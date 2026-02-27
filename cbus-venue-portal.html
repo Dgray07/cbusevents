@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>CBusEvents — Venue Portal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: #0b0b0f; color: #e8e8f0; font-family: 'DM Sans', sans-serif; }
+input, textarea, select {
+  background: #0b0b0f; color: #e8e8f0; border: 1px solid #25252f;
+  border-radius: 8px; padding: 10px 14px; font-family: 'DM Sans', sans-serif;
+  font-size: 14px; width: 100%; outline: none;
+}
+input:focus, textarea:focus, select:focus { border-color: #FF6B35; }
+label { display: block; font-size: 13px; color: #8888a0; margin-bottom: 6px; font-weight: 500; }
+textarea { resize: vertical; min-height: 90px; }
+@keyframes spin { to { transform: rotate(360deg); } }
+</style>
+</head>
+<body>
+<div id="root">
+  <div style="min-height:100vh;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:16px;">
+    <div style="font-family:serif;font-size:28px;font-weight:800;">CBUS<span style="color:#FF6B35">EVENTS</span></div>
+    <div style="width:32px;height:32px;border:3px solid #25252f;border-top-color:#FF6B35;border-radius:50%;animation:spin 0.8s linear infinite;"></div>
+    <div id="status" style="color:#8888a0;font-size:13px;">Loading scripts...</div>
+  </div>
+</div>
+
+<script>
+function status(msg) { var el = document.getElementById('status'); if(el) el.textContent = msg; }
+function fatal(msg) {
+  document.getElementById('root').innerHTML =
+    '<div style="min-height:100vh;display:flex;align-items:center;justify-content:center;padding:40px;">' +
+    '<div style="max-width:500px;text-align:center;">' +
+    '<div style="font-size:48px;margin-bottom:16px;">⚠️</div>' +
+    '<h2 style="font-size:20px;margin-bottom:12px;color:#ef4444;">Failed to Load</h2>' +
+    '<p style="color:#8888a0;line-height:1.7;font-size:14px;">' + msg + '</p></div></div>';
+}
+</script>
+
+<script src="https://unpkg.com/react@18/umd/react.production.min.js"
+  onload="status('React ✓ — loading ReactDOM...')"
+  onerror="fatal('Could not load React from unpkg.com.<br><br>Please make sure you are connected to the internet and try again in Chrome or Firefox.')"></script>
+
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"
+  onload="status('ReactDOM ✓ — loading Supabase...')"
+  onerror="fatal('Could not load ReactDOM.')"></script>
+
+<script src="https://unpkg.com/@supabase/supabase-js@2/dist/umd/supabase.js"
+  onload="status('Supabase ✓ — loading app...')"
+  onerror="fatal('Could not load Supabase.')"></script>
+
+
+
+<script src="https://unpkg.com/@babel/standalone@7/babel.min.js"
+  onload="status('All scripts loaded! Starting app...')"
+  onerror="fatal('Could not load Babel.')"></script>
+
+<script type="text/babel" data-presets="react">
+const { useState, useEffect, createContext, useContext } = React;
+
+const SB_URL  = "https://toblgvatvsjljbqogzsv.supabase.co";
+const SB_KEY  = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRvYmxndmF0dnNqbGpicW9nenN2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMDgwNTAsImV4cCI6MjA4NzY4NDA1MH0._WJEQPizNDiQfDXQB_DHPaQhixPGpMdmYQSmyWmm_FQ";
+const sb = supabase.createClient(SB_URL, SB_KEY);
+
+const AuthCtx = createContext(null);
+const useAuth = () => useContext(AuthCtx);
+
+function AuthProvider({ children }) {
+  const [user, setUser] = useState(null);
+  const [profile, setProfile] = useState(null);
+  const [loading, setLoading] = useState(true);
+  useEffect(() => {
+    sb.auth.getSession().then(({ data: { session } }) => {
+      setUser(session?.user ?? null);
+      if (session?.user) fetchProfile(session.user.id);
+      else setLoading(false);
+    });
+    const { data: { subscription } } = sb.auth.onAuthStateChange((_e, session) => {
+      setUser(session?.user ?? null);
+      if (session?.user) fetchProfile(session.user.id);
+      else { setProfile(null); setLoading(false); }
+    });
+    return () => subscription.unsubscribe();
+  }, []);
+  async function fetchProfile(id) {
+    const { data } = await sb.from("profiles").select("*").eq("id", id).single();
+    setProfile(data); setLoading(false);
+  }
+  return <AuthCtx.Provider value={{ user, profile, loading }}>{children}</AuthCtx.Provider>;
+}
+
+// Primitives
+const Btn = ({ children, onClick, variant="primary", size="md", disabled, style={} }) => {
+  const sz = { sm:{padding:"7px 14px",fontSize:12}, md:{padding:"10px 20px",fontSize:14}, lg:{padding:"13px 28px",fontSize:15} };
+  const vr = {
+    primary:   {background:"#FF6B35",color:"#fff"},
+    secondary: {background:"#1a1a24",color:"#e8e8f0",border:"1px solid #25252f"},
+    ghost:     {background:"transparent",color:"#8888a0",border:"1px solid #25252f"},
+    danger:    {background:"#2a0a0a",color:"#ef4444",border:"1px solid #4a1010"},
+  };
+  return <button onClick={disabled?undefined:onClick} style={{border:"none",borderRadius:8,fontFamily:"'DM Sans',sans-serif",fontWeight:600,cursor:disabled?"not-allowed":"pointer",opacity:disabled?0.5:1,...sz[size],...vr[variant],...style}}>{children}</button>;
+};
+const Card = ({children,style={}}) => <div style={{background:"#1a1a24",border:"1px solid #25252f",borderRadius:12,padding:24,...style}}>{children}</div>;
+const Badge = ({children,color="#55556a"}) => <span style={{background:color+"22",color,border:`1px solid ${color}44`,borderRadius:20,padding:"3px 10px",fontSize:11,fontWeight:600}}>{children}</span>;
+const Field = ({label,children}) => <div style={{marginBottom:18}}><label>{label}</label>{children}</div>;
+const Grid2 = ({children,gap=16}) => <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap}}>{children}</div>;
+const Spin = () => <div style={{display:"flex",justifyContent:"center",padding:60}}><div style={{width:32,height:32,border:"3px solid #25252f",borderTopColor:"#FF6B35",borderRadius:"50%",animation:"spin 0.8s linear infinite"}}/></div>;
+
+// Auth Page
+function AuthPage() {
+  const [mode, setMode] = useState("signin");
+  const [email, setEmail] = useState(""); const [pw, setPw] = useState(""); const [name, setName] = useState("");
+  const [busy, setBusy] = useState(false); const [msg, setMsg] = useState(""); const [err, setErr] = useState("");
+  const go = async () => {
+    setBusy(true); setErr(""); setMsg("");
+    try {
+      if (mode==="signin") { const {error}=await sb.auth.signInWithPassword({email,password:pw}); if(error) setErr(error.message); }
+      else if (mode==="signup") { const {error}=await sb.auth.signUp({email,password:pw,options:{data:{full_name:name}}}); if(error) setErr(error.message); else setMsg("Check your email to confirm, then sign in!"); }
+      else { const {error}=await sb.auth.resetPasswordForEmail(email); if(error) setErr(error.message); else setMsg("Reset email sent!"); }
+    } catch(e) { setErr("Network error. Check your connection."); }
+    setBusy(false);
+  };
+  return (
+    <div style={{minHeight:"100vh",background:"#0b0b0f",display:"flex",alignItems:"center",justifyContent:"center",padding:24}}>
+      <div style={{width:"100%",maxWidth:400}}>
+        <div style={{textAlign:"center",marginBottom:36}}>
+          <div style={{fontFamily:"Syne,sans-serif",fontWeight:800,fontSize:32,marginBottom:8}}>CBUS<span style={{color:"#FF6B35"}}>EVENTS</span></div>
+          <div style={{color:"#8888a0",fontSize:14}}>Venue Owner Portal</div>
+        </div>
+        <Card>
+          <h2 style={{fontFamily:"Syne,sans-serif",fontSize:20,fontWeight:700,marginBottom:24}}>
+            {mode==="signin"?"Sign in":mode==="signup"?"Create account":"Reset password"}
+          </h2>
+          {msg && <div style={{background:"#0a2a14",color:"#22c55e",border:"1px solid #1a4a24",borderRadius:8,padding:"12px",marginBottom:16,fontSize:14}}>✓ {msg}</div>}
+          {err && <div style={{background:"#2a0a0a",color:"#ef4444",border:"1px solid #4a1010",borderRadius:8,padding:"12px",marginBottom:16,fontSize:14}}>⚠ {err}</div>}
+          {mode==="signup" && <Field label="Full Name"><input value={name} onChange={e=>setName(e.target.value)} placeholder="Your name"/></Field>}
+          <Field label="Email"><input type="email" value={email} onChange={e=>setEmail(e.target.value)} placeholder="you@yourvenue.com" onKeyDown={e=>e.key==="Enter"&&go()}/></Field>
+          {mode!=="reset" && <Field label="Password"><input type="password" value={pw} onChange={e=>setPw(e.target.value)} placeholder="••••••••" onKeyDown={e=>e.key==="Enter"&&go()}/></Field>}
+          <Btn onClick={go} disabled={busy} size="lg" style={{width:"100%",marginTop:8}}>
+            {busy?"Please wait...":mode==="signin"?"Sign In":mode==="signup"?"Create Account":"Send Reset Email"}
+          </Btn>
+          <div style={{marginTop:20,display:"flex",flexDirection:"column",gap:10,alignItems:"center"}}>
+            {mode==="signin" && <>
+              <button onClick={()=>setMode("signup")} style={{background:"none",border:"none",color:"#FF6B35",cursor:"pointer",fontSize:14,fontFamily:"'DM Sans',sans-serif"}}>No account? Sign up free</button>
+              <button onClick={()=>setMode("reset")} style={{background:"none",border:"none",color:"#8888a0",cursor:"pointer",fontSize:13,fontFamily:"'DM Sans',sans-serif"}}>Forgot password?</button>
+            </>}
+            {mode!=="signin" && <button onClick={()=>setMode("signin")} style={{background:"none",border:"none",color:"#FF6B35",cursor:"pointer",fontSize:14,fontFamily:"'DM Sans',sans-serif"}}>← Back to sign in</button>}
+          </div>
+        </Card>
+      </div>
+    </div>
+  );
+}
+
+// Sidebar
+const NAV = [{key:"dashboard",icon:"⊞",label:"Dashboard"},{key:"venue",icon:"🏛",label:"My Venue"},{key:"events",icon:"📅",label:"Events"},{key:"inquiries",icon:"💬",label:"Inquiries"},{key:"plan",icon:"⭐",label:"Plan & Billing"}];
+
+function Sidebar({active,setActive,profile}) {
+  return (
+    <div style={{width:210,background:"#13131a",borderRight:"1px solid #25252f",display:"flex",flexDirection:"column",height:"100vh",position:"sticky",top:0,flexShrink:0}}>
+      <div style={{padding:"22px 18px",borderBottom:"1px solid #25252f"}}>
+        <div style={{fontFamily:"Syne,sans-serif",fontWeight:800,fontSize:18}}>CBUS<span style={{color:"#FF6B35"}}>EVENTS</span></div>
+        <div style={{color:"#8888a0",fontSize:11,marginTop:4}}>Venue Portal</div>
+      </div>
+      <nav style={{flex:1,padding:"10px 8px"}}>
+        {NAV.map(n=>(
+          <button key={n.key} onClick={()=>setActive(n.key)} style={{display:"flex",alignItems:"center",gap:10,width:"100%",background:active===n.key?"#1a1a24":"transparent",color:active===n.key?"#e8e8f0":"#8888a0",border:`1px solid ${active===n.key?"#25252f":"transparent"}`,borderRadius:8,padding:"10px 12px",cursor:"pointer",fontSize:13,fontFamily:"'DM Sans',sans-serif",fontWeight:active===n.key?600:400,marginBottom:2,textAlign:"left"}}>
+            <span>{n.icon}</span>{n.label}
+          </button>
+        ))}
+      </nav>
+      <div style={{padding:14,borderTop:"1px solid #25252f"}}>
+        <div style={{fontSize:12,color:"#8888a0",marginBottom:10,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{profile?.full_name||profile?.email||"Account"}</div>
+        <Btn variant="ghost" size="sm" onClick={()=>sb.auth.signOut()} style={{width:"100%"}}>Sign Out</Btn>
+      </div>
+    </div>
+  );
+}
+
+// Dashboard
+function Dashboard({venue,events}) {
+  const now=new Date(),week=new Date(now.getTime()+7*24*60*60*1000);
+  const thisWeek=events.filter(e=>{const d=new Date(e.start_time);return d>=now&&d<=week;});
+  return (
+    <div>
+      <h1 style={{fontFamily:"Syne,sans-serif",fontSize:24,fontWeight:800,marginBottom:6}}>Welcome back{venue?.name?`, ${venue.name}`:""}!</h1>
+      <p style={{color:"#8888a0",marginBottom:28,fontSize:14}}>Here's your venue overview.</p>
+      <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(160px,1fr))",gap:14,marginBottom:28}}>
+        {[
+          {label:"Published",value:events.filter(e=>e.status==="published").length,icon:"📅",color:"#FF6B35"},
+          {label:"This Week",value:thisWeek.length,icon:"🟢",color:"#22c55e"},
+          {label:"Status",value:venue?.status||"—",icon:"🏛",color:venue?.status==="approved"?"#22c55e":"#f59e0b"},
+          {label:"Plan",value:venue?.tier?venue.tier[0].toUpperCase()+venue.tier.slice(1):"Free",icon:"⭐",color:"#f59e0b"},
+        ].map(s=>(
+          <Card key={s.label} style={{padding:18}}>
+            <div style={{fontSize:22,marginBottom:8}}>{s.icon}</div>
+            <div style={{fontFamily:"Syne,sans-serif",fontSize:20,fontWeight:800,color:s.color,marginBottom:3}}>{s.value}</div>
+            <div style={{color:"#8888a0",fontSize:12}}>{s.label}</div>
+          </Card>
+        ))}
+      </div>
+      {!venue && (
+        <Card style={{borderColor:"#FF6B35",borderStyle:"dashed",textAlign:"center",padding:"36px 24px"}}>
+          <div style={{fontSize:36,marginBottom:12}}>🏛</div>
+          <h3 style={{fontFamily:"Syne,sans-serif",fontSize:18,fontWeight:700,marginBottom:8}}>Set up your venue listing</h3>
+          <p style={{color:"#8888a0",fontSize:14}}>Click "My Venue" in the sidebar to get started.</p>
+        </Card>
+      )}
+      {thisWeek.length>0 && (
+        <Card style={{marginTop:20}}>
+          <h3 style={{fontFamily:"Syne,sans-serif",fontSize:15,fontWeight:700,marginBottom:16}}>Events This Week</h3>
+          {thisWeek.map(e=>(
+            <div key={e.id} style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"9px 0",borderBottom:"1px solid #25252f"}}>
+              <div>
+                <div style={{fontSize:14,fontWeight:500}}>{e.title}</div>
+                <div style={{fontSize:12,color:"#8888a0",marginTop:2}}>{new Date(e.start_time).toLocaleDateString("en-US",{weekday:"short",month:"short",day:"numeric"})}</div>
+              </div>
+              <Badge color={e.status==="published"?"#22c55e":"#55556a"}>{e.status}</Badge>
+            </div>
+          ))}
+        </Card>
+      )}
+    </div>
+  );
+}
+
+// Venue Form
+function VenueForm({venue,onSave}) {
+  const {user}=useAuth();
+  const [f,setF]=useState({name:venue?.name||"",description:venue?.description||"",address:venue?.address||"",neighborhood:venue?.neighborhood||"",website:venue?.website||"",phone:venue?.phone||"",email:venue?.email||"",venue_type:venue?.venue_type||"",capacity:venue?.capacity||"",indoor_outdoor:venue?.indoor_outdoor||"indoor",tags:venue?.tags?.join(", ")||"",amenities:venue?.amenities?.join(", ")||"",cover_image_url:venue?.cover_image_url||""});
+  const [busy,setBusy]=useState(false);
+  const [toast,setToast]=useState({msg:"",type:"success"});
+  const set=k=>e=>setF(p=>({...p,[k]:e.target.value}));
+  const save=async()=>{
+    if(!f.name.trim()){setToast({msg:"Venue name is required.",type:"error"});setTimeout(()=>setToast({msg:""}),3000);return;}
+    setBusy(true);
+    const payload={...f,capacity:f.capacity?parseInt(f.capacity):null,tags:f.tags.split(",").map(t=>t.trim()).filter(Boolean),amenities:f.amenities.split(",").map(t=>t.trim()).filter(Boolean),owner_id:user.id};
+    const {error}=venue?.id?await sb.from("venues").update(payload).eq("id",venue.id):await sb.from("venues").insert(payload);
+    setBusy(false);
+    if(error){setToast({msg:"Error: "+error.message,type:"error"});}
+    else{setToast({msg:"Venue saved! We'll review it within 24 hours.",type:"success"});onSave?.();}
+    setTimeout(()=>setToast({msg:""}),5000);
+  };
+  return (
+    <div>
+      <h2 style={{fontFamily:"Syne,sans-serif",fontSize:22,fontWeight:800,marginBottom:20}}>My Venue</h2>
+      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:20}}>
+        <Card style={{gridColumn:"1/-1"}}>
+          <div style={{fontFamily:"Syne,sans-serif",fontWeight:700,fontSize:11,marginBottom:18,color:"#8888a0",textTransform:"uppercase",letterSpacing:1.5}}>Basic Info</div>
+          <Grid2><Field label="Venue Name *"><input value={f.name} onChange={set("name")} placeholder="The Bluestone"/></Field><Field label="Venue Type"><input value={f.venue_type} onChange={set("venue_type")} placeholder="Historic Ballroom"/></Field></Grid2>
+          <Field label="Description"><textarea value={f.description} onChange={set("description")} placeholder="What makes your space special?"/></Field>
+          <Grid2><Field label="Capacity"><input type="number" value={f.capacity} onChange={set("capacity")} placeholder="200"/></Field><Field label="Indoor/Outdoor"><select value={f.indoor_outdoor} onChange={set("indoor_outdoor")}><option value="indoor">Indoor</option><option value="outdoor">Outdoor</option><option value="both">Both</option></select></Field></Grid2>
+        </Card>
+        <Card>
+          <div style={{fontFamily:"Syne,sans-serif",fontWeight:700,fontSize:11,marginBottom:18,color:"#8888a0",textTransform:"uppercase",letterSpacing:1.5}}>Location & Contact</div>
+          <Field label="Address"><input value={f.address} onChange={set("address")} placeholder="583 E Broad St"/></Field>
+          <Field label="Neighborhood"><input value={f.neighborhood} onChange={set("neighborhood")} placeholder="Downtown"/></Field>
+          <Field label="Website"><input value={f.website} onChange={set("website")} placeholder="https://yourvenue.com"/></Field>
+          <Field label="Phone"><input value={f.phone} onChange={set("phone")} placeholder="(614) 555-0000"/></Field>
+          <Field label="Booking Email"><input type="email" value={f.email} onChange={set("email")} placeholder="bookings@venue.com"/></Field>
+        </Card>
+        <Card>
+          <div style={{fontFamily:"Syne,sans-serif",fontWeight:700,fontSize:11,marginBottom:18,color:"#8888a0",textTransform:"uppercase",letterSpacing:1.5}}>Tags & Media</div>
+          <Field label="Tags (comma-separated)"><input value={f.tags} onChange={set("tags")} placeholder="Weddings, Concerts, Corporate"/></Field>
+          <Field label="Amenities (comma-separated)"><input value={f.amenities} onChange={set("amenities")} placeholder="PA System, Bar, Catering"/></Field>
+          <Field label="Cover Photo URL"><input value={f.cover_image_url} onChange={set("cover_image_url")} placeholder="https://..."/></Field>
+          {f.cover_image_url&&<img src={f.cover_image_url} alt="" style={{width:"100%",height:120,objectFit:"cover",borderRadius:8,marginTop:10,border:"1px solid #25252f"}} onError={e=>e.target.style.display="none"}/>}
+        </Card>
+      </div>
+      <div style={{marginTop:22,display:"flex",gap:12,alignItems:"center"}}>
+        <Btn onClick={save} disabled={busy} size="lg">{busy?"Saving...":venue?"Save Changes":"Submit Venue"}</Btn>
+        {venue?.status==="pending"&&<Badge color="#f59e0b">Pending Review</Badge>}
+        {venue?.status==="approved"&&<Badge color="#22c55e">Live ✓</Badge>}
+      </div>
+      {toast.msg&&<div style={{position:"fixed",bottom:24,right:24,background:toast.type==="success"?"#0a2a14":"#2a0a0a",color:toast.type==="success"?"#22c55e":"#ef4444",border:`1px solid ${toast.type==="success"?"#1a4a24":"#4a1010"}`,borderRadius:10,padding:"12px 20px",fontSize:14,fontWeight:500,zIndex:999,boxShadow:"0 8px 32px rgba(0,0,0,0.5)"}}>
+        {toast.type==="success"?"✓ ":"⚠ "}{toast.msg}
+      </div>}
+    </div>
+  );
+}
+
+// Events
+const ECATS=["Concert","Sports","Comedy","Theater","Networking","Wedding","Corporate","Food & Drink","Arts","Other"];
+
+function EventModal({event,venueId,venueTier,currentEventCount,onClose,onSave}) {
+  const {user}=useAuth();
+  const blank={title:"",description:"",category:"Other",start_time:"",end_time:"",is_free:false,price_min:"",price_max:"",ticket_url:"",cover_image_url:"",status:"draft"};
+  const [f,setF]=useState(event?{...event,start_time:event.start_time?new Date(event.start_time).toISOString().slice(0,16):"",end_time:event.end_time?new Date(event.end_time).toISOString().slice(0,16):""}:blank);
+  const [busy,setBusy]=useState(false);
+  const [err,setErr]=useState("");
+  const set=k=>e=>setF(p=>({...p,[k]:e.target.type==="checkbox"?e.target.checked:e.target.value}));
+  const save=async()=>{
+    if(!f.title.trim()){setErr("Title required.");return;}
+    if(!f.start_time){setErr("Start time required.");return;}
+    // Enforce event limits for new events (not edits)
+    if(!event?.id){
+      const tier=venueTier||"free";
+      const limit=tier==="premium"?null:tier==="standard"?20:4;
+      if(limit!==null&&currentEventCount>=limit){
+        setErr(`Your ${tier} plan is limited to ${limit} events. Upgrade to add more.`);
+        setBusy(false);return;
+      }
+    }
+    setBusy(true);setErr("");
+    const payload={...f,venue_id:venueId,owner_id:user.id,price_min:f.price_min||null,price_max:f.price_max||null};
+    const {error}=event?.id?await sb.from("events").update(payload).eq("id",event.id):await sb.from("events").insert(payload);
+    setBusy(false);
+    if(error)setErr(error.message);else{onSave();onClose();}
+  };
+  return (
+    <div style={{position:"fixed",inset:0,background:"rgba(0,0,0,0.8)",zIndex:100,display:"flex",alignItems:"center",justifyContent:"center",padding:20}} onClick={onClose}>
+      <div style={{background:"#1a1a24",border:"1px solid #25252f",borderRadius:16,padding:28,width:"100%",maxWidth:560,maxHeight:"90vh",overflowY:"auto"}} onClick={e=>e.stopPropagation()}>
+        <h3 style={{fontFamily:"Syne,sans-serif",fontWeight:800,fontSize:18,marginBottom:20}}>{event?"Edit Event":"New Event"}</h3>
+        {err&&<div style={{background:"#2a0a0a",color:"#ef4444",border:"1px solid #4a1010",borderRadius:8,padding:"10px",marginBottom:14,fontSize:14}}>⚠ {err}</div>}
+        <Field label="Title *"><input value={f.title} onChange={set("title")} placeholder="Comedy Night Live"/></Field>
+        <Field label="Description"><textarea value={f.description} onChange={set("description")} placeholder="What should attendees expect?"/></Field>
+        <Grid2>
+          <Field label="Category"><select value={f.category} onChange={set("category")}>{ECATS.map(c=><option key={c}>{c}</option>)}</select></Field>
+          <Field label="Status"><select value={f.status} onChange={set("status")}><option value="draft">Draft</option><option value="published">Published</option><option value="cancelled">Cancelled</option></select></Field>
+        </Grid2>
+        <Grid2>
+          <Field label="Start *"><input type="datetime-local" value={f.start_time} onChange={set("start_time")}/></Field>
+          <Field label="End"><input type="datetime-local" value={f.end_time} onChange={set("end_time")}/></Field>
+        </Grid2>
+        <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:18}}>
+          <input type="checkbox" id="fc" checked={f.is_free} onChange={set("is_free")} style={{width:"auto",cursor:"pointer"}}/>
+          <label htmlFor="fc" style={{marginBottom:0,cursor:"pointer"}}>Free event</label>
+        </div>
+        {!f.is_free&&<Grid2><Field label="Min Price ($)"><input type="number" value={f.price_min} onChange={set("price_min")} placeholder="10"/></Field><Field label="Max Price ($)"><input type="number" value={f.price_max} onChange={set("price_max")} placeholder="75"/></Field></Grid2>}
+        <Field label="Ticket URL"><input value={f.ticket_url} onChange={set("ticket_url")} placeholder="https://..."/></Field>
+        <Field label="Cover Image URL"><input value={f.cover_image_url} onChange={set("cover_image_url")} placeholder="https://..."/></Field>
+        {f.cover_image_url&&<img src={f.cover_image_url} alt="" style={{width:"100%",height:100,objectFit:"cover",borderRadius:8,marginBottom:14,border:"1px solid #25252f"}} onError={e=>e.target.style.display="none"}/>}
+        <div style={{display:"flex",gap:10,marginTop:8}}>
+          <Btn onClick={save} disabled={busy}>{busy?"Saving...":event?"Save Changes":"Create Event"}</Btn>
+          <Btn variant="ghost" onClick={onClose}>Cancel</Btn>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function EventsManager({venue,events,onRefresh}) {
+  const [modal,setModal]=useState(null);
+  const del=async id=>{if(!confirm("Delete this event?"))return;await sb.from("events").delete().eq("id",id);onRefresh();};
+  return (
+    <div>
+      {(()=>{
+        const tier=venue?.tier||"free";
+        const limit=tier==="premium"?null:tier==="standard"?20:4;
+        const atLimit=limit!==null&&events.length>=limit;
+        return(
+          <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:16,flexWrap:"wrap",gap:12}}>
+            <div>
+              <h2 style={{fontFamily:"Syne,sans-serif",fontSize:22,fontWeight:800}}>Events</h2>
+              <p style={{color:"#8888a0",fontSize:14,marginTop:4}}>
+                {events.length}{limit!==null?` / ${limit}`:""} events
+                {tier==="premium"&&<span style={{color:"#f59e0b",marginLeft:6,fontSize:12}}>★ Unlimited</span>}
+              </p>
+            </div>
+            <div style={{display:"flex",gap:8,alignItems:"center"}}>
+              {atLimit&&<span style={{fontSize:12,color:"#FF6B35",background:"#FF6B3515",border:"1px solid #FF6B3530",borderRadius:6,padding:"4px 10px"}}>Limit reached</span>}
+              <Btn onClick={()=>setModal("new")} disabled={!venue||atLimit}>+ New Event</Btn>
+            </div>
+          </div>
+        );
+      })()}
+      {(()=>{
+        const tier=venue?.tier||"free";
+        const limit=tier==="premium"?null:tier==="standard"?20:4;
+        const atLimit=limit!==null&&events.length>=limit;
+        if(!atLimit)return null;
+        return(
+          <div style={{background:"linear-gradient(135deg,#1a0800,#200d00)",border:"1px solid #FF6B3540",borderRadius:12,padding:18,marginBottom:20,display:"flex",justifyContent:"space-between",alignItems:"center",gap:12,flexWrap:"wrap"}}>
+            <div>
+              <div style={{fontWeight:700,marginBottom:4}}>🚀 You've hit your {tier==="free"?"Free (4 events)":"Standard (20 events)"} limit</div>
+              <div style={{color:"#8888a0",fontSize:13}}>{tier==="free"?"Upgrade to Standard for 20 events, or Premium for unlimited.":"Upgrade to Premium for unlimited events + hero placement + flyer design."}</div>
+            </div>
+            <Btn onClick={()=>window.location.href=tier==="free"?PAYMENT_LINK_STANDARD:PAYMENT_LINK_PREMIUM} variant="primary" size="sm">Upgrade Now →</Btn>
+          </div>
+        );
+      })()}
+      {!venue&&<Card style={{textAlign:"center",padding:40}}><p style={{color:"#8888a0"}}>Set up your venue first.</p></Card>}
+      {venue&&events.length===0&&<Card style={{textAlign:"center",padding:48,borderStyle:"dashed"}}><div style={{fontSize:40,marginBottom:12}}>📅</div><h3 style={{fontFamily:"Syne,sans-serif",fontWeight:700,marginBottom:8}}>No events yet</h3><p style={{color:"#8888a0",fontSize:14,marginBottom:16}}>Add events to get discovered by Columbus event-goers.</p><Btn onClick={()=>setModal("new")}>+ Add First Event</Btn></Card>}
+      <div style={{display:"flex",flexDirection:"column",gap:10}}>
+        {events.map(e=>(
+          <Card key={e.id} style={{display:"flex",alignItems:"center",gap:14,padding:14}}>
+            {e.cover_image_url?<img src={e.cover_image_url} alt="" style={{width:56,height:56,borderRadius:8,objectFit:"cover",flexShrink:0}} onError={ev=>ev.target.style.display="none"}/>:<div style={{width:56,height:56,borderRadius:8,background:"#13131a",display:"flex",alignItems:"center",justifyContent:"center",fontSize:22,flexShrink:0}}>📅</div>}
+            <div style={{flex:1,minWidth:0}}>
+              <div style={{fontWeight:600,fontSize:14,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{e.title}</div>
+              <div style={{color:"#8888a0",fontSize:12,marginTop:2}}>{e.start_time?new Date(e.start_time).toLocaleDateString("en-US",{weekday:"short",month:"short",day:"numeric",year:"numeric"}):"No date"} · {e.category}</div>
+            </div>
+            <div style={{display:"flex",gap:8,alignItems:"center",flexShrink:0}}>
+              <Badge color={e.status==="published"?"#22c55e":e.status==="cancelled"?"#ef4444":"#55556a"}>{e.status}</Badge>
+              <Btn size="sm" variant="secondary" onClick={()=>setModal(e)}>Edit</Btn>
+              <Btn size="sm" variant="danger" onClick={()=>del(e.id)}>Del</Btn>
+            </div>
+          </Card>
+        ))}
+      </div>
+      {modal&&<EventModal event={modal==="new"?null:modal} venueId={venue?.id} venueTier={venue?.tier||"free"} currentEventCount={events.length} onClose={()=>setModal(null)} onSave={onRefresh}/>}
+    </div>
+  );
+}
+
+// Inquiries
+function Inquiries({venue}) {
+  const [items,setItems]=useState([]);
+  const [busy,setBusy]=useState(true);
+  useEffect(()=>{if(!venue?.id){setBusy(false);return;}sb.from("inquiries").select("*").eq("venue_id",venue.id).order("created_at",{ascending:false}).then(({data})=>{setItems(data||[]);setBusy(false);});},[venue?.id]);
+  const markRead=async id=>{await sb.from("inquiries").update({status:"read"}).eq("id",id);setItems(items.map(i=>i.id===id?{...i,status:"read"}:i));};
+  if(busy)return<Spin/>;
+  return (
+    <div>
+      <h2 style={{fontFamily:"Syne,sans-serif",fontSize:22,fontWeight:800,marginBottom:6}}>Inquiries</h2>
+      <p style={{color:"#8888a0",fontSize:14,marginBottom:24}}>{items.filter(i=>i.status==="new").length} unread</p>
+      {items.length===0&&<Card style={{textAlign:"center",padding:48}}><div style={{fontSize:40,marginBottom:12}}>💬</div><h3 style={{fontFamily:"Syne,sans-serif",fontWeight:700,marginBottom:8}}>No inquiries yet</h3><p style={{color:"#8888a0",fontSize:14}}>Booking requests will show up here.</p></Card>}
+      <div style={{display:"flex",flexDirection:"column",gap:12}}>
+        {items.map(i=>(
+          <Card key={i.id} style={{borderColor:i.status==="new"?"#FF6B35":"#25252f",padding:18}}>
+            <div style={{display:"flex",justifyContent:"space-between",marginBottom:8}}>
+              <div><strong>{i.name}</strong><span style={{color:"#8888a0",fontSize:13,marginLeft:10}}>{i.email}</span></div>
+              <div style={{display:"flex",gap:8,alignItems:"center"}}><Badge color={i.status==="new"?"#FF6B35":"#55556a"}>{i.status}</Badge>{i.status==="new"&&<Btn size="sm" variant="secondary" onClick={()=>markRead(i.id)}>Mark Read</Btn>}</div>
+            </div>
+            {i.event_date&&<div style={{fontSize:13,color:"#8888a0",marginBottom:8}}>📅 {i.event_date} · 👥 {i.guest_count} guests</div>}
+            <p style={{fontSize:14,lineHeight:1.7}}>{i.message}</p>
+          </Card>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// Stripe config
+const PAYMENT_LINK_STANDARD="https://buy.stripe.com/5kQeVfadt0SJgcG8QRew800";
+const PAYMENT_LINK_PREMIUM="https://buy.stripe.com/5kQ00lgBRcBr9Oi1opew801";
+
+
+
+// Marketing Services (Premium)
+function MarketingServices({venue}) {
+  const [type,setType]=React.useState(null);
+  const [details,setDetails]=React.useState("");
+  const [busy,setBusy]=React.useState(false);
+  const [sent,setSent]=React.useState(false);
+  const [err,setErr]=React.useState("");
+  const tier=venue?.tier||"free";
+  const isPremium=tier==="premium";
+
+  const submit=async()=>{
+    if(!details.trim()){setErr("Please describe what you need.");return;}
+    setBusy(true);setErr("");
+    const{data:{user}}=await sb.auth.getUser();
+    const{error}=await sb.from("design_requests").insert({
+      venue_id:venue.id,
+      venue_name:venue.name,
+      email:user?.email||"",
+      type,
+      details,
+      status:"new"
+    });
+    setBusy(false);
+    if(error){setErr(error.message);return;}
+    setSent(true);setType(null);setDetails("");
+    setTimeout(()=>setSent(false),5000);
+  };
+
+  return(
+    <div style={{background:"linear-gradient(135deg,#130800,#1a0f00)",border:`2px solid ${isPremium?"#FF6B3550":"#25252f"}`,borderRadius:14,padding:24,marginTop:24}}>
+      <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:16}}>
+        <div>
+          <div style={{fontFamily:"Syne,sans-serif",fontWeight:800,fontSize:16,marginBottom:4}}>🎨 Marketing Services</div>
+          <div style={{color:"#8888a0",fontSize:13}}>Custom designs for your venue & events</div>
+        </div>
+        {isPremium&&<span style={{background:"#FF6B3520",color:"#FF6B35",border:"1px solid #FF6B3540",borderRadius:20,padding:"3px 10px",fontSize:11,fontWeight:700}}>★ Premium</span>}
+      </div>
+
+      {!isPremium?(
+        <div style={{textAlign:"center",padding:"24px 0"}}>
+          <div style={{fontSize:32,marginBottom:10}}>🔒</div>
+          <div style={{fontWeight:600,marginBottom:8}}>Premium exclusive</div>
+          <div style={{color:"#8888a0",fontSize:13,marginBottom:16,lineHeight:1.6}}>Upgrade to Premium to request custom flyer design and branded merch — printed and shipped by CBusEvents.</div>
+          <Btn onClick={()=>window.location.href=PAYMENT_LINK_PREMIUM}>Upgrade to Premium →</Btn>
+        </div>
+      ):(
+        <div>
+          {sent&&<div style={{background:"#0a2a14",color:"#22c55e",border:"1px solid #1a4a24",borderRadius:8,padding:"10px 14px",fontSize:14,marginBottom:14}}>✓ Request sent! We'll reach out within 24 hours.</div>}
+          {err&&<div style={{background:"#2a0a0a",color:"#ef4444",border:"1px solid #4a1010",borderRadius:8,padding:"10px 14px",fontSize:14,marginBottom:14}}>⚠ {err}</div>}
+          <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12,marginBottom:16}}>
+            <div
+              onClick={()=>setType(type==="flyer"?null:"flyer")}
+              style={{background:type==="flyer"?"#FF6B3515":"#13131a",border:`1.5px solid ${type==="flyer"?"#FF6B35":"#25252f"}`,borderRadius:12,padding:18,cursor:"pointer",transition:"all 0.15s"}}>
+              <div style={{fontSize:28,marginBottom:8}}>🎨</div>
+              <div style={{fontWeight:700,marginBottom:4}}>Flyer Design</div>
+              <div style={{color:"#8888a0",fontSize:12,lineHeight:1.5}}>Custom event flyers for social media & print</div>
+              <div style={{color:"#22c55e",fontSize:11,fontWeight:600,marginTop:8}}>Included with Premium</div>
+            </div>
+            <div
+              onClick={()=>setType(type==="merch"?null:"merch")}
+              style={{background:type==="merch"?"#FF6B3515":"#13131a",border:`1.5px solid ${type==="merch"?"#FF6B35":"#25252f"}`,borderRadius:12,padding:18,cursor:"pointer",transition:"all 0.15s"}}>
+              <div style={{fontSize:28,marginBottom:8}}>👕</div>
+              <div style={{fontWeight:700,marginBottom:4}}>Merch Design</div>
+              <div style={{color:"#8888a0",fontSize:12,lineHeight:1.5}}>Custom branded shirts, hats & more on demand</div>
+              <div style={{color:"#f59e0b",fontSize:11,fontWeight:600,marginTop:8}}>Heat press printed</div>
+            </div>
+          </div>
+          {type&&(
+            <div>
+              <label style={{display:"block",fontSize:13,color:"#8888a0",marginBottom:6}}>Tell us what you need for your {type==="flyer"?"flyer":"merch"} *</label>
+              <textarea
+                value={details}
+                onChange={e=>setDetails(e.target.value)}
+                placeholder={type==="flyer"?"e.g. Comedy Night flyer, Feb 28, 9pm, dark theme with our logo...":"e.g. 20 black tees with our venue logo on front, size M-XL..."}
+                style={{width:"100%",background:"#0b0b0f",border:"1px solid #25252f",borderRadius:8,padding:"10px 14px",color:"#e8e8f0",fontFamily:"DM Sans,sans-serif",fontSize:14,minHeight:80,resize:"vertical",outline:"none",marginBottom:12}}
+              />
+              <Btn onClick={submit} disabled={busy}>{busy?"Sending...":"Send Request →"}</Btn>
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// Plan & Billing
+function PlanBilling({venue}) {
+  const cur=venue?.tier||"free";
+  const [loading,setLoading]=React.useState(null);
+  const [err,setErr]=React.useState(null);
+
+  const plans=[
+    {id:"free",    name:"Free",    price:0,  priceId:null, perks:["1 venue listing","Up to 3 events","Basic search placement","Public venue page"]},
+    {id:"standard",name:"Standard",price:29, priceId:"standard", perks:["Up to 20 events/month","Priority search placement","Inquiry form enabled","Email support","Analytics dashboard"]},
+    {id:"premium", name:"Premium", price:79, priceId:"premium",  perks:["Unlimited events","Hero slider feature","Top of every page","Full analytics","Dedicated support","Verified badge"]},
+  ];
+
+  const checkout=(plan)=>{
+    if(!plan.priceId)return;
+    const links={standard:PAYMENT_LINK_STANDARD,premium:PAYMENT_LINK_PREMIUM};
+    const url=links[plan.id];
+    if(url) window.location.href=url+"?client_reference_id="+(venue?.id||"unknown");
+  };
+
+  // Handle return from Stripe
+  React.useEffect(()=>{
+    const p=new URLSearchParams(window.location.search);
+    if(p.get("upgrade")==="success"){
+      window.history.replaceState({},"",window.location.pathname);
+    }
+  },[]);
+
+  const upgraded=new URLSearchParams(window.location.search).get("upgrade")==="success";
+
+  return (
+    <div>
+      <h2 style={{fontFamily:"Syne,sans-serif",fontSize:22,fontWeight:800,marginBottom:6}}>Plan & Billing</h2>
+      <p style={{color:"#8888a0",fontSize:14,marginBottom:upgraded?16:32}}>Current plan: <strong style={{color:"#f59e0b"}}>{cur[0].toUpperCase()+cur.slice(1)}</strong></p>
+
+      {upgraded&&<div style={{background:"#0a2a14",border:"1px solid #1a4a24",borderRadius:10,padding:"14px 18px",marginBottom:28,display:"flex",alignItems:"center",gap:10,color:"#22c55e",fontSize:14,fontWeight:600}}>
+        ✓ Upgrade successful! Your plan will be activated within a minute.
+      </div>}
+
+      {err&&<div style={{background:"#2a0a0a",border:"1px solid #4a1a1a",borderRadius:10,padding:"12px 16px",marginBottom:20,color:"#ef4444",fontSize:13}}>⚠ {err}</div>}
+
+      <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(220px,1fr))",gap:20}}>
+        {plans.map(p=>{const active=p.id===cur;const isLoading=loading===p.id;return(
+          <div key={p.id} style={{background:active?"#1a1a24":"#13131a",border:`1.5px solid ${active?"#FF6B35":"#25252f"}`,borderRadius:14,padding:24,position:"relative",marginTop:16}}>
+            {active&&<div style={{position:"absolute",top:-12,left:"50%",transform:"translateX(-50%)",background:"#FF6B35",color:"#fff",borderRadius:20,padding:"2px 14px",fontSize:11,fontWeight:700,whiteSpace:"nowrap"}}>CURRENT</div>}
+            {p.id==="premium"&&!active&&<div style={{position:"absolute",top:-12,left:"50%",transform:"translateX(-50%)",background:"#f59e0b",color:"#000",borderRadius:20,padding:"2px 14px",fontSize:11,fontWeight:700,whiteSpace:"nowrap"}}>MOST POPULAR</div>}
+            <h3 style={{fontFamily:"Syne,sans-serif",fontWeight:800,fontSize:20,marginBottom:4}}>{p.name}</h3>
+            <div style={{marginBottom:18}}>
+              <span style={{fontFamily:"Syne,sans-serif",fontSize:32,fontWeight:800,color:p.price===0?"#e8e8f0":"#FF6B35"}}>{p.price===0?"Free":`$${p.price}`}</span>
+              {p.price>0&&<span style={{color:"#8888a0",fontSize:13}}>/mo</span>}
+            </div>
+            <div style={{display:"flex",flexDirection:"column",gap:8,marginBottom:22}}>
+              {p.perks.map(k=><div key={k} style={{display:"flex",gap:8,fontSize:13,color:"#8888a0"}}><span style={{color:"#22c55e"}}>✓</span>{k}</div>)}
+            </div>
+            {active
+              ?<Btn variant="ghost" style={{width:"100%"}} disabled>Current Plan</Btn>
+              :p.price===0
+                ?<Btn variant="ghost" style={{width:"100%",opacity:0.5}} disabled>Downgrade</Btn>
+                :<Btn style={{width:"100%",opacity:isLoading?0.7:1}} variant={p.id==="premium"?"primary":"secondary"} onClick={()=>checkout(p)} disabled={!!loading}>
+                  {isLoading?"Redirecting to Stripe...":"Upgrade Now →"}
+                </Btn>
+            }
+          </div>
+        );})}
+      </div>
+
+      <div style={{marginTop:32,padding:20,background:"#13131a",border:"1px solid #25252f",borderRadius:12}}>
+        <h4 style={{fontWeight:700,fontSize:14,marginBottom:8}}>Billing & Cancellation</h4>
+        <p style={{color:"#8888a0",fontSize:13,lineHeight:1.7}}>Subscriptions are billed monthly and can be cancelled anytime. After upgrading, your tier is activated automatically within 1–2 minutes via Stripe webhook. To manage or cancel your subscription, contact <a href="mailto:Cbusevents@gmail.com" style={{color:"#FF6B35"}}>Cbusevents@gmail.com</a>.</p>
+      </div>
+    </div>
+  );
+}
+
+// Portal Shell
+function Portal() {
+  const {user,profile}=useAuth();
+  const [page,setPage]=useState("dashboard");
+  const [venue,setVenue]=useState(null);
+  const [events,setEvents]=useState([]);
+  const [busy,setBusy]=useState(true);
+  const load=async()=>{
+    setBusy(true);
+    const {data:v}=await sb.from("venues").select("*").eq("owner_id",user.id).single();
+    setVenue(v||null);
+    if(v?.id){const {data:ev}=await sb.from("events").select("*").eq("venue_id",v.id).order("start_time",{ascending:true});setEvents(ev||[]);}
+    else setEvents([]);
+    setBusy(false);
+  };
+  useEffect(()=>{load();},[]);
+  return (
+    <div style={{display:"flex",minHeight:"100vh"}}>
+      <Sidebar active={page} setActive={setPage} profile={profile}/>
+      <main style={{flex:1,padding:36,overflowY:"auto",background:"#0b0b0f"}}>
+        {busy?<Spin/>:<>
+          {page==="dashboard"&&<Dashboard venue={venue} events={events}/>}
+          {page==="venue"    &&<VenueForm venue={venue} onSave={load}/>}
+          {page==="events"   &&<EventsManager venue={venue} events={events} onRefresh={load}/>}
+          {page==="inquiries"&&<Inquiries venue={venue}/>}
+          {page==="plan"     &&<PlanBilling venue={venue}/>}
+        </>}
+      </main>
+    </div>
+  );
+}
+
+function App() {
+  const {user,loading}=useAuth();
+  useEffect(()=>{
+    if(!loading){
+      const el=document.getElementById('root');
+      // Remove loading screen content — React will take over
+    }
+  },[loading]);
+  if(loading)return null;
+  return user?<Portal/>:<AuthPage/>;
+}
+
+function Root() {
+  return <AuthProvider><App/></AuthProvider>;
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(<Root/>);
+</script>
+</body>
+</html>
