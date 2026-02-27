@@ -351,7 +351,7 @@ footer { background:var(--surface); border-top:1px solid var(--border); padding:
     <button class="nav-link" id="nav-venues" onclick="showPage('venues')">Venues</button>
     <button class="nav-link" id="nav-events" onclick="showPage('events')">Events</button>
   </div>
-  <button class="nav-cta" onclick="window.open('https://dgray07.github.io/cbusevents/cbus-venue-portal.html','_blank')">List Your Venue</button>
+  <button class="nav-cta" onclick="window.open('https://dgray07.github.io/cbusevents/cbus-venue-portal.html','_blank')">Sign In</button>
 </nav>
 
 <div id="app">
@@ -474,6 +474,7 @@ function showPage(page,data=null){
   else if(page==='events')renderEvents();
   else if(page==='venue')renderVenueDetail(data);
   else if(page==='category')renderCategory(data);
+  else if(page==='listVenue')renderVenueLanding();
   // Update SEO title
   const titles={home:'CBusEvents — Columbus Ohio Venues & Events',venues:'Columbus Venues — CBusEvents',events:'Columbus Events — CBusEvents'};
   document.title=titles[page]||document.title;
@@ -503,6 +504,7 @@ function renderHome(){
           <button class="btn-primary" onclick="showPage('venues')">Browse Venues →</button>
           <button class="btn-outline" onclick="showPage('events')">View Events</button>
           <button class="btn-outline" style="border-color:#60a5fa40;color:var(--blue)" onclick="window.open('https://dgray07.github.io/cbusevents/cbus-planner-portal.html','_blank')">🎯 I'm a Planner</button>
+          <button class="btn-outline" style="border-color:#FF6B3540;color:#FF6B35" onclick="showPage('listVenue')">🏛 List Your Venue</button>
         </div>
         <div class="hero-dots" id="heroDots"></div>
       </div>
@@ -1132,6 +1134,84 @@ function footer(){
   </footer>`;
 }
 
+
+// ── VENUE LANDING PAGE ───────────────────────────────────────
+function renderVenueLanding(){
+  setNavActive('');
+  document.getElementById('app').innerHTML=`
+    <div style="max-width:960px;margin:0 auto;padding:52px 32px">
+
+      <!-- Hero -->
+      <div style="text-align:center;margin-bottom:60px">
+        <div style="display:inline-flex;align-items:center;gap:6px;background:#FF6B3520;color:#FF6B35;border:1px solid #FF6B3540;border-radius:20px;padding:4px 14px;font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:16px">🏛 For Venue Owners</div>
+        <h1 style="font-family:'Syne',sans-serif;font-size:clamp(28px,5vw,48px);font-weight:800;margin-bottom:14px;line-height:1.1">Get your Columbus venue in front of<br><span style="color:#FF6B35">thousands of event planners</span></h1>
+        <p style="color:#8888a0;font-size:16px;max-width:540px;margin:0 auto 28px;line-height:1.65">CBusEvents is Columbus's go-to directory for bars, comedy clubs, rooftops, and unique event spaces. List free and start getting discovered today.</p>
+        <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-bottom:14px">
+          <button onclick="window.open('https://dgray07.github.io/cbusevents/cbus-venue-portal.html','_blank')" style="background:#FF6B35;color:#fff;border:none;border-radius:10px;padding:14px 32px;font-size:16px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif">Create Free Listing →</button>
+          <button onclick="window.open('https://dgray07.github.io/cbusevents/cbus-venue-portal.html','_blank')" style="background:transparent;color:#e8e8f0;border:1.5px solid #25252f;border-radius:10px;padding:13px 24px;font-size:15px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif">Sign In</button>
+        </div>
+        <p style="color:#55556a;font-size:13px">Free to list · No credit card needed · Takes 5 minutes</p>
+      </div>
+
+      <!-- Benefits grid -->
+      <div style="margin-bottom:60px">
+        <h2 style="font-family:'Syne',sans-serif;font-size:22px;font-weight:800;text-align:center;margin-bottom:32px">Everything your venue needs to grow bookings</h2>
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px">
+          ${[
+            {icon:'🔍',title:'Get Discovered',desc:'Show up when Columbus locals and event planners search for bars, comedy clubs, rooftops, and unique event spaces.',badge:''},
+            {icon:'📅',title:'Manage Your Events',desc:'Add and publish events directly from your dashboard. Keep your calendar live and visible to thousands.',badge:''},
+            {icon:'💬',title:'Receive Booking Requests',desc:'Event planners send inquiries straight to your portal inbox. Name, email, date, guest count — everything you need.',badge:''},
+            {icon:'📊',title:'Analytics Dashboard',desc:'See how many people viewed your listing, clicked through, and sent inquiries every month.',badge:'Standard+'},
+            {icon:'⭐',title:'Priority Placement',desc:'Standard and Premium venues appear at the top of search results and category pages.',badge:'Standard+'},
+            {icon:'🎯',title:'Hero Slider',desc:'Premium venues rotate through the homepage hero — maximum visibility across the entire site.',badge:'Premium'},
+            {icon:'🎨',title:'Free Flyer Design',desc:'Get custom event flyers designed for your social media and print — included with Premium.',badge:'Premium'},
+            {icon:'👕',title:'Merch On Demand',desc:'Branded shirts, hats, and more printed via heat press and ready for your staff and events.',badge:'Premium'},
+          ].map(b=>`
+            <div style="background:#1a1a24;border:1px solid #25252f;border-radius:14px;padding:22px">
+              <div style="font-size:28px;margin-bottom:10px">${b.icon}</div>
+              <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+                <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:15px">${b.title}</div>
+                ${b.badge?`<span style="background:#FF6B3520;color:#FF6B35;border:1px solid #FF6B3530;border-radius:20px;padding:1px 8px;font-size:10px;font-weight:700">${b.badge}</span>`:''}
+              </div>
+              <div style="color:#8888a0;font-size:13px;line-height:1.6">${b.desc}</div>
+            </div>`).join('')}
+        </div>
+      </div>
+
+      <!-- Pricing -->
+      <div style="margin-bottom:60px">
+        <h2 style="font-family:'Syne',sans-serif;font-size:22px;font-weight:800;text-align:center;margin-bottom:8px">Simple, transparent pricing</h2>
+        <p style="color:#8888a0;font-size:14px;text-align:center;margin-bottom:32px">Start free. Upgrade when you're ready to grow.</p>
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:16px">
+          ${[
+            {name:'Free',price:0,color:'#8888a0',perks:['1 venue listing','Up to 4 events','Basic search placement','Public venue page']},
+            {name:'Standard',price:29,color:'#60a5fa',perks:['Up to 20 events/month','Priority search placement','Inquiry form enabled','Email support','Analytics dashboard']},
+            {name:'Premium',price:79,color:'#FF6B35',popular:true,perks:['Unlimited events','Hero slider feature','Top of every page','Full analytics','✦ Free flyer design','✦ Merch on demand']},
+          ].map(p=>`
+            <div style="background:${p.popular?'linear-gradient(135deg,#1a0800,#1a0f00)':'#13131a'};border:${p.popular?'2px solid #FF6B3550':'1px solid #25252f'};border-radius:14px;padding:24px;position:relative">
+              ${p.popular?'<div style="position:absolute;top:-12px;left:50%;transform:translateX(-50%);background:#FF6B35;color:#fff;border-radius:20px;padding:2px 14px;font-size:11px;font-weight:700;white-space:nowrap">MOST POPULAR</div>':''}
+              <div style="font-size:11px;color:${p.color};font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">${p.name}</div>
+              <div style="font-family:'Syne',sans-serif;font-size:32px;font-weight:800;margin-bottom:16px">${p.price===0?'Free':'$'+p.price}<span style="font-size:14px;color:#8888a0;font-weight:400">${p.price>0?'/mo':''}</span></div>
+              <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:20px">
+                ${p.perks.map(k=>'<div style="display:flex;gap:8px;font-size:13px;color:#8888a0"><span style="color:#22c55e">✓</span>'+k+'</div>').join('')}
+              </div>
+              <button onclick="window.open('https://dgray07.github.io/cbusevents/cbus-venue-portal.html','_blank')" style="width:100%;background:${p.popular?'#FF6B35':'#1a1a24'};color:${p.popular?'#fff':'#e8e8f0'};border:1px solid ${p.popular?'#FF6B35':'#25252f'};border-radius:8px;padding:10px;font-size:14px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif">Get Started →</button>
+            </div>`).join('')}
+        </div>
+      </div>
+
+      <!-- Social proof -->
+      <div style="background:#13131a;border:1px solid #25252f;border-radius:16px;padding:36px;text-align:center;margin-bottom:32px">
+        <div style="font-size:36px;margin-bottom:12px">🏛</div>
+        <h3 style="font-family:'Syne',sans-serif;font-size:20px;font-weight:800;margin-bottom:8px">Join 23+ Columbus venues already on CBusEvents</h3>
+        <p style="color:#8888a0;font-size:14px;margin-bottom:24px;line-height:1.65">Dick's Den, Lincoln Social Rooftop, Columbus Funny Bone, Sacred Palm, The Hashtag Comedy Club and more are already getting discovered daily.</p>
+        <button onclick="window.open('https://dgray07.github.io/cbusevents/cbus-venue-portal.html','_blank')" style="background:#FF6B35;color:#fff;border:none;border-radius:10px;padding:13px 32px;font-size:15px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif">Create Your Free Listing →</button>
+      </div>
+
+    </div>
+  `;
+  window.scrollTo({top:0,behavior:'smooth'});
+}
 
 // ── PRICING MODAL ─────────────────────────────────────────────
 function showPricing(){
