@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>CBusEvents — Admin</title>
+<title>CBUSEVENTS — Admin</title>
 <meta name="robots" content="noindex">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
@@ -156,7 +156,7 @@ const SB_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZ
 const sb=supabase.createClient(SB_URL,SB_KEY);
 
 // ADMIN EMAILS — add yours here
-const ADMIN_EMAILS=["Cbusevents@gmail.com","cbusevents@gmail.com","Deante90@gmail.com","deante90@gmail.com"];
+const ADMIN_EMAILS=["CBUSEVENTS@gmail.com","cbusevents@gmail.com","Deante90@gmail.com","deante90@gmail.com"];
 
 let currentPage='dashboard';
 let allVenues=[],allEvents=[],allInquiries=[],allDesignRequests=[],currentUser=null;
@@ -175,7 +175,7 @@ async function init(){
   if(!session){renderLogin();return;}
   const email=session.user.email;
   if(!ADMIN_EMAILS.includes(email)){
-    document.getElementById('app').innerHTML=`<div class="login-wrap"><div class="login-card" style="text-align:center"><div style="font-size:48px;margin-bottom:16px">🚫</div><h2 style="font-family:Syne,sans-serif;font-size:20px;font-weight:800;margin-bottom:8px">Access Denied</h2><p style="color:var(--sub);font-size:14px">This portal is for CBusEvents admins only.</p><button onclick="sb.auth.signOut().then(()=>renderLogin())" style="margin-top:20px;background:var(--orange);color:#fff;border:none;border-radius:8px;padding:10px 20px;font-size:14px;cursor:pointer">Sign Out</button></div></div>`;
+    document.getElementById('app').innerHTML=`<div class="login-wrap"><div class="login-card" style="text-align:center"><div style="font-size:48px;margin-bottom:16px">🚫</div><h2 style="font-family:Syne,sans-serif;font-size:20px;font-weight:800;margin-bottom:8px">Access Denied</h2><p style="color:var(--sub);font-size:14px">This portal is for CBUSEVENTS admins only.</p><button onclick="sb.auth.signOut().then(()=>renderLogin())" style="margin-top:20px;background:var(--orange);color:#fff;border:none;border-radius:8px;padding:10px 20px;font-size:14px;cursor:pointer">Sign Out</button></div></div>`;
     return;
   }
   currentUser=session.user;

@@ -5,23 +5,23 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 
 <!-- SEO META TAGS -->
-<title id="pageTitle">CBusEvents — Columbus Ohio Event Venues & Nightlife Directory</title>
-<meta name="description" content="Discover the best bars, comedy clubs, concert halls, and event spaces in Columbus, Ohio. Browse upcoming events or list your venue on CBusEvents — Columbus's event directory.">
+<title id="pageTitle">CBUSEVENTS — Columbus Ohio Event Venues & Nightlife Directory</title>
+<meta name="description" content="Discover the best bars, comedy clubs, concert halls, and event spaces in Columbus, Ohio. Browse upcoming events or list your venue on CBUSEVENTS — Columbus's event directory.">
 <meta name="keywords" content="Columbus Ohio venues, Columbus bars, Columbus comedy clubs, Short North bars, Columbus events, event spaces Columbus Ohio, nightlife Columbus">
 <meta name="robots" content="index, follow">
-<meta name="author" content="CBusEvents">
+<meta name="author" content="CBUSEVENTS">
 <link rel="canonical" href="https://dgray07.github.io/cbusevents">
 
 <!-- Open Graph (Facebook/LinkedIn) -->
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://dgray07.github.io/cbusevents">
-<meta property="og:title" content="CBusEvents — Columbus Ohio Venues & Events">
+<meta property="og:title" content="CBUSEVENTS — Columbus Ohio Venues & Events">
 <meta property="og:description" content="The Columbus event directory. Discover bars, comedy clubs, concert halls & unique spaces. Browse upcoming events or list your venue.">
 <meta property="og:image" content="https://images.unsplash.com/photo-1519671482749-fd09be7ccebf?w=1200&q=80">
 
 <!-- Twitter Card -->
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="CBusEvents — Columbus Ohio Venues & Events">
+<meta name="twitter:title" content="CBUSEVENTS — Columbus Ohio Venues & Events">
 <meta name="twitter:description" content="The Columbus event directory. Discover bars, comedy clubs, and unique event spaces.">
 <meta name="twitter:image" content="https://images.unsplash.com/photo-1519671482749-fd09be7ccebf?w=1200&q=80">
 
@@ -30,7 +30,7 @@
 {
   "@context": "https://schema.org",
   "@type": "WebSite",
-  "name": "CBusEvents",
+  "name": "CBUSEVENTS",
   "url": "https://dgray07.github.io/cbusevents",
   "description": "Columbus Ohio event venue and nightlife directory",
   "potentialAction": {
@@ -476,7 +476,7 @@ function showPage(page,data=null){
   else if(page==='category')renderCategory(data);
   else if(page==='listVenue')renderVenueLanding();
   // Update SEO title
-  const titles={home:'CBusEvents — Columbus Ohio Venues & Events',venues:'Columbus Venues — CBusEvents',events:'Columbus Events — CBusEvents'};
+  const titles={home:'CBUSEVENTS — Columbus Ohio Venues & Events',venues:'Columbus Venues — CBUSEVENTS',events:'Columbus Events — CBUSEVENTS'};
   document.title=titles[page]||document.title;
 }
 
@@ -631,7 +631,7 @@ function renderHome(){
     <div class="cta-banner">
       <div>
         <h2>Own a venue or host events?</h2>
-        <p>Get discovered by thousands of Columbus event organizers. List your space free — upgrade to get featured in the hero slider and unlock premium placement across CBusEvents.</p>
+        <p>Get discovered by thousands of Columbus event organizers. List your space free — upgrade to get featured in the hero slider and unlock premium placement across CBUSEVENTS.</p>
       </div>
       <div class="cta-actions">
         <button class="btn-primary" onclick="window.open('https://dgray07.github.io/cbusevents/cbus-venue-portal.html','_blank')">List Your Venue Free →</button>
@@ -821,7 +821,7 @@ function filterEvents(){
 // ── VENUE DETAIL PAGE ─────────────────────────────────────────
 async function renderVenueDetail(venue){
   if(!venue)return showPage('venues');
-  document.title=`${venue.name} — CBusEvents`;
+  document.title=`${venue.name} — CBUSEVENTS`;
 
   // Load this venue's events
   const{data:events}=await sb.from('events').select('*').eq('venue_id',venue.id).eq('status','published').gte('start_time',new Date().toISOString()).order('start_time',{ascending:true});
@@ -970,7 +970,7 @@ function renderCategory(cat){
   const evCats=catEventMap[cat]||[];
   const catEvents=evCats.length?allEvents.filter(e=>evCats.includes(e.category)).slice(0,6):[];
 
-  document.title=`${c.name} — CBusEvents`;
+  document.title=`${c.name} — CBUSEVENTS`;
 
   document.getElementById('app').innerHTML=`
     <div class="cat-hero">
@@ -1128,7 +1128,7 @@ function footer(){
       </div>
     </div>
     <div class="footer-bottom">
-      <span class="footer-copy">© 2026 CBusEvents · Columbus, Ohio</span>
+      <span class="footer-copy">© 2026 CBUSEVENTS · Columbus, Ohio</span>
       <span class="footer-copy">Made for Columbus 🏙</span>
     </div>
   </footer>`;
@@ -1145,7 +1145,7 @@ function renderVenueLanding(){
       <div style="text-align:center;margin-bottom:60px">
         <div style="display:inline-flex;align-items:center;gap:6px;background:#FF6B3520;color:#FF6B35;border:1px solid #FF6B3540;border-radius:20px;padding:4px 14px;font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:16px">🏛 For Venue Owners</div>
         <h1 style="font-family:'Syne',sans-serif;font-size:clamp(28px,5vw,48px);font-weight:800;margin-bottom:14px;line-height:1.1">Get your Columbus venue in front of<br><span style="color:#FF6B35">thousands of event planners</span></h1>
-        <p style="color:#8888a0;font-size:16px;max-width:540px;margin:0 auto 28px;line-height:1.65">CBusEvents is Columbus's go-to directory for bars, comedy clubs, rooftops, and unique event spaces. List free and start getting discovered today.</p>
+        <p style="color:#8888a0;font-size:16px;max-width:540px;margin:0 auto 28px;line-height:1.65">CBUSEVENTS is Columbus's go-to directory for bars, comedy clubs, rooftops, and unique event spaces. List free and start getting discovered today.</p>
         <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-bottom:14px">
           <button onclick="window.open('https://dgray07.github.io/cbusevents/cbus-venue-portal.html','_blank')" style="background:#FF6B35;color:#fff;border:none;border-radius:10px;padding:14px 32px;font-size:16px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif">Create Free Listing →</button>
           <button onclick="window.open('https://dgray07.github.io/cbusevents/cbus-venue-portal.html','_blank')" style="background:transparent;color:#e8e8f0;border:1.5px solid #25252f;border-radius:10px;padding:13px 24px;font-size:15px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif">Sign In</button>
@@ -1203,7 +1203,7 @@ function renderVenueLanding(){
       <!-- Social proof -->
       <div style="background:#13131a;border:1px solid #25252f;border-radius:16px;padding:36px;text-align:center;margin-bottom:32px">
         <div style="font-size:36px;margin-bottom:12px">🏛</div>
-        <h3 style="font-family:'Syne',sans-serif;font-size:20px;font-weight:800;margin-bottom:8px">Join 23+ Columbus venues already on CBusEvents</h3>
+        <h3 style="font-family:'Syne',sans-serif;font-size:20px;font-weight:800;margin-bottom:8px">Join 23+ Columbus venues already on CBUSEVENTS</h3>
         <p style="color:#8888a0;font-size:14px;margin-bottom:24px;line-height:1.65">Dick's Den, Lincoln Social Rooftop, Columbus Funny Bone, Sacred Palm, The Hashtag Comedy Club and more are already getting discovered daily.</p>
         <button onclick="window.open('https://dgray07.github.io/cbusevents/cbus-venue-portal.html','_blank')" style="background:#FF6B35;color:#fff;border:none;border-radius:10px;padding:13px 32px;font-size:15px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif">Create Your Free Listing →</button>
       </div>

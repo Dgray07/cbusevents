@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>CBusEvents — Planner Portal</title>
+<title>CBUSEVENTS — Planner Portal</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
@@ -307,7 +307,7 @@ function renderHero(){
           {icon:'🏛',title:'Browse Venues',desc:'Filter by type, neighborhood, and capacity. Find the perfect space for any event.'},
           {icon:'📬',title:'Send Inquiries',desc:'Contact venues directly from your dashboard. Track every request in one place.'},
           {icon:'📋',title:'Track Requests',desc:'See the status of all your venue inquiries. Never lose track of a conversation.'},
-          {icon:'📅',title:'List Your Events',desc:'Publish your events to the CBusEvents directory for free. Reach Columbus.'},
+          {icon:'📅',title:'List Your Events',desc:'Publish your events to the CBUSEVENTS directory for free. Reach Columbus.'},
         ].map(f=>`
           <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:24px">
             <div style="font-size:28px;margin-bottom:10px">${f.icon}</div>
@@ -351,7 +351,7 @@ function showAuth(tab='login'){
         </div>
         <div id="authForm">${tab==='login'?loginForm():signupForm()}</div>
         <div style="margin-top:16px;text-align:center">
-          <button onclick="window.location.href='https://dgray07.github.io/cbusevents'" style="background:none;border:none;color:var(--muted);font-size:12px;cursor:pointer">← Back to CBusEvents</button>
+          <button onclick="window.location.href='https://dgray07.github.io/cbusevents'" style="background:none;border:none;color:var(--muted);font-size:12px;cursor:pointer">← Back to CBUSEVENTS</button>
         </div>
       </div>
     </div>`;
@@ -401,7 +401,7 @@ async function doSignup(){
   if(error){const el=document.getElementById('aErr');if(el){el.textContent=error.message;el.style.display='block';}return;}
   currentUser=data.user;
   await loadData();setLoggedInNav();nav('dashboard');
-  toast('Welcome to CBusEvents! 🎉');
+  toast('Welcome to CBUSEVENTS! 🎉');
 }
 
 // ── NAV ───────────────────────────────────────────────────────
@@ -688,7 +688,7 @@ function renderEvents(){
         <div class="empty" style="border:1px solid var(--border);border-radius:14px">
           <div class="empty-icon">📅</div>
           <h3>No events listed yet</h3>
-          <p style="font-size:13px;margin-bottom:16px">List your event on CBusEvents to reach Columbus</p>
+          <p style="font-size:13px;margin-bottom:16px">List your event on CBUSEVENTS to reach Columbus</p>
           <button class="btn btn-primary" onclick="openAddEventModal()">List Your First Event →</button>
         </div>`}
     </div>`;
@@ -872,7 +872,7 @@ async function submitEvent(){
   if(error){if(errEl){errEl.textContent=error.message;errEl.style.display='block';}return;}
   closeModal();
   await loadData();
-  toast('✓ Event published to CBusEvents!');
+  toast('✓ Event published to CBUSEVENTS!');
   nav('events');
 }
 
