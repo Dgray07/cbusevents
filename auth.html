@@ -64,6 +64,16 @@ nav{background:rgba(11,11,15,0.95);backdrop-filter:blur(16px);border-bottom:1px 
 .role-name{font-weight:700;font-size:14px;margin-bottom:3px;}
 .role-desc{font-size:11px;color:var(--sub);line-height:1.4;}
 
+/* CLAIM STEP */
+.claim-card{background:var(--surface);border:1.5px solid var(--border);border-radius:12px;padding:16px 18px;cursor:pointer;transition:all 0.2s;margin-bottom:10px;display:flex;align-items:center;gap:14px;}
+.claim-card:hover{border-color:var(--orange);}
+.claim-card.selected{border-color:var(--orange);background:#FF6B3510;}
+.claim-card-icon{font-size:28px;flex-shrink:0;}
+.claim-card-name{font-weight:700;font-size:14px;margin-bottom:2px;}
+.claim-card-meta{font-size:12px;color:var(--sub);}
+.claim-check{margin-left:auto;width:20px;height:20px;border-radius:50%;border:2px solid var(--border);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:11px;transition:all 0.15s;}
+.claim-card.selected .claim-check{background:var(--orange);border-color:var(--orange);color:#fff;}
+
 /* BACK LINK */
 .back-btn{background:none;border:none;color:var(--sub);font-size:13px;cursor:pointer;display:flex;align-items:center;gap:4px;margin-bottom:16px;font-family:'DM Sans',sans-serif;padding:0;}
 .back-btn:hover{color:var(--text);}
@@ -121,6 +131,7 @@ nav{background:rgba(11,11,15,0.95);backdrop-filter:blur(16px);border-bottom:1px 
           <div class="step-dot active" id="dot1"></div>
           <div class="step-dot" id="dot2"></div>
           <div class="step-dot" id="dot3"></div>
+          <div class="step-dot" id="dot4"></div>
         </div>
 
         <!-- STEP 1: Role selection -->
@@ -161,6 +172,17 @@ nav{background:rgba(11,11,15,0.95);backdrop-filter:blur(16px);border-bottom:1px 
           <div id="step2Fields"></div>
           <div class="auth-err" id="step2Err"></div>
           <button class="btn-primary" onclick="nextStep(3)">Continue →</button>
+        </div>
+
+        <!-- STEP 2b: Claim existing listing -->
+        <div class="step" id="stepClaim">
+          <button class="back-btn" onclick="goBack(2)">← Back</button>
+          <div class="step-title">We found a match!</div>
+          <div class="step-sub" id="claimSub">Is this your venue? Claim it to take ownership.</div>
+          <div id="claimResults"></div>
+          <div class="auth-err" id="claimErr"></div>
+          <button class="btn-primary" id="claimBtn" onclick="proceedWithClaim()">Claim This Listing →</button>
+          <button onclick="goBack(2)" style="background:none;border:none;color:var(--sub);font-size:13px;cursor:pointer;width:100%;margin-top:10px;padding:8px;">Not my venue — create a new listing</button>
         </div>
 
         <!-- STEP 3: Account creation -->
@@ -274,13 +296,14 @@ function showStep(n){
   currentStep=n;
   document.querySelectorAll('.step').forEach(s=>s.classList.remove('active'));
   document.getElementById('step'+n)?.classList.add('active');
-  // Update dots
-  [1,2,3].forEach(i=>{
+  // Update dots — claim counts as step 2.5 visually
+  const dotN = n==='Claim'?2 : n==='Loading'?4 : n;
+  [1,2,3,4].forEach(i=>{
     const dot=document.getElementById('dot'+i);
     if(!dot)return;
     dot.classList.remove('active','done');
-    if(i<n)dot.classList.add('done');
-    else if(i===n)dot.classList.add('active');
+    if(i<dotN)dot.classList.add('done');
+    else if(i===dotN)dot.classList.add('active');
   });
 }
 
@@ -291,8 +314,12 @@ function nextStep(n){
     showStep(2);
   } else if(n===3){
     if(!validateStep2())return;
-    buildStep3Summary();
-    showStep(3);
+    if(selectedRole==='venue_owner'){
+      checkForExistingVenue();
+    } else {
+      buildStep3Summary();
+      showStep(3);
+    }
   }
 }
 
@@ -343,6 +370,83 @@ function buildStep3Summary(){
   document.getElementById('step3Sub').textContent=`Creating your ${labels[selectedRole]} account`;
 }
 
+// ── CLAIM FLOW ────────────────────────────────────────────────
+async function checkForExistingVenue(){
+  const name = stepData.venueName || '';
+  if(!name){buildStep3Summary();showStep(3);return;}
+
+  // Search for unclaimed venues with similar name
+  const{data:matches}=await sb.from('venues')
+    .select('id,name,venue_type,neighborhood,status,cover_image_url')
+    .is('owner_id',null)
+    .ilike('name','%'+name.split(' ')[0]+'%')
+    .limit(5)
+    .catch(()=>({data:[]}));
+
+  // Also check claimed venues with same name (to warn of duplicates)
+  const{data:claimed}=await sb.from('venues')
+    .select('id,name,owner_id')
+    .ilike('name','%'+name+'%')
+    .not('owner_id','is',null)
+    .limit(3)
+    .catch(()=>({data:[]}));
+
+  const unclaimedMatches=(matches||[]).filter(m=>!m.owner_id);
+
+  if(!unclaimedMatches.length){
+    // No match — just create new
+    buildStep3Summary();
+    showStep(3);
+    return;
+  }
+
+  // Show claim step
+  claimMatches=unclaimedMatches;
+  selectedClaimId=null;
+  document.getElementById('claimSub').textContent=`We found ${unclaimedMatches.length} existing listing${unclaimedMatches.length>1?'s':''} that match "${name}". Is one of these yours?`;
+  document.getElementById('claimResults').innerHTML=unclaimedMatches.map(v=>`
+    <div class="claim-card" id="claim-${v.id}" onclick="selectClaim('${v.id}')">
+      <div class="claim-card-icon">${v.cover_image_url?`<img src="${v.cover_image_url}" style="width:44px;height:44px;border-radius:8px;object-fit:cover" onerror="this.outerHTML='🏛'"/>`:'🏛'}</div>
+      <div style="flex:1">
+        <div class="claim-card-name">${v.name}</div>
+        <div class="claim-card-meta">${v.venue_type||'Venue'}${v.neighborhood?' · '+v.neighborhood:''} · <span style="color:${v.status==='approved'?'#22c55e':'#f59e0b'}">${v.status==='approved'?'Live':'Pending'}</span></div>
+      </div>
+      <div class="claim-check" id="check-${v.id}"></div>
+    </div>`).join('')+`
+    <div class="claim-card" id="claim-new" onclick="selectClaim('new')" style="border-style:dashed">
+      <div class="claim-card-icon">➕</div>
+      <div style="flex:1">
+        <div class="claim-card-name">Create a new listing for "${name}"</div>
+        <div class="claim-card-meta">My venue isn't listed above</div>
+      </div>
+      <div class="claim-check" id="check-new"></div>
+    </div>`;
+  document.getElementById('claimErr').textContent='';
+  showStep('Claim');
+}
+
+function selectClaim(id){
+  selectedClaimId=id;
+  document.querySelectorAll('.claim-card').forEach(c=>c.classList.remove('selected'));
+  document.querySelectorAll('.claim-check').forEach(c=>c.textContent='');
+  document.getElementById('claim-'+id)?.classList.add('selected');
+  const chk=document.getElementById('check-'+id);
+  if(chk)chk.textContent='✓';
+  document.getElementById('claimErr').textContent='';
+}
+
+function proceedWithClaim(){
+  if(!selectedClaimId){document.getElementById('claimErr').textContent='Please select an option.';return;}
+  buildStep3Summary();
+  if(selectedClaimId==='new'){
+    document.getElementById('step3Sub').textContent='Creating your Venue Owner account — new listing';
+  } else {
+    const v=claimMatches.find(m=>m.id===selectedClaimId);
+    document.getElementById('step3Sub').textContent=`Creating your account and claiming "${v?.name||'venue'}"`;
+  }
+  showStep(3);
+}
+
 // ── SIGN UP ───────────────────────────────────────────────────
 async function doSignUp(){
   const email=document.getElementById('suEmail').value.trim();
@@ -377,11 +481,25 @@ async function doSignUp(){
 
   // Create profile based on role
   if(selectedRole==='venue_owner'){
-    await sb.from('venues').insert({
-      name:stepData.venueName,venue_type:stepData.venueType||null,
-      neighborhood:stepData.venueNeighborhood||null,
-      owner_id:userId,status:'pending',tier:'free',city:'Columbus',state:'OH'
-    }).catch(()=>{});
+    if(selectedClaimId && selectedClaimId!=='new'){
+      // CLAIM existing listing
+      document.getElementById('loadingMsg').textContent='Claiming your listing…';
+      await sb.from('venues').update({
+        owner_id:userId,
+        claim_status:'pending',
+        claimed_at:new Date().toISOString(),
+        claim_email:email,
+      }).eq('id',selectedClaimId).catch(()=>{});
+      // Also store in user_roles that this is a venue claim pending review
+      await sb.from('user_roles').update({claim_venue_id:selectedClaimId}).eq('user_id',userId).catch(()=>{});
+    } else {
+      // NEW listing
+      await sb.from('venues').insert({
+        name:stepData.venueName,venue_type:stepData.venueType||null,
+        neighborhood:stepData.venueNeighborhood||null,
+        owner_id:userId,status:'pending',tier:'free',city:'Columbus',state:'OH'
+      }).catch(()=>{});
+    }
   } else if(selectedRole==='vendor'){
     await sb.from('vendors').upsert({
       user_id:userId,business_name:stepData.bizName,

@@ -247,6 +247,7 @@ function renderShell(){
       <div class="nav-item ${currentPage==='subscriptions'?'active':''}" onclick="nav('subscriptions')">💳 Subscriptions</div>
       <div class="nav-item ${currentPage==='users'?'active':''}" onclick="nav('users')">👥 Users</div>
       <div class="nav-item ${currentPage==='overrides'?'active':''}" onclick="nav('overrides')">⚙️ Overrides</div>
+      <div class="nav-item ${currentPage==='claims'?'active':''}" onclick="nav('claims')">🏷 Claims <span style='background:#ef4444;color:#fff;border-radius:20px;padding:1px 7px;font-size:10px;font-weight:700;margin-left:auto' id='claimsBadge' style='display:none'></span></div>
       <div class="sidebar-bottom">
         <div class="admin-tag">⚡ Admin</div>
         <button onclick="sb.auth.signOut().then(()=>renderLogin())" style="width:100%;margin-top:10px;background:none;border:1px solid var(--border);border-radius:7px;padding:7px;color:var(--muted);font-size:12px;cursor:pointer;font-family:'DM Sans',sans-serif">Sign Out</button>
@@ -279,7 +280,7 @@ function nav(page){
   currentPage=page;
   document.querySelectorAll('.nav-item').forEach(el=>el.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(el=>{if(el.textContent.toLowerCase().includes(page))el.classList.add('active');});
-  const title={dashboard:'Dashboard',venues:'Venues',events:'Events',inquiries:'Inquiries',revenue:'Revenue',design:'Design Requests',vendors:'Vendors',subscriptions:'Subscriptions',users:'Users',overrides:'Overrides'};
+  const title={dashboard:'Dashboard',venues:'Venues',events:'Events',inquiries:'Inquiries',revenue:'Revenue',design:'Design Requests',vendors:'Vendors',subscriptions:'Subscriptions',users:'Users',overrides:'Overrides',claims:'Listing Claims'};
   const el=document.getElementById('topbarTitle');
   if(el)el.textContent=title[page]||page;
   renderPage();
@@ -296,6 +297,7 @@ function renderPage(){
   else if(currentPage==='subscriptions')renderSubscriptions();
   else if(currentPage==='users')renderUsers();
   else if(currentPage==='overrides')renderOverrides();
+  else if(currentPage==='claims')renderClaims();
 }
 
 // ── DASHBOARD ─────────────────────────────────────────────────
@@ -1104,6 +1106,90 @@ async function applyOverride(){
 
 // ── START ─────────────────────────────────────────────────────
 init();
+
+// ── CLAIMS ─────────────────────────────────────────────────────
+async function renderClaims(){
+  const el=document.getElementById('pageContent');
+  el.innerHTML='<div class="spinner"></div>';
+
+  const{data:claims}=await sb.from('venues')
+    .select('id,name,venue_type,neighborhood,status,claim_status,claim_email,claimed_at,owner_id')
+    .not('claim_status','is',null)
+    .order('claimed_at',{ascending:false})
+    .catch(()=>({data:[]}));
+
+  const pending=(claims||[]).filter(c=>c.claim_status==='pending');
+  const reviewed=(claims||[]).filter(c=>c.claim_status!=='pending');
+
+  // Update badge
+  const badge=document.getElementById('claimsBadge');
+  if(badge){badge.textContent=pending.length||'';badge.style.display=pending.length?'':'none';}
+
+  el.innerHTML=`
+    <div style="margin-bottom:28px">
+      <div style="font-family:'Syne',sans-serif;font-size:20px;font-weight:800;margin-bottom:6px">Listing Claims</div>
+      <div style="color:var(--sub);font-size:14px">${pending.length} pending · ${reviewed.length} reviewed</div>
+    </div>
+
+    ${pending.length?`
+    <div style="margin-bottom:24px">
+      <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:12px">Pending Review</div>
+      ${pending.map(c=>`
+        <div style="background:var(--card);border:1px solid #f59e0b40;border-radius:12px;padding:18px 20px;margin-bottom:10px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap">
+          <div>
+            <div style="font-weight:700;font-size:15px;margin-bottom:4px">${c.name}</div>
+            <div style="font-size:12px;color:var(--sub);margin-bottom:4px">${c.venue_type||'Venue'}${c.neighborhood?' · '+c.neighborhood:''}</div>
+            <div style="font-size:12px;color:var(--sub)">📧 ${c.claim_email||'No email'} · 🕐 ${c.claimed_at?new Date(c.claimed_at).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}):'Unknown'}</div>
+          </div>
+          <div style="display:flex;gap:8px;flex-shrink:0">
+            <button onclick="approveClaim('${c.id}','${c.name.replace(/'/g,"\'")}')" style="background:#22c55e20;color:#22c55e;border:1px solid #22c55e40;border-radius:8px;padding:7px 16px;font-size:13px;font-weight:700;cursor:pointer">✓ Approve</button>
+            <button onclick="rejectClaim('${c.id}','${c.name.replace(/'/g,"\'")}')" style="background:#ef444420;color:#ef4444;border:1px solid #ef444430;border-radius:8px;padding:7px 16px;font-size:13px;font-weight:700;cursor:pointer">✗ Reject</button>
+          </div>
+        </div>`).join('')}
+    </div>`:`
+    <div style="background:var(--card);border:1px solid #22c55e30;border-radius:12px;padding:16px 20px;margin-bottom:24px;color:#22c55e;font-size:14px;font-weight:500">
+      ✓ No pending claims
+    </div>`}
+
+    ${reviewed.length?`
+    <div>
+      <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:12px">Recently Reviewed</div>
+      ${reviewed.slice(0,10).map(c=>`
+        <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px 18px;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between;gap:12px">
+          <div>
+            <div style="font-weight:600;font-size:14px">${c.name}</div>
+            <div style="font-size:12px;color:var(--sub);margin-top:2px">📧 ${c.claim_email||'—'}</div>
+          </div>
+          <span style="background:${c.claim_status==='approved'?'#22c55e20':'#ef444420'};color:${c.claim_status==='approved'?'#22c55e':'#ef4444'};border:1px solid ${c.claim_status==='approved'?'#22c55e30':'#ef444430'};border-radius:20px;padding:3px 12px;font-size:11px;font-weight:700">${c.claim_status}</span>
+        </div>`).join('')}
+    </div>`:''}
+  `;
+}
+
+async function approveClaim(venueId, venueName){
+  if(!confirm(`Approve claim for "${venueName}"? This confirms the person who claimed it is the real owner.`))return;
+  const{error}=await sb.from('venues').update({
+    claim_status:'approved',
+    status:'approved',
+  }).eq('id',venueId);
+  if(error){alert('Error: '+error.message);return;}
+  showToast(`✓ Claim approved — ${venueName} is now live`,'success');
+  renderClaims();
+}
+
+async function rejectClaim(venueId, venueName){
+  const reason=prompt(`Reason for rejecting claim on "${venueName}" (optional):`);
+  if(reason===null)return; // cancelled
+  const{error}=await sb.from('venues').update({
+    claim_status:'rejected',
+    owner_id:null,
+    claim_email:null,
+  }).eq('id',venueId);
+  if(error){alert('Error: '+error.message);return;}
+  showToast(`Claim rejected for ${venueName}`,'error');
+  renderClaims();
+}
+
 </script>
 </body>
 </html>
