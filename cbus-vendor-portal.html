@@ -1,0 +1,868 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>CBUSEVENTS — Vendor Portal</title>
+<meta name="robots" content="noindex,nofollow"/>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --bg:#0b0b0f;--surface:#13131a;--card:#1a1a24;--border:#25252f;
+  --text:#e8e8f0;--sub:#8888a0;--muted:#55556a;
+  --orange:#FF6B35;--green:#22c55e;--gold:#f59e0b;--blue:#60a5fa;--red:#ef4444;
+}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min-height:100vh;}
+a{text-decoration:none;color:inherit;}
+button{cursor:pointer;font-family:'DM Sans',sans-serif;border:none;}
+input,textarea,select{background:var(--bg);color:var(--text);border:1px solid var(--border);border-radius:8px;padding:10px 14px;font-family:'DM Sans',sans-serif;font-size:14px;width:100%;outline:none;}
+input:focus,textarea:focus,select:focus{border-color:var(--orange);}
+textarea{resize:vertical;min-height:90px;}
+label{display:block;font-size:12px;color:var(--sub);font-weight:500;margin-bottom:5px;}
+@keyframes spin{to{transform:rotate(360deg);}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:translateY(0);}}
+
+/* ── AUTH ── */
+.auth-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;}
+.auth-card{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:40px;width:100%;max-width:440px;animation:fadeUp 0.4s ease;}
+.auth-logo{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;text-align:center;margin-bottom:4px;}
+.auth-logo span{color:var(--orange);}
+.auth-sub{color:var(--sub);font-size:13px;text-align:center;margin-bottom:28px;}
+.auth-tabs{display:grid;grid-template-columns:1fr 1fr;background:var(--surface);border-radius:10px;padding:4px;margin-bottom:24px;}
+.auth-tab{background:none;border:none;color:var(--sub);padding:8px;border-radius:7px;font-size:14px;font-weight:500;transition:all 0.15s;}
+.auth-tab.active{background:var(--card);color:var(--text);font-weight:600;}
+.field{margin-bottom:14px;}
+.btn-primary{background:var(--orange);color:#fff;border:none;border-radius:8px;padding:12px;font-size:14px;font-weight:700;width:100%;transition:opacity 0.15s;}
+.btn-primary:hover{opacity:0.85;}
+.auth-err{color:var(--red);font-size:13px;margin-bottom:10px;min-height:18px;}
+
+/* ── NAV ── */
+nav{position:sticky;top:0;z-index:100;background:rgba(11,11,15,0.95);backdrop-filter:blur(16px);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 40px;height:60px;}
+.nav-logo{font-family:'Syne',sans-serif;font-weight:800;font-size:18px;cursor:pointer;}
+.nav-logo span{color:var(--orange);}
+.nav-logo-sub{font-size:10px;color:var(--muted);font-weight:400;margin-left:6px;letter-spacing:1px;text-transform:uppercase;}
+.nav-right{display:flex;align-items:center;gap:10px;}
+.nav-home{background:var(--card);border:1px solid var(--border);color:var(--text);border-radius:8px;padding:7px 14px;font-size:13px;font-weight:500;transition:all 0.15s;}
+.nav-home:hover{border-color:var(--muted);}
+.nav-plan{border-radius:20px;padding:4px 12px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;}
+.plan-free{background:var(--surface);color:var(--muted);border:1px solid var(--border);}
+.plan-standard{background:#60a5fa20;color:var(--blue);border:1px solid #60a5fa40;}
+.plan-premium{background:#f59e0b20;color:var(--gold);border:1px solid #f59e0b40;}
+.nav-signout{background:none;border:1px solid var(--border);color:var(--sub);border-radius:8px;padding:7px 14px;font-size:13px;transition:all 0.15s;}
+.nav-signout:hover{color:var(--text);}
+
+/* ── LAYOUT ── */
+.portal-layout{display:grid;grid-template-columns:210px 1fr;min-height:calc(100vh - 60px);}
+@media(max-width:900px){.portal-layout{grid-template-columns:1fr;}.sidebar{display:flex;flex-wrap:wrap;gap:4px;padding:12px;border-right:none;border-bottom:1px solid var(--border);position:static;height:auto;}}
+
+/* ── SIDEBAR ── */
+.sidebar{background:var(--surface);border-right:1px solid var(--border);padding:16px 10px;display:flex;flex-direction:column;gap:2px;position:sticky;top:60px;height:calc(100vh - 60px);overflow-y:auto;}
+.sidebar-section{padding:10px 10px 4px;font-size:10px;color:var(--muted);font-weight:700;letter-spacing:1.5px;text-transform:uppercase;}
+.nav-item{display:flex;align-items:center;gap:8px;padding:9px 12px;border-radius:8px;cursor:pointer;font-size:13px;font-weight:500;color:var(--sub);transition:all 0.15s;}
+.nav-item:hover{background:var(--card);color:var(--text);}
+.nav-item.active{background:var(--card);color:var(--text);}
+.nav-item .badge{background:var(--orange);color:#fff;border-radius:20px;padding:1px 7px;font-size:10px;font-weight:700;margin-left:auto;}
+
+/* ── CONTENT ── */
+.content{padding:32px;animation:fadeUp 0.3s ease;}
+.page{display:none;}
+.page.active{display:block;}
+.page-title{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;margin-bottom:6px;}
+.page-sub{color:var(--sub);font-size:14px;margin-bottom:28px;}
+
+/* ── CARDS ── */
+.card{background:var(--card);border:1px solid var(--border);border-radius:14px;overflow:hidden;}
+.card-header{display:flex;align-items:center;justify-content:space-between;padding:18px 22px;border-bottom:1px solid var(--border);}
+.card-title{font-family:'Syne',sans-serif;font-size:16px;font-weight:700;}
+.card-body{padding:22px;}
+
+/* ── STAT GRID ── */
+.stat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:14px;margin-bottom:28px;}
+.stat-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:20px;}
+.stat-icon{font-size:22px;margin-bottom:8px;}
+.stat-num{font-family:'Syne',sans-serif;font-size:26px;font-weight:800;margin-bottom:3px;}
+.stat-label{font-size:12px;color:var(--sub);}
+
+/* ── SERVICES GRID ── */
+.services-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;}
+.service-card{background:var(--surface);border:1.5px solid var(--border);border-radius:12px;padding:16px 18px;cursor:pointer;transition:all 0.2s;position:relative;}
+.service-card:hover{border-color:var(--orange);}
+.service-card.selected{border-color:var(--orange);background:#FF6B3510;}
+.service-card.selected::after{content:'✓';position:absolute;top:10px;right:12px;background:var(--orange);color:#fff;border-radius:50%;width:20px;height:20px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;}
+.service-icon{font-size:28px;margin-bottom:8px;}
+.service-name{font-weight:600;font-size:14px;margin-bottom:3px;}
+.service-desc{font-size:12px;color:var(--sub);}
+
+/* ── PORTFOLIO ── */
+.portfolio-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;margin-bottom:20px;}
+.portfolio-item{position:relative;border-radius:10px;overflow:hidden;aspect-ratio:1;background:var(--surface);border:1px solid var(--border);}
+.portfolio-item img{width:100%;height:100%;object-fit:cover;}
+.portfolio-remove{position:absolute;top:6px;right:6px;background:rgba(0,0,0,0.7);border:none;color:#fff;border-radius:6px;width:26px;height:26px;font-size:13px;display:flex;align-items:center;justify-content:center;cursor:pointer;opacity:0;transition:opacity 0.15s;}
+.portfolio-item:hover .portfolio-remove{opacity:1;}
+.portfolio-add{border-radius:10px;aspect-ratio:1;background:var(--surface);border:2px dashed var(--border);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;cursor:pointer;transition:all 0.2s;color:var(--sub);font-size:13px;}
+.portfolio-add:hover{border-color:var(--orange);color:var(--orange);}
+
+/* ── PROPOSALS ── */
+.proposal-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:18px 20px;margin-bottom:12px;transition:all 0.2s;}
+.proposal-card:hover{border-color:var(--orange);}
+.proposal-title{font-weight:600;font-size:14px;margin-bottom:4px;}
+.proposal-meta{font-size:12px;color:var(--sub);margin-bottom:10px;}
+.proposal-status{display:inline-block;border-radius:20px;padding:3px 10px;font-size:11px;font-weight:700;}
+.status-pending{background:#f59e0b20;color:var(--gold);border:1px solid #f59e0b40;}
+.status-accepted{background:#22c55e20;color:var(--green);border:1px solid #22c55e40;}
+.status-declined{background:#ef444420;color:var(--red);border:1px solid #ef444430;}
+
+/* ── PLAN CARDS ── */
+.plan-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;}
+@media(max-width:700px){.plan-grid{grid-template-columns:1fr;}}
+.plan-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:24px;position:relative;display:flex;flex-direction:column;}
+.plan-card.current{border-color:var(--orange);background:linear-gradient(135deg,#1a0800,#1a1a24);}
+.plan-card.popular{border-color:#f59e0b80;}
+.plan-badge{position:absolute;top:-12px;left:50%;transform:translateX(-50%);background:var(--orange);color:#fff;border-radius:20px;padding:3px 14px;font-size:11px;font-weight:700;white-space:nowrap;}
+.plan-name{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;}
+.plan-price{font-family:'Syne',sans-serif;font-size:34px;font-weight:800;margin-bottom:4px;}
+.plan-price span{font-size:14px;color:var(--sub);font-weight:400;}
+.plan-period{color:var(--sub);font-size:13px;margin-bottom:20px;}
+.plan-perks{flex:1;display:flex;flex-direction:column;gap:9px;margin-bottom:24px;}
+.plan-perk{display:flex;gap:8px;font-size:13px;color:var(--sub);}
+.plan-perk .check{color:var(--green);flex-shrink:0;}
+.plan-perk.premium-perk .check{color:var(--gold);}
+.plan-btn{width:100%;border:none;border-radius:9px;padding:11px;font-size:14px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;transition:opacity 0.15s;}
+.plan-btn:hover{opacity:0.85;}
+
+/* ── BROWSE EVENTS (for proposals) ── */
+.event-row{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px 16px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;gap:12px;}
+.event-row-info .event-title{font-weight:600;font-size:14px;margin-bottom:3px;}
+.event-row-info .event-meta{font-size:12px;color:var(--sub);}
+
+/* ── MODAL ── */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:200;display:flex;align-items:center;justify-content:center;padding:20px;overflow-y:auto;}
+.modal{background:var(--card);border:1px solid var(--border);border-radius:18px;width:100%;max-width:560px;animation:fadeUp 0.25s ease;}
+.modal-header{display:flex;justify-content:space-between;align-items:center;padding:20px 24px;border-bottom:1px solid var(--border);}
+.modal-title{font-family:'Syne',sans-serif;font-size:17px;font-weight:700;}
+.modal-body{padding:24px;}
+.modal-footer{padding:16px 24px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:8px;}
+
+/* ── BUTTONS ── */
+.btn{border:none;border-radius:7px;padding:8px 16px;font-size:13px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all 0.15s;}
+.btn-orange{background:var(--orange);color:#fff;}
+.btn-orange:hover{opacity:0.85;}
+.btn-ghost{background:var(--surface);color:var(--sub);border:1px solid var(--border);}
+.btn-ghost:hover{color:var(--text);}
+.btn-sm{padding:5px 12px;font-size:12px;}
+
+/* ── UPGRADE GATE ── */
+.upgrade-gate{background:linear-gradient(135deg,#1a0f00,#1a1a24);border:1px solid #FF6B3540;border-radius:16px;padding:40px;text-align:center;}
+.upgrade-gate-icon{font-size:44px;margin-bottom:14px;}
+.upgrade-gate h3{font-family:'Syne',sans-serif;font-size:20px;font-weight:800;margin-bottom:8px;}
+.upgrade-gate p{color:var(--sub);font-size:14px;line-height:1.65;max-width:420px;margin:0 auto 24px;}
+
+/* ── TOAST ── */
+.toast{position:fixed;bottom:24px;right:24px;z-index:999;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:12px 18px;font-size:13px;font-weight:500;animation:fadeUp 0.3s ease;box-shadow:0 8px 32px rgba(0,0,0,0.4);display:none;}
+.toast.success{border-color:#22c55e40;color:var(--green);}
+.toast.error{border-color:#ef444440;color:var(--red);}
+
+/* ── MISC ── */
+.empty{text-align:center;padding:60px 20px;color:var(--sub);}
+.empty-icon{font-size:44px;margin-bottom:12px;}
+.empty h3{font-family:'Syne',sans-serif;font-size:17px;font-weight:700;margin-bottom:8px;color:var(--text);}
+.spinner{width:28px;height:28px;border:3px solid var(--border);border-top-color:var(--orange);border-radius:50%;animation:spin 0.8s linear infinite;margin:48px auto;display:block;}
+.badge-green{background:#22c55e20;color:var(--green);border:1px solid #22c55e30;border-radius:20px;padding:3px 10px;font-size:11px;font-weight:700;display:inline-block;}
+.badge-orange{background:#FF6B3520;color:var(--orange);border:1px solid #FF6B3530;border-radius:20px;padding:3px 10px;font-size:11px;font-weight:700;display:inline-block;}
+.badge-blue{background:#60a5fa20;color:var(--blue);border:1px solid #60a5fa30;border-radius:20px;padding:3px 10px;font-size:11px;font-weight:700;display:inline-block;}
+.badge-gold{background:#f59e0b20;color:var(--gold);border:1px solid #f59e0b30;border-radius:20px;padding:3px 10px;font-size:11px;font-weight:700;display:inline-block;}
+footer{background:var(--surface);border-top:1px solid var(--border);padding:20px 40px;display:flex;justify-content:space-between;align-items:center;}
+.footer-copy{color:var(--muted);font-size:12px;}
+.footer-admin{color:var(--muted);font-size:11px;font-weight:600;opacity:0.4;transition:opacity 0.2s;}
+.footer-admin:hover{opacity:1;}
+</style>
+</head>
+<body>
+
+<!-- ── AUTH GATE ── -->
+<div id="authGate">
+  <div class="auth-wrap">
+    <div class="auth-card">
+      <div class="auth-logo">CBUS<span>EVENTS</span></div>
+      <p class="auth-sub">Vendor Portal — reach venues & planners across Columbus</p>
+      <div class="auth-tabs">
+        <button class="auth-tab active" id="tabSignin" onclick="switchTab('signin')">Sign In</button>
+        <button class="auth-tab"        id="tabSignup" onclick="switchTab('signup')">Create Account</button>
+      </div>
+      <div id="nameField" class="field" style="display:none">
+        <label>Business Name</label>
+        <input id="authName" placeholder="e.g. Columbus Creative Co."/>
+      </div>
+      <div class="field">
+        <label>Email</label>
+        <input type="email" id="authEmail" placeholder="you@business.com" onkeydown="if(event.key==='Enter')doAuth()"/>
+      </div>
+      <div class="field">
+        <label>Password</label>
+        <input type="password" id="authPass" placeholder="••••••••" onkeydown="if(event.key==='Enter')doAuth()"/>
+      </div>
+      <div class="auth-err" id="authErr"></div>
+      <button class="btn-primary" id="authBtn" onclick="doAuth()">Sign In</button>
+      <div style="text-align:center;margin-top:14px;font-size:13px;color:var(--sub)">
+        <span id="authSwitchText">New vendor?</span>
+        <button onclick="switchTab(currentTab==='signin'?'signup':'signin')" style="background:none;border:none;color:var(--orange);font-size:13px;font-weight:600;margin-left:4px" id="authSwitchBtn">Create a free account</button>
+      </div>
+      <div style="text-align:center;margin-top:12px">
+        <a href="https://cbusevents.com" style="color:var(--muted);font-size:12px">← Back to CBUSEVENTS</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── PORTAL ── -->
+<div id="portal" style="display:none">
+
+  <nav>
+    <div class="nav-logo" onclick="window.location.href='https://cbusevents.com'">
+      CBUS<span>EVENTS</span>
+      <span class="nav-logo-sub">Vendor</span>
+    </div>
+    <div class="nav-right">
+      <span class="nav-plan plan-free" id="navPlanBadge">Free</span>
+      <button class="nav-home" onclick="window.location.href='https://cbusevents.com'">🏠 Home</button>
+      <button class="nav-signout" onclick="doSignOut()">Sign Out</button>
+    </div>
+  </nav>
+
+  <div class="portal-layout">
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-section">My Business</div>
+      <div class="nav-item active" id="nav-dashboard" onclick="showPage('dashboard')">⊞ Dashboard</div>
+      <div class="nav-item"        id="nav-profile"   onclick="showPage('profile')">🏢 My Profile</div>
+      <div class="nav-item"        id="nav-services"  onclick="showPage('services')">🛠 Services & Products</div>
+      <div class="nav-item"        id="nav-portfolio"  onclick="showPage('portfolio')">📸 Portfolio</div>
+      <div class="sidebar-section">Growth</div>
+      <div class="nav-item"        id="nav-proposals"  onclick="showPage('proposals')">📨 Proposals <span class="badge" id="proposalBadge" style="display:none">0</span></div>
+      <div class="nav-item"        id="nav-events"     onclick="showPage('events')">🎯 Browse Events</div>
+      <div class="nav-item"        id="nav-plan"       onclick="showPage('plan')">⭐ Plan & Billing</div>
+    </aside>
+
+    <!-- Pages -->
+    <main class="content">
+
+      <!-- DASHBOARD -->
+      <div class="page active" id="page-dashboard">
+        <div class="page-title">Welcome back!</div>
+        <div class="page-sub" id="dashSub">Here's your vendor overview.</div>
+        <div class="stat-grid" id="dashStats"></div>
+        <div id="dashContent"></div>
+      </div>
+
+      <!-- PROFILE -->
+      <div class="page" id="page-profile">
+        <div class="page-title">My Vendor Profile</div>
+        <div class="page-sub">This is how venues and planners see your business</div>
+        <div class="card" style="max-width:640px">
+          <div class="card-body" style="display:flex;flex-direction:column;gap:14px">
+            <div class="field"><label>Business Name *</label><input id="profName" placeholder="e.g. Columbus Creative Co."/></div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+              <div class="field"><label>Email</label><input id="profEmail" type="email" placeholder="contact@yourbiz.com"/></div>
+              <div class="field"><label>Phone</label><input id="profPhone" placeholder="(614) 555-0000"/></div>
+            </div>
+            <div class="field"><label>Website</label><input id="profWebsite" placeholder="https://yourbiz.com"/></div>
+            <div class="field"><label>Bio / About Your Business</label><textarea id="profBio" placeholder="Tell venues and planners what makes you special..."></textarea></div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+              <div class="field"><label>Instagram</label><input id="profInsta" placeholder="@handle"/></div>
+              <div class="field"><label>Years in Business</label><input id="profYears" type="number" placeholder="5"/></div>
+            </div>
+            <div id="profMsg" style="color:var(--green);font-size:13px;min-height:18px"></div>
+            <button class="btn btn-orange" onclick="saveProfile()" style="align-self:flex-start;padding:10px 24px">Save Profile →</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- SERVICES -->
+      <div class="page" id="page-services">
+        <div class="page-title">Services & Products</div>
+        <div class="page-sub">Select everything your business offers — this determines how you appear in search</div>
+        <div class="services-grid" id="servicesGrid"></div>
+        <div style="margin-top:20px">
+          <div class="field" style="max-width:480px">
+            <label>Custom service or product not listed above?</label>
+            <input id="customService" placeholder="e.g. Custom Neon Signs, Photo Booths..."/>
+          </div>
+          <button class="btn btn-orange" onclick="saveServices()" style="margin-top:4px">Save Services →</button>
+          <div id="servicesMsg" style="color:var(--green);font-size:13px;margin-top:8px;min-height:18px"></div>
+        </div>
+      </div>
+
+      <!-- PORTFOLIO -->
+      <div class="page" id="page-portfolio">
+        <div class="page-title">Portfolio</div>
+        <div class="page-sub">Showcase your work — photos help you get chosen. Free for all vendors.</div>
+        <div class="portfolio-grid" id="portfolioGrid"></div>
+        <div style="margin-top:4px">
+          <div class="field" style="max-width:500px">
+            <label>Add photo by URL</label>
+            <div style="display:flex;gap:8px">
+              <input id="photoUrl" placeholder="https://... (paste image URL)"/>
+              <button class="btn btn-orange" onclick="addPhoto()" style="white-space:nowrap;flex-shrink:0">Add Photo</button>
+            </div>
+          </div>
+          <div id="portfolioMsg" style="color:var(--green);font-size:13px;margin-top:8px;min-height:18px"></div>
+        </div>
+      </div>
+
+      <!-- PROPOSALS -->
+      <div class="page" id="page-proposals">
+        <div class="page-title">My Proposals</div>
+        <div class="page-sub">Track proposals you've sent to venues and event planners</div>
+        <div id="proposalsContent"><div class="spinner"></div></div>
+      </div>
+
+      <!-- BROWSE EVENTS -->
+      <div class="page" id="page-events">
+        <div class="page-title">Browse Events</div>
+        <div class="page-sub">Find upcoming events and send proposals to the organizers</div>
+        <div id="eventsContent"><div class="spinner"></div></div>
+      </div>
+
+      <!-- PLAN -->
+      <div class="page" id="page-plan">
+        <div class="page-title">Plan & Billing</div>
+        <div class="page-sub">Upgrade to get featured and send proposals directly to venues & planners</div>
+        <div id="planContent"></div>
+      </div>
+
+    </main>
+  </div>
+
+  <footer>
+    <span class="footer-copy">© 2026 CBUSEVENTS · Columbus, Ohio</span>
+    <div style="display:flex;align-items:center;gap:20px">
+      <span class="footer-copy">Made for Columbus 🏙</span>
+      <a href="https://cbusevents.com/cbus-admin.html" class="footer-admin">Admin</a>
+    </div>
+  </footer>
+</div>
+
+<div id="toast" class="toast"></div>
+<div id="modalContainer"></div>
+
+<script src="https://unpkg.com/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script>
+const SB_URL="https://toblgvatvsjljbqogzsv.supabase.co";
+const SB_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRvYmxndmF0dnNqbGpicW9nenN2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMDgwNTAsImV4cCI6MjA4NzY4NDA1MH0._WJEQPizNDiQfDXQB_DHPaQhixPGpMdmYQSmyWmm_FQ";
+const sb=supabase.createClient(SB_URL,SB_KEY);
+
+// Stripe payment links
+const STRIPE_LINKS={
+  standard:'https://buy.stripe.com/5kQeVfadt0SJgcG8QRew800',
+  premium:'https://buy.stripe.com/5kQ00lgBRcBr9Oi1opew801',
+};
+
+const SERVICES=[
+  {key:'photography',icon:'📷',name:'Photography',desc:'Event & venue photography'},
+  {key:'videography',icon:'🎥',name:'Videography',desc:'Video production & reels'},
+  {key:'dj',icon:'🎧',name:'DJ Services',desc:'Music & entertainment'},
+  {key:'live_music',icon:'🎸',name:'Live Music',desc:'Bands & performers'},
+  {key:'catering',icon:'🍽',name:'Catering',desc:'Full service catering'},
+  {key:'bartending',icon:'🍸',name:'Bartending',desc:'Bar service & mixology'},
+  {key:'event_staffing',icon:'👥',name:'Event Staffing',desc:'Staff & crew for hire'},
+  {key:'security',icon:'🛡',name:'Security',desc:'Event security services'},
+  {key:'florist',icon:'💐',name:'Florist & Decor',desc:'Flowers & event décor'},
+  {key:'hair_makeup',icon:'💄',name:'Hair & Makeup',desc:'Beauty & styling'},
+  {key:'lighting',icon:'💡',name:'Lighting & AV',desc:'Production & tech'},
+  {key:'photo_booth',icon:'🤳',name:'Photo Booth',desc:'Interactive photo experiences'},
+  {key:'planning',icon:'📋',name:'Event Planning',desc:'Full coordination'},
+  {key:'rentals',icon:'🪑',name:'Rentals',desc:'Furniture & equipment'},
+  {key:'printing',icon:'🖨',name:'Printing & Signage',desc:'Flyers, banners & more'},
+  {key:'merch',icon:'👕',name:'Merch & Apparel',desc:'Custom branded merchandise'},
+];
+
+let currentUser=null,vendorProfile=null,currentTab='signin';
+let selectedServices=new Set(),portfolioPhotos=[];
+
+// ── AUTH ──────────────────────────────────────────────────────
+async function init(){
+  const{data:{session}}=await sb.auth.getSession();
+  if(session?.user){currentUser=session.user;await enterPortal();}
+  sb.auth.onAuthStateChange(async(_,session)=>{
+    currentUser=session?.user??null;
+    if(currentUser)await enterPortal(); else exitPortal();
+  });
+}
+
+function switchTab(tab){
+  currentTab=tab;
+  document.getElementById('tabSignin').classList.toggle('active',tab==='signin');
+  document.getElementById('tabSignup').classList.toggle('active',tab==='signup');
+  document.getElementById('nameField').style.display=tab==='signup'?'block':'none';
+  document.getElementById('authBtn').textContent=tab==='signin'?'Sign In':'Create Account';
+  document.getElementById('authSwitchText').textContent=tab==='signin'?'New vendor?':'Already have an account?';
+  document.getElementById('authSwitchBtn').textContent=tab==='signin'?'Create a free account':'Sign in instead';
+  document.getElementById('authErr').textContent='';
+}
+
+async function doAuth(){
+  const email=document.getElementById('authEmail').value.trim();
+  const pass=document.getElementById('authPass').value;
+  const name=document.getElementById('authName').value.trim();
+  const errEl=document.getElementById('authErr');
+  const btn=document.getElementById('authBtn');
+  if(!email||!pass){errEl.textContent='Email and password required.';return;}
+  btn.disabled=true;btn.textContent='Please wait…';errEl.textContent='';
+  let error;
+  if(currentTab==='signin'){
+    ({error}=await sb.auth.signInWithPassword({email,password:pass}));
+  } else {
+    const{data,error:e}=await sb.auth.signUp({email,password:pass});
+    error=e;
+    if(!error&&data.user){
+      await sb.from('vendors').upsert({user_id:data.user.id,email,business_name:name||email,name:name||email,subscription_tier:'FREE',subscription_status:'free'},{onConflict:'user_id'}).catch(()=>{});
+    }
+  }
+  if(error){errEl.textContent=error.message;btn.disabled=false;btn.textContent=currentTab==='signin'?'Sign In':'Create Account';}
+}
+
+async function doSignOut(){
+  await sb.auth.signOut();
+  vendorProfile=null;selectedServices=new Set();portfolioPhotos=[];
+  exitPortal();
+}
+
+async function enterPortal(){
+  // Load vendor profile
+  const{data}=await sb.from('vendors').select('*').eq('user_id',currentUser.id).maybeSingle();
+  if(!data){
+    // Create profile if doesn't exist
+    const{data:newVendor}=await sb.from('vendors').insert({user_id:currentUser.id,email:currentUser.email,business_name:currentUser.email,subscription_tier:'FREE',subscription_status:'free'}).select().single().catch(()=>({data:null}));
+    vendorProfile=newVendor;
+  } else {
+    vendorProfile=data;
+  }
+
+  // Parse stored data
+  selectedServices=new Set(vendorProfile?.services||[]);
+  portfolioPhotos=vendorProfile?.portfolio_photos||[];
+
+  // Update nav plan badge
+  updatePlanBadge();
+
+  document.getElementById('authGate').style.display='none';
+  document.getElementById('portal').style.display='';
+
+  // Load dashboard
+  renderDashboard();
+  renderServicesGrid();
+  renderPortfolioGrid();
+}
+
+function exitPortal(){
+  document.getElementById('authGate').style.display='';
+  document.getElementById('portal').style.display='none';
+}
+
+function updatePlanBadge(){
+  const badge=document.getElementById('navPlanBadge');
+  const tier=(vendorProfile?.subscription_tier||'FREE').toUpperCase();
+  badge.textContent=tier==='PREMIUM'?'⭐ Premium':tier==='STANDARD'?'✦ Standard':'Free';
+  badge.className='nav-plan '+(tier==='PREMIUM'?'plan-premium':tier==='STANDARD'?'plan-standard':'plan-free');
+}
+
+// ── PAGE NAV ──────────────────────────────────────────────────
+function showPage(p){
+  document.querySelectorAll('.page').forEach(el=>el.classList.remove('active'));
+  document.querySelectorAll('.nav-item[id^="nav-"]').forEach(el=>el.classList.remove('active'));
+  document.getElementById('page-'+p)?.classList.add('active');
+  document.getElementById('nav-'+p)?.classList.add('active');
+  if(p==='proposals')loadProposals();
+  else if(p==='events')loadBrowseEvents();
+  else if(p==='plan')renderPlan();
+  else if(p==='profile')prefillProfile();
+}
+
+// ── DASHBOARD ─────────────────────────────────────────────────
+async function renderDashboard(){
+  const name=vendorProfile?.business_name||currentUser?.email||'';
+  document.getElementById('dashSub').textContent=`Welcome back${name?', '+name:''}! Here's your vendor overview.`;
+
+  const tier=(vendorProfile?.subscription_tier||'FREE').toUpperCase();
+  const sentProposals=await sb.from('vendor_proposals').select('id,status').eq('vendor_id',vendorProfile?.id).catch(()=>({data:[]}));
+  const proposals=sentProposals.data||[];
+  const accepted=proposals.filter(p=>p.status==='accepted').length;
+
+  document.getElementById('dashStats').innerHTML=`
+    <div class="stat-card">
+      <div class="stat-icon">🛠</div>
+      <div class="stat-num" style="color:var(--orange)">${selectedServices.size}</div>
+      <div class="stat-label">Services Listed</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">📸</div>
+      <div class="stat-num" style="color:var(--blue)">${portfolioPhotos.length}</div>
+      <div class="stat-label">Portfolio Photos</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">📨</div>
+      <div class="stat-num" style="color:${tier==='PREMIUM'?'var(--gold)':'var(--muted)'}">${tier==='PREMIUM'?proposals.length:'—'}</div>
+      <div class="stat-label">Proposals Sent</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">✅</div>
+      <div class="stat-num" style="color:var(--green)">${tier==='PREMIUM'?accepted:'—'}</div>
+      <div class="stat-label">Proposals Accepted</div>
+    </div>`;
+
+  // Status cards
+  const checks=[
+    {done:!!vendorProfile?.business_name&&vendorProfile?.business_name!==currentUser?.email,label:'Complete your profile',action:"showPage('profile')",btn:'Set Up Profile'},
+    {done:selectedServices.size>0,label:'Add your services',action:"showPage('services')",btn:'Add Services'},
+    {done:portfolioPhotos.length>0,label:'Upload portfolio photos',action:"showPage('portfolio')",btn:'Add Photos'},
+    {done:tier!=='FREE',label:'Get featured in the directory',action:"showPage('plan')",btn:'Upgrade Plan'},
+  ];
+  const incomplete=checks.filter(c=>!c.done);
+
+  document.getElementById('dashContent').innerHTML=incomplete.length?`
+    <div class="card">
+      <div class="card-header"><div class="card-title">🚀 Complete your setup</div><div style="font-size:13px;color:var(--sub)">${checks.filter(c=>c.done).length}/${checks.length} done</div></div>
+      <div class="card-body" style="display:flex;flex-direction:column;gap:10px">
+        ${checks.map(c=>`
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 14px;background:${c.done?'var(--surface)':'var(--bg)'};border:1px solid ${c.done?'#22c55e30':'var(--border)'};border-radius:10px;gap:12px">
+            <div style="display:flex;align-items:center;gap:10px">
+              <span style="font-size:16px">${c.done?'✅':'⬜'}</span>
+              <span style="font-size:13px;font-weight:500;${c.done?'color:var(--muted);text-decoration:line-through':''}">${c.label}</span>
+            </div>
+            ${!c.done?`<button class="btn btn-orange btn-sm" onclick="${c.action}">${c.btn}</button>`:''}
+          </div>`).join('')}
+      </div>
+    </div>`:`
+    <div style="background:#0a1a0a;border:1px solid #22c55e30;border-radius:14px;padding:20px 24px;display:flex;align-items:center;gap:12px;color:var(--green);font-size:14px;font-weight:500">
+      ✓ Your profile is fully set up and live on CBUSEVENTS!
+    </div>`;
+}
+
+// ── PROFILE ───────────────────────────────────────────────────
+function prefillProfile(){
+  if(!vendorProfile)return;
+  const f=vendorProfile;
+  document.getElementById('profName').value=f.business_name||f.name||'';
+  document.getElementById('profEmail').value=f.email||'';
+  document.getElementById('profPhone').value=f.phone||'';
+  document.getElementById('profWebsite').value=f.website||'';
+  document.getElementById('profBio').value=f.description||'';
+  document.getElementById('profInsta').value=f.instagram||'';
+  document.getElementById('profYears').value=f.years_in_business||'';
+}
+
+async function saveProfile(){
+  if(!vendorProfile)return;
+  const updates={
+    business_name:document.getElementById('profName').value.trim(),
+    email:document.getElementById('profEmail').value.trim(),
+    phone:document.getElementById('profPhone').value.trim()||null,
+    website:document.getElementById('profWebsite').value.trim()||null,
+    description:document.getElementById('profBio').value.trim()||null,
+    instagram:document.getElementById('profInsta').value.trim()||null,
+    years_in_business:document.getElementById('profYears').value||null,
+    updated_at:new Date().toISOString(),
+  };
+  const{error}=await sb.from('vendors').update(updates).eq('id',vendorProfile.id);
+  if(error){toast('Error: '+error.message,'error');return;}
+  Object.assign(vendorProfile,updates);
+  const msg=document.getElementById('profMsg');
+  msg.textContent='✓ Profile saved!';
+  setTimeout(()=>msg.textContent='',3000);
+  renderDashboard();
+}
+
+// ── SERVICES ──────────────────────────────────────────────────
+function renderServicesGrid(){
+  document.getElementById('servicesGrid').innerHTML=SERVICES.map(s=>`
+    <div class="service-card ${selectedServices.has(s.key)?'selected':''}" id="svc-${s.key}" onclick="toggleService('${s.key}')">
+      <div class="service-icon">${s.icon}</div>
+      <div class="service-name">${s.name}</div>
+      <div class="service-desc">${s.desc}</div>
+    </div>`).join('');
+}
+
+function toggleService(key){
+  if(selectedServices.has(key))selectedServices.delete(key);
+  else selectedServices.add(key);
+  document.getElementById('svc-'+key)?.classList.toggle('selected',selectedServices.has(key));
+}
+
+async function saveServices(){
+  if(!vendorProfile)return;
+  const custom=document.getElementById('customService').value.trim();
+  const services=[...selectedServices,...(custom?custom.split(',').map(s=>s.trim().toLowerCase().replace(/\s+/g,'_')):[] )];
+  const{error}=await sb.from('vendors').update({services,updated_at:new Date().toISOString()}).eq('id',vendorProfile.id);
+  if(error){toast('Error: '+error.message,'error');return;}
+  vendorProfile.services=services;
+  const msg=document.getElementById('servicesMsg');
+  msg.textContent='✓ Services saved!';
+  setTimeout(()=>msg.textContent='',3000);
+  renderDashboard();
+}
+
+// ── PORTFOLIO ─────────────────────────────────────────────────
+function renderPortfolioGrid(){
+  const grid=document.getElementById('portfolioGrid');
+  if(!grid)return;
+  grid.innerHTML=portfolioPhotos.map((url,i)=>`
+    <div class="portfolio-item">
+      <img src="${url}" alt="Portfolio ${i+1}" onerror="this.parentNode.remove()">
+      <button class="portfolio-remove" onclick="removePhoto(${i})">✕</button>
+    </div>`).join('')+`
+    <div class="portfolio-add" onclick="document.getElementById('photoUrl').focus()">
+      <span style="font-size:28px">+</span>
+      <span>Add Photo</span>
+    </div>`;
+}
+
+async function addPhoto(){
+  const url=document.getElementById('photoUrl').value.trim();
+  if(!url){toast('Paste an image URL first','error');return;}
+  if(!url.startsWith('http')){toast('Must be a valid URL starting with https://','error');return;}
+  portfolioPhotos=[...portfolioPhotos,url];
+  await savePortfolio();
+  document.getElementById('photoUrl').value='';
+}
+
+async function removePhoto(i){
+  portfolioPhotos=portfolioPhotos.filter((_,idx)=>idx!==i);
+  await savePortfolio();
+}
+
+async function savePortfolio(){
+  if(!vendorProfile)return;
+  const{error}=await sb.from('vendors').update({portfolio_photos:portfolioPhotos,updated_at:new Date().toISOString()}).eq('id',vendorProfile.id);
+  if(error){toast('Error saving photo','error');return;}
+  vendorProfile.portfolio_photos=portfolioPhotos;
+  renderPortfolioGrid();
+  const msg=document.getElementById('portfolioMsg');
+  if(msg){msg.textContent='✓ Portfolio updated!';setTimeout(()=>msg.textContent='',2500);}
+  renderDashboard();
+}
+
+// ── PROPOSALS ─────────────────────────────────────────────────
+async function loadProposals(){
+  const el=document.getElementById('proposalsContent');
+  const tier=(vendorProfile?.subscription_tier||'FREE').toUpperCase();
+
+  if(tier!=='PREMIUM'){
+    el.innerHTML=`
+      <div class="upgrade-gate">
+        <div class="upgrade-gate-icon">📨</div>
+        <h3>Send Proposals with Premium</h3>
+        <p>Premium vendors can browse upcoming events and send proposals directly to venues and planners. Stand out before the event is even booked.</p>
+        <button class="btn btn-orange" onclick="showPage('plan')" style="padding:12px 28px;font-size:14px">Upgrade to Premium →</button>
+      </div>`;
+    return;
+  }
+
+  const{data:proposals}=await sb.from('vendor_proposals')
+    .select('*,events(title,start_time,venues(name))')
+    .eq('vendor_id',vendorProfile.id)
+    .order('created_at',{ascending:false})
+    .catch(()=>({data:[]}));
+
+  if(!proposals?.length){
+    el.innerHTML=`<div class="empty"><div class="empty-icon">📨</div><h3>No proposals sent yet</h3><p style="margin-bottom:16px">Browse upcoming events and introduce your business.</p><button class="btn btn-orange" onclick="showPage('events')">Browse Events →</button></div>`;
+    return;
+  }
+
+  // Update badge
+  const pending=proposals.filter(p=>p.status==='pending').length;
+  const badge=document.getElementById('proposalBadge');
+  if(badge){badge.textContent=pending;badge.style.display=pending?'':'none';}
+
+  el.innerHTML=proposals.map(p=>`
+    <div class="proposal-card">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px">
+        <div>
+          <div class="proposal-title">${p.events?.title||'Event'}</div>
+          <div class="proposal-meta">🏛 ${p.events?.venues?.name||'Venue'} · 📅 ${fmt(p.events?.start_time)}</div>
+          <div style="font-size:13px;color:var(--sub);margin-top:6px;line-height:1.6">${p.message||''}</div>
+        </div>
+        <span class="proposal-status status-${p.status||'pending'}">${p.status||'pending'}</span>
+      </div>
+    </div>`).join('');
+}
+
+// ── BROWSE EVENTS ─────────────────────────────────────────────
+async function loadBrowseEvents(){
+  const el=document.getElementById('eventsContent');
+  const tier=(vendorProfile?.subscription_tier||'FREE').toUpperCase();
+
+  if(tier!=='PREMIUM'){
+    el.innerHTML=`
+      <div class="upgrade-gate">
+        <div class="upgrade-gate-icon">🎯</div>
+        <h3>Browse Events with Premium</h3>
+        <p>See every upcoming event on CBUSEVENTS and pitch your services directly to the organizer before they've even hired anyone.</p>
+        <button class="btn btn-orange" onclick="showPage('plan')" style="padding:12px 28px;font-size:14px">Upgrade to Premium →</button>
+      </div>`;
+    return;
+  }
+
+  el.innerHTML='<div class="spinner"></div>';
+
+  const{data:events}=await sb.from('events')
+    .select('id,title,start_time,category,description,venues(id,name,neighborhood),profiles:owner_id(email)')
+    .gte('start_time',new Date().toISOString())
+    .eq('status','published')
+    .order('start_time',{ascending:true})
+    .limit(40)
+    .catch(()=>({data:[]}));
+
+  if(!events?.length){
+    el.innerHTML=`<div class="empty"><div class="empty-icon">📅</div><h3>No upcoming events right now</h3><p>Check back soon!</p></div>`;
+    return;
+  }
+
+  // Check which events already have proposals from this vendor
+  const{data:myProps}=await sb.from('vendor_proposals').select('event_id').eq('vendor_id',vendorProfile.id).catch(()=>({data:[]}));
+  const proposedIds=new Set((myProps||[]).map(p=>p.event_id));
+
+  el.innerHTML=events.map(e=>`
+    <div class="event-row">
+      <div class="event-row-info">
+        <div class="event-title">${e.title}</div>
+        <div class="event-meta">🏛 ${e.venues?.name||'Venue'} · 📍 ${e.venues?.neighborhood||'Columbus'} · 📅 ${fmt(e.start_time)} · ${e.category||'Event'}</div>
+      </div>
+      <div style="flex-shrink:0">
+        ${proposedIds.has(e.id)
+          ?'<span class="badge-green">✓ Proposed</span>'
+          :`<button class="btn btn-orange btn-sm" onclick="openProposalModal('${e.id}','${(e.title||'').replace(/'/g,"\\'")}','${e.venues?.name||''}')">Send Proposal</button>`}
+      </div>
+    </div>`).join('');
+}
+
+function openProposalModal(eventId,eventTitle,venueName){
+  document.getElementById('modalContainer').innerHTML=`
+    <div class="modal-overlay" onclick="if(event.target===this)closeModal()">
+      <div class="modal">
+        <div class="modal-header">
+          <div class="modal-title">📨 Send a Proposal</div>
+          <button onclick="closeModal()" style="background:none;border:none;color:var(--sub);font-size:18px;cursor:pointer">✕</button>
+        </div>
+        <div class="modal-body">
+          <div style="background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:12px 14px;margin-bottom:16px">
+            <div style="font-weight:600;font-size:13px">${eventTitle}</div>
+            <div style="font-size:12px;color:var(--sub);margin-top:2px">🏛 ${venueName}</div>
+          </div>
+          <div class="field"><label>Your Pitch *</label><textarea id="proposalMsg" placeholder="Introduce your business and how you can help with this event. Be specific about what you offer and your rates..." style="min-height:120px"></textarea></div>
+          <div class="field"><label>Your Rate / Starting Price (optional)</label><input id="proposalRate" placeholder="e.g. Starting at $500 · Packages from $250"/></div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-orange" onclick="sendProposal('${eventId}')">Send Proposal →</button>
+          <button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
+        </div>
+      </div>
+    </div>`;
+}
+
+async function sendProposal(eventId){
+  const message=document.getElementById('proposalMsg')?.value.trim();
+  const rate=document.getElementById('proposalRate')?.value.trim();
+  if(!message){toast('Please write a pitch message','error');return;}
+
+  const{error}=await sb.from('vendor_proposals').insert({
+    vendor_id:vendorProfile.id,
+    event_id:eventId,
+    message,
+    rate:rate||null,
+    status:'pending',
+    created_at:new Date().toISOString(),
+  });
+  if(error){toast('Error: '+error.message,'error');return;}
+  closeModal();
+  toast('✓ Proposal sent!');
+  loadBrowseEvents();
+  loadProposals();
+}
+
+// ── PLAN ──────────────────────────────────────────────────────
+function renderPlan(){
+  const tier=(vendorProfile?.subscription_tier||'FREE').toUpperCase();
+  const isStandard=tier==='STANDARD';
+  const isPremium=tier==='PREMIUM';
+
+  document.getElementById('planContent').innerHTML=`
+    <div class="plan-grid">
+
+      <!-- FREE -->
+      <div class="plan-card ${!isStandard&&!isPremium?'current':''}">
+        <div class="plan-name" style="color:var(--muted)">Free</div>
+        <div class="plan-price">$0<span>/mo</span></div>
+        <div class="plan-period">forever</div>
+        <div class="plan-perks">
+          <div class="plan-perk"><span class="check">✓</span>Vendor profile & bio</div>
+          <div class="plan-perk"><span class="check">✓</span>Select all your services</div>
+          <div class="plan-perk"><span class="check">✓</span>Portfolio photos (unlimited)</div>
+          <div class="plan-perk"><span class="check" style="color:var(--muted)">✗</span><span style="color:var(--muted)">Featured in directory</span></div>
+          <div class="plan-perk"><span class="check" style="color:var(--muted)">✗</span><span style="color:var(--muted)">Send proposals</span></div>
+        </div>
+        <button class="plan-btn" style="background:var(--surface);color:var(--sub);border:1px solid var(--border)" disabled>${!isStandard&&!isPremium?'Current Plan':'Free Plan'}</button>
+      </div>
+
+      <!-- STANDARD -->
+      <div class="plan-card ${isStandard?'current':''}">
+        <div class="plan-name" style="color:var(--blue)">Standard</div>
+        <div class="plan-price">$29<span>/mo</span></div>
+        <div class="plan-period">cancel anytime</div>
+        <div class="plan-perks">
+          <div class="plan-perk"><span class="check">✓</span>Everything in Free</div>
+          <div class="plan-perk"><span class="check">✓</span>Featured in vendor directory</div>
+          <div class="plan-perk"><span class="check">✓</span>Priority search placement</div>
+          <div class="plan-perk"><span class="check" style="color:var(--muted)">✗</span><span style="color:var(--muted)">Send proposals to events</span></div>
+        </div>
+        ${isStandard
+          ?'<button class="plan-btn" style="background:var(--surface);color:var(--sub);border:1px solid var(--border)" disabled>Current Plan</button>'
+          :`<button class="plan-btn" style="background:var(--blue);color:#000" onclick="window.open('${STRIPE_LINKS.standard}','_blank')">Get Standard →</button>`}
+      </div>
+
+      <!-- PREMIUM -->
+      <div class="plan-card ${isPremium?'current':'popular'}" style="${isPremium?'':'background:linear-gradient(135deg,#1a1000,#1a0f00);border-color:#f59e0b80;'}">
+        ${!isPremium?'<div class="plan-badge">MOST POPULAR</div>':''}
+        <div class="plan-name" style="color:var(--gold)">Premium</div>
+        <div class="plan-price">$79<span>/mo</span></div>
+        <div class="plan-period">cancel anytime</div>
+        <div class="plan-perks">
+          <div class="plan-perk"><span class="check">✓</span>Everything in Standard</div>
+          <div class="plan-perk premium-perk"><span class="check">✦</span>Send proposals to venues</div>
+          <div class="plan-perk premium-perk"><span class="check">✦</span>Send proposals to planners</div>
+          <div class="plan-perk premium-perk"><span class="check">✦</span>Browse all upcoming events</div>
+          <div class="plan-perk premium-perk"><span class="check">✦</span>Top of directory listings</div>
+        </div>
+        ${isPremium
+          ?'<button class="plan-btn" style="background:var(--surface);color:var(--sub);border:1px solid var(--border)" disabled>Current Plan</button>'
+          :`<button class="plan-btn" style="background:var(--gold);color:#000" onclick="window.open('${STRIPE_LINKS.premium}','_blank')">Get Premium →</button>`}
+      </div>
+    </div>
+
+    <div style="margin-top:20px;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px 20px;font-size:13px;color:var(--sub);line-height:1.7">
+      💳 After payment your plan upgrades automatically within a few minutes. Questions? Email <a href="mailto:cbusevents@gmail.com" style="color:var(--orange)">cbusevents@gmail.com</a>
+    </div>`;
+}
+
+// ── HELPERS ───────────────────────────────────────────────────
+function fmt(iso){
+  if(!iso)return'TBD';
+  return new Date(iso).toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'});
+}
+
+function toast(msg,type='success'){
+  const el=document.getElementById('toast');
+  el.textContent=msg;el.className='toast '+type;el.style.display='block';
+  setTimeout(()=>el.style.display='none',3000);
+}
+
+function closeModal(){document.getElementById('modalContainer').innerHTML='';}
+
+// ── INIT ──────────────────────────────────────────────────────
+init();
+</script>
+</body>
+</html>
