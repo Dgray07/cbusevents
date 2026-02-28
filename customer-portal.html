@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>My Account — CBUSEVENTS</title>
+<meta name="description" content="Your CBUSEVENTS dashboard — saved venues, upcoming tickets, and personalized Columbus event recommendations."/>
+<meta name="robots" content="noindex,nofollow"/>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --bg:#0b0b0f;--surface:#13131a;--card:#1a1a24;--border:#25252f;
+  --text:#e8e8f0;--sub:#8888a0;--muted:#55556a;
+  --orange:#FF6B35;--green:#22c55e;--gold:#f59e0b;--blue:#60a5fa;--red:#ef4444;
+}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min-height:100vh;}
+a{text-decoration:none;color:inherit;}
+button{cursor:pointer;font-family:'DM Sans',sans-serif;border:none;}
+@keyframes spin{to{transform:rotate(360deg);}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:translateY(0);}}
+
+/* ── AUTH GATE ── */
+.auth-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;}
+.auth-card{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:40px;width:100%;max-width:420px;animation:fadeUp 0.4s ease;}
+.auth-logo{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;margin-bottom:4px;text-align:center;}
+.auth-logo span{color:var(--orange);}
+.auth-sub{color:var(--sub);font-size:13px;text-align:center;margin-bottom:28px;}
+.auth-tabs{display:grid;grid-template-columns:1fr 1fr;gap:0;background:var(--surface);border-radius:10px;padding:4px;margin-bottom:24px;}
+.auth-tab{background:none;border:none;color:var(--sub);padding:8px;border-radius:7px;font-size:14px;font-weight:500;transition:all 0.15s;}
+.auth-tab.active{background:var(--card);color:var(--text);font-weight:600;}
+.field{margin-bottom:14px;}
+.field label{display:block;font-size:12px;color:var(--sub);font-weight:500;margin-bottom:5px;}
+.field input{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:10px 14px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:14px;outline:none;}
+.field input:focus{border-color:var(--orange);}
+.btn-primary{background:var(--orange);color:#fff;border:none;border-radius:8px;padding:12px;font-size:14px;font-weight:700;width:100%;transition:opacity 0.15s;}
+.btn-primary:hover{opacity:0.85;}
+.auth-err{color:var(--red);font-size:13px;margin-bottom:10px;min-height:18px;}
+.auth-switch{text-align:center;margin-top:16px;font-size:13px;color:var(--sub);}
+.auth-switch button{background:none;border:none;color:var(--orange);font-size:13px;font-weight:600;}
+
+/* ── NAV ── */
+nav{
+  position:sticky;top:0;z-index:100;
+  background:rgba(11,11,15,0.95);backdrop-filter:blur(16px);
+  border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 40px;height:60px;
+}
+.nav-logo{font-family:'Syne',sans-serif;font-weight:800;font-size:18px;cursor:pointer;}
+.nav-logo span{color:var(--orange);}
+.nav-right{display:flex;align-items:center;gap:12px;}
+.nav-email{font-size:13px;color:var(--sub);}
+.nav-home-btn{background:var(--card);border:1px solid var(--border);color:var(--text);border-radius:8px;padding:7px 16px;font-size:13px;font-weight:500;transition:all 0.15s;}
+.nav-home-btn:hover{border-color:var(--muted);}
+.nav-signout{background:none;border:1px solid var(--border);color:var(--sub);border-radius:8px;padding:7px 14px;font-size:13px;transition:all 0.15s;}
+.nav-signout:hover{color:var(--text);border-color:var(--muted);}
+
+/* ── LAYOUT ── */
+.portal-layout{display:grid;grid-template-columns:200px 1fr;gap:0;min-height:calc(100vh - 60px);}
+@media(max-width:900px){.portal-layout{grid-template-columns:1fr;}.sidebar{display:flex;flex-wrap:wrap;gap:4px;padding:12px;border-right:none;border-bottom:1px solid var(--border);position:static;height:auto;}}
+
+/* ── SIDEBAR ── */
+.sidebar{
+  background:var(--surface);border-right:1px solid var(--border);
+  padding:16px 10px;display:flex;flex-direction:column;gap:2px;
+  position:sticky;top:60px;height:calc(100vh - 60px);overflow-y:auto;
+}
+.sidebar-section{padding:10px 10px 4px;font-size:10px;color:var(--muted);font-weight:700;letter-spacing:1.5px;text-transform:uppercase;}
+.nav-item{
+  display:flex;align-items:center;gap:8px;padding:9px 12px;border-radius:8px;
+  cursor:pointer;font-size:13px;font-weight:500;color:var(--sub);transition:all 0.15s;
+}
+.nav-item:hover{background:var(--card);color:var(--text);}
+.nav-item.active{background:var(--card);color:var(--text);}
+
+/* ── CONTENT ── */
+.content{padding:32px;animation:fadeUp 0.3s ease;}
+.page{display:none;}
+.page.active{display:block;}
+.page-title{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;margin-bottom:6px;}
+.page-sub{color:var(--sub);font-size:14px;margin-bottom:28px;}
+
+/* ── CARDS ── */
+.card-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px;}
+.card{background:var(--card);border:1px solid var(--border);border-radius:14px;overflow:hidden;cursor:pointer;transition:all 0.2s;}
+.card:hover{border-color:var(--orange);transform:translateY(-2px);}
+.card-img{width:100%;height:150px;object-fit:cover;background:var(--surface);display:flex;align-items:center;justify-content:center;font-size:40px;}
+.card-img img{width:100%;height:100%;object-fit:cover;}
+.card-body{padding:14px;}
+.card-type{font-size:11px;color:var(--orange);font-weight:600;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;}
+.card-name{font-family:'Syne',sans-serif;font-weight:700;font-size:15px;margin-bottom:5px;}
+.card-meta{color:var(--sub);font-size:12px;}
+.badge-premium{display:inline-block;background:#f59e0b20;color:var(--gold);border:1px solid #f59e0b40;border-radius:20px;padding:2px 8px;font-size:10px;font-weight:700;margin-top:6px;}
+.badge-boosted{display:inline-block;background:#FF6B3520;color:var(--orange);border:1px solid #FF6B3540;border-radius:20px;padding:2px 8px;font-size:10px;font-weight:700;margin-top:6px;}
+.unsave-btn{display:block;width:100%;background:none;border:1px solid var(--border);color:var(--muted);border-radius:6px;padding:6px;font-size:12px;margin-top:10px;transition:all 0.15s;}
+.unsave-btn:hover{border-color:var(--red);color:var(--red);}
+
+/* ── FEED EVENTS ── */
+.feed-item{
+  background:var(--card);border:1px solid var(--border);border-radius:12px;
+  display:grid;grid-template-columns:90px 1fr;overflow:hidden;
+  margin-bottom:12px;cursor:pointer;transition:all 0.2s;
+}
+.feed-item:hover{border-color:var(--orange);}
+.feed-item-img{height:90px;background:var(--surface);display:flex;align-items:center;justify-content:center;font-size:28px;overflow:hidden;}
+.feed-item-img img{width:100%;height:100%;object-fit:cover;}
+.feed-item-body{padding:12px 14px;}
+.feed-item-title{font-weight:600;font-size:14px;margin-bottom:3px;}
+.feed-item-venue{color:var(--sub);font-size:12px;}
+.feed-item-date{color:var(--orange);font-size:12px;margin-top:2px;}
+
+/* ── TICKETS ── */
+.ticket-card{
+  background:var(--card);border:1px solid var(--border);border-radius:12px;
+  padding:18px 20px;display:grid;grid-template-columns:1fr auto;gap:16px;
+  align-items:center;margin-bottom:12px;
+}
+.ticket-card.upcoming{border-left:3px solid var(--orange);}
+.ticket-card.past{opacity:0.55;}
+.ticket-event{font-weight:600;font-size:14px;margin-bottom:3px;}
+.ticket-venue{color:var(--sub);font-size:13px;}
+.ticket-date{color:var(--orange);font-size:13px;margin-top:3px;}
+.ticket-code-box{background:var(--surface);border:1px dashed var(--border);border-radius:8px;padding:10px 14px;text-align:center;}
+.ticket-code-label{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;}
+.ticket-code-val{font-family:'Syne',sans-serif;font-size:18px;font-weight:800;color:var(--orange);letter-spacing:3px;}
+
+/* ── PROFILE ── */
+.profile-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:24px;max-width:480px;}
+
+/* ── EMPTY / LOADING ── */
+.empty{text-align:center;padding:60px 20px;color:var(--sub);}
+.empty-icon{font-size:44px;margin-bottom:12px;}
+.empty h3{font-family:'Syne',sans-serif;font-size:17px;font-weight:700;margin-bottom:8px;color:var(--text);}
+.empty a{color:var(--orange);font-weight:600;}
+.spinner{width:28px;height:28px;border:3px solid var(--border);border-top-color:var(--orange);border-radius:50%;animation:spin 0.8s linear infinite;margin:48px auto;display:block;}
+
+/* ── FOOTER ── */
+footer{background:var(--surface);border-top:1px solid var(--border);padding:20px 40px;display:flex;justify-content:space-between;align-items:center;}
+.footer-copy{color:var(--muted);font-size:12px;}
+.footer-admin{color:var(--muted);font-size:11px;font-weight:600;opacity:0.4;transition:opacity 0.2s;}
+.footer-admin:hover{opacity:1;}
+</style>
+</head>
+<body>
+
+<!-- ── AUTH GATE ── -->
+<div id="authGate">
+  <div class="auth-wrap">
+    <div class="auth-card">
+      <div class="auth-logo">CBUS<span>EVENTS</span></div>
+      <p class="auth-sub">Your Columbus event dashboard</p>
+
+      <div class="auth-tabs">
+        <button class="auth-tab active" id="tabSignin" onclick="switchTab('signin')">Sign In</button>
+        <button class="auth-tab"        id="tabSignup" onclick="switchTab('signup')">Create Account</button>
+      </div>
+
+      <div id="nameField" class="field" style="display:none">
+        <label>Display Name</label>
+        <input id="authName" placeholder="Your name (optional)"/>
+      </div>
+      <div class="field">
+        <label>Email</label>
+        <input type="email" id="authEmail" placeholder="you@email.com" onkeydown="if(event.key==='Enter')doAuth()"/>
+      </div>
+      <div class="field">
+        <label>Password</label>
+        <input type="password" id="authPass" placeholder="••••••••" onkeydown="if(event.key==='Enter')doAuth()"/>
+      </div>
+      <div class="auth-err" id="authErr"></div>
+      <button class="btn-primary" id="authBtn" onclick="doAuth()">Sign In</button>
+      <div class="auth-switch">
+        <span id="authSwitchText">New to CBUSEVENTS?</span>
+        <button id="authSwitchBtn" onclick="switchTab(currentTab==='signin'?'signup':'signin')">Create a free account</button>
+      </div>
+      <div style="text-align:center;margin-top:16px">
+        <a href="https://cbusevents.com" style="color:var(--muted);font-size:12px">← Back to CBUSEVENTS</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── PORTAL ── -->
+<div id="portal" style="display:none">
+
+  <nav>
+    <div class="nav-logo" onclick="window.location.href='https://cbusevents.com'">CBUS<span>EVENTS</span></div>
+    <div class="nav-right">
+      <span class="nav-email" id="navEmail"></span>
+      <button class="nav-home-btn" onclick="window.location.href='https://cbusevents.com'">🏠 Home</button>
+      <button class="nav-signout" onclick="doSignOut()">Sign Out</button>
+    </div>
+  </nav>
+
+  <div class="portal-layout">
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-section">My Account</div>
+      <div class="nav-item active" id="nav-feed"    onclick="showPage('feed')">🏠 My Feed</div>
+      <div class="nav-item"        id="nav-tickets" onclick="showPage('tickets')">🎟 My Tickets</div>
+      <div class="nav-item"        id="nav-venues"  onclick="showPage('venues')">📍 Saved Venues</div>
+      <div class="nav-item"        id="nav-events"  onclick="showPage('events')">📅 Saved Events</div>
+      <div class="nav-item"        id="nav-follows" onclick="showPage('follows')">❤️ Following</div>
+      <div class="nav-item"        id="nav-profile" onclick="showPage('profile')">👤 Profile</div>
+      <div class="sidebar-section">Discover</div>
+      <div class="nav-item" onclick="window.location.href='https://cbusevents.com'">🔍 Browse Venues</div>
+      <div class="nav-item" onclick="window.location.href='https://cbusevents.com/#events'">🎉 Browse Events</div>
+    </aside>
+
+    <!-- Pages -->
+    <main class="content">
+
+      <!-- FEED -->
+      <div class="page active" id="page-feed">
+        <div class="page-title">Your Columbus Feed</div>
+        <div class="page-sub">Personalized events based on your saved venues & interests</div>
+        <div id="feedContent"><div class="spinner"></div></div>
+      </div>
+
+      <!-- TICKETS -->
+      <div class="page" id="page-tickets">
+        <div class="page-title">My Tickets</div>
+        <div class="page-sub">Your purchased event tickets</div>
+        <div id="ticketsContent"><div class="spinner"></div></div>
+      </div>
+
+      <!-- SAVED VENUES -->
+      <div class="page" id="page-venues">
+        <div class="page-title">Saved Venues</div>
+        <div class="page-sub">Venues you've saved for later</div>
+        <div id="savedVenuesContent"><div class="spinner"></div></div>
+      </div>
+
+      <!-- SAVED EVENTS -->
+      <div class="page" id="page-events">
+        <div class="page-title">Saved Events</div>
+        <div class="page-sub">Events you want to attend</div>
+        <div id="savedEventsContent"><div class="spinner"></div></div>
+      </div>
+
+      <!-- FOLLOWING -->
+      <div class="page" id="page-follows">
+        <div class="page-title">Venues You Follow</div>
+        <div class="page-sub">Stay updated on events from these venues</div>
+        <div id="followsContent"><div class="spinner"></div></div>
+      </div>
+
+      <!-- PROFILE -->
+      <div class="page" id="page-profile">
+        <div class="page-title">Profile Settings</div>
+        <div class="page-sub">Manage your account preferences</div>
+        <div id="profileContent"></div>
+      </div>
+
+    </main>
+  </div>
+
+  <footer>
+    <span class="footer-copy">© 2026 CBUSEVENTS · Columbus, Ohio</span>
+    <div style="display:flex;align-items:center;gap:20px">
+      <span class="footer-copy">Made for Columbus 🏙</span>
+      <a href="https://cbusevents.com/cbus-admin.html" class="footer-admin">Admin</a>
+    </div>
+  </footer>
+
+</div>
+
+<script src="https://unpkg.com/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script>
+const SB_URL="https://toblgvatvsjljbqogzsv.supabase.co";
+const SB_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRvYmxndmF0dnNqbGpicW9nenN2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMDgwNTAsImV4cCI6MjA4NzY4NDA1MH0._WJEQPizNDiQfDXQB_DHPaQhixPGpMdmYQSmyWmm_FQ";
+const sb=supabase.createClient(SB_URL,SB_KEY);
+
+let currentUser=null;
+let currentTab='signin';
+let loadedPages=new Set();
+
+// ── AUTH ────────────────────────────────────────────────────────
+async function init(){
+  const{data:{session}}=await sb.auth.getSession();
+  if(session?.user){currentUser=session.user;enterPortal();}
+  sb.auth.onAuthStateChange((_,session)=>{
+    currentUser=session?.user??null;
+    if(currentUser)enterPortal(); else exitPortal();
+  });
+}
+
+function switchTab(tab){
+  currentTab=tab;
+  document.getElementById('tabSignin').classList.toggle('active',tab==='signin');
+  document.getElementById('tabSignup').classList.toggle('active',tab==='signup');
+  document.getElementById('nameField').style.display=tab==='signup'?'block':'none';
+  document.getElementById('authBtn').textContent=tab==='signin'?'Sign In':'Create Account';
+  document.getElementById('authSwitchText').textContent=tab==='signin'?'New to CBUSEVENTS?':'Already have an account?';
+  document.getElementById('authSwitchBtn').textContent=tab==='signin'?'Create a free account':'Sign in instead';
+  document.getElementById('authErr').textContent='';
+}
+
+async function doAuth(){
+  const email=document.getElementById('authEmail').value.trim();
+  const pass=document.getElementById('authPass').value;
+  const name=document.getElementById('authName').value.trim();
+  const errEl=document.getElementById('authErr');
+  const btn=document.getElementById('authBtn');
+  if(!email||!pass){errEl.textContent='Email and password required.';return;}
+  btn.disabled=true;btn.textContent='Please wait…';errEl.textContent='';
+
+  let error;
+  if(currentTab==='signin'){
+    ({error}=await sb.auth.signInWithPassword({email,password:pass}));
+  } else {
+    const{data,error:e}=await sb.auth.signUp({email,password:pass});
+    error=e;
+    if(!error&&name&&data.user){
+      await sb.from('customer_profiles').upsert({user_id:data.user.id,display_name:name},{onConflict:'user_id'}).catch(()=>{});
+    }
+  }
+  if(error){errEl.textContent=error.message;btn.disabled=false;btn.textContent=currentTab==='signin'?'Sign In':'Create Account';}
+}
+
+async function doSignOut(){
+  await sb.auth.signOut();
+  loadedPages=new Set();
+  exitPortal();
+}
+
+function enterPortal(){
+  document.getElementById('authGate').style.display='none';
+  document.getElementById('portal').style.display='';
+  document.getElementById('navEmail').textContent='👋 '+currentUser.email;
+  loadPage('feed');
+}
+function exitPortal(){
+  document.getElementById('authGate').style.display='';
+  document.getElementById('portal').style.display='none';
+}
+
+// ── PAGE NAV ────────────────────────────────────────────────────
+function showPage(p){
+  document.querySelectorAll('.page').forEach(el=>el.classList.remove('active'));
+  document.querySelectorAll('.nav-item[id^="nav-"]').forEach(el=>el.classList.remove('active'));
+  document.getElementById('page-'+p)?.classList.add('active');
+  document.getElementById('nav-'+p)?.classList.add('active');
+  loadPage(p);
+}
+
+function loadPage(p){
+  if(loadedPages.has(p))return;
+  loadedPages.add(p);
+  if(p==='feed')loadFeed();
+  else if(p==='tickets')loadTickets();
+  else if(p==='venues')loadSavedVenues();
+  else if(p==='events')loadSavedEvents();
+  else if(p==='follows')loadFollows();
+  else if(p==='profile')loadProfile();
+}
+
+// ── FEED ────────────────────────────────────────────────────────
+async function loadFeed(){
+  const el=document.getElementById('feedContent');
+  const{data:follows}=await sb.from('customer_venue_follows').select('venue_id').eq('user_id',currentUser.id).catch(()=>({data:[]}));
+  const followedIds=(follows||[]).map(f=>f.venue_id);
+
+  const{data:events}=await sb.from('events')
+    .select('id,title,description,start_time,cover_image_url,is_boosted,venues(id,name,slug)')
+    .gte('start_time',new Date().toISOString())
+    .order('start_time',{ascending:true})
+    .limit(40);
+
+  if(!events?.length){
+    el.innerHTML=`<div class="empty"><div class="empty-icon">🎉</div><h3>No upcoming events yet</h3><p><a href="https://cbusevents.com">Browse CBUSEVENTS →</a></p></div>`;
+    return;
+  }
+
+  // Boost followed venues to top
+  const sorted=[...events].sort((a,b)=>{
+    const aF=followedIds.includes(a.venues?.id)?1:0;
+    const bF=followedIds.includes(b.venues?.id)?1:0;
+    return bF-aF;
+  });
+
+  el.innerHTML=sorted.map(e=>`
+    <div class="feed-item" onclick="window.location.href='https://cbusevents.com'">
+      <div class="feed-item-img">
+        ${e.cover_image_url?`<img src="${e.cover_image_url}" alt="${e.title}" loading="lazy">`:'📅'}
+      </div>
+      <div class="feed-item-body">
+        <div class="feed-item-title">${e.title}</div>
+        <div class="feed-item-venue">🏛 ${e.venues?.name||'Columbus Venue'}</div>
+        <div class="feed-item-date">📅 ${fmt(e.start_time)}</div>
+        <div style="margin-top:4px;display:flex;gap:6px;flex-wrap:wrap">
+          ${e.is_boosted?'<span class="badge-boosted">⚡ Featured</span>':''}
+          ${followedIds.includes(e.venues?.id)?'<span style="background:#22c55e20;color:var(--green);border:1px solid #22c55e40;border-radius:20px;padding:2px 8px;font-size:10px;font-weight:700">❤️ Following</span>':''}
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+// ── TICKETS ────────────────────────────────────────────────────
+async function loadTickets(){
+  const el=document.getElementById('ticketsContent');
+  const{data:tickets}=await sb.from('tickets')
+    .select('*,events(id,title,start_time,venues(name))')
+    .eq('user_id',currentUser.id)
+    .eq('status','active')
+    .order('purchased_at',{ascending:false})
+    .catch(()=>({data:[]}));
+
+  if(!tickets?.length){
+    el.innerHTML=`<div class="empty"><div class="empty-icon">🎟</div><h3>No tickets yet</h3><p><a href="https://cbusevents.com">Browse upcoming events →</a></p></div>`;
+    return;
+  }
+
+  const now=new Date();
+  const upcoming=tickets.filter(t=>new Date(t.events?.start_time||0)>=now);
+  const past=tickets.filter(t=>new Date(t.events?.start_time||0)<now);
+
+  const renderTickets=(list,isPast)=>list.map(t=>`
+    <div class="ticket-card ${isPast?'past':'upcoming'}">
+      <div>
+        <div class="ticket-event">${t.events?.title||'Event'}</div>
+        <div class="ticket-venue">📍 ${t.events?.venues?.name||'Columbus Venue'}</div>
+        <div class="ticket-date">📅 ${fmt(t.events?.start_time)}</div>
+        <div style="margin-top:6px;display:flex;gap:8px;flex-wrap:wrap">
+          <span style="background:var(--surface);border-radius:6px;padding:3px 8px;font-size:12px">Qty: ${t.quantity||1}</span>
+          <span style="background:var(--surface);border-radius:6px;padding:3px 8px;font-size:12px">$${((t.amount_paid||0)/100).toFixed(2)}</span>
+        </div>
+      </div>
+      <div class="ticket-code-box">
+        <div class="ticket-code-label">Ticket</div>
+        <div class="ticket-code-val">${t.ticket_code||'—'}</div>
+      </div>
+    </div>`).join('');
+
+  el.innerHTML=`
+    ${upcoming.length?`<h3 style="font-family:'Syne',sans-serif;font-size:14px;font-weight:700;margin-bottom:12px;color:var(--green)">🟢 Upcoming (${upcoming.length})</h3>${renderTickets(upcoming,false)}`:''}
+    ${past.length?`<h3 style="font-family:'Syne',sans-serif;font-size:14px;font-weight:700;margin:20px 0 12px;color:var(--muted)">Past Events</h3>${renderTickets(past,true)}`:''}`;
+}
+
+// ── SAVED VENUES ───────────────────────────────────────────────
+async function loadSavedVenues(){
+  const el=document.getElementById('savedVenuesContent');
+  const{data}=await sb.from('customer_saved_venues')
+    .select('venue_id,venues(id,name,venue_type,cover_image_url,tier,neighborhood)')
+    .eq('user_id',currentUser.id)
+    .order('saved_at',{ascending:false})
+    .catch(()=>({data:[]}));
+
+  const venues=(data||[]).map(d=>d.venues).filter(Boolean);
+  if(!venues.length){
+    el.innerHTML=`<div class="empty"><div class="empty-icon">📍</div><h3>No saved venues</h3><p><a href="https://cbusevents.com">Browse Columbus venues →</a></p></div>`;
+    return;
+  }
+
+  el.innerHTML=`<div class="card-grid">${venues.map(v=>`
+    <div class="card">
+      <div class="card-img">${v.cover_image_url?`<img src="${v.cover_image_url}" alt="${v.name}" loading="lazy">`:'🏛'}</div>
+      <div class="card-body">
+        <div class="card-type">${v.venue_type||'Venue'}</div>
+        <div class="card-name">${v.name}</div>
+        <div class="card-meta">📍 ${v.neighborhood||'Columbus'}</div>
+        ${v.tier==='premium'?'<span class="badge-premium">⭐ Premium</span>':''}
+        <button class="unsave-btn" onclick="unsaveVenue('${v.id}',this)">Remove from saved</button>
+      </div>
+    </div>`).join('')}</div>`;
+}
+
+// ── SAVED EVENTS ───────────────────────────────────────────────
+async function loadSavedEvents(){
+  const el=document.getElementById('savedEventsContent');
+  const{data}=await sb.from('customer_saved_events')
+    .select('event_id,events(id,title,start_time,cover_image_url,is_boosted,venues(name))')
+    .eq('user_id',currentUser.id)
+    .order('saved_at',{ascending:false})
+    .catch(()=>({data:[]}));
+
+  const events=(data||[]).map(d=>d.events).filter(Boolean);
+  if(!events.length){
+    el.innerHTML=`<div class="empty"><div class="empty-icon">📅</div><h3>No saved events</h3><p><a href="https://cbusevents.com">Browse upcoming events →</a></p></div>`;
+    return;
+  }
+
+  el.innerHTML=`<div class="card-grid">${events.map(e=>`
+    <div class="card" onclick="window.location.href='https://cbusevents.com'">
+      <div class="card-img">${e.cover_image_url?`<img src="${e.cover_image_url}" alt="${e.title}" loading="lazy">`:'📅'}</div>
+      <div class="card-body">
+        <div class="card-name">${e.title}</div>
+        <div class="card-meta">🏛 ${e.venues?.name||''}</div>
+        <div class="card-meta" style="color:var(--orange);margin-top:3px">📅 ${fmt(e.start_time)}</div>
+        ${e.is_boosted?'<span class="badge-boosted">⚡ Featured</span>':''}
+        <button class="unsave-btn" onclick="event.stopPropagation();unsaveEvent('${e.id}',this)">Remove from saved</button>
+      </div>
+    </div>`).join('')}</div>`;
+}
+
+// ── FOLLOWS ────────────────────────────────────────────────────
+async function loadFollows(){
+  const el=document.getElementById('followsContent');
+  const{data}=await sb.from('customer_venue_follows')
+    .select('venue_id,venues(id,name,cover_image_url,tier)')
+    .eq('user_id',currentUser.id)
+    .order('followed_at',{ascending:false})
+    .catch(()=>({data:[]}));
+
+  const venues=(data||[]).map(d=>d.venues).filter(Boolean);
+  if(!venues.length){
+    el.innerHTML=`<div class="empty"><div class="empty-icon">❤️</div><h3>Not following any venues yet</h3><p>Follow venues to see their events first in your feed.</p></div>`;
+    return;
+  }
+
+  el.innerHTML=`<div class="card-grid">${venues.map(v=>`
+    <div class="card" onclick="window.location.href='https://cbusevents.com'">
+      <div class="card-img">${v.cover_image_url?`<img src="${v.cover_image_url}" alt="${v.name}" loading="lazy">`:'🏛'}</div>
+      <div class="card-body">
+        <div class="card-name">${v.name}</div>
+        ${v.tier==='premium'?'<span class="badge-premium">⭐ Premium</span>':''}
+        <button class="unsave-btn" onclick="event.stopPropagation();unfollowVenue('${v.id}',this)">Unfollow</button>
+      </div>
+    </div>`).join('')}</div>`;
+}
+
+// ── PROFILE ────────────────────────────────────────────────────
+async function loadProfile(){
+  const el=document.getElementById('profileContent');
+  const{data:profile}=await sb.from('customer_profiles')
+    .select('*').eq('user_id',currentUser.id).single().catch(()=>({data:{}}));
+
+  el.innerHTML=`
+    <div class="profile-card">
+      <div class="field"><label>Display Name</label><input id="profName" value="${profile?.display_name||''}" placeholder="Your name"/></div>
+      <div class="field"><label>Email (read-only)</label><input value="${currentUser.email}" disabled style="opacity:0.5"/></div>
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px">
+        <label style="font-size:12px;color:var(--sub);font-weight:500">Email Notifications</label>
+        <input type="checkbox" id="profNotif" ${profile?.notification_email!==false?'checked':''} style="width:16px;height:16px;accent-color:var(--orange)"/>
+      </div>
+      <button class="btn-primary" style="padding:10px" onclick="saveProfile()">Save Changes</button>
+      <div id="profMsg" style="color:var(--green);font-size:13px;margin-top:10px;min-height:18px"></div>
+      <div style="margin-top:20px;padding-top:16px;border-top:1px solid var(--border);color:var(--muted);font-size:12px">
+        Member since ${new Date(currentUser.created_at).toLocaleDateString('en-US',{month:'long',year:'numeric'})}
+      </div>
+    </div>`;
+}
+
+async function saveProfile(){
+  await sb.from('customer_profiles').upsert({
+    user_id:currentUser.id,
+    display_name:document.getElementById('profName').value.trim(),
+    notification_email:document.getElementById('profNotif').checked,
+    updated_at:new Date().toISOString()
+  },{onConflict:'user_id'}).catch(()=>{});
+  const msg=document.getElementById('profMsg');
+  if(msg){msg.textContent='✓ Saved!';setTimeout(()=>msg.textContent='',3000);}
+}
+
+// ── ACTIONS ────────────────────────────────────────────────────
+async function unsaveVenue(venueId,btn){
+  btn.textContent='Removing…';
+  await sb.from('customer_saved_venues').delete().eq('user_id',currentUser.id).eq('venue_id',venueId).catch(()=>{});
+  btn.closest('.card').remove();
+}
+async function unsaveEvent(eventId,btn){
+  btn.textContent='Removing…';
+  await sb.from('customer_saved_events').delete().eq('user_id',currentUser.id).eq('event_id',eventId).catch(()=>{});
+  btn.closest('.card').remove();
+}
+async function unfollowVenue(venueId,btn){
+  btn.textContent='Unfollowing…';
+  await sb.from('customer_venue_follows').delete().eq('user_id',currentUser.id).eq('venue_id',venueId).catch(()=>{});
+  btn.closest('.card').remove();
+}
+
+// ── HELPERS ────────────────────────────────────────────────────
+function fmt(iso){
+  if(!iso)return'TBD';
+  return new Date(iso).toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric',hour:'numeric',minute:'2-digit'});
+}
+
+// ── INIT ───────────────────────────────────────────────────────
+init();
+</script>
+</body>
+</html>

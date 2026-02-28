@@ -159,7 +159,7 @@ const sb=supabase.createClient(SB_URL,SB_KEY);
 const ADMIN_EMAILS=["CBUSEVENTS@gmail.com","cbusevents@gmail.com","Deante90@gmail.com","deante90@gmail.com"];
 
 let currentPage='dashboard';
-let allVenues=[],allEvents=[],allInquiries=[],allDesignRequests=[],currentUser=null;
+let allVenues=[],allEvents=[],allInquiries=[],allDesignRequests=[],allVendors=[],currentUser=null;
 let venueFilter='all',eventFilter='all',inquiryFilter='all';
 
 // ── TOAST ─────────────────────────────────────────────────────
@@ -207,16 +207,18 @@ async function doLogin(){
 
 // ── DATA ──────────────────────────────────────────────────────
 async function loadData(){
-  const[vRes,eRes,iRes,dRes]=await Promise.all([
+  const[vRes,eRes,iRes,dRes,vendRes]=await Promise.all([
     sb.from('venues').select('*').order('created_at',{ascending:false}),
     sb.from('events').select('*,venues(name)').order('created_at',{ascending:false}),
     sb.from('inquiries').select('*,venues(name)').order('created_at',{ascending:false}),
     sb.from('design_requests').select('*').order('created_at',{ascending:false}),
+    sb.from('vendors').select('*').order('created_at',{ascending:false}).then(r=>r).catch(()=>({data:[]})),
   ]);
   allVenues=vRes.data||[];
   allEvents=eRes.data||[];
   allInquiries=iRes.data||[];
   allDesignRequests=dRes.data||[];
+  allVendors=vendRes.data||[];
 }
 
 // ── SHELL ─────────────────────────────────────────────────────
@@ -232,6 +234,7 @@ function renderShell(){
         <div style="font-size:11px;color:var(--muted);margin-top:3px">Admin Portal</div>
       </div>
       <div class="sidebar-section">Main</div>
+      <div class="nav-item" onclick="window.location.href='https://cbusevents.com'" style="border-bottom:1px solid var(--border);margin-bottom:4px;padding-bottom:12px">🏠 Home</div>
       <div class="nav-item ${currentPage==='dashboard'?'active':''}" onclick="nav('dashboard')">📊 Dashboard</div>
       <div class="nav-item ${currentPage==='venues'?'active':''}" onclick="nav('venues')">🏛 Venues ${pendingVenues?`<span class="badge">${pendingVenues}</span>`:''}</div>
       <div class="nav-item ${currentPage==='events'?'active':''}" onclick="nav('events')">📅 Events</div>
@@ -239,6 +242,11 @@ function renderShell(){
       <div class="sidebar-section">Revenue</div>
       <div class="nav-item ${currentPage==='revenue'?'active':''}" onclick="nav('revenue')">💰 Revenue</div>
       <div class="nav-item ${currentPage==='design'?'active':''}" onclick="nav('design')">🎨 Design Requests ${allDesignRequests.filter(d=>d.status==='new').length?`<span class="badge">${allDesignRequests.filter(d=>d.status==='new').length}</span>`:''}</div>
+      <div class="sidebar-section">Platform</div>
+      <div class="nav-item ${currentPage==='vendors'?'active':''}" onclick="nav('vendors')">🤝 Vendors</div>
+      <div class="nav-item ${currentPage==='subscriptions'?'active':''}" onclick="nav('subscriptions')">💳 Subscriptions</div>
+      <div class="nav-item ${currentPage==='users'?'active':''}" onclick="nav('users')">👥 Users</div>
+      <div class="nav-item ${currentPage==='overrides'?'active':''}" onclick="nav('overrides')">⚙️ Overrides</div>
       <div class="sidebar-bottom">
         <div class="admin-tag">⚡ Admin</div>
         <button onclick="sb.auth.signOut().then(()=>renderLogin())" style="width:100%;margin-top:10px;background:none;border:1px solid var(--border);border-radius:7px;padding:7px;color:var(--muted);font-size:12px;cursor:pointer;font-family:'DM Sans',sans-serif">Sign Out</button>
@@ -271,7 +279,7 @@ function nav(page){
   currentPage=page;
   document.querySelectorAll('.nav-item').forEach(el=>el.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(el=>{if(el.textContent.toLowerCase().includes(page))el.classList.add('active');});
-  const title={dashboard:'Dashboard',venues:'Venues',events:'Events',inquiries:'Inquiries',revenue:'Revenue'};
+  const title={dashboard:'Dashboard',venues:'Venues',events:'Events',inquiries:'Inquiries',revenue:'Revenue',design:'Design Requests',vendors:'Vendors',subscriptions:'Subscriptions',users:'Users',overrides:'Overrides'};
   const el=document.getElementById('topbarTitle');
   if(el)el.textContent=title[page]||page;
   renderPage();
@@ -284,6 +292,10 @@ function renderPage(){
   else if(currentPage==='inquiries')renderInquiries();
   else if(currentPage==='revenue')renderRevenue();
   else if(currentPage==='design')renderDesignRequests();
+  else if(currentPage==='vendors')renderVendors();
+  else if(currentPage==='subscriptions')renderSubscriptions();
+  else if(currentPage==='users')renderUsers();
+  else if(currentPage==='overrides')renderOverrides();
 }
 
 // ── DASHBOARD ─────────────────────────────────────────────────
@@ -396,7 +408,7 @@ function renderVenues(){
         <input class="search-input" placeholder="Search venues..." oninput="searchVenues(this.value)" style="margin-left:auto">
       </div>
       <table>
-        <thead><tr><th>Venue</th><th>Type</th><th>Neighborhood</th><th>Status</th><th>Plan</th><th>Actions</th></tr></thead>
+        <thead><tr><th>Venue</th><th>Type</th><th>Neighborhood</th><th>Status</th><th>Plan</th><th>Featured</th><th>Actions</th></tr></thead>
         <tbody id="venueTableBody">
           ${renderVenueRows(filtered)}
         </tbody>
@@ -417,10 +429,12 @@ function renderVenueRows(venues){
       <td style="color:var(--sub)">${v.neighborhood||'—'}</td>
       <td><span class="badge ${v.status==='approved'?'badge-green':v.status==='pending'?'badge-orange':'badge-red'}">${v.status}</span></td>
       <td><span class="badge ${v.tier==='premium'?'badge-gold':v.tier==='standard'?'badge-blue':'badge-muted'}">${v.tier||'free'}</span></td>
+      <td>${v.is_featured?'<span class="badge badge-gold">⭐ Yes</span>':'<span class="badge badge-muted">—</span>'}</td>
       <td>
         <div style="display:flex;gap:5px;flex-wrap:wrap">
           ${v.status==='pending'?`<button class="btn btn-success btn-sm" onclick="approveVenue('${v.id}')">✓</button>`:''}
           ${v.status!=='rejected'?`<button class="btn btn-ghost btn-sm" onclick="openTierModal('${v.id}')">Tier</button>`:''}
+          <button class="btn btn-ghost btn-sm" onclick="toggleVenueFeature('${v.id}',${!v.is_featured})">${v.is_featured?'Unfeature':'⭐ Feature'}</button>
           <button class="btn btn-danger btn-sm" onclick="deleteVenue('${v.id}','${v.name.replace(/'/g,"\\'")}')">✕</button>
         </div>
       </td>
@@ -450,7 +464,7 @@ function renderEvents(){
         <input class="search-input" placeholder="Search events..." oninput="searchEvents(this.value)" style="margin-left:auto">
       </div>
       <table>
-        <thead><tr><th>Event</th><th>Venue</th><th>Date</th><th>Category</th><th>Status</th><th>Actions</th></tr></thead>
+        <thead><tr><th>Event</th><th>Venue</th><th>Date</th><th>Category</th><th>Status</th><th>Boost</th><th>Actions</th></tr></thead>
         <tbody id="eventTableBody">
           ${renderEventRows(filtered)}
         </tbody>
@@ -468,7 +482,11 @@ function renderEventRows(events){
       <td style="color:var(--muted)">${new Date(e.start_time).toLocaleDateString()} ${new Date(e.start_time).toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'})}</td>
       <td style="color:var(--sub)">${e.category||'—'}</td>
       <td><span class="badge ${e.status==='published'?'badge-green':'badge-muted'}">${e.status}</span></td>
-      <td><button class="btn btn-danger btn-sm" onclick="deleteEvent('${e.id}','${e.title.replace(/'/g,"\\'")}')">✕ Delete</button></td>
+      <td>${e.is_boosted?`<span class="badge badge-gold">⚡ ${e.boost_type||'boosted'}</span>`:`<span class="badge badge-muted">—</span>`}</td>
+      <td><div style="display:flex;gap:5px;flex-wrap:wrap">
+        <button class="btn btn-ghost btn-sm" onclick="toggleEventBoost('${e.id}',${!e.is_boosted})">${e.is_boosted?'↓ Unboost':'⚡ Boost'}</button>
+        <button class="btn btn-danger btn-sm" onclick="deleteEvent('${e.id}','${e.title.replace(/'/g,"\\'")}')">✕</button>
+      </div></td>
     </tr>`).join('');
 }
 
@@ -844,6 +862,244 @@ function viewDesignRequest(id){
         </div>
       </div>
     </div>`;
+}
+
+// ── BOOST / FEATURE ACTIONS ──────────────────────────────────
+async function toggleEventBoost(id,val){
+  const upd=val?{is_boosted:true,boost_type:'admin',admin_boost:true}:{is_boosted:false,boost_type:null,admin_boost:false};
+  const{error}=await sb.from('events').update(upd).eq('id',id);
+  if(error){toast('Error: '+error.message,'error');return;}
+  await loadData();renderPage();
+  toast(val?'⚡ Event boosted!':'Boost removed');
+}
+
+async function toggleVenueFeature(id,val){
+  const{error}=await sb.from('venues').update({is_featured:val}).eq('id',id);
+  if(error){toast('Error: '+error.message,'error');return;}
+  await loadData();renderShell();
+  toast(val?'⭐ Venue featured!':'Feature removed');
+}
+
+// ── VENDORS ───────────────────────────────────────────────────
+function renderVendors(){
+  document.getElementById('pageContent').innerHTML=`
+    <div class="table-card">
+      <div class="table-header">
+        <div class="table-title">All Vendors (${allVendors.length})</div>
+        <input class="search-input" placeholder="Search vendors..." oninput="searchVendors(this.value)">
+      </div>
+      <table>
+        <thead><tr><th>Business</th><th>Category</th><th>Tier</th><th>Sub Status</th><th>Promoted</th><th>Actions</th></tr></thead>
+        <tbody id="vendorTableBody">
+          ${renderVendorRows(allVendors)}
+        </tbody>
+      </table>
+    </div>`;
+}
+
+function renderVendorRows(vendors){
+  if(!vendors.length)return'<tr class="empty-row"><td colspan="6">No vendors found</td></tr>';
+  return vendors.map(v=>`
+    <tr>
+      <td><strong>${v.business_name||v.name||'—'}</strong><div style="font-size:11px;color:var(--muted)">${v.email||''}</div></td>
+      <td style="color:var(--sub)">${v.category||'—'}</td>
+      <td><span class="badge ${v.subscription_tier==='PREMIUM'||v.tier==='premium'?'badge-gold':v.subscription_tier==='STANDARD'||v.tier==='standard'?'badge-blue':'badge-muted'}">${v.subscription_tier||v.tier||'free'}</span></td>
+      <td><span class="badge ${v.subscription_status==='active'?'badge-green':'badge-muted'}">${v.subscription_status||'—'}</span></td>
+      <td>${v.admin_promoted?'<span class="badge badge-gold">⭐ Yes</span>':'<span class="badge badge-muted">—</span>'}</td>
+      <td><button class="btn ${v.admin_promoted?'btn-ghost':'btn-success'} btn-sm" onclick="toggleVendorPromo('${v.id}',${!v.admin_promoted})">${v.admin_promoted?'Remove Promo':'⭐ Promote'}</button></td>
+    </tr>`).join('');
+}
+
+function searchVendors(q){
+  const f=allVendors.filter(v=>(v.business_name||v.name||'').toLowerCase().includes(q.toLowerCase())||(v.category||'').toLowerCase().includes(q.toLowerCase()));
+  const el=document.getElementById('vendorTableBody');
+  if(el)el.innerHTML=renderVendorRows(f);
+}
+
+async function toggleVendorPromo(id,val){
+  await sb.from('vendors').update({admin_promoted:val}).eq('id',id);
+  await loadData();renderPage();
+  toast(val?'⭐ Vendor promoted!':'Promotion removed');
+}
+
+// ── SUBSCRIPTIONS ─────────────────────────────────────────────
+async function renderSubscriptions(){
+  document.getElementById('pageContent').innerHTML=`<div style="color:var(--muted);padding:32px;text-align:center">Loading subscriptions…</div>`;
+
+  const[{data:venues},{data:vendors}]=await Promise.all([
+    sb.from('venues').select('id,name,tier,subscription_tier,subscription_status,subscription_period_end,stripe_subscription_id').order('tier'),
+    sb.from('vendors').select('id,business_name,subscription_tier,subscription_status,subscription_period_end,stripe_subscription_id').order('subscription_tier').then(r=>r).catch(()=>({data:[]})),
+  ]);
+
+  const renderRows=(rows,nameKey)=>(rows||[]).map(r=>`<tr>
+    <td><strong>${r[nameKey]||'—'}</strong></td>
+    <td><span class="badge ${(r.subscription_tier||r.tier)==='PREMIUM'||(r.subscription_tier||r.tier)==='premium'?'badge-gold':(r.subscription_tier||r.tier)==='STANDARD'||(r.subscription_tier||r.tier)==='standard'?'badge-blue':'badge-muted'}">${r.subscription_tier||r.tier||'free'}</span></td>
+    <td><span class="badge ${r.subscription_status==='active'?'badge-green':r.subscription_status?'badge-orange':'badge-muted'}">${r.subscription_status||'—'}</span></td>
+    <td style="color:var(--muted);font-size:12px">${r.subscription_period_end?new Date(r.subscription_period_end).toLocaleDateString():'—'}</td>
+    <td style="font-size:11px;color:var(--muted)">${r.stripe_subscription_id?r.stripe_subscription_id.substring(0,22)+'…':'—'}</td>
+  </tr>`).join('');
+
+  document.getElementById('pageContent').innerHTML=`
+    <div class="table-card" style="margin-bottom:24px">
+      <div class="table-header"><div class="table-title">Venue Subscriptions (${(venues||[]).length})</div></div>
+      <table>
+        <thead><tr><th>Name</th><th>Tier</th><th>Status</th><th>Period End</th><th>Stripe Sub ID</th></tr></thead>
+        <tbody>${renderRows(venues,'name')||'<tr class="empty-row"><td colspan="5">No venues</td></tr>'}</tbody>
+      </table>
+    </div>
+    <div class="table-card">
+      <div class="table-header"><div class="table-title">Vendor Subscriptions (${(vendors||[]).length})</div></div>
+      <table>
+        <thead><tr><th>Business</th><th>Tier</th><th>Status</th><th>Period End</th><th>Stripe Sub ID</th></tr></thead>
+        <tbody>${renderRows(vendors,'business_name')||'<tr class="empty-row"><td colspan="5">No vendors</td></tr>'}</tbody>
+      </table>
+    </div>`;
+}
+
+// ── USERS ─────────────────────────────────────────────────────
+function renderUsers(){
+  document.getElementById('pageContent').innerHTML=`
+    <div class="table-card">
+      <div class="table-header">
+        <div class="table-title">User & Role Management</div>
+        <div style="display:flex;gap:8px">
+          <input class="search-input" id="userSearchInput" placeholder="Search by display name..." style="width:240px">
+          <button class="btn btn-primary btn-sm" onclick="doUserSearch()">Search</button>
+        </div>
+      </div>
+      <div id="userTableWrap">
+        <div class="empty-row"><td colspan="5" style="text-align:center;padding:48px;color:var(--muted)">Enter a name to search customer profiles.</td></div>
+      </div>
+    </div>`;
+}
+
+async function doUserSearch(){
+  const q=document.getElementById('userSearchInput')?.value?.trim();
+  if(!q)return;
+  const wrap=document.getElementById('userTableWrap');
+  if(wrap)wrap.innerHTML='<div style="padding:24px;text-align:center;color:var(--muted)">Searching…</div>';
+
+  const{data}=await sb.from('customer_profiles')
+    .select('user_id,display_name,created_at')
+    .ilike('display_name',`%${q}%`)
+    .limit(30)
+    .catch(()=>({data:[]}));
+
+  if(!data?.length){
+    if(wrap)wrap.innerHTML='<div style="padding:24px;text-align:center;color:var(--muted)">No results found.</div>';
+    return;
+  }
+
+  if(wrap)wrap.innerHTML=`
+    <table>
+      <thead><tr><th>User ID</th><th>Display Name</th><th>Member Since</th><th>Set Role</th></tr></thead>
+      <tbody>
+        ${data.map(u=>`<tr>
+          <td><code style="font-size:11px;color:var(--orange)">${u.user_id.substring(0,12)}…</code></td>
+          <td><strong>${u.display_name||'—'}</strong></td>
+          <td style="color:var(--muted)">${new Date(u.created_at).toLocaleDateString()}</td>
+          <td>
+            <select onchange="setUserRole('${u.user_id}',this.value)" style="background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:4px 8px;color:var(--text);font-size:12px">
+              <option value="customer">Customer</option>
+              <option value="venue_owner">Venue Owner</option>
+              <option value="vendor">Vendor</option>
+              <option value="admin">Admin</option>
+            </select>
+          </td>
+        </tr>`).join('')}
+      </tbody>
+    </table>`;
+}
+
+async function setUserRole(userId,role){
+  await sb.from('user_roles').upsert({user_id:userId,role},{onConflict:'user_id'}).catch(()=>{});
+  toast(`Role set → ${role}`);
+}
+
+// ── OVERRIDES ─────────────────────────────────────────────────
+async function renderOverrides(){
+  const{data}=await sb.from('admin_overrides')
+    .select('*').order('set_at',{ascending:false}).limit(50)
+    .catch(()=>({data:[]}));
+
+  document.getElementById('pageContent').innerHTML=`
+    <div style="display:grid;grid-template-columns:380px 1fr;gap:24px;align-items:start">
+
+      <!-- Form -->
+      <div class="table-card">
+        <div class="table-header"><div class="table-title">Apply Override</div></div>
+        <div style="padding:20px;display:flex;flex-direction:column;gap:12px">
+          <div class="field">
+            <label>Entity Type</label>
+            <select id="ov-entity-type"><option value="venue">Venue</option><option value="event">Event</option><option value="vendor">Vendor</option><option value="user">User</option></select>
+          </div>
+          <div class="field"><label>Entity UUID</label><input id="ov-entity-id" placeholder="Paste the row UUID"/></div>
+          <div class="field">
+            <label>Override Action</label>
+            <select id="ov-key">
+              <option value="feature_listing">Feature Listing</option>
+              <option value="admin_boost">Admin Boost</option>
+              <option value="promote_vendor">Promote Vendor</option>
+              <option value="event_boost">Event Boost</option>
+              <option value="suspend">Suspend Account</option>
+            </select>
+          </div>
+          <div class="field"><label>Value (optional)</label><input id="ov-value" placeholder="e.g. true / false"/></div>
+          <div class="field"><label>Reason</label><input id="ov-reason" placeholder="Why are you applying this?"/></div>
+          <div class="field"><label>Expires At (optional)</label><input type="datetime-local" id="ov-expires"/></div>
+          <button class="btn btn-primary" onclick="applyOverride()">Apply Override →</button>
+        </div>
+      </div>
+
+      <!-- Log -->
+      <div class="table-card">
+        <div class="table-header"><div class="table-title">Override Log (recent 50)</div></div>
+        <table>
+          <thead><tr><th>Type</th><th>Entity</th><th>Action</th><th>Reason</th><th>Applied</th><th>Expires</th></tr></thead>
+          <tbody>
+            ${(data||[]).length?(data||[]).map(o=>`<tr>
+              <td><span class="badge badge-muted">${o.entity_type}</span></td>
+              <td><code style="font-size:11px;color:var(--orange)">${(o.entity_id||'').substring(0,8)}…</code></td>
+              <td style="font-weight:500">${o.override_key}</td>
+              <td style="color:var(--muted);font-size:12px">${o.reason||'—'}</td>
+              <td style="color:var(--muted);font-size:12px">${new Date(o.set_at).toLocaleDateString()}</td>
+              <td style="font-size:12px">${o.expires_at?new Date(o.expires_at).toLocaleDateString():'∞'}</td>
+            </tr>`).join(''):'<tr class="empty-row"><td colspan="6">No overrides yet</td></tr>'}
+          </tbody>
+        </table>
+      </div>
+    </div>`;
+}
+
+async function applyOverride(){
+  const entityId=document.getElementById('ov-entity-id').value.trim();
+  const entityType=document.getElementById('ov-entity-type').value;
+  const key=document.getElementById('ov-key').value;
+  const val=document.getElementById('ov-value').value.trim()||null;
+  const reason=document.getElementById('ov-reason').value.trim()||null;
+  const expires=document.getElementById('ov-expires').value||null;
+
+  if(!entityId){toast('Entity UUID is required','error');return;}
+
+  // Log it
+  await sb.from('admin_overrides').insert({
+    entity_type:entityType,entity_id:entityId,override_key:key,
+    override_value:val,reason,expires_at:expires,set_by:currentUser?.id
+  }).catch(()=>{});
+
+  // Apply directly
+  if(key==='feature_listing'&&entityType==='venue')
+    await sb.from('venues').update({is_featured:val!=='false'}).eq('id',entityId);
+  if(key==='admin_boost')
+    await sb.from(entityType==='event'?'events':'venues').update({admin_boost:val!=='false'}).eq('id',entityId);
+  if(key==='promote_vendor')
+    await sb.from('vendors').update({admin_promoted:true}).eq('id',entityId);
+  if(key==='event_boost')
+    await sb.from('events').update({is_boosted:true,boost_type:'admin',admin_boost:true}).eq('id',entityId);
+
+  toast('✓ Override applied!');
+  await loadData();
+  renderOverrides();
 }
 
 // ── START ─────────────────────────────────────────────────────

@@ -158,6 +158,7 @@ function AuthPage() {
 
 // Sidebar
 const NAV = [{key:"dashboard",icon:"⊞",label:"Dashboard"},{key:"venue",icon:"🏛",label:"My Venue"},{key:"events",icon:"📅",label:"Events"},{key:"inquiries",icon:"💬",label:"Inquiries"},{key:"plan",icon:"⭐",label:"Plan & Billing"}];
+const HOME_BTN_STYLE = {display:"flex",alignItems:"center",gap:10,width:"100%",background:"transparent",color:"#8888a0",border:"1px solid transparent",borderRadius:8,padding:"10px 12px",cursor:"pointer",fontSize:13,fontFamily:"'DM Sans',sans-serif",fontWeight:400,marginBottom:2,textAlign:"left",transition:"color 0.15s"};
 
 function Sidebar({active,setActive,profile}) {
   return (
@@ -167,6 +168,10 @@ function Sidebar({active,setActive,profile}) {
         <div style={{color:"#8888a0",fontSize:11,marginTop:4}}>Venue Portal</div>
       </div>
       <nav style={{flex:1,padding:"10px 8px"}}>
+        <button style={{display:"flex",alignItems:"center",gap:10,width:"100%",background:"transparent",color:"#8888a0",border:"1px solid transparent",borderRadius:8,padding:"10px 12px",cursor:"pointer",fontSize:13,fontFamily:"'DM Sans',sans-serif",fontWeight:400,marginBottom:6,textAlign:"left"}} onClick={()=>window.open('https://cbusevents.com','_self')}>
+          <span>🏠</span>Home
+        </button>
+        <div style={{height:1,background:"#25252f",marginBottom:6}}/>
         {NAV.map(n=>(
           <button key={n.key} onClick={()=>setActive(n.key)} style={{display:"flex",alignItems:"center",gap:10,width:"100%",background:active===n.key?"#1a1a24":"transparent",color:active===n.key?"#e8e8f0":"#8888a0",border:`1px solid ${active===n.key?"#25252f":"transparent"}`,borderRadius:8,padding:"10px 12px",cursor:"pointer",fontSize:13,fontFamily:"'DM Sans',sans-serif",fontWeight:active===n.key?600:400,marginBottom:2,textAlign:"left"}}>
             <span>{n.icon}</span>{n.label}
