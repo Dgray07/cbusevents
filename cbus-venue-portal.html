@@ -233,10 +233,78 @@ function Dashboard({venue,events}) {
   );
 }
 
+
+// ── SOCIAL SHARE ──────────────────────────────────────────────
+function SharePanel({event, venue, onClose}) {
+  const eventUrl = `https://cbusevents.com/?event=${event.id}`;
+  const title = encodeURIComponent(event.title || "");
+  const text = encodeURIComponent(`🎉 ${event.title} at ${venue?.name||"our venue"} in Columbus! Get tickets → ${eventUrl}`);
+  const igHandle = venue?.instagram ? venue.instagram.replace("@","") : "";
+  const fbUrl = venue?.facebook || "";
+
+  const platforms = [
+    {
+      name:"Facebook",icon:"📘",color:"#1877f2",
+      url: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(eventUrl)}&quote=${text}`
+    },
+    {
+      name:"X / Twitter",icon:"🐦",color:"#1da1f2",
+      url: `https://twitter.com/intent/tweet?text=${text}`
+    },
+    {
+      name:"TikTok",icon:"🎵",color:"#ff0050",
+      url: `https://www.tiktok.com/`
+    },
+    {
+      name:"Instagram",icon:"📸",color:"#e1306c",
+      url: `https://www.instagram.com/`
+    },
+  ];
+
+  const copyLink = () => {
+    navigator.clipboard.writeText(eventUrl);
+  };
+
+  return (
+    <div style={{position:"fixed",inset:0,background:"rgba(0,0,0,0.85)",zIndex:300,display:"flex",alignItems:"center",justifyContent:"center",padding:20}} onClick={e=>{if(e.target===e.currentTarget)onClose();}}>
+      <div style={{background:"#1a1a24",border:"1px solid #25252f",borderRadius:20,padding:32,width:"100%",maxWidth:480}}>
+        <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:20}}>
+          <div style={{fontFamily:"Syne,sans-serif",fontSize:18,fontWeight:800}}>Share This Event</div>
+          <button onClick={onClose} style={{background:"none",border:"none",color:"#8888a0",fontSize:20,cursor:"pointer"}}>✕</button>
+        </div>
+        <div style={{background:"#13131a",border:"1px solid #25252f",borderRadius:10,padding:"12px 14px",marginBottom:20}}>
+          <div style={{fontWeight:600,fontSize:14}}>{event.title}</div>
+          <div style={{color:"#8888a0",fontSize:12,marginTop:3}}>{venue?.name} · {event.start_time?new Date(event.start_time).toLocaleDateString("en-US",{weekday:"short",month:"short",day:"numeric"}):""}</div>
+        </div>
+        <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10,marginBottom:20}}>
+          {platforms.map(p=>(
+            <a key={p.name} href={p.url} target="_blank" rel="noopener noreferrer"
+              style={{display:"flex",alignItems:"center",gap:10,background:"#13131a",border:"1px solid #25252f",borderRadius:10,padding:"12px 14px",textDecoration:"none",color:"#e8e8f0",fontWeight:600,fontSize:13,transition:"all 0.15s",cursor:"pointer"}}
+              onMouseOver={e=>{e.currentTarget.style.borderColor=p.color;e.currentTarget.style.color=p.color;}}
+              onMouseOut={e=>{e.currentTarget.style.borderColor="#25252f";e.currentTarget.style.color="#e8e8f0";}}>
+              <span style={{fontSize:20}}>{p.icon}</span>{p.name}
+            </a>
+          ))}
+        </div>
+        <div style={{marginBottom:12}}>
+          <div style={{fontSize:12,color:"#8888a0",marginBottom:6,fontWeight:500}}>Event Link</div>
+          <div style={{display:"flex",gap:8}}>
+            <input readOnly value={eventUrl} style={{flex:1,background:"#0b0b0f",border:"1px solid #25252f",borderRadius:8,padding:"9px 12px",color:"#8888a0",fontSize:13,fontFamily:"monospace"}}/>
+            <button onClick={copyLink} style={{background:"#FF6B35",color:"#fff",border:"none",borderRadius:8,padding:"9px 16px",fontSize:13,fontWeight:700,cursor:"pointer",whiteSpace:"nowrap"}}>Copy</button>
+          </div>
+        </div>
+        <div style={{fontSize:12,color:"#55556a",lineHeight:1.6}}>
+          💡 For Instagram & TikTok — copy the link above and paste it in your bio or story. Instagram and TikTok don't support direct URL sharing from external sites.
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // Venue Form
 function VenueForm({venue,onSave}) {
   const {user}=useAuth();
-  const [f,setF]=useState({name:venue?.name||"",description:venue?.description||"",address:venue?.address||"",neighborhood:venue?.neighborhood||"",website:venue?.website||"",phone:venue?.phone||"",email:venue?.email||"",venue_type:venue?.venue_type||"",capacity:venue?.capacity||"",indoor_outdoor:venue?.indoor_outdoor||"indoor",tags:venue?.tags?.join(", ")||"",amenities:venue?.amenities?.join(", ")||"",cover_image_url:venue?.cover_image_url||""});
+  const [f,setF]=useState({name:venue?.name||"",description:venue?.description||"",address:venue?.address||"",neighborhood:venue?.neighborhood||"",website:venue?.website||"",phone:venue?.phone||"",email:venue?.email||"",venue_type:venue?.venue_type||"",capacity:venue?.capacity||"",indoor_outdoor:venue?.indoor_outdoor||"indoor",tags:venue?.tags?.join(", ")||"",amenities:venue?.amenities?.join(", ")||"",cover_image_url:venue?.cover_image_url||"",instagram:venue?.instagram||"",facebook:venue?.facebook||"",tiktok:venue?.tiktok||"",twitter:venue?.twitter||""});
   const [busy,setBusy]=useState(false);
   const [toast,setToast]=useState({msg:"",type:"success"});
   const set=k=>e=>setF(p=>({...p,[k]:e.target.value}));
@@ -276,7 +344,17 @@ function VenueForm({venue,onSave}) {
           {f.cover_image_url&&<img src={f.cover_image_url} alt="" style={{width:"100%",height:120,objectFit:"cover",borderRadius:8,marginTop:10,border:"1px solid #25252f"}} onError={e=>e.target.style.display="none"}/>}
         </Card>
       </div>
-      <div style={{marginTop:22,display:"flex",gap:12,alignItems:"center"}}>
+      <Card style={{gridColumn:"1/-1"}}>
+          <div style={{fontFamily:"Syne,sans-serif",fontWeight:700,fontSize:11,marginBottom:18,color:"#8888a0",textTransform:"uppercase",letterSpacing:1.5}}>📱 Social Media</div>
+          <div style={{color:"#8888a0",fontSize:13,marginBottom:16}}>Link your accounts so fans can follow you — and share events directly to your profiles.</div>
+          <Grid2>
+            <Field label="Instagram"><input value={f.instagram} onChange={set("instagram")} placeholder="@yourvenue"/></Field>
+            <Field label="TikTok"><input value={f.tiktok} onChange={set("tiktok")} placeholder="@yourvenue"/></Field>
+            <Field label="Facebook Page URL"><input value={f.facebook} onChange={set("facebook")} placeholder="https://facebook.com/yourvenue"/></Field>
+            <Field label="X / Twitter"><input value={f.twitter} onChange={set("twitter")} placeholder="@yourvenue"/></Field>
+          </Grid2>
+        </Card>
+        <div style={{marginTop:22,display:"flex",gap:12,alignItems:"center"}}>
         <Btn onClick={save} disabled={busy} size="lg">{busy?"Saving...":venue?"Save Changes":"Submit Venue"}</Btn>
         {venue?.status==="pending"&&<Badge color="#f59e0b">Pending Review</Badge>}
         {venue?.status==="approved"&&<Badge color="#22c55e">Live ✓</Badge>}
@@ -401,12 +479,14 @@ function EventsManager({venue,events,onRefresh}) {
             <div style={{display:"flex",gap:8,alignItems:"center",flexShrink:0}}>
               <Badge color={e.status==="published"?"#22c55e":e.status==="cancelled"?"#ef4444":"#55556a"}>{e.status}</Badge>
               <Btn size="sm" variant="secondary" onClick={()=>setModal(e)}>Edit</Btn>
+              {e.status==="published"&&<Btn size="sm" onClick={()=>setShareEvent(e)} style={{background:"#FF6B3520",color:"#FF6B35",border:"1px solid #FF6B3540"}}>Share</Btn>}
               <Btn size="sm" variant="danger" onClick={()=>del(e.id)}>Del</Btn>
             </div>
           </Card>
         ))}
       </div>
       {modal&&<EventModal event={modal==="new"?null:modal} venueId={venue?.id} venueTier={venue?.tier||"free"} currentEventCount={events.length} onClose={()=>setModal(null)} onSave={onRefresh}/>}
+      {shareEvent&&<SharePanel event={shareEvent} venue={venue} onClose={()=>setShareEvent(null)}/>}
     </div>
   );
 }
