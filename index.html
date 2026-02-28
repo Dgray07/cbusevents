@@ -339,6 +339,12 @@ footer { background:var(--surface); border-top:1px solid var(--border); padding:
   .cat-hero { padding:36px 20px; }
   .hero-stats { display:none; }
 }
+@media(max-width:768px){
+  #missionGrid{grid-template-columns:1fr !important;}
+  #missionStats{grid-template-columns:1fr 1fr !important;}
+  #whoGrid{grid-template-columns:1fr 1fr !important;}
+  .mission-section-pad{padding:48px 20px !important;}
+}
 </style>
 </head>
 <body>
@@ -583,6 +589,108 @@ function renderHome(){
           <div class="cat-pill-icon">🎉</div>
           <div><div class="cat-pill-name">Private Events</div><div class="cat-pill-count">${allVenues.filter(v=>(v.tags||[]).join(' ').toLowerCase().includes('private')).length} venues</div></div>
         </div>
+      </div>
+    </section>
+
+
+    <!-- MISSION SECTION -->
+    <section style="padding:80px 48px;max-width:1200px;margin:0 auto;box-sizing:border-box">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center">
+        <div>
+          <div style="display:inline-flex;align-items:center;gap:6px;background:#FF6B3520;color:#FF6B35;border:1px solid #FF6B3540;border-radius:20px;padding:5px 16px;font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:20px">🏙 Our Mission</div>
+          <h2 style="font-family:'Syne',sans-serif;font-size:clamp(28px,4vw,44px);font-weight:800;line-height:1.1;margin-bottom:20px">Becoming Columbus'<br><span style="color:#FF6B35">#1 Event Platform</span></h2>
+          <p style="color:#8888a0;font-size:16px;line-height:1.8;margin-bottom:16px">Columbus is one of the fastest-growing cities in America — and its event scene deserves a platform built specifically for it. CBUSEVENTS is that platform.</p>
+          <p style="color:#8888a0;font-size:16px;line-height:1.8;margin-bottom:28px">We're building the single source of truth for everything happening in Columbus — connecting venues, vendors, planners, and attendees in one place so the city's culture can thrive.</p>
+          <div style="display:flex;flex-direction:column;gap:14px">
+            <div style="display:flex;align-items:flex-start;gap:12px">
+              <div style="background:#FF6B3520;border:1px solid #FF6B3540;border-radius:8px;width:36px;height:36px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0">📍</div>
+              <div><div style="font-weight:700;font-size:14px;margin-bottom:3px">Hyper-local, always</div><div style="color:#8888a0;font-size:13px;line-height:1.6">We're not a national platform that happens to include Columbus. We're built from the ground up for this city and this city only.</div></div>
+            </div>
+            <div style="display:flex;align-items:flex-start;gap:12px">
+              <div style="background:#22c55e20;border:1px solid #22c55e30;border-radius:8px;width:36px;height:36px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0">🤝</div>
+              <div><div style="font-weight:700;font-size:14px;margin-bottom:3px">Every seat at the table</div><div style="color:#8888a0;font-size:13px;line-height:1.6">Venues, vendors, planners, and attendees all have their own portal. Everyone benefits. Everyone grows together.</div></div>
+            </div>
+            <div style="display:flex;align-items:flex-start;gap:12px">
+              <div style="background:#60a5fa20;border:1px solid #60a5fa30;border-radius:8px;width:36px;height:36px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0">🚀</div>
+              <div><div style="font-weight:700;font-size:14px;margin-bottom:3px">Built to grow with you</div><div style="color:#8888a0;font-size:13px;line-height:1.6">Whether you're just getting started or you're Columbus's most iconic venue, CBUSEVENTS scales with your ambition.</div></div>
+            </div>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+          <div style="background:#1a1a24;border:1px solid #25252f;border-radius:16px;padding:24px;text-align:center">
+            <div style="font-size:36px;margin-bottom:10px">🏛</div>
+            <div style="font-family:'Syne',sans-serif;font-size:28px;font-weight:800;color:#FF6B35;margin-bottom:4px">${allVenues.length||'50'}+</div>
+            <div style="color:#8888a0;font-size:13px">Columbus Venues</div>
+          </div>
+          <div style="background:#1a1a24;border:1px solid #25252f;border-radius:16px;padding:24px;text-align:center">
+            <div style="font-size:36px;margin-bottom:10px">📅</div>
+            <div style="font-family:'Syne',sans-serif;font-size:28px;font-weight:800;color:#22c55e;margin-bottom:4px">${allEvents.length||'100'}+</div>
+            <div style="color:#8888a0;font-size:13px">Events Listed</div>
+          </div>
+          <div style="background:#1a1a24;border:1px solid #25252f;border-radius:16px;padding:24px;text-align:center">
+            <div style="font-size:36px;margin-bottom:10px">🛠</div>
+            <div style="font-family:'Syne',sans-serif;font-size:28px;font-weight:800;color:#60a5fa;margin-bottom:4px">16+</div>
+            <div style="color:#8888a0;font-size:13px">Vendor Categories</div>
+          </div>
+          <div style="background:linear-gradient(135deg,#1a0800,#1a1a24);border:1px solid #FF6B3530;border-radius:16px;padding:24px;text-align:center">
+            <div style="font-size:36px;margin-bottom:10px">🏙</div>
+            <div style="font-family:'Syne',sans-serif;font-size:28px;font-weight:800;color:#f59e0b;margin-bottom:4px">#1</div>
+            <div style="color:#8888a0;font-size:13px">Columbus Only</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- WHO IT'S FOR -->
+    <section style="padding:0 48px 80px;max-width:1200px;margin:0 auto;box-sizing:border-box">
+      <div style="text-align:center;margin-bottom:40px">
+        <div style="display:inline-flex;align-items:center;gap:6px;background:#13131a;color:#8888a0;border:1px solid #25252f;border-radius:20px;padding:5px 16px;font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:14px">Built for everyone in Columbus</div>
+        <div style="font-family:'Syne',sans-serif;font-size:clamp(24px,3vw,36px);font-weight:800">One platform. Four communities.</div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px">
+        <a href="https://cbusevents.com/venues.html" style="background:linear-gradient(135deg,#1a0800,#1a1a24);border:1px solid #FF6B3530;border-radius:16px;padding:28px 20px;text-decoration:none;color:#e8e8f0;transition:all 0.2s;display:block" onmouseover="this.style.transform='translateY(-4px)';this.style.borderColor='#FF6B35'" onmouseout="this.style.transform='';this.style.borderColor='#FF6B3530'">
+          <div style="font-size:36px;margin-bottom:14px">🏛</div>
+          <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:17px;margin-bottom:8px">Venue Owners</div>
+          <div style="color:#8888a0;font-size:13px;line-height:1.65;margin-bottom:16px">Get discovered, receive booking inquiries, publish events, and sell tickets.</div>
+          <div style="color:#FF6B35;font-size:13px;font-weight:700">List your venue →</div>
+        </a>
+        <a href="https://cbusevents.com/vendors.html" style="background:linear-gradient(135deg,#001a20,#1a1a24);border:1px solid #60a5fa30;border-radius:16px;padding:28px 20px;text-decoration:none;color:#e8e8f0;transition:all 0.2s;display:block" onmouseover="this.style.transform='translateY(-4px)';this.style.borderColor='#60a5fa'" onmouseout="this.style.transform='';this.style.borderColor='#60a5fa30'">
+          <div style="font-size:36px;margin-bottom:14px">🛠</div>
+          <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:17px;margin-bottom:8px">Vendors</div>
+          <div style="color:#8888a0;font-size:13px;line-height:1.65;margin-bottom:16px">Showcase your services, build your portfolio, and send proposals to venues and planners.</div>
+          <div style="color:#60a5fa;font-size:13px;font-weight:700">List your services →</div>
+        </a>
+        <a href="https://cbusevents.com/planners.html" style="background:linear-gradient(135deg,#100a20,#1a1a24);border:1px solid #a78bfa30;border-radius:16px;padding:28px 20px;text-decoration:none;color:#e8e8f0;transition:all 0.2s;display:block" onmouseover="this.style.transform='translateY(-4px)';this.style.borderColor='#a78bfa'" onmouseout="this.style.transform='';this.style.borderColor='#a78bfa30'">
+          <div style="font-size:36px;margin-bottom:14px">📋</div>
+          <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:17px;margin-bottom:8px">Event Planners</div>
+          <div style="color:#8888a0;font-size:13px;line-height:1.65;margin-bottom:16px">Find venues, book vendors, manage events, and sell tickets all in one place.</div>
+          <div style="color:#a78bfa;font-size:13px;font-weight:700">Join as a planner →</div>
+        </a>
+        <a href="https://cbusevents.com/attendees.html" style="background:linear-gradient(135deg,#001a0a,#1a1a24);border:1px solid #22c55e30;border-radius:16px;padding:28px 20px;text-decoration:none;color:#e8e8f0;transition:all 0.2s;display:block" onmouseover="this.style.transform='translateY(-4px)';this.style.borderColor='#22c55e'" onmouseout="this.style.transform='';this.style.borderColor='#22c55e30'">
+          <div style="font-size:36px;margin-bottom:14px">🎉</div>
+          <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:17px;margin-bottom:8px">Attendees</div>
+          <div style="color:#8888a0;font-size:13px;line-height:1.65;margin-bottom:16px">Discover Columbus events, follow your favorite venues, and keep all your tickets in one place.</div>
+          <div style="color:#22c55e;font-size:13px;font-weight:700">Find events →</div>
+        </a>
+      </div>
+    </section>
+
+    <!-- NEIGHBORHOODS STRIP -->
+    <section style="padding:0 0 80px;overflow:hidden">
+      <div style="text-align:center;padding:0 48px;margin-bottom:28px">
+        <div style="font-family:'Syne',sans-serif;font-size:clamp(22px,3vw,32px);font-weight:800;margin-bottom:8px">Explore by Neighborhood</div>
+        <div style="color:#8888a0;font-size:14px">Every corner of Columbus, covered</div>
+      </div>
+      <div style="display:flex;gap:12px;overflow-x:auto;padding:0 48px 12px;scrollbar-width:none;-webkit-overflow-scrolling:touch">
+        ${['Short North','Downtown','German Village','Arena District','Easton','Clintonville','OSU / Campus','Grandview','Brewery District','Italian Village'].map((hood,i)=>{
+          const icons=['🎨','🏙','🏰','🏟','🛍','🌿','🎓','🌆','🍺','🍕'];
+          const count=allVenues.filter(v=>(v.neighborhood||'').toLowerCase().includes(hood.toLowerCase().split('/')[0].trim())).length;
+          return`<div onclick="homeNeighborhood('${hood.split('/')[0].trim()}',document.createElement('span'))" style="background:#1a1a24;border:1px solid #25252f;border-radius:12px;padding:16px 20px;flex-shrink:0;cursor:pointer;transition:all 0.2s;text-align:center;min-width:130px" onmouseover="this.style.borderColor='#FF6B35';this.style.background='#1a0800'" onmouseout="this.style.borderColor='#25252f';this.style.background='#1a1a24'">
+            <div style="font-size:24px;margin-bottom:6px">${icons[i]}</div>
+            <div style="font-weight:700;font-size:13px;margin-bottom:3px">${hood}</div>
+            <div style="color:#8888a0;font-size:11px">${count} venue${count!==1?'s':''}</div>
+          </div>`;
+        }).join('')}
       </div>
     </section>
 
