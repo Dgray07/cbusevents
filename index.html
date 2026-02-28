@@ -351,7 +351,19 @@ footer { background:var(--surface); border-top:1px solid var(--border); padding:
     <button class="nav-link" id="nav-venues" onclick="showPage('venues')">Venues</button>
     <button class="nav-link" id="nav-events" onclick="showPage('events')">Events</button>
   </div>
-  <button class="nav-cta" onclick="window.open('https://cbusevents.com/cbus-venue-portal.html','_blank')">Sign In</button>
+  <div style="display:flex;align-items:center;gap:10px">
+    <div style="position:relative" id="joinDropdown">
+      <button class="nav-link" onclick="toggleJoinMenu()" style="display:flex;align-items:center;gap:4px">Join ▾</button>
+      <div id="joinMenu" style="display:none;position:absolute;top:calc(100% + 8px);right:0;background:#1a1a24;border:1px solid #25252f;border-radius:12px;padding:8px;min-width:190px;box-shadow:0 16px 40px rgba(0,0,0,0.5);z-index:200;">
+        <a href="https://cbusevents.com/venues.html" style="display:flex;align-items:center;gap:8px;padding:9px 14px;border-radius:8px;font-size:13px;font-weight:500;color:#8888a0;text-decoration:none;transition:all 0.15s;" onmouseover="this.style.background='#13131a';this.style.color='#e8e8f0'" onmouseout="this.style.background='';this.style.color='#8888a0'">🏛 List Your Venue</a>
+        <a href="https://cbusevents.com/vendors.html" style="display:flex;align-items:center;gap:8px;padding:9px 14px;border-radius:8px;font-size:13px;font-weight:500;color:#8888a0;text-decoration:none;transition:all 0.15s;" onmouseover="this.style.background='#13131a';this.style.color='#e8e8f0'" onmouseout="this.style.background='';this.style.color='#8888a0'">🛠 List Your Services</a>
+        <a href="https://cbusevents.com/planners.html" style="display:flex;align-items:center;gap:8px;padding:9px 14px;border-radius:8px;font-size:13px;font-weight:500;color:#8888a0;text-decoration:none;transition:all 0.15s;" onmouseover="this.style.background='#13131a';this.style.color='#e8e8f0'" onmouseout="this.style.background='';this.style.color='#8888a0'">📋 Event Planners</a>
+        <div style="height:1px;background:#25252f;margin:4px 8px;"></div>
+        <a href="https://cbusevents.com/attendees.html" style="display:flex;align-items:center;gap:8px;padding:9px 14px;border-radius:8px;font-size:13px;font-weight:500;color:#8888a0;text-decoration:none;transition:all 0.15s;" onmouseover="this.style.background='#13131a';this.style.color='#e8e8f0'" onmouseout="this.style.background='';this.style.color='#8888a0'">🎉 Find Events</a>
+      </div>
+    </div>
+    <a href="https://cbusevents.com/auth.html" class="nav-cta" style="text-decoration:none">Sign In</a>
+  </div>
 </nav>
 
 <div id="app">
@@ -1301,6 +1313,17 @@ function showPricing(){
   el.addEventListener('click',e=>{if(e.target===el)el.remove();});
   document.body.appendChild(el);
 }
+
+// ── JOIN DROPDOWN ─────────────────────────────────────────────
+function toggleJoinMenu(){
+  const m=document.getElementById('joinMenu');
+  if(m)m.style.display=m.style.display==='none'?'block':'none';
+}
+document.addEventListener('click',function(e){
+  const d=document.getElementById('joinDropdown');
+  const m=document.getElementById('joinMenu');
+  if(d&&m&&!d.contains(e.target))m.style.display='none';
+});
 
 // ── START ─────────────────────────────────────────────────────
 setNavActive('home');
