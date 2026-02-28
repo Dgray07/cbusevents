@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Event Planners — CBUSEVENTS</title>
+<meta name="description" content="Find Columbus venues, vendors, and everything you need to plan extraordinary events."/>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{--bg:#0b0b0f;--surface:#13131a;--card:#1a1a24;--border:#25252f;--text:#e8e8f0;--sub:#8888a0;--muted:#55556a;--orange:#FF6B35;--green:#22c55e;--gold:#f59e0b;--purple:#a78bfa;}
+body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(24px);}to{opacity:1;transform:translateY(0);}}
+@keyframes scroll{0%{transform:translateX(0);}100%{transform:translateX(-50%);}}
+nav{position:sticky;top:0;z-index:100;background:rgba(11,11,15,0.95);backdrop-filter:blur(16px);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 48px;height:62px;}
+.nav-logo{font-family:'Syne',sans-serif;font-weight:800;font-size:20px;text-decoration:none;color:var(--text);}
+.nav-logo span{color:var(--orange);}
+.nav-links{display:flex;gap:4px;}
+.nav-link{background:none;border:none;color:var(--sub);font-size:14px;padding:7px 16px;border-radius:8px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;text-decoration:none;transition:all 0.15s;}
+.nav-link:hover{background:var(--card);color:var(--text);}
+.nav-cta{background:var(--purple);color:#fff;padding:8px 20px;border-radius:8px;font-size:13px;font-weight:700;text-decoration:none;transition:opacity 0.15s;}
+.nav-cta:hover{opacity:0.85;}
+.dropdown{position:relative;}
+.dropdown-menu{display:none;position:absolute;top:calc(100% + 8px);left:50%;transform:translateX(-50%);background:var(--card);border:1px solid var(--border);border-radius:12px;padding:8px;min-width:180px;box-shadow:0 16px 40px rgba(0,0,0,0.5);z-index:200;}
+.dropdown:hover .dropdown-menu{display:block;}
+.dropdown-item{display:block;padding:9px 14px;border-radius:8px;font-size:13px;font-weight:500;color:var(--sub);text-decoration:none;transition:all 0.15s;}
+.dropdown-item:hover{background:var(--surface);color:var(--text);}
+.dropdown-item.active{color:var(--orange);}
+.hero{min-height:88vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:80px 24px 60px;position:relative;overflow:hidden;}
+.hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 70% 50% at 50% 0%,#a78bfa12 0%,transparent 70%);}
+.hero-eyebrow{display:inline-flex;align-items:center;gap:6px;background:#a78bfa18;color:var(--purple);border:1px solid #a78bfa30;border-radius:20px;padding:5px 16px;font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-bottom:24px;animation:fadeUp 0.5s ease;}
+.hero h1{font-family:'Syne',sans-serif;font-size:clamp(40px,7vw,72px);font-weight:800;line-height:1.05;margin-bottom:20px;animation:fadeUp 0.5s 0.1s ease both;}
+.hero h1 span{color:var(--purple);}
+.hero p{color:var(--sub);font-size:18px;max-width:520px;line-height:1.7;margin-bottom:36px;animation:fadeUp 0.5s 0.2s ease both;}
+.hero-btns{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;animation:fadeUp 0.5s 0.3s ease both;}
+.btn-hero{padding:14px 32px;border-radius:10px;font-size:15px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;text-decoration:none;transition:all 0.2s;display:inline-block;}
+.btn-hero-primary{background:var(--purple);color:#fff;border:none;}
+.btn-hero-primary:hover{opacity:0.85;transform:translateY(-1px);}
+.btn-hero-ghost{background:var(--card);color:var(--text);border:1px solid var(--border);}
+.btn-hero-ghost:hover{border-color:var(--muted);transform:translateY(-1px);}
+.slider-section{padding:60px 0;overflow:hidden;border-top:1px solid var(--border);border-bottom:1px solid var(--border);}
+.slider-label{text-align:center;font-size:11px;font-weight:700;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-bottom:24px;}
+.slider-track{display:flex;gap:16px;width:max-content;animation:scroll 30s linear infinite;}
+.slider-track:hover{animation-play-state:paused;}
+.event-slide{background:var(--card);border:1px solid var(--border);border-radius:14px;overflow:hidden;width:280px;flex-shrink:0;cursor:pointer;transition:border-color 0.2s;}
+.event-slide:hover{border-color:var(--purple);}
+.event-slide-img{height:140px;background:linear-gradient(135deg,var(--surface),var(--border));display:flex;align-items:center;justify-content:center;font-size:36px;overflow:hidden;}
+.event-slide-img img{width:100%;height:100%;object-fit:cover;}
+.event-slide-body{padding:12px 14px;}
+.event-slide-cat{font-size:10px;color:var(--purple);font-weight:700;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;}
+.event-slide-title{font-family:'Syne',sans-serif;font-weight:700;font-size:14px;margin-bottom:3px;}
+.event-slide-meta{font-size:12px;color:var(--sub);}
+.features{padding:80px 48px;max-width:1100px;margin:0 auto;}
+.section-label{font-size:11px;font-weight:700;color:var(--purple);letter-spacing:2px;text-transform:uppercase;margin-bottom:10px;}
+.section-title{font-family:'Syne',sans-serif;font-size:clamp(28px,4vw,42px);font-weight:800;margin-bottom:14px;line-height:1.15;}
+.section-sub{color:var(--sub);font-size:16px;max-width:480px;line-height:1.7;margin-bottom:52px;}
+.features-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;}
+@media(max-width:768px){.features-grid{grid-template-columns:1fr;}}
+.feature-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:28px;}
+.feature-icon{font-size:32px;margin-bottom:14px;}
+.feature-title{font-family:'Syne',sans-serif;font-size:17px;font-weight:700;margin-bottom:8px;}
+.feature-desc{color:var(--sub);font-size:14px;line-height:1.65;}
+.cta-banner{padding:100px 48px;text-align:center;}
+.cta-banner h2{font-family:'Syne',sans-serif;font-size:clamp(28px,4vw,48px);font-weight:800;margin-bottom:16px;}
+.cta-banner p{color:var(--sub);font-size:16px;max-width:440px;margin:0 auto 36px;line-height:1.7;}
+footer{background:var(--surface);border-top:1px solid var(--border);padding:24px 48px;display:flex;justify-content:space-between;align-items:center;}
+.footer-copy{color:var(--muted);font-size:12px;}
+.footer-admin{color:var(--muted);font-size:11px;opacity:0.4;transition:opacity 0.2s;text-decoration:none;}
+.footer-admin:hover{opacity:1;}
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="https://cbusevents.com" class="nav-logo">CBUS<span>EVENTS</span></a>
+  <div class="nav-links">
+    <a href="https://cbusevents.com" class="nav-link">Home</a>
+    <div class="dropdown">
+      <a class="nav-link" style="color:var(--text)">Join ▾</a>
+      <div class="dropdown-menu">
+        <a href="https://cbusevents.com/venues.html" class="dropdown-item">🏛 Venues</a>
+        <a href="https://cbusevents.com/vendors.html" class="dropdown-item">🛠 Vendors</a>
+        <a href="https://cbusevents.com/planners.html" class="dropdown-item active">📋 Planners</a>
+        <a href="https://cbusevents.com/attendees.html" class="dropdown-item">🎉 Attendees</a>
+      </div>
+    </div>
+  </div>
+  <a href="https://cbusevents.com/auth.html?role=planner" class="nav-cta">Join as Planner →</a>
+</nav>
+
+<section class="hero">
+  <div class="hero-eyebrow">📋 For Event Planners</div>
+  <h1>Plan Better Events<br>Faster in <span>Columbus</span></h1>
+  <p>Browse every available venue, connect with trusted vendors, and manage your events all in one place built for Columbus planners.</p>
+  <div class="hero-btns">
+    <a href="https://cbusevents.com/auth.html?role=planner" class="btn-hero btn-hero-primary">Join Free →</a>
+    <a href="https://cbusevents.com/cbus-planner-portal.html" class="btn-hero btn-hero-ghost">Sign In</a>
+  </div>
+</section>
+
+<section class="slider-section">
+  <div class="slider-label">Upcoming Events on CBUSEVENTS</div>
+  <div style="overflow:hidden">
+    <div class="slider-track" id="eventsSlider"></div>
+  </div>
+</section>
+
+<section class="features">
+  <div class="section-label">Why CBUSEVENTS</div>
+  <div class="section-title">Your Columbus event<br>command center</div>
+  <div class="section-sub">Everything you need to find, book, and execute exceptional events in one platform.</div>
+  <div class="features-grid">
+    <div class="feature-card">
+      <div class="feature-icon">🏛</div>
+      <div class="feature-title">Browse All Venues</div>
+      <div class="feature-desc">Filter Columbus venues by capacity, neighborhood, type, and availability. Send inquiries directly from the platform.</div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">🛠</div>
+      <div class="feature-title">Find Trusted Vendors</div>
+      <div class="feature-desc">Browse DJs, photographers, caterers, and every other service provider with real portfolios and reviews.</div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">📅</div>
+      <div class="feature-title">Manage Your Events</div>
+      <div class="feature-desc">Create and publish events, manage ticket sales, and track attendance all from your planner dashboard.</div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">📨</div>
+      <div class="feature-title">Receive Proposals</div>
+      <div class="feature-desc">Premium vendors on CBUSEVENTS can send you proposals for your events — you get the best talent reaching out first.</div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">🎟</div>
+      <div class="feature-title">Sell Tickets</div>
+      <div class="feature-desc">Built-in ticketing with Stripe. Sell tickets to your events and receive payouts directly with just an 8% platform fee.</div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">🤝</div>
+      <div class="feature-title">Build Relationships</div>
+      <div class="feature-desc">Follow venues, save your favorite vendors, and build a Columbus network that makes every future event easier.</div>
+    </div>
+  </div>
+</section>
+
+<section class="cta-banner">
+  <h2>Plan your next Columbus event here</h2>
+  <p>Join planners already using CBUSEVENTS to find venues, book vendors, and sell tickets faster.</p>
+  <a href="https://cbusevents.com/auth.html?role=planner" class="btn-hero btn-hero-primary">Get Started Free →</a>
+</section>
+
+<footer>
+  <span class="footer-copy">© 2026 CBUSEVENTS · Columbus, Ohio</span>
+  <div style="display:flex;gap:20px;align-items:center">
+    <span class="footer-copy">Made for Columbus 🏙</span>
+    <a href="https://cbusevents.com/cbus-admin.html" class="footer-admin">Admin</a>
+  </div>
+</footer>
+
+<script src="https://unpkg.com/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script>
+const sb=supabase.createClient("https://toblgvatvsjljbqogzsv.supabase.co","eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRvYmxndmF0dnNqbGpicW9nenN2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMDgwNTAsImV4cCI6MjA4NzY4NDA1MH0._WJEQPizNDiQfDXQB_DHPaQhixPGpMdmYQSmyWmm_FQ");
+const PLACEHOLDERS=[
+  {title:'Short North Art Crawl',category:'Arts',start_time:new Date(Date.now()+3*86400000).toISOString(),venues:{name:'Short North Gallery'},cover_image_url:'',icon:'🎨'},
+  {title:'Columbus Food Fest',category:'Food & Drink',start_time:new Date(Date.now()+7*86400000).toISOString(),venues:{name:'Dock at Scioto Audubon'},cover_image_url:'',icon:'🍽'},
+  {title:'Arena District Block Party',category:'Music',start_time:new Date(Date.now()+10*86400000).toISOString(),venues:{name:'Arena District'},cover_image_url:'',icon:'🎵'},
+  {title:'German Village Wine Walk',category:'Social',start_time:new Date(Date.now()+14*86400000).toISOString(),venues:{name:'German Village'},cover_image_url:'',icon:'🍷'},
+  {title:'Cbus Tech Summit',category:'Networking',start_time:new Date(Date.now()+18*86400000).toISOString(),venues:{name:'Nationwide Hotel'},cover_image_url:'',icon:'💻'},
+  {title:'Night Market Columbus',category:'Shopping',start_time:new Date(Date.now()+21*86400000).toISOString(),venues:{name:'North Market'},cover_image_url:'',icon:'🌙'},
+];
+async function loadSlider(){
+  const{data:events}=await sb.from('events').select('id,title,category,start_time,cover_image_url,venues(name)').eq('status','published').gte('start_time',new Date().toISOString()).order('rank_score',{ascending:false}).limit(12).catch(()=>({data:[]}));
+  const items=events?.length?events:PLACEHOLDERS;
+  const makeCard=e=>`
+    <div class="event-slide">
+      <div class="event-slide-img">${e.cover_image_url?`<img src="${e.cover_image_url}" alt="${e.title}" loading="lazy">`:(e.icon||'📅')}</div>
+      <div class="event-slide-body">
+        <div class="event-slide-cat">${e.category||'Event'}</div>
+        <div class="event-slide-title">${e.title}</div>
+        <div class="event-slide-meta">🏛 ${e.venues?.name||'Columbus'} · ${new Date(e.start_time).toLocaleDateString('en-US',{month:'short',day:'numeric'})}</div>
+      </div>
+    </div>`;
+  const html=items.map(makeCard).join('');
+  document.getElementById('eventsSlider').innerHTML=html+html;
+}
+loadSlider();
+</script>
+</body>
+</html>
