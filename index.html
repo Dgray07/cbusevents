@@ -17,13 +17,13 @@
 <meta property="og:url" content="https://cbusevents.com">
 <meta property="og:title" content="CBUSEVENTS — Columbus Ohio Venues & Events">
 <meta property="og:description" content="The Columbus event directory. Discover bars, comedy clubs, concert halls & unique spaces. Browse upcoming events or list your venue.">
-<meta property="og:image" content="https://images.unsplash.com/photo-1519671482749-fd09be7ccebf?w=1200&q=80">
+<meta property="og:image" content="https://cbusevents.com/og-image.png">
 
 <!-- Twitter Card -->
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="CBUSEVENTS — Columbus Ohio Venues & Events">
 <meta name="twitter:description" content="The Columbus event directory. Discover bars, comedy clubs, and unique event spaces.">
-<meta name="twitter:image" content="https://images.unsplash.com/photo-1519671482749-fd09be7ccebf?w=1200&q=80">
+<meta name="twitter:image" content="https://cbusevents.com/og-image.png">
 
 <!-- Structured Data for Google -->
 <script type="application/ld+json">
@@ -326,24 +326,87 @@ footer { background:var(--surface); border-top:1px solid var(--border); padding:
 .empty h3 { font-family:'Syne',sans-serif; font-size:18px; font-weight:700; margin-bottom:8px; color:var(--text); }
 
 /* ── RESPONSIVE ── */
-@media(max-width:900px) {
-  nav { padding:0 20px; }
-  .hero-cards { display:none; }
-  .hero-content { padding:40px 20px; }
-  .search-section { padding:20px; }
-  .section { padding:36px 20px; }
-  .venue-detail-grid { grid-template-columns:1fr; }
-  .venue-detail-body,.venue-detail-meta { padding:24px 20px; }
-  .footer-grid { grid-template-columns:1fr 1fr; }
-  .cta-banner { flex-direction:column; margin:0 20px 36px; padding:36px 24px; }
-  .cat-hero { padding:36px 20px; }
-  .hero-stats { display:none; }
+/* ── TABLET ── */
+@media(max-width:900px){
+  nav{padding:0 20px;}
+  .hero-cards{display:none;}
+  .hero-content{padding:40px 20px;}
+  .search-section{padding:20px;}
+  .section{padding:36px 20px;}
+  .venue-detail-grid{grid-template-columns:1fr;}
+  .venue-detail-body,.venue-detail-meta{padding:24px 20px;}
+  .footer-grid{grid-template-columns:1fr 1fr;}
+  .cta-banner{flex-direction:column;margin:0 20px 36px;padding:36px 24px;}
+  .cat-hero{padding:36px 20px;}
+  .hero-stats{display:none;}
 }
-@media(max-width:768px){
-  #missionGrid{grid-template-columns:1fr !important;}
-  #missionStats{grid-template-columns:1fr 1fr !important;}
-  #whoGrid{grid-template-columns:1fr 1fr !important;}
-  .mission-section-pad{padding:48px 20px !important;}
+
+/* ── MOBILE ── */
+@media(max-width:680px){
+  /* NAV */
+  nav{padding:0 16px;height:56px;}
+  .nav-links{display:none;}
+  #joinDropdown .nav-link{font-size:12px;padding:6px 10px;}
+  #joinMenu{min-width:160px;right:-10px;}
+  .nav-cta{padding:7px 14px;font-size:12px;}
+  .nav-logo{font-size:17px;}
+
+  /* HERO */
+  .hero-content{padding:32px 16px 24px;}
+  .hero-title{font-size:32px !important;}
+  .hero-sub{font-size:14px !important;}
+  .hero-actions{flex-wrap:wrap;gap:8px;}
+  .hero-actions button{font-size:13px;padding:10px 16px;}
+  .hero-dots{margin-top:16px;}
+
+  /* SEARCH */
+  .search-section{padding:16px;}
+  .search-bar{flex-direction:column;gap:8px;}
+  .search-select{width:100%;}
+  .filter-chips{gap:6px;}
+  .chip{font-size:12px;padding:5px 12px;}
+
+  /* CATEGORIES */
+  .cat-pills{grid-template-columns:1fr 1fr !important;gap:10px;}
+  .cat-pill{padding:14px 12px;}
+  .cat-pill-name{font-size:13px;}
+
+  /* SECTIONS */
+  .section{padding:28px 16px;}
+  .section-title{font-size:18px !important;}
+  .section-header{flex-direction:column;align-items:flex-start;gap:8px;}
+
+  /* CARDS */
+  .venue-grid{grid-template-columns:1fr !important;}
+  .event-grid{grid-template-columns:1fr !important;}
+
+  /* MISSION SECTION */
+  .mission-grid{grid-template-columns:1fr !important;gap:32px !important;}
+  .mission-stats{grid-template-columns:1fr 1fr !important;}
+  .mission-pad{padding:40px 16px !important;}
+
+  /* WHO ITS FOR */
+  .who-grid{grid-template-columns:1fr 1fr !important;gap:10px !important;}
+  .who-pad{padding:0 16px 48px !important;}
+  .who-card{padding:18px 14px !important;}
+  .who-card-icon{font-size:26px !important;}
+  .who-card-title{font-size:14px !important;}
+  .who-card-desc{display:none;}
+
+  /* NEIGHBORHOODS */
+  .hood-pad{padding:0 0 48px !important;}
+  .hood-pad-inner{padding:0 16px !important;}
+  .hood-scroll{padding:0 16px 12px !important;}
+
+  /* CTA BANNER */
+  .cta-banner{flex-direction:column;margin:0 16px 32px;padding:28px 20px;}
+  .cta-banner h2{font-size:20px;}
+  .cta-banner p{font-size:13px;}
+
+  /* FOOTER */
+  .footer-grid{grid-template-columns:1fr !important;}
+  footer{padding:32px 16px 24px;}
+  .footer-bottom{flex-direction:column;gap:8px;}
 }
 </style>
 </head>
@@ -594,8 +657,8 @@ function renderHome(){
 
 
     <!-- MISSION SECTION -->
-    <section style="padding:80px 48px;max-width:1200px;margin:0 auto;box-sizing:border-box">
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center">
+    <section class="mission-pad" style="padding:80px 48px;max-width:1200px;margin:0 auto;box-sizing:border-box">
+      <div class="mission-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center">
         <div>
           <div style="display:inline-flex;align-items:center;gap:6px;background:#FF6B3520;color:#FF6B35;border:1px solid #FF6B3540;border-radius:20px;padding:5px 16px;font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:20px">🏙 Our Mission</div>
           <h2 style="font-family:'Syne',sans-serif;font-size:clamp(28px,4vw,44px);font-weight:800;line-height:1.1;margin-bottom:20px">Becoming Columbus'<br><span style="color:#FF6B35">#1 Event Platform</span></h2>
@@ -616,7 +679,7 @@ function renderHome(){
             </div>
           </div>
         </div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+        <div class="mission-stats" style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
           <div style="background:#1a1a24;border:1px solid #25252f;border-radius:16px;padding:24px;text-align:center">
             <div style="font-size:36px;margin-bottom:10px">🏛</div>
             <div style="font-family:'Syne',sans-serif;font-size:28px;font-weight:800;color:#FF6B35;margin-bottom:4px">${allVenues.length||'50'}+</div>
@@ -642,12 +705,12 @@ function renderHome(){
     </section>
 
     <!-- WHO IT'S FOR -->
-    <section style="padding:0 48px 80px;max-width:1200px;margin:0 auto;box-sizing:border-box">
+    <section class="who-pad" style="padding:0 48px 80px;max-width:1200px;margin:0 auto;box-sizing:border-box">
       <div style="text-align:center;margin-bottom:40px">
         <div style="display:inline-flex;align-items:center;gap:6px;background:#13131a;color:#8888a0;border:1px solid #25252f;border-radius:20px;padding:5px 16px;font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:14px">Built for everyone in Columbus</div>
         <div style="font-family:'Syne',sans-serif;font-size:clamp(24px,3vw,36px);font-weight:800">One platform. Four communities.</div>
       </div>
-      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px">
+      <div class="who-grid" style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px">
         <a href="https://cbusevents.com/venues.html" style="background:linear-gradient(135deg,#1a0800,#1a1a24);border:1px solid #FF6B3530;border-radius:16px;padding:28px 20px;text-decoration:none;color:#e8e8f0;transition:all 0.2s;display:block" onmouseover="this.style.transform='translateY(-4px)';this.style.borderColor='#FF6B35'" onmouseout="this.style.transform='';this.style.borderColor='#FF6B3530'">
           <div style="font-size:36px;margin-bottom:14px">🏛</div>
           <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:17px;margin-bottom:8px">Venue Owners</div>
@@ -676,12 +739,12 @@ function renderHome(){
     </section>
 
     <!-- NEIGHBORHOODS STRIP -->
-    <section style="padding:0 0 80px;overflow:hidden">
-      <div style="text-align:center;padding:0 48px;margin-bottom:28px">
+    <section class="hood-pad" style="padding:0 0 80px;overflow:hidden">
+      <div class="hood-pad-inner" style="text-align:center;padding:0 48px;margin-bottom:28px">
         <div style="font-family:'Syne',sans-serif;font-size:clamp(22px,3vw,32px);font-weight:800;margin-bottom:8px">Explore by Neighborhood</div>
         <div style="color:#8888a0;font-size:14px">Every corner of Columbus, covered</div>
       </div>
-      <div style="display:flex;gap:12px;overflow-x:auto;padding:0 48px 12px;scrollbar-width:none;-webkit-overflow-scrolling:touch">
+      <div class="hood-scroll" style="display:flex;gap:12px;overflow-x:auto;padding:0 48px 12px;scrollbar-width:none;-webkit-overflow-scrolling:touch">
         ${['Short North','Downtown','German Village','Arena District','Easton','Clintonville','OSU / Campus','Grandview','Brewery District','Italian Village'].map((hood,i)=>{
           const icons=['🎨','🏙','🏰','🏟','🛍','🌿','🎓','🌆','🍺','🍕'];
           const count=allVenues.filter(v=>(v.neighborhood||'').toLowerCase().includes(hood.toLowerCase().split('/')[0].trim())).length;

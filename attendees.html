@@ -76,6 +76,36 @@ nav{position:sticky;top:0;z-index:100;background:rgba(11,11,15,0.95);backdrop-fi
 .cta-banner{padding:100px 48px;text-align:center;}
 .cta-banner h2{font-family:'Syne',sans-serif;font-size:clamp(28px,4vw,48px);font-weight:800;margin-bottom:16px;}
 .cta-banner p{color:var(--sub);font-size:16px;max-width:440px;margin:0 auto 36px;line-height:1.7;}
+
+/* ── MOBILE ─────────────────────────────────────────────────── */
+@media(max-width:680px){
+  nav{padding:0 16px;height:54px;}
+  nav .nav-links{display:none;}
+  .nav-cta{font-size:12px;padding:7px 14px;}
+  .nav-logo{font-size:17px;}
+  .hero{min-height:auto;padding:60px 20px 40px;}
+  .hero h1{font-size:clamp(32px,8vw,52px);}
+  .hero p{font-size:15px;}
+  .hero-btns{flex-direction:column;align-items:stretch;}
+  .btn-hero{text-align:center;padding:13px 20px;}
+  .hero-stats{gap:20px;flex-wrap:wrap;justify-content:center;}
+  .features{padding:48px 20px;}
+  .features-grid{grid-template-columns:1fr !important;}
+  .plan-grid{grid-template-columns:1fr !important;}
+  .pricing{padding:48px 20px;}
+  .cta-banner{padding:60px 20px;}
+  .cta-banner h2{font-size:clamp(24px,6vw,36px);}
+  .section-title{font-size:clamp(24px,5vw,36px);}
+  footer{padding:20px 16px;flex-direction:column;gap:10px;}
+  .services-showcase{padding:48px 20px;}
+  .services-tags{gap:8px;}
+  .service-tag{font-size:12px;padding:6px 12px;}
+  .hood-grid{grid-template-columns:1fr 1fr !important;}
+  .categories{gap:6px;}
+  .cat-chip{font-size:12px;padding:6px 12px;}
+  .slider-section{padding:40px 0;}
+  .role-grid{grid-template-columns:1fr 1fr;}
+}
 footer{background:var(--surface);border-top:1px solid var(--border);padding:24px 48px;display:flex;justify-content:space-between;align-items:center;}
 .footer-copy{color:var(--muted);font-size:12px;}
 .footer-admin{color:var(--muted);font-size:11px;opacity:0.4;transition:opacity 0.2s;text-decoration:none;}
