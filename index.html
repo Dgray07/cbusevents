@@ -907,7 +907,9 @@ function renderVenueLanding(){
 function showPricing(){
  const el=document.createElement('div');
  el.id='pricingModal';
- el.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:500;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:16px';
+ el.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:500;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:12px';
+ document.body.style.overflow='hidden';
+ el.addEventListener('click',e=>{if(e.target===el){el.remove();document.body.style.overflow='';}});
 
  const plans=[
   {label:'Free',color:'#8888a0',price:'$0',sub:'forever',features:['1 venue listing','Up to 4 events','Basic search placement','Public venue page'],btn:'Get Started Free',btnStyle:'background:#25252f;color:#e8e8f0',popular:false,link:'cbus-venue-portal.html'},
@@ -923,9 +925,10 @@ function showPricing(){
       <div style="font-family:'Syne',sans-serif;font-size:20px;font-weight:800">Simple, transparent pricing</div>
       <div style="color:#8888a0;font-size:13px;margin-top:3px">Get your venue in front of Columbus every day</div>
      </div>
-     <button onclick="document.getElementById('pricingModal').remove()" style="background:#25252f;border:none;color:#8888a0;border-radius:8px;width:36px;height:36px;font-size:20px;cursor:pointer;flex-shrink:0">×</button>
+     <button onclick="document.getElementById('pricingModal').remove();document.body.style.overflow='';document.body.style.overflow=''" style="background:#25252f;border:none;color:#8888a0;border-radius:8px;width:36px;height:36px;font-size:20px;cursor:pointer;flex-shrink:0">×</button>
     </div>
-    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;padding:20px">
+    <style>@media(max-width:640px){.pricing-grid{grid-template-columns:1fr!important;}}</style>
+    <div class="pricing-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;padding:20px">
      ${plans.map(p=>`
       <div style="background:${p.popular?'linear-gradient(135deg,#1a1000,#1a0f00)':'#13131a'};border:${p.popular?'2px solid #FF6B3550':'1px solid #25252f'};border-radius:16px;padding:22px;display:flex;flex-direction:column;position:relative;${p.popular?'margin-top:8px':''}">
        ${p.popular?`<div style="position:absolute;top:-12px;left:50%;transform:translateX(-50%);background:#FF6B35;color:#fff;border-radius:20px;padding:3px 14px;font-size:11px;font-weight:700;white-space:nowrap">MOST POPULAR</div>`:''}
@@ -935,7 +938,7 @@ function showPricing(){
        <div style="flex:1;display:flex;flex-direction:column;gap:8px;margin-bottom:20px">
         ${p.features.map(f=>`<div style="display:flex;align-items:center;gap:7px;font-size:13px"><span style="color:${p.color};font-size:14px">✓</span>${f}</div>`).join('')}
        </div>
-       <button onclick="window.open('https://cbusevents.com/${p.link}','_blank');document.getElementById('pricingModal').remove()" style="width:100%;${p.btnStyle};border:none;border-radius:9px;padding:12px;font-size:14px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif">${p.btn}</button>
+       <button onclick="window.open('https://cbusevents.com/${p.link}','_blank');document.getElementById('pricingModal').remove();document.body.style.overflow=''" style="width:100%;${p.btnStyle};border:none;border-radius:9px;padding:12px;font-size:14px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif">${p.btn}</button>
       </div>`).join('')}
     </div>
     <div style="margin:0 20px 20px;background:#13131a;border:1px solid #f59e0b30;border-radius:14px;padding:18px 20px">
@@ -957,7 +960,6 @@ function showPricing(){
    </div>
   </div>`;
 
- el.addEventListener('click',e=>{if(e.target===el)el.remove();});
  document.body.appendChild(el);
 }
 
