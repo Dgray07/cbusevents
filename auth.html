@@ -202,7 +202,7 @@ function buildStep2(){
  venue_owner:{title:'Tell us about your venue',sub:'You can add more details in your portal',fields:[
  {id:'venueName',label:'Venue Name *',placeholder:'e.g. The Basement Bar'},
  {id:'venueType',label:'Type of Venue',placeholder:'e.g. Bar, Event Space, Comedy Club'},
- {id:'venueNeighborhood',label:'Neighborhood',placeholder:'e.g. Short North, Downtown'},
+ {id:'venueNeighborhood',label:'Neighborhood',placeholder:'e.g. Short North, Downtown',datalist:['Short North','Downtown','German Village','Arena District','Easton','Clintonville','OSU / Campus','Grandview','Brewery District','Italian Village','Polaris','Dublin','Westerville','Gahanna','Grove City','Hilliard','Upper Arlington','Worthington','Bexley','Whitehall']},
  ]},
  vendor:{title:'Tell us about your business',sub:'You can fill out your full profile in the vendor portal',fields:[
  {id:'bizName',label:'Business Name *',placeholder:'e.g. Columbus Creative Co.'},
@@ -220,7 +220,12 @@ function buildStep2(){
  document.getElementById('step2Title').textContent=c.title;
  document.getElementById('step2Sub').textContent=c.sub;
  document.getElementById('step2Fields').innerHTML=c.fields.map(f=>`
- <div class="field"><label>${f.label}</label><input id="${f.id}" placeholder="${f.placeholder}" onkeydown="if(event.key==='Enter')nextStep(3)"/></div> `).join('');
+ <div class="field"><label>${f.label}</label>
+ ${f.datalist?`
+   <input id="${f.id}" placeholder="${f.placeholder}" list="${f.id}_list" onkeydown="if(event.key==='Enter')nextStep(3)" autocomplete="off"/>
+   <datalist id="${f.id}_list">${f.datalist.map(o=>`<option value="${o}">`).join('')}</datalist>
+ `:`<input id="${f.id}" placeholder="${f.placeholder}" onkeydown="if(event.key==='Enter')nextStep(3)"/>`}
+ </div>`).join('');
 }
 
 function validateStep2(){
@@ -414,6 +419,7 @@ async function doSignUp(){
             venue_type:stepData.venueType||null,
             neighborhood:stepData.venueNeighborhood||null,
             owner_id:finalUserId, status:'pending', tier:'free', city:'Columbus', state:'OH',
+            email:email,
           });
         }
       } else if(selectedRole==='vendor'){
@@ -438,9 +444,52 @@ async function doSignUp(){
     }
   })();
 
+  // Send welcome email (non-blocking)
+  const roleLabels={venue_owner:'Venue Owner',vendor:'Vendor',planner:'Event Planner',customer:'Attendee'};
+  const portalLabels={venue_owner:'Venue Portal',vendor:'Vendor Portal',planner:'Planner Portal',customer:'My Account'};
+  sendEmail({
+    to: email,
+    subject: 'Welcome to CBUSEVENTS 🎉',
+    html: `
+      <div style="font-family:sans-serif;max-width:520px;margin:0 auto;background:#0b0b0f;color:#e8e8f0;padding:40px;border-radius:16px">
+        <div style="font-size:24px;font-weight:800;margin-bottom:4px">CBUS<span style="color:#FF6B35">EVENTS</span></div>
+        <div style="color:#8888a0;font-size:13px;margin-bottom:32px">Columbus Event Directory</div>
+        <h1 style="font-size:22px;font-weight:800;margin-bottom:12px">You're in! 🎊</h1>
+        <p style="color:#c8c8d8;line-height:1.7;margin-bottom:20px">
+          Your <strong>${roleLabels[selectedRole]||'CBUSEVENTS'}</strong> account has been created.
+          ${selectedRole==='venue_owner'?'Your venue listing is currently <strong style="color:#f59e0b">pending review</strong>. We'll approve it within 24 hours and send you a confirmation.':'You can now access your portal and start using CBUSEVENTS.'}
+        </p>
+        <a href="${destUrl}" style="display:inline-block;background:#FF6B35;color:#fff;text-decoration:none;padding:12px 28px;border-radius:10px;font-weight:700;font-size:15px;margin-bottom:32px">Go to ${portalLabels[selectedRole]||'My Account'} →</a>
+        <div style="border-top:1px solid #25252f;padding-top:20px;color:#55556a;font-size:12px">
+          Questions? Reply to this email or contact us at <a href="mailto:cbusevents@gmail.com" style="color:#FF6B35">cbusevents@gmail.com</a><br>
+          © 2026 CBUSEVENTS · Columbus, Ohio
+        </div>
+      </div>`
+  }).catch(()=>{});
+
   // Redirect immediately — don't wait for profile insert
   document.getElementById('loadingMsg').textContent='Redirecting to your portal…';
   setTimeout(()=>{ window.location.href=destUrl; }, 600);
+}
+
+// ── EMAIL ─────────────────────────────────────────────────────
+const RESEND_API_KEY='re_3mMuHqrV_Eov9mW1voin7wYpAUTjUi3xt';
+const FROM_EMAIL='CBUSEVENTS <noreply@cbusevents.com>';
+
+async function sendEmail({to,subject,html}){
+  if(!RESEND_API_KEY||RESEND_API_KEY.startsWith('PASTE')){
+    console.warn('Resend API key not set — email not sent');
+    return;
+  }
+  try {
+    const res=await fetch('https://api.resend.com/emails',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+RESEND_API_KEY},
+      body:JSON.stringify({from:FROM_EMAIL,to:[to],subject,html})
+    });
+    const d=await res.json();
+    if(!res.ok) console.warn('Email error:',d);
+  } catch(e){ console.warn('Email send failed:',e); }
 }
 
 init();

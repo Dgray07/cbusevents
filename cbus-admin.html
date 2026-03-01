@@ -221,6 +221,21 @@ const SB_URL="https://toblgvatvsjljbqogzsv.supabase.co";
 const SB_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRvYmxndmF0dnNqbGpicW9nenN2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMDgwNTAsImV4cCI6MjA4NzY4NDA1MH0._WJEQPizNDiQfDXQB_DHPaQhixPGpMdmYQSmyWmm_FQ";
 const sb=supabase.createClient(SB_URL,SB_KEY);
 
+// ── EMAIL ─────────────────────────────────────────────────────
+const RESEND_API_KEY='re_3mMuHqrV_Eov9mW1voin7wYpAUTjUi3xt';
+const FROM_EMAIL='CBUSEVENTS <noreply@cbusevents.com>';
+async function sendEmail({to,subject,html}){
+  if(!RESEND_API_KEY||RESEND_API_KEY.startsWith('PASTE')){console.warn('Resend key not set');return;}
+  try{
+    const res=await fetch('https://api.resend.com/emails',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+RESEND_API_KEY},
+      body:JSON.stringify({from:FROM_EMAIL,to:[to],subject,html})
+    });
+    if(!res.ok){const d=await res.json();console.warn('Email error:',d);}
+  }catch(e){console.warn('Email failed:',e);}
+}
+
 // ADMIN EMAILS — add yours here
 const ADMIN_EMAILS=["CBUSEVENTS@gmail.com","cbusevents@gmail.com","Deante90@gmail.com","deante90@gmail.com"];
 
@@ -652,13 +667,69 @@ function renderRevenue(){
 async function approveVenue(id){
  const{error}=await sb.from('venues').update({status:'approved'}).eq('id',id);
  if(error){toast('Error: '+error.message,'error');return;}
- await loadData();renderShell();toast(' Venue approved!');
+ await loadData();
+
+ // Send approval email to venue owner
+ const venue=allVenues.find(v=>v.id===id);
+ if(venue?.owner_id){
+   const{data:userData}=await sb.from('user_roles').select('user_id').eq('user_id',venue.owner_id).maybeSingle();
+   // Get email from auth — use venue's claim_email or stored email if available
+   const ownerEmail=venue.claim_email||venue.email||null;
+   if(ownerEmail){
+     sendEmail({
+       to:ownerEmail,
+       subject:'Your venue is live on CBUSEVENTS! 🎉',
+       html:`
+         <div style="font-family:sans-serif;max-width:520px;margin:0 auto;background:#0b0b0f;color:#e8e8f0;padding:40px;border-radius:16px">
+           <div style="font-size:24px;font-weight:800;margin-bottom:4px">CBUS<span style="color:#FF6B35">EVENTS</span></div>
+           <div style="color:#8888a0;font-size:13px;margin-bottom:32px">Columbus Event Directory</div>
+           <h1 style="font-size:22px;font-weight:800;margin-bottom:12px">Your venue is live! 🎊</h1>
+           <p style="color:#c8c8d8;line-height:1.7;margin-bottom:8px">
+             <strong>${venue.name}</strong> has been approved and is now publicly listed on CBUSEVENTS.
+           </p>
+           <p style="color:#8888a0;font-size:14px;line-height:1.7;margin-bottom:24px">
+             Columbus event planners and attendees can now discover your venue, send booking inquiries, and see your events.
+           </p>
+           <a href="https://cbusevents.com/cbus-venue-portal.html" style="display:inline-block;background:#FF6B35;color:#fff;text-decoration:none;padding:12px 28px;border-radius:10px;font-weight:700;font-size:15px;margin-bottom:32px">Go to Your Venue Portal →</a>
+           <div style="border-top:1px solid #25252f;padding-top:20px;color:#55556a;font-size:12px">
+             Questions? Email us at <a href="mailto:cbusevents@gmail.com" style="color:#FF6B35">cbusevents@gmail.com</a><br>
+             © 2026 CBUSEVENTS · Columbus, Ohio
+           </div>
+         </div>`
+     });
+   }
+ }
+ renderShell();toast(' Venue approved!');
 }
 async function rejectVenue(id){
  if(!confirm('Reject this venue?'))return;
  const{error}=await sb.from('venues').update({status:'rejected'}).eq('id',id);
  if(error){toast('Error: '+error.message,'error');return;}
- await loadData();renderShell();toast('Venue rejected');
+ await loadData();
+ const venue=allVenues.find(v=>v.id===id);
+ const ownerEmail=venue?.claim_email||venue?.email||null;
+ if(ownerEmail){
+   sendEmail({
+     to:ownerEmail,
+     subject:'Update on your CBUSEVENTS listing',
+     html:`
+       <div style="font-family:sans-serif;max-width:520px;margin:0 auto;background:#0b0b0f;color:#e8e8f0;padding:40px;border-radius:16px">
+         <div style="font-size:24px;font-weight:800;margin-bottom:32px">CBUS<span style="color:#FF6B35">EVENTS</span></div>
+         <h1 style="font-size:20px;font-weight:800;margin-bottom:12px">Listing Update</h1>
+         <p style="color:#c8c8d8;line-height:1.7;margin-bottom:20px">
+           Thank you for submitting <strong>${venue?.name||'your venue'}</strong> to CBUSEVENTS. After review, we were unable to approve this listing at this time.
+         </p>
+         <p style="color:#8888a0;font-size:14px;line-height:1.7;margin-bottom:24px">
+           If you believe this is an error or have questions, please reach out to us directly.
+         </p>
+         <a href="mailto:cbusevents@gmail.com" style="display:inline-block;background:#FF6B35;color:#fff;text-decoration:none;padding:12px 28px;border-radius:10px;font-weight:700;font-size:15px;margin-bottom:32px">Contact Us</a>
+         <div style="border-top:1px solid #25252f;padding-top:20px;color:#55556a;font-size:12px">
+           © 2026 CBUSEVENTS · Columbus, Ohio
+         </div>
+       </div>`
+   });
+ }
+ renderShell();toast('Venue rejected');
 }
 async function deleteVenue(id,name){
  if(!confirm(`Delete "${name}"? This cannot be undone.`))return;
