@@ -400,6 +400,8 @@ footer { background:var(--surface); border-top:1px solid var(--border); padding:
 .save-btn{transition:all 0.15s;}
 .save-btn.saved{color:#ef4444 !important;border-color:#ef444460 !important;}
 .save-btn:hover{background:rgba(0,0,0,0.85) !important;}
+.join-item{display:flex;align-items:center;padding:9px 14px;border-radius:8px;font-size:13px;font-weight:500;color:#8888a0;text-decoration:none;transition:all 0.15s;}
+.join-item:hover{background:#13131a;color:#e8e8f0;}
 </style>
 </head>
 <body> <!-- NAV -->
@@ -903,9 +905,10 @@ function toggleJoinMenu(){
 async function initNavAuth(){
   try {
     const{data:{session}}=await sb.auth.getSession();
+    const navRight=document.querySelector('nav > div:last-child');
+    if(!navRight) return;
     if(session?.user){
       const userId=session.user.id;
-      // Get their role to show right portal link
       const{data:roleData}=await sb.from('user_roles').select('role').eq('user_id',userId).maybeSingle();
       const role=roleData?.role||'customer';
       const portalUrls={
@@ -914,16 +917,33 @@ async function initNavAuth(){
         planner:'https://cbusevents.com/cbus-planner-portal.html',
         customer:'https://cbusevents.com/customer-portal.html',
       };
-      const portalLabels={venue_owner:'Venue Portal',vendor:'Vendor Portal',planner:'Planner Portal',customer:'My Account'};
-      const navRight=document.querySelector('nav > div:last-child');
-      if(navRight){
-        navRight.innerHTML=`
-          <button class="nav-link" onclick="window.location.href='${portalUrls[role]||portalUrls.customer}'" style="color:var(--orange);font-weight:600">${portalLabels[role]||'My Account'}</button>
-          <button class="nav-cta" onclick="sb.auth.signOut().then(()=>window.location.reload())" style="background:#1a1a24;border:1px solid #25252f;color:#8888a0">Sign Out</button>
-        `;
-      }
+      const portalLabels={
+        venue_owner:'Venue Portal',
+        vendor:'Vendor Portal',
+        planner:'Planner Portal',
+        customer:'My Account'
+      };
+      navRight.innerHTML=`
+        <button class="nav-link" onclick="window.location.href='${portalUrls[role]||portalUrls.customer}'" style="color:var(--orange);font-weight:600">${portalLabels[role]||'My Account'}</button>
+        <button class="nav-cta" onclick="sb.auth.signOut().then(()=>window.location.reload())" style="background:#1a1a24;border:1px solid #25252f;color:#8888a0;cursor:pointer">Sign Out</button>
+      `;
+    } else {
+      // Not logged in — restore default nav
+      navRight.innerHTML=`
+        <div style="position:relative" id="joinDropdown">
+          <button class="nav-link" onclick="toggleJoinMenu()" style="display:flex;align-items:center;gap:4px">Join ▾</button>
+          <div id="joinMenu" style="display:none;position:absolute;top:calc(100% + 4px);right:0;background:#1a1a24;border:1px solid #25252f;border-radius:12px;padding:8px;min-width:190px;box-shadow:0 16px 40px rgba(0,0,0,0.5);z-index:200;">
+            <a href="https://cbusevents.com/venues.html" class="join-item">List Your Venue</a>
+            <a href="https://cbusevents.com/vendors.html" class="join-item">List Your Services</a>
+            <a href="https://cbusevents.com/planners.html" class="join-item">Event Planners</a>
+            <div style="height:1px;background:#25252f;margin:4px 8px;"></div>
+            <a href="https://cbusevents.com/attendees.html" class="join-item">Find Events</a>
+          </div>
+        </div>
+        <a href="https://cbusevents.com/auth.html" class="nav-cta" style="text-decoration:none">Sign In</a>
+      `;
     }
-  } catch(e){}
+  } catch(e){ console.warn('Nav auth error:',e); }
 }
 document.addEventListener('click',function(e){
  const d=document.getElementById('joinDropdown');
