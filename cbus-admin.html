@@ -408,6 +408,25 @@ function renderVenueRows(venues){
  <button class="btn btn-ghost btn-sm" onclick="toggleVenueFeature('${v.id}',${!v.is_featured})">${v.is_featured?'Unfeature':'⭐ Feature'}</button> <button class="btn btn-danger btn-sm" onclick="deleteVenue('${v.id}','${v.name.replace(/'/g,"\\'")}')">Delete</button> </div> </td> </tr>`).join('');
 }
 
+function renderVenueCards(venues){
+ if(!venues||!venues.length)return'<div style="text-align:center;padding:32px;color:var(--muted)">No venues found</div>';
+ return venues.map(v=>`
+ <div class="v-card">
+   <div class="v-card-name">${v.name}</div>
+   <div class="v-card-meta">
+     ${v.venue_type||'—'} &nbsp;·&nbsp; ${v.neighborhood||'—'}<br>
+     <span class="badge ${v.status==='approved'?'badge-green':v.status==='pending'?'badge-orange':'badge-red'}" style="margin-right:4px">${v.status}</span>
+     <span class="badge ${v.tier==='premium'?'badge-gold':v.tier==='standard'?'badge-blue':'badge-muted'}">${v.tier||'free'}</span>
+   </div>
+   <div class="v-card-actions">
+     ${v.status==='pending'?`<button class="btn btn-success btn-sm" onclick="approveVenue('${v.id}')">Approve</button>`:''}
+     ${v.status!=='rejected'?`<button class="btn btn-ghost btn-sm" onclick="openTierModal('${v.id}')">Tier</button>`:''}
+     <button class="btn btn-ghost btn-sm" onclick="toggleVenueFeature('${v.id}',${!v.is_featured})">${v.is_featured?'Unfeature':'Feature'}</button>
+     <button class="btn btn-danger btn-sm" onclick="deleteVenue('${v.id}','${v.name.replace(/'/g,"\'")}')">Delete</button>
+   </div>
+ </div>`).join('');
+}
+
 function searchVenues(q){
  const f=allVenues.filter(v=>v.name.toLowerCase().includes(q.toLowerCase())||(v.venue_type||'').toLowerCase().includes(q.toLowerCase())||(v.neighborhood||'').toLowerCase().includes(q.toLowerCase()));
  const el=document.getElementById('venueTableBody');
