@@ -385,11 +385,11 @@ async function doSignUp(){
     const msg=authErr.message||'';
     const lmsg=msg.toLowerCase();
     if(lmsg.includes('already registered')||lmsg.includes('already exists')||lmsg.includes('duplicate')){
-      document.getElementById('suErr').innerHTML='An account with this email already exists. <button onclick="setMode(\'signin\')" style="background:none;border:none;color:var(--orange);font-size:13px;cursor:pointer;text-decoration:underline;padding:0">Sign in instead →</button>';
+      document.getElementById('suErr').innerHTML='An account with this email already exists. <button onclick="setMode(&apos;signin&apos;)" style="background:none;border:none;color:var(--orange);font-size:13px;cursor:pointer;text-decoration:underline;padding:0">Sign in instead →</button>';
     } else if(lmsg.includes('database')||lmsg.includes('error saving')){
       // Supabase returns this when email confirmation is on — account WAS created
       document.getElementById('suErr').style.color='#4ade80';
-      document.getElementById('suErr').innerHTML='Account created! <button onclick="setMode(\'signin\')" style="background:none;border:none;color:var(--orange);font-size:13px;cursor:pointer;text-decoration:underline;padding:0">Sign in to continue →</button>';
+      document.getElementById('suErr').innerHTML='Account created! <button onclick="setMode(&apos;signin&apos;)" style="background:none;border:none;color:var(--orange);font-size:13px;cursor:pointer;text-decoration:underline;padding:0">Sign in to continue →</button>';
       btn.textContent='Sign In →';
       btn.onclick=()=>setMode('signin');
       btn.disabled=false;
@@ -420,7 +420,7 @@ async function doSignUp(){
       // Still no session - account may need a moment, just redirect to sign in
       showStep(3);
       document.getElementById('suErr').style.color='#4ade80';
-      document.getElementById('suErr').innerHTML='Account created! <button onclick="setMode(\'signin\')" style="background:none;border:none;color:var(--orange);font-size:13px;cursor:pointer;text-decoration:underline;padding:0">Sign in to continue →</button>';
+      document.getElementById('suErr').innerHTML='Account created! <button onclick="setMode(&apos;signin&apos;)" style="background:none;border:none;color:var(--orange);font-size:13px;cursor:pointer;text-decoration:underline;padding:0">Sign in to continue →</button>';
       btn.textContent='Sign In →';
       btn.onclick=()=>setMode('signin');
       btn.disabled=false;
@@ -505,7 +505,7 @@ async function doSignUp(){
         <h1 style="font-size:22px;font-weight:800;margin-bottom:12px">You're in! 🎊</h1>
         <p style="color:#c8c8d8;line-height:1.7;margin-bottom:20px">
           Your <strong>${roleLabels[selectedRole]||'CBUSEVENTS'}</strong> account has been created.
-          ${selectedRole==='venue_owner'?'Your venue listing is currently <strong style="color:#f59e0b">pending review</strong>. We'll approve it within 24 hours and send you a confirmation.':'You can now access your portal and start using CBUSEVENTS.'}
+          ${selectedRole==='venue_owner'?'Your venue listing is currently <strong style="color:#f59e0b">pending review</strong>. We\'ll approve it within 24 hours and send you a confirmation.':'You can now access your portal and start using CBUSEVENTS.'}
         </p>
         <a href="${destUrl}" style="display:inline-block;background:#FF6B35;color:#fff;text-decoration:none;padding:12px 28px;border-radius:10px;font-weight:700;font-size:15px;margin-bottom:32px">Go to ${portalLabels[selectedRole]||'My Account'} →</a>
         <div style="border-top:1px solid #25252f;padding-top:20px;color:#55556a;font-size:12px">
