@@ -321,8 +321,21 @@ async function doSignUp(){
   const{data,error:authErr}=await sb.auth.signUp({email,password:pass});
   if(authErr){
     showStep(3);
-    document.getElementById('suErr').textContent=authErr.message;
-    btn.disabled=false;btn.textContent='Create Account →';
+    const msg=authErr.message||'';
+    const lmsg=msg.toLowerCase();
+    if(lmsg.includes('already registered')||lmsg.includes('already exists')||lmsg.includes('duplicate')){
+      document.getElementById('suErr').innerHTML='An account with this email already exists. <button onclick="setMode(\'signin\')" style="background:none;border:none;color:var(--orange);font-size:13px;cursor:pointer;text-decoration:underline;padding:0">Sign in instead →</button>';
+    } else if(lmsg.includes('database')||lmsg.includes('error saving')){
+      // Supabase returns this when email confirmation is on — account WAS created
+      document.getElementById('suErr').style.color='#4ade80';
+      document.getElementById('suErr').innerHTML='Account created! <button onclick="setMode(\'signin\')" style="background:none;border:none;color:var(--orange);font-size:13px;cursor:pointer;text-decoration:underline;padding:0">Sign in to continue →</button>';
+      btn.textContent='Sign In →';
+      btn.onclick=()=>setMode('signin');
+      btn.disabled=false;
+    } else {
+      document.getElementById('suErr').textContent=msg||'Signup failed — please try again.';
+      btn.disabled=false;btn.textContent='Create Account →';
+    }
     return;
   }
   const userId=data.user?.id;
@@ -330,6 +343,16 @@ async function doSignUp(){
     showStep(3);
     document.getElementById('suErr').textContent='Signup failed — please try again.';
     btn.disabled=false;btn.textContent='Create Account →';
+    return;
+  }
+  // Email confirmation still on = no session yet
+  if(!data.session){
+    showStep(3);
+    document.getElementById('suErr').style.color='#4ade80';
+    document.getElementById('suErr').textContent='Account created! Check your email to confirm, then sign in.';
+    btn.textContent='Go to Sign In →';
+    btn.onclick=()=>setMode('signin');
+    btn.disabled=false;
     return;
   }
 
