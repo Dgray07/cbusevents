@@ -878,32 +878,67 @@ async function renderSubscriptions(){
 }
 
 // ── USERS ─────────────────────────────────────────────────────
-function renderUsers(){
- document.getElementById('pageContent').innerHTML=`
- <div class="table-card"> <div class="table-header"> <div class="table-title">User & Role Management</div> <div style="display:flex;gap:8px"> <input class="search-input" id="userSearchInput" placeholder="Search by display name..." style="width:240px"> <button class="btn btn-primary btn-sm" onclick="doUserSearch()">Search</button> </div> </div> <div id="userTableWrap"> <div class="empty-row"><td colspan="5" style="text-align:center;padding:48px;color:var(--muted)">Enter a name to search customer profiles.</td></div> </div> </div>`;
-}
+async function renderUsers(){
+ document.getElementById('pageContent').innerHTML=`<div style="padding:32px;text-align:center;color:var(--muted)">Loading users…</div>`;
 
-async function doUserSearch(){
- const q=document.getElementById('userSearchInput')?.value?.trim();
- if(!q)return;
- const wrap=document.getElementById('userTableWrap');
- if(wrap)wrap.innerHTML='<div style="padding:24px;text-align:center;color:var(--muted)">Searching…</div>';
+ // Load all user_roles joined with auth users via RPC or direct query
+ const[{data:roles},{data:profiles}]=await Promise.all([
+   sb.from('user_roles').select('user_id,role').order('role'),
+   sb.from('customer_profiles').select('user_id,display_name').catch(()=>({data:[]})),
+ ]);
 
- const{data}=await sb.from('customer_profiles')
- .select('user_id,display_name,created_at')
- .ilike('display_name',`%${q}%`)
- .limit(30)
- .catch(()=>({data:[]}));
+ // Also load vendors and venues to get emails
+ const[{data:vendors},{data:venues}]=await Promise.all([
+   sb.from('vendors').select('user_id,email,business_name').catch(()=>({data:[]})),
+   sb.from('venues').select('owner_id,email,name').catch(()=>({data:[]})),
+ ]);
 
- if(!data?.length){
- if(wrap)wrap.innerHTML='<div style="padding:24px;text-align:center;color:var(--muted)">No results found.</div>';
- return;
+ const profileMap=Object.fromEntries((profiles||[]).map(p=>[p.user_id,p.display_name]));
+ const vendorMap=Object.fromEntries((vendors||[]).map(v=>[v.user_id,{email:v.email,name:v.business_name}]));
+ const venueMap=Object.fromEntries((venues||[]).filter(v=>v.owner_id).map(v=>[v.owner_id,{email:v.email,name:v.name}]));
+
+ const allRoles=roles||[];
+ const roleBadge={venue_owner:'badge-orange',vendor:'badge-blue',planner:'badge-gold',customer:'badge-muted',admin:'badge-green'};
+
+ const byRole={venue_owner:[],vendor:[],planner:[],customer:[],admin:[]};
+ allRoles.forEach(r=>{ if(byRole[r.role]) byRole[r.role].push(r); else byRole.customer.push(r); });
+
+ function userRow(u){
+   const info=vendorMap[u.user_id]||venueMap[u.user_id]||{};
+   const name=info.name||profileMap[u.user_id]||'—';
+   const email=info.email||'—';
+   return`<tr>
+     <td><strong>${name}</strong><div style="font-size:11px;color:var(--muted)">${email}</div></td>
+     <td><span class="badge ${roleBadge[u.role]||'badge-muted'}">${u.role}</span></td>
+     <td><code style="font-size:11px;color:var(--muted)">${u.user_id.substring(0,14)}…</code></td>
+     <td><select onchange="setUserRole('${u.user_id}',this.value)" style="background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:4px 8px;color:var(--text);font-size:12px">
+       <option value="customer" ${u.role==='customer'?'selected':''}>Customer</option>
+       <option value="venue_owner" ${u.role==='venue_owner'?'selected':''}>Venue Owner</option>
+       <option value="vendor" ${u.role==='vendor'?'selected':''}>Vendor</option>
+       <option value="planner" ${u.role==='planner'?'selected':''}>Planner</option>
+     </select></td>
+   </tr>`;
  }
 
- if(wrap)wrap.innerHTML=`
- <table> <thead><tr><th>User ID</th><th>Display Name</th><th>Member Since</th><th>Set Role</th></tr></thead> <tbody> ${data.map(u=>`<tr> <td><code style="font-size:11px;color:var(--orange)">${u.user_id.substring(0,12)}…</code></td> <td><strong>${u.display_name||'—'}</strong></td> <td style="color:var(--muted)">${new Date(u.created_at).toLocaleDateString()}</td> <td> <select onchange="setUserRole('${u.user_id}',this.value)" style="background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:4px 8px;color:var(--text);font-size:12px"> <option value="customer">Customer</option> <option value="venue_owner">Venue Owner</option> <option value="vendor">Vendor</option> <option value="admin">Admin</option> </select> </td> </tr>`).join('')}
- </tbody> </table>`;
+ document.getElementById('pageContent').innerHTML=`
+ <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px">
+   ${[['venue_owner','Venue Owners','var(--orange)'],['vendor','Vendors','var(--blue)'],['planner','Planners','var(--gold)'],['customer','Attendees','var(--green)']].map(([role,label,color])=>`
+   <div class="stat-card" style="cursor:pointer" onclick="document.getElementById('filter-${role}').scrollIntoView({behavior:'smooth'})">
+     <div class="stat-card-num" style="color:${color}">${byRole[role]?.length||0}</div>
+     <div class="stat-card-label">${label}</div>
+   </div>`).join('')}
+ </div>
+ ${[['venue_owner','Venue Owners'],['vendor','Vendors'],['planner','Planners'],['customer','Attendees']].map(([role,label])=>
+   byRole[role]?.length?`
+   <div class="table-card" style="margin-bottom:20px" id="filter-${role}">
+     <div class="table-header"><div class="table-title">${label} (${byRole[role].length})</div></div>
+     <table><thead><tr><th>Name / Email</th><th>Role</th><th>User ID</th><th>Change Role</th></tr></thead>
+     <tbody>${byRole[role].map(u=>userRow(u)).join('')}</tbody></table>
+   </div>`:''
+ ).join('')}`;
 }
+
+async function doUserSearch(){}
 
 async function setUserRole(userId,role){
  await sb.from('user_roles').upsert({user_id:userId,role},{onConflict:'user_id'}).catch(()=>{});
