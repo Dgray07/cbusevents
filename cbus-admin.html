@@ -733,8 +733,15 @@ async function rejectVenue(id){
 }
 async function deleteVenue(id,name){
  if(!confirm(`Delete "${name}"? This cannot be undone.`))return;
- const{error}=await sb.from('venues').delete().eq('id',id);
- if(error){toast('Error: '+error.message,'error');return;}
+ const{error,data}=await sb.from('venues').delete().eq('id',id).select();
+ if(error){toast('Error: '+error.message,'error');console.error('Delete error:',error);return;}
+ if(!data||data.length===0){
+   // Row not deleted — RLS blocking it. Try bypassing with service role workaround
+   // Fall back: mark as deleted flag instead
+   toast('Permission error — contact admin','error');
+   console.error('Delete blocked by RLS. Logged in as:',currentUser?.email);
+   return;
+ }
  allVenues=allVenues.filter(v=>v.id!==id);
  renderVenues();
  toast('Venue deleted');
