@@ -1,4 +1,4 @@
-<!DOCTYPE  html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8"/>
@@ -410,10 +410,13 @@ footer { background:var(--surface); border-top:1px solid var(--border); padding:
 </div> <!-- EVENT MODAL -->
 <div id="eventModal" style="display:none" class="modal-overlay" onclick="if(event.target===this)closeEventModal()"> <div class="modal" id="eventModalContent"></div>
 </div> <script src="https://unpkg.com/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDqS7QcHow2PDpVLI6J74Ada_tYkj5BWmg&libraries=places&callback=initMapsApi" async defer></script>
 <script>
 const SB_URL="https://toblgvatvsjljbqogzsv.supabase.co";
 const SB_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRvYmxndmF0dnNqbGpicW9nenN2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMDgwNTAsImV4cCI6MjA4NzY4NDA1MH0._WJEQPizNDiQfDXQB_DHPaQhixPGpMdmYQSmyWmm_FQ";
 const sb=supabase.createClient(SB_URL,SB_KEY);
+let mapsReady=false;
+function initMapsApi(){ mapsReady=true; }
 
 // ── STATE ─────────────────────────────────────────────────────
 let allVenues=[],allEvents=[],currentPage='home',heroTimer=null,heroIdx=0;
@@ -693,7 +696,8 @@ async function renderVenueDetail(venue){
  ${venue.phone?`<div class="info-row"> <strong><a href="tel:${venue.phone}" style="color:var(--orange)">${venue.phone}</a></strong></div>`:''}
  ${venue.website?`<div class="info-row"> <a href="${venue.website}" target="_blank" style="color:var(--orange);font-weight:600">Visit Website</a></div>`:''}
  ${venue.email?`<div class="info-row"> <a href="mailto:${venue.email}" style="color:var(--orange)">${venue.email}</a></div>`:''}
- </div> <!-- Description --> <h2 style="font-family:'Syne',sans-serif;font-size:18px;font-weight:700;margin-bottom:12px">About</h2> <p style="color:var(--sub);font-size:15px;line-height:1.75;margin-bottom:28px">${venue.description||'A great Columbus venue.'}</p> <!-- Amenities --> ${venue.amenities?.length?`
+ </div> <!-- MAP --> <div id="venueMapWrap" style="border-radius:12px;overflow:hidden;margin-bottom:28px;display:none"><div id="venueMap" style="width:100%;height:220px;background:var(--surface)"></div><div id="venueMapAddr" style="background:var(--surface);border-top:1px solid var(--border);padding:10px 14px;font-size:13px;color:var(--sub)"></div></div>
+ <!-- Description --> <h2 style="font-family:'Syne',sans-serif;font-size:18px;font-weight:700;margin-bottom:12px">About</h2> <p style="color:var(--sub);font-size:15px;line-height:1.75;margin-bottom:28px">${venue.description||'A great Columbus venue.'}</p> <!-- Amenities --> ${venue.amenities?.length?`
  <h2 style="font-family:'Syne',sans-serif;font-size:18px;font-weight:700;margin-bottom:12px">Amenities</h2> <div class="amenity-chips" style="margin-bottom:28px"> ${venue.amenities.map(a=>`<span class="amenity-chip"> ${a}</span>`).join('')}
  </div>`:''}
 
@@ -709,6 +713,63 @@ async function renderVenueDetail(venue){
  </div>`:''}
  </div> <!-- RIGHT: INQUIRY CARD --> <div> <div class="inquiry-card"> <h3>Send a Booking Inquiry</h3> <div id="iqForm"> <div class="field-row"> <div class="field"><label>Your Name</label><input id="iqName" placeholder="Jane Smith"></div> <div class="field"><label>Email</label><input id="iqEmail" type="email" placeholder="you@email.com"></div> </div> <div class="field-row"> <div class="field"><label>Phone</label><input id="iqPhone" placeholder="(614) 555-0000"></div> <div class="field"><label>Event Date</label><input id="iqDate" type="date"></div> </div> <div class="field"><label>Expected Guests</label><input id="iqGuests" type="number" placeholder="100"></div> <div class="field"><label>Tell them about your event</label><textarea id="iqMsg" placeholder="What are you planning? What do you need?"></textarea></div> <div id="iqStatus"></div> <button class="btn-primary" style="width:100%;padding:13px" onclick="sendInquiry('${venue.id}')">Send Inquiry →</button> </div> </div> </div> </div> </div> ${footer()}
  `;
+ // Init map after DOM is set
+ setTimeout(()=>initVenueMap(venue), 100);
+}
+
+async function initVenueMap(venue){
+  const wrap=document.getElementById('venueMapWrap');
+  const mapDiv=document.getElementById('venueMap');
+  const addrEl=document.getElementById('venueMapAddr');
+  if(!wrap||!mapDiv) return;
+
+  // Build search query from venue data
+  const query=[venue.name, venue.address, venue.neighborhood, 'Columbus OH'].filter(Boolean).join(', ');
+
+  // Wait for Maps API to load (max 5s)
+  let waited=0;
+  while(!mapsReady && waited<50){ await new Promise(r=>setTimeout(r,100)); waited++; }
+  if(!mapsReady){ console.warn('Maps not ready'); return; }
+
+  const geocoder=new google.maps.Geocoder();
+  geocoder.geocode({address: query}, (results, status)=>{
+    if(status==='OK' && results[0]){
+      const loc=results[0].geometry.location;
+      const formattedAddr=results[0].formatted_address;
+      wrap.style.display='block';
+      if(addrEl) addrEl.textContent='📍 '+formattedAddr;
+      const map=new google.maps.Map(mapDiv,{
+        center:loc, zoom:15,
+        styles:[
+          {elementType:'geometry',stylers:[{color:'#1a1a24'}]},
+          {elementType:'labels.text.fill',stylers:[{color:'#8888a0'}]},
+          {elementType:'labels.text.stroke',stylers:[{color:'#13131a'}]},
+          {featureType:'road',elementType:'geometry',stylers:[{color:'#25252f'}]},
+          {featureType:'road',elementType:'labels.text.fill',stylers:[{color:'#8888a0'}]},
+          {featureType:'water',elementType:'geometry',stylers:[{color:'#0b0b0f'}]},
+          {featureType:'poi',elementType:'geometry',stylers:[{color:'#13131a'}]},
+          {featureType:'poi',elementType:'labels.text.fill',stylers:[{color:'#55556a'}]},
+          {featureType:'transit',elementType:'geometry',stylers:[{color:'#25252f'}]},
+        ],
+        disableDefaultUI:false,
+        zoomControl:true,
+        streetViewControl:true,
+        mapTypeControl:false,
+      });
+      new google.maps.Marker({
+        map, position:loc,
+        title:venue.name,
+        icon:{
+          path:google.maps.SymbolPath.CIRCLE,
+          scale:10,
+          fillColor:'#FF6B35',
+          fillOpacity:1,
+          strokeColor:'#fff',
+          strokeWeight:2,
+        }
+      });
+    }
+  });
 }
 
 async function sendInquiry(venueId){
@@ -846,18 +907,56 @@ function renderVenueLanding(){
 function showPricing(){
  const el=document.createElement('div');
  el.id='pricingModal';
- el.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;display:flex;align-items:center;justify-content:center;padding:24px;overflow-y:auto';
+ el.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:500;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:16px';
+
+ const plans=[
+  {label:'Free',color:'#8888a0',price:'$0',sub:'forever',features:['1 venue listing','Up to 4 events','Basic search placement','Public venue page'],btn:'Get Started Free',btnStyle:'background:#25252f;color:#e8e8f0',popular:false,link:'cbus-venue-portal.html'},
+  {label:'Standard',color:'#60a5fa',price:'$29',sub:'/mo · cancel anytime',features:['Up to 20 events/month','Priority search placement','Inquiry form enabled','Email support','Analytics dashboard'],btn:'Get Standard →',btnStyle:'background:#60a5fa;color:#000',popular:false,link:'cbus-venue-portal.html'},
+  {label:'Premium',color:'#FF6B35',price:'$79',sub:'/mo · cancel anytime',features:['Unlimited events','Hero slider feature','Top of every search page','Full analytics suite','Free flyer design','Merch design on demand'],btn:'Get Premium →',btnStyle:'background:#FF6B35;color:#fff',popular:true,link:'cbus-venue-portal.html'},
+ ];
+
  el.innerHTML=`
- <div style="background:#1a1a24;border:1px solid #25252f;border-radius:20px;width:100%;max-width:860px;overflow:hidden"> <!-- Header --> <div style="display:flex;justify-content:space-between;align-items:center;padding:28px 32px;border-bottom:1px solid #25252f"> <div> <div style="font-family:'Syne',sans-serif;font-size:22px;font-weight:800">Simple, transparent pricing</div> <div style="color:#8888a0;font-size:14px;margin-top:4px">Get your venue in front of Columbus every day</div> </div> <button onclick="document.getElementById('pricingModal').remove()" style="background:#25252f;border:none;color:#8888a0;border-radius:8px;width:36px;height:36px;font-size:18px;cursor:pointer"></button> </div> <!-- Plans --> <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:0;padding:32px;gap:16px"> <!-- Free --> <div style="background:#13131a;border:1px solid #25252f;border-radius:16px;padding:24px;display:flex;flex-direction:column"> <div style="font-size:12px;color:#8888a0;font-weight:600;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">Free</div> <div style="font-family:'Syne',sans-serif;font-size:36px;font-weight:800;margin-bottom:4px">$0</div> <div style="color:#8888a0;font-size:13px;margin-bottom:20px">forever</div> <div style="flex:1;display:flex;flex-direction:column;gap:9px;margin-bottom:24px"> ${['1 venue listing','Up to 4 events','Basic search placement','Public venue page'].map(p=>`
- <div style="display:flex;align-items:center;gap:8px;font-size:13px;color:#8888a0"> ${p}
- </div>`).join('')}
- </div> <button onclick="window.open('https://cbusevents.com/cbus-venue-portal.html','_blank');document.getElementById('pricingModal').remove()" style="width:100%;background:#25252f;border:none;color:#e8e8f0;border-radius:9px;padding:11px;font-size:14px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif">Get Started Free</button> </div> <!-- Standard --> <div style="background:#13131a;border:1px solid #25252f;border-radius:16px;padding:24px;display:flex;flex-direction:column"> <div style="font-size:12px;color:#60a5fa;font-weight:600;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">Standard</div> <div style="font-family:'Syne',sans-serif;font-size:36px;font-weight:800;margin-bottom:4px">$29<span style="font-size:16px;font-weight:400;color:#8888a0">/mo</span></div> <div style="color:#8888a0;font-size:13px;margin-bottom:20px">cancel anytime</div> <div style="flex:1;display:flex;flex-direction:column;gap:9px;margin-bottom:24px"> ${['Up to 20 events/month','Priority search placement','Inquiry form enabled','Email support','Analytics dashboard'].map(p=>`
- <div style="display:flex;align-items:center;gap:8px;font-size:13px"> ${p}
- </div>`).join('')}
- </div> <button onclick="window.open('https://cbusevents.com/cbus-venue-portal.html','_blank');document.getElementById('pricingModal').remove()" style="width:100%;background:#60a5fa;border:none;color:#000;border-radius:9px;padding:11px;font-size:14px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif">Get Standard →</button> </div> <!-- Premium --> <div style="background:linear-gradient(135deg,#1a1000,#1a0f00);border:2px solid #FF6B3550;border-radius:16px;padding:24px;display:flex;flex-direction:column;position:relative"> <div style="position:absolute;top:-12px;left:50%;transform:translateX(-50%);background:#FF6B35;color:#fff;border-radius:20px;padding:3px 14px;font-size:11px;font-weight:700;white-space:nowrap">MOST POPULAR</div> <div style="font-size:12px;color:#FF6B35;font-weight:600;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">Premium</div> <div style="font-family:'Syne',sans-serif;font-size:36px;font-weight:800;margin-bottom:4px">$79<span style="font-size:16px;font-weight:400;color:#8888a0">/mo</span></div> <div style="color:#8888a0;font-size:13px;margin-bottom:20px">cancel anytime</div> <div style="flex:1;display:flex;flex-direction:column;gap:9px;margin-bottom:24px"> ${['Unlimited events','Hero slider feature','Top of every search page','Full analytics suite',' Free flyer design',' Merch design on demand'].map(p=>`
- <div style="display:flex;align-items:center;gap:8px;font-size:13px"> ${p}
- </div>`).join('')}
- </div> <button onclick="window.open('https://cbusevents.com/cbus-venue-portal.html','_blank');document.getElementById('pricingModal').remove()" style="width:100%;background:#FF6B35;border:none;color:#fff;border-radius:9px;padding:11px;font-size:14px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif">Get Premium →</button> </div> </div> <!-- Event boost add-on --> <div style="margin:0 32px 32px;background:#13131a;border:1px solid #f59e0b30;border-radius:14px;padding:20px 24px;display:flex;justify-content:space-between;align-items:center;gap:20px;flex-wrap:wrap"> <div> <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:15px;margin-bottom:4px"> Event Boost Add-on <span style="font-size:12px;background:#f59e0b20;color:#f59e0b;border-radius:20px;padding:2px 8px;font-weight:600">For Planners</span></div> <div style="color:#8888a0;font-size:13px">Pin your event to the top · Hero slider · Highlighted in categories</div> </div> <div style="display:flex;gap:10px;flex-shrink:0"> <div style="text-align:center;background:#0b0b0f;border:1px solid #f59e0b30;border-radius:10px;padding:10px 18px"> <div style="font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:#f59e0b">$10</div> <div style="color:#8888a0;font-size:11px">7 days</div> </div> <div style="text-align:center;background:#0b0b0f;border:1px solid #f59e0b30;border-radius:10px;padding:10px 18px"> <div style="font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:#f59e0b">$20</div> <div style="color:#8888a0;font-size:11px">30 days</div> </div> </div> </div> </div> `;
+  <div style="min-height:100%;display:flex;align-items:flex-start;justify-content:center;padding:16px 0 40px">
+   <div style="background:#1a1a24;border:1px solid #25252f;border-radius:20px;width:100%;max-width:860px;overflow:hidden">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 20px;border-bottom:1px solid #25252f">
+     <div>
+      <div style="font-family:'Syne',sans-serif;font-size:20px;font-weight:800">Simple, transparent pricing</div>
+      <div style="color:#8888a0;font-size:13px;margin-top:3px">Get your venue in front of Columbus every day</div>
+     </div>
+     <button onclick="document.getElementById('pricingModal').remove()" style="background:#25252f;border:none;color:#8888a0;border-radius:8px;width:36px;height:36px;font-size:20px;cursor:pointer;flex-shrink:0">×</button>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;padding:20px">
+     ${plans.map(p=>`
+      <div style="background:${p.popular?'linear-gradient(135deg,#1a1000,#1a0f00)':'#13131a'};border:${p.popular?'2px solid #FF6B3550':'1px solid #25252f'};border-radius:16px;padding:22px;display:flex;flex-direction:column;position:relative;${p.popular?'margin-top:8px':''}">
+       ${p.popular?`<div style="position:absolute;top:-12px;left:50%;transform:translateX(-50%);background:#FF6B35;color:#fff;border-radius:20px;padding:3px 14px;font-size:11px;font-weight:700;white-space:nowrap">MOST POPULAR</div>`:''}
+       <div style="font-size:11px;color:${p.color};font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">${p.label}</div>
+       <div style="font-family:'Syne',sans-serif;font-size:34px;font-weight:800;margin-bottom:2px">${p.price}<span style="font-size:14px;font-weight:400;color:#8888a0">${p.price==='$0'?'':'/mo'}</span></div>
+       <div style="color:#8888a0;font-size:12px;margin-bottom:18px">${p.sub}</div>
+       <div style="flex:1;display:flex;flex-direction:column;gap:8px;margin-bottom:20px">
+        ${p.features.map(f=>`<div style="display:flex;align-items:center;gap:7px;font-size:13px"><span style="color:${p.color};font-size:14px">✓</span>${f}</div>`).join('')}
+       </div>
+       <button onclick="window.open('https://cbusevents.com/${p.link}','_blank');document.getElementById('pricingModal').remove()" style="width:100%;${p.btnStyle};border:none;border-radius:9px;padding:12px;font-size:14px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif">${p.btn}</button>
+      </div>`).join('')}
+    </div>
+    <div style="margin:0 20px 20px;background:#13131a;border:1px solid #f59e0b30;border-radius:14px;padding:18px 20px">
+     <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:15px;margin-bottom:4px">
+      Event Boost Add-on <span style="font-size:12px;background:#f59e0b20;color:#f59e0b;border-radius:20px;padding:2px 8px;font-weight:600;margin-left:6px">For Planners</span>
+     </div>
+     <div style="color:#8888a0;font-size:13px;margin-bottom:14px">Pin your event to the top · Hero slider · Highlighted in categories</div>
+     <div style="display:flex;gap:10px">
+      <div style="text-align:center;background:#0b0b0f;border:1px solid #f59e0b30;border-radius:10px;padding:10px 20px">
+       <div style="font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:#f59e0b">$10</div>
+       <div style="color:#8888a0;font-size:11px">7 days</div>
+      </div>
+      <div style="text-align:center;background:#0b0b0f;border:1px solid #f59e0b30;border-radius:10px;padding:10px 20px">
+       <div style="font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:#f59e0b">$20</div>
+       <div style="color:#8888a0;font-size:11px">30 days</div>
+      </div>
+     </div>
+    </div>
+   </div>
+  </div>`;
+
  el.addEventListener('click',e=>{if(e.target===el)el.remove();});
  document.body.appendChild(el);
 }

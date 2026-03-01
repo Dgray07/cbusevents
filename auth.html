@@ -82,6 +82,7 @@ nav{background:rgba(11,11,15,0.95);backdrop-filter:blur(16px);border-bottom:1px 
 .auth-loader{text-align:center;padding:20px 0;}
 .spinner{width:32px;height:32px;border:3px solid var(--border);border-top-color:var(--orange);border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 12px;}
 </style>
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDqS7QcHow2PDpVLI6J74Ada_tYkj5BWmg&libraries=places" async defer></script>
 </head>
 <body>
 <nav>
@@ -250,6 +251,7 @@ function buildStep2(){
  venue_owner:{title:'Tell us about your venue',sub:'You can add more details in your portal',fields:[
  {id:'venueName',label:'Venue Name *',placeholder:'e.g. The Basement Bar'},
  {id:'venueType',label:'Type of Venue',placeholder:'e.g. Bar, Event Space, Comedy Club'},
+ {id:'venueAddress',label:'Address',placeholder:'Start typing your address…',maps:true},
  {id:'venueNeighborhood',label:'Neighborhood',placeholder:'e.g. Short North, Downtown',datalist:['Short North','Downtown','German Village','Arena District','Easton','Clintonville','OSU / Campus','Grandview','Brewery District','Italian Village','Polaris','Dublin','Westerville','Gahanna','Grove City','Hilliard','Upper Arlington','Worthington','Bexley','Whitehall']},
  ]},
  vendor:{title:'Tell us about your business',sub:'You can fill out your full profile in the vendor portal',fields:[
@@ -284,6 +286,29 @@ function validateStep2(){
  if(!val){document.getElementById('step2Err').textContent='Please fill in the required field.';return false;}
  }
  // Store step 2 data
+ // Attach Google Places autocomplete for venue address
+ if(selectedRole==='venue_owner'){
+   setTimeout(()=>{
+     const addrInput=document.getElementById('venueAddress');
+     if(addrInput && window.google?.maps?.places){
+       const ac=new google.maps.places.Autocomplete(addrInput,{
+         componentRestrictions:{country:'us'},
+         fields:['formatted_address','geometry','address_components'],
+         types:['establishment','geocode'],
+       });
+       ac.addListener('place_changed',()=>{
+         const place=ac.getPlace();
+         if(place.formatted_address) addrInput.value=place.formatted_address;
+         // Auto-fill neighborhood from address components
+         const hood=place.address_components?.find(c=>c.types.includes('neighborhood')||c.types.includes('sublocality'));
+         if(hood){
+           const nField=document.getElementById('venueNeighborhood');
+           if(nField&&!nField.value) nField.value=hood.long_name;
+         }
+       });
+     }
+   },300);
+ }
  const allInputs=document.getElementById('step2Fields').querySelectorAll('input');
  allInputs.forEach(inp=>{stepData[inp.id]=inp.value.trim();});
  return true;
@@ -465,6 +490,7 @@ async function doSignUp(){
           await sb.from('venues').insert({
             name:stepData.venueName||'My Venue',
             venue_type:stepData.venueType||null,
+            address:stepData.venueAddress||null,
             neighborhood:stepData.venueNeighborhood||null,
             owner_id:finalUserId, status:'pending', tier:'free', city:'Columbus', state:'OH',
             email:email,
