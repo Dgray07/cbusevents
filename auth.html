@@ -83,148 +83,20 @@ nav{background:rgba(11,11,15,0.95);backdrop-filter:blur(16px);border-bottom:1px 
 .spinner{width:32px;height:32px;border:3px solid var(--border);border-top-color:var(--orange);border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 12px;}
 </style>
 </head>
-<body>
-
-<nav>
-  <a href="https://cbusevents.com" class="nav-logo">CBUS<span>EVENTS</span></a>
-  <a href="https://cbusevents.com" style="color:var(--sub);font-size:13px;text-decoration:none;">← Back to site</a>
-</nav>
-
-<div class="auth-wrap">
-  <div class="auth-container">
-    <div class="auth-card">
-
-      <!-- SIGN IN MODE -->
-      <div id="signinView">
-        <div class="auth-logo">CBUS<span>EVENTS</span></div>
-        <p class="auth-sub">Welcome back to Columbus</p>
-        <div class="auth-tabs">
-          <button class="auth-tab active" onclick="setMode('signin')">Sign In</button>
-          <button class="auth-tab" onclick="setMode('signup')">Create Account</button>
-        </div>
-        <div class="field"><label>Email</label><input type="email" id="siEmail" placeholder="you@email.com" onkeydown="if(event.key==='Enter')doSignIn()"/></div>
-        <div class="field"><label>Password</label><input type="password" id="siPass" placeholder="••••••••" onkeydown="if(event.key==='Enter')doSignIn()"/></div>
-        <div class="auth-err" id="siErr"></div>
-        <button class="btn-primary" id="siBtn" onclick="doSignIn()">Sign In →</button>
-        <div style="text-align:center;margin-top:14px">
-          <button onclick="setMode('reset')" style="background:none;border:none;color:var(--muted);font-size:12px;cursor:pointer">Forgot password?</button>
-        </div>
-      </div>
-
-      <!-- RESET MODE -->
-      <div id="resetView" style="display:none">
-        <div class="auth-logo">CBUS<span>EVENTS</span></div>
-        <p class="auth-sub">Enter your email to reset your password</p>
-        <div class="field"><label>Email</label><input type="email" id="rstEmail" placeholder="you@email.com"/></div>
-        <div class="auth-err" id="rstErr"></div>
-        <button class="btn-primary" onclick="doReset()">Send Reset Email →</button>
-        <div style="text-align:center;margin-top:14px">
-          <button onclick="setMode('signin')" style="background:none;border:none;color:var(--orange);font-size:13px;cursor:pointer">← Back to sign in</button>
-        </div>
-      </div>
-
-      <!-- SIGNUP ONBOARDING -->
-      <div id="signupView" style="display:none">
-
-        <!-- Step indicators -->
-        <div class="step-indicator">
-          <div class="step-dot active" id="dot1"></div>
-          <div class="step-dot" id="dot2"></div>
-          <div class="step-dot" id="dot3"></div>
-          <div class="step-dot" id="dot4"></div>
-        </div>
-
-        <!-- STEP 1: Role selection -->
-        <div class="step active" id="step1">
-          <div class="step-title">What brings you to CBUSEVENTS?</div>
-          <div class="step-sub">We'll set up the right account for you</div>
-          <div class="role-grid">
-            <div class="role-card" id="role-venue_owner" onclick="selectRole('venue_owner')">
-              <div class="role-icon">🏛</div>
-              <div class="role-name">Venue Owner</div>
-              <div class="role-desc">I own or manage an event space or bar</div>
-            </div>
-            <div class="role-card" id="role-vendor" onclick="selectRole('vendor')">
-              <div class="role-icon">🛠</div>
-              <div class="role-name">Vendor</div>
-              <div class="role-desc">I offer services like DJ, catering, photography</div>
-            </div>
-            <div class="role-card" id="role-planner" onclick="selectRole('planner')">
-              <div class="role-icon">📋</div>
-              <div class="role-name">Event Planner</div>
-              <div class="role-desc">I plan and organize events for clients</div>
-            </div>
-            <div class="role-card" id="role-customer" onclick="selectRole('customer')">
-              <div class="role-icon">🎉</div>
-              <div class="role-name">Attendee</div>
-              <div class="role-desc">I want to discover events in Columbus</div>
-            </div>
-          </div>
-          <div class="auth-err" id="step1Err"></div>
-          <button class="btn-primary" onclick="nextStep(2)">Continue →</button>
-        </div>
-
-        <!-- STEP 2: Details based on role -->
-        <div class="step" id="step2">
-          <button class="back-btn" onclick="goBack(1)">← Back</button>
-          <div class="step-title" id="step2Title">Tell us about yourself</div>
-          <div class="step-sub" id="step2Sub">Just a few quick details</div>
-          <div id="step2Fields"></div>
-          <div class="auth-err" id="step2Err"></div>
-          <button class="btn-primary" onclick="nextStep(3)">Continue →</button>
-        </div>
-
-        <!-- STEP 2b: Claim existing listing -->
-        <div class="step" id="stepClaim">
-          <button class="back-btn" onclick="goBack(2)">← Back</button>
-          <div class="step-title">We found a match!</div>
-          <div class="step-sub" id="claimSub">Is this your venue? Claim it to take ownership.</div>
-          <div id="claimResults"></div>
-          <div class="auth-err" id="claimErr"></div>
-          <button class="btn-primary" id="claimBtn" onclick="proceedWithClaim()">Claim This Listing →</button>
-          <button onclick="goBack(2)" style="background:none;border:none;color:var(--sub);font-size:13px;cursor:pointer;width:100%;margin-top:10px;padding:8px;">Not my venue — create a new listing</button>
-        </div>
-
-        <!-- STEP 3: Account creation -->
-        <div class="step" id="step3">
-          <button class="back-btn" onclick="goBack(2)">← Back</button>
-          <div class="step-title">Create your account</div>
-          <div class="step-sub" id="step3Sub">Almost there!</div>
-          <div class="field"><label>Email</label><input type="email" id="suEmail" placeholder="you@email.com" onkeydown="if(event.key==='Enter')doSignUp()"/></div>
-          <div class="field"><label>Password</label><input type="password" id="suPass" placeholder="At least 6 characters" onkeydown="if(event.key==='Enter')doSignUp()"/></div>
-          <div class="auth-err" id="suErr"></div>
-          <button class="btn-primary" id="suBtn" onclick="doSignUp()">Create Account →</button>
-        </div>
-
-        <!-- LOADING -->
-        <div class="step" id="stepLoading">
-          <div class="auth-loader">
-            <div class="spinner"></div>
-            <div style="color:var(--sub);font-size:14px" id="loadingMsg">Setting up your account…</div>
-          </div>
-        </div>
-
-      </div>
-
-    </div>
-
-    <div style="text-align:center;margin-top:16px;color:var(--muted);font-size:12px">
-      By creating an account you agree to our terms of service
-    </div>
-  </div>
-</div>
-
-<script src="https://unpkg.com/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<body> <nav> <a href="https://cbusevents.com" class="nav-logo">CBUS<span>EVENTS</span></a> <a href="https://cbusevents.com" style="color:var(--sub);font-size:13px;text-decoration:none;">← Back to site</a>
+</nav> <div class="auth-wrap"> <div class="auth-container"> <div class="auth-card"> <!-- SIGN IN MODE --> <div id="signinView"> <div class="auth-logo">CBUS<span>EVENTS</span></div> <p class="auth-sub">Welcome back to Columbus</p> <div class="auth-tabs"> <button class="auth-tab active" onclick="setMode('signin')">Sign In</button> <button class="auth-tab" onclick="setMode('signup')">Create Account</button> </div> <div class="field"><label>Email</label><input type="email" id="siEmail" placeholder="you@email.com" onkeydown="if(event.key==='Enter')doSignIn()"/></div> <div class="field"><label>Password</label><input type="password" id="siPass" placeholder="••••••••" onkeydown="if(event.key==='Enter')doSignIn()"/></div> <div class="auth-err" id="siErr"></div> <button class="btn-primary" id="siBtn" onclick="doSignIn()">Sign In →</button> <div style="text-align:center;margin-top:14px"> <button onclick="setMode('reset')" style="background:none;border:none;color:var(--muted);font-size:12px;cursor:pointer">Forgot password?</button> </div> </div> <!-- RESET MODE --> <div id="resetView" style="display:none"> <div class="auth-logo">CBUS<span>EVENTS</span></div> <p class="auth-sub">Enter your email to reset your password</p> <div class="field"><label>Email</label><input type="email" id="rstEmail" placeholder="you@email.com"/></div> <div class="auth-err" id="rstErr"></div> <button class="btn-primary" onclick="doReset()">Send Reset Email →</button> <div style="text-align:center;margin-top:14px"> <button onclick="setMode('signin')" style="background:none;border:none;color:var(--orange);font-size:13px;cursor:pointer">← Back to sign in</button> </div> </div> <!-- SIGNUP ONBOARDING --> <div id="signupView" style="display:none"> <!-- Step indicators --> <div class="step-indicator"> <div class="step-dot active" id="dot1"></div> <div class="step-dot" id="dot2"></div> <div class="step-dot" id="dot3"></div> <div class="step-dot" id="dot4"></div> </div> <!-- STEP 1: Role selection --> <div class="step active" id="step1"> <div class="step-title">What brings you to CBUSEVENTS?</div> <div class="step-sub">We'll set up the right account for you</div> <div class="role-grid"> <div class="role-card" id="role-venue_owner" onclick="selectRole('venue_owner')"> <div class="role-name">Venue Owner</div> <div class="role-desc">I own or manage an event space or bar</div> </div> <div class="role-card" id="role-vendor" onclick="selectRole('vendor')"> <div class="role-name">Vendor</div> <div class="role-desc">I offer services like DJ, catering, photography</div> </div> <div class="role-card" id="role-planner" onclick="selectRole('planner')"> <div class="role-name">Event Planner</div> <div class="role-desc">I plan and organize events for clients</div> </div> <div class="role-card" id="role-customer" onclick="selectRole('customer')"> <div class="role-name">Attendee</div> <div class="role-desc">I want to discover events in Columbus</div> </div> </div> <div class="auth-err" id="step1Err"></div> <button class="btn-primary" onclick="nextStep(2)">Continue →</button> </div> <!-- STEP 2: Details based on role --> <div class="step" id="step2"> <button class="back-btn" onclick="goBack(1)">← Back</button> <div class="step-title" id="step2Title">Tell us about yourself</div> <div class="step-sub" id="step2Sub">Just a few quick details</div> <div id="step2Fields"></div> <div class="auth-err" id="step2Err"></div> <button class="btn-primary" onclick="nextStep(3)">Continue →</button> </div> <!-- STEP 2b: Claim existing listing --> <div class="step" id="stepClaim"> <button class="back-btn" onclick="goBack(2)">← Back</button> <div class="step-title">We found a match!</div> <div class="step-sub" id="claimSub">Is this your venue? Claim it to take ownership.</div> <div id="claimResults"></div> <div class="auth-err" id="claimErr"></div> <button class="btn-primary" id="claimBtn" onclick="proceedWithClaim()">Claim This Listing →</button> <button onclick="goBack(2)" style="background:none;border:none;color:var(--sub);font-size:13px;cursor:pointer;width:100%;margin-top:10px;padding:8px;">Not my venue — create a new listing</button> </div> <!-- STEP 3: Account creation --> <div class="step" id="step3"> <button class="back-btn" onclick="goBack(2)">← Back</button> <div class="step-title">Create your account</div> <div class="step-sub" id="step3Sub">Almost there!</div> <div class="field"><label>Email</label><input type="email" id="suEmail" placeholder="you@email.com" onkeydown="if(event.key==='Enter')doSignUp()"/></div> <div class="field"><label>Password</label><input type="password" id="suPass" placeholder="At least 6 characters" onkeydown="if(event.key==='Enter')doSignUp()"/></div> <div class="auth-err" id="suErr"></div> <button class="btn-primary" id="suBtn" onclick="doSignUp()">Create Account →</button> </div> <!-- LOADING --> <div class="step" id="stepLoading"> <div class="auth-loader"> <div class="spinner"></div> <div style="color:var(--sub);font-size:14px" id="loadingMsg">Setting up your account…</div> </div> </div> </div> </div> <div style="text-align:center;margin-top:16px;color:var(--muted);font-size:12px"> By creating an account you agree to our terms of service
+ </div> </div>
+</div> <script src="https://unpkg.com/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <script>
 const SB_URL="https://toblgvatvsjljbqogzsv.supabase.co";
 const SB_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRvYmxndmF0dnNqbGpicW9nenN2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMDgwNTAsImV4cCI6MjA4NzY4NDA1MH0._WJEQPizNDiQfDXQB_DHPaQhixPGpMdmYQSmyWmm_FQ";
 const sb=supabase.createClient(SB_URL,SB_KEY);
 
 const PORTAL_URLS={
-  venue_owner:'https://cbusevents.com/cbus-venue-portal.html',
-  vendor:'https://cbusevents.com/cbus-vendor-portal.html',
-  planner:'https://cbusevents.com/cbus-planner-portal.html',
-  customer:'https://cbusevents.com/customer-portal.html',
+ venue_owner:'https://cbusevents.com/cbus-venue-portal.html',
+ vendor:'https://cbusevents.com/cbus-vendor-portal.html',
+ planner:'https://cbusevents.com/cbus-planner-portal.html',
+ customer:'https://cbusevents.com/customer-portal.html',
 };
 
 let selectedRole=null;
@@ -233,291 +105,276 @@ let currentStep=1;
 
 // ── CHECK IF ALREADY LOGGED IN ────────────────────────────────
 async function init(){
-  const{data:{session}}=await sb.auth.getSession();
-  if(session?.user) await redirectByRole(session.user.id);
+ const{data:{session}}=await sb.auth.getSession();
+ if(session?.user) await redirectByRole(session.user.id);
 
-  // Pre-select role if passed in URL
-  const params=new URLSearchParams(window.location.search);
-  const roleParam=params.get('role');
-  if(roleParam&&['venue_owner','vendor','planner','customer'].includes(roleParam)){
-    setMode('signup');
-    selectRole(roleParam);
-    nextStep(2);
-  }
+ // Pre-select role if passed in URL
+ const params=new URLSearchParams(window.location.search);
+ const roleParam=params.get('role');
+ if(roleParam&&['venue_owner','vendor','planner','customer'].includes(roleParam)){
+ setMode('signup');
+ selectRole(roleParam);
+ nextStep(2);
+ }
 }
 
 // ── MODE SWITCHING ────────────────────────────────────────────
 function setMode(mode){
-  document.getElementById('signinView').style.display=mode==='signin'?'block':'none';
-  document.getElementById('resetView').style.display=mode==='reset'?'block':'none';
-  document.getElementById('signupView').style.display=mode==='signup'?'block':'none';
-  if(mode==='signup'){currentStep=1;showStep(1);}
+ document.getElementById('signinView').style.display=mode==='signin'?'block':'none';
+ document.getElementById('resetView').style.display=mode==='reset'?'block':'none';
+ document.getElementById('signupView').style.display=mode==='signup'?'block':'none';
+ if(mode==='signup'){currentStep=1;showStep(1);}
 }
 
 // ── SIGN IN ───────────────────────────────────────────────────
 async function doSignIn(){
-  const email=document.getElementById('siEmail').value.trim();
-  const pass=document.getElementById('siPass').value;
-  const err=document.getElementById('siErr');
-  const btn=document.getElementById('siBtn');
-  if(!email||!pass){err.textContent='Email and password required.';return;}
-  btn.disabled=true;btn.textContent='Signing in…';err.textContent='';
-  const{data,error}=await sb.auth.signInWithPassword({email,password:pass});
-  if(error){err.textContent=error.message;btn.disabled=false;btn.textContent='Sign In →';return;}
-  await redirectByRole(data.user.id);
+ const email=document.getElementById('siEmail').value.trim();
+ const pass=document.getElementById('siPass').value;
+ const err=document.getElementById('siErr');
+ const btn=document.getElementById('siBtn');
+ if(!email||!pass){err.textContent='Email and password required.';return;}
+ btn.disabled=true;btn.textContent='Signing in…';err.textContent='';
+ const{data,error}=await sb.auth.signInWithPassword({email,password:pass});
+ if(error){err.textContent=error.message;btn.disabled=false;btn.textContent='Sign In →';return;}
+ await redirectByRole(data.user.id);
 }
 
 async function redirectByRole(userId){
-  const{data}=await sb.from('user_roles').select('role').eq('user_id',userId).maybeSingle();
-  const role=data?.role||'customer';
-  window.location.href=PORTAL_URLS[role]||PORTAL_URLS.customer;
+ const{data}=await sb.from('user_roles').select('role').eq('user_id',userId).maybeSingle();
+ const role=data?.role||'customer';
+ window.location.href=PORTAL_URLS[role]||PORTAL_URLS.customer;
 }
 
 // ── RESET ─────────────────────────────────────────────────────
 async function doReset(){
-  const email=document.getElementById('rstEmail').value.trim();
-  const err=document.getElementById('rstErr');
-  if(!email){err.textContent='Enter your email.';return;}
-  const{error}=await sb.auth.resetPasswordForEmail(email,{redirectTo:'https://cbusevents.com/auth.html'});
-  if(error){err.textContent=error.message;return;}
-  err.style.color='var(--green)';err.textContent='✓ Reset email sent! Check your inbox.';
+ const email=document.getElementById('rstEmail').value.trim();
+ const err=document.getElementById('rstErr');
+ if(!email){err.textContent='Enter your email.';return;}
+ const{error}=await sb.auth.resetPasswordForEmail(email,{redirectTo:'https://cbusevents.com/auth.html'});
+ if(error){err.textContent=error.message;return;}
+ err.style.color='var(--green)';err.textContent=' Reset email sent! Check your inbox.';
 }
 
 // ── ROLE SELECTION ────────────────────────────────────────────
 function selectRole(role){
-  selectedRole=role;
-  document.querySelectorAll('.role-card').forEach(c=>c.classList.remove('selected'));
-  document.getElementById('role-'+role)?.classList.add('selected');
-  document.getElementById('step1Err').textContent='';
+ selectedRole=role;
+ document.querySelectorAll('.role-card').forEach(c=>c.classList.remove('selected'));
+ document.getElementById('role-'+role)?.classList.add('selected');
+ document.getElementById('step1Err').textContent='';
 }
 
 // ── STEP NAVIGATION ───────────────────────────────────────────
 function showStep(n){
-  currentStep=n;
-  document.querySelectorAll('.step').forEach(s=>s.classList.remove('active'));
-  document.getElementById('step'+n)?.classList.add('active');
-  // Update dots — claim counts as step 2.5 visually
-  const dotN = n==='Claim'?2 : n==='Loading'?4 : n;
-  [1,2,3,4].forEach(i=>{
-    const dot=document.getElementById('dot'+i);
-    if(!dot)return;
-    dot.classList.remove('active','done');
-    if(i<dotN)dot.classList.add('done');
-    else if(i===dotN)dot.classList.add('active');
-  });
+ currentStep=n;
+ document.querySelectorAll('.step').forEach(s=>s.classList.remove('active'));
+ document.getElementById('step'+n)?.classList.add('active');
+ // Update dots — claim counts as step 2.5 visually
+ const dotN = n==='Claim'?2 : n==='Loading'?4 : n;
+ [1,2,3,4].forEach(i=>{
+ const dot=document.getElementById('dot'+i);
+ if(!dot)return;
+ dot.classList.remove('active','done');
+ if(i<dotN)dot.classList.add('done');
+ else if(i===dotN)dot.classList.add('active');
+ });
 }
 
 function nextStep(n){
-  if(n===2){
-    if(!selectedRole){document.getElementById('step1Err').textContent='Please select an account type.';return;}
-    buildStep2();
-    showStep(2);
-  } else if(n===3){
-    if(!validateStep2())return;
-    if(selectedRole==='venue_owner'){
-      checkForExistingVenue();
-    } else {
-      buildStep3Summary();
-      showStep(3);
-    }
-  }
+ if(n===2){
+ if(!selectedRole){document.getElementById('step1Err').textContent='Please select an account type.';return;}
+ buildStep2();
+ showStep(2);
+ } else if(n===3){
+ if(!validateStep2())return;
+ if(selectedRole==='venue_owner'){
+ checkForExistingVenue();
+ } else {
+ buildStep3Summary();
+ showStep(3);
+ }
+ }
 }
 
 function goBack(n){showStep(n);}
 
 function buildStep2(){
-  const configs={
-    venue_owner:{title:'Tell us about your venue',sub:'You can add more details in your portal',fields:[
-      {id:'venueName',label:'Venue Name *',placeholder:'e.g. The Basement Bar'},
-      {id:'venueType',label:'Type of Venue',placeholder:'e.g. Bar, Event Space, Comedy Club'},
-      {id:'venueNeighborhood',label:'Neighborhood',placeholder:'e.g. Short North, Downtown'},
-    ]},
-    vendor:{title:'Tell us about your business',sub:'You can fill out your full profile in the vendor portal',fields:[
-      {id:'bizName',label:'Business Name *',placeholder:'e.g. Columbus Creative Co.'},
-      {id:'bizCategory',label:'What do you offer?',placeholder:'e.g. DJ, Photography, Catering'},
-    ]},
-    planner:{title:'Tell us about yourself',sub:'You can complete your profile in the planner portal',fields:[
-      {id:'plannerName',label:'Your Name *',placeholder:'e.g. Jordan Smith'},
-      {id:'plannerCompany',label:'Company (optional)',placeholder:'e.g. Columbus Events Co.'},
-    ]},
-    customer:{title:'What are you into?',sub:'We\'ll personalize your Columbus event feed',fields:[
-      {id:'displayName',label:'Your Name',placeholder:'e.g. Alex'},
-    ]},
-  };
-  const c=configs[selectedRole];
-  document.getElementById('step2Title').textContent=c.title;
-  document.getElementById('step2Sub').textContent=c.sub;
-  document.getElementById('step2Fields').innerHTML=c.fields.map(f=>`
-    <div class="field"><label>${f.label}</label><input id="${f.id}" placeholder="${f.placeholder}" onkeydown="if(event.key==='Enter')nextStep(3)"/></div>
-  `).join('');
+ const configs={
+ venue_owner:{title:'Tell us about your venue',sub:'You can add more details in your portal',fields:[
+ {id:'venueName',label:'Venue Name *',placeholder:'e.g. The Basement Bar'},
+ {id:'venueType',label:'Type of Venue',placeholder:'e.g. Bar, Event Space, Comedy Club'},
+ {id:'venueNeighborhood',label:'Neighborhood',placeholder:'e.g. Short North, Downtown'},
+ ]},
+ vendor:{title:'Tell us about your business',sub:'You can fill out your full profile in the vendor portal',fields:[
+ {id:'bizName',label:'Business Name *',placeholder:'e.g. Columbus Creative Co.'},
+ {id:'bizCategory',label:'What do you offer?',placeholder:'e.g. DJ, Photography, Catering'},
+ ]},
+ planner:{title:'Tell us about yourself',sub:'You can complete your profile in the planner portal',fields:[
+ {id:'plannerName',label:'Your Name *',placeholder:'e.g. Jordan Smith'},
+ {id:'plannerCompany',label:'Company (optional)',placeholder:'e.g. Columbus Events Co.'},
+ ]},
+ customer:{title:'What are you into?',sub:'We\'ll personalize your Columbus event feed',fields:[
+ {id:'displayName',label:'Your Name',placeholder:'e.g. Alex'},
+ ]},
+ };
+ const c=configs[selectedRole];
+ document.getElementById('step2Title').textContent=c.title;
+ document.getElementById('step2Sub').textContent=c.sub;
+ document.getElementById('step2Fields').innerHTML=c.fields.map(f=>`
+ <div class="field"><label>${f.label}</label><input id="${f.id}" placeholder="${f.placeholder}" onkeydown="if(event.key==='Enter')nextStep(3)"/></div> `).join('');
 }
 
 function validateStep2(){
-  const required={venue_owner:'venueName',vendor:'bizName',planner:'plannerName',customer:null};
-  const reqId=required[selectedRole];
-  if(reqId){
-    const val=document.getElementById(reqId)?.value?.trim();
-    if(!val){document.getElementById('step2Err').textContent='Please fill in the required field.';return false;}
-  }
-  // Store step 2 data
-  const allInputs=document.getElementById('step2Fields').querySelectorAll('input');
-  allInputs.forEach(inp=>{stepData[inp.id]=inp.value.trim();});
-  return true;
+ const required={venue_owner:'venueName',vendor:'bizName',planner:'plannerName',customer:null};
+ const reqId=required[selectedRole];
+ if(reqId){
+ const val=document.getElementById(reqId)?.value?.trim();
+ if(!val){document.getElementById('step2Err').textContent='Please fill in the required field.';return false;}
+ }
+ // Store step 2 data
+ const allInputs=document.getElementById('step2Fields').querySelectorAll('input');
+ allInputs.forEach(inp=>{stepData[inp.id]=inp.value.trim();});
+ return true;
 }
 
 function buildStep3Summary(){
-  const labels={venue_owner:'Venue Owner',vendor:'Vendor',planner:'Event Planner',customer:'Attendee'};
-  document.getElementById('step3Sub').textContent=`Creating your ${labels[selectedRole]} account`;
+ const labels={venue_owner:'Venue Owner',vendor:'Vendor',planner:'Event Planner',customer:'Attendee'};
+ document.getElementById('step3Sub').textContent=`Creating your ${labels[selectedRole]} account`;
 }
 
 // ── CLAIM FLOW ────────────────────────────────────────────────
 async function checkForExistingVenue(){
-  const name = stepData.venueName || '';
-  if(!name){buildStep3Summary();showStep(3);return;}
+ const name = stepData.venueName || '';
+ if(!name){buildStep3Summary();showStep(3);return;}
 
-  // Search for unclaimed venues with similar name
-  const{data:matches}=await sb.from('venues')
-    .select('id,name,venue_type,neighborhood,status,cover_image_url')
-    .is('owner_id',null)
-    .ilike('name','%'+name.split(' ')[0]+'%')
-    .limit(5)
-    .catch(()=>({data:[]}));
+ // Search for unclaimed venues with similar name
+ const{data:matches}=await sb.from('venues')
+ .select('id,name,venue_type,neighborhood,status,cover_image_url')
+ .is('owner_id',null)
+ .ilike('name','%'+name.split(' ')[0]+'%')
+ .limit(5)
+ .catch(()=>({data:[]}));
 
-  // Also check claimed venues with same name (to warn of duplicates)
-  const{data:claimed}=await sb.from('venues')
-    .select('id,name,owner_id')
-    .ilike('name','%'+name+'%')
-    .not('owner_id','is',null)
-    .limit(3)
-    .catch(()=>({data:[]}));
+ // Also check claimed venues with same name (to warn of duplicates)
+ const{data:claimed}=await sb.from('venues')
+ .select('id,name,owner_id')
+ .ilike('name','%'+name+'%')
+ .not('owner_id','is',null)
+ .limit(3)
+ .catch(()=>({data:[]}));
 
-  const unclaimedMatches=(matches||[]).filter(m=>!m.owner_id);
+ const unclaimedMatches=(matches||[]).filter(m=>!m.owner_id);
 
-  if(!unclaimedMatches.length){
-    // No match — just create new
-    buildStep3Summary();
-    showStep(3);
-    return;
-  }
+ if(!unclaimedMatches.length){
+ // No match — just create new
+ buildStep3Summary();
+ showStep(3);
+ return;
+ }
 
-  // Show claim step
-  claimMatches=unclaimedMatches;
-  selectedClaimId=null;
-  document.getElementById('claimSub').textContent=`We found ${unclaimedMatches.length} existing listing${unclaimedMatches.length>1?'s':''} that match "${name}". Is one of these yours?`;
-  document.getElementById('claimResults').innerHTML=unclaimedMatches.map(v=>`
-    <div class="claim-card" id="claim-${v.id}" onclick="selectClaim('${v.id}')">
-      <div class="claim-card-icon">${v.cover_image_url?`<img src="${v.cover_image_url}" style="width:44px;height:44px;border-radius:8px;object-fit:cover" onerror="this.outerHTML='🏛'"/>`:'🏛'}</div>
-      <div style="flex:1">
-        <div class="claim-card-name">${v.name}</div>
-        <div class="claim-card-meta">${v.venue_type||'Venue'}${v.neighborhood?' · '+v.neighborhood:''} · <span style="color:${v.status==='approved'?'#22c55e':'#f59e0b'}">${v.status==='approved'?'Live':'Pending'}</span></div>
-      </div>
-      <div class="claim-check" id="check-${v.id}"></div>
-    </div>`).join('')+`
-    <div class="claim-card" id="claim-new" onclick="selectClaim('new')" style="border-style:dashed">
-      <div class="claim-card-icon">➕</div>
-      <div style="flex:1">
-        <div class="claim-card-name">Create a new listing for "${name}"</div>
-        <div class="claim-card-meta">My venue isn't listed above</div>
-      </div>
-      <div class="claim-check" id="check-new"></div>
-    </div>`;
-  document.getElementById('claimErr').textContent='';
-  showStep('Claim');
+ // Show claim step
+ claimMatches=unclaimedMatches;
+ selectedClaimId=null;
+ document.getElementById('claimSub').textContent=`We found ${unclaimedMatches.length} existing listing${unclaimedMatches.length>1?'s':''} that match "${name}". Is one of these yours?`;
+ document.getElementById('claimResults').innerHTML=unclaimedMatches.map(v=>`
+ <div class="claim-card" id="claim-${v.id}" onclick="selectClaim('${v.id}')"> <div class="claim-card-icon">${v.cover_image_url?`<img src="${v.cover_image_url}" style="width:44px;height:44px;border-radius:8px;object-fit:cover" onerror="this.outerHTML=''"/>`:''}</div> <div style="flex:1"> <div class="claim-card-name">${v.name}</div> <div class="claim-card-meta">${v.venue_type||'Venue'}${v.neighborhood?' · '+v.neighborhood:''} · <span style="color:${v.status==='approved'?'#22c55e':'#f59e0b'}">${v.status==='approved'?'Live':'Pending'}</span></div> </div> <div class="claim-check" id="check-${v.id}"></div> </div>`).join('')+`
+ <div class="claim-card" id="claim-new" onclick="selectClaim('new')" style="border-style:dashed"> <div style="flex:1"> <div class="claim-card-name">Create a new listing for "${name}"</div> <div class="claim-card-meta">My venue isn't listed above</div> </div> <div class="claim-check" id="check-new"></div> </div>`;
+ document.getElementById('claimErr').textContent='';
+ showStep('Claim');
 }
 
 function selectClaim(id){
-  selectedClaimId=id;
-  document.querySelectorAll('.claim-card').forEach(c=>c.classList.remove('selected'));
-  document.querySelectorAll('.claim-check').forEach(c=>c.textContent='');
-  document.getElementById('claim-'+id)?.classList.add('selected');
-  const chk=document.getElementById('check-'+id);
-  if(chk)chk.textContent='✓';
-  document.getElementById('claimErr').textContent='';
+ selectedClaimId=id;
+ document.querySelectorAll('.claim-card').forEach(c=>c.classList.remove('selected'));
+ document.querySelectorAll('.claim-check').forEach(c=>c.textContent='');
+ document.getElementById('claim-'+id)?.classList.add('selected');
+ const chk=document.getElementById('check-'+id);
+ if(chk)chk.textContent='';
+ document.getElementById('claimErr').textContent='';
 }
 
 function proceedWithClaim(){
-  if(!selectedClaimId){document.getElementById('claimErr').textContent='Please select an option.';return;}
-  buildStep3Summary();
-  if(selectedClaimId==='new'){
-    document.getElementById('step3Sub').textContent='Creating your Venue Owner account — new listing';
-  } else {
-    const v=claimMatches.find(m=>m.id===selectedClaimId);
-    document.getElementById('step3Sub').textContent=`Creating your account and claiming "${v?.name||'venue'}"`;
-  }
-  showStep(3);
+ if(!selectedClaimId){document.getElementById('claimErr').textContent='Please select an option.';return;}
+ buildStep3Summary();
+ if(selectedClaimId==='new'){
+ document.getElementById('step3Sub').textContent='Creating your Venue Owner account — new listing';
+ } else {
+ const v=claimMatches.find(m=>m.id===selectedClaimId);
+ document.getElementById('step3Sub').textContent=`Creating your account and claiming "${v?.name||'venue'}"`;
+ }
+ showStep(3);
 }
 
 // ── SIGN UP ───────────────────────────────────────────────────
 async function doSignUp(){
-  const email=document.getElementById('suEmail').value.trim();
-  const pass=document.getElementById('suPass').value;
-  const err=document.getElementById('suErr');
-  const btn=document.getElementById('suBtn');
-  if(!email||!pass){err.textContent='Email and password required.';return;}
-  if(pass.length<6){err.textContent='Password must be at least 6 characters.';return;}
-  btn.disabled=true;btn.textContent='Creating account…';err.textContent='';
+ const email=document.getElementById('suEmail').value.trim();
+ const pass=document.getElementById('suPass').value;
+ const err=document.getElementById('suErr');
+ const btn=document.getElementById('suBtn');
+ if(!email||!pass){err.textContent='Email and password required.';return;}
+ if(pass.length<6){err.textContent='Password must be at least 6 characters.';return;}
+ btn.disabled=true;btn.textContent='Creating account…';err.textContent='';
 
-  // Show loading
-  showStep('Loading');
-  document.getElementById('loadingMsg').textContent='Creating your account…';
+ // Show loading
+ showStep('Loading');
+ document.getElementById('loadingMsg').textContent='Creating your account…';
 
-  const{data,error}=await sb.auth.signUp({email,password:pass});
-  if(error){
-    showStep(3);
-    document.getElementById('suErr').textContent=error.message;
-    btn.disabled=false;btn.textContent='Create Account →';
-    return;
-  }
+ const{data,error}=await sb.auth.signUp({email,password:pass});
+ if(error){
+ showStep(3);
+ document.getElementById('suErr').textContent=error.message;
+ btn.disabled=false;btn.textContent='Create Account →';
+ return;
+ }
 
-  const userId=data.user?.id;
-  if(!userId){showStep(3);document.getElementById('suErr').textContent='Signup failed. Try again.';btn.disabled=false;btn.textContent='Create Account →';return;}
+ const userId=data.user?.id;
+ if(!userId){showStep(3);document.getElementById('suErr').textContent='Signup failed. Try again.';btn.disabled=false;btn.textContent='Create Account →';return;}
 
-  document.getElementById('loadingMsg').textContent='Setting up your profile…';
+ document.getElementById('loadingMsg').textContent='Setting up your profile…';
 
-  // Set role
-  const roleMap={planner:'customer'}; // planners use customer role but get planner portal
-  const dbRole=roleMap[selectedRole]||selectedRole;
-  await sb.from('user_roles').upsert({user_id:userId,role:dbRole},{onConflict:'user_id'}).catch(()=>{});
+ // Set role
+ const roleMap={planner:'customer'}; // planners use customer role but get planner portal
+ const dbRole=roleMap[selectedRole]||selectedRole;
+ await sb.from('user_roles').upsert({user_id:userId,role:dbRole},{onConflict:'user_id'}).catch(()=>{});
 
-  // Create profile based on role
-  if(selectedRole==='venue_owner'){
-    if(selectedClaimId && selectedClaimId!=='new'){
-      // CLAIM existing listing
-      document.getElementById('loadingMsg').textContent='Claiming your listing…';
-      await sb.from('venues').update({
-        owner_id:userId,
-        claim_status:'pending',
-        claimed_at:new Date().toISOString(),
-        claim_email:email,
-      }).eq('id',selectedClaimId).catch(()=>{});
-      // Also store in user_roles that this is a venue claim pending review
-      await sb.from('user_roles').update({claim_venue_id:selectedClaimId}).eq('user_id',userId).catch(()=>{});
-    } else {
-      // NEW listing
-      await sb.from('venues').insert({
-        name:stepData.venueName,venue_type:stepData.venueType||null,
-        neighborhood:stepData.venueNeighborhood||null,
-        owner_id:userId,status:'pending',tier:'free',city:'Columbus',state:'OH'
-      }).catch(()=>{});
-    }
-  } else if(selectedRole==='vendor'){
-    await sb.from('vendors').upsert({
-      user_id:userId,business_name:stepData.bizName,
-      category:stepData.bizCategory||null,email,
-      subscription_tier:'FREE',subscription_status:'free'
-    },{onConflict:'user_id'}).catch(()=>{});
-  } else if(selectedRole==='planner'){
-    await sb.from('customer_profiles').upsert({
-      user_id:userId,display_name:stepData.plannerName,
-    },{onConflict:'user_id'}).catch(()=>{});
-  } else {
-    await sb.from('customer_profiles').upsert({
-      user_id:userId,display_name:stepData.displayName||null,
-    },{onConflict:'user_id'}).catch(()=>{});
-  }
+ // Create profile based on role
+ if(selectedRole==='venue_owner'){
+ if(selectedClaimId && selectedClaimId!=='new'){
+ // CLAIM existing listing
+ document.getElementById('loadingMsg').textContent='Claiming your listing…';
+ await sb.from('venues').update({
+ owner_id:userId,
+ claim_status:'pending',
+ claimed_at:new Date().toISOString(),
+ claim_email:email,
+ }).eq('id',selectedClaimId).catch(()=>{});
+ // Also store in user_roles that this is a venue claim pending review
+ await sb.from('user_roles').update({claim_venue_id:selectedClaimId}).eq('user_id',userId).catch(()=>{});
+ } else {
+ // NEW listing
+ await sb.from('venues').insert({
+ name:stepData.venueName,venue_type:stepData.venueType||null,
+ neighborhood:stepData.venueNeighborhood||null,
+ owner_id:userId,status:'pending',tier:'free',city:'Columbus',state:'OH'
+ }).catch(()=>{});
+ }
+ } else if(selectedRole==='vendor'){
+ await sb.from('vendors').upsert({
+ user_id:userId,business_name:stepData.bizName,
+ category:stepData.bizCategory||null,email,
+ subscription_tier:'FREE',subscription_status:'free'
+ },{onConflict:'user_id'}).catch(()=>{});
+ } else if(selectedRole==='planner'){
+ await sb.from('customer_profiles').upsert({
+ user_id:userId,display_name:stepData.plannerName,
+ },{onConflict:'user_id'}).catch(()=>{});
+ } else {
+ await sb.from('customer_profiles').upsert({
+ user_id:userId,display_name:stepData.displayName||null,
+ },{onConflict:'user_id'}).catch(()=>{});
+ }
 
-  document.getElementById('loadingMsg').textContent='Redirecting to your portal…';
-  setTimeout(()=>{window.location.href=PORTAL_URLS[selectedRole]||PORTAL_URLS.customer;},800);
+ document.getElementById('loadingMsg').textContent='Redirecting to your portal…';
+ setTimeout(()=>{window.location.href=PORTAL_URLS[selectedRole]||PORTAL_URLS.customer;},800);
 }
 
 init();

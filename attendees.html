@@ -79,193 +79,78 @@ nav{position:sticky;top:0;z-index:100;background:rgba(11,11,15,0.95);backdrop-fi
 
 /* ── MOBILE ─────────────────────────────────────────────────── */
 @media(max-width:680px){
-  nav{padding:0 16px;height:54px;}
-  nav .nav-links{display:none;}
-  .nav-cta{font-size:12px;padding:7px 14px;}
-  .nav-logo{font-size:17px;}
-  .hero{min-height:auto;padding:60px 20px 40px;}
-  .hero h1{font-size:clamp(32px,8vw,52px);}
-  .hero p{font-size:15px;}
-  .hero-btns{flex-direction:column;align-items:stretch;}
-  .btn-hero{text-align:center;padding:13px 20px;}
-  .hero-stats{gap:20px;flex-wrap:wrap;justify-content:center;}
-  .features{padding:48px 20px;}
-  .features-grid{grid-template-columns:1fr !important;}
-  .plan-grid{grid-template-columns:1fr !important;}
-  .pricing{padding:48px 20px;}
-  .cta-banner{padding:60px 20px;}
-  .cta-banner h2{font-size:clamp(24px,6vw,36px);}
-  .section-title{font-size:clamp(24px,5vw,36px);}
-  footer{padding:20px 16px;flex-direction:column;gap:10px;}
-  .services-showcase{padding:48px 20px;}
-  .services-tags{gap:8px;}
-  .service-tag{font-size:12px;padding:6px 12px;}
-  .hood-grid{grid-template-columns:1fr 1fr !important;}
-  .categories{gap:6px;}
-  .cat-chip{font-size:12px;padding:6px 12px;}
-  .slider-section{padding:40px 0;}
-  .role-grid{grid-template-columns:1fr 1fr;}
+ nav{padding:0 16px;height:54px;}
+ nav .nav-links{display:none;}
+ .nav-cta{font-size:12px;padding:7px 14px;}
+ .nav-logo{font-size:17px;}
+ .hero{min-height:auto;padding:60px 20px 40px;}
+ .hero h1{font-size:clamp(32px,8vw,52px);}
+ .hero p{font-size:15px;}
+ .hero-btns{flex-direction:column;align-items:stretch;}
+ .btn-hero{text-align:center;padding:13px 20px;}
+ .hero-stats{gap:20px;flex-wrap:wrap;justify-content:center;}
+ .features{padding:48px 20px;}
+ .features-grid{grid-template-columns:1fr !important;}
+ .plan-grid{grid-template-columns:1fr !important;}
+ .pricing{padding:48px 20px;}
+ .cta-banner{padding:60px 20px;}
+ .cta-banner h2{font-size:clamp(24px,6vw,36px);}
+ .section-title{font-size:clamp(24px,5vw,36px);}
+ footer{padding:20px 16px;flex-direction:column;gap:10px;}
+ .services-showcase{padding:48px 20px;}
+ .services-tags{gap:8px;}
+ .service-tag{font-size:12px;padding:6px 12px;}
+ .hood-grid{grid-template-columns:1fr 1fr !important;}
+ .categories{gap:6px;}
+ .cat-chip{font-size:12px;padding:6px 12px;}
+ .slider-section{padding:40px 0;}
+ .role-grid{grid-template-columns:1fr 1fr;}
 }
 footer{background:var(--surface);border-top:1px solid var(--border);padding:24px 48px;display:flex;justify-content:space-between;align-items:center;}
 .footer-copy{color:var(--muted);font-size:12px;}
 .footer-admin{color:var(--muted);font-size:11px;opacity:0.4;transition:opacity 0.2s;text-decoration:none;}
 .footer-admin:hover{opacity:1;}
+.feature-accent{width:28px;height:3px;background:var(--orange);border-radius:2px;margin-bottom:18px;}
 </style>
 </head>
-<body>
-
-<nav>
-  <a href="https://cbusevents.com" class="nav-logo">CBUS<span>EVENTS</span></a>
-  <div class="nav-links">
-    <a href="https://cbusevents.com" class="nav-link">Home</a>
-    <div class="dropdown">
-      <a class="nav-link" onclick="toggleDrop(event)" style="color:var(--text);cursor:pointer">Join ▾</a>
-      <div class="dropdown-menu">
-        <a href="https://cbusevents.com/venues.html" class="dropdown-item">🏛 Venues</a>
-        <a href="https://cbusevents.com/vendors.html" class="dropdown-item">🛠 Vendors</a>
-        <a href="https://cbusevents.com/planners.html" class="dropdown-item">📋 Planners</a>
-        <a href="https://cbusevents.com/attendees.html" class="dropdown-item active">🎉 Attendees</a>
-      </div>
-    </div>
-  </div>
-  <a href="https://cbusevents.com/auth.html?role=customer" class="nav-cta">Create Free Account →</a>
-</nav>
-
-<section class="hero">
-  <div class="hero-eyebrow">🎉 For Event Lovers</div>
-  <h1>Columbus Events,<br><span>All in One Place</span></h1>
-  <p>Concerts, food fests, art shows, comedy nights, rooftop parties — discover everything happening in Columbus and never miss a thing.</p>
-  <div class="hero-btns">
-    <a href="https://cbusevents.com/auth.html?role=customer" class="btn-hero btn-hero-primary">Create Free Account →</a>
-    <a href="https://cbusevents.com" class="btn-hero btn-hero-ghost">Browse Events</a>
-  </div>
-  <div class="categories">
-    <a href="https://cbusevents.com" class="cat-chip">🎵 Music</a>
-    <a href="https://cbusevents.com" class="cat-chip">🍽 Food & Drink</a>
-    <a href="https://cbusevents.com" class="cat-chip">🎨 Arts</a>
-    <a href="https://cbusevents.com" class="cat-chip">😂 Comedy</a>
-    <a href="https://cbusevents.com" class="cat-chip">🏃 Fitness</a>
-    <a href="https://cbusevents.com" class="cat-chip">💼 Networking</a>
-    <a href="https://cbusevents.com" class="cat-chip">🎭 Theater</a>
-    <a href="https://cbusevents.com" class="cat-chip">🌙 Nightlife</a>
-  </div>
-</section>
-
-<section class="slider-section">
-  <div class="slider-label">Happening in Columbus</div>
-  <div style="overflow:hidden">
-    <div class="slider-track" id="eventsSlider"></div>
-  </div>
-</section>
-
-<section class="perks">
-  <div class="section-label">Why Create an Account</div>
-  <div class="section-title">Your personal Columbus<br>event guide</div>
-  <div class="section-sub">A free account gives you a personalized feed, saved events, and your tickets all in one place.</div>
-  <div class="perks-grid">
-    <div class="perk-card">
-      <div class="perk-icon">🏠</div>
-      <div class="perk-title">Personalized Feed</div>
-      <div class="perk-desc">Follow your favorite venues and get a curated feed of events tailored to what you actually like.</div>
-    </div>
-    <div class="perk-card">
-      <div class="perk-icon">🎟</div>
-      <div class="perk-title">Tickets in One Place</div>
-      <div class="perk-desc">All your event tickets stored in your account dashboard. No more digging through email for confirmations.</div>
-    </div>
-    <div class="perk-card">
-      <div class="perk-icon">📍</div>
-      <div class="perk-title">Save Venues</div>
-      <div class="perk-desc">Found a spot you love? Save it and get notified when they announce new events.</div>
-    </div>
-    <div class="perk-card">
-      <div class="perk-icon">📅</div>
-      <div class="perk-title">Save Events</div>
-      <div class="perk-desc">Bookmark events you're interested in and come back to buy tickets when you're ready.</div>
-    </div>
-    <div class="perk-card">
-      <div class="perk-icon">❤️</div>
-      <div class="perk-title">Follow Venues</div>
-      <div class="perk-desc">Follow venues to always see their events first in your feed before they sell out.</div>
-    </div>
-    <div class="perk-card">
-      <div class="perk-icon">🆓</div>
-      <div class="perk-title">Always Free</div>
-      <div class="perk-desc">Attendee accounts are 100% free, forever. No subscriptions, no hidden fees.</div>
-    </div>
-  </div>
-</section>
-
-<section class="neighborhoods">
-  <div class="neighborhoods-inner">
-    <div class="section-label">Explore by Neighborhood</div>
-    <div class="section-title">Columbus, block by block</div>
-    <div class="hood-grid">
-      <a href="https://cbusevents.com" class="hood-card"><div class="hood-icon">🎨</div><div class="hood-name">Short North</div><div class="hood-count">Arts & Nightlife</div></a>
-      <a href="https://cbusevents.com" class="hood-card"><div class="hood-icon">🏟</div><div class="hood-name">Arena District</div><div class="hood-count">Sports & Concerts</div></a>
-      <a href="https://cbusevents.com" class="hood-card"><div class="hood-icon">🏰</div><div class="hood-name">German Village</div><div class="hood-count">Historic & Dining</div></a>
-      <a href="https://cbusevents.com" class="hood-card"><div class="hood-icon">🏙</div><div class="hood-name">Downtown</div><div class="hood-count">Business & Events</div></a>
-      <a href="https://cbusevents.com" class="hood-card"><div class="hood-icon">🛍</div><div class="hood-name">Easton</div><div class="hood-count">Shopping & Food</div></a>
-      <a href="https://cbusevents.com" class="hood-card"><div class="hood-icon">🌿</div><div class="hood-name">Clintonville</div><div class="hood-count">Local & Chill</div></a>
-      <a href="https://cbusevents.com" class="hood-card"><div class="hood-icon">🎓</div><div class="hood-name">OSU / Campus</div><div class="hood-count">College & Culture</div></a>
-      <a href="https://cbusevents.com" class="hood-card"><div class="hood-icon">🌆</div><div class="hood-name">Grandview</div><div class="hood-count">Dining & Social</div></a>
-    </div>
-  </div>
-</section>
-
-<section class="cta-banner">
-  <h2>Columbus is happening.<br>Don't miss it.</h2>
-  <p>Create your free account and get a personalized feed of Columbus events delivered to you.</p>
-  <a href="https://cbusevents.com/auth.html?role=customer" class="btn-hero btn-hero-primary">Create Free Account →</a>
-</section>
-
-<footer>
-  <span class="footer-copy">© 2026 CBUSEVENTS · Columbus, Ohio</span>
-  <div style="display:flex;gap:20px;align-items:center">
-    <span class="footer-copy">Made for Columbus 🏙</span>
-    <a href="https://cbusevents.com/cbus-admin.html" class="footer-admin">Admin</a>
-  </div>
-</footer>
-
-<script src="https://unpkg.com/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<body> <nav> <a href="https://cbusevents.com" class="nav-logo">CBUS<span>EVENTS</span></a> <div class="nav-links"> <a href="https://cbusevents.com" class="nav-link">Home</a> <div class="dropdown"> <a class="nav-link" onclick="toggleDrop(event)" style="color:var(--text);cursor:pointer">Join ▾</a> <div class="dropdown-menu"> <a href="https://cbusevents.com/venues.html" class="dropdown-item"> Venues</a> <a href="https://cbusevents.com/vendors.html" class="dropdown-item"> Vendors</a> <a href="https://cbusevents.com/planners.html" class="dropdown-item"> Planners</a> <a href="https://cbusevents.com/attendees.html" class="dropdown-item active"> Attendees</a> </div> </div> </div> <a href="https://cbusevents.com/auth.html?role=customer" class="nav-cta">Create Free Account →</a>
+</nav> <section class="hero"> <div class="hero-eyebrow"> For Event Lovers</div> <h1>Columbus Events,<br><span>All in One Place</span></h1> <p>Concerts, food fests, art shows, comedy nights, rooftop parties — discover everything happening in Columbus and never miss a thing.</p> <div class="hero-btns"> <a href="https://cbusevents.com/auth.html?role=customer" class="btn-hero btn-hero-primary">Create Free Account →</a> <a href="https://cbusevents.com" class="btn-hero btn-hero-ghost">Browse Events</a> </div> <div class="categories"> <a href="https://cbusevents.com" class="cat-chip"> Music</a> <a href="https://cbusevents.com" class="cat-chip"> Food & Drink</a> <a href="https://cbusevents.com" class="cat-chip"> Arts</a> <a href="https://cbusevents.com" class="cat-chip"> Comedy</a> <a href="https://cbusevents.com" class="cat-chip"> Fitness</a> <a href="https://cbusevents.com" class="cat-chip"> Networking</a> <a href="https://cbusevents.com" class="cat-chip"> Theater</a> <a href="https://cbusevents.com" class="cat-chip"> Nightlife</a> </div>
+</section> <section class="slider-section"> <div class="slider-label">Happening in Columbus</div> <div style="overflow:hidden"> <div class="slider-track" id="eventsSlider"></div> </div>
+</section> <section class="perks"> <div class="section-label">Why Create an Account</div> <div class="section-title">Your personal Columbus<br>event guide</div> <div class="section-sub">A free account gives you a personalized feed, saved events, and your tickets all in one place.</div> <div class="perks-grid"> <div class="perk-card"> <div class="perk-title">Personalized Feed</div> <div class="perk-desc">Follow your favorite venues and get a curated feed of events tailored to what you actually like.</div> </div> <div class="perk-card"> <div class="perk-title">Tickets in One Place</div> <div class="perk-desc">All your event tickets stored in your account dashboard. No more digging through email for confirmations.</div> </div> <div class="perk-card"> <div class="perk-title">Save Venues</div> <div class="perk-desc">Found a spot you love? Save it and get notified when they announce new events.</div> </div> <div class="perk-card"> <div class="perk-title">Save Events</div> <div class="perk-desc">Bookmark events you're interested in and come back to buy tickets when you're ready.</div> </div> <div class="perk-card"> <div class="perk-title">Follow Venues</div> <div class="perk-desc">Follow venues to always see their events first in your feed before they sell out.</div> </div> <div class="perk-card"> <div class="perk-icon">🆓</div> <div class="perk-title">Always Free</div> <div class="perk-desc">Attendee accounts are 100% free, forever. No subscriptions, no hidden fees.</div> </div> </div>
+</section> <section class="neighborhoods"> <div class="neighborhoods-inner"> <div class="section-label">Explore by Neighborhood</div> <div class="section-title">Columbus, block by block</div> <div class="hood-grid"> <a href="https://cbusevents.com" class="hood-card"><div class="hood-name">Short North</div><div class="hood-count">Arts & Nightlife</div></a> <a href="https://cbusevents.com" class="hood-card"><div class="hood-name">Arena District</div><div class="hood-count">Sports & Concerts</div></a> <a href="https://cbusevents.com" class="hood-card"><div class="hood-name">German Village</div><div class="hood-count">Historic & Dining</div></a> <a href="https://cbusevents.com" class="hood-card"><div class="hood-name">Downtown</div><div class="hood-count">Business & Events</div></a> <a href="https://cbusevents.com" class="hood-card"><div class="hood-name">Easton</div><div class="hood-count">Shopping & Food</div></a> <a href="https://cbusevents.com" class="hood-card"><div class="hood-name">Clintonville</div><div class="hood-count">Local & Chill</div></a> <a href="https://cbusevents.com" class="hood-card"><div class="hood-name">OSU / Campus</div><div class="hood-count">College & Culture</div></a> <a href="https://cbusevents.com" class="hood-card"><div class="hood-name">Grandview</div><div class="hood-count">Dining & Social</div></a> </div> </div>
+</section> <section class="cta-banner"> <h2>Columbus is happening.<br>Don't miss it.</h2> <p>Create your free account and get a personalized feed of Columbus events delivered to you.</p> <a href="https://cbusevents.com/auth.html?role=customer" class="btn-hero btn-hero-primary">Create Free Account →</a>
+</section> <footer> <span class="footer-copy">© 2026 CBUSEVENTS · Columbus, Ohio</span> <div style="display:flex;gap:20px;align-items:center"> <span class="footer-copy">Made for Columbus </span> <a href="https://cbusevents.com/cbus-admin.html" class="footer-admin">Admin</a> </div>
+</footer> <script src="https://unpkg.com/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <script>
 const sb=supabase.createClient("https://toblgvatvsjljbqogzsv.supabase.co","eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRvYmxndmF0dnNqbGpicW9nenN2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMDgwNTAsImV4cCI6MjA4NzY4NDA1MH0._WJEQPizNDiQfDXQB_DHPaQhixPGpMdmYQSmyWmm_FQ");
 const PLACEHOLDERS=[
-  {title:'Short North Art Crawl',category:'Arts',start_time:new Date(Date.now()+3*86400000).toISOString(),venues:{name:'Short North'},icon:'🎨'},
-  {title:'Columbus Food Fest',category:'Food & Drink',start_time:new Date(Date.now()+7*86400000).toISOString(),venues:{name:'Bicentennial Park'},icon:'🍽'},
-  {title:'Arena District Block Party',category:'Music',start_time:new Date(Date.now()+10*86400000).toISOString(),venues:{name:'Arena District'},icon:'🎵'},
-  {title:'German Village Wine Walk',category:'Social',start_time:new Date(Date.now()+14*86400000).toISOString(),venues:{name:'German Village'},icon:'🍷'},
-  {title:'Comedy Night at The Basement',category:'Comedy',start_time:new Date(Date.now()+5*86400000).toISOString(),venues:{name:'The Basement'},icon:'😂'},
-  {title:'Night Market Columbus',category:'Shopping',start_time:new Date(Date.now()+21*86400000).toISOString(),venues:{name:'North Market'},icon:'🌙'},
+ {title:'Short North Art Crawl',category:'Arts',start_time:new Date(Date.now()+3*86400000).toISOString(),venues:{name:'Short North'},icon:''},
+ {title:'Columbus Food Fest',category:'Food & Drink',start_time:new Date(Date.now()+7*86400000).toISOString(),venues:{name:'Bicentennial Park'},icon:''},
+ {title:'Arena District Block Party',category:'Music',start_time:new Date(Date.now()+10*86400000).toISOString(),venues:{name:'Arena District'},icon:''},
+ {title:'German Village Wine Walk',category:'Social',start_time:new Date(Date.now()+14*86400000).toISOString(),venues:{name:'German Village'},icon:''},
+ {title:'Comedy Night at The Basement',category:'Comedy',start_time:new Date(Date.now()+5*86400000).toISOString(),venues:{name:'The Basement'},icon:''},
+ {title:'Night Market Columbus',category:'Shopping',start_time:new Date(Date.now()+21*86400000).toISOString(),venues:{name:'North Market'},icon:''},
 ];
 async function loadSlider(){
-  const{data:events}=await sb.from('events').select('id,title,category,start_time,cover_image_url,venues(name)').eq('status','published').gte('start_time',new Date().toISOString()).order('rank_score',{ascending:false}).limit(12).catch(()=>({data:[]}));
-  const items=events?.length?events:PLACEHOLDERS;
-  const fmt=iso=>new Date(iso).toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'});
-  const makeCard=e=>`
-    <div class="event-card" onclick="window.location.href='https://cbusevents.com'">
-      <div class="event-card-img">${e.cover_image_url?`<img src="${e.cover_image_url}" alt="${e.title}" loading="lazy">`:(e.icon||'📅')}</div>
-      <div class="event-card-body">
-        <div class="event-card-cat">${e.category||'Event'}</div>
-        <div class="event-card-title">${e.title}</div>
-        <div class="event-card-meta">🏛 ${e.venues?.name||'Columbus'}</div>
-        <div class="event-card-date">📅 ${fmt(e.start_time)}</div>
-      </div>
-    </div>`;
-  const html=items.map(makeCard).join('');
-  document.getElementById('eventsSlider').innerHTML=html+html;
+ const{data:events}=await sb.from('events').select('id,title,category,start_time,cover_image_url,venues(name)').eq('status','published').gte('start_time',new Date().toISOString()).order('rank_score',{ascending:false}).limit(12).catch(()=>({data:[]}));
+ const items=events?.length?events:PLACEHOLDERS;
+ const fmt=iso=>new Date(iso).toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'});
+ const makeCard=e=>`
+ <div class="event-card" onclick="window.location.href='https://cbusevents.com'"> <div class="event-card-img">${e.cover_image_url?`<img src="${e.cover_image_url}" alt="${e.title}" loading="lazy">`:(e.icon||'')}</div> <div class="event-card-body"> <div class="event-card-cat">${e.category||'Event'}</div> <div class="event-card-title">${e.title}</div> <div class="event-card-meta"> ${e.venues?.name||'Columbus'}</div> <div class="event-card-date"> ${fmt(e.start_time)}</div> </div> </div>`;
+ const html=items.map(makeCard).join('');
+ document.getElementById('eventsSlider').innerHTML=html+html;
 }
 loadSlider();
 
 // ── DROPDOWN TOGGLE ───────────────────────────────────────────
 function toggleDrop(e){
-  e.stopPropagation();
-  const menu=document.querySelector('.dropdown-menu');
-  if(menu)menu.classList.toggle('open');
+ e.stopPropagation();
+ const menu=document.querySelector('.dropdown-menu');
+ if(menu)menu.classList.toggle('open');
 }
 document.addEventListener('click',function(){
-  const menu=document.querySelector('.dropdown-menu');
-  if(menu)menu.classList.remove('open');
+ const menu=document.querySelector('.dropdown-menu');
+ if(menu)menu.classList.remove('open');
 });
 </script>
 </body>

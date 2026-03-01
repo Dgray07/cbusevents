@@ -10,9 +10,9 @@
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
 :root{
-  --bg:#0b0b0f;--surface:#13131a;--card:#1a1a24;--border:#25252f;
-  --text:#e8e8f0;--sub:#8888a0;--muted:#55556a;
-  --orange:#FF6B35;--green:#22c55e;--red:#ef4444;--blue:#60a5fa;--gold:#f59e0b;
+ --bg:#0b0b0f;--surface:#13131a;--card:#1a1a24;--border:#25252f;
+ --text:#e8e8f0;--sub:#8888a0;--muted:#55556a;
+ --orange:#FF6B35;--green:#22c55e;--red:#ef4444;--blue:#60a5fa;--gold:#f59e0b;
 }
 body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;display:flex;min-height:100vh;}
 @keyframes spin{to{transform:rotate(360deg);}}
@@ -20,8 +20,8 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;dis
 
 /* SIDEBAR */
 .sidebar{
-  width:220px;flex-shrink:0;background:var(--surface);border-right:1px solid var(--border);
-  display:flex;flex-direction:column;position:sticky;top:0;height:100vh;overflow-y:auto;
+ width:220px;flex-shrink:0;background:var(--surface);border-right:1px solid var(--border);
+ display:flex;flex-direction:column;position:sticky;top:0;height:100vh;overflow-y:auto;
 }
 .sidebar-logo{padding:24px 20px 20px;border-bottom:1px solid var(--border);}
 .sidebar-logo-text{font-family:'Syne',sans-serif;font-size:18px;font-weight:800;}
@@ -29,8 +29,8 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;dis
 .sidebar-badge{background:var(--red);color:#fff;border-radius:4px;padding:2px 6px;font-size:9px;font-weight:700;margin-left:6px;}
 .sidebar-section{padding:16px 12px 8px;font-size:10px;color:var(--muted);font-weight:700;letter-spacing:1.5px;text-transform:uppercase;}
 .nav-item{
-  display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:8px;
-  margin:1px 8px;cursor:pointer;font-size:13px;font-weight:500;color:var(--sub);transition:all 0.15s;
+ display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:8px;
+ margin:1px 8px;cursor:pointer;font-size:13px;font-weight:500;color:var(--sub);transition:all 0.15s;
 }
 .nav-item:hover{background:var(--card);color:var(--text);}
 .nav-item.active{background:var(--card);color:var(--text);}
@@ -40,73 +40,73 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;dis
 .admin-tag{background:#FF6B3520;color:var(--orange);border:1px solid #FF6B3540;border-radius:6px;padding:4px 10px;font-size:11px;font-weight:600;text-align:center;}
 /* ── ADMIN MOBILE ─────────────────────────────────────────── */
 @media(max-width:768px){
-  /* App wrapper becomes column on mobile */
-  #app{flex-direction:column !important;align-items:stretch !important;}
+ /* App wrapper becomes column on mobile */
+ #app{flex-direction:column !important;align-items:stretch !important;}
 
-  /* Sidebar becomes horizontal bottom nav */
-  .sidebar{
-    width:100% !important;height:auto !important;
-    flex-direction:row !important;position:fixed !important;
-    bottom:0;top:auto !important;z-index:200;
-    border-right:none !important;border-top:1px solid var(--border) !important;
-    overflow-x:auto !important;overflow-y:hidden !important;
-    padding-bottom:env(safe-area-inset-bottom);
-  }
-  .sidebar-logo{display:none !important;}
-  .sidebar-section{display:none !important;}
-  .sidebar-bottom{display:none !important;}
-  .nav-item{
-    flex-direction:column !important;gap:3px !important;
-    padding:8px 6px !important;margin:0 !important;
-    border-radius:0 !important;font-size:9px !important;
-    min-width:56px;text-align:center;white-space:nowrap;
-    flex-shrink:0;
-  }
-  /* Show only emoji, hide text label on very small screens */
-  .nav-item-label{display:none;}
+ /* Sidebar becomes horizontal bottom nav */
+ .sidebar{
+ width:100% !important;height:auto !important;
+ flex-direction:row !important;position:fixed !important;
+ bottom:0;top:auto !important;z-index:200;
+ border-right:none !important;border-top:1px solid var(--border) !important;
+ overflow-x:auto !important;overflow-y:hidden !important;
+ padding-bottom:env(safe-area-inset-bottom);
+ }
+ .sidebar-logo{display:none !important;}
+ .sidebar-section{display:none !important;}
+ .sidebar-bottom{display:none !important;}
+ .nav-item{
+ flex-direction:column !important;gap:3px !important;
+ padding:8px 6px !important;margin:0 !important;
+ border-radius:0 !important;font-size:9px !important;
+ min-width:56px;text-align:center;white-space:nowrap;
+ flex-shrink:0;
+ }
+ /* Show only emoji, hide text label on very small screens */
+ .nav-item-label{display:none;}
 
-  /* Main content gets bottom padding so content isn't behind nav */
-  .main{padding-bottom:72px !important;}
+ /* Main content gets bottom padding so content isn't behind nav */
+ .main{padding-bottom:72px !important;}
 
-  /* Topbar */
-  .topbar{padding:0 16px !important;height:52px !important;}
-  .topbar-title{font-size:15px !important;}
-  .topbar-time{display:none;}
-  .topbar-site-btn{font-size:11px !important;padding:5px 10px !important;}
+ /* Topbar */
+ .topbar{padding:0 16px !important;height:52px !important;}
+ .topbar-title{font-size:15px !important;}
+ .topbar-time{display:none;}
+ .topbar-site-btn{font-size:11px !important;padding:5px 10px !important;}
 
-  /* Content */
-  .content{padding:16px !important;}
+ /* Content */
+ .content{padding:16px !important;}
 
-  /* Stat grid — 2 cols */
-  .stat-grid{grid-template-columns:1fr 1fr !important;gap:10px !important;}
-  .stat-card{padding:14px !important;}
-  .stat-num{font-size:26px !important;}
+ /* Stat grid — 2 cols */
+ .stat-grid{grid-template-columns:1fr 1fr !important;gap:10px !important;}
+ .stat-card{padding:14px !important;}
+ .stat-num{font-size:26px !important;}
 
-  /* Tables become cards */
-  table{display:none !important;}
+ /* Tables become cards */
+ table{display:none !important;}
 
-  /* Charts */
-  .chart-wrap{overflow-x:auto;}
+ /* Charts */
+ .chart-wrap{overflow-x:auto;}
 }
 
 @media(max-width:480px){
-  .topbar-site-btn{display:none;}
-  .stat-grid{grid-template-columns:1fr 1fr !important;}
+ .topbar-site-btn{display:none;}
+ .stat-grid{grid-template-columns:1fr 1fr !important;}
 }
 @media(max-width:768px){
-  #mobileMenuBtn{display:block !important;}
-  .main{padding-bottom:0 !important;}
+ #mobileMenuBtn{display:block !important;}
+ .main{padding-bottom:0 !important;}
 }
 
 
 /* MAIN */
 .main{flex:1;overflow-x:hidden;}
 .topbar{
-  position:sticky;top:0;z-index:50;
-  background:rgba(11,11,15,0.95);backdrop-filter:blur(12px);
-  border-bottom:1px solid var(--border);
-  display:flex;align-items:center;justify-content:space-between;
-  padding:0 32px;height:58px;
+ position:sticky;top:0;z-index:50;
+ background:rgba(11,11,15,0.95);backdrop-filter:blur(12px);
+ border-bottom:1px solid var(--border);
+ display:flex;align-items:center;justify-content:space-between;
+ padding:0 32px;height:58px;
 }
 .topbar-title{font-family:'Syne',sans-serif;font-size:17px;font-weight:800;}
 .topbar-right{display:flex;align-items:center;gap:12px;}
@@ -197,19 +197,8 @@ tr:hover td{background:rgba(255,255,255,0.02);}
 .rev-bar-label{font-size:10px;color:var(--muted);}
 </style>
 </head>
-<body>
-
-<div id="app" style="display:flex;width:100%;min-height:100vh;align-items:stretch;">
-  <div style="text-align:center;">
-    <div style="font-family:'Syne',sans-serif;font-size:24px;font-weight:800;margin-bottom:16px;">CBUS<span style="color:#FF6B35">EVENTS</span></div>
-    <div style="width:32px;height:32px;border:3px solid #25252f;border-top-color:#FF6B35;border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 12px;"></div>
-    <div style="color:#8888a0;font-size:13px;">Loading admin...</div>
-  </div>
-</div>
-
-<div id="toast" style="display:none" class="toast"></div>
-
-<script src="https://unpkg.com/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<body> <div id="app" style="display:flex;width:100%;min-height:100vh;align-items:stretch;"> <div style="text-align:center;"> <div style="font-family:'Syne',sans-serif;font-size:24px;font-weight:800;margin-bottom:16px;">CBUS<span style="color:#FF6B35">EVENTS</span></div> <div style="width:32px;height:32px;border:3px solid #25252f;border-top-color:#FF6B35;border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 12px;"></div> <div style="color:#8888a0;font-size:13px;">Loading admin...</div> </div>
+</div> <div id="toast" style="display:none" class="toast"></div> <script src="https://unpkg.com/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <script>
 const SB_URL="https://toblgvatvsjljbqogzsv.supabase.co";
 const SB_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRvYmxndmF0dnNqbGpicW9nenN2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMDgwNTAsImV4cCI6MjA4NzY4NDA1MH0._WJEQPizNDiQfDXQB_DHPaQhixPGpMdmYQSmyWmm_FQ";
@@ -225,991 +214,461 @@ let venueFilter='all',eventFilter='all',inquiryFilter='all';
 
 // ── MOBILE MENU ───────────────────────────────────────────────
 function toggleMobileMenu(){
-  const overlay=document.getElementById('mobileMenuOverlay');
-  const drawer=document.getElementById('mobileMenuDrawer');
-  const items=document.getElementById('mobileMenuItems');
-  const isOpen=drawer.style.transform==='translateX(0px)' || drawer.style.transform==='translateX(0%)';
-  if(!isOpen){
-    // Build menu items
-    const pages=[
-      {id:'dashboard',label:'📊 Dashboard'},
-      {id:'venues',label:'🏛 Venues'},
-      {id:'events',label:'📅 Events'},
-      {id:'inquiries',label:'💬 Inquiries'},
-      {id:'revenue',label:'💰 Revenue'},
-      {id:'design',label:'🎨 Design Requests'},
-      {id:'vendors',label:'🤝 Vendors'},
-      {id:'subscriptions',label:'💳 Subscriptions'},
-      {id:'users',label:'👥 Users'},
-      {id:'overrides',label:'⚙️ Overrides'},
-      {id:'claims',label:'🏷 Claims'},
-    ];
-    items.innerHTML=pages.map(p=>`
-      <div onclick="nav('${p.id}');toggleMobileMenu()" style="padding:12px 20px;font-size:14px;font-weight:500;color:${p.id===currentPage?'var(--orange)':'var(--sub)'};cursor:pointer;border-bottom:1px solid var(--border);background:${p.id===currentPage?'var(--card)':'transparent'}">${p.label}</div>
-    `).join('') + `
-      <div style="padding:16px 20px;margin-top:8px">
-        <button onclick="sb.auth.signOut().then(()=>{toggleMobileMenu();renderLogin();})" style="width:100%;background:none;border:1px solid var(--border);border-radius:8px;padding:10px;color:var(--muted);font-size:13px;cursor:pointer">Sign Out</button>
-      </div>`;
-    overlay.style.display='block';
-    drawer.style.display='block';
-    setTimeout(()=>{drawer.style.transform='translateX(0%)';},10);
-  } else {
-    drawer.style.transform='translateX(-100%)';
-    setTimeout(()=>{overlay.style.display='none';drawer.style.display='none';},250);
-  }
+ const overlay=document.getElementById('mobileMenuOverlay');
+ const drawer=document.getElementById('mobileMenuDrawer');
+ const items=document.getElementById('mobileMenuItems');
+ const isOpen=drawer.style.transform==='translateX(0px)' || drawer.style.transform==='translateX(0%)';
+ if(!isOpen){
+ // Build menu items
+ const pages=[
+ {id:'dashboard',label:' Dashboard'},
+ {id:'venues',label:' Venues'},
+ {id:'events',label:' Events'},
+ {id:'inquiries',label:' Inquiries'},
+ {id:'revenue',label:' Revenue'},
+ {id:'design',label:' Design Requests'},
+ {id:'vendors',label:' Vendors'},
+ {id:'subscriptions',label:' Subscriptions'},
+ {id:'users',label:' Users'},
+ {id:'overrides',label:' Overrides'},
+ {id:'claims',label:' Claims'},
+ ];
+ items.innerHTML=pages.map(p=>`
+ <div onclick="nav('${p.id}');toggleMobileMenu()" style="padding:12px 20px;font-size:14px;font-weight:500;color:${p.id===currentPage?'var(--orange)':'var(--sub)'};cursor:pointer;border-bottom:1px solid var(--border);background:${p.id===currentPage?'var(--card)':'transparent'}">${p.label}</div> `).join('') + `
+ <div style="padding:16px 20px;margin-top:8px"> <button onclick="sb.auth.signOut().then(()=>{toggleMobileMenu();renderLogin();})" style="width:100%;background:none;border:1px solid var(--border);border-radius:8px;padding:10px;color:var(--muted);font-size:13px;cursor:pointer">Sign Out</button> </div>`;
+ overlay.style.display='block';
+ drawer.style.display='block';
+ setTimeout(()=>{drawer.style.transform='translateX(0%)';},10);
+ } else {
+ drawer.style.transform='translateX(-100%)';
+ setTimeout(()=>{overlay.style.display='none';drawer.style.display='none';},250);
+ }
 }
 
 // ── TOAST ─────────────────────────────────────────────────────
 function toast(msg,type='success'){
-  const el=document.getElementById('toast');
-  el.textContent=msg;el.className=`toast ${type}`;el.style.display='block';
-  setTimeout(()=>el.style.display='none',3000);
+ const el=document.getElementById('toast');
+ el.textContent=msg;el.className=`toast ${type}`;el.style.display='block';
+ setTimeout(()=>el.style.display='none',3000);
 }
 
 // ── AUTH ──────────────────────────────────────────────────────
 async function init(){
-  const{data:{session}}=await sb.auth.getSession();
-  if(!session){renderLogin();return;}
-  const email=session.user.email;
-  if(!ADMIN_EMAILS.includes(email)){
-    document.getElementById('app').innerHTML=`<div class="login-wrap"><div class="login-card" style="text-align:center"><div style="font-size:48px;margin-bottom:16px">🚫</div><h2 style="font-family:Syne,sans-serif;font-size:20px;font-weight:800;margin-bottom:8px">Access Denied</h2><p style="color:var(--sub);font-size:14px">This portal is for CBUSEVENTS admins only.</p><button onclick="sb.auth.signOut().then(()=>renderLogin())" style="margin-top:20px;background:var(--orange);color:#fff;border:none;border-radius:8px;padding:10px 20px;font-size:14px;cursor:pointer">Sign Out</button></div></div>`;
-    return;
-  }
-  currentUser=session.user;
-  await loadData();
-  renderShell();
+ const{data:{session}}=await sb.auth.getSession();
+ if(!session){renderLogin();return;}
+ const email=session.user.email;
+ if(!ADMIN_EMAILS.includes(email)){
+ document.getElementById('app').innerHTML=`<div class="login-wrap"><div class="login-card" style="text-align:center"><div style="font-size:48px;margin-bottom:16px"></div><h2 style="font-family:Syne,sans-serif;font-size:20px;font-weight:800;margin-bottom:8px">Access Denied</h2><p style="color:var(--sub);font-size:14px">This portal is for CBUSEVENTS admins only.</p><button onclick="sb.auth.signOut().then(()=>renderLogin())" style="margin-top:20px;background:var(--orange);color:#fff;border:none;border-radius:8px;padding:10px 20px;font-size:14px;cursor:pointer">Sign Out</button></div></div>`;
+ return;
+ }
+ currentUser=session.user;
+ await loadData();
+ renderShell();
 }
 
 function renderLogin(){
-  document.getElementById('app').innerHTML=`
-    <div class="login-wrap">
-      <div class="login-card">
-        <div class="login-logo">CBUS<span>EVENTS</span></div>
-        <div style="color:var(--sub);font-size:13px;margin-bottom:28px">Admin Portal — restricted access</div>
-        <div class="field"><label>Email</label><input id="lEmail" type="email" placeholder="admin@email.com"></div>
-        <div class="field"><label>Password</label><input id="lPass" type="password" placeholder="••••••••"></div>
-        <div id="lErr" style="color:var(--red);font-size:13px;margin-bottom:12px;display:none"></div>
-        <button onclick="doLogin()" style="width:100%;background:var(--orange);color:#fff;border:none;border-radius:8px;padding:12px;font-size:14px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif">Sign In →</button>
-      </div>
-    </div>`;
+ document.getElementById('app').innerHTML=`
+ <div class="login-wrap"> <div class="login-card"> <div class="login-logo">CBUS<span>EVENTS</span></div> <div style="color:var(--sub);font-size:13px;margin-bottom:28px">Admin Portal — restricted access</div> <div class="field"><label>Email</label><input id="lEmail" type="email" placeholder="admin@email.com"></div> <div class="field"><label>Password</label><input id="lPass" type="password" placeholder="••••••••"></div> <div id="lErr" style="color:var(--red);font-size:13px;margin-bottom:12px;display:none"></div> <button onclick="doLogin()" style="width:100%;background:var(--orange);color:#fff;border:none;border-radius:8px;padding:12px;font-size:14px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif">Sign In →</button> </div> </div>`;
 }
 
 async function doLogin(){
-  const email=document.getElementById('lEmail').value;
-  const pass=document.getElementById('lPass').value;
-  const{error}=await sb.auth.signInWithPassword({email,password:pass});
-  if(error){const el=document.getElementById('lErr');el.textContent=error.message;el.style.display='block';return;}
-  await init();
+ const email=document.getElementById('lEmail').value;
+ const pass=document.getElementById('lPass').value;
+ const{error}=await sb.auth.signInWithPassword({email,password:pass});
+ if(error){const el=document.getElementById('lErr');el.textContent=error.message;el.style.display='block';return;}
+ await init();
 }
 
 // ── DATA ──────────────────────────────────────────────────────
 async function loadData(){
-  const[vRes,eRes,iRes,dRes,vendRes]=await Promise.all([
-    sb.from('venues').select('*').order('created_at',{ascending:false}),
-    sb.from('events').select('*,venues(name)').order('created_at',{ascending:false}),
-    sb.from('inquiries').select('*,venues(name)').order('created_at',{ascending:false}),
-    sb.from('design_requests').select('*').order('created_at',{ascending:false}),
-    sb.from('vendors').select('*').order('created_at',{ascending:false}).then(r=>r).catch(()=>({data:[]})),
-  ]);
-  allVenues=vRes.data||[];
-  allEvents=eRes.data||[];
-  allInquiries=iRes.data||[];
-  allDesignRequests=dRes.data||[];
-  allVendors=vendRes.data||[];
+ const[vRes,eRes,iRes,dRes,vendRes]=await Promise.all([
+ sb.from('venues').select('*').order('created_at',{ascending:false}),
+ sb.from('events').select('*,venues(name)').order('created_at',{ascending:false}),
+ sb.from('inquiries').select('*,venues(name)').order('created_at',{ascending:false}),
+ sb.from('design_requests').select('*').order('created_at',{ascending:false}),
+ sb.from('vendors').select('*').order('created_at',{ascending:false}).then(r=>r).catch(()=>({data:[]})),
+ ]);
+ allVenues=vRes.data||[];
+ allEvents=eRes.data||[];
+ allInquiries=iRes.data||[];
+ allDesignRequests=dRes.data||[];
+ allVendors=vendRes.data||[];
 }
 
 // ── SHELL ─────────────────────────────────────────────────────
 function renderShell(){
-  const pendingVenues=allVenues.filter(v=>v.status==='pending').length;
-  const newInquiries=allInquiries.filter(i=>i.status==='new').length;
-  const revenue=allVenues.filter(v=>v.tier==='standard').length*29+allVenues.filter(v=>v.tier==='premium').length*79;
+ const pendingVenues=allVenues.filter(v=>v.status==='pending').length;
+ const newInquiries=allInquiries.filter(i=>i.status==='new').length;
+ const revenue=allVenues.filter(v=>v.tier==='standard').length*29+allVenues.filter(v=>v.tier==='premium').length*79;
 
-  document.getElementById('app').innerHTML=`
-    <div class="sidebar">
-      <div class="sidebar-logo">
-        <div class="sidebar-logo-text">CBUS<span>EVENTS</span></div>
-        <div style="font-size:11px;color:var(--muted);margin-top:3px">Admin Portal</div>
-      </div>
-      <div class="sidebar-section">Main</div>
-      <div class="nav-item" onclick="window.location.href='https://cbusevents.com'" style="border-bottom:1px solid var(--border);margin-bottom:4px;padding-bottom:12px">🏠 Home</div>
-      <div class="nav-item ${currentPage==='dashboard'?'active':''}" onclick="nav('dashboard')">📊 Dashboard</div>
-      <div class="nav-item ${currentPage==='venues'?'active':''}" onclick="nav('venues')">🏛 Venues ${pendingVenues?`<span class="badge">${pendingVenues}</span>`:''}</div>
-      <div class="nav-item ${currentPage==='events'?'active':''}" onclick="nav('events')">📅 Events</div>
-      <div class="nav-item ${currentPage==='inquiries'?'active':''}" onclick="nav('inquiries')">💬 Inquiries ${newInquiries?`<span class="badge green">${newInquiries}</span>`:''}</div>
-      <div class="sidebar-section">Revenue</div>
-      <div class="nav-item ${currentPage==='revenue'?'active':''}" onclick="nav('revenue')">💰 Revenue</div>
-      <div class="nav-item ${currentPage==='design'?'active':''}" onclick="nav('design')">🎨 Design Requests ${allDesignRequests.filter(d=>d.status==='new').length?`<span class="badge">${allDesignRequests.filter(d=>d.status==='new').length}</span>`:''}</div>
-      <div class="sidebar-section">Platform</div>
-      <div class="nav-item ${currentPage==='vendors'?'active':''}" onclick="nav('vendors')">🤝 Vendors</div>
-      <div class="nav-item ${currentPage==='subscriptions'?'active':''}" onclick="nav('subscriptions')">💳 Subscriptions</div>
-      <div class="nav-item ${currentPage==='users'?'active':''}" onclick="nav('users')">👥 Users</div>
-      <div class="nav-item ${currentPage==='overrides'?'active':''}" onclick="nav('overrides')">⚙️ Overrides</div>
-      <div class="nav-item ${currentPage==='claims'?'active':''}" onclick="nav('claims')">🏷 Claims <span style='background:#ef4444;color:#fff;border-radius:20px;padding:1px 7px;font-size:10px;font-weight:700;margin-left:auto' id='claimsBadge' style='display:none'></span></div>
-      <div class="sidebar-bottom">
-        <div class="admin-tag">⚡ Admin</div>
-        <button onclick="sb.auth.signOut().then(()=>renderLogin())" style="width:100%;margin-top:10px;background:none;border:1px solid var(--border);border-radius:7px;padding:7px;color:var(--muted);font-size:12px;cursor:pointer;font-family:'DM Sans',sans-serif">Sign Out</button>
-      </div>
-    </div>
-    <div class="main">
-      <div class="topbar">
-        <div style="display:flex;align-items:center;gap:12px">
-          <button id="mobileMenuBtn" onclick="toggleMobileMenu()" style="display:none;background:none;border:none;color:var(--text);font-size:22px;cursor:pointer;padding:4px;line-height:1">☰</button>
-          <div class="topbar-title" id="topbarTitle">Dashboard</div>
-        </div>
-        <div class="topbar-right">
-          <span class="topbar-time" id="topbarTime"></span>
-          <button class="topbar-site-btn" onclick="window.open('https://cbusevents.com','_blank')">View Site ↗</button>
-          <button class="topbar-site-btn" onclick="window.open('https://cbusevents.com/cbus-venue-portal.html','_blank')">Venue Portal ↗</button>
-        </div>
-      </div>
-      <div id="mobileMenuOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:300;" onclick="toggleMobileMenu()"></div>
-      <div id="mobileMenuDrawer" style="display:none;position:fixed;left:0;top:0;bottom:0;width:240px;background:var(--surface);border-right:1px solid var(--border);z-index:301;overflow-y:auto;padding-bottom:32px;transform:translateX(-100%);transition:transform 0.25s ease;">
-        <div style="padding:20px 16px 16px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center">
-          <div style="font-family:'Syne',sans-serif;font-size:17px;font-weight:800">CBUS<span style="color:#FF6B35">EVENTS</span></div>
-          <button onclick="toggleMobileMenu()" style="background:none;border:none;color:var(--sub);font-size:20px;cursor:pointer">✕</button>
-        </div>
-        <div id="mobileMenuItems"></div>
-      </div>
-      <div class="content" id="pageContent"></div>
-    </div>
-    <div id="modalContainer"></div>
-  `;
+ document.getElementById('app').innerHTML=`
+ <div class="sidebar"> <div class="sidebar-logo"> <div class="sidebar-logo-text">CBUS<span>EVENTS</span></div> <div style="font-size:11px;color:var(--muted);margin-top:3px">Admin Portal</div> </div> <div class="sidebar-section">Main</div> <div class="nav-item" onclick="window.location.href='https://cbusevents.com'" style="border-bottom:1px solid var(--border);margin-bottom:4px;padding-bottom:12px"> Home</div> <div class="nav-item ${currentPage==='dashboard'?'active':''}" onclick="nav('dashboard')"> Dashboard</div> <div class="nav-item ${currentPage==='venues'?'active':''}" onclick="nav('venues')"> Venues ${pendingVenues?`<span class="badge">${pendingVenues}</span>`:''}</div> <div class="nav-item ${currentPage==='events'?'active':''}" onclick="nav('events')"> Events</div> <div class="nav-item ${currentPage==='inquiries'?'active':''}" onclick="nav('inquiries')"> Inquiries ${newInquiries?`<span class="badge green">${newInquiries}</span>`:''}</div> <div class="sidebar-section">Revenue</div> <div class="nav-item ${currentPage==='revenue'?'active':''}" onclick="nav('revenue')"> Revenue</div> <div class="nav-item ${currentPage==='design'?'active':''}" onclick="nav('design')"> Design Requests ${allDesignRequests.filter(d=>d.status==='new').length?`<span class="badge">${allDesignRequests.filter(d=>d.status==='new').length}</span>`:''}</div> <div class="sidebar-section">Platform</div> <div class="nav-item ${currentPage==='vendors'?'active':''}" onclick="nav('vendors')"> Vendors</div> <div class="nav-item ${currentPage==='subscriptions'?'active':''}" onclick="nav('subscriptions')"> Subscriptions</div> <div class="nav-item ${currentPage==='users'?'active':''}" onclick="nav('users')"> Users</div> <div class="nav-item ${currentPage==='overrides'?'active':''}" onclick="nav('overrides')"> Overrides</div> <div class="nav-item ${currentPage==='claims'?'active':''}" onclick="nav('claims')"> Claims <span style='background:#ef4444;color:#fff;border-radius:20px;padding:1px 7px;font-size:10px;font-weight:700;margin-left:auto' id='claimsBadge' style='display:none'></span></div> <div class="sidebar-bottom"> <div class="admin-tag"> Admin</div> <button onclick="sb.auth.signOut().then(()=>renderLogin())" style="width:100%;margin-top:10px;background:none;border:1px solid var(--border);border-radius:7px;padding:7px;color:var(--muted);font-size:12px;cursor:pointer;font-family:'DM Sans',sans-serif">Sign Out</button> </div> </div> <div class="main"> <div class="topbar"> <div style="display:flex;align-items:center;gap:12px"> <button id="mobileMenuBtn" onclick="toggleMobileMenu()" style="display:none;background:none;border:none;color:var(--text);font-size:22px;cursor:pointer;padding:4px;line-height:1"></button> <div class="topbar-title" id="topbarTitle">Dashboard</div> </div> <div class="topbar-right"> <span class="topbar-time" id="topbarTime"></span> <button class="topbar-site-btn" onclick="window.open('https://cbusevents.com','_blank')">View Site ↗</button> <button class="topbar-site-btn" onclick="window.open('https://cbusevents.com/cbus-venue-portal.html','_blank')">Venue Portal ↗</button> </div> </div> <div id="mobileMenuOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:300;" onclick="toggleMobileMenu()">×</div> <div id="mobileMenuDrawer" style="display:none;position:fixed;left:0;top:0;bottom:0;width:240px;background:var(--surface);border-right:1px solid var(--border);z-index:301;overflow-y:auto;padding-bottom:32px;transform:translateX(-100%);transition:transform 0.25s ease;"> <div style="padding:20px 16px 16px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center"> <div style="font-family:'Syne',sans-serif;font-size:17px;font-weight:800">CBUS<span style="color:#FF6B35">EVENTS</span></div> <button onclick="toggleMobileMenu()" style="background:none;border:none;color:var(--sub);font-size:20px;cursor:pointer"></button> </div> <div id="mobileMenuItems"></div> </div> <div class="content" id="pageContent"></div> </div> <div id="modalContainer"></div> `;
 
-  // Live clock
-  setInterval(()=>{
-    const el=document.getElementById('topbarTime');
-    if(el)el.textContent=new Date().toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
-  },1000);
+ // Live clock
+ setInterval(()=>{
+ const el=document.getElementById('topbarTime');
+ if(el)el.textContent=new Date().toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
+ },1000);
 
-  renderPage();
+ renderPage();
 }
 
 function nav(page){
-  currentPage=page;
-  document.querySelectorAll('.nav-item').forEach(el=>el.classList.remove('active'));
-  document.querySelectorAll('.nav-item').forEach(el=>{if(el.textContent.toLowerCase().includes(page))el.classList.add('active');});
-  const title={dashboard:'Dashboard',venues:'Venues',events:'Events',inquiries:'Inquiries',revenue:'Revenue',design:'Design Requests',vendors:'Vendors',subscriptions:'Subscriptions',users:'Users',overrides:'Overrides',claims:'Listing Claims'};
-  const el=document.getElementById('topbarTitle');
-  if(el)el.textContent=title[page]||page;
-  renderPage();
+ currentPage=page;
+ document.querySelectorAll('.nav-item').forEach(el=>el.classList.remove('active'));
+ document.querySelectorAll('.nav-item').forEach(el=>{if(el.textContent.toLowerCase().includes(page))el.classList.add('active');});
+ const title={dashboard:'Dashboard',venues:'Venues',events:'Events',inquiries:'Inquiries',revenue:'Revenue',design:'Design Requests',vendors:'Vendors',subscriptions:'Subscriptions',users:'Users',overrides:'Overrides',claims:'Listing Claims'};
+ const el=document.getElementById('topbarTitle');
+ if(el)el.textContent=title[page]||page;
+ renderPage();
 }
 
 function renderPage(){
-  if(currentPage==='dashboard')renderDashboard();
-  else if(currentPage==='venues')renderVenues();
-  else if(currentPage==='events')renderEvents();
-  else if(currentPage==='inquiries')renderInquiries();
-  else if(currentPage==='revenue')renderRevenue();
-  else if(currentPage==='design')renderDesignRequests();
-  else if(currentPage==='vendors')renderVendors();
-  else if(currentPage==='subscriptions')renderSubscriptions();
-  else if(currentPage==='users')renderUsers();
-  else if(currentPage==='overrides')renderOverrides();
-  else if(currentPage==='claims')renderClaims();
+ if(currentPage==='dashboard')renderDashboard();
+ else if(currentPage==='venues')renderVenues();
+ else if(currentPage==='events')renderEvents();
+ else if(currentPage==='inquiries')renderInquiries();
+ else if(currentPage==='revenue')renderRevenue();
+ else if(currentPage==='design')renderDesignRequests();
+ else if(currentPage==='vendors')renderVendors();
+ else if(currentPage==='subscriptions')renderSubscriptions();
+ else if(currentPage==='users')renderUsers();
+ else if(currentPage==='overrides')renderOverrides();
+ else if(currentPage==='claims')renderClaims();
 }
 
 // ── DASHBOARD ─────────────────────────────────────────────────
 function renderDashboard(){
-  const approved=allVenues.filter(v=>v.status==='approved').length;
-  const pending=allVenues.filter(v=>v.status==='pending').length;
-  const premium=allVenues.filter(v=>v.tier==='premium').length;
-  const standard=allVenues.filter(v=>v.tier==='standard').length;
-  const revenue=standard*29+premium*79;
-  const newInq=allInquiries.filter(i=>i.status==='new').length;
-  const thisWeekEvents=allEvents.filter(e=>{const d=new Date(e.start_time),n=new Date();return d>=n&&d<=new Date(n.getTime()+7*86400000);}).length;
+ const approved=allVenues.filter(v=>v.status==='approved').length;
+ const pending=allVenues.filter(v=>v.status==='pending').length;
+ const premium=allVenues.filter(v=>v.tier==='premium').length;
+ const standard=allVenues.filter(v=>v.tier==='standard').length;
+ const revenue=standard*29+premium*79;
+ const newInq=allInquiries.filter(i=>i.status==='new').length;
+ const thisWeekEvents=allEvents.filter(e=>{const d=new Date(e.start_time),n=new Date();return d>=n&&d<=new Date(n.getTime()+7*86400000);}).length;
 
-  document.getElementById('pageContent').innerHTML=`
-    <div class="stat-grid">
-      <div class="stat-card">
-        <div class="stat-card-icon">🏛</div>
-        <div class="stat-card-num">${allVenues.length}</div>
-        <div class="stat-card-label">Total Venues</div>
-        <div class="stat-card-sub" style="color:var(--green)">${approved} approved · ${pending} pending</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-card-icon">💰</div>
-        <div class="stat-card-num" style="color:var(--green)">$${revenue}</div>
-        <div class="stat-card-label">Monthly Revenue (est.)</div>
-        <div class="stat-card-sub" style="color:var(--sub)">${standard} standard · ${premium} premium</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-card-icon">💬</div>
-        <div class="stat-card-num" style="color:${newInq?'var(--orange)':'var(--text)'}">${newInq}</div>
-        <div class="stat-card-label">New Inquiries</div>
-        <div class="stat-card-sub" style="color:var(--sub)">${allInquiries.length} total</div>
-      </div>
-      <div class="stat-card" onclick="nav('design')" style="cursor:pointer">
-        <div class="stat-card-icon">🎨</div>
-        <div class="stat-card-num" style="color:${allDesignRequests.filter(d=>d.status==='new').length?'var(--gold)':'var(--text)'}">${allDesignRequests.filter(d=>d.status==='new').length}</div>
-        <div class="stat-card-label">Design Requests</div>
-        <div class="stat-card-sub" style="color:var(--sub)">${allDesignRequests.length} total</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-card-icon">📅</div>
-        <div class="stat-card-num">${thisWeekEvents}</div>
-        <div class="stat-card-label">Events This Week</div>
-        <div class="stat-card-sub" style="color:var(--sub)">${allEvents.length} total upcoming</div>
-      </div>
-    </div>
+ document.getElementById('pageContent').innerHTML=`
+ <div class="stat-grid"> <div class="stat-card"> <div class="stat-card-num">${allVenues.length}</div> <div class="stat-card-label">Total Venues</div> <div class="stat-card-sub" style="color:var(--green)">${approved} approved · ${pending} pending</div> </div> <div class="stat-card"> <div class="stat-card-num" style="color:var(--green)">$${revenue}</div> <div class="stat-card-label">Monthly Revenue (est.)</div> <div class="stat-card-sub" style="color:var(--sub)">${standard} standard · ${premium} premium</div> </div> <div class="stat-card"> <div class="stat-card-num" style="color:${newInq?'var(--orange)':'var(--text)'}">${newInq}</div> <div class="stat-card-label">New Inquiries</div> <div class="stat-card-sub" style="color:var(--sub)">${allInquiries.length} total</div> </div> <div class="stat-card" onclick="nav('design')" style="cursor:pointer"> <div class="stat-card-num" style="color:${allDesignRequests.filter(d=>d.status==='new').length?'var(--gold)':'var(--text)'}">${allDesignRequests.filter(d=>d.status==='new').length}</div> <div class="stat-card-label">Design Requests</div> <div class="stat-card-sub" style="color:var(--sub)">${allDesignRequests.length} total</div> </div> <div class="stat-card"> <div class="stat-card-num">${thisWeekEvents}</div> <div class="stat-card-label">Events This Week</div> <div class="stat-card-sub" style="color:var(--sub)">${allEvents.length} total upcoming</div> </div> </div> <!-- Pending venues --> ${pending?`
+ <div class="table-card"> <div class="table-header"> <div class="table-title"> Pending Approval (${pending})</div> <button class="btn btn-ghost btn-sm" onclick="nav('venues')">View All →</button> </div> <table> <thead><tr><th>Venue</th><th>Type</th><th>Submitted</th><th>Actions</th></tr></thead> <tbody> ${allVenues.filter(v=>v.status==='pending').map(v=>`
+ <tr> <td><strong>${v.name}</strong><div style="font-size:11px;color:var(--muted)">${v.neighborhood||v.city||''}</div></td> <td>${v.venue_type||'—'}</td> <td style="color:var(--muted)">${new Date(v.created_at).toLocaleDateString()}</td> <td><div style="display:flex;gap:6px"> <button class="btn btn-success btn-sm" onclick="approveVenue('${v.id}')"> Approve</button> <button class="btn btn-danger btn-sm" onclick="rejectVenue('${v.id}')"> Reject</button> </div></td> </tr>`).join('')}
+ </tbody> </table> </div>`:'<div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:20px 24px;margin-bottom:24px;display:flex;align-items:center;gap:10px;color:var(--green);font-size:14px;font-weight:500"> No pending venues — all caught up!</div>'}
 
-    <!-- Pending venues -->
-    ${pending?`
-    <div class="table-card">
-      <div class="table-header">
-        <div class="table-title">⚠ Pending Approval (${pending})</div>
-        <button class="btn btn-ghost btn-sm" onclick="nav('venues')">View All →</button>
-      </div>
-      <table>
-        <thead><tr><th>Venue</th><th>Type</th><th>Submitted</th><th>Actions</th></tr></thead>
-        <tbody>
-          ${allVenues.filter(v=>v.status==='pending').map(v=>`
-            <tr>
-              <td><strong>${v.name}</strong><div style="font-size:11px;color:var(--muted)">${v.neighborhood||v.city||''}</div></td>
-              <td>${v.venue_type||'—'}</td>
-              <td style="color:var(--muted)">${new Date(v.created_at).toLocaleDateString()}</td>
-              <td><div style="display:flex;gap:6px">
-                <button class="btn btn-success btn-sm" onclick="approveVenue('${v.id}')">✓ Approve</button>
-                <button class="btn btn-danger btn-sm" onclick="rejectVenue('${v.id}')">✕ Reject</button>
-              </div></td>
-            </tr>`).join('')}
-        </tbody>
-      </table>
-    </div>`:'<div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:20px 24px;margin-bottom:24px;display:flex;align-items:center;gap:10px;color:var(--green);font-size:14px;font-weight:500">✓ No pending venues — all caught up!</div>'}
-
-    <!-- Recent inquiries -->
-    <div class="table-card">
-      <div class="table-header">
-        <div class="table-title">💬 Recent Inquiries</div>
-        <button class="btn btn-ghost btn-sm" onclick="nav('inquiries')">View All →</button>
-      </div>
-      <table>
-        <thead><tr><th>From</th><th>Venue</th><th>Date</th><th>Status</th></tr></thead>
-        <tbody>
-          ${allInquiries.slice(0,5).map(i=>`
-            <tr>
-              <td><strong>${i.name}</strong><div style="font-size:11px;color:var(--muted)">${i.email}</div></td>
-              <td style="color:var(--sub)">${i.venues?.name||'—'}</td>
-              <td style="color:var(--muted)">${new Date(i.created_at).toLocaleDateString()}</td>
-              <td><span class="badge ${i.status==='new'?'badge-orange':'badge-muted'}">${i.status}</span></td>
-            </tr>`).join('')||'<tr class="empty-row"><td colspan="4">No inquiries yet</td></tr>'}
-        </tbody>
-      </table>
-    </div>
-  `;
+ <!-- Recent inquiries --> <div class="table-card"> <div class="table-header"> <div class="table-title"> Recent Inquiries</div> <button class="btn btn-ghost btn-sm" onclick="nav('inquiries')">View All →</button> </div> <table> <thead><tr><th>From</th><th>Venue</th><th>Date</th><th>Status</th></tr></thead> <tbody> ${allInquiries.slice(0,5).map(i=>`
+ <tr> <td><strong>${i.name}</strong><div style="font-size:11px;color:var(--muted)">${i.email}</div></td> <td style="color:var(--sub)">${i.venues?.name||'—'}</td> <td style="color:var(--muted)">${new Date(i.created_at).toLocaleDateString()}</td> <td><span class="badge ${i.status==='new'?'badge-orange':'badge-muted'}">${i.status}</span></td> </tr>`).join('')||'<tr class="empty-row"><td colspan="4">No inquiries yet</td></tr>'}
+ </tbody> </table> </div> `;
 }
 
 // ── VENUES ────────────────────────────────────────────────────
 function renderVenues(){
-  const filters={all:allVenues,pending:allVenues.filter(v=>v.status==='pending'),approved:allVenues.filter(v=>v.status==='approved'),premium:allVenues.filter(v=>v.tier==='premium'),standard:allVenues.filter(v=>v.tier==='standard')};
-  const filtered=filters[venueFilter]||allVenues;
+ const filters={all:allVenues,pending:allVenues.filter(v=>v.status==='pending'),approved:allVenues.filter(v=>v.status==='approved'),premium:allVenues.filter(v=>v.tier==='premium'),standard:allVenues.filter(v=>v.tier==='standard')};
+ const filtered=filters[venueFilter]||allVenues;
 
-  document.getElementById('pageContent').innerHTML=`
-    <div class="table-card">
-      <div class="table-header">
-        <div class="table-title">All Venues (${allVenues.length})</div>
-        <div class="table-actions">
-          <button class="btn btn-primary btn-sm" onclick="openAddVenueModal()">+ Add Venue</button>
-        </div>
-      </div>
-      <div class="filter-row">
-        ${['all','pending','approved','premium','standard'].map(f=>`
-          <button class="filter-chip${venueFilter===f?' active':''}" onclick="venueFilter='${f}';renderVenues()">${f.charAt(0).toUpperCase()+f.slice(1)} ${f==='all'?'('+allVenues.length+')':f==='pending'?'('+filters.pending.length+')':f==='approved'?'('+filters.approved.length+')':f==='premium'?'('+filters.premium.length+')':'('+filters.standard.length+')'}</button>
-        `).join('')}
-        <input class="search-input" placeholder="Search venues..." oninput="searchVenues(this.value)" style="margin-left:auto">
-      </div>
-      <table>
-        <thead><tr><th>Venue</th><th>Type</th><th>Neighborhood</th><th>Status</th><th>Plan</th><th>Featured</th><th>Actions</th></tr></thead>
-        <tbody id="venueTableBody">
-          ${renderVenueRows(filtered)}
-        </tbody>
-      </table>
-    </div>
-  `;
+ document.getElementById('pageContent').innerHTML=`
+ <div class="table-card"> <div class="table-header"> <div class="table-title">All Venues (${allVenues.length})</div> <div class="table-actions"> <button class="btn btn-primary btn-sm" onclick="openAddVenueModal()">+ Add Venue</button> </div> </div> <div class="filter-row"> ${['all','pending','approved','premium','standard'].map(f=>`
+ <button class="filter-chip${venueFilter===f?' active':''}" onclick="venueFilter='${f}';renderVenues()">${f.charAt(0).toUpperCase()+f.slice(1)} ${f==='all'?'('+allVenues.length+')':f==='pending'?'('+filters.pending.length+')':f==='approved'?'('+filters.approved.length+')':f==='premium'?'('+filters.premium.length+')':'('+filters.standard.length+')'}</button> `).join('')}
+ <input class="search-input" placeholder="Search venues..." oninput="searchVenues(this.value)" style="margin-left:auto"> </div> <table> <thead><tr><th>Venue</th><th>Type</th><th>Neighborhood</th><th>Status</th><th>Plan</th><th>Featured</th><th>Actions</th></tr></thead> <tbody id="venueTableBody"> ${renderVenueRows(filtered)}
+ </tbody> </table> </div> `;
 }
 
 function renderVenueRows(venues){
-  if(!venues.length)return'<tr class="empty-row"><td colspan="6">No venues found</td></tr>';
-  return venues.map(v=>`
-    <tr>
-      <td>
-        <strong style="font-size:13px">${v.name}</strong>
-        ${v.website?`<div style="font-size:11px"><a href="${v.website}" target="_blank" style="color:var(--orange)">${v.website.replace('https://','')}</a></div>`:''}
-      </td>
-      <td style="color:var(--sub)">${v.venue_type||'—'}</td>
-      <td style="color:var(--sub)">${v.neighborhood||'—'}</td>
-      <td><span class="badge ${v.status==='approved'?'badge-green':v.status==='pending'?'badge-orange':'badge-red'}">${v.status}</span></td>
-      <td><span class="badge ${v.tier==='premium'?'badge-gold':v.tier==='standard'?'badge-blue':'badge-muted'}">${v.tier||'free'}</span></td>
-      <td>${v.is_featured?'<span class="badge badge-gold">⭐ Yes</span>':'<span class="badge badge-muted">—</span>'}</td>
-      <td>
-        <div style="display:flex;gap:5px;flex-wrap:wrap">
-          ${v.status==='pending'?`<button class="btn btn-success btn-sm" onclick="approveVenue('${v.id}')">✓</button>`:''}
-          ${v.status!=='rejected'?`<button class="btn btn-ghost btn-sm" onclick="openTierModal('${v.id}')">Tier</button>`:''}
-          <button class="btn btn-ghost btn-sm" onclick="toggleVenueFeature('${v.id}',${!v.is_featured})">${v.is_featured?'Unfeature':'⭐ Feature'}</button>
-          <button class="btn btn-danger btn-sm" onclick="deleteVenue('${v.id}','${v.name.replace(/'/g,"\\'")}')">✕</button>
-        </div>
-      </td>
-    </tr>`).join('');
+ if(!venues.length)return'<tr class="empty-row"><td colspan="6">No venues found</td></tr>';
+ return venues.map(v=>`
+ <tr> <td> <strong style="font-size:13px">${v.name}</strong> ${v.website?`<div style="font-size:11px"><a href="${v.website}" target="_blank" style="color:var(--orange)">${v.website.replace('https://','')}</a></div>`:''}
+ </td> <td style="color:var(--sub)">${v.venue_type||'—'}</td> <td style="color:var(--sub)">${v.neighborhood||'—'}</td> <td><span class="badge ${v.status==='approved'?'badge-green':v.status==='pending'?'badge-orange':'badge-red'}">${v.status}</span></td> <td><span class="badge ${v.tier==='premium'?'badge-gold':v.tier==='standard'?'badge-blue':'badge-muted'}">${v.tier||'free'}</span></td> <td>${v.is_featured?'<span class="badge badge-gold">⭐ Yes</span>':'<span class="badge badge-muted">—</span>'}</td> <td> <div style="display:flex;gap:5px;flex-wrap:wrap"> ${v.status==='pending'?`<button class="btn btn-success btn-sm" onclick="approveVenue('${v.id}')">Approve</button>`:''}
+ ${v.status!=='rejected'?`<button class="btn btn-ghost btn-sm" onclick="openTierModal('${v.id}')">Tier</button>`:''}
+ <button class="btn btn-ghost btn-sm" onclick="toggleVenueFeature('${v.id}',${!v.is_featured})">${v.is_featured?'Unfeature':'⭐ Feature'}</button> <button class="btn btn-danger btn-sm" onclick="deleteVenue('${v.id}','${v.name.replace(/'/g,"\\'")}')"></button> </div> </td> </tr>`).join('');
 }
 
 function searchVenues(q){
-  const f=allVenues.filter(v=>v.name.toLowerCase().includes(q.toLowerCase())||(v.venue_type||'').toLowerCase().includes(q.toLowerCase())||(v.neighborhood||'').toLowerCase().includes(q.toLowerCase()));
-  const el=document.getElementById('venueTableBody');
-  if(el)el.innerHTML=renderVenueRows(f);
+ const f=allVenues.filter(v=>v.name.toLowerCase().includes(q.toLowerCase())||(v.venue_type||'').toLowerCase().includes(q.toLowerCase())||(v.neighborhood||'').toLowerCase().includes(q.toLowerCase()));
+ const el=document.getElementById('venueTableBody');
+ if(el)el.innerHTML=renderVenueRows(f);
 }
 
 // ── EVENTS ────────────────────────────────────────────────────
 function renderEvents(){
-  const filters={all:allEvents,published:allEvents.filter(e=>e.status==='published'),draft:allEvents.filter(e=>e.status==='draft')};
-  const filtered=filters[eventFilter]||allEvents;
+ const filters={all:allEvents,published:allEvents.filter(e=>e.status==='published'),draft:allEvents.filter(e=>e.status==='draft')};
+ const filtered=filters[eventFilter]||allEvents;
 
-  document.getElementById('pageContent').innerHTML=`
-    <div class="table-card">
-      <div class="table-header">
-        <div class="table-title">All Events (${allEvents.length})</div>
-      </div>
-      <div class="filter-row">
-        ${['all','published','draft'].map(f=>`
-          <button class="filter-chip${eventFilter===f?' active':''}" onclick="eventFilter='${f}';renderEvents()">${f.charAt(0).toUpperCase()+f.slice(1)} (${(filters[f]||[]).length})</button>
-        `).join('')}
-        <input class="search-input" placeholder="Search events..." oninput="searchEvents(this.value)" style="margin-left:auto">
-      </div>
-      <table>
-        <thead><tr><th>Event</th><th>Venue</th><th>Date</th><th>Category</th><th>Status</th><th>Boost</th><th>Actions</th></tr></thead>
-        <tbody id="eventTableBody">
-          ${renderEventRows(filtered)}
-        </tbody>
-      </table>
-    </div>
-  `;
+ document.getElementById('pageContent').innerHTML=`
+ <div class="table-card"> <div class="table-header"> <div class="table-title">All Events (${allEvents.length})</div> </div> <div class="filter-row"> ${['all','published','draft'].map(f=>`
+ <button class="filter-chip${eventFilter===f?' active':''}" onclick="eventFilter='${f}';renderEvents()">${f.charAt(0).toUpperCase()+f.slice(1)} (${(filters[f]||[]).length})</button> `).join('')}
+ <input class="search-input" placeholder="Search events..." oninput="searchEvents(this.value)" style="margin-left:auto"> </div> <table> <thead><tr><th>Event</th><th>Venue</th><th>Date</th><th>Category</th><th>Status</th><th>Boost</th><th>Actions</th></tr></thead> <tbody id="eventTableBody"> ${renderEventRows(filtered)}
+ </tbody> </table> </div> `;
 }
 
 function renderEventRows(events){
-  if(!events.length)return'<tr class="empty-row"><td colspan="6">No events found</td></tr>';
-  return events.map(e=>`
-    <tr>
-      <td><strong>${e.title}</strong>${e.is_free?'<span style="color:var(--green);font-size:11px;margin-left:6px">FREE</span>':e.price_min?`<span style="font-size:11px;color:var(--sub);margin-left:6px">$${e.price_min}</span>`:''}</td>
-      <td style="color:var(--sub)">${e.venues?.name||'—'}</td>
-      <td style="color:var(--muted)">${new Date(e.start_time).toLocaleDateString()} ${new Date(e.start_time).toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'})}</td>
-      <td style="color:var(--sub)">${e.category||'—'}</td>
-      <td><span class="badge ${e.status==='published'?'badge-green':'badge-muted'}">${e.status}</span></td>
-      <td>${e.is_boosted?`<span class="badge badge-gold">⚡ ${e.boost_type||'boosted'}</span>`:`<span class="badge badge-muted">—</span>`}</td>
-      <td><div style="display:flex;gap:5px;flex-wrap:wrap">
-        <button class="btn btn-ghost btn-sm" onclick="toggleEventBoost('${e.id}',${!e.is_boosted})">${e.is_boosted?'↓ Unboost':'⚡ Boost'}</button>
-        <button class="btn btn-danger btn-sm" onclick="deleteEvent('${e.id}','${e.title.replace(/'/g,"\\'")}')">✕</button>
-      </div></td>
-    </tr>`).join('');
+ if(!events.length)return'<tr class="empty-row"><td colspan="6">No events found</td></tr>';
+ return events.map(e=>`
+ <tr> <td><strong>${e.title}</strong>${e.is_free?'<span style="color:var(--green);font-size:11px;margin-left:6px">FREE</span>':e.price_min?`<span style="font-size:11px;color:var(--sub);margin-left:6px">$${e.price_min}</span>`:''}</td> <td style="color:var(--sub)">${e.venues?.name||'—'}</td> <td style="color:var(--muted)">${new Date(e.start_time).toLocaleDateString()} ${new Date(e.start_time).toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'})}</td> <td style="color:var(--sub)">${e.category||'—'}</td> <td><span class="badge ${e.status==='published'?'badge-green':'badge-muted'}">${e.status}</span></td> <td>${e.is_boosted?`<span class="badge badge-gold"> ${e.boost_type||'boosted'}</span>`:`<span class="badge badge-muted">—</span>`}</td> <td><div style="display:flex;gap:5px;flex-wrap:wrap"> <button class="btn btn-ghost btn-sm" onclick="toggleEventBoost('${e.id}',${!e.is_boosted})">${e.is_boosted?'↓ Unboost':' Boost'}</button> <button class="btn btn-danger btn-sm" onclick="deleteEvent('${e.id}','${e.title.replace(/'/g,"\\'")}')"></button> </div></td> </tr>`).join('');
 }
 
 function searchEvents(q){
-  const f=allEvents.filter(e=>e.title.toLowerCase().includes(q.toLowerCase())||(e.venues?.name||'').toLowerCase().includes(q.toLowerCase()));
-  const el=document.getElementById('eventTableBody');
-  if(el)el.innerHTML=renderEventRows(f);
+ const f=allEvents.filter(e=>e.title.toLowerCase().includes(q.toLowerCase())||(e.venues?.name||'').toLowerCase().includes(q.toLowerCase()));
+ const el=document.getElementById('eventTableBody');
+ if(el)el.innerHTML=renderEventRows(f);
 }
 
 // ── INQUIRIES ─────────────────────────────────────────────────
 function renderInquiries(){
-  const filters={all:allInquiries,new:allInquiries.filter(i=>i.status==='new'),read:allInquiries.filter(i=>i.status==='read')};
-  const filtered=filters[inquiryFilter]||allInquiries;
+ const filters={all:allInquiries,new:allInquiries.filter(i=>i.status==='new'),read:allInquiries.filter(i=>i.status==='read')};
+ const filtered=filters[inquiryFilter]||allInquiries;
 
-  document.getElementById('pageContent').innerHTML=`
-    <div class="table-card">
-      <div class="table-header">
-        <div class="table-title">All Inquiries (${allInquiries.length})</div>
-        <div style="font-size:13px;color:var(--sub)">${allInquiries.filter(i=>i.status==='new').length} unread</div>
-      </div>
-      <div class="filter-row">
-        ${['all','new','read'].map(f=>`
-          <button class="filter-chip${inquiryFilter===f?' active':''}" onclick="inquiryFilter='${f}';renderInquiries()">${f.charAt(0).toUpperCase()+f.slice(1)} (${(filters[f]||[]).length})</button>
-        `).join('')}
-      </div>
-      <table>
-        <thead><tr><th>From</th><th>Venue</th><th>Event Date</th><th>Guests</th><th>Message</th><th>Status</th><th>Actions</th></tr></thead>
-        <tbody>
-          ${filtered.length?filtered.map(i=>`
-            <tr>
-              <td>
-                <strong>${i.name}</strong>
-                <div style="font-size:11px;color:var(--orange)"><a href="mailto:${i.email}" style="color:var(--orange)">${i.email}</a></div>
-                ${i.phone?`<div style="font-size:11px;color:var(--muted)">${i.phone}</div>`:''}
-              </td>
-              <td style="color:var(--sub)">${i.venues?.name||'—'}</td>
-              <td style="color:var(--muted)">${i.event_date||'—'}</td>
-              <td style="color:var(--sub)">${i.guest_count||'—'}</td>
-              <td style="max-width:200px"><div style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--sub);font-size:12px">${i.message||'—'}</div></td>
-              <td><span class="badge ${i.status==='new'?'badge-orange':'badge-muted'}">${i.status}</span></td>
-              <td>
-                <div style="display:flex;gap:5px">
-                  ${i.status==='new'?`<button class="btn btn-ghost btn-sm" onclick="markRead('${i.id}')">Mark Read</button>`:''}
-                  <button class="btn btn-ghost btn-sm" onclick="viewInquiry('${i.id}')">View</button>
-                </div>
-              </td>
-            </tr>`).join(''):'<tr class="empty-row"><td colspan="7">No inquiries found</td></tr>'}
-        </tbody>
-      </table>
-    </div>
-  `;
+ document.getElementById('pageContent').innerHTML=`
+ <div class="table-card"> <div class="table-header"> <div class="table-title">All Inquiries (${allInquiries.length})</div> <div style="font-size:13px;color:var(--sub)">${allInquiries.filter(i=>i.status==='new').length} unread</div> </div> <div class="filter-row"> ${['all','new','read'].map(f=>`
+ <button class="filter-chip${inquiryFilter===f?' active':''}" onclick="inquiryFilter='${f}';renderInquiries()">${f.charAt(0).toUpperCase()+f.slice(1)} (${(filters[f]||[]).length})</button> `).join('')}
+ </div> <table> <thead><tr><th>From</th><th>Venue</th><th>Event Date</th><th>Guests</th><th>Message</th><th>Status</th><th>Actions</th></tr></thead> <tbody> ${filtered.length?filtered.map(i=>`
+ <tr> <td> <strong>${i.name}</strong> <div style="font-size:11px;color:var(--orange)"><a href="mailto:${i.email}" style="color:var(--orange)">${i.email}</a></div> ${i.phone?`<div style="font-size:11px;color:var(--muted)">${i.phone}</div>`:''}
+ </td> <td style="color:var(--sub)">${i.venues?.name||'—'}</td> <td style="color:var(--muted)">${i.event_date||'—'}</td> <td style="color:var(--sub)">${i.guest_count||'—'}</td> <td style="max-width:200px"><div style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--sub);font-size:12px">${i.message||'—'}</div></td> <td><span class="badge ${i.status==='new'?'badge-orange':'badge-muted'}">${i.status}</span></td> <td> <div style="display:flex;gap:5px"> ${i.status==='new'?`<button class="btn btn-ghost btn-sm" onclick="markRead('${i.id}')">Mark Read</button>`:''}
+ <button class="btn btn-ghost btn-sm" onclick="viewInquiry('${i.id}')">View</button> </div> </td> </tr>`).join(''):'<tr class="empty-row"><td colspan="7">No inquiries found</td></tr>'}
+ </tbody> </table> </div> `;
 }
 
 // ── REVENUE ───────────────────────────────────────────────────
 function renderRevenue(){
-  const standard=allVenues.filter(v=>v.tier==='standard').length;
-  const premium=allVenues.filter(v=>v.tier==='premium').length;
-  const free=allVenues.filter(v=>!v.tier||v.tier==='free').length;
-  const mrr=standard*29+premium*79;
-  const arr=mrr*12;
+ const standard=allVenues.filter(v=>v.tier==='standard').length;
+ const premium=allVenues.filter(v=>v.tier==='premium').length;
+ const free=allVenues.filter(v=>!v.tier||v.tier==='free').length;
+ const mrr=standard*29+premium*79;
+ const arr=mrr*12;
 
-  document.getElementById('pageContent').innerHTML=`
-    <div class="stat-grid">
-      <div class="stat-card">
-        <div class="stat-card-icon">💰</div>
-        <div class="stat-card-num" style="color:var(--green)">$${mrr}</div>
-        <div class="stat-card-label">Monthly Recurring Revenue</div>
-        <div class="stat-card-sub" style="color:var(--sub)">MRR</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-card-icon">📈</div>
-        <div class="stat-card-num" style="color:var(--green)">$${arr.toLocaleString()}</div>
-        <div class="stat-card-label">Annual Run Rate</div>
-        <div class="stat-card-sub" style="color:var(--sub)">ARR</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-card-icon">⭐</div>
-        <div class="stat-card-num" style="color:var(--gold)">${premium}</div>
-        <div class="stat-card-label">Premium Venues</div>
-        <div class="stat-card-sub" style="color:var(--sub)">$${premium*79}/mo</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-card-icon">✦</div>
-        <div class="stat-card-num" style="color:var(--blue)">${standard}</div>
-        <div class="stat-card-label">Standard Venues</div>
-        <div class="stat-card-sub" style="color:var(--sub)">$${standard*29}/mo</div>
-      </div>
-    </div>
-
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
-      <div class="table-card">
-        <div class="table-header"><div class="table-title">Revenue Breakdown</div></div>
-        <div style="padding:24px">
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;padding-bottom:14px;border-bottom:1px solid var(--border)">
-            <div><div style="font-weight:600">Premium Plan</div><div style="font-size:12px;color:var(--sub)">${premium} venues × $79/mo</div></div>
-            <div style="font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:var(--gold)">$${premium*79}</div>
-          </div>
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;padding-bottom:14px;border-bottom:1px solid var(--border)">
-            <div><div style="font-weight:600">Standard Plan</div><div style="font-size:12px;color:var(--sub)">${standard} venues × $29/mo</div></div>
-            <div style="font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:var(--blue)">$${standard*29}</div>
-          </div>
-          <div style="display:flex;justify-content:space-between;align-items:center">
-            <div><div style="font-weight:700">Total MRR</div></div>
-            <div style="font-family:'Syne',sans-serif;font-size:24px;font-weight:800;color:var(--green)">$${mrr}</div>
-          </div>
-        </div>
-      </div>
-
-      <div class="table-card">
-        <div class="table-header"><div class="table-title">Plan Distribution</div></div>
-        <div style="padding:24px">
-          ${[{label:'Free',count:free,color:'var(--muted)'},{label:'Standard',count:standard,color:'var(--blue)'},{label:'Premium',count:premium,color:'var(--gold)'}].map(p=>`
-            <div style="margin-bottom:16px">
-              <div style="display:flex;justify-content:space-between;margin-bottom:5px">
-                <span style="font-size:13px;font-weight:500">${p.label}</span>
-                <span style="font-size:13px;color:var(--sub)">${p.count} venues</span>
-              </div>
-              <div style="height:6px;background:var(--border);border-radius:3px;overflow:hidden">
-                <div style="height:100%;background:${p.color};border-radius:3px;width:${allVenues.length?Math.round(p.count/allVenues.length*100):0}%;transition:width 0.5s ease"></div>
-              </div>
-            </div>`).join('')}
-          <div style="margin-top:20px;padding-top:16px;border-top:1px solid var(--border)">
-            <div style="font-size:12px;color:var(--muted);margin-bottom:4px">Revenue to goal ($1,000/mo)</div>
-            <div style="height:8px;background:var(--border);border-radius:4px;overflow:hidden">
-              <div style="height:100%;background:var(--green);border-radius:4px;width:${Math.min(mrr/10,100)}%;transition:width 0.5s ease"></div>
-            </div>
-            <div style="font-size:12px;color:var(--sub);margin-top:4px">${mrr}/1000 — ${Math.round(mrr/10)}% to goal</div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="table-card" style="margin-top:20px">
-      <div class="table-header"><div class="table-title">Paying Venues</div></div>
-      <table>
-        <thead><tr><th>Venue</th><th>Plan</th><th>Monthly Value</th><th>Type</th><th>Actions</th></tr></thead>
-        <tbody>
-          ${allVenues.filter(v=>v.tier==='premium'||v.tier==='standard').map(v=>`
-            <tr>
-              <td><strong>${v.name}</strong></td>
-              <td><span class="badge ${v.tier==='premium'?'badge-gold':'badge-blue'}">${v.tier}</span></td>
-              <td style="color:var(--green);font-weight:600">$${v.tier==='premium'?79:29}/mo</td>
-              <td style="color:var(--sub)">${v.venue_type||'—'}</td>
-              <td><button class="btn btn-ghost btn-sm" onclick="openTierModal('${v.id}')">Change Plan</button></td>
-            </tr>`).join('')||'<tr class="empty-row"><td colspan="5">No paying venues yet — time to hustle! 💪</td></tr>'}
-        </tbody>
-      </table>
-    </div>
-  `;
+ document.getElementById('pageContent').innerHTML=`
+ <div class="stat-grid"> <div class="stat-card"> <div class="stat-card-num" style="color:var(--green)">$${mrr}</div> <div class="stat-card-label">Monthly Recurring Revenue</div> <div class="stat-card-sub" style="color:var(--sub)">MRR</div> </div> <div class="stat-card"> <div class="stat-card-num" style="color:var(--green)">$${arr.toLocaleString()}</div> <div class="stat-card-label">Annual Run Rate</div> <div class="stat-card-sub" style="color:var(--sub)">ARR</div> </div> <div class="stat-card"> <div class="stat-card-icon">⭐</div> <div class="stat-card-num" style="color:var(--gold)">${premium}</div> <div class="stat-card-label">Premium Venues</div> <div class="stat-card-sub" style="color:var(--sub)">$${premium*79}/mo</div> </div> <div class="stat-card"> <div class="stat-card-num" style="color:var(--blue)">${standard}</div> <div class="stat-card-label">Standard Venues</div> <div class="stat-card-sub" style="color:var(--sub)">$${standard*29}/mo</div> </div> </div> <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px"> <div class="table-card"> <div class="table-header"><div class="table-title">Revenue Breakdown</div></div> <div style="padding:24px"> <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;padding-bottom:14px;border-bottom:1px solid var(--border)"> <div><div style="font-weight:600">Premium Plan</div><div style="font-size:12px;color:var(--sub)">${premium} venues × $79/mo</div></div> <div style="font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:var(--gold)">$${premium*79}</div> </div> <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;padding-bottom:14px;border-bottom:1px solid var(--border)"> <div><div style="font-weight:600">Standard Plan</div><div style="font-size:12px;color:var(--sub)">${standard} venues × $29/mo</div></div> <div style="font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:var(--blue)">$${standard*29}</div> </div> <div style="display:flex;justify-content:space-between;align-items:center"> <div><div style="font-weight:700">Total MRR</div></div> <div style="font-family:'Syne',sans-serif;font-size:24px;font-weight:800;color:var(--green)">$${mrr}</div> </div> </div> </div> <div class="table-card"> <div class="table-header"><div class="table-title">Plan Distribution</div></div> <div style="padding:24px"> ${[{label:'Free',count:free,color:'var(--muted)'},{label:'Standard',count:standard,color:'var(--blue)'},{label:'Premium',count:premium,color:'var(--gold)'}].map(p=>`
+ <div style="margin-bottom:16px"> <div style="display:flex;justify-content:space-between;margin-bottom:5px"> <span style="font-size:13px;font-weight:500">${p.label}</span> <span style="font-size:13px;color:var(--sub)">${p.count} venues</span> </div> <div style="height:6px;background:var(--border);border-radius:3px;overflow:hidden"> <div style="height:100%;background:${p.color};border-radius:3px;width:${allVenues.length?Math.round(p.count/allVenues.length*100):0}%;transition:width 0.5s ease"></div> </div> </div>`).join('')}
+ <div style="margin-top:20px;padding-top:16px;border-top:1px solid var(--border)"> <div style="font-size:12px;color:var(--muted);margin-bottom:4px">Revenue to goal ($1,000/mo)</div> <div style="height:8px;background:var(--border);border-radius:4px;overflow:hidden"> <div style="height:100%;background:var(--green);border-radius:4px;width:${Math.min(mrr/10,100)}%;transition:width 0.5s ease"></div> </div> <div style="font-size:12px;color:var(--sub);margin-top:4px">${mrr}/1000 — ${Math.round(mrr/10)}% to goal</div> </div> </div> </div> </div> <div class="table-card" style="margin-top:20px"> <div class="table-header"><div class="table-title">Paying Venues</div></div> <table> <thead><tr><th>Venue</th><th>Plan</th><th>Monthly Value</th><th>Type</th><th>Actions</th></tr></thead> <tbody> ${allVenues.filter(v=>v.tier==='premium'||v.tier==='standard').map(v=>`
+ <tr> <td><strong>${v.name}</strong></td> <td><span class="badge ${v.tier==='premium'?'badge-gold':'badge-blue'}">${v.tier}</span></td> <td style="color:var(--green);font-weight:600">$${v.tier==='premium'?79:29}/mo</td> <td style="color:var(--sub)">${v.venue_type||'—'}</td> <td><button class="btn btn-ghost btn-sm" onclick="openTierModal('${v.id}')">Change Plan</button></td> </tr>`).join('')||'<tr class="empty-row"><td colspan="5">No paying venues yet — time to hustle! </td></tr>'}
+ </tbody> </table> </div> `;
 }
 
 // ── ACTIONS ───────────────────────────────────────────────────
 async function approveVenue(id){
-  const{error}=await sb.from('venues').update({status:'approved'}).eq('id',id);
-  if(error){toast('Error: '+error.message,'error');return;}
-  await loadData();renderShell();toast('✓ Venue approved!');
+ const{error}=await sb.from('venues').update({status:'approved'}).eq('id',id);
+ if(error){toast('Error: '+error.message,'error');return;}
+ await loadData();renderShell();toast(' Venue approved!');
 }
 async function rejectVenue(id){
-  if(!confirm('Reject this venue?'))return;
-  const{error}=await sb.from('venues').update({status:'rejected'}).eq('id',id);
-  if(error){toast('Error: '+error.message,'error');return;}
-  await loadData();renderShell();toast('Venue rejected');
+ if(!confirm('Reject this venue?'))return;
+ const{error}=await sb.from('venues').update({status:'rejected'}).eq('id',id);
+ if(error){toast('Error: '+error.message,'error');return;}
+ await loadData();renderShell();toast('Venue rejected');
 }
 async function deleteVenue(id,name){
-  if(!confirm(`Delete "${name}"? This cannot be undone.`))return;
-  const{error}=await sb.from('venues').delete().eq('id',id);
-  if(error){toast('Error: '+error.message,'error');return;}
-  await loadData();renderShell();toast('Venue deleted');
+ if(!confirm(`Delete "${name}"? This cannot be undone.`))return;
+ const{error}=await sb.from('venues').delete().eq('id',id);
+ if(error){toast('Error: '+error.message,'error');return;}
+ await loadData();renderShell();toast('Venue deleted');
 }
 async function deleteEvent(id,title){
-  if(!confirm(`Delete "${title}"?`))return;
-  const{error}=await sb.from('events').delete().eq('id',id);
-  if(error){toast('Error: '+error.message,'error');return;}
-  await loadData();renderEvents();toast('Event deleted');
+ if(!confirm(`Delete "${title}"?`))return;
+ const{error}=await sb.from('events').delete().eq('id',id);
+ if(error){toast('Error: '+error.message,'error');return;}
+ await loadData();renderEvents();toast('Event deleted');
 }
 async function markRead(id){
-  await sb.from('inquiries').update({status:'read'}).eq('id',id);
-  await loadData();renderInquiries();toast('Marked as read');
+ await sb.from('inquiries').update({status:'read'}).eq('id',id);
+ await loadData();renderInquiries();toast('Marked as read');
 }
 
 function viewInquiry(id){
-  const i=allInquiries.find(x=>x.id===id);
-  if(!i)return;
-  document.getElementById('modalContainer').innerHTML=`
-    <div class="modal-overlay" onclick="if(event.target===this)closeModal()">
-      <div class="modal">
-        <div class="modal-header">
-          <div class="modal-title">Inquiry from ${i.name}</div>
-          <button onclick="closeModal()" style="background:none;border:none;color:var(--sub);font-size:18px;cursor:pointer">✕</button>
-        </div>
-        <div class="modal-body">
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px">
-            <div><div style="font-size:11px;color:var(--muted);margin-bottom:3px">NAME</div><div style="font-weight:600">${i.name}</div></div>
-            <div><div style="font-size:11px;color:var(--muted);margin-bottom:3px">EMAIL</div><a href="mailto:${i.email}" style="color:var(--orange);font-weight:600">${i.email}</a></div>
-            <div><div style="font-size:11px;color:var(--muted);margin-bottom:3px">PHONE</div><div>${i.phone||'—'}</div></div>
-            <div><div style="font-size:11px;color:var(--muted);margin-bottom:3px">EVENT DATE</div><div>${i.event_date||'—'}</div></div>
-            <div><div style="font-size:11px;color:var(--muted);margin-bottom:3px">GUESTS</div><div>${i.guest_count||'—'}</div></div>
-            <div><div style="font-size:11px;color:var(--muted);margin-bottom:3px">VENUE</div><div>${i.venues?.name||'—'}</div></div>
-          </div>
-          <div><div style="font-size:11px;color:var(--muted);margin-bottom:6px">MESSAGE</div>
-          <div style="background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:14px;font-size:14px;line-height:1.65;color:var(--sub)">${i.message||'—'}</div></div>
-        </div>
-        <div class="modal-footer">
-          <a href="mailto:${i.email}?subject=Re: Your venue inquiry for ${i.venues?.name||'our venue'}"><button class="btn btn-primary">Reply via Email →</button></a>
-          <button class="btn btn-ghost" onclick="closeModal()">Close</button>
-        </div>
-      </div>
-    </div>`;
-  if(i.status==='new')markRead(id);
+ const i=allInquiries.find(x=>x.id===id);
+ if(!i)return;
+ document.getElementById('modalContainer').innerHTML=`
+ <div class="modal-overlay" onclick="if(event.target===this)closeModal()"> <div class="modal"> <div class="modal-header"> <div class="modal-title">Inquiry from ${i.name}</div> <button onclick="closeModal()" style="background:none;border:none;color:var(--sub);font-size:18px;cursor:pointer"></button> </div> <div class="modal-body"> <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px"> <div><div style="font-size:11px;color:var(--muted);margin-bottom:3px">NAME</div><div style="font-weight:600">${i.name}</div></div> <div><div style="font-size:11px;color:var(--muted);margin-bottom:3px">EMAIL</div><a href="mailto:${i.email}" style="color:var(--orange);font-weight:600">${i.email}</a></div> <div><div style="font-size:11px;color:var(--muted);margin-bottom:3px">PHONE</div><div>${i.phone||'—'}</div></div> <div><div style="font-size:11px;color:var(--muted);margin-bottom:3px">EVENT DATE</div><div>${i.event_date||'—'}</div></div> <div><div style="font-size:11px;color:var(--muted);margin-bottom:3px">GUESTS</div><div>${i.guest_count||'—'}</div></div> <div><div style="font-size:11px;color:var(--muted);margin-bottom:3px">VENUE</div><div>${i.venues?.name||'—'}</div></div> </div> <div><div style="font-size:11px;color:var(--muted);margin-bottom:6px">MESSAGE</div> <div style="background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:14px;font-size:14px;line-height:1.65;color:var(--sub)">${i.message||'—'}</div></div> </div> <div class="modal-footer"> <a href="mailto:${i.email}?subject=Re: Your venue inquiry for ${i.venues?.name||'our venue'}"><button class="btn btn-primary">Reply via Email →</button></a> <button class="btn btn-ghost" onclick="closeModal()">Close</button> </div> </div> </div>`;
+ if(i.status==='new')markRead(id);
 }
 
 function openTierModal(id){
-  const v=allVenues.find(x=>x.id===id);
-  if(!v)return;
-  document.getElementById('modalContainer').innerHTML=`
-    <div class="modal-overlay" onclick="if(event.target===this)closeModal()">
-      <div class="modal">
-        <div class="modal-header">
-          <div class="modal-title">Change Plan — ${v.name}</div>
-          <button onclick="closeModal()" style="background:none;border:none;color:var(--sub);font-size:18px;cursor:pointer">✕</button>
-        </div>
-        <div class="modal-body">
-          <div class="field">
-            <label>Plan Tier</label>
-            <select id="tierSelect">
-              <option value="free" ${v.tier==='free'||!v.tier?'selected':''}>Free</option>
-              <option value="standard" ${v.tier==='standard'?'selected':''}>Standard ($29/mo)</option>
-              <option value="premium" ${v.tier==='premium'?'selected':''}>Premium ($79/mo)</option>
-            </select>
-          </div>
-          <div class="field">
-            <label>Status</label>
-            <select id="statusSelect">
-              <option value="approved" ${v.status==='approved'?'selected':''}>Approved</option>
-              <option value="pending" ${v.status==='pending'?'selected':''}>Pending</option>
-              <option value="rejected" ${v.status==='rejected'?'selected':''}>Rejected</option>
-            </select>
-          </div>
-        </div>
-        <div class="modal-footer">
-          <button class="btn btn-primary" onclick="saveTier('${id}')">Save Changes</button>
-          <button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
-        </div>
-      </div>
-    </div>`;
+ const v=allVenues.find(x=>x.id===id);
+ if(!v)return;
+ document.getElementById('modalContainer').innerHTML=`
+ <div class="modal-overlay" onclick="if(event.target===this)closeModal()"> <div class="modal"> <div class="modal-header"> <div class="modal-title">Change Plan — ${v.name}</div> <button onclick="closeModal()" style="background:none;border:none;color:var(--sub);font-size:18px;cursor:pointer"></button> </div> <div class="modal-body"> <div class="field"> <label>Plan Tier</label> <select id="tierSelect"> <option value="free" ${v.tier==='free'||!v.tier?'selected':''}>Free</option> <option value="standard" ${v.tier==='standard'?'selected':''}>Standard ($29/mo)</option> <option value="premium" ${v.tier==='premium'?'selected':''}>Premium ($79/mo)</option> </select> </div> <div class="field"> <label>Status</label> <select id="statusSelect"> <option value="approved" ${v.status==='approved'?'selected':''}>Approved</option> <option value="pending" ${v.status==='pending'?'selected':''}>Pending</option> <option value="rejected" ${v.status==='rejected'?'selected':''}>Rejected</option> </select> </div> </div> <div class="modal-footer"> <button class="btn btn-primary" onclick="saveTier('${id}')">Save Changes</button> <button class="btn btn-ghost" onclick="closeModal()">Cancel</button> </div> </div> </div>`;
 }
 
 async function saveTier(id){
-  const tier=document.getElementById('tierSelect').value;
-  const status=document.getElementById('statusSelect').value;
-  const{error}=await sb.from('venues').update({tier,status}).eq('id',id);
-  if(error){toast('Error: '+error.message,'error');return;}
-  closeModal();await loadData();renderShell();toast('✓ Venue updated!');
+ const tier=document.getElementById('tierSelect').value;
+ const status=document.getElementById('statusSelect').value;
+ const{error}=await sb.from('venues').update({tier,status}).eq('id',id);
+ if(error){toast('Error: '+error.message,'error');return;}
+ closeModal();await loadData();renderShell();toast(' Venue updated!');
 }
 
 function openAddVenueModal(){
-  document.getElementById('modalContainer').innerHTML=`
-    <div class="modal-overlay" onclick="if(event.target===this)closeModal()">
-      <div class="modal">
-        <div class="modal-header">
-          <div class="modal-title">Add Venue Manually</div>
-          <button onclick="closeModal()" style="background:none;border:none;color:var(--sub);font-size:18px;cursor:pointer">✕</button>
-        </div>
-        <div class="modal-body">
-          <div class="field"><label>Venue Name *</label><input id="avName" placeholder="e.g. The Basement"></div>
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
-            <div class="field"><label>Type</label><input id="avType" placeholder="e.g. Bar & Grill"></div>
-            <div class="field"><label>Neighborhood</label><input id="avHood" placeholder="e.g. Short North"></div>
-          </div>
-          <div class="field"><label>Description</label><textarea id="avDesc" placeholder="Brief description..."></textarea></div>
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
-            <div class="field"><label>Plan</label><select id="avTier"><option value="free">Free</option><option value="standard">Standard</option><option value="premium">Premium</option></select></div>
-            <div class="field"><label>Status</label><select id="avStatus"><option value="approved">Approved</option><option value="pending">Pending</option></select></div>
-          </div>
-        </div>
-        <div class="modal-footer">
-          <button class="btn btn-primary" onclick="addVenue()">Add Venue →</button>
-          <button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
-        </div>
-      </div>
-    </div>`;
+ document.getElementById('modalContainer').innerHTML=`
+ <div class="modal-overlay" onclick="if(event.target===this)closeModal()"> <div class="modal"> <div class="modal-header"> <div class="modal-title">Add Venue Manually</div> <button onclick="closeModal()" style="background:none;border:none;color:var(--sub);font-size:18px;cursor:pointer"></button> </div> <div class="modal-body"> <div class="field"><label>Venue Name *</label><input id="avName" placeholder="e.g. The Basement"></div> <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px"> <div class="field"><label>Type</label><input id="avType" placeholder="e.g. Bar & Grill"></div> <div class="field"><label>Neighborhood</label><input id="avHood" placeholder="e.g. Short North"></div> </div> <div class="field"><label>Description</label><textarea id="avDesc" placeholder="Brief description..."></textarea></div> <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px"> <div class="field"><label>Plan</label><select id="avTier"><option value="free">Free</option><option value="standard">Standard</option><option value="premium">Premium</option></select></div> <div class="field"><label>Status</label><select id="avStatus"><option value="approved">Approved</option><option value="pending">Pending</option></select></div> </div> </div> <div class="modal-footer"> <button class="btn btn-primary" onclick="addVenue()">Add Venue →</button> <button class="btn btn-ghost" onclick="closeModal()">Cancel</button> </div> </div> </div>`;
 }
 
 async function addVenue(){
-  const name=document.getElementById('avName').value.trim();
-  if(!name){toast('Name is required','error');return;}
-  const{error}=await sb.from('venues').insert({
-    name,venue_type:document.getElementById('avType').value||null,
-    neighborhood:document.getElementById('avHood').value||null,
-    description:document.getElementById('avDesc').value||null,
-    tier:document.getElementById('avTier').value,
-    status:document.getElementById('avStatus').value,
-    city:'Columbus',state:'OH',
-  });
-  if(error){toast('Error: '+error.message,'error');return;}
-  closeModal();await loadData();renderShell();toast('✓ Venue added!');
+ const name=document.getElementById('avName').value.trim();
+ if(!name){toast('Name is required','error');return;}
+ const{error}=await sb.from('venues').insert({
+ name,venue_type:document.getElementById('avType').value||null,
+ neighborhood:document.getElementById('avHood').value||null,
+ description:document.getElementById('avDesc').value||null,
+ tier:document.getElementById('avTier').value,
+ status:document.getElementById('avStatus').value,
+ city:'Columbus',state:'OH',
+ });
+ if(error){toast('Error: '+error.message,'error');return;}
+ closeModal();await loadData();renderShell();toast(' Venue added!');
 }
 
 function closeModal(){document.getElementById('modalContainer').innerHTML='';}
 
 // ── DESIGN REQUESTS ──────────────────────────────────────────
 function renderDesignRequests(){
-  const newReqs=allDesignRequests.filter(d=>d.status==='new');
-  document.getElementById('pageContent').innerHTML=`
-    <div class="table-card">
-      <div class="table-header">
-        <div class="table-title">🎨 Design Requests (${allDesignRequests.length})</div>
-        <div style="font-size:13px;color:var(--sub)">${newReqs.length} new</div>
-      </div>
-      <div class="filter-row">
-        <div style="font-size:13px;color:var(--sub);padding:4px 0">
-          💡 Reply directly to the venue's email. Mark as complete when done.
-        </div>
-      </div>
-      <table>
-        <thead><tr><th>Venue</th><th>Type</th><th>Email</th><th>Details</th><th>Date</th><th>Status</th><th>Actions</th></tr></thead>
-        <tbody>
-          ${allDesignRequests.length?allDesignRequests.map(d=>`
-            <tr>
-              <td><strong>${d.venue_name||'—'}</strong></td>
-              <td>
-                <span class="badge ${d.type==='flyer'?'badge-blue':'badge-gold'}">
-                  ${d.type==='flyer'?'🎨 Flyer':'👕 Merch'}
-                </span>
-              </td>
-              <td><a href="mailto:${d.email}?subject=Re: Your ${d.type} design request" style="color:var(--orange)">${d.email}</a></td>
-              <td style="max-width:220px"><div style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--sub);font-size:12px">${d.details||'—'}</div></td>
-              <td style="color:var(--muted)">${new Date(d.created_at).toLocaleDateString()}</td>
-              <td><span class="badge ${d.status==='new'?'badge-orange':d.status==='in_progress'?'badge-blue':'badge-green'}">${d.status}</span></td>
-              <td>
-                <div style="display:flex;gap:5px;flex-wrap:wrap">
-                  ${d.status==='new'?`<button class="btn btn-ghost btn-sm" onclick="updateDesignStatus('${d.id}','in_progress')">Start</button>`:''}
-                  ${d.status==='in_progress'?`<button class="btn btn-success btn-sm" onclick="updateDesignStatus('${d.id}','complete')">✓ Done</button>`:''}
-                  <button class="btn btn-ghost btn-sm" onclick="viewDesignRequest('${d.id}')">View</button>
-                </div>
-              </td>
-            </tr>`).join(''):`<tr class="empty-row"><td colspan="7">No design requests yet</td></tr>`}
-        </tbody>
-      </table>
-    </div>
-  `;
+ const newReqs=allDesignRequests.filter(d=>d.status==='new');
+ document.getElementById('pageContent').innerHTML=`
+ <div class="table-card"> <div class="table-header"> <div class="table-title"> Design Requests (${allDesignRequests.length})</div> <div style="font-size:13px;color:var(--sub)">${newReqs.length} new</div> </div> <div class="filter-row"> <div style="font-size:13px;color:var(--sub);padding:4px 0"> Reply directly to the venue's email. Mark as complete when done.
+ </div> </div> <table> <thead><tr><th>Venue</th><th>Type</th><th>Email</th><th>Details</th><th>Date</th><th>Status</th><th>Actions</th></tr></thead> <tbody> ${allDesignRequests.length?allDesignRequests.map(d=>`
+ <tr> <td><strong>${d.venue_name||'—'}</strong></td> <td> <span class="badge ${d.type==='flyer'?'badge-blue':'badge-gold'}"> ${d.type==='flyer'?' Flyer':' Merch'}
+ </span> </td> <td><a href="mailto:${d.email}?subject=Re: Your ${d.type} design request" style="color:var(--orange)">${d.email}</a></td> <td style="max-width:220px"><div style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--sub);font-size:12px">${d.details||'—'}</div></td> <td style="color:var(--muted)">${new Date(d.created_at).toLocaleDateString()}</td> <td><span class="badge ${d.status==='new'?'badge-orange':d.status==='in_progress'?'badge-blue':'badge-green'}">${d.status}</span></td> <td> <div style="display:flex;gap:5px;flex-wrap:wrap"> ${d.status==='new'?`<button class="btn btn-ghost btn-sm" onclick="updateDesignStatus('${d.id}','in_progress')">Start</button>`:''}
+ ${d.status==='in_progress'?`<button class="btn btn-success btn-sm" onclick="updateDesignStatus('${d.id}','complete')"> Done</button>`:''}
+ <button class="btn btn-ghost btn-sm" onclick="viewDesignRequest('${d.id}')">View</button> </div> </td> </tr>`).join(''):`<tr class="empty-row"><td colspan="7">No design requests yet</td></tr>`}
+ </tbody> </table> </div> `;
 }
 
 async function updateDesignStatus(id,status){
-  await sb.from('design_requests').update({status}).eq('id',id);
-  await loadData();renderDesignRequests();
-  toast(status==='complete'?'✓ Marked complete!':'Started!');
+ await sb.from('design_requests').update({status}).eq('id',id);
+ await loadData();renderDesignRequests();
+ toast(status==='complete'?' Marked complete!':'Started!');
 }
 
 function viewDesignRequest(id){
-  const d=allDesignRequests.find(x=>x.id===id);
-  if(!d)return;
-  document.getElementById('modalContainer').innerHTML=`
-    <div class="modal-overlay" onclick="if(event.target===this)closeModal()">
-      <div class="modal">
-        <div class="modal-header">
-          <div class="modal-title">${d.type==='flyer'?'🎨 Flyer':'👕 Merch'} Request — ${d.venue_name}</div>
-          <button onclick="closeModal()" style="background:none;border:none;color:var(--sub);font-size:18px;cursor:pointer">✕</button>
-        </div>
-        <div class="modal-body">
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px">
-            <div><div style="font-size:11px;color:var(--muted);margin-bottom:3px">VENUE</div><div style="font-weight:600">${d.venue_name}</div></div>
-            <div><div style="font-size:11px;color:var(--muted);margin-bottom:3px">TYPE</div><span class="badge ${d.type==='flyer'?'badge-blue':'badge-gold'}">${d.type==='flyer'?'🎨 Flyer':'👕 Merch'}</span></div>
-            <div><div style="font-size:11px;color:var(--muted);margin-bottom:3px">EMAIL</div><a href="mailto:${d.email}" style="color:var(--orange)">${d.email}</a></div>
-            <div><div style="font-size:11px;color:var(--muted);margin-bottom:3px">STATUS</div><span class="badge ${d.status==='new'?'badge-orange':d.status==='in_progress'?'badge-blue':'badge-green'}">${d.status}</span></div>
-          </div>
-          <div><div style="font-size:11px;color:var(--muted);margin-bottom:6px">DETAILS</div>
-          <div style="background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:14px;font-size:14px;line-height:1.7;color:var(--sub)">${d.details||'—'}</div></div>
-        </div>
-        <div class="modal-footer">
-          <a href="mailto:${d.email}?subject=Re: Your ${d.type} design request for ${d.venue_name}"><button class="btn btn-primary">Reply via Email →</button></a>
-          <button class="btn btn-ghost" onclick="closeModal()">Close</button>
-        </div>
-      </div>
-    </div>`;
+ const d=allDesignRequests.find(x=>x.id===id);
+ if(!d)return;
+ document.getElementById('modalContainer').innerHTML=`
+ <div class="modal-overlay" onclick="if(event.target===this)closeModal()"> <div class="modal"> <div class="modal-header"> <div class="modal-title">${d.type==='flyer'?' Flyer':' Merch'} Request — ${d.venue_name}</div> <button onclick="closeModal()" style="background:none;border:none;color:var(--sub);font-size:18px;cursor:pointer"></button> </div> <div class="modal-body"> <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px"> <div><div style="font-size:11px;color:var(--muted);margin-bottom:3px">VENUE</div><div style="font-weight:600">${d.venue_name}</div></div> <div><div style="font-size:11px;color:var(--muted);margin-bottom:3px">TYPE</div><span class="badge ${d.type==='flyer'?'badge-blue':'badge-gold'}">${d.type==='flyer'?' Flyer':' Merch'}</span></div> <div><div style="font-size:11px;color:var(--muted);margin-bottom:3px">EMAIL</div><a href="mailto:${d.email}" style="color:var(--orange)">${d.email}</a></div> <div><div style="font-size:11px;color:var(--muted);margin-bottom:3px">STATUS</div><span class="badge ${d.status==='new'?'badge-orange':d.status==='in_progress'?'badge-blue':'badge-green'}">${d.status}</span></div> </div> <div><div style="font-size:11px;color:var(--muted);margin-bottom:6px">DETAILS</div> <div style="background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:14px;font-size:14px;line-height:1.7;color:var(--sub)">${d.details||'—'}</div></div> </div> <div class="modal-footer"> <a href="mailto:${d.email}?subject=Re: Your ${d.type} design request for ${d.venue_name}"><button class="btn btn-primary">Reply via Email →</button></a> <button class="btn btn-ghost" onclick="closeModal()">Close</button> </div> </div> </div>`;
 }
 
 // ── BOOST / FEATURE ACTIONS ──────────────────────────────────
 async function toggleEventBoost(id,val){
-  const upd=val?{is_boosted:true,boost_type:'admin',admin_boost:true}:{is_boosted:false,boost_type:null,admin_boost:false};
-  const{error}=await sb.from('events').update(upd).eq('id',id);
-  if(error){toast('Error: '+error.message,'error');return;}
-  await loadData();renderPage();
-  toast(val?'⚡ Event boosted!':'Boost removed');
+ const upd=val?{is_boosted:true,boost_type:'admin',admin_boost:true}:{is_boosted:false,boost_type:null,admin_boost:false};
+ const{error}=await sb.from('events').update(upd).eq('id',id);
+ if(error){toast('Error: '+error.message,'error');return;}
+ await loadData();renderPage();
+ toast(val?' Event boosted!':'Boost removed');
 }
 
 async function toggleVenueFeature(id,val){
-  const{error}=await sb.from('venues').update({is_featured:val}).eq('id',id);
-  if(error){toast('Error: '+error.message,'error');return;}
-  await loadData();renderShell();
-  toast(val?'⭐ Venue featured!':'Feature removed');
+ const{error}=await sb.from('venues').update({is_featured:val}).eq('id',id);
+ if(error){toast('Error: '+error.message,'error');return;}
+ await loadData();renderShell();
+ toast(val?'⭐ Venue featured!':'Feature removed');
 }
 
 // ── VENDORS ───────────────────────────────────────────────────
 function renderVendors(){
-  document.getElementById('pageContent').innerHTML=`
-    <div class="table-card">
-      <div class="table-header">
-        <div class="table-title">All Vendors (${allVendors.length})</div>
-        <input class="search-input" placeholder="Search vendors..." oninput="searchVendors(this.value)">
-      </div>
-      <table>
-        <thead><tr><th>Business</th><th>Category</th><th>Tier</th><th>Sub Status</th><th>Promoted</th><th>Actions</th></tr></thead>
-        <tbody id="vendorTableBody">
-          ${renderVendorRows(allVendors)}
-        </tbody>
-      </table>
-    </div>`;
+ document.getElementById('pageContent').innerHTML=`
+ <div class="table-card"> <div class="table-header"> <div class="table-title">All Vendors (${allVendors.length})</div> <input class="search-input" placeholder="Search vendors..." oninput="searchVendors(this.value)"> </div> <table> <thead><tr><th>Business</th><th>Category</th><th>Tier</th><th>Sub Status</th><th>Promoted</th><th>Actions</th></tr></thead> <tbody id="vendorTableBody"> ${renderVendorRows(allVendors)}
+ </tbody> </table> </div>`;
 }
 
 function renderVendorRows(vendors){
-  if(!vendors.length)return'<tr class="empty-row"><td colspan="6">No vendors found</td></tr>';
-  return vendors.map(v=>`
-    <tr>
-      <td><strong>${v.business_name||v.name||'—'}</strong><div style="font-size:11px;color:var(--muted)">${v.email||''}</div></td>
-      <td style="color:var(--sub)">${v.category||'—'}</td>
-      <td><span class="badge ${v.subscription_tier==='PREMIUM'||v.tier==='premium'?'badge-gold':v.subscription_tier==='STANDARD'||v.tier==='standard'?'badge-blue':'badge-muted'}">${v.subscription_tier||v.tier||'free'}</span></td>
-      <td><span class="badge ${v.subscription_status==='active'?'badge-green':'badge-muted'}">${v.subscription_status||'—'}</span></td>
-      <td>${v.admin_promoted?'<span class="badge badge-gold">⭐ Yes</span>':'<span class="badge badge-muted">—</span>'}</td>
-      <td><button class="btn ${v.admin_promoted?'btn-ghost':'btn-success'} btn-sm" onclick="toggleVendorPromo('${v.id}',${!v.admin_promoted})">${v.admin_promoted?'Remove Promo':'⭐ Promote'}</button></td>
-    </tr>`).join('');
+ if(!vendors.length)return'<tr class="empty-row"><td colspan="6">No vendors found</td></tr>';
+ return vendors.map(v=>`
+ <tr> <td><strong>${v.business_name||v.name||'—'}</strong><div style="font-size:11px;color:var(--muted)">${v.email||''}</div></td> <td style="color:var(--sub)">${v.category||'—'}</td> <td><span class="badge ${v.subscription_tier==='PREMIUM'||v.tier==='premium'?'badge-gold':v.subscription_tier==='STANDARD'||v.tier==='standard'?'badge-blue':'badge-muted'}">${v.subscription_tier||v.tier||'free'}</span></td> <td><span class="badge ${v.subscription_status==='active'?'badge-green':'badge-muted'}">${v.subscription_status||'—'}</span></td> <td>${v.admin_promoted?'<span class="badge badge-gold">⭐ Yes</span>':'<span class="badge badge-muted">—</span>'}</td> <td><button class="btn ${v.admin_promoted?'btn-ghost':'btn-success'} btn-sm" onclick="toggleVendorPromo('${v.id}',${!v.admin_promoted})">${v.admin_promoted?'Remove Promo':'⭐ Promote'}</button></td> </tr>`).join('');
 }
 
 function searchVendors(q){
-  const f=allVendors.filter(v=>(v.business_name||v.name||'').toLowerCase().includes(q.toLowerCase())||(v.category||'').toLowerCase().includes(q.toLowerCase()));
-  const el=document.getElementById('vendorTableBody');
-  if(el)el.innerHTML=renderVendorRows(f);
+ const f=allVendors.filter(v=>(v.business_name||v.name||'').toLowerCase().includes(q.toLowerCase())||(v.category||'').toLowerCase().includes(q.toLowerCase()));
+ const el=document.getElementById('vendorTableBody');
+ if(el)el.innerHTML=renderVendorRows(f);
 }
 
 async function toggleVendorPromo(id,val){
-  await sb.from('vendors').update({admin_promoted:val}).eq('id',id);
-  await loadData();renderPage();
-  toast(val?'⭐ Vendor promoted!':'Promotion removed');
+ await sb.from('vendors').update({admin_promoted:val}).eq('id',id);
+ await loadData();renderPage();
+ toast(val?'⭐ Vendor promoted!':'Promotion removed');
 }
 
 // ── SUBSCRIPTIONS ─────────────────────────────────────────────
 async function renderSubscriptions(){
-  document.getElementById('pageContent').innerHTML=`<div style="color:var(--muted);padding:32px;text-align:center">Loading subscriptions…</div>`;
+ document.getElementById('pageContent').innerHTML=`<div style="color:var(--muted);padding:32px;text-align:center">Loading subscriptions…</div>`;
 
-  const[{data:venues},{data:vendors}]=await Promise.all([
-    sb.from('venues').select('id,name,tier,subscription_tier,subscription_status,subscription_period_end,stripe_subscription_id').order('tier'),
-    sb.from('vendors').select('id,business_name,subscription_tier,subscription_status,subscription_period_end,stripe_subscription_id').order('subscription_tier').then(r=>r).catch(()=>({data:[]})),
-  ]);
+ const[{data:venues},{data:vendors}]=await Promise.all([
+ sb.from('venues').select('id,name,tier,subscription_tier,subscription_status,subscription_period_end,stripe_subscription_id').order('tier'),
+ sb.from('vendors').select('id,business_name,subscription_tier,subscription_status,subscription_period_end,stripe_subscription_id').order('subscription_tier').then(r=>r).catch(()=>({data:[]})),
+ ]);
 
-  const renderRows=(rows,nameKey)=>(rows||[]).map(r=>`<tr>
-    <td><strong>${r[nameKey]||'—'}</strong></td>
-    <td><span class="badge ${(r.subscription_tier||r.tier)==='PREMIUM'||(r.subscription_tier||r.tier)==='premium'?'badge-gold':(r.subscription_tier||r.tier)==='STANDARD'||(r.subscription_tier||r.tier)==='standard'?'badge-blue':'badge-muted'}">${r.subscription_tier||r.tier||'free'}</span></td>
-    <td><span class="badge ${r.subscription_status==='active'?'badge-green':r.subscription_status?'badge-orange':'badge-muted'}">${r.subscription_status||'—'}</span></td>
-    <td style="color:var(--muted);font-size:12px">${r.subscription_period_end?new Date(r.subscription_period_end).toLocaleDateString():'—'}</td>
-    <td style="font-size:11px;color:var(--muted)">${r.stripe_subscription_id?r.stripe_subscription_id.substring(0,22)+'…':'—'}</td>
-  </tr>`).join('');
+ const renderRows=(rows,nameKey)=>(rows||[]).map(r=>`<tr> <td><strong>${r[nameKey]||'—'}</strong></td> <td><span class="badge ${(r.subscription_tier||r.tier)==='PREMIUM'||(r.subscription_tier||r.tier)==='premium'?'badge-gold':(r.subscription_tier||r.tier)==='STANDARD'||(r.subscription_tier||r.tier)==='standard'?'badge-blue':'badge-muted'}">${r.subscription_tier||r.tier||'free'}</span></td> <td><span class="badge ${r.subscription_status==='active'?'badge-green':r.subscription_status?'badge-orange':'badge-muted'}">${r.subscription_status||'—'}</span></td> <td style="color:var(--muted);font-size:12px">${r.subscription_period_end?new Date(r.subscription_period_end).toLocaleDateString():'—'}</td> <td style="font-size:11px;color:var(--muted)">${r.stripe_subscription_id?r.stripe_subscription_id.substring(0,22)+'…':'—'}</td> </tr>`).join('');
 
-  document.getElementById('pageContent').innerHTML=`
-    <div class="table-card" style="margin-bottom:24px">
-      <div class="table-header"><div class="table-title">Venue Subscriptions (${(venues||[]).length})</div></div>
-      <table>
-        <thead><tr><th>Name</th><th>Tier</th><th>Status</th><th>Period End</th><th>Stripe Sub ID</th></tr></thead>
-        <tbody>${renderRows(venues,'name')||'<tr class="empty-row"><td colspan="5">No venues</td></tr>'}</tbody>
-      </table>
-    </div>
-    <div class="table-card">
-      <div class="table-header"><div class="table-title">Vendor Subscriptions (${(vendors||[]).length})</div></div>
-      <table>
-        <thead><tr><th>Business</th><th>Tier</th><th>Status</th><th>Period End</th><th>Stripe Sub ID</th></tr></thead>
-        <tbody>${renderRows(vendors,'business_name')||'<tr class="empty-row"><td colspan="5">No vendors</td></tr>'}</tbody>
-      </table>
-    </div>`;
+ document.getElementById('pageContent').innerHTML=`
+ <div class="table-card" style="margin-bottom:24px"> <div class="table-header"><div class="table-title">Venue Subscriptions (${(venues||[]).length})</div></div> <table> <thead><tr><th>Name</th><th>Tier</th><th>Status</th><th>Period End</th><th>Stripe Sub ID</th></tr></thead> <tbody>${renderRows(venues,'name')||'<tr class="empty-row"><td colspan="5">No venues</td></tr>'}</tbody> </table> </div> <div class="table-card"> <div class="table-header"><div class="table-title">Vendor Subscriptions (${(vendors||[]).length})</div></div> <table> <thead><tr><th>Business</th><th>Tier</th><th>Status</th><th>Period End</th><th>Stripe Sub ID</th></tr></thead> <tbody>${renderRows(vendors,'business_name')||'<tr class="empty-row"><td colspan="5">No vendors</td></tr>'}</tbody> </table> </div>`;
 }
 
 // ── USERS ─────────────────────────────────────────────────────
 function renderUsers(){
-  document.getElementById('pageContent').innerHTML=`
-    <div class="table-card">
-      <div class="table-header">
-        <div class="table-title">User & Role Management</div>
-        <div style="display:flex;gap:8px">
-          <input class="search-input" id="userSearchInput" placeholder="Search by display name..." style="width:240px">
-          <button class="btn btn-primary btn-sm" onclick="doUserSearch()">Search</button>
-        </div>
-      </div>
-      <div id="userTableWrap">
-        <div class="empty-row"><td colspan="5" style="text-align:center;padding:48px;color:var(--muted)">Enter a name to search customer profiles.</td></div>
-      </div>
-    </div>`;
+ document.getElementById('pageContent').innerHTML=`
+ <div class="table-card"> <div class="table-header"> <div class="table-title">User & Role Management</div> <div style="display:flex;gap:8px"> <input class="search-input" id="userSearchInput" placeholder="Search by display name..." style="width:240px"> <button class="btn btn-primary btn-sm" onclick="doUserSearch()">Search</button> </div> </div> <div id="userTableWrap"> <div class="empty-row"><td colspan="5" style="text-align:center;padding:48px;color:var(--muted)">Enter a name to search customer profiles.</td></div> </div> </div>`;
 }
 
 async function doUserSearch(){
-  const q=document.getElementById('userSearchInput')?.value?.trim();
-  if(!q)return;
-  const wrap=document.getElementById('userTableWrap');
-  if(wrap)wrap.innerHTML='<div style="padding:24px;text-align:center;color:var(--muted)">Searching…</div>';
+ const q=document.getElementById('userSearchInput')?.value?.trim();
+ if(!q)return;
+ const wrap=document.getElementById('userTableWrap');
+ if(wrap)wrap.innerHTML='<div style="padding:24px;text-align:center;color:var(--muted)">Searching…</div>';
 
-  const{data}=await sb.from('customer_profiles')
-    .select('user_id,display_name,created_at')
-    .ilike('display_name',`%${q}%`)
-    .limit(30)
-    .catch(()=>({data:[]}));
+ const{data}=await sb.from('customer_profiles')
+ .select('user_id,display_name,created_at')
+ .ilike('display_name',`%${q}%`)
+ .limit(30)
+ .catch(()=>({data:[]}));
 
-  if(!data?.length){
-    if(wrap)wrap.innerHTML='<div style="padding:24px;text-align:center;color:var(--muted)">No results found.</div>';
-    return;
-  }
+ if(!data?.length){
+ if(wrap)wrap.innerHTML='<div style="padding:24px;text-align:center;color:var(--muted)">No results found.</div>';
+ return;
+ }
 
-  if(wrap)wrap.innerHTML=`
-    <table>
-      <thead><tr><th>User ID</th><th>Display Name</th><th>Member Since</th><th>Set Role</th></tr></thead>
-      <tbody>
-        ${data.map(u=>`<tr>
-          <td><code style="font-size:11px;color:var(--orange)">${u.user_id.substring(0,12)}…</code></td>
-          <td><strong>${u.display_name||'—'}</strong></td>
-          <td style="color:var(--muted)">${new Date(u.created_at).toLocaleDateString()}</td>
-          <td>
-            <select onchange="setUserRole('${u.user_id}',this.value)" style="background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:4px 8px;color:var(--text);font-size:12px">
-              <option value="customer">Customer</option>
-              <option value="venue_owner">Venue Owner</option>
-              <option value="vendor">Vendor</option>
-              <option value="admin">Admin</option>
-            </select>
-          </td>
-        </tr>`).join('')}
-      </tbody>
-    </table>`;
+ if(wrap)wrap.innerHTML=`
+ <table> <thead><tr><th>User ID</th><th>Display Name</th><th>Member Since</th><th>Set Role</th></tr></thead> <tbody> ${data.map(u=>`<tr> <td><code style="font-size:11px;color:var(--orange)">${u.user_id.substring(0,12)}…</code></td> <td><strong>${u.display_name||'—'}</strong></td> <td style="color:var(--muted)">${new Date(u.created_at).toLocaleDateString()}</td> <td> <select onchange="setUserRole('${u.user_id}',this.value)" style="background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:4px 8px;color:var(--text);font-size:12px"> <option value="customer">Customer</option> <option value="venue_owner">Venue Owner</option> <option value="vendor">Vendor</option> <option value="admin">Admin</option> </select> </td> </tr>`).join('')}
+ </tbody> </table>`;
 }
 
 async function setUserRole(userId,role){
-  await sb.from('user_roles').upsert({user_id:userId,role},{onConflict:'user_id'}).catch(()=>{});
-  toast(`Role set → ${role}`);
+ await sb.from('user_roles').upsert({user_id:userId,role},{onConflict:'user_id'}).catch(()=>{});
+ toast(`Role set → ${role}`);
 }
 
 // ── OVERRIDES ─────────────────────────────────────────────────
 async function renderOverrides(){
-  const{data}=await sb.from('admin_overrides')
-    .select('*').order('set_at',{ascending:false}).limit(50)
-    .catch(()=>({data:[]}));
+ const{data}=await sb.from('admin_overrides')
+ .select('*').order('set_at',{ascending:false}).limit(50)
+ .catch(()=>({data:[]}));
 
-  document.getElementById('pageContent').innerHTML=`
-    <div style="display:grid;grid-template-columns:380px 1fr;gap:24px;align-items:start">
-
-      <!-- Form -->
-      <div class="table-card">
-        <div class="table-header"><div class="table-title">Apply Override</div></div>
-        <div style="padding:20px;display:flex;flex-direction:column;gap:12px">
-          <div class="field">
-            <label>Entity Type</label>
-            <select id="ov-entity-type"><option value="venue">Venue</option><option value="event">Event</option><option value="vendor">Vendor</option><option value="user">User</option></select>
-          </div>
-          <div class="field"><label>Entity UUID</label><input id="ov-entity-id" placeholder="Paste the row UUID"/></div>
-          <div class="field">
-            <label>Override Action</label>
-            <select id="ov-key">
-              <option value="feature_listing">Feature Listing</option>
-              <option value="admin_boost">Admin Boost</option>
-              <option value="promote_vendor">Promote Vendor</option>
-              <option value="event_boost">Event Boost</option>
-              <option value="suspend">Suspend Account</option>
-            </select>
-          </div>
-          <div class="field"><label>Value (optional)</label><input id="ov-value" placeholder="e.g. true / false"/></div>
-          <div class="field"><label>Reason</label><input id="ov-reason" placeholder="Why are you applying this?"/></div>
-          <div class="field"><label>Expires At (optional)</label><input type="datetime-local" id="ov-expires"/></div>
-          <button class="btn btn-primary" onclick="applyOverride()">Apply Override →</button>
-        </div>
-      </div>
-
-      <!-- Log -->
-      <div class="table-card">
-        <div class="table-header"><div class="table-title">Override Log (recent 50)</div></div>
-        <table>
-          <thead><tr><th>Type</th><th>Entity</th><th>Action</th><th>Reason</th><th>Applied</th><th>Expires</th></tr></thead>
-          <tbody>
-            ${(data||[]).length?(data||[]).map(o=>`<tr>
-              <td><span class="badge badge-muted">${o.entity_type}</span></td>
-              <td><code style="font-size:11px;color:var(--orange)">${(o.entity_id||'').substring(0,8)}…</code></td>
-              <td style="font-weight:500">${o.override_key}</td>
-              <td style="color:var(--muted);font-size:12px">${o.reason||'—'}</td>
-              <td style="color:var(--muted);font-size:12px">${new Date(o.set_at).toLocaleDateString()}</td>
-              <td style="font-size:12px">${o.expires_at?new Date(o.expires_at).toLocaleDateString():'∞'}</td>
-            </tr>`).join(''):'<tr class="empty-row"><td colspan="6">No overrides yet</td></tr>'}
-          </tbody>
-        </table>
-      </div>
-    </div>`;
+ document.getElementById('pageContent').innerHTML=`
+ <div style="display:grid;grid-template-columns:380px 1fr;gap:24px;align-items:start"> <!-- Form --> <div class="table-card"> <div class="table-header"><div class="table-title">Apply Override</div></div> <div style="padding:20px;display:flex;flex-direction:column;gap:12px"> <div class="field"> <label>Entity Type</label> <select id="ov-entity-type"><option value="venue">Venue</option><option value="event">Event</option><option value="vendor">Vendor</option><option value="user">User</option></select> </div> <div class="field"><label>Entity UUID</label><input id="ov-entity-id" placeholder="Paste the row UUID"/></div> <div class="field"> <label>Override Action</label> <select id="ov-key"> <option value="feature_listing">Feature Listing</option> <option value="admin_boost">Admin Boost</option> <option value="promote_vendor">Promote Vendor</option> <option value="event_boost">Event Boost</option> <option value="suspend">Suspend Account</option> </select> </div> <div class="field"><label>Value (optional)</label><input id="ov-value" placeholder="e.g. true / false"/></div> <div class="field"><label>Reason</label><input id="ov-reason" placeholder="Why are you applying this?"/></div> <div class="field"><label>Expires At (optional)</label><input type="datetime-local" id="ov-expires"/></div> <button class="btn btn-primary" onclick="applyOverride()">Apply Override →</button> </div> </div> <!-- Log --> <div class="table-card"> <div class="table-header"><div class="table-title">Override Log (recent 50)</div></div> <table> <thead><tr><th>Type</th><th>Entity</th><th>Action</th><th>Reason</th><th>Applied</th><th>Expires</th></tr></thead> <tbody> ${(data||[]).length?(data||[]).map(o=>`<tr> <td><span class="badge badge-muted">${o.entity_type}</span></td> <td><code style="font-size:11px;color:var(--orange)">${(o.entity_id||'').substring(0,8)}…</code></td> <td style="font-weight:500">${o.override_key}</td> <td style="color:var(--muted);font-size:12px">${o.reason||'—'}</td> <td style="color:var(--muted);font-size:12px">${new Date(o.set_at).toLocaleDateString()}</td> <td style="font-size:12px">${o.expires_at?new Date(o.expires_at).toLocaleDateString():'∞'}</td> </tr>`).join(''):'<tr class="empty-row"><td colspan="6">No overrides yet</td></tr>'}
+ </tbody> </table> </div> </div>`;
 }
 
 async function applyOverride(){
-  const entityId=document.getElementById('ov-entity-id').value.trim();
-  const entityType=document.getElementById('ov-entity-type').value;
-  const key=document.getElementById('ov-key').value;
-  const val=document.getElementById('ov-value').value.trim()||null;
-  const reason=document.getElementById('ov-reason').value.trim()||null;
-  const expires=document.getElementById('ov-expires').value||null;
+ const entityId=document.getElementById('ov-entity-id').value.trim();
+ const entityType=document.getElementById('ov-entity-type').value;
+ const key=document.getElementById('ov-key').value;
+ const val=document.getElementById('ov-value').value.trim()||null;
+ const reason=document.getElementById('ov-reason').value.trim()||null;
+ const expires=document.getElementById('ov-expires').value||null;
 
-  if(!entityId){toast('Entity UUID is required','error');return;}
+ if(!entityId){toast('Entity UUID is required','error');return;}
 
-  // Log it
-  await sb.from('admin_overrides').insert({
-    entity_type:entityType,entity_id:entityId,override_key:key,
-    override_value:val,reason,expires_at:expires,set_by:currentUser?.id
-  }).catch(()=>{});
+ // Log it
+ await sb.from('admin_overrides').insert({
+ entity_type:entityType,entity_id:entityId,override_key:key,
+ override_value:val,reason,expires_at:expires,set_by:currentUser?.id
+ }).catch(()=>{});
 
-  // Apply directly
-  if(key==='feature_listing'&&entityType==='venue')
-    await sb.from('venues').update({is_featured:val!=='false'}).eq('id',entityId);
-  if(key==='admin_boost')
-    await sb.from(entityType==='event'?'events':'venues').update({admin_boost:val!=='false'}).eq('id',entityId);
-  if(key==='promote_vendor')
-    await sb.from('vendors').update({admin_promoted:true}).eq('id',entityId);
-  if(key==='event_boost')
-    await sb.from('events').update({is_boosted:true,boost_type:'admin',admin_boost:true}).eq('id',entityId);
+ // Apply directly
+ if(key==='feature_listing'&&entityType==='venue')
+ await sb.from('venues').update({is_featured:val!=='false'}).eq('id',entityId);
+ if(key==='admin_boost')
+ await sb.from(entityType==='event'?'events':'venues').update({admin_boost:val!=='false'}).eq('id',entityId);
+ if(key==='promote_vendor')
+ await sb.from('vendors').update({admin_promoted:true}).eq('id',entityId);
+ if(key==='event_boost')
+ await sb.from('events').update({is_boosted:true,boost_type:'admin',admin_boost:true}).eq('id',entityId);
 
-  toast('✓ Override applied!');
-  await loadData();
-  renderOverrides();
+ toast(' Override applied!');
+ await loadData();
+ renderOverrides();
 }
 
 // ── START ─────────────────────────────────────────────────────
@@ -1217,85 +676,59 @@ init();
 
 // ── CLAIMS ─────────────────────────────────────────────────────
 async function renderClaims(){
-  const el=document.getElementById('pageContent');
-  el.innerHTML='<div class="spinner"></div>';
+ const el=document.getElementById('pageContent');
+ el.innerHTML='<div class="spinner"></div>';
 
-  const{data:claims}=await sb.from('venues')
-    .select('id,name,venue_type,neighborhood,status,claim_status,claim_email,claimed_at,owner_id')
-    .not('claim_status','is',null)
-    .order('claimed_at',{ascending:false})
-    .catch(()=>({data:[]}));
+ const{data:claims}=await sb.from('venues')
+ .select('id,name,venue_type,neighborhood,status,claim_status,claim_email,claimed_at,owner_id')
+ .not('claim_status','is',null)
+ .order('claimed_at',{ascending:false})
+ .catch(()=>({data:[]}));
 
-  const pending=(claims||[]).filter(c=>c.claim_status==='pending');
-  const reviewed=(claims||[]).filter(c=>c.claim_status!=='pending');
+ const pending=(claims||[]).filter(c=>c.claim_status==='pending');
+ const reviewed=(claims||[]).filter(c=>c.claim_status!=='pending');
 
-  // Update badge
-  const badge=document.getElementById('claimsBadge');
-  if(badge){badge.textContent=pending.length||'';badge.style.display=pending.length?'':'none';}
+ // Update badge
+ const badge=document.getElementById('claimsBadge');
+ if(badge){badge.textContent=pending.length||'';badge.style.display=pending.length?'':'none';}
 
-  el.innerHTML=`
-    <div style="margin-bottom:28px">
-      <div style="font-family:'Syne',sans-serif;font-size:20px;font-weight:800;margin-bottom:6px">Listing Claims</div>
-      <div style="color:var(--sub);font-size:14px">${pending.length} pending · ${reviewed.length} reviewed</div>
-    </div>
+ el.innerHTML=`
+ <div style="margin-bottom:28px"> <div style="font-family:'Syne',sans-serif;font-size:20px;font-weight:800;margin-bottom:6px">Listing Claims</div> <div style="color:var(--sub);font-size:14px">${pending.length} pending · ${reviewed.length} reviewed</div> </div> ${pending.length?`
+ <div style="margin-bottom:24px"> <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:12px">Pending Review</div> ${pending.map(c=>`
+ <div style="background:var(--card);border:1px solid #f59e0b40;border-radius:12px;padding:18px 20px;margin-bottom:10px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap"> <div> <div style="font-weight:700;font-size:15px;margin-bottom:4px">${c.name}</div> <div style="font-size:12px;color:var(--sub);margin-bottom:4px">${c.venue_type||'Venue'}${c.neighborhood?' · '+c.neighborhood:''}</div> <div style="font-size:12px;color:var(--sub)"> ${c.claim_email||'No email'} · ${c.claimed_at?new Date(c.claimed_at).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}):'Unknown'}</div> </div> <div style="display:flex;gap:8px;flex-shrink:0"> <button onclick="approveClaim('${c.id}','${c.name.replace(/'/g,"\'")}')" style="background:#22c55e20;color:#22c55e;border:1px solid #22c55e40;border-radius:8px;padding:7px 16px;font-size:13px;font-weight:700;cursor:pointer"> Approve</button> <button onclick="rejectClaim('${c.id}','${c.name.replace(/'/g,"\'")}')" style="background:#ef444420;color:#ef4444;border:1px solid #ef444430;border-radius:8px;padding:7px 16px;font-size:13px;font-weight:700;cursor:pointer"> Reject</button> </div> </div>`).join('')}
+ </div>`:`
+ <div style="background:var(--card);border:1px solid #22c55e30;border-radius:12px;padding:16px 20px;margin-bottom:24px;color:#22c55e;font-size:14px;font-weight:500"> No pending claims
+ </div>`}
 
-    ${pending.length?`
-    <div style="margin-bottom:24px">
-      <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:12px">Pending Review</div>
-      ${pending.map(c=>`
-        <div style="background:var(--card);border:1px solid #f59e0b40;border-radius:12px;padding:18px 20px;margin-bottom:10px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap">
-          <div>
-            <div style="font-weight:700;font-size:15px;margin-bottom:4px">${c.name}</div>
-            <div style="font-size:12px;color:var(--sub);margin-bottom:4px">${c.venue_type||'Venue'}${c.neighborhood?' · '+c.neighborhood:''}</div>
-            <div style="font-size:12px;color:var(--sub)">📧 ${c.claim_email||'No email'} · 🕐 ${c.claimed_at?new Date(c.claimed_at).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}):'Unknown'}</div>
-          </div>
-          <div style="display:flex;gap:8px;flex-shrink:0">
-            <button onclick="approveClaim('${c.id}','${c.name.replace(/'/g,"\'")}')" style="background:#22c55e20;color:#22c55e;border:1px solid #22c55e40;border-radius:8px;padding:7px 16px;font-size:13px;font-weight:700;cursor:pointer">✓ Approve</button>
-            <button onclick="rejectClaim('${c.id}','${c.name.replace(/'/g,"\'")}')" style="background:#ef444420;color:#ef4444;border:1px solid #ef444430;border-radius:8px;padding:7px 16px;font-size:13px;font-weight:700;cursor:pointer">✗ Reject</button>
-          </div>
-        </div>`).join('')}
-    </div>`:`
-    <div style="background:var(--card);border:1px solid #22c55e30;border-radius:12px;padding:16px 20px;margin-bottom:24px;color:#22c55e;font-size:14px;font-weight:500">
-      ✓ No pending claims
-    </div>`}
-
-    ${reviewed.length?`
-    <div>
-      <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:12px">Recently Reviewed</div>
-      ${reviewed.slice(0,10).map(c=>`
-        <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px 18px;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between;gap:12px">
-          <div>
-            <div style="font-weight:600;font-size:14px">${c.name}</div>
-            <div style="font-size:12px;color:var(--sub);margin-top:2px">📧 ${c.claim_email||'—'}</div>
-          </div>
-          <span style="background:${c.claim_status==='approved'?'#22c55e20':'#ef444420'};color:${c.claim_status==='approved'?'#22c55e':'#ef4444'};border:1px solid ${c.claim_status==='approved'?'#22c55e30':'#ef444430'};border-radius:20px;padding:3px 12px;font-size:11px;font-weight:700">${c.claim_status}</span>
-        </div>`).join('')}
-    </div>`:''}
-  `;
+ ${reviewed.length?`
+ <div> <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:12px">Recently Reviewed</div> ${reviewed.slice(0,10).map(c=>`
+ <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px 18px;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between;gap:12px"> <div> <div style="font-weight:600;font-size:14px">${c.name}</div> <div style="font-size:12px;color:var(--sub);margin-top:2px"> ${c.claim_email||'—'}</div> </div> <span style="background:${c.claim_status==='approved'?'#22c55e20':'#ef444420'};color:${c.claim_status==='approved'?'#22c55e':'#ef4444'};border:1px solid ${c.claim_status==='approved'?'#22c55e30':'#ef444430'};border-radius:20px;padding:3px 12px;font-size:11px;font-weight:700">${c.claim_status}</span> </div>`).join('')}
+ </div>`:''}
+ `;
 }
 
 async function approveClaim(venueId, venueName){
-  if(!confirm(`Approve claim for "${venueName}"? This confirms the person who claimed it is the real owner.`))return;
-  const{error}=await sb.from('venues').update({
-    claim_status:'approved',
-    status:'approved',
-  }).eq('id',venueId);
-  if(error){alert('Error: '+error.message);return;}
-  showToast(`✓ Claim approved — ${venueName} is now live`,'success');
-  renderClaims();
+ if(!confirm(`Approve claim for "${venueName}"? This confirms the person who claimed it is the real owner.`))return;
+ const{error}=await sb.from('venues').update({
+ claim_status:'approved',
+ status:'approved',
+ }).eq('id',venueId);
+ if(error){alert('Error: '+error.message);return;}
+ showToast(` Claim approved — ${venueName} is now live`,'success');
+ renderClaims();
 }
 
 async function rejectClaim(venueId, venueName){
-  const reason=prompt(`Reason for rejecting claim on "${venueName}" (optional):`);
-  if(reason===null)return; // cancelled
-  const{error}=await sb.from('venues').update({
-    claim_status:'rejected',
-    owner_id:null,
-    claim_email:null,
-  }).eq('id',venueId);
-  if(error){alert('Error: '+error.message);return;}
-  showToast(`Claim rejected for ${venueName}`,'error');
-  renderClaims();
+ const reason=prompt(`Reason for rejecting claim on "${venueName}" (optional):`);
+ if(reason===null)return; // cancelled
+ const{error}=await sb.from('venues').update({
+ claim_status:'rejected',
+ owner_id:null,
+ claim_email:null,
+ }).eq('id',venueId);
+ if(error){alert('Error: '+error.message);return;}
+ showToast(`Claim rejected for ${venueName}`,'error');
+ renderClaims();
 }
 
 </script>
