@@ -68,6 +68,11 @@ function AuthProvider({ children }) {
  return () => subscription.unsubscribe();
  }, []);
  async function fetchProfile(id) {
+ // Redirect if wrong portal
+ const{data:rd}=await sb.from('user_roles').select('role').eq('user_id',id).maybeSingle();
+ const role=rd?.role;
+ if(role==='vendor'){window.location.href='https://cbusevents.com/cbus-vendor-portal.html';return;}
+ if(role==='customer'||role==='planner'){window.location.href='https://cbusevents.com/cbus-planner-portal.html';return;}
  const { data } = await sb.from("profiles").select("*").eq("id", id).single();
  setProfile(data); setLoading(false);
  }
@@ -257,6 +262,7 @@ function EventModal({event,venueId,venueTier,currentEventCount,onClose,onSave}) 
 
 function EventsManager({venue,events,onRefresh}) {
  const [modal,setModal]=useState(null);
+ const [shareEvent,setShareEvent]=useState(null);
  const del=async id=>{if(!confirm("Delete this event?"))return;await sb.from("events").delete().eq("id",id);onRefresh();};
  return (
  <div> {(()=>{

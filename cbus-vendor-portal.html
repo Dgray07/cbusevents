@@ -289,6 +289,15 @@ async function doSignOut(){
 }
 
 async function enterPortal(){
+ // Check role first — redirect if wrong portal
+ const{data:roleData}=await sb.from('user_roles').select('role').eq('user_id',currentUser.id).maybeSingle();
+ const role=roleData?.role||'vendor';
+ const rolePortals={venue_owner:'cbus-venue-portal.html',planner:'cbus-planner-portal.html',customer:'customer-portal.html'};
+ if(rolePortals[role]){
+   window.location.href='https://cbusevents.com/'+rolePortals[role];
+   return;
+ }
+
  // Load vendor profile
  const{data}=await sb.from('vendors').select('*').eq('user_id',currentUser.id).maybeSingle();
  if(!data){

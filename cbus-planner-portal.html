@@ -255,6 +255,11 @@ async function init(){
  const{data:{session}}=await sb.auth.getSession();
  if(session){
  currentUser=session.user;
+ // Redirect if wrong portal
+ const{data:rd}=await sb.from('user_roles').select('role').eq('user_id',currentUser.id).maybeSingle();
+ const role=rd?.role;
+ if(role==='vendor'){window.location.href='https://cbusevents.com/cbus-vendor-portal.html';return;}
+ if(role==='venue_owner'){window.location.href='https://cbusevents.com/cbus-venue-portal.html';return;}
  await loadData();
  await handleBoostReturn();
  setLoggedInNav();
