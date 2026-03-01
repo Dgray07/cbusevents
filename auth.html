@@ -319,6 +319,14 @@ async function doSignUp(){
 
   // 1. Create auth user
   const{data,error:authErr}=await sb.auth.signUp({email,password:pass});
+  console.log('SIGNUP RESPONSE:', JSON.stringify({
+    user: data?.user?.id,
+    email: data?.user?.email,
+    confirmed: data?.user?.email_confirmed_at,
+    session: !!data?.session,
+    error: authErr?.message,
+    status: authErr?.status,
+  }));
   if(authErr){
     showStep(3);
     const msg=authErr.message||'';
@@ -333,7 +341,9 @@ async function doSignUp(){
       btn.onclick=()=>setMode('signin');
       btn.disabled=false;
     } else {
+      // Show the EXACT error so we can diagnose
       document.getElementById('suErr').textContent=msg||'Signup failed — please try again.';
+      console.error('SIGNUP AUTH ERROR:', authErr);
       btn.disabled=false;btn.textContent='Create Account →';
     }
     return;
@@ -372,7 +382,8 @@ async function doSignUp(){
   // 3. Set role
   const roleMap={planner:'customer'};
   const dbRole=roleMap[selectedRole]||selectedRole;
-  await sb.from('user_roles').upsert({user_id:finalUserId,role:dbRole},{onConflict:'user_id'}).catch(e=>console.warn('role:',e?.message));
+  try { await sb.from('user_roles').upsert({user_id:finalUserId,role:dbRole},{onConflict:'user_id'}); }
+  catch(e){ console.warn('role:',e?.message); }
 
   // 4. Create profile — fire and forget, NEVER block redirect on DB errors
   const destUrl = PORTAL_URLS[selectedRole]||PORTAL_URLS.customer;
@@ -385,7 +396,7 @@ async function doSignUp(){
             owner_id:finalUserId, claim_status:'pending',
             claimed_at:new Date().toISOString(), claim_email:email,
           }).eq('id',selectedClaimId);
-          await sb.from('user_roles').update({claim_venue_id:selectedClaimId}).eq('user_id',finalUserId).catch(()=>{});
+          try { await sb.from('user_roles').update({claim_venue_id:selectedClaimId}).eq('user_id',finalUserId); } catch(e){}
         } else {
           await sb.from('venues').insert({
             name:stepData.venueName||'My Venue',
