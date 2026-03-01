@@ -863,44 +863,6 @@ function showPricing(){
 }
 
 // ── JOIN DROPDOWN ─────────────────────────────────────────────
-
-// ── FAVORITES ─────────────────────────────────────────────────
-let currentUserId=null;
-let savedVenueIds=new Set();
-let savedEventIds=new Set();
-
-async function loadSavedState(){
-  try {
-    const{data:{session}}=await sb.auth.getSession();
-    if(!session?.user) return;
-    currentUserId=session.user.id;
-    // Show all save buttons
-    document.querySelectorAll('.save-btn').forEach(b=>b.style.display='flex');
-    document.querySelectorAll('.save-btn').forEach(b=>{b.style.alignItems='center';b.style.justifyContent='center';});
-    // Load saved venues
-    const{data:saved}=await sb.from('customer_saved_venues').select('venue_id').eq('user_id',currentUserId);
-    if(saved) saved.forEach(s=>{
-      savedVenueIds.add(s.venue_id);
-      const btn=document.getElementById('save-'+s.venue_id);
-      if(btn){btn.textContent='♥';btn.classList.add('saved');}
-    });
-  } catch(e){}
-}
-
-async function toggleSave(venueId, btn){
-  if(!currentUserId){window.location.href='https://cbusevents.com/auth.html?role=customer';return;}
-  const isSaved=savedVenueIds.has(venueId);
-  if(isSaved){
-    savedVenueIds.delete(venueId);
-    btn.textContent='♡';btn.classList.remove('saved');
-    await sb.from('customer_saved_venues').delete().eq('user_id',currentUserId).eq('venue_id',venueId);
-  } else {
-    savedVenueIds.add(venueId);
-    btn.textContent='♥';btn.classList.add('saved');
-    await sb.from('customer_saved_venues').upsert({user_id:currentUserId,venue_id:venueId},{onConflict:'user_id,venue_id'});
-  }
-}
-
 function toggleJoinMenu(){
  const m=document.getElementById('joinMenu');
  if(m)m.style.display=m.style.display==='none'?'block':'none';
