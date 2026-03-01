@@ -276,7 +276,7 @@ async function doAuth(){
  const{data,error:e}=await sb.auth.signUp({email,password:pass});
  error=e;
  if(!error&&data.user){
- await sb.from('vendors').upsert({user_id:data.user.id,email,business_name:name||email,name:name||email,subscription_tier:'FREE',subscription_status:'free'},{onConflict:'user_id'}).catch(()=>{});
+ await sb.from('vendors').upsert({user_id:data.user.id,email,business_name:name||email,name:name||email,subscription_tier:'FREE',subscription_status:'free'},{onConflict:'user_id'});
  }
  }
  if(error){errEl.textContent=error.message;btn.disabled=false;btn.textContent=currentTab==='signin'?'Sign In':'Create Account';}
@@ -293,7 +293,7 @@ async function enterPortal(){
  const{data}=await sb.from('vendors').select('*').eq('user_id',currentUser.id).maybeSingle();
  if(!data){
  // Create profile if doesn't exist
- const{data:newVendor}=await sb.from('vendors').insert({user_id:currentUser.id,email:currentUser.email,business_name:currentUser.email,subscription_tier:'FREE',subscription_status:'free'}).select().single().catch(()=>({data:null}));
+ const{data:newVendor}=await sb.from('vendors').insert({user_id:currentUser.id,email:currentUser.email,business_name:currentUser.email,subscription_tier:'FREE',subscription_status:'free'}).select().single() ?? {data:null};
  vendorProfile=newVendor;
  } else {
  vendorProfile=data;
@@ -345,7 +345,7 @@ async function renderDashboard(){
  document.getElementById('dashSub').textContent=`Welcome back${name?', '+name:''}! Here's your vendor overview.`;
 
  const tier=(vendorProfile?.subscription_tier||'FREE').toUpperCase();
- const sentProposals=await sb.from('vendor_proposals').select('id,status').eq('vendor_id',vendorProfile?.id).catch(()=>({data:[]}));
+ const sentProposals=await sb.from('vendor_proposals').select('id,status').eq('vendor_id',vendorProfile?.id) ?? {data:[]};
  const proposals=sentProposals.data||[];
  const accepted=proposals.filter(p=>p.status==='accepted').length;
 
@@ -527,7 +527,7 @@ async function loadBrowseEvents(){
  }
 
  // Check which events already have proposals from this vendor
- const{data:myProps}=await sb.from('vendor_proposals').select('event_id').eq('vendor_id',vendorProfile.id).catch(()=>({data:[]}));
+ const{data:myProps}=await sb.from('vendor_proposals').select('event_id').eq('vendor_id',vendorProfile.id) ?? {data:[]};
  const proposedIds=new Set((myProps||[]).map(p=>p.event_id));
 
  el.innerHTML=events.map(e=>`

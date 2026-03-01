@@ -396,6 +396,10 @@ footer { background:var(--surface); border-top:1px solid var(--border); padding:
  footer{padding:32px 16px 24px;}
  .footer-bottom{flex-direction:column;gap:8px;}
 }
+
+.save-btn{transition:all 0.15s;}
+.save-btn.saved{color:#ef4444 !important;border-color:#ef444460 !important;}
+.save-btn:hover{background:rgba(0,0,0,0.85) !important;}
 </style>
 </head>
 <body> <!-- NAV -->
@@ -850,9 +854,74 @@ function showPricing(){
 }
 
 // ── JOIN DROPDOWN ─────────────────────────────────────────────
+
+// ── FAVORITES ─────────────────────────────────────────────────
+let currentUserId=null;
+let savedVenueIds=new Set();
+let savedEventIds=new Set();
+
+async function loadSavedState(){
+  try {
+    const{data:{session}}=await sb.auth.getSession();
+    if(!session?.user) return;
+    currentUserId=session.user.id;
+    // Show all save buttons
+    document.querySelectorAll('.save-btn').forEach(b=>b.style.display='flex');
+    document.querySelectorAll('.save-btn').forEach(b=>{b.style.alignItems='center';b.style.justifyContent='center';});
+    // Load saved venues
+    const{data:saved}=await sb.from('customer_saved_venues').select('venue_id').eq('user_id',currentUserId);
+    if(saved) saved.forEach(s=>{
+      savedVenueIds.add(s.venue_id);
+      const btn=document.getElementById('save-'+s.venue_id);
+      if(btn){btn.textContent='♥';btn.classList.add('saved');}
+    });
+  } catch(e){}
+}
+
+async function toggleSave(venueId, btn){
+  if(!currentUserId){window.location.href='https://cbusevents.com/auth.html?role=customer';return;}
+  const isSaved=savedVenueIds.has(venueId);
+  if(isSaved){
+    savedVenueIds.delete(venueId);
+    btn.textContent='♡';btn.classList.remove('saved');
+    await sb.from('customer_saved_venues').delete().eq('user_id',currentUserId).eq('venue_id',venueId);
+  } else {
+    savedVenueIds.add(venueId);
+    btn.textContent='♥';btn.classList.add('saved');
+    await sb.from('customer_saved_venues').upsert({user_id:currentUserId,venue_id:venueId},{onConflict:'user_id,venue_id'});
+  }
+}
+
 function toggleJoinMenu(){
  const m=document.getElementById('joinMenu');
  if(m)m.style.display=m.style.display==='none'?'block':'none';
+}
+
+// ── AUTH STATE IN NAV ─────────────────────────────────────
+async function initNavAuth(){
+  try {
+    const{data:{session}}=await sb.auth.getSession();
+    if(session?.user){
+      const userId=session.user.id;
+      // Get their role to show right portal link
+      const{data:roleData}=await sb.from('user_roles').select('role').eq('user_id',userId).maybeSingle();
+      const role=roleData?.role||'customer';
+      const portalUrls={
+        venue_owner:'https://cbusevents.com/cbus-venue-portal.html',
+        vendor:'https://cbusevents.com/cbus-vendor-portal.html',
+        planner:'https://cbusevents.com/cbus-planner-portal.html',
+        customer:'https://cbusevents.com/customer-portal.html',
+      };
+      const portalLabels={venue_owner:'Venue Portal',vendor:'Vendor Portal',planner:'Planner Portal',customer:'My Account'};
+      const navRight=document.querySelector('nav > div:last-child');
+      if(navRight){
+        navRight.innerHTML=`
+          <button class="nav-link" onclick="window.location.href='${portalUrls[role]||portalUrls.customer}'" style="color:var(--orange);font-weight:600">${portalLabels[role]||'My Account'}</button>
+          <button class="nav-cta" onclick="sb.auth.signOut().then(()=>window.location.reload())" style="background:#1a1a24;border:1px solid #25252f;color:#8888a0">Sign Out</button>
+        `;
+      }
+    }
+  } catch(e){}
 }
 document.addEventListener('click',function(e){
  const d=document.getElementById('joinDropdown');

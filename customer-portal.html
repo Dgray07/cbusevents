@@ -194,7 +194,7 @@ async function doAuth(){
  const{data,error:e}=await sb.auth.signUp({email,password:pass});
  error=e;
  if(!error&&name&&data.user){
- await sb.from('customer_profiles').upsert({user_id:data.user.id,display_name:name},{onConflict:'user_id'}).catch(()=>{});
+ await sb.from('customer_profiles').upsert({user_id:data.user.id,display_name:name},{onConflict:'user_id'});
  }
  }
  if(error){errEl.textContent=error.message;btn.disabled=false;btn.textContent=currentTab==='signin'?'Sign In':'Create Account';}
@@ -240,7 +240,7 @@ function loadPage(p){
 // ── FEED ────────────────────────────────────────────────────────
 async function loadFeed(){
  const el=document.getElementById('feedContent');
- const{data:follows}=await sb.from('customer_venue_follows').select('venue_id').eq('user_id',currentUser.id).catch(()=>({data:[]}));
+ const{data:follows}=await sb.from('customer_venue_follows').select('venue_id').eq('user_id',currentUser.id) ?? {data:[]};
  const followedIds=(follows||[]).map(f=>f.venue_id);
 
  const{data:events}=await sb.from('events')
@@ -359,7 +359,7 @@ async function loadFollows(){
 async function loadProfile(){
  const el=document.getElementById('profileContent');
  const{data:profile}=await sb.from('customer_profiles')
- .select('*').eq('user_id',currentUser.id).single().catch(()=>({data:{}}));
+ .select('*').eq('user_id',currentUser.id).single() ?? {data:{}};
 
  el.innerHTML=`
  <div class="profile-card"> <div class="field"><label>Display Name</label><input id="profName" value="${profile?.display_name||''}" placeholder="Your name"/></div> <div class="field"><label>Email (read-only)</label><input value="${currentUser.email}" disabled style="opacity:0.5"/></div> <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px"> <label style="font-size:12px;color:var(--sub);font-weight:500">Email Notifications</label> <input type="checkbox" id="profNotif" ${profile?.notification_email!==false?'checked':''} style="width:16px;height:16px;accent-color:var(--orange)"/> </div> <button class="btn-primary" style="padding:10px" onclick="saveProfile()">Save Changes</button> <div id="profMsg" style="color:var(--green);font-size:13px;margin-top:10px;min-height:18px"></div> <div style="margin-top:20px;padding-top:16px;border-top:1px solid var(--border);color:var(--muted);font-size:12px"> Member since ${new Date(currentUser.created_at).toLocaleDateString('en-US',{month:'long',year:'numeric'})}
@@ -372,7 +372,7 @@ async function saveProfile(){
  display_name:document.getElementById('profName').value.trim(),
  notification_email:document.getElementById('profNotif').checked,
  updated_at:new Date().toISOString()
- },{onConflict:'user_id'}).catch(()=>{});
+ },{onConflict:'user_id'});
  const msg=document.getElementById('profMsg');
  if(msg){msg.textContent=' Saved!';setTimeout(()=>msg.textContent='',3000);}
 }
@@ -380,17 +380,17 @@ async function saveProfile(){
 // ── ACTIONS ────────────────────────────────────────────────────
 async function unsaveVenue(venueId,btn){
  btn.textContent='Removing…';
- await sb.from('customer_saved_venues').delete().eq('user_id',currentUser.id).eq('venue_id',venueId).catch(()=>{});
+ await sb.from('customer_saved_venues').delete().eq('user_id',currentUser.id).eq('venue_id',venueId);
  btn.closest('.card').remove();
 }
 async function unsaveEvent(eventId,btn){
  btn.textContent='Removing…';
- await sb.from('customer_saved_events').delete().eq('user_id',currentUser.id).eq('event_id',eventId).catch(()=>{});
+ await sb.from('customer_saved_events').delete().eq('user_id',currentUser.id).eq('event_id',eventId);
  btn.closest('.card').remove();
 }
 async function unfollowVenue(venueId,btn){
  btn.textContent='Unfollowing…';
- await sb.from('customer_venue_follows').delete().eq('user_id',currentUser.id).eq('venue_id',venueId).catch(()=>{});
+ await sb.from('customer_venue_follows').delete().eq('user_id',currentUser.id).eq('venue_id',venueId);
  btn.closest('.card').remove();
 }
 
