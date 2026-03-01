@@ -196,7 +196,26 @@ footer{background:var(--surface);border-top:1px solid var(--border);padding:20px
 <body> <!-- ── AUTH GATE ── -->
 <div id="authGate"> <div class="auth-wrap"> <div class="auth-card"> <div class="auth-logo">CBUS<span>EVENTS</span></div> <p class="auth-sub">Vendor Portal — reach venues & planners across Columbus</p> <div class="auth-tabs"> <button class="auth-tab active" id="tabSignin" onclick="switchTab('signin')">Sign In</button> <button class="auth-tab" id="tabSignup" onclick="switchTab('signup')">Create Account</button> </div> <div id="nameField" class="field" style="display:none"> <label>Business Name</label> <input id="authName" placeholder="e.g. Columbus Creative Co."/> </div> <div class="field"> <label>Email</label> <input type="email" id="authEmail" placeholder="you@business.com" onkeydown="if(event.key==='Enter')doAuth()"/> </div> <div class="field"> <label>Password</label> <input type="password" id="authPass" placeholder="••••••••" onkeydown="if(event.key==='Enter')doAuth()"/> </div> <div class="auth-err" id="authErr"></div> <button class="btn-primary" id="authBtn" onclick="doAuth()">Sign In</button> <div style="text-align:center;margin-top:14px;font-size:13px;color:var(--sub)"> <span id="authSwitchText">New vendor?</span> <button onclick="switchTab(currentTab==='signin'?'signup':'signin')" style="background:none;border:none;color:var(--orange);font-size:13px;font-weight:600;margin-left:4px" id="authSwitchBtn">Create a free account</button> </div> <div style="text-align:center;margin-top:12px"> <a href="https://cbusevents.com" style="color:var(--muted);font-size:12px">← Back to CBUSEVENTS</a> </div> </div> </div>
 </div> <!-- ── PORTAL ── -->
-<div id="portal" style="display:none"> <nav> <div class="nav-logo" onclick="window.location.href='https://cbusevents.com'"> CBUS<span>EVENTS</span> <span class="nav-logo-sub">Vendor</span> </div> <div class="nav-right"> <span class="nav-plan plan-free" id="navPlanBadge">Free</span> <button class="nav-home" onclick="window.location.href='https://cbusevents.com'"> Home</button> <button class="nav-signout" onclick="doSignOut()">Sign Out</button> </div> </nav> <div class="portal-layout"> <!-- Sidebar --> <aside class="sidebar"> <div class="sidebar-section">My Business</div> <div class="nav-item active" id="nav-dashboard" onclick="showPage('dashboard')">⊞ Dashboard</div> <div class="nav-item" id="nav-profile" onclick="showPage('profile')"> My Profile</div> <div class="nav-item" id="nav-services" onclick="showPage('services')"> Services & Products</div> <div class="nav-item" id="nav-portfolio" onclick="showPage('portfolio')"> Portfolio</div> <div class="sidebar-section">Growth</div> <div class="nav-item" id="nav-proposals" onclick="showPage('proposals')"> Proposals <span class="badge" id="proposalBadge" style="display:none">0</span></div> <div class="nav-item" id="nav-events" onclick="showPage('events')"> Browse Events</div> <div class="nav-item" id="nav-plan" onclick="showPage('plan')">⭐ Plan & Billing</div> </aside> <!-- Pages --> <main class="content"> <!-- DASHBOARD --> <div class="page active" id="page-dashboard"> <div class="page-title">Welcome back!</div> <div class="page-sub" id="dashSub">Here's your vendor overview.</div> <div class="stat-grid" id="dashStats"></div> <div id="dashContent"></div> </div> <!-- PROFILE --> <div class="page" id="page-profile"> <div class="page-title">My Vendor Profile</div> <div class="page-sub">This is how venues and planners see your business</div> <div class="card" style="max-width:640px"> <div class="card-body" style="display:flex;flex-direction:column;gap:14px"> <div class="field"><label>Business Name *</label><input id="profName" placeholder="e.g. Columbus Creative Co."/></div> <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px"> <div class="field"><label>Email</label><input id="profEmail" type="email" placeholder="contact@yourbiz.com"/></div> <div class="field"><label>Phone</label><input id="profPhone" placeholder="(614) 555-0000"/></div> </div> <div class="field"><label>Website</label><input id="profWebsite" placeholder="https://yourbiz.com"/></div> <div class="field"><label>Bio / About Your Business</label><textarea id="profBio" placeholder="Tell venues and planners what makes you special..."></textarea></div> <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px"> <div style="grid-column:1/-1;font-family:'DM Sans',sans-serif;font-size:12px;color:var(--sub);font-weight:700;text-transform:uppercase;letter-spacing:1px;padding-top:4px"> Social Media — share events to your followers</div> <div class="field"><label>Instagram</label><input id="profInsta" placeholder="@handle"/></div> <div class="field"><label>TikTok</label><input id="profTiktok" placeholder="@handle"/></div> <div class="field"><label>Facebook Page URL</label><input id="profFacebook" placeholder="https://facebook.com/yourpage"/></div> <div class="field"><label>X / Twitter</label><input id="profTwitter" placeholder="@handle"/></div> <div class="field"><label>Years in Business</label><input id="profYears" type="number" placeholder="5"/></div> </div> <div id="profMsg" style="color:var(--green);font-size:13px;min-height:18px"></div> <button class="btn btn-orange" onclick="saveProfile()" style="align-self:flex-start;padding:10px 24px">Save Profile →</button> </div> </div> </div> <!-- SERVICES --> <div class="page" id="page-services"> <div class="page-title">Services & Products</div> <div class="page-sub">Select everything your business offers — this determines how you appear in search</div> <div class="services-grid" id="servicesGrid"></div> <div style="margin-top:20px"> <div class="field" style="max-width:480px"> <label>Custom service or product not listed above?</label> <input id="customService" placeholder="e.g. Custom Neon Signs, Photo Booths..."/> </div> <button class="btn btn-orange" onclick="saveServices()" style="margin-top:4px">Save Services →</button> <div id="servicesMsg" style="color:var(--green);font-size:13px;margin-top:8px;min-height:18px"></div> </div> </div> <!-- PORTFOLIO --> <div class="page" id="page-portfolio"> <div class="page-title">Portfolio</div> <div class="page-sub">Showcase your work — photos help you get chosen. Free for all vendors.</div> <div class="portfolio-grid" id="portfolioGrid"></div> <div style="margin-top:4px"> <div class="field" style="max-width:500px"> <label>Add photo by URL</label> <div style="display:flex;gap:8px"> <input id="photoUrl" placeholder="https://... (paste image URL)"/> <button class="btn btn-orange" onclick="addPhoto()" style="white-space:nowrap;flex-shrink:0">Add Photo</button> </div> </div> <div id="portfolioMsg" style="color:var(--green);font-size:13px;margin-top:8px;min-height:18px"></div> </div> </div> <!-- PROPOSALS --> <div class="page" id="page-proposals"> <div class="page-title">My Proposals</div> <div class="page-sub">Track proposals you've sent to venues and event planners</div> <div id="proposalsContent"><div class="spinner"></div></div> </div> <!-- BROWSE EVENTS --> <div class="page" id="page-events"> <div class="page-title">Browse Events</div> <div class="page-sub">Find upcoming events and send proposals to the organizers</div> <div id="eventsContent"><div class="spinner"></div></div> </div> <!-- PLAN --> <div class="page" id="page-plan"> <div class="page-title">Plan & Billing</div> <div class="page-sub">Upgrade to get featured and send proposals directly to venues & planners</div> <div id="planContent"></div> </div> </main> </div> <footer> <span class="footer-copy">© 2026 CBUSEVENTS · Columbus, Ohio</span> <div style="display:flex;align-items:center;gap:20px"> <span class="footer-copy">Made for Columbus </span> <a href="https://cbusevents.com/cbus-admin.html" class="footer-admin">Admin</a> </div> </footer>
+<div id="portal" style="display:none"> <nav> <div class="nav-logo" onclick="window.location.href='https://cbusevents.com'"> CBUS<span>EVENTS</span> <span class="nav-logo-sub">Vendor</span> </div> <div class="nav-right"> <span class="nav-plan plan-free" id="navPlanBadge">Free</span> <button class="nav-home" onclick="window.location.href='https://cbusevents.com'"> Home</button> <button class="nav-signout" onclick="doSignOut()">Sign Out</button> </div> </nav> <div class="portal-layout"> <!-- Sidebar --> <aside class="sidebar"> <div class="sidebar-section">My Business</div> <div class="nav-item active" id="nav-dashboard" onclick="showPage('dashboard')">⊞ Dashboard</div> <div class="nav-item" id="nav-profile" onclick="showPage('profile')"> My Profile</div> <div class="nav-item" id="nav-services" onclick="showPage('services')"> Services & Products</div> <div class="nav-item" id="nav-portfolio" onclick="showPage('portfolio')"> Portfolio</div> <div class="sidebar-section">Growth</div> <div class="nav-item" id="nav-proposals" onclick="showPage('proposals')"> Proposals <span class="badge" id="proposalBadge" style="display:none">0</span></div> <div class="nav-item" id="nav-events" onclick="showPage('events')"> Browse Events</div> <div class="nav-item" id="nav-plan" onclick="showPage('plan')">⭐ Plan & Billing</div> </aside> <!-- Pages --> <main class="content"> <!-- DASHBOARD --> <div class="page active" id="page-dashboard"> <div class="page-title">Welcome back!</div> <div class="page-sub" id="dashSub">Here's your vendor overview.</div> <div class="stat-grid" id="dashStats"></div> <div id="dashContent"></div> </div> <!-- PROFILE --> <div class="page" id="page-profile"> <div class="page-title">My Vendor Profile</div> <div class="page-sub">This is how venues and planners see your business</div> <div class="card" style="max-width:640px"> <div class="card-body" style="display:flex;flex-direction:column;gap:14px"> <div class="field"><label>Business Name *</label><input id="profName" placeholder="e.g. Columbus Creative Co."/></div> <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px"> <div class="field"><label>Email</label><input id="profEmail" type="email" placeholder="contact@yourbiz.com"/></div> <div class="field"><label>Phone</label><input id="profPhone" placeholder="(614) 555-0000"/></div> </div> <div class="field"><label>Website</label><input id="profWebsite" placeholder="https://yourbiz.com"/></div> <div class="field"><label>Bio / About Your Business</label><textarea id="profBio" placeholder="Tell venues and planners what makes you special..."></textarea></div> <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px"> <div style="grid-column:1/-1;font-family:'DM Sans',sans-serif;font-size:12px;color:var(--sub);font-weight:700;text-transform:uppercase;letter-spacing:1px;padding-top:4px"> Social Media — share events to your followers</div> <div class="field"><label>Instagram</label><input id="profInsta" placeholder="@handle"/></div> <div class="field"><label>TikTok</label><input id="profTiktok" placeholder="@handle"/></div> <div class="field"><label>Facebook Page URL</label><input id="profFacebook" placeholder="https://facebook.com/yourpage"/></div> <div class="field"><label>X / Twitter</label><input id="profTwitter" placeholder="@handle"/></div> <div class="field"><label>Years in Business</label><input id="profYears" type="number" placeholder="5"/></div> </div> <div id="profMsg" style="color:var(--green);font-size:13px;min-height:18px"></div> <button class="btn btn-orange" onclick="saveProfile()" style="align-self:flex-start;padding:10px 24px">Save Profile →</button> </div> </div> </div> <!-- SERVICES --> <div class="page" id="page-services"> <div class="page-title">Services & Products</div> <div class="page-sub">Select everything your business offers — this determines how you appear in search</div> <div class="services-grid" id="servicesGrid"></div> <div style="margin-top:20px"> <div class="field" style="max-width:480px"> <label>Custom service or product not listed above?</label> <input id="customService" placeholder="e.g. Custom Neon Signs, Photo Booths..."/> </div> <button class="btn btn-orange" onclick="saveServices()" style="margin-top:4px">Save Services →</button> <div id="servicesMsg" style="color:var(--green);font-size:13px;margin-top:8px;min-height:18px"></div> </div> </div> <!-- PORTFOLIO --> <div class="page" id="page-portfolio"> <div class="page-title">Portfolio</div> <div class="page-sub">Showcase your work — photos help you get chosen. Free for all vendors.</div> <div class="portfolio-grid" id="portfolioGrid"></div> <input type="file" id="photoFileInput" accept="image/*" multiple style="display:none" onchange="handlePhotoUpload(event)"/>
+ <div style="margin-top:4px;max-width:500px">
+  <button class="btn btn-orange" onclick="document.getElementById('photoFileInput').click()" style="width:100%;padding:14px;font-size:15px;margin-bottom:12px;display:flex;align-items:center;justify-content:center;gap:8px">
+   <span style="font-size:20px">📷</span> Upload Photos from Gallery
+  </button>
+  <div id="uploadProgress" style="display:none;margin-bottom:10px">
+   <div style="background:var(--surface);border-radius:8px;height:6px;overflow:hidden">
+    <div id="uploadBar" style="background:var(--orange);height:100%;width:0%;transition:width 0.3s"></div>
+   </div>
+   <div id="uploadStatus" style="color:var(--sub);font-size:12px;margin-top:6px"></div>
+  </div>
+  <details style="margin-top:4px">
+   <summary style="color:var(--muted);font-size:12px;cursor:pointer;user-select:none">Or add by URL</summary>
+   <div style="display:flex;gap:8px;margin-top:8px">
+    <input id="photoUrl" placeholder="https://... (paste image URL)"/>
+    <button class="btn btn-orange" onclick="addPhotoByUrl()" style="white-space:nowrap;flex-shrink:0">Add</button>
+   </div>
+  </details>
+  <div id="portfolioMsg" style="color:var(--green);font-size:13px;margin-top:8px;min-height:18px"></div>
+ </div> </div> <!-- PROPOSALS --> <div class="page" id="page-proposals"> <div class="page-title">My Proposals</div> <div class="page-sub">Track proposals you've sent to venues and event planners</div> <div id="proposalsContent"><div class="spinner"></div></div> </div> <!-- BROWSE EVENTS --> <div class="page" id="page-events"> <div class="page-title">Browse Events</div> <div class="page-sub">Find upcoming events and send proposals to the organizers</div> <div id="eventsContent"><div class="spinner"></div></div> </div> <!-- PLAN --> <div class="page" id="page-plan"> <div class="page-title">Plan & Billing</div> <div class="page-sub">Upgrade to get featured and send proposals directly to venues & planners</div> <div id="planContent"></div> </div> </main> </div> <footer> <span class="footer-copy">© 2026 CBUSEVENTS · Columbus, Ohio</span> <div style="display:flex;align-items:center;gap:20px"> <span class="footer-copy">Made for Columbus </span> <a href="https://cbusevents.com/cbus-admin.html" class="footer-admin">Admin</a> </div> </footer>
 </div> <div id="toast" class="toast"></div>
 <div id="modalContainer"></div> <script src="https://unpkg.com/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <script>
@@ -487,16 +506,98 @@ function renderPortfolioGrid(){
  if(!grid)return;
  grid.innerHTML=portfolioPhotos.map((url,i)=>`
  <div class="portfolio-item"> <img src="${url}" alt="Portfolio ${i+1}" onerror="this.parentNode.remove()"> <button class="portfolio-remove" onclick="removePhoto(${i})"></button> </div>`).join('')+`
- <div class="portfolio-add" onclick="document.getElementById('photoUrl').focus()"> <span style="font-size:28px">+</span> <span>Add Photo</span> </div>`;
+ <div class="portfolio-add" onclick="document.getElementById('photoFileInput').click()"> <span style="font-size:28px">📷</span> <span>Upload Photo</span> </div>`;
 }
 
-async function addPhoto(){
+async function addPhotoByUrl(){
  const url=document.getElementById('photoUrl').value.trim();
  if(!url){toast('Paste an image URL first','error');return;}
  if(!url.startsWith('http')){toast('Must be a valid URL starting with https://','error');return;}
  portfolioPhotos=[...portfolioPhotos,url];
  await savePortfolio();
  document.getElementById('photoUrl').value='';
+}
+
+async function handlePhotoUpload(event){
+ const files=[...event.target.files];
+ if(!files.length) return;
+ if(!vendorProfile){toast('Profile not loaded — try refreshing','error');return;}
+
+ const progress=document.getElementById('uploadProgress');
+ const bar=document.getElementById('uploadBar');
+ const status=document.getElementById('uploadStatus');
+ progress.style.display='block';
+
+ let uploaded=0;
+ const errors=[];
+
+ for(let i=0;i<files.length;i++){
+   const file=files[i];
+   status.textContent=`Uploading ${i+1} of ${files.length}...`;
+   bar.style.width=`${Math.round((i/files.length)*100)}%`;
+
+   try {
+     // Compress image before upload using canvas
+     const compressed = await compressImage(file, 1200, 0.82);
+     
+     // Upload to Supabase Storage
+     const fileName=`vendor_${vendorProfile.id || currentUser.id}_${Date.now()}_${i}.jpg`;
+     const {data, error} = await sb.storage
+       .from('vendor-portfolio')
+       .upload(fileName, compressed, {contentType:'image/jpeg', upsert:false});
+     
+     if(error){
+       // Fallback: convert to base64 data URL if storage fails
+       const dataUrl = await fileToDataUrl(file);
+       portfolioPhotos=[...portfolioPhotos, dataUrl];
+     } else {
+       const {data:{publicUrl}} = sb.storage.from('vendor-portfolio').getPublicUrl(fileName);
+       portfolioPhotos=[...portfolioPhotos, publicUrl];
+     }
+     uploaded++;
+   } catch(e){
+     errors.push(file.name);
+   }
+ }
+
+ bar.style.width='100%';
+ await savePortfolio();
+ 
+ setTimeout(()=>{progress.style.display='none';bar.style.width='0%';},1500);
+ event.target.value=''; // reset input
+
+ if(errors.length){
+   toast(`${uploaded} uploaded, ${errors.length} failed`,'error');
+ } else {
+   toast(`${uploaded} photo${uploaded>1?'s':''} uploaded!`);
+ }
+}
+
+function compressImage(file, maxWidth, quality){
+ return new Promise((resolve)=>{
+   const reader=new FileReader();
+   reader.onload=(e)=>{
+     const img=new Image();
+     img.onload=()=>{
+       const canvas=document.createElement('canvas');
+       let w=img.width, h=img.height;
+       if(w>maxWidth){h=Math.round(h*(maxWidth/w));w=maxWidth;}
+       canvas.width=w; canvas.height=h;
+       canvas.getContext('2d').drawImage(img,0,0,w,h);
+       canvas.toBlob(resolve,'image/jpeg',quality);
+     };
+     img.src=e.target.result;
+   };
+   reader.readAsDataURL(file);
+ });
+}
+
+function fileToDataUrl(file){
+ return new Promise((resolve)=>{
+   const reader=new FileReader();
+   reader.onload=(e)=>resolve(e.target.result);
+   reader.readAsDataURL(file);
+ });
 }
 
 async function removePhoto(i){
