@@ -26,8 +26,8 @@ nav{position:sticky;top:0;z-index:100;background:rgba(11,11,15,0.95);backdrop-fi
 
 /* DROPDOWN */
 .dropdown{position:relative;}
-.dropdown-menu{display:none;position:absolute;top:calc(100% + 8px);left:50%;transform:translateX(-50%);background:var(--card);border:1px solid var(--border);border-radius:12px;padding:8px;min-width:180px;box-shadow:0 16px 40px rgba(0,0,0,0.5);z-index:200;}
-.dropdown:hover .dropdown-menu{display:block;}
+.dropdown-menu{display:none;position:absolute;top:calc(100% + 4px);left:50%;transform:translateX(-50%);background:var(--card);border:1px solid var(--border);border-radius:12px;padding:8px;min-width:180px;box-shadow:0 16px 40px rgba(0,0,0,0.5);z-index:200;}
+.dropdown-menu.open{display:block;}
 .dropdown-item{display:block;padding:9px 14px;border-radius:8px;font-size:13px;font-weight:500;color:var(--sub);text-decoration:none;transition:all 0.15s;white-space:nowrap;}
 .dropdown-item:hover{background:var(--surface);color:var(--text);}
 .dropdown-item.active{color:var(--orange);}
@@ -332,6 +332,17 @@ function renderSlider(items,isPlaceholder){
 }
 
 loadSlider();
+
+// ── DROPDOWN TOGGLE ───────────────────────────────────────────
+function toggleDrop(e){
+  e.stopPropagation();
+  const menu=document.querySelector('.dropdown-menu');
+  if(menu)menu.classList.toggle('open');
+}
+document.addEventListener('click',function(){
+  const menu=document.querySelector('.dropdown-menu');
+  if(menu)menu.classList.remove('open');
+});
 </script>
 </body>
 </html>
