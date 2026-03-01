@@ -195,6 +195,23 @@ tr:hover td{background:rgba(255,255,255,0.02);}
 .rev-bar-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;}
 .rev-bar-fill{width:100%;background:var(--orange);border-radius:4px 4px 0 0;opacity:0.8;min-height:4px;transition:height 0.5s ease;}
 .rev-bar-label{font-size:10px;color:var(--muted);}
+
+/* ── ADMIN VENUE CARDS (mobile) ──────────────────────────── */
+.venue-card-mobile{display:none;flex-direction:column;gap:12px;}
+.v-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px;}
+.v-card-name{font-weight:700;font-size:14px;margin-bottom:6px;}
+.v-card-meta{font-size:12px;color:var(--sub);margin-bottom:10px;line-height:1.6;}
+.v-card-actions{display:flex;gap:6px;flex-wrap:wrap;}
+@media(max-width:768px){
+  .venue-card-mobile{display:flex;}
+  .table-card table{display:none;}
+  .filter-row{flex-wrap:wrap;gap:6px;}
+  .filter-chip{font-size:11px;padding:4px 10px;}
+  .search-input{width:100%;margin-left:0 !important;margin-top:4px;}
+  .content{padding:12px !important;}
+  .table-header{flex-direction:column;align-items:flex-start;gap:8px;}
+  .stat-grid{grid-template-columns:1fr 1fr !important;}
+}
 </style>
 </head>
 <body> <div id="app" style="display:flex;width:100%;min-height:100vh;align-items:stretch;"> <div style="text-align:center;"> <div style="font-family:'Syne',sans-serif;font-size:24px;font-weight:800;margin-bottom:16px;">CBUS<span style="color:#FF6B35">EVENTS</span></div> <div style="width:32px;height:32px;border:3px solid #25252f;border-top-color:#FF6B35;border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 12px;"></div> <div style="color:#8888a0;font-size:13px;">Loading admin...</div> </div>
@@ -366,7 +383,8 @@ function renderVenues(){
  document.getElementById('pageContent').innerHTML=`
  <div class="table-card"> <div class="table-header"> <div class="table-title">All Venues (${allVenues.length})</div> <div class="table-actions"> <button class="btn btn-primary btn-sm" onclick="openAddVenueModal()">+ Add Venue</button> </div> </div> <div class="filter-row"> ${['all','pending','approved','premium','standard'].map(f=>`
  <button class="filter-chip${venueFilter===f?' active':''}" onclick="venueFilter='${f}';renderVenues()">${f.charAt(0).toUpperCase()+f.slice(1)} ${f==='all'?'('+allVenues.length+')':f==='pending'?'('+filters.pending.length+')':f==='approved'?'('+filters.approved.length+')':f==='premium'?'('+filters.premium.length+')':'('+filters.standard.length+')'}</button> `).join('')}
- <input class="search-input" placeholder="Search venues..." oninput="searchVenues(this.value)" style="margin-left:auto"> </div> <table> <thead><tr><th>Venue</th><th>Type</th><th>Neighborhood</th><th>Status</th><th>Plan</th><th>Featured</th><th>Actions</th></tr></thead> <tbody id="venueTableBody"> ${renderVenueRows(filtered)}
+ <input class="search-input" placeholder="Search venues..." oninput="searchVenues(this.value)" style="margin-left:auto"> </div> <div class="venue-card-mobile" id="venueCardBody">${renderVenueCards(filtered)}</div>
+ <table> <thead><tr><th>Venue</th><th>Type</th><th>Neighborhood</th><th>Status</th><th>Plan</th><th>Featured</th><th>Actions</th></tr></thead> <tbody id="venueTableBody"> ${renderVenueRows(filtered)}
  </tbody> </table> </div> `;
 }
 
@@ -376,13 +394,15 @@ function renderVenueRows(venues){
  <tr> <td> <strong style="font-size:13px">${v.name}</strong> ${v.website?`<div style="font-size:11px"><a href="${v.website}" target="_blank" style="color:var(--orange)">${v.website.replace('https://','')}</a></div>`:''}
  </td> <td style="color:var(--sub)">${v.venue_type||'—'}</td> <td style="color:var(--sub)">${v.neighborhood||'—'}</td> <td><span class="badge ${v.status==='approved'?'badge-green':v.status==='pending'?'badge-orange':'badge-red'}">${v.status}</span></td> <td><span class="badge ${v.tier==='premium'?'badge-gold':v.tier==='standard'?'badge-blue':'badge-muted'}">${v.tier||'free'}</span></td> <td>${v.is_featured?'<span class="badge badge-gold">⭐ Yes</span>':'<span class="badge badge-muted">—</span>'}</td> <td> <div style="display:flex;gap:5px;flex-wrap:wrap"> ${v.status==='pending'?`<button class="btn btn-success btn-sm" onclick="approveVenue('${v.id}')">Approve</button>`:''}
  ${v.status!=='rejected'?`<button class="btn btn-ghost btn-sm" onclick="openTierModal('${v.id}')">Tier</button>`:''}
- <button class="btn btn-ghost btn-sm" onclick="toggleVenueFeature('${v.id}',${!v.is_featured})">${v.is_featured?'Unfeature':'⭐ Feature'}</button> <button class="btn btn-danger btn-sm" onclick="deleteVenue('${v.id}','${v.name.replace(/'/g,"\\'")}')"></button> </div> </td> </tr>`).join('');
+ <button class="btn btn-ghost btn-sm" onclick="toggleVenueFeature('${v.id}',${!v.is_featured})">${v.is_featured?'Unfeature':'⭐ Feature'}</button> <button class="btn btn-danger btn-sm" onclick="deleteVenue('${v.id}','${v.name.replace(/'/g,"\\'")}')">Delete</button> </div> </td> </tr>`).join('');
 }
 
 function searchVenues(q){
  const f=allVenues.filter(v=>v.name.toLowerCase().includes(q.toLowerCase())||(v.venue_type||'').toLowerCase().includes(q.toLowerCase())||(v.neighborhood||'').toLowerCase().includes(q.toLowerCase()));
  const el=document.getElementById('venueTableBody');
  if(el)el.innerHTML=renderVenueRows(f);
+ const cards=document.getElementById('venueCardBody');
+ if(cards)cards.innerHTML=renderVenueCards(f);
 }
 
 // ── EVENTS ────────────────────────────────────────────────────
@@ -400,7 +420,7 @@ function renderEvents(){
 function renderEventRows(events){
  if(!events.length)return'<tr class="empty-row"><td colspan="6">No events found</td></tr>';
  return events.map(e=>`
- <tr> <td><strong>${e.title}</strong>${e.is_free?'<span style="color:var(--green);font-size:11px;margin-left:6px">FREE</span>':e.price_min?`<span style="font-size:11px;color:var(--sub);margin-left:6px">$${e.price_min}</span>`:''}</td> <td style="color:var(--sub)">${e.venues?.name||'—'}</td> <td style="color:var(--muted)">${new Date(e.start_time).toLocaleDateString()} ${new Date(e.start_time).toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'})}</td> <td style="color:var(--sub)">${e.category||'—'}</td> <td><span class="badge ${e.status==='published'?'badge-green':'badge-muted'}">${e.status}</span></td> <td>${e.is_boosted?`<span class="badge badge-gold"> ${e.boost_type||'boosted'}</span>`:`<span class="badge badge-muted">—</span>`}</td> <td><div style="display:flex;gap:5px;flex-wrap:wrap"> <button class="btn btn-ghost btn-sm" onclick="toggleEventBoost('${e.id}',${!e.is_boosted})">${e.is_boosted?'↓ Unboost':' Boost'}</button> <button class="btn btn-danger btn-sm" onclick="deleteEvent('${e.id}','${e.title.replace(/'/g,"\\'")}')"></button> </div></td> </tr>`).join('');
+ <tr> <td><strong>${e.title}</strong>${e.is_free?'<span style="color:var(--green);font-size:11px;margin-left:6px">FREE</span>':e.price_min?`<span style="font-size:11px;color:var(--sub);margin-left:6px">$${e.price_min}</span>`:''}</td> <td style="color:var(--sub)">${e.venues?.name||'—'}</td> <td style="color:var(--muted)">${new Date(e.start_time).toLocaleDateString()} ${new Date(e.start_time).toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'})}</td> <td style="color:var(--sub)">${e.category||'—'}</td> <td><span class="badge ${e.status==='published'?'badge-green':'badge-muted'}">${e.status}</span></td> <td>${e.is_boosted?`<span class="badge badge-gold"> ${e.boost_type||'boosted'}</span>`:`<span class="badge badge-muted">—</span>`}</td> <td><div style="display:flex;gap:5px;flex-wrap:wrap"> <button class="btn btn-ghost btn-sm" onclick="toggleEventBoost('${e.id}',${!e.is_boosted})">${e.is_boosted?'↓ Unboost':' Boost'}</button> <button class="btn btn-danger btn-sm" onclick="deleteEvent('${e.id}','${e.title.replace(/'/g,"\\'")}')">Delete</button> </div></td> </tr>`).join('');
 }
 
 function searchEvents(q){
@@ -456,7 +476,9 @@ async function deleteVenue(id,name){
  if(!confirm(`Delete "${name}"? This cannot be undone.`))return;
  const{error}=await sb.from('venues').delete().eq('id',id);
  if(error){toast('Error: '+error.message,'error');return;}
- await loadData();renderShell();toast('Venue deleted');
+ allVenues=allVenues.filter(v=>v.id!==id);
+ renderVenues();
+ toast('Venue deleted');
 }
 async function deleteEvent(id,title){
  if(!confirm(`Delete "${title}"?`))return;
