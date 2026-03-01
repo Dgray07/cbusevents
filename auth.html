@@ -345,28 +345,36 @@ async function doSignUp(){
     btn.disabled=false;btn.textContent='Create Account →';
     return;
   }
-  // Email confirmation still on = no session yet
-  if(!data.session){
-    showStep(3);
-    document.getElementById('suErr').style.color='#4ade80';
-    document.getElementById('suErr').textContent='Account created! Check your email to confirm, then sign in.';
-    btn.textContent='Go to Sign In →';
-    btn.onclick=()=>setMode('signin');
-    btn.disabled=false;
-    return;
+  // 2. If no session (edge case), try signing in immediately with same credentials
+  let finalUserId = userId;
+  let finalSession = data.session;
+  if(!finalSession){
+    const{data:siData, error:siErr} = await sb.auth.signInWithPassword({email, password:pass});
+    if(!siErr && siData?.session){
+      finalSession = siData.session;
+      finalUserId = siData.user?.id || userId;
+    } else {
+      // Still no session - account may need a moment, just redirect to sign in
+      showStep(3);
+      document.getElementById('suErr').style.color='#4ade80';
+      document.getElementById('suErr').innerHTML='Account created! <button onclick="setMode(\'signin\')" style="background:none;border:none;color:var(--orange);font-size:13px;cursor:pointer;text-decoration:underline;padding:0">Sign in to continue →</button>';
+      btn.textContent='Sign In →';
+      btn.onclick=()=>setMode('signin');
+      btn.disabled=false;
+      return;
+    }
   }
 
-  // 2. Short wait for session to be available
-  await new Promise(r=>setTimeout(r,800));
+  // Short wait for session to be available
+  await new Promise(r=>setTimeout(r,600));
   document.getElementById('loadingMsg').textContent='Setting up your profile…';
 
   // 3. Set role
   const roleMap={planner:'customer'};
   const dbRole=roleMap[selectedRole]||selectedRole;
-  await sb.from('user_roles').upsert({user_id:userId,role:dbRole},{onConflict:'user_id'}).catch(e=>console.warn('role:',e?.message));
+  await sb.from('user_roles').upsert({user_id:finalUserId,role:dbRole},{onConflict:'user_id'}).catch(e=>console.warn('role:',e?.message));
 
   // 4. Create profile — fire and forget, NEVER block redirect on DB errors
-  // Profile creation runs in background so a table constraint never stops signup
   const destUrl = PORTAL_URLS[selectedRole]||PORTAL_URLS.customer;
 
   (async()=>{
@@ -374,31 +382,31 @@ async function doSignUp(){
       if(selectedRole==='venue_owner'){
         if(selectedClaimId&&selectedClaimId!=='new'){
           await sb.from('venues').update({
-            owner_id:userId, claim_status:'pending',
+            owner_id:finalUserId, claim_status:'pending',
             claimed_at:new Date().toISOString(), claim_email:email,
           }).eq('id',selectedClaimId);
-          await sb.from('user_roles').update({claim_venue_id:selectedClaimId}).eq('user_id',userId).catch(()=>{});
+          await sb.from('user_roles').update({claim_venue_id:selectedClaimId}).eq('user_id',finalUserId).catch(()=>{});
         } else {
           await sb.from('venues').insert({
             name:stepData.venueName||'My Venue',
             venue_type:stepData.venueType||null,
             neighborhood:stepData.venueNeighborhood||null,
-            owner_id:userId, status:'pending', tier:'free', city:'Columbus', state:'OH',
+            owner_id:finalUserId, status:'pending', tier:'free', city:'Columbus', state:'OH',
           });
         }
       } else if(selectedRole==='vendor'){
         await sb.from('vendors').upsert({
-          user_id:userId,
+          user_id:finalUserId,
           business_name:stepData.bizName||'My Business',
           category:stepData.bizCategory||null,
           email:email,
           subscription_tier:'FREE',
-          subscription_status:'free',   // must match DB constraint
+          subscription_status:'active',
         },{onConflict:'user_id'});
       } else {
         // planner and attendee both use customer_profiles
         await sb.from('customer_profiles').upsert({
-          user_id:userId,
+          user_id:finalUserId,
           display_name:stepData.plannerName||stepData.displayName||null,
         },{onConflict:'user_id'});
       }
