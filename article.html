@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<!-- SEO meta tags injected by JS below -->
+<title>CBUSEVENTS Blog</title>
+<meta name="description" content="">
+<meta property="og:title" content="">
+<meta property="og:description" content="">
+<meta property="og:image" content="https://cbusevents.com/og-image.png">
+<meta property="og:type" content="article">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="canonical" href="">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{
+  --bg:#0b0b0f;--surface:#13131a;--card:#1a1a24;--border:#25252f;
+  --text:#e8e8f0;--sub:#8888a0;--muted:#55556a;--orange:#FF6B35;
+}
+body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min-height:100vh;}
+
+nav{display:flex;align-items:center;justify-content:space-between;padding:0 48px;height:60px;border-bottom:1px solid var(--border);position:sticky;top:0;background:rgba(11,11,15,0.95);backdrop-filter:blur(12px);z-index:100;}
+.nav-logo{font-family:'Syne',sans-serif;font-size:20px;font-weight:800;text-decoration:none;color:var(--text);}
+.nav-logo span{color:var(--orange);}
+.nav-link{color:var(--sub);font-size:14px;text-decoration:none;transition:color 0.15s;}
+.nav-link:hover{color:var(--text);}
+.nav-cta{background:var(--orange);color:#fff;border:none;border-radius:8px;padding:8px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;text-decoration:none;}
+
+/* ARTICLE */
+.article-wrap{max-width:740px;margin:0 auto;padding:60px 24px 100px;}
+
+.back-link{display:inline-flex;align-items:center;gap:6px;color:var(--sub);font-size:13px;text-decoration:none;margin-bottom:40px;transition:color 0.15s;}
+.back-link:hover{color:var(--orange);}
+
+.article-cat{font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--orange);margin-bottom:14px;}
+.article-title{font-family:'Syne',sans-serif;font-size:clamp(28px,5vw,44px);font-weight:800;line-height:1.1;margin-bottom:16px;}
+.article-subtitle{font-size:18px;color:var(--sub);line-height:1.6;margin-bottom:28px;}
+.article-meta{display:flex;align-items:center;gap:16px;font-size:13px;color:var(--muted);padding-bottom:28px;border-bottom:1px solid var(--border);margin-bottom:40px;}
+.article-meta strong{color:var(--sub);}
+
+.article-cover{width:100%;border-radius:16px;margin-bottom:48px;max-height:480px;object-fit:cover;}
+
+/* Article body styles */
+.article-body{font-size:17px;line-height:1.8;color:#c8c8d8;}
+.article-body h2{font-family:'Syne',sans-serif;font-size:24px;font-weight:800;color:var(--text);margin:48px 0 16px;}
+.article-body h3{font-family:'Syne',sans-serif;font-size:20px;font-weight:700;color:var(--text);margin:36px 0 12px;}
+.article-body p{margin-bottom:24px;}
+.article-body a{color:var(--orange);text-decoration:underline;text-underline-offset:3px;}
+.article-body ul,.article-body ol{margin:0 0 24px 24px;}
+.article-body li{margin-bottom:8px;}
+.article-body blockquote{border-left:3px solid var(--orange);padding:16px 24px;margin:32px 0;background:var(--surface);border-radius:0 12px 12px 0;font-style:italic;color:var(--sub);}
+.article-body strong{color:var(--text);font-weight:600;}
+.article-body img{width:100%;border-radius:12px;margin:24px 0;}
+.article-body hr{border:none;border-top:1px solid var(--border);margin:48px 0;}
+
+/* SHARE */
+.share-section{margin-top:60px;padding-top:40px;border-top:1px solid var(--border);}
+.share-title{font-family:'Syne',sans-serif;font-size:16px;font-weight:800;margin-bottom:16px;}
+.share-buttons{display:flex;gap:10px;flex-wrap:wrap;}
+.share-btn{display:flex;align-items:center;gap:8px;padding:10px 20px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all 0.15s;}
+.share-btn:hover{border-color:var(--orange);color:var(--orange);}
+.share-btn.copied{border-color:#22c55e;color:#22c55e;}
+
+/* CTA */
+.article-cta{margin-top:60px;background:linear-gradient(135deg,#1a0800,#1a1a24);border:1px solid #FF6B3530;border-radius:20px;padding:40px;text-align:center;}
+.article-cta h3{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;margin-bottom:10px;}
+.article-cta p{color:var(--sub);font-size:14px;margin-bottom:24px;line-height:1.6;}
+.article-cta a{display:inline-block;background:var(--orange);color:#fff;text-decoration:none;border-radius:10px;padding:12px 28px;font-weight:700;font-size:15px;}
+
+/* RELATED */
+.related-section{margin-top:60px;}
+.related-title{font-family:'Syne',sans-serif;font-size:18px;font-weight:800;margin-bottom:20px;}
+.related-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;}
+.related-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:20px;text-decoration:none;color:var(--text);transition:all 0.2s;display:block;}
+.related-card:hover{border-color:#FF6B3540;transform:translateY(-2px);}
+.related-card-cat{font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--orange);margin-bottom:8px;}
+.related-card-title{font-family:'Syne',sans-serif;font-size:15px;font-weight:700;line-height:1.3;}
+
+/* NOT FOUND */
+.not-found{text-align:center;padding:100px 24px;}
+.not-found h2{font-family:'Syne',sans-serif;font-size:28px;font-weight:800;margin-bottom:12px;}
+.not-found p{color:var(--sub);margin-bottom:24px;}
+
+@media(max-width:680px){
+  nav{padding:0 16px;}
+  .article-wrap{padding:32px 16px 60px;}
+  .share-buttons{flex-direction:column;}
+  .share-btn{justify-content:center;}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="https://cbusevents.com" class="nav-logo">CBUS<span>EVENTS</span></a>
+  <a href="https://cbusevents.com/blog.html" class="nav-link">← Blog</a>
+  <a href="https://cbusevents.com/auth.html" class="nav-cta" id="navCta">Sign In</a>
+</nav>
+
+<div class="article-wrap" id="articleWrap">
+  <!-- Loading skeleton -->
+  <div style="animation:pulse 1.5s infinite">
+    <div style="height:20px;width:100px;background:#1a1a24;border-radius:4px;margin-bottom:20px"></div>
+    <div style="height:48px;background:#1a1a24;border-radius:8px;margin-bottom:12px"></div>
+    <div style="height:24px;width:70%;background:#13131a;border-radius:4px;margin-bottom:32px"></div>
+    <div style="height:360px;background:#13131a;border-radius:16px;margin-bottom:40px"></div>
+  </div>
+</div>
+
+<script>
+const SB_URL="https://toblgvatvsjljbqogzsv.supabase.co";
+const SB_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRvYmxndmF0dnNqbGpicW9nenN2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMDgwNTAsImV4cCI6MjA4NzY4NDA1MH0._WJEQPizNDiQfDXQB_DHPaQhixPGpMdmYQSmyWmm_FQ";
+const sb=supabase.createClient(SB_URL,SB_KEY);
+
+const slug=new URLSearchParams(window.location.search).get('slug');
+
+async function init(){
+  // Auth nav
+  const{data:{session}}=await sb.auth.getSession();
+  if(session?.user){
+    document.getElementById('navCta').textContent='My Account';
+  }
+
+  if(!slug){showNotFound();return;}
+
+  const{data:article}=await sb.from('articles')
+    .select('*')
+    .eq('slug',slug)
+    .eq('status','published')
+    .maybeSingle();
+
+  if(!article){showNotFound();return;}
+
+  // Inject SEO meta tags
+  document.title=(article.seo_title||article.title)+' | CBUSEVENTS';
+  setMeta('description', article.seo_description||article.subtitle||'');
+  setMeta('og:title', article.seo_title||article.title);
+  setMeta('og:description', article.seo_description||article.subtitle||'');
+  setMeta('og:image', article.cover_image_url||'https://cbusevents.com/og-image.png');
+  setMeta('twitter:title', article.seo_title||article.title);
+  setMeta('twitter:description', article.seo_description||article.subtitle||'');
+  setMeta('twitter:image', article.cover_image_url||'https://cbusevents.com/og-image.png');
+  document.querySelector('link[rel=canonical]').href=`https://cbusevents.com/article.html?slug=${slug}`;
+
+  const date=article.published_at
+    ?new Date(article.published_at).toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric'})
+    :'';
+  const articleUrl=`https://cbusevents.com/article.html?slug=${slug}`;
+
+  document.getElementById('articleWrap').innerHTML=`
+    <a href="https://cbusevents.com/blog.html" class="back-link">← Back to Blog</a>
+
+    <div class="article-cat">${article.category||'Columbus'}</div>
+    <h1 class="article-title">${article.title}</h1>
+    ${article.subtitle?`<p class="article-subtitle">${article.subtitle}</p>`:''}
+    <div class="article-meta">
+      <strong>${article.author||'CBUSEVENTS'}</strong>
+      <span>${date}</span>
+      ${article.tags?.length?`<span>${article.tags.join(' · ')}</span>`:''}
+    </div>
+
+    ${article.cover_image_url?`<img class="article-cover" src="${article.cover_image_url}" alt="${article.title}">`:''}
+
+    <div class="article-body">${article.body}</div>
+
+    <div class="share-section">
+      <div class="share-title">Share this article</div>
+      <div class="share-buttons">
+        <button class="share-btn" onclick="shareTwitter()">X / Twitter</button>
+        <button class="share-btn" onclick="shareFacebook()">Facebook</button>
+        <button class="share-btn" onclick="shareLinkedIn()">LinkedIn</button>
+        <button class="share-btn" id="copyBtn" onclick="copyLink()">Copy Link</button>
+      </div>
+    </div>
+
+    <div class="article-cta">
+      <h3>Discover Columbus Events</h3>
+      <p>Browse hundreds of venues, upcoming events, and local vendors — all in one place.</p>
+      <a href="https://cbusevents.com">Explore CBUSEVENTS →</a>
+    </div>
+
+    <div class="related-section" id="relatedSection"></div>
+  `;
+
+  // Load related articles
+  const{data:related}=await sb.from('articles')
+    .select('slug,title,category,published_at')
+    .eq('status','published')
+    .eq('category',article.category)
+    .neq('slug',slug)
+    .limit(3);
+
+  if(related?.length){
+    document.getElementById('relatedSection').innerHTML=`
+      <div class="related-title">More from Columbus</div>
+      <div class="related-grid">
+        ${related.map(r=>`
+          <a href="https://cbusevents.com/article.html?slug=${r.slug}" class="related-card">
+            <div class="related-card-cat">${r.category}</div>
+            <div class="related-card-title">${r.title}</div>
+          </a>`).join('')}
+      </div>`;
+  }
+
+  // Share functions use closure over articleUrl and article.title
+  window.shareTwitter=()=>window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(article.title)}&url=${encodeURIComponent(articleUrl)}`,'_blank');
+  window.shareFacebook=()=>window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(articleUrl)}`,'_blank');
+  window.shareLinkedIn=()=>window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(articleUrl)}`,'_blank');
+  window.copyLink=()=>{
+    navigator.clipboard.writeText(articleUrl);
+    const btn=document.getElementById('copyBtn');
+    if(btn){btn.textContent='Copied!';btn.classList.add('copied');setTimeout(()=>{btn.textContent='Copy Link';btn.classList.remove('copied');},2000);}
+  };
+}
+
+function setMeta(name,content){
+  const el=document.querySelector(`meta[property="${name}"]`)||document.querySelector(`meta[name="${name}"]`);
+  if(el)el.setAttribute('content',content);
+}
+
+function showNotFound(){
+  document.getElementById('articleWrap').innerHTML=`
+    <div class="not-found">
+      <h2>Article not found</h2>
+      <p>This article may have been moved or deleted.</p>
+      <a href="https://cbusevents.com/blog.html" style="color:var(--orange);font-weight:600">← Back to Blog</a>
+    </div>`;
+}
+
+init();
+</script>
+</body>
+</html>

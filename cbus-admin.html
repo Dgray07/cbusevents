@@ -260,6 +260,7 @@ function toggleMobileMenu(){
  {id:'users',label:' Users'},
  {id:'overrides',label:' Overrides'},
  {id:'claims',label:' Claims'},
+ {id:'blog',label:' Blog & SEO'},
  ];
  items.innerHTML=pages.map(p=>`
  <div onclick="closeMobileNav('${p.id}')" style="padding:12px 20px;font-size:14px;font-weight:500;color:${p.id===currentPage?'var(--orange)':'var(--sub)'};cursor:pointer;border-bottom:1px solid var(--border);background:${p.id===currentPage?'var(--card)':'transparent'}">${p.label}</div> `).join('') + `
@@ -278,6 +279,160 @@ function toast(msg,type='success'){
  const el=document.getElementById('toast');
  el.textContent=msg;el.className=`toast ${type}`;el.style.display='block';
  setTimeout(()=>el.style.display='none',3000);
+}
+
+// ── BLOG ──────────────────────────────────────────────────────
+let editingArticle=null;
+
+async function renderBlog(){
+ const{data:articles}=await sb.from('articles').select('*').order('created_at',{ascending:false});
+ const list=articles||[];
+ document.getElementById('pageContent').innerHTML=`
+ <div style="display:grid;grid-template-columns:1fr 380px;gap:24px;align-items:start;flex-wrap:wrap">
+ <div class="table-card">
+   <div class="table-header">
+     <div class="table-title">Articles (${list.length})</div>
+     <button class="btn btn-primary btn-sm" onclick="openArticleEditor(null)">+ New Article</button>
+   </div>
+   ${list.length===0?'<div style="padding:40px;text-align:center;color:var(--muted)">No articles yet. Write your first!</div>':''}
+   <div style="display:flex;flex-direction:column;">
+   ${list.map(a=>`
+     <div style="display:flex;align-items:center;gap:12px;padding:14px 20px;border-bottom:1px solid var(--border);flex-wrap:wrap">
+       <div style="flex:1;min-width:200px">
+         <div style="font-weight:600;font-size:14px">${a.title}</div>
+         <div style="font-size:12px;color:var(--muted);margin-top:3px">${a.category||'—'} &nbsp;·&nbsp; ${a.status==='published'?'<span style="color:#22c55e">Published</span>':'<span style="color:#f59e0b">Draft</span>'} &nbsp;·&nbsp; ${a.published_at?new Date(a.published_at).toLocaleDateString():''}</div>
+       </div>
+       <div style="display:flex;gap:5px;flex-wrap:wrap;flex-shrink:0">
+         ${a.status==='draft'?`<button class="btn btn-success btn-sm" onclick="publishArticle('${a.id}')">Publish</button>`:`<button class="btn btn-ghost btn-sm" onclick="unpublishArticle('${a.id}')">Unpublish</button>`}
+         <button class="btn btn-ghost btn-sm" onclick="openArticleEditor('${a.id}')">Edit</button>
+         <a href="https://cbusevents.com/article.html?slug=${a.slug}" target="_blank" class="btn btn-ghost btn-sm" style="text-decoration:none">View</a>
+         <button class="btn btn-danger btn-sm" onclick="deleteArticle('${a.id}')">Delete</button>
+       </div>
+     </div>`).join('')}
+   </div>
+ </div>
+ <div class="table-card">
+   <div class="table-header"><div class="table-title">SEO Tips</div></div>
+   <div style="padding:20px;display:flex;flex-direction:column;gap:14px;font-size:13px;color:var(--sub);line-height:1.7">
+     <div><strong style="color:var(--text)">Title (60 chars max)</strong><br>Include "Columbus" + topic. e.g. "Best Rooftop Bars Columbus Ohio 2026"</div>
+     <div><strong style="color:var(--text)">Slug</strong><br>Use hyphens only. e.g. best-rooftop-bars-columbus</div>
+     <div><strong style="color:var(--text)">SEO Description (160 chars)</strong><br>Compelling summary that shows in Google results.</div>
+     <div><strong style="color:var(--text)">Body</strong><br>Aim for 600+ words. Use H2/H3 headings. Link back to cbusevents.com.</div>
+     <div style="padding:12px;background:var(--bg);border-radius:8px;border:1px solid var(--border);margin-top:4px">
+       <a href="https://cbusevents.com/blog.html" target="_blank" style="color:var(--orange);font-weight:600">View live blog →</a>
+     </div>
+   </div>
+ </div>
+ </div>
+ <div id="articleEditor" style="display:none;margin-top:24px"></div>`;
+}
+
+async function openArticleEditor(id){
+ let article=null;
+ if(id){
+   const{data}=await sb.from('articles').select('*').eq('id',id).maybeSingle();
+   article=data;
+ }
+ editingArticle=article;
+ const el=document.getElementById('articleEditor');
+ el.style.display='block';
+ el.innerHTML=`
+ <div class="table-card">
+   <div class="table-header">
+     <div class="table-title">${article?'Edit: '+article.title:'New Article'}</div>
+     <button class="btn btn-ghost btn-sm" onclick="document.getElementById('articleEditor').style.display='none'">Cancel</button>
+   </div>
+   <div style="padding:24px;display:grid;grid-template-columns:1fr 1fr;gap:16px">
+     <div class="field" style="grid-column:1/-1"><label>Title *</label><input id="artTitle" value="${article?.title||''}" placeholder="Best Event Venues in Columbus Ohio 2026"/></div>
+     <div class="field" style="grid-column:1/-1"><label>Subtitle</label><input id="artSubtitle" value="${article?.subtitle||''}" placeholder="Short description shown on the blog listing"/></div>
+     <div class="field"><label>Slug * (URL-friendly)</label><input id="artSlug" value="${article?.slug||''}" placeholder="best-event-venues-columbus"/></div>
+     <div class="field"><label>Category</label><input id="artCat" value="${article?.category||'Columbus'}" placeholder="Columbus, Venues, Events..."/></div>
+     <div class="field"><label>Author</label><input id="artAuthor" value="${article?.author||'CBUSEVENTS'}" placeholder="CBUSEVENTS"/></div>
+     <div class="field"><label>Cover Image URL</label><input id="artImage" value="${article?.cover_image_url||''}" placeholder="https://..."/></div>
+     <div class="field" style="grid-column:1/-1"><label>SEO Title (60 chars max)</label><input id="artSeoTitle" value="${article?.seo_title||''}" placeholder="Best Event Venues Columbus Ohio | CBUSEVENTS" maxlength="70"/></div>
+     <div class="field" style="grid-column:1/-1"><label>SEO Description (160 chars max)</label><textarea id="artSeoDesc" maxlength="170" style="height:70px" placeholder="Compelling summary for Google...">${article?.seo_description||''}</textarea></div>
+     <div class="field" style="grid-column:1/-1">
+       <label>Body (HTML supported)</label>
+       <div style="display:flex;gap:6px;margin-bottom:8px;flex-wrap:wrap">
+         <button class="btn btn-ghost btn-sm" onclick="insertTag('h2')">H2</button>
+         <button class="btn btn-ghost btn-sm" onclick="insertTag('h3')">H3</button>
+         <button class="btn btn-ghost btn-sm" onclick="insertTag('p')">P</button>
+         <button class="btn btn-ghost btn-sm" onclick="insertTag('strong')">Bold</button>
+         <button class="btn btn-ghost btn-sm" onclick="insertTag('a')">Link</button>
+         <button class="btn btn-ghost btn-sm" onclick="insertTag('blockquote')">Quote</button>
+         <button class="btn btn-ghost btn-sm" onclick="insertTag('ul')">List</button>
+       </div>
+       <textarea id="artBody" style="height:320px;font-family:monospace;font-size:13px;line-height:1.6" placeholder="<p>Your content here...</p>&#10;<h2>Section</h2>&#10;<p>More content...</p>">${article?.body||''}</textarea>
+     </div>
+     <div id="artErr" style="grid-column:1/-1;color:#ef4444;font-size:13px;min-height:18px"></div>
+     <div style="grid-column:1/-1;display:flex;gap:10px">
+       <button class="btn btn-primary" onclick="saveArticle('published')">Publish →</button>
+       <button class="btn btn-ghost" onclick="saveArticle('draft')">Save Draft</button>
+     </div>
+   </div>
+ </div>`;
+ el.scrollIntoView({behavior:'smooth'});
+ // Auto-generate slug from title for new articles
+ if(!article){
+   document.getElementById('artTitle').addEventListener('input',function(){
+     document.getElementById('artSlug').value=this.value.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
+   });
+ }
+}
+
+function insertTag(tag){
+ const ta=document.getElementById('artBody');
+ const s=ta.selectionStart,e=ta.selectionEnd;
+ const sel=ta.value.substring(s,e);
+ let ins='';
+ if(tag==='a')ins=`<a href="https://cbusevents.com">${sel||'Link text'}</a>`;
+ else if(tag==='ul')ins=`<ul>\n  <li>${sel||'Item 1'}</li>\n  <li>Item 2</li>\n</ul>`;
+ else ins=`<${tag}>${sel||'Text here'}</${tag}>`;
+ ta.value=ta.value.substring(0,s)+ins+ta.value.substring(e);
+ ta.focus();
+}
+
+async function saveArticle(status){
+ const title=document.getElementById('artTitle').value.trim();
+ const slug=document.getElementById('artSlug').value.trim();
+ const body=document.getElementById('artBody').value.trim();
+ const errEl=document.getElementById('artErr');
+ if(!title||!slug||!body){errEl.textContent='Title, slug, and body are required.';return;}
+ errEl.textContent='';
+ const payload={
+   title,slug,body,status,
+   subtitle:document.getElementById('artSubtitle').value.trim()||null,
+   category:document.getElementById('artCat').value.trim()||'Columbus',
+   author:document.getElementById('artAuthor').value.trim()||'CBUSEVENTS',
+   cover_image_url:document.getElementById('artImage').value.trim()||null,
+   seo_title:document.getElementById('artSeoTitle').value.trim()||null,
+   seo_description:document.getElementById('artSeoDesc').value.trim()||null,
+   ...(status==='published'&&{published_at:new Date().toISOString()}),
+ };
+ let error;
+ if(editingArticle){
+   ({error}=await sb.from('articles').update(payload).eq('id',editingArticle.id));
+ } else {
+   ({error}=await sb.from('articles').insert(payload));
+ }
+ if(error){errEl.textContent='Error: '+error.message;return;}
+ toast(status==='published'?'Article published!':'Draft saved');
+ document.getElementById('articleEditor').style.display='none';
+ renderBlog();
+}
+
+async function publishArticle(id){
+ await sb.from('articles').update({status:'published',published_at:new Date().toISOString()}).eq('id',id);
+ toast('Article published!');renderBlog();
+}
+async function unpublishArticle(id){
+ await sb.from('articles').update({status:'draft'}).eq('id',id);
+ toast('Article unpublished');renderBlog();
+}
+async function deleteArticle(id){
+ if(!confirm('Delete this article? Cannot be undone.'))return;
+ await sb.from('articles').delete().eq('id',id);
+ toast('Article deleted');renderBlog();
 }
 
 // ── AUTH ──────────────────────────────────────────────────────
@@ -330,7 +485,9 @@ function renderShell(){
  const revenue=allVenues.filter(v=>v.tier==='standard').length*29+allVenues.filter(v=>v.tier==='premium').length*79;
 
  document.getElementById('app').innerHTML=`
- <div class="sidebar"> <div class="sidebar-logo"> <div class="sidebar-logo-text">CBUS<span>EVENTS</span></div> <div style="font-size:11px;color:var(--muted);margin-top:3px">Admin Portal</div> </div> <div class="sidebar-section">Main</div> <div class="nav-item" onclick="window.location.href='https://cbusevents.com'" style="border-bottom:1px solid var(--border);margin-bottom:4px;padding-bottom:12px"> Home</div> <div class="nav-item ${currentPage==='dashboard'?'active':''}" onclick="nav('dashboard')"> Dashboard</div> <div class="nav-item ${currentPage==='venues'?'active':''}" onclick="nav('venues')"> Venues ${pendingVenues?`<span class="badge">${pendingVenues}</span>`:''}</div> <div class="nav-item ${currentPage==='events'?'active':''}" onclick="nav('events')"> Events</div> <div class="nav-item ${currentPage==='inquiries'?'active':''}" onclick="nav('inquiries')"> Inquiries ${newInquiries?`<span class="badge green">${newInquiries}</span>`:''}</div> <div class="sidebar-section">Revenue</div> <div class="nav-item ${currentPage==='revenue'?'active':''}" onclick="nav('revenue')"> Revenue</div> <div class="nav-item ${currentPage==='design'?'active':''}" onclick="nav('design')"> Design Requests ${allDesignRequests.filter(d=>d.status==='new').length?`<span class="badge">${allDesignRequests.filter(d=>d.status==='new').length}</span>`:''}</div> <div class="sidebar-section">Platform</div> <div class="nav-item ${currentPage==='vendors'?'active':''}" onclick="nav('vendors')"> Vendors</div> <div class="nav-item ${currentPage==='subscriptions'?'active':''}" onclick="nav('subscriptions')"> Subscriptions</div> <div class="nav-item ${currentPage==='users'?'active':''}" onclick="nav('users')"> Users</div> <div class="nav-item ${currentPage==='overrides'?'active':''}" onclick="nav('overrides')"> Overrides</div> <div class="nav-item ${currentPage==='claims'?'active':''}" onclick="nav('claims')"> Claims <span style='background:#ef4444;color:#fff;border-radius:20px;padding:1px 7px;font-size:10px;font-weight:700;margin-left:auto' id='claimsBadge' style='display:none'></span></div> <div class="sidebar-bottom"> <div class="admin-tag"> Admin</div> <button onclick="sb.auth.signOut().then(()=>renderLogin())" style="width:100%;margin-top:10px;background:none;border:1px solid var(--border);border-radius:7px;padding:7px;color:var(--muted);font-size:12px;cursor:pointer;font-family:'DM Sans',sans-serif">Sign Out</button> </div> </div> <div class="main"> <div class="topbar"> <div style="display:flex;align-items:center;gap:12px"> <button id="mobileMenuBtn" onclick="toggleMobileMenu()" style="display:none;background:none;border:none;color:var(--text);font-size:22px;cursor:pointer;padding:4px;line-height:1">☰</button> <div class="topbar-title" id="topbarTitle">Dashboard</div> </div> <div class="topbar-right"> <span class="topbar-time" id="topbarTime"></span> <button class="topbar-site-btn" onclick="window.open('https://cbusevents.com','_blank')">View Site ↗</button> <button class="topbar-site-btn" onclick="window.open('https://cbusevents.com/cbus-venue-portal.html','_blank')">Venue Portal ↗</button> </div> </div> <div id="mobileMenuOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:300;" onclick="toggleMobileMenu()" style="cursor:pointer">×</div> <div id="mobileMenuDrawer" style="display:none;position:fixed;left:0;top:0;bottom:0;width:240px;background:var(--surface);border-right:1px solid var(--border);z-index:301;overflow-y:auto;padding-bottom:32px;transform:translateX(-100%);transition:transform 0.25s ease;"> <div style="padding:20px 16px 16px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center"> <div style="font-family:'Syne',sans-serif;font-size:17px;font-weight:800">CBUS<span style="color:#FF6B35">EVENTS</span></div> <button onclick="toggleMobileMenu()" style="background:none;border:none;color:var(--sub);font-size:20px;cursor:pointer">✕</button> </div> <div id="mobileMenuItems"></div> </div> <div class="content" id="pageContent"></div> </div> <div id="modalContainer"></div> `;
+ <div class="sidebar"> <div class="sidebar-logo"> <div class="sidebar-logo-text">CBUS<span>EVENTS</span></div> <div style="font-size:11px;color:var(--muted);margin-top:3px">Admin Portal</div> </div> <div class="sidebar-section">Main</div> <div class="nav-item" onclick="window.location.href='https://cbusevents.com'" style="border-bottom:1px solid var(--border);margin-bottom:4px;padding-bottom:12px"> Home</div> <div class="nav-item ${currentPage==='dashboard'?'active':''}" onclick="nav('dashboard')"> Dashboard</div> <div class="nav-item ${currentPage==='venues'?'active':''}" onclick="nav('venues')"> Venues ${pendingVenues?`<span class="badge">${pendingVenues}</span>`:''}</div> <div class="nav-item ${currentPage==='events'?'active':''}" onclick="nav('events')"> Events</div> <div class="nav-item ${currentPage==='inquiries'?'active':''}" onclick="nav('inquiries')"> Inquiries ${newInquiries?`<span class="badge green">${newInquiries}</span>`:''}</div> <div class="sidebar-section">Revenue</div> <div class="nav-item ${currentPage==='revenue'?'active':''}" onclick="nav('revenue')"> Revenue</div> <div class="nav-item ${currentPage==='design'?'active':''}" onclick="nav('design')"> Design Requests ${allDesignRequests.filter(d=>d.status==='new').length?`<span class="badge">${allDesignRequests.filter(d=>d.status==='new').length}</span>`:''}</div> <div class="sidebar-section">Platform</div> <div class="nav-item ${currentPage==='vendors'?'active':''}" onclick="nav('vendors')"> Vendors</div> <div class="nav-item ${currentPage==='subscriptions'?'active':''}" onclick="nav('subscriptions')"> Subscriptions</div> <div class="nav-item ${currentPage==='users'?'active':''}" onclick="nav('users')"> Users</div> <div class="nav-item ${currentPage==='overrides'?'active':''}" onclick="nav('overrides')"> Overrides</div> <div class="nav-item ${currentPage==='claims'?'active':''}" onclick="nav('claims')"> Claims <span style='background:#ef4444;color:#fff;border-radius:20px;padding:1px 7px;font-size:10px;font-weight:700;margin-left:auto' id='claimsBadge' style='display:none'></span></div>
+ <div class="sidebar-section">Content</div>
+ <div class="nav-item ${currentPage==='blog'?'active':''}" onclick="nav('blog')"> Blog & SEO</div> <div class="sidebar-bottom"> <div class="admin-tag"> Admin</div> <button onclick="sb.auth.signOut().then(()=>renderLogin())" style="width:100%;margin-top:10px;background:none;border:1px solid var(--border);border-radius:7px;padding:7px;color:var(--muted);font-size:12px;cursor:pointer;font-family:'DM Sans',sans-serif">Sign Out</button> </div> </div> <div class="main"> <div class="topbar"> <div style="display:flex;align-items:center;gap:12px"> <button id="mobileMenuBtn" onclick="toggleMobileMenu()" style="display:none;background:none;border:none;color:var(--text);font-size:22px;cursor:pointer;padding:4px;line-height:1">☰</button> <div class="topbar-title" id="topbarTitle">Dashboard</div> </div> <div class="topbar-right"> <span class="topbar-time" id="topbarTime"></span> <button class="topbar-site-btn" onclick="window.open('https://cbusevents.com','_blank')">View Site ↗</button> <button class="topbar-site-btn" onclick="window.open('https://cbusevents.com/cbus-venue-portal.html','_blank')">Venue Portal ↗</button> </div> </div> <div id="mobileMenuOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:300;" onclick="toggleMobileMenu()" style="cursor:pointer">×</div> <div id="mobileMenuDrawer" style="display:none;position:fixed;left:0;top:0;bottom:0;width:240px;background:var(--surface);border-right:1px solid var(--border);z-index:301;overflow-y:auto;padding-bottom:32px;transform:translateX(-100%);transition:transform 0.25s ease;"> <div style="padding:20px 16px 16px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center"> <div style="font-family:'Syne',sans-serif;font-size:17px;font-weight:800">CBUS<span style="color:#FF6B35">EVENTS</span></div> <button onclick="toggleMobileMenu()" style="background:none;border:none;color:var(--sub);font-size:20px;cursor:pointer">✕</button> </div> <div id="mobileMenuItems"></div> </div> <div class="content" id="pageContent"></div> </div> <div id="modalContainer"></div> `;
 
  // Live clock
  setInterval(()=>{
@@ -345,7 +502,7 @@ function nav(page){
  currentPage=page;
  document.querySelectorAll('.nav-item').forEach(el=>el.classList.remove('active'));
  document.querySelectorAll('.nav-item').forEach(el=>{if(el.textContent.trim().toLowerCase().includes(page))el.classList.add('active');});
- const title={dashboard:'Dashboard',venues:'Venues',events:'Events',inquiries:'Inquiries',revenue:'Revenue',design:'Design Requests',vendors:'Vendors',subscriptions:'Subscriptions',users:'Users',overrides:'Overrides',claims:'Listing Claims'};
+ const title={dashboard:'Dashboard',venues:'Venues',events:'Events',inquiries:'Inquiries',revenue:'Revenue',design:'Design Requests',vendors:'Vendors',subscriptions:'Subscriptions',users:'Users',overrides:'Overrides',claims:'Listing Claims',blog:'Blog & SEO'};
  const el=document.getElementById('topbarTitle');
  if(el)el.textContent=title[page]||page;
  renderPage();
@@ -363,6 +520,7 @@ function renderPage(){
  else if(currentPage==='users')renderUsers();
  else if(currentPage==='overrides')renderOverrides();
  else if(currentPage==='claims')renderClaims();
+ else if(currentPage==='blog')renderBlog();
 }
 
 // ── DASHBOARD ─────────────────────────────────────────────────
