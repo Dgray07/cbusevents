@@ -193,8 +193,8 @@ const sb=supabase.createClient(SB_URL,SB_KEY);
 
 // Stripe payment links
 const STRIPE_LINKS={
- standard:'https://buy.stripe.com/5kQeVfadt0SJgcG8QRew800',
- premium:'https://buy.stripe.com/5kQ00lgBRcBr9Oi1opew801',
+ standard:'https://buy.stripe.com/bJe14p3P58lb2lQ2stew804',
+ premium:'https://buy.stripe.com/4gM6oJ5Xd58Z8Ke1opew805',
 };
 
 const SERVICES=[
@@ -296,6 +296,18 @@ async function enterPortal(){
  if(rolePortals[role]){
    window.location.href='https://cbusevents.com/'+rolePortals[role];
    return;
+ }
+
+ // Handle return from Stripe — auto-update vendor tier
+ const params=new URLSearchParams(window.location.search);
+ if(params.get('upgrade')==='success'&&params.get('tier')){
+   const newTier=params.get('tier').toUpperCase();
+   await sb.from('vendors').update({
+     subscription_tier:newTier,
+     subscription_status:'active',
+   }).eq('user_id',currentUser.id);
+   window.history.replaceState({},'',window.location.pathname);
+   toast('Plan upgraded to '+newTier.charAt(0)+newTier.slice(1).toLowerCase()+'!');
  }
 
  // Load vendor profile
@@ -581,11 +593,11 @@ function renderPlan(){
  document.getElementById('planContent').innerHTML=`
  <div class="plan-grid"> <!-- FREE --> <div class="plan-card ${!isStandard&&!isPremium?'current':''}"> <div class="plan-name" style="color:var(--muted)">Free</div> <div class="plan-price">$0<span>/mo</span></div> <div class="plan-period">forever</div> <div class="plan-perks"> <div class="plan-perk"><span class="check"></span>Vendor profile & bio</div> <div class="plan-perk"><span class="check"></span>Select all your services</div> <div class="plan-perk"><span class="check"></span>Portfolio photos (unlimited)</div> <div class="plan-perk"><span class="check" style="color:var(--muted)"></span><span style="color:var(--muted)">Featured in directory</span></div> <div class="plan-perk"><span class="check" style="color:var(--muted)"></span><span style="color:var(--muted)">Send proposals</span></div> </div> <button class="plan-btn" style="background:var(--surface);color:var(--sub);border:1px solid var(--border)" disabled>${!isStandard&&!isPremium?'Current Plan':'Free Plan'}</button> </div> <!-- STANDARD --> <div class="plan-card ${isStandard?'current':''}"> <div class="plan-name" style="color:var(--blue)">Standard</div> <div class="plan-price">$29<span>/mo</span></div> <div class="plan-period">cancel anytime</div> <div class="plan-perks"> <div class="plan-perk"><span class="check"></span>Everything in Free</div> <div class="plan-perk"><span class="check"></span>Featured in vendor directory</div> <div class="plan-perk"><span class="check"></span>Priority search placement</div> <div class="plan-perk"><span class="check" style="color:var(--muted)"></span><span style="color:var(--muted)">Send proposals to events</span></div> </div> ${isStandard
  ?'<button class="plan-btn" style="background:var(--surface);color:var(--sub);border:1px solid var(--border)" disabled>Current Plan</button>'
- :`<button class="plan-btn" style="background:var(--blue);color:#000" onclick="window.open('${STRIPE_LINKS.standard}','_blank')">Get Standard →</button>`}
+ :`<button class="plan-btn" style="background:var(--blue);color:#000" onclick="window.location.href='${STRIPE_LINKS.standard}&prefilled_email='+encodeURIComponent(currentUser?.email||'')">Get Standard →</button>`}
  </div> <!-- PREMIUM --> <div class="plan-card ${isPremium?'current':'popular'}" style="${isPremium?'':'background:linear-gradient(135deg,#1a1000,#1a0f00);border-color:#f59e0b80;'}"> ${!isPremium?'<div class="plan-badge">MOST POPULAR</div>':''}
  <div class="plan-name" style="color:var(--gold)">Premium</div> <div class="plan-price">$79<span>/mo</span></div> <div class="plan-period">cancel anytime</div> <div class="plan-perks"> <div class="plan-perk"><span class="check"></span>Everything in Standard</div> <div class="plan-perk premium-perk"><span class="check"></span>Send proposals to venues</div> <div class="plan-perk premium-perk"><span class="check"></span>Send proposals to planners</div> <div class="plan-perk premium-perk"><span class="check"></span>Browse all upcoming events</div> <div class="plan-perk premium-perk"><span class="check"></span>Top of directory listings</div> </div> ${isPremium
  ?'<button class="plan-btn" style="background:var(--surface);color:var(--sub);border:1px solid var(--border)" disabled>Current Plan</button>'
- :`<button class="plan-btn" style="background:var(--gold);color:#000" onclick="window.open('${STRIPE_LINKS.premium}','_blank')">Get Premium →</button>`}
+ :`<button class="plan-btn" style="background:var(--gold);color:#000" onclick="window.location.href='${STRIPE_LINKS.premium}&prefilled_email='+encodeURIComponent(currentUser?.email||'')">Get Premium →</button>`}
  </div> </div> <div style="margin-top:20px;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px 20px;font-size:13px;color:var(--sub);line-height:1.7"> After payment your plan upgrades automatically within a few minutes. Questions? Email <a href="mailto:cbusevents@gmail.com" style="color:var(--orange)">cbusevents@gmail.com</a> </div>`;
 }
 
