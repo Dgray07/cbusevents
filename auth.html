@@ -112,9 +112,10 @@ async function init(){
  const params=new URLSearchParams(window.location.search);
  const roleParam=params.get('role');
  if(roleParam&&['venue_owner','vendor','planner','customer'].includes(roleParam)){
- setMode('signup');
- selectRole(roleParam);
- nextStep(2);
+   setMode('signup');
+   selectedRole=roleParam;
+   buildStep2();
+   showStep(2);
  }
 }
 
