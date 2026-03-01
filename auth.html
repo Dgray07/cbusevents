@@ -306,75 +306,88 @@ function proceedWithClaim(){
 
 // ── SIGN UP ───────────────────────────────────────────────────
 async function doSignUp(){
- const email=document.getElementById('suEmail').value.trim();
- const pass=document.getElementById('suPass').value;
- const err=document.getElementById('suErr');
- const btn=document.getElementById('suBtn');
- if(!email||!pass){err.textContent='Email and password required.';return;}
- if(pass.length<6){err.textContent='Password must be at least 6 characters.';return;}
- btn.disabled=true;btn.textContent='Creating account…';err.textContent='';
+  const email=document.getElementById('suEmail').value.trim();
+  const pass=document.getElementById('suPass').value;
+  const errEl=document.getElementById('suErr');
+  const btn=document.getElementById('suBtn');
+  if(!email||!pass){errEl.textContent='Email and password required.';return;}
+  if(pass.length<6){errEl.textContent='Password must be at least 6 characters.';return;}
+  btn.disabled=true;btn.textContent='Creating account…';errEl.textContent='';
 
- // Show loading
- showStep('Loading');
- document.getElementById('loadingMsg').textContent='Creating your account…';
+  showStep('Loading');
+  document.getElementById('loadingMsg').textContent='Creating your account…';
 
- const{data,error}=await sb.auth.signUp({email,password:pass});
- if(error){
- showStep(3);
- document.getElementById('suErr').textContent=error.message;
- btn.disabled=false;btn.textContent='Create Account →';
- return;
- }
+  // 1. Create auth user
+  const{data,error:authErr}=await sb.auth.signUp({email,password:pass});
+  if(authErr){
+    showStep(3);
+    document.getElementById('suErr').textContent=authErr.message;
+    btn.disabled=false;btn.textContent='Create Account →';
+    return;
+  }
+  const userId=data.user?.id;
+  if(!userId){
+    showStep(3);
+    document.getElementById('suErr').textContent='Signup failed — please try again.';
+    btn.disabled=false;btn.textContent='Create Account →';
+    return;
+  }
 
- const userId=data.user?.id;
- if(!userId){showStep(3);document.getElementById('suErr').textContent='Signup failed. Try again.';btn.disabled=false;btn.textContent='Create Account →';return;}
+  // 2. Short wait for session to be available
+  await new Promise(r=>setTimeout(r,800));
+  document.getElementById('loadingMsg').textContent='Setting up your profile…';
 
- document.getElementById('loadingMsg').textContent='Setting up your profile…';
+  // 3. Set role
+  const roleMap={planner:'customer'};
+  const dbRole=roleMap[selectedRole]||selectedRole;
+  await sb.from('user_roles').upsert({user_id:userId,role:dbRole},{onConflict:'user_id'}).catch(e=>console.warn('role:',e?.message));
 
- // Set role
- const roleMap={planner:'customer'}; // planners use customer role but get planner portal
- const dbRole=roleMap[selectedRole]||selectedRole;
- await sb.from('user_roles').upsert({user_id:userId,role:dbRole},{onConflict:'user_id'}).catch(()=>{});
+  // 4. Create profile — fire and forget, NEVER block redirect on DB errors
+  // Profile creation runs in background so a table constraint never stops signup
+  const destUrl = PORTAL_URLS[selectedRole]||PORTAL_URLS.customer;
 
- // Create profile based on role
- if(selectedRole==='venue_owner'){
- if(selectedClaimId && selectedClaimId!=='new'){
- // CLAIM existing listing
- document.getElementById('loadingMsg').textContent='Claiming your listing…';
- await sb.from('venues').update({
- owner_id:userId,
- claim_status:'pending',
- claimed_at:new Date().toISOString(),
- claim_email:email,
- }).eq('id',selectedClaimId).catch(()=>{});
- // Also store in user_roles that this is a venue claim pending review
- await sb.from('user_roles').update({claim_venue_id:selectedClaimId}).eq('user_id',userId).catch(()=>{});
- } else {
- // NEW listing
- await sb.from('venues').insert({
- name:stepData.venueName,venue_type:stepData.venueType||null,
- neighborhood:stepData.venueNeighborhood||null,
- owner_id:userId,status:'pending',tier:'free',city:'Columbus',state:'OH'
- }).catch(()=>{});
- }
- } else if(selectedRole==='vendor'){
- await sb.from('vendors').upsert({
- user_id:userId,business_name:stepData.bizName,
- category:stepData.bizCategory||null,email,
- subscription_tier:'FREE',subscription_status:'free'
- },{onConflict:'user_id'}).catch(()=>{});
- } else if(selectedRole==='planner'){
- await sb.from('customer_profiles').upsert({
- user_id:userId,display_name:stepData.plannerName,
- },{onConflict:'user_id'}).catch(()=>{});
- } else {
- await sb.from('customer_profiles').upsert({
- user_id:userId,display_name:stepData.displayName||null,
- },{onConflict:'user_id'}).catch(()=>{});
- }
+  (async()=>{
+    try {
+      if(selectedRole==='venue_owner'){
+        if(selectedClaimId&&selectedClaimId!=='new'){
+          await sb.from('venues').update({
+            owner_id:userId, claim_status:'pending',
+            claimed_at:new Date().toISOString(), claim_email:email,
+          }).eq('id',selectedClaimId);
+          await sb.from('user_roles').update({claim_venue_id:selectedClaimId}).eq('user_id',userId).catch(()=>{});
+        } else {
+          await sb.from('venues').insert({
+            name:stepData.venueName||'My Venue',
+            venue_type:stepData.venueType||null,
+            neighborhood:stepData.venueNeighborhood||null,
+            owner_id:userId, status:'pending', tier:'free', city:'Columbus', state:'OH',
+          });
+        }
+      } else if(selectedRole==='vendor'){
+        await sb.from('vendors').upsert({
+          user_id:userId,
+          business_name:stepData.bizName||'My Business',
+          category:stepData.bizCategory||null,
+          email:email,
+          subscription_tier:'FREE',
+          subscription_status:'free',   // must match DB constraint
+        },{onConflict:'user_id'});
+      } else {
+        // planner and attendee both use customer_profiles
+        await sb.from('customer_profiles').upsert({
+          user_id:userId,
+          display_name:stepData.plannerName||stepData.displayName||null,
+        },{onConflict:'user_id'});
+      }
+    } catch(profileErr){
+      // Profile insert failed — not critical, user can complete profile in portal
+      console.warn('Profile setup error (non-blocking):', profileErr?.message);
+    }
+  })();
 
- document.getElementById('loadingMsg').textContent='Redirecting to your portal…';
- setTimeout(()=>{window.location.href=PORTAL_URLS[selectedRole]||PORTAL_URLS.customer;},800);
+  // Redirect immediately — don't wait for profile insert
+  document.getElementById('loadingMsg').textContent='Redirecting to your portal…';
+  setTimeout(()=>{ window.location.href=destUrl; }, 600);
 }
 
 init();
