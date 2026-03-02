@@ -849,8 +849,23 @@ async function toggleVenueFeature(id,val){
 
 // ── VENDORS ───────────────────────────────────────────────────
 async function renderPlanners(){
- const{data:planners}=await sb.from('planners').select('*').order('created_at',{ascending:false});
- const list=planners||[];
+ // Planners are stored in user_roles joined with auth users via profiles/vendors
+ const{data:roles}=await sb.from('user_roles')
+   .select('user_id, role, created_at')
+   .eq('role','planner')
+   .order('created_at',{ascending:false});
+ const list=roles||[];
+
+ // Get emails from vendors table (planners may have vendor-style profiles)
+ const userIds=list.map(r=>r.user_id);
+ let profileMap={};
+ if(userIds.length){
+   const{data:profiles}=await sb.from('vendors')
+     .select('user_id,email,business_name,phone')
+     .in('user_id',userIds);
+   (profiles||[]).forEach(p=>profileMap[p.user_id]=p);
+ }
+
  document.getElementById('pageContent').innerHTML=`
  <div class="table-card">
    <div class="table-header">
@@ -859,28 +874,27 @@ async function renderPlanners(){
    ${list.length===0?'<div style="padding:40px;text-align:center;color:var(--muted)">No planners signed up yet.</div>':''}
    <table class="data-table">
      <thead><tr>
-       <th>Name</th><th>Email</th><th>Phone</th><th>Company</th><th>Plan</th><th>Joined</th><th>Actions</th>
+       <th>Email</th><th>Name / Company</th><th>Phone</th><th>Joined</th><th>Actions</th>
      </tr></thead>
      <tbody>
-     ${list.map(p=>`<tr>
-       <td><strong>${p.full_name||p.name||'—'}</strong></td>
-       <td>${p.email||'—'}</td>
-       <td>${p.phone||'—'}</td>
-       <td>${p.company||'—'}</td>
-       <td><span class="badge ${(p.subscription_tier||'free').toLowerCase()==='premium'?'gold':'gray'}">${p.subscription_tier||'FREE'}</span></td>
-       <td>${p.created_at?new Date(p.created_at).toLocaleDateString():'—'}</td>
-       <td>
-         <button class="btn btn-ghost btn-sm" onclick="deletePlanner('${p.id}')">Delete</button>
-       </td>
-     </tr>`).join('')}
+     ${list.map(p=>{
+       const prof=profileMap[p.user_id]||{};
+       return`<tr>
+         <td><strong>${prof.email||p.user_id}</strong></td>
+         <td>${prof.business_name||'—'}</td>
+         <td>${prof.phone||'—'}</td>
+         <td>${p.created_at?new Date(p.created_at).toLocaleDateString():'—'}</td>
+         <td><button class="btn btn-ghost btn-sm" onclick="deletePlanner('${p.user_id}')">Delete</button></td>
+       </tr>`;
+     }).join('')}
      </tbody>
    </table>
  </div>`;
 }
 
-async function deletePlanner(id){
+async function deletePlanner(userId){
  if(!confirm('Delete this planner account?'))return;
- await sb.from('planners').delete().eq('id',id);
+ await sb.from('user_roles').delete().eq('user_id',userId).eq('role','planner');
  toast('Planner deleted');
  renderPlanners();
 }
