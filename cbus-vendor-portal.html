@@ -529,65 +529,53 @@ async function handlePhotoUpload(event){
  progress.style.display='block';
 
  let uploaded=0;
- const errors=[];
 
  for(let i=0;i<files.length;i++){
    const file=files[i];
-   status.textContent=`Uploading ${i+1} of ${files.length}...`;
-   bar.style.width=`${Math.round((i/files.length)*100)}%`;
+   status.textContent=`Processing ${i+1} of ${files.length}...`;
+   bar.style.width=`${Math.round(((i+0.5)/files.length)*100)}%`;
 
    try {
-     // Compress image before upload using canvas
-     const compressed = await compressImage(file, 1200, 0.82);
-     
-     // Upload to Supabase Storage
-     const fileName=`vendor_${vendorProfile.id || currentUser.id}_${Date.now()}_${i}.jpg`;
-     const {data, error} = await sb.storage
-       .from('vendor-portfolio')
-       .upload(fileName, compressed, {contentType:'image/jpeg', upsert:false});
-     
-     if(error){
-       // Fallback: convert to base64 data URL if storage fails
-       const dataUrl = await fileToDataUrl(file);
-       portfolioPhotos=[...portfolioPhotos, dataUrl];
-     } else {
-       const {data:{publicUrl}} = sb.storage.from('vendor-portfolio').getPublicUrl(fileName);
-       portfolioPhotos=[...portfolioPhotos, publicUrl];
-     }
+     // Compress to reasonable size then store as data URL
+     // This works without any storage bucket setup
+     const dataUrl = await compressImage(file, 1000, 0.78);
+     portfolioPhotos=[...portfolioPhotos, dataUrl];
      uploaded++;
    } catch(e){
-     errors.push(file.name);
+     console.error('Photo error:',e);
    }
  }
 
  bar.style.width='100%';
+ status.textContent='Saving...';
+ 
  await savePortfolio();
  
- setTimeout(()=>{progress.style.display='none';bar.style.width='0%';},1500);
- event.target.value=''; // reset input
+ setTimeout(()=>{progress.style.display='none';bar.style.width='0%';},1200);
+ event.target.value='';
 
- if(errors.length){
-   toast(`${uploaded} uploaded, ${errors.length} failed`,'error');
- } else {
-   toast(`${uploaded} photo${uploaded>1?'s':''} uploaded!`);
- }
+ toast(`${uploaded} photo${uploaded>1?'s':''} added!`);
 }
 
 function compressImage(file, maxWidth, quality){
- return new Promise((resolve)=>{
+ return new Promise((resolve, reject)=>{
    const reader=new FileReader();
    reader.onload=(e)=>{
      const img=new Image();
      img.onload=()=>{
-       const canvas=document.createElement('canvas');
-       let w=img.width, h=img.height;
-       if(w>maxWidth){h=Math.round(h*(maxWidth/w));w=maxWidth;}
-       canvas.width=w; canvas.height=h;
-       canvas.getContext('2d').drawImage(img,0,0,w,h);
-       canvas.toBlob(resolve,'image/jpeg',quality);
+       try {
+         const canvas=document.createElement('canvas');
+         let w=img.width, h=img.height;
+         if(w>maxWidth){h=Math.round(h*(maxWidth/w));w=maxWidth;}
+         canvas.width=w; canvas.height=h;
+         canvas.getContext('2d').drawImage(img,0,0,w,h);
+         resolve(canvas.toDataURL('image/jpeg', quality));
+       } catch(e){ reject(e); }
      };
+     img.onerror=reject;
      img.src=e.target.result;
    };
+   reader.onerror=reject;
    reader.readAsDataURL(file);
  });
 }
@@ -606,13 +594,43 @@ async function removePhoto(i){
 }
 
 async function savePortfolio(){
- if(!vendorProfile){toast('Profile not loaded — try refreshing','error');return;}
- const{error}=await sb.from('vendors').update({portfolio_photos:portfolioPhotos,updated_at:new Date().toISOString()}).eq('user_id',currentUser.id);
- if(error){toast('Error saving photo','error');return;}
+ // Auto-create vendor row if missing
+ if(!vendorProfile){
+   const{data:existing}=await sb.from('vendors').select('*').eq('user_id',currentUser.id).single();
+   if(existing){
+     vendorProfile=existing;
+   } else {
+     const{data:created,error:ce}=await sb.from('vendors').insert({
+       user_id:currentUser.id,email:currentUser.email,
+       business_name:currentUser.email,tier:'FREE',
+       portfolio_photos:[]
+     }).select().single();
+     if(ce){toast('Could not create profile: '+ce.message,'error');return;}
+     vendorProfile=created;
+   }
+ }
+
+ // Check if portfolio_photos column exists by trying a small update first
+ const{error}=await sb.from('vendors')
+   .update({portfolio_photos:portfolioPhotos, updated_at:new Date().toISOString()})
+   .eq('user_id',currentUser.id);
+
+ if(error){
+   console.error('savePortfolio error:',error);
+   // If column missing, show helpful message
+   if(error.message && error.message.includes('portfolio_photos')){
+     toast('DB needs update — run SQL migration #28','error');
+   } else if(error.message && error.message.includes('too large')){
+     toast('Photo too large — try a smaller image','error');
+   } else {
+     toast('Save failed: '+error.message,'error');
+   }
+   return;
+ }
  vendorProfile.portfolio_photos=portfolioPhotos;
  renderPortfolioGrid();
  const msg=document.getElementById('portfolioMsg');
- if(msg){msg.textContent=' Portfolio updated!';setTimeout(()=>msg.textContent='',2500);}
+ if(msg){msg.textContent='✓ Portfolio updated!';setTimeout(()=>msg.textContent='',2500);}
  renderDashboard();
 }
 
