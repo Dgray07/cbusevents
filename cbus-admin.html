@@ -849,21 +849,35 @@ async function toggleVenueFeature(id,val){
 
 // ── VENDORS ───────────────────────────────────────────────────
 async function renderPlanners(){
- // Planners are stored in user_roles joined with auth users via profiles/vendors
- const{data:roles}=await sb.from('user_roles')
+ // Pull planners joining user_roles with customer_profiles for email/name
+ const{data:roles, error:rolesErr}=await sb.from('user_roles')
    .select('user_id, role, created_at')
    .eq('role','planner')
    .order('created_at',{ascending:false});
+
+ if(rolesErr){
+   document.getElementById('pageContent').innerHTML=`<div style="padding:40px;color:#ef4444">Error loading planners: ${rolesErr.message}</div>`;
+   return;
+ }
+
  const list=roles||[];
 
- // Get emails from vendors table (planners may have vendor-style profiles)
+ // Try customer_profiles first, fall back to vendors table
  const userIds=list.map(r=>r.user_id);
- let profileMap={};
+ let emailMap={};
  if(userIds.length){
-   const{data:profiles}=await sb.from('vendors')
+   const{data:cp}=await sb.from('customer_profiles')
+     .select('user_id,display_name,email')
+     .in('user_id',userIds);
+   (cp||[]).forEach(p=>emailMap[p.user_id]={name:p.display_name,email:p.email});
+   
+   // Also check vendors table
+   const{data:vp}=await sb.from('vendors')
      .select('user_id,email,business_name,phone')
      .in('user_id',userIds);
-   (profiles||[]).forEach(p=>profileMap[p.user_id]=p);
+   (vp||[]).forEach(p=>{
+     if(!emailMap[p.user_id]) emailMap[p.user_id]={name:p.business_name,email:p.email,phone:p.phone};
+   });
  }
 
  document.getElementById('pageContent').innerHTML=`
@@ -874,15 +888,14 @@ async function renderPlanners(){
    ${list.length===0?'<div style="padding:40px;text-align:center;color:var(--muted)">No planners signed up yet.</div>':''}
    <table class="data-table">
      <thead><tr>
-       <th>Email</th><th>Name / Company</th><th>Phone</th><th>Joined</th><th>Actions</th>
+       <th>User ID</th><th>Email / Name</th><th>Joined</th><th>Actions</th>
      </tr></thead>
      <tbody>
      ${list.map(p=>{
-       const prof=profileMap[p.user_id]||{};
+       const prof=emailMap[p.user_id]||{};
        return`<tr>
-         <td><strong>${prof.email||p.user_id}</strong></td>
-         <td>${prof.business_name||'—'}</td>
-         <td>${prof.phone||'—'}</td>
+         <td style="font-size:11px;color:var(--muted)">${p.user_id.slice(0,8)}...</td>
+         <td><strong>${prof.email||prof.name||p.user_id}</strong>${prof.name&&prof.email?`<br><span style="font-size:12px;color:var(--sub)">${prof.name}</span>`:''}</td>
          <td>${p.created_at?new Date(p.created_at).toLocaleDateString():'—'}</td>
          <td><button class="btn btn-ghost btn-sm" onclick="deletePlanner('${p.user_id}')">Delete</button></td>
        </tr>`;
