@@ -443,14 +443,10 @@ function prefillProfile(){
 }
 
 async function saveProfile(){
- if(!vendorProfile){
-   const{data}=await sb.from('vendors').insert({user_id:currentUser.id,email:currentUser.email,business_name:currentUser.email,subscription_tier:'FREE',subscription_status:'free'}).select().single();
-   vendorProfile=data;
-   if(!vendorProfile){toast('Could not save — try refreshing','error');return;}
- }
  const updates={
- business_name:document.getElementById('profName').value.trim(),
- email:document.getElementById('profEmail').value.trim(),
+ user_id:currentUser.id,
+ email:document.getElementById('profEmail').value.trim()||currentUser.email,
+ business_name:document.getElementById('profName').value.trim()||currentUser.email,
  phone:document.getElementById('profPhone').value.trim()||null,
  website:document.getElementById('profWebsite').value.trim()||null,
  description:document.getElementById('profBio').value.trim()||null,
@@ -459,9 +455,12 @@ async function saveProfile(){
  facebook:document.getElementById('profFacebook').value.trim()||null,
  twitter:document.getElementById('profTwitter').value.trim()||null,
  years_in_business:document.getElementById('profYears').value||null,
+ subscription_tier: vendorProfile?.subscription_tier||'FREE',
+ subscription_status: vendorProfile?.subscription_status||'free',
  updated_at:new Date().toISOString(),
  };
- const{error}=await sb.from('vendors').update(updates).eq('user_id',currentUser.id);
+ const{data:upserted,error}=await sb.from('vendors').upsert(updates,{onConflict:'user_id'}).select().single();
+ if(upserted) vendorProfile=upserted;
  if(error){toast('Error: '+error.message,'error');return;}
  Object.assign(vendorProfile,updates);
  const msg=document.getElementById('profMsg');
