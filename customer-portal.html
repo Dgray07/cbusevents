@@ -271,12 +271,12 @@ async function loadFeed(){
 // ── TICKETS ────────────────────────────────────────────────────
 async function loadTickets(){
  const el=document.getElementById('ticketsContent');
- const{data:tickets}=await sb.from('tickets')
+ const{data:tickets,error}=await sb.from('tickets')
  .select('*,events(id,title,start_time,venues(name))')
  .eq('user_id',currentUser.id)
  .eq('status','active')
- .order('purchased_at',{ascending:false})
- .catch(()=>({data:[]}));
+ .order('purchased_at',{ascending:false});
+ if(error){el.innerHTML=`<div class="empty"><h3>Error</h3><p>${error.message}</p></div>`;return;}
 
  if(!tickets?.length){
  el.innerHTML=`<div class="empty"><h3>No tickets yet</h3><p><a href="https://cbusevents.com">Browse upcoming events →</a></p></div>`;
@@ -298,11 +298,11 @@ async function loadTickets(){
 // ── SAVED VENUES ───────────────────────────────────────────────
 async function loadSavedVenues(){
  const el=document.getElementById('savedVenuesContent');
- const{data}=await sb.from('customer_saved_venues')
+ const{data,error}=await sb.from('customer_saved_venues')
  .select('venue_id,venues(id,name,venue_type,cover_image_url,tier,neighborhood)')
  .eq('user_id',currentUser.id)
- .order('saved_at',{ascending:false})
- .catch(()=>({data:[]}));
+ .order('saved_at',{ascending:false});
+ if(error){el.innerHTML=`<div class="empty"><h3>Error</h3><p>${error.message}</p></div>`;return;}
 
  const venues=(data||[]).map(d=>d.venues).filter(Boolean);
  if(!venues.length){
@@ -318,11 +318,11 @@ async function loadSavedVenues(){
 // ── SAVED EVENTS ───────────────────────────────────────────────
 async function loadSavedEvents(){
  const el=document.getElementById('savedEventsContent');
- const{data}=await sb.from('customer_saved_events')
+ const{data,error}=await sb.from('customer_saved_events')
  .select('event_id,events(id,title,start_time,cover_image_url,is_boosted,venues(name))')
  .eq('user_id',currentUser.id)
- .order('saved_at',{ascending:false})
- .catch(()=>({data:[]}));
+ .order('saved_at',{ascending:false});
+ if(error){el.innerHTML=`<div class="empty"><h3>Error</h3><p>${error.message}</p></div>`;return;}
 
  const events=(data||[]).map(d=>d.events).filter(Boolean);
  if(!events.length){
@@ -338,11 +338,11 @@ async function loadSavedEvents(){
 // ── FOLLOWS ────────────────────────────────────────────────────
 async function loadFollows(){
  const el=document.getElementById('followsContent');
- const{data}=await sb.from('customer_venue_follows')
+ const{data,error}=await sb.from('customer_venue_follows')
  .select('venue_id,venues(id,name,cover_image_url,tier)')
  .eq('user_id',currentUser.id)
- .order('followed_at',{ascending:false})
- .catch(()=>({data:[]}));
+ .order('followed_at',{ascending:false});
+ if(error){el.innerHTML=`<div class="empty"><h3>Error</h3><p>${error.message}</p></div>`;return;}
 
  const venues=(data||[]).map(d=>d.venues).filter(Boolean);
  if(!venues.length){
