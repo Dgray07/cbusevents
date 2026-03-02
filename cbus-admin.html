@@ -851,9 +851,8 @@ async function toggleVenueFeature(id,val){
 async function renderPlanners(){
  // Pull planners joining user_roles with customer_profiles for email/name
  const{data:roles, error:rolesErr}=await sb.from('user_roles')
-   .select('user_id, role, created_at')
-   .eq('role','planner')
-   .order('created_at',{ascending:false});
+   .select('user_id, role')
+   .eq('role','planner');
 
  if(rolesErr){
    document.getElementById('pageContent').innerHTML=`<div style="padding:40px;color:#ef4444">Error loading planners: ${rolesErr.message}</div>`;
@@ -896,7 +895,7 @@ async function renderPlanners(){
        return`<tr>
          <td style="font-size:11px;color:var(--muted)">${p.user_id.slice(0,8)}...</td>
          <td><strong>${prof.email||prof.name||p.user_id}</strong>${prof.name&&prof.email?`<br><span style="font-size:12px;color:var(--sub)">${prof.name}</span>`:''}</td>
-         <td>${p.created_at?new Date(p.created_at).toLocaleDateString():'—'}</td>
+         <td>—</td>
          <td><button class="btn btn-ghost btn-sm" onclick="deletePlanner('${p.user_id}')">Delete</button></td>
        </tr>`;
      }).join('')}
