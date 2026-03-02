@@ -443,30 +443,61 @@ function prefillProfile(){
 }
 
 async function saveProfile(){
- const updates={
- user_id:currentUser.id,
- email:document.getElementById('profEmail').value.trim()||currentUser.email,
- business_name:document.getElementById('profName').value.trim()||currentUser.email,
- phone:document.getElementById('profPhone').value.trim()||null,
- website:document.getElementById('profWebsite').value.trim()||null,
- description:document.getElementById('profBio').value.trim()||null,
- instagram:document.getElementById('profInsta').value.trim()||null,
- tiktok:document.getElementById('profTiktok').value.trim()||null,
- facebook:document.getElementById('profFacebook').value.trim()||null,
- twitter:document.getElementById('profTwitter').value.trim()||null,
- years_in_business:document.getElementById('profYears').value||null,
- subscription_tier: vendorProfile?.subscription_tier||'FREE',
- subscription_status: vendorProfile?.subscription_status||'free',
- updated_at:new Date().toISOString(),
- };
- const{data:upserted,error}=await sb.from('vendors').upsert(updates,{onConflict:'user_id'}).select().single();
- if(upserted) vendorProfile=upserted;
- if(error){toast('Error: '+error.message,'error');return;}
- Object.assign(vendorProfile,updates);
  const msg=document.getElementById('profMsg');
- msg.textContent=' Profile saved!';
- setTimeout(()=>msg.textContent='',3000);
- renderDashboard();
+ msg.style.color='var(--sub)';
+ msg.textContent='Saving...';
+ try {
+   const profName=document.getElementById('profName').value.trim();
+   if(!profName){msg.style.color='var(--red,#ff4444)';msg.textContent='Business name is required';return;}
+   
+   // Only update fields — never overwrite subscription data
+   const updates={
+     business_name: profName,
+     name: profName,
+     email: document.getElementById('profEmail').value.trim()||currentUser.email,
+     phone: document.getElementById('profPhone').value.trim()||null,
+     website: document.getElementById('profWebsite').value.trim()||null,
+     description: document.getElementById('profBio').value.trim()||null,
+     instagram: document.getElementById('profInsta').value.trim()||null,
+     tiktok: document.getElementById('profTiktok').value.trim()||null,
+     facebook: document.getElementById('profFacebook').value.trim()||null,
+     twitter: document.getElementById('profTwitter').value.trim()||null,
+     years_in_business: document.getElementById('profYears').value?parseInt(document.getElementById('profYears').value):null,
+     updated_at: new Date().toISOString(),
+   };
+
+   // Try UPDATE first (most common case)
+   const{data:updated, error:updateErr}=await sb.from('vendors')
+     .update(updates)
+     .eq('user_id', currentUser.id)
+     .select().single();
+
+   if(updateErr){
+     // If update failed, try upsert as fallback
+     const{data:upserted, error:upsertErr}=await sb.from('vendors')
+       .upsert({...updates, user_id:currentUser.id, subscription_tier:'FREE', subscription_status:'free'},{onConflict:'user_id'})
+       .select().single();
+     if(upsertErr){
+       msg.style.color='var(--red,#ff4444)';
+       msg.textContent='Save failed: '+upsertErr.message;
+       console.error('Upsert error:',upsertErr);
+       return;
+     }
+     if(upserted) vendorProfile=upserted;
+   } else {
+     if(updated) vendorProfile=updated;
+     else Object.assign(vendorProfile||{},updates);
+   }
+
+   msg.style.color='var(--green)';
+   msg.textContent='✓ Profile saved!';
+   setTimeout(()=>msg.textContent='',3000);
+   renderDashboard();
+ } catch(e){
+   msg.style.color='var(--red,#ff4444)';
+   msg.textContent='Error: '+e.message;
+   console.error('saveProfile exception:',e);
+ }
 }
 
 // ── SERVICES ──────────────────────────────────────────────────
