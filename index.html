@@ -512,7 +512,11 @@ function setNavActive(page){
 }
 
 // ── ROUTING ───────────────────────────────────────────────────
-function showPage(page,data=null){
+function toSlug(name){
+ return (name||'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
+}
+
+function showPage(page,data=null,pushState=true){
  currentPage=page;
  if(heroTimer){clearInterval(heroTimer);heroTimer=null;}
  setNavActive(page==='venue'||page==='category'?'venues':page);
@@ -523,10 +527,39 @@ function showPage(page,data=null){
  else if(page==='venue')renderVenueDetail(data);
  else if(page==='category')renderCategory(data);
  else if(page==='listVenue')renderVenueLanding();
- // Update SEO title
+
+ // Update URL and SEO title
  const titles={home:'CBUSEVENTS — Columbus Ohio Venues & Events',venues:'Columbus Venues — CBUSEVENTS',events:'Columbus Events — CBUSEVENTS'};
- document.title=titles[page]||document.title;
+ let url='/';
+ let title=titles[page]||document.title;
+ if(page==='venues'){url='/venues';}
+ else if(page==='events'){url='/events';}
+ else if(page==='venue'&&data){
+   const slug=data.slug||toSlug(data.name);
+   url=`/venues/${slug}`;
+   title=`${data.name} — Columbus Venue | CBUSEVENTS`;
+ }
+ else if(page==='category'&&data){url=`/category/${data}`;}
+ 
+ if(pushState) history.pushState({page,data:data?{id:data.id,name:data.name,slug:data.slug}:null},title,url);
+ document.title=title;
 }
+
+// Handle browser back/forward
+window.addEventListener('popstate',(e)=>{
+ const s=e.state;
+ if(!s||s.page==='home'){showPage('home',null,false);}
+ else if(s.page==='venues'){showPage('venues',null,false);}
+ else if(s.page==='events'){showPage('events',null,false);}
+ else if(s.page==='venue'&&s.data){
+   // Re-find venue by id from allVenues
+   const v=allVenues.find(x=>x.id===s.data.id);
+   if(v)showPage('venue',v,false);
+   else showPage('venues',null,false);
+ }
+ else if(s.page==='category'){showPage('category',s.data,false);}
+ else showPage('home',null,false);
+});
 
 // ── HOME ──────────────────────────────────────────────────────
 function renderHome(){
