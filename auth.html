@@ -396,7 +396,7 @@ async function doSignUp(){
   document.getElementById('loadingMsg').textContent='Creating your account…';
 
   // 1. Create auth user
-  const{data,error:authErr}=await sb.auth.signUp({email,password:pass});
+  const{data,error:authErr}=await sb.auth.signUp({email,password:pass,options:{emailRedirectTo:'https://cbusevents.com/auth.html'}});
   console.log('SIGNUP RESPONSE:', JSON.stringify({
     user: data?.user?.id,
     email: data?.user?.email,
@@ -458,7 +458,7 @@ async function doSignUp(){
   document.getElementById('loadingMsg').textContent='Setting up your profile…';
 
   // 3. Set role — retry up to 3 times since session may not be ready
-  const roleMap={planner:'customer'};
+  const roleMap={}; // all roles map to themselves
   const dbRole=roleMap[selectedRole]||selectedRole;
   let roleWritten=false;
   for(let attempt=0;attempt<3;attempt++){
