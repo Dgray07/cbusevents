@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<meta id="og-title" property="og:title" content="CBUSEVENTS"/>
+<meta id="og-description" property="og:description" content="Columbus, Ohio's #1 Event Platform"/>
+<meta id="og-image" property="og:image" content="https://cbusevents.com/og-image.png"/>
+<meta id="og-url" property="og:url" content="https://cbusevents.com"/>
+<meta id="tw-card" name="twitter:card" content="summary_large_image"/>
+<meta id="tw-title" name="twitter:title" content="CBUSEVENTS"/>
+<meta id="tw-image" name="twitter:image" content="https://cbusevents.com/og-image.png"/>
+<meta id="tw-description" name="twitter:description" content="Columbus, Ohio's #1 Event Platform"/>
+<title>CBUSEVENTS</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:#0d0d14;color:#fff;font-family:'Inter',sans-serif;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;}
+.card{background:#13131a;border:1px solid #25252f;border-radius:16px;max-width:480px;width:100%;overflow:hidden;}
+.cover{width:100%;height:220px;object-fit:cover;}
+.cover-placeholder{width:100%;height:220px;background:#1e1e2e;display:flex;align-items:center;justify-content:center;font-size:52px;}
+.body{padding:24px;}
+.category{font-size:11px;color:#f97316;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;}
+.title{font-size:22px;font-weight:800;line-height:1.2;margin-bottom:16px;}
+.pills{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px;}
+.pill{background:#1e1e2e;border-radius:20px;padding:6px 14px;font-size:13px;color:#ccc;}
+.venue-box{background:#1e1e2e;border-radius:10px;padding:14px;margin-bottom:16px;}
+.venue-name{font-weight:700;font-size:15px;}
+.venue-sub{font-size:12px;color:#888;margin-top:3px;}
+.desc{font-size:14px;color:#aaa;line-height:1.6;margin-bottom:20px;}
+.btn{display:block;width:100%;background:#f97316;color:#fff;border:none;border-radius:10px;padding:14px;font-size:15px;font-weight:700;cursor:pointer;text-align:center;text-decoration:none;}
+.loading{text-align:center;padding:60px 24px;color:#888;}
+.spinner{width:32px;height:32px;border:3px solid #25252f;border-top-color:#f97316;border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 16px;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.logo{text-align:center;padding:16px 0 0;font-size:13px;color:#555;letter-spacing:1px;}
+.logo span{color:#f97316;font-weight:700;}
+</style>
+</head>
+<body>
+<div style="width:100%;max-width:480px;">
+  <div class="card" id="card">
+    <div class="loading"><div class="spinner"></div>Loading event...</div>
+  </div>
+  <div class="logo">CBUS<span>EVENTS</span> &middot; Columbus, Ohio</div>
+</div>
+<script>
+const SB_URL="https://toblgvatvsjljbqogzsv.supabase.co";
+const SB_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRvYmxndmF0dnNqbGpicW9nenN2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMDgwNTAsImV4cCI6MjA4NzY4NDA1MH0._WJEQPizNDiQfDXQB_DHPaQhixPGpMdmYQSmyWmm_FQ";
+
+function fmt(dt){
+  if(!dt)return'';
+  const d=new Date(dt);
+  return d.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'})+' \u00b7 '+d.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
+}
+
+async function load(){
+  const params=new URLSearchParams(location.search);
+  const id=params.get('id');
+  if(!id){document.getElementById('card').innerHTML='<div class="loading">No event specified.</div>';return;}
+
+  const res=await fetch(`${SB_URL}/rest/v1/events?select=*,venues(id,name,neighborhood)&id=eq.${encodeURIComponent(id)}&limit=1`,
+    {headers:{'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY}});
+  const data=await res.json();
+  const e=data[0];
+
+  if(!e){document.getElementById('card').innerHTML='<div class="loading">Event not found.</div>';return;}
+
+  const venue=e.venues||{};
+  const title=e.title||'Event';
+  const desc=e.description||'Check out this event on CBUSEVENTS';
+  const img=e.cover_image_url||'https://cbusevents.com/og-image.png';
+
+  document.getElementById('og-title').content=title+' \u2014 CBUSEVENTS';
+  document.getElementById('og-description').content=desc.slice(0,200);
+  document.getElementById('og-image').content=img;
+  document.getElementById('og-url').content=location.href;
+  document.getElementById('tw-title').content=title+' \u2014 CBUSEVENTS';
+  document.getElementById('tw-image').content=img;
+  document.getElementById('tw-description').content=desc.slice(0,200);
+  document.title=title+' \u2014 CBUSEVENTS';
+
+  const minPrice=e.min_price??e.price_min??null;
+  const maxPrice=e.max_price??e.price_max??null;
+  const priceStr=minPrice!=null?(minPrice===0?'Free':`From $${minPrice}${maxPrice&&maxPrice!==minPrice?` \u2013 $${maxPrice}`:''}`):'';
+
+  document.getElementById('card').innerHTML=`
+    ${img?`<img class="cover" src="${img}" alt="${title}" onerror="this.style.display='none'"/>`:'<div class="cover-placeholder">&#127881;</div>'}
+    <div class="body">
+      ${e.category?`<div class="category">${e.category}</div>`:''}
+      <div class="title">${title}</div>
+      <div class="pills">
+        ${e.start_time?`<span class="pill">&#128197; ${fmt(e.start_time)}</span>`:''}
+        ${e.end_time?`<span class="pill">Until ${new Date(e.end_time).toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'})}</span>`:''}
+        ${priceStr?`<span class="pill">&#128181; ${priceStr}</span>`:''}
+      </div>
+      ${venue.name?`<div class="venue-box"><div class="venue-name">${venue.name}</div><div class="venue-sub">${venue.neighborhood?venue.neighborhood+' \u2014 ':''}<a href="https://cbusevents.com" style="color:#f97316;text-decoration:none">View on CBUSEVENTS</a></div></div>`:''}
+      ${desc?`<div class="desc">${desc}</div>`:''}
+      <a class="btn" href="https://cbusevents.com">View All Events on CBUSEVENTS &#8594;</a>
+    </div>
+  `;
+}
+load();
+</script>
+</body>
+</html>
