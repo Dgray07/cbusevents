@@ -419,17 +419,27 @@ let mapsReady=false;
 function initMapsApi(){ mapsReady=true; }
 
 // ── STATE ─────────────────────────────────────────────────────
-let allVenues=[],allEvents=[],currentPage='home',heroTimer=null,heroIdx=0;
+let allVenues=[],allEvents=[],allVendors=[],currentPage='home',heroTimer=null,heroIdx=0;
 let currentUser=null,savedVenueIds=new Set(),savedEventIds=new Set();
 
 // ── HERO SLIDES ───────────────────────────────────────────────
 // Real venue photos matched to type
 const HERO_SLIDES=[
- { bg:'https://images.unsplash.com/photo-1527224538127-2104bb71c51b?w=1400&q=80', label:'Bars & Nightlife', title:'Short North', sub:'16 bars and nightlife venues' },
- { bg:'https://images.unsplash.com/photo-1580809361436-42a7ec204889?w=1400&q=80', label:'Comedy', title:'Stand-Up & Improv', sub:'7 comedy clubs and performance spaces' },
+ { bg:'https://images.unsplash.com/photo-1527224538127-2104bb71c51b?w=1400&q=80', label:'Bars & Nightlife', title:'Short North', sub:'Columbus bars & nightlife' },
+ { bg:'https://images.unsplash.com/photo-1519671482749-fd09be7ccebf?w=1400&q=80', label:'Event Spaces', title:'Private Events', sub:'Find your perfect venue' },
  { bg:'https://images.unsplash.com/photo-1415201364774-f6f0bb35f28f?w=1400&q=80', label:'Live Music', title:'Jazz & Live Music', sub:"Columbus's best live music venues" },
- { bg:'https://images.unsplash.com/photo-1519671482749-fd09be7ccebf?w=1400&q=80', label:'Rooftop', title:'Lincoln Social', sub:'9 floors up in Short North' },
+ { bg:'https://images.unsplash.com/photo-1580809361436-42a7ec204889?w=1400&q=80', label:'Comedy', title:'Stand-Up & Improv', sub:'Comedy clubs & performance spaces' },
 ];
+
+function buildHeroSlidesFromVenues(){
+ // Replace default slides with real venue photos when available
+ const withPhotos=allVenues.filter(v=>v.cover_image_url&&v.cover_image_url.startsWith('http')&&!v.cover_image_url.includes('drive.google')).slice(0,4);
+ if(withPhotos.length>=2){
+   withPhotos.forEach((v,i)=>{
+     if(HERO_SLIDES[i]) HERO_SLIDES[i]={bg:v.cover_image_url,label:v.venue_type||'Venue',title:v.name,sub:v.neighborhood||'Columbus'};
+   });
+ }
+}
 
 // Real venue image map
 const VENUE_IMGS={
@@ -473,18 +483,43 @@ function getVenueImg(venue){
 // ── INIT ──────────────────────────────────────────────────────
 async function init(){
  try {
- const [vRes,eRes]=await Promise.all([
+ const [vRes,eRes,vendRes]=await Promise.all([
  sb.from('venues').select('*').eq('status','approved').order('tier',{ascending:false}),
  sb.from('events').select('*,venues(name,neighborhood)').eq('status','published')
- .gte('start_time',new Date().toISOString()).order('start_time',{ascending:true})
+ .gte('start_time',new Date().toISOString()).order('start_time',{ascending:true}),
+ sb.from('vendors').select('*').order('admin_promoted',{ascending:false})
  ]);
  allVenues=vRes.data||[];
  allEvents=eRes.data||[];
+ allVendors=vendRes.data||[];
  } catch(e) {
  allVenues=[];
  allEvents=[];
  }
- renderHome();
+ // Handle 404 redirect from GitHub Pages
+ const rParam = new URLSearchParams(location.search).get('r');
+ const pathToRoute = rParam ? decodeURIComponent(rParam) : location.pathname;
+ 
+ if(pathToRoute && pathToRoute !== '/') {
+   const parts = pathToRoute.replace(/^\//,'').split('/');
+   if(parts[0]==='venues' && parts[1]) {
+     // /venues/slug — find venue by slug
+     const slug = parts[1];
+     const v = allVenues.find(x=>(x.slug||toSlug(x.name))===slug);
+     if(v){ showPage('venue',v); }
+     else { showPage('venues'); }
+   } else if(parts[0]==='venues') {
+     showPage('venues');
+   } else if(parts[0]==='events') {
+     showPage('events');
+   } else {
+     renderHome();
+   }
+   // Clean up the ?r= param from URL
+   if(rParam) history.replaceState({},'',pathToRoute);
+ } else {
+   renderHome();
+ }
  await initNavAuth();
  await loadSavedState();
 }
@@ -586,12 +621,29 @@ function renderHome(){
  </div> </section> <!-- THIS WEEK --> ${thisWeek.length?`
  <section class="section section-alt"> <div class="section-header"> <div><div class="section-title"> Happening This Week</div><div class="section-sub">Events in Columbus in the next 7 days</div></div> <button class="see-all" onclick="showPage('events')">See all events →</button> </div> <div class="event-grid">${thisWeek.map(e=>eventCard(e)).join('')}</div> </section>`:''}
 
- <!-- FEATURED VENUES --> <section class="section"> <div class="section-header"> <div><div class="section-title"> Featured Venues</div><div class="section-sub">${allVenues.length} venues across Columbus</div></div> <button class="see-all" onclick="showPage('venues')">Browse all →</button> </div> <div class="venue-grid" id="homeVenueGrid">${allVenues.slice(0,8).map(v=>venueCard(v)).join('')}</div> </section> <!-- UPCOMING EVENTS --> ${upcoming.length?`
+ <!-- FEATURED VENUES --> <section class="section"> <div class="section-header"> <div><div class="section-title"> Featured Venues</div><div class="section-sub">${allVenues.length} venues across Columbus</div></div> <button class="see-all" onclick="showPage('venues')">Browse all →</button> </div> <div class="venue-grid" id="homeVenueGrid">${allVenues.slice(0,8).map(v=>venueCard(v)).join('')}</div> </section>
+
+ <!-- FEATURED VENDORS -->
+ <section class="section">
+   <div class="sect-head">
+     <div>
+       <div class="sect-label">Columbus Vendors</div>
+       <h2 class="sect-title">Trusted Event Professionals</h2>
+     </div>
+     <a href="https://cbusevents.com/vendors.html" class="see-all">Browse all →</a>
+   </div>
+   <div class="venue-grid" id="homeVendorGrid">
+     ${allVendors&&allVendors.length?allVendors.slice(0,8).map(v=>vendorCard(v)).join(''):'<div class="empty-state"><p>Vendors coming soon</p></div>'}
+   </div>
+ </section>
+
+ <!-- UPCOMING EVENTS --> ${upcoming.length?`
  <section class="section section-alt"> <div class="section-header"> <div><div class="section-title"> Upcoming Events</div><div class="section-sub">What's on in Columbus</div></div> <button class="see-all" onclick="showPage('events')">View calendar →</button> </div> <div class="event-grid">${upcoming.map(e=>eventCard(e)).join('')}</div> </section>`:''}
 
  <!-- CTA --> <div style="height:52px"></div> <!-- PLANNER CTA SECTION --> <section class="section section-alt"> <div style="max-width:900px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;gap:32px;flex-wrap:wrap"> <div> <div style="display:inline-flex;align-items:center;gap:6px;background:#60a5fa20;color:var(--blue);border:1px solid #60a5fa30;border-radius:20px;padding:4px 14px;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-bottom:14px"> For Event Planners</div> <h2 style="font-family:'Syne',sans-serif;font-size:26px;font-weight:800;margin-bottom:10px">Planning an event in Columbus?</h2> <p style="color:var(--sub);font-size:15px;line-height:1.65;max-width:480px">Browse venues, send booking inquiries, track your requests, and list your events — all from a free planner dashboard.</p> <div style="display:flex;gap:16px;margin-top:16px;flex-wrap:wrap"> <div style="display:flex;align-items:center;gap:6px;font-size:13px;color:var(--sub)"> Free forever</div> <div style="display:flex;align-items:center;gap:6px;font-size:13px;color:var(--sub)"> Send venue inquiries</div> <div style="display:flex;align-items:center;gap:6px;font-size:13px;color:var(--sub)"> List your events</div> <div style="display:flex;align-items:center;gap:6px;font-size:13px;color:var(--sub)"> Boost for more reach</div> </div> </div> <div style="display:flex;flex-direction:column;gap:10px;flex-shrink:0"> <button class="btn-primary" style="padding:14px 28px;font-size:15px;font-weight:700;border-radius:10px;background:var(--blue)" onclick="window.open('https://cbusevents.com/cbus-planner-portal.html','_blank')">Create Free Planner Account →</button> <button class="btn-outline" style="padding:12px 24px;font-size:14px;border-radius:10px" onclick="window.open('https://cbusevents.com/cbus-planner-portal.html','_blank')">Sign In to Planner Portal</button> </div> </div> </section> <div style="height:52px"></div> <div class="cta-banner"> <div> <h2>Own a venue or host events?</h2> <p>Get discovered by thousands of Columbus event organizers. List your space free — upgrade to get featured in the hero slider and unlock premium placement across CBUSEVENTS.</p> </div> <div class="cta-actions"> <button class="btn-primary" onclick="window.open('https://cbusevents.com/cbus-venue-portal.html','_blank')">List Your Venue Free →</button> <button class="btn-secondary" onclick="showPricing()">View Pricing Plans</button> </div> </div> ${footer()}
  `;
 
+ buildHeroSlidesFromVenues();
  initHero();
  buildHeroCards();
 }
@@ -617,24 +669,33 @@ function goSlide(idx){
 function buildHeroCards(){
  const el=document.getElementById('heroCards');
  if(!el)return;
- const featuredVenues=allVenues.filter(v=>v.tier!=='free').slice(0,2);
- const showVenues=featuredVenues.length?featuredVenues:allVenues.slice(0,2);
- const nextEvent=allEvents.find(e=>isPromoted(e))||allEvents[0];
+ // Featured = is_featured flag OR non-free tier
+ const featuredVenues=allVenues.filter(v=>v.is_featured||v.tier==='premium'||v.tier==='standard');
+ const showVenues=featuredVenues.length>=2?featuredVenues.slice(0,2):allVenues.slice(0,2);
+ const nextEvent=allEvents.find(e=>e.is_boosted)||allEvents[0];
  const items=[
- ...showVenues.map(v=>({
- icon:getVenueImg(v)?`<img src="${getVenueImg(v)}" alt="${v.name}" onerror="this.parentNode.textContent='${venueEmoji(v.venue_type)}'">`:venueEmoji(v.venue_type),
- label:v.venue_type||'Venue', title:v.name, meta:v.neighborhood||v.city,
- onclick:`showPage('venue',allVenues.find(x=>x.id==='${v.id}'))`
- })),
- ...(nextEvent?[{
- icon:'', label:'Next Event', title:nextEvent.title,
- meta:`${fmt(nextEvent.start_time)} · ${fmtTime(nextEvent.start_time)}`,
- onclick:`openEventModal('${nextEvent.id}')`
- }]:[])
+   ...showVenues.map(v=>({
+     icon:getVenueImg(v)?`<img src="${getVenueImg(v)}" alt="${v.name}" style="width:100%;height:100%;object-fit:cover;border-radius:8px" onerror="this.parentNode.textContent='${venueEmoji(v.venue_type)}'">`:venueEmoji(v.venue_type),
+     label:v.venue_type||'Venue', title:v.name, meta:v.neighborhood||'Columbus',
+     onclick:`showPage('venue',allVenues.find(x=>x.id==='${v.id}'))`
+   })),
+   ...(nextEvent?[{
+     icon:'🎉', label:'Featured Event', title:nextEvent.title,
+     meta:`${fmt(nextEvent.start_time)} · ${fmtTime(nextEvent.start_time)}`,
+     onclick:`openEventModal('${nextEvent.id}')`
+   }]:[])
  ];
  el.innerHTML=items.map(item=>`
- <div class="hero-card" onclick="${item.onclick}"> <div class="hero-card-icon">${item.icon}</div> <div style="flex:1;min-width:0"> <div class="hero-card-label">${item.label}</div> <div class="hero-card-title">${item.title}</div> <div class="hero-card-meta">${item.meta}</div> </div> </div>`).join('');
+   <div class="hero-card" onclick="${item.onclick}">
+     <div class="hero-card-icon">${item.icon}</div>
+     <div style="flex:1;min-width:0">
+       <div class="hero-card-label">${item.label}</div>
+       <div class="hero-card-title">${item.title}</div>
+       <div class="hero-card-meta">${item.meta}</div>
+     </div>
+   </div>`).join('');
 }
+
 
 function homeSearch(q){
  const lq=q.toLowerCase();
@@ -866,6 +927,25 @@ function venueCard(v){
  <button onclick="toggleSaveVenue('${v.id}',this,event)" style="margin-top:8px;background:${savedVenueIds.has(v.id)?'#FF6B3520':'transparent'};color:${savedVenueIds.has(v.id)?'var(--orange)':'var(--sub)'};border:1px solid var(--border);border-radius:6px;padding:5px 12px;font-size:12px;cursor:pointer;width:100%;font-family:'DM Sans',sans-serif;">${savedVenueIds.has(v.id)?'♥ Saved':'♡ Save'}</button>
  </div> </div>`;
 }
+function vendorCard(v){
+ const img=v.cover_image_url||v.logo_url||null;
+ const name=v.business_name||v.name||v.email||'Vendor';
+ const cat=v.category||v.services||'Event Services';
+ const promoted=v.admin_promoted||v.tier==='premium'||v.tier==='PREMIUM';
+ return`<div class="venue-card" onclick="window.location.href='https://cbusevents.com/vendors.html'" style="cursor:pointer">
+   <div class="venue-card-img">
+     ${img?`<img src="${img}" alt="${name}" style="width:100%;height:100%;object-fit:cover" onerror="this.style.display='none'"/>`:
+     `<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:36px;background:#1e1e2e">🎯</div>`}
+     ${promoted?'<div class="venue-badge" style="background:#f59e0b">⭐ Featured</div>':''}
+   </div>
+   <div class="venue-card-body">
+     <div class="venue-card-name">${name}</div>
+     <div class="venue-card-meta">${typeof cat==='object'?cat.join(', '):cat}</div>
+     ${v.neighborhood?`<div class="venue-card-hood">${v.neighborhood}</div>`:''}
+   </div>
+ </div>`;
+}
+
 
 function eventCard(e){
  const tw=isThisWeek(e.start_time);
