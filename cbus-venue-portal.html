@@ -197,7 +197,7 @@ function SharePanel({event, venue, onClose}) {
 // Venue Form
 function VenueForm({venue,onSave}) {
  const {user}=useAuth();
- const [f,setF]=useState({name:venue?.name||"",description:venue?.description||"",address:venue?.address||"",neighborhood:venue?.neighborhood||"",website:venue?.website||"",phone:venue?.phone||"",email:venue?.email||"",venue_type:venue?.venue_type||"",capacity:venue?.capacity||"",indoor_outdoor:venue?.indoor_outdoor||"indoor",tags:venue?.tags?.join(", ")||"",amenities:venue?.amenities?.join(", ")||"",cover_image_url:venue?.cover_image_url||"",instagram:venue?.instagram||"",facebook:venue?.facebook||"",tiktok:venue?.tiktok||"",twitter:venue?.twitter||""});
+ const [f,setF]=useState({name:venue?.name||"",description:venue?.description||"",address:venue?.address||"",neighborhood:venue?.neighborhood||"",website:venue?.website||"",phone:venue?.phone||"",email:venue?.email||"",venue_type:venue?.venue_type||"",capacity:venue?.capacity||"",indoor_outdoor:venue?.indoor_outdoor||"indoor",tags:venue?.tags?.join(", ")||"",amenities:venue?.amenities?.join(", ")||"",cover_image_url:venue?.cover_image_url||"",instagram:venue?.instagram||"",facebook:venue?.facebook||"",tiktok:venue?.tiktok||"",twitter:venue?.twitter||"",photos:venue?.photos||[]});
  const [busy,setBusy]=useState(false);
  const [toast,setToast]=useState({msg:"",type:"success"});
  const set=k=>e=>setF(p=>({...p,[k]:e.target.value}));
@@ -258,7 +258,41 @@ function VenueForm({venue,onSave}) {
   </div>
   {f.cover_image_url&&<img src={f.cover_image_url} alt="" style={{width:"100%",height:120,objectFit:"cover",borderRadius:8,marginTop:10,border:"1px solid #25252f"}} onError={e=>e.target.style.display="none"}/>}
 </Field>}
- </Card> </div> <Card style={{gridColumn:"1/-1"}}> <div style={{fontFamily:"Syne,sans-serif",fontWeight:700,fontSize:11,marginBottom:18,color:"#8888a0",textTransform:"uppercase",letterSpacing:1.5}}> Social Media</div> <div style={{color:"#8888a0",fontSize:13,marginBottom:16}}>Link your accounts so fans can follow you — and share events directly to your profiles.</div> <Grid2> <Field label="Instagram"><input value={f.instagram} onChange={set("instagram")} placeholder="@yourvenue"/></Field> <Field label="TikTok"><input value={f.tiktok} onChange={set("tiktok")} placeholder="@yourvenue"/></Field> <Field label="Facebook Page URL"><input value={f.facebook} onChange={set("facebook")} placeholder="https://facebook.com/yourvenue"/></Field> <Field label="X / Twitter"><input value={f.twitter} onChange={set("twitter")} placeholder="@yourvenue"/></Field> </Grid2> </Card> <div style={{marginTop:22,display:"flex",gap:12,alignItems:"center"}}> <Btn onClick={save} disabled={busy} size="lg">{busy?"Saving...":venue?"Save Changes":"Submit Venue"}</Btn> {venue?.status==="pending"&&<Badge color="#f59e0b">Pending Review</Badge>}
+ </Card> </div> <Card style={{gridColumn:"1/-1"}}>
+ <div style={{fontFamily:"Syne,sans-serif",fontWeight:700,fontSize:11,marginBottom:12,color:"#8888a0",textTransform:"uppercase",letterSpacing:1.5}}>Space Photos</div>
+ <div style={{color:"#8888a0",fontSize:13,marginBottom:14}}>Upload up to 6 photos of your event space. These appear on your venue page.</div>
+ <button type="button" onClick={()=>document.getElementById('spacePhotoInput').click()} style={{background:"#f97316",color:"#fff",border:"none",borderRadius:8,padding:"10px 18px",cursor:"pointer",fontWeight:600,fontSize:13,marginBottom:12}}>📷 Upload Space Photos</button>
+ <input type="file" id="spacePhotoInput" accept="image/*" multiple style={{display:"none"}} onChange={async(e)=>{
+   const files=Array.from(e.target.files).slice(0,6-(f.photos||[]).length);
+   const compressed=await Promise.all(files.map(file=>new Promise((res)=>{
+     const reader=new FileReader();
+     reader.onload=ev=>{
+       const img=new Image();
+       img.onload=()=>{
+         const canvas=document.createElement('canvas');
+         let w=img.width,h=img.height;
+         if(w>1200){h=Math.round(h*(1200/w));w=1200;}
+         canvas.width=w;canvas.height=h;
+         canvas.getContext('2d').drawImage(img,0,0,w,h);
+         res(canvas.toDataURL('image/jpeg',0.82));
+       };
+       img.src=ev.target.result;
+     };
+     reader.readAsDataURL(file);
+   })));
+   setF(p=>({...p,photos:[...(p.photos||[]),...compressed].slice(0,6)}));
+   e.target.value='';
+ }}/>
+ {(f.photos||[]).length>0&&<div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:8,marginTop:4}}>
+   {(f.photos||[]).map((photo,i)=>(
+     <div key={i} style={{position:"relative"}}>
+       <img src={photo} alt="" style={{width:"100%",height:100,objectFit:"cover",borderRadius:8,border:"1px solid #25252f"}}/>
+       <button onClick={()=>setF(p=>({...p,photos:p.photos.filter((_,j)=>j!==i)}))} style={{position:"absolute",top:4,right:4,background:"rgba(0,0,0,0.75)",color:"#fff",border:"none",borderRadius:4,width:22,height:22,fontSize:13,cursor:"pointer"}}>×</button>
+     </div>
+   ))}
+ </div>}
+</Card>
+<Card style={{gridColumn:"1/-1"}}> <div style={{fontFamily:"Syne,sans-serif",fontWeight:700,fontSize:11,marginBottom:18,color:"#8888a0",textTransform:"uppercase",letterSpacing:1.5}}> Social Media</div> <div style={{color:"#8888a0",fontSize:13,marginBottom:16}}>Link your accounts so fans can follow you — and share events directly to your profiles.</div> <Grid2> <Field label="Instagram"><input value={f.instagram} onChange={set("instagram")} placeholder="@yourvenue"/></Field> <Field label="TikTok"><input value={f.tiktok} onChange={set("tiktok")} placeholder="@yourvenue"/></Field> <Field label="Facebook Page URL"><input value={f.facebook} onChange={set("facebook")} placeholder="https://facebook.com/yourvenue"/></Field> <Field label="X / Twitter"><input value={f.twitter} onChange={set("twitter")} placeholder="@yourvenue"/></Field> </Grid2> </Card> <div style={{marginTop:22,display:"flex",gap:12,alignItems:"center"}}> <Btn onClick={save} disabled={busy} size="lg">{busy?"Saving...":venue?"Save Changes":"Submit Venue"}</Btn> {venue?.status==="pending"&&<Badge color="#f59e0b">Pending Review</Badge>}
  {venue?.status==="approved"&&<Badge color="#22c55e">Live </Badge>}
  </div> {toast.msg&&<div style={{position:"fixed",bottom:24,right:24,background:toast.type==="success"?"#0a2a14":"#2a0a0a",color:toast.type==="success"?"#22c55e":"#ef4444",border:`1px solid ${toast.type==="success"?"#1a4a24":"#4a1010"}`,borderRadius:10,padding:"12px 20px",fontSize:14,fontWeight:500,zIndex:999,boxShadow:"0 8px 32px rgba(0,0,0,0.5)"}}> {toast.type==="success"?" ":" "}{toast.msg}
  </div>}
@@ -288,7 +322,15 @@ function EventModal({event,venueId,venueTier,currentEventCount,onClose,onSave}) 
  }
  }
  setBusy(true);setErr("");
- const payload={...f,venue_id:venueId,owner_id:user.id,price_min:f.price_min||null,price_max:f.price_max||null};
+ const payload={
+  ...f,
+  venue_id:venueId,
+  owner_id:user.id,
+  price_min:f.price_min||null,
+  price_max:f.price_max||null,
+  start_time:f.start_time||null,
+  end_time:f.end_time&&f.end_time.trim()!==''?f.end_time:null,
+};
  const {error}=event?.id?await sb.from("events").update(payload).eq("id",event.id):await sb.from("events").insert(payload);
  setBusy(false);
  if(error)setErr(error.message);else{onSave();onClose();}
@@ -476,7 +518,7 @@ function Portal() {
  const [busy,setBusy]=useState(true);
  const load=async()=>{
  setBusy(true);
- const {data:v}=await sb.from("venues").select("*").eq("owner_id",user.id).single();
+ const {data:v}=await sb.from("venues").select("*").eq("owner_id",user.id).maybeSingle();
  setVenue(v||null);
  if(v?.id){const {data:ev}=await sb.from("events").select("*").eq("venue_id",v.id).order("start_time",{ascending:true});setEvents(ev||[]);}
  else setEvents([]);

@@ -566,16 +566,23 @@ async function submitEvent(){
  const price=document.getElementById('evPrice')?.value;
  const venueId=document.getElementById('evVenue')?.value||null;
 
+ const endDate=document.getElementById('evEndDate')?.value;
+ const endTime=document.getElementById('evEndTime')?.value;
+ const endDateTime=(endDate&&endTime)?new Date(`${endDate}T${endTime}:00`).toISOString():null;
+
  const{error}=await sb.from('events').insert({
  title,
  start_time:startTime.toISOString(),
+ end_time:endDateTime,
  category:document.getElementById('evCat')?.value||'Other',
  venue_id:venueId||null,
  description:document.getElementById('evDesc')?.value||null,
  ticket_url:document.getElementById('evTicket')?.value||null,
  price_min:price?parseFloat(price):null,
+ price_max:price?parseFloat(price):null,
  is_free:!price||parseFloat(price)===0,
  status:'published',
+ owner_id:currentUser.id,
  planner_email:currentUser.email,
  });
  if(error){if(errEl){errEl.textContent=error.message;errEl.style.display='block';}return;}
