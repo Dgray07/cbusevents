@@ -818,42 +818,8 @@ async function renderVenueDetail(venue){
 
  <!-- Space Photos -->
  ${(venue.photos&&venue.photos.length>0)?`<h2 style="font-family:'Syne',sans-serif;font-size:18px;font-weight:700;margin-bottom:12px">The Space</h2><div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;margin-bottom:28px">${venue.photos.map(p=>`<img src="${p}" alt="venue" style="width:100%;height:160px;object-fit:cover;border-radius:10px;border:1px solid #25252f" onerror="this.style.display='none'">`).join('')}</div>`:''}
- 
-
- DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/> <!-- SEO META TAGS -->
-<title id="pageTitle">CBUSEVENTS — Columbus Ohio Event Venues & Nightlife Directory</title>
-<meta name="description" content="Discover the best bars, comedy clubs, concert halls, and event spaces in Columbus, Ohio. Browse upcoming events or list your venue on CBUSEVENTS — Columbus's event directory.">
-<meta name="keywords" content="Columbus Ohio venues, Columbus bars, Columbus comedy clubs, Short North bars, Columbus events, event spaces Columbus Ohio, nightlife Columbus">
-<meta name="robots" content="index, follow">
-<meta name="author" content="CBUSEVENTS">
-<link rel="canonical" href="https://cbusevents.com"> <!-- Open Graph (Facebook/LinkedIn) -->
-<meta property="og:type" content="website">
-<meta property="og:url" content="https://cbusevents.com">
-<meta property="og:title" content="CBUSEVENTS — Columbus Ohio Venues & Events">
-<meta property="og:description" content="The Columbus event directory. Discover bars, comedy clubs, concert halls & unique spaces. Browse upcoming events or list your venue.">
-<meta property="og:image" content="https://cbusevents.com/og-image.png"> <!-- Twitter Card -->
-<meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="CBUSEVENTS — Columbus Ohio Venues & Events">
-<meta name="twitter:description" content="The Columbus event directory. Discover bars, comedy clubs, and unique event spaces.">
-<meta name="twitter:image" content="https://cbusevents.com/og-image.png"> <!-- Structured Data for Google -->
-<script type="application/ld+json">
-{
- "@context": "https://schema.org",
- "@type": "WebSite",
- "name": "CBUSEVENTS",
- "url": "https://cbusevents.com",
- "description": "Columbus Ohio event venue and nightlife directory",
- "potentialAction": {
- "@type": "SearchAction",
- "target": "https://cbusevents.com/?search={search_term_string}",
- "query-input": "required name=search_term_string"
- }
-}
-</script> <link rel="preconnect" href="https://fonts.googleapis.com">
+   
+<link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"> <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
 :root {
