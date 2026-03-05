@@ -3,10 +3,16 @@
 <head>
 <meta charset="UTF-8"/>
 <script>
-// Grab the path and redirect to index with it as a query param
-const path = window.location.pathname;
-const search = window.location.search;
-window.location.replace('https://cbusevents.com/?r=' + encodeURIComponent(path + search));
+  // ONLY redirect if this is the main browser window.
+  // This prevents the "hall of mirrors" loop in footers or broken images.
+  if (window.self === window.top) {
+    const path = window.location.pathname;
+    const search = window.location.search;
+    window.location.replace('https://cbusevents.com/?r=' + encodeURIComponent(path + search));
+  } else {
+    // If it's a broken image or sub-resource, just stop here.
+    console.warn("404 suppressed to prevent infinite loop.");
+  }
 </script>
 </head>
 <body></body>
