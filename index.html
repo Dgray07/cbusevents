@@ -1,6 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<script>
+  /* CIRCUIT BREAKER: Stops the infinite loop immediately */
+  if (window.self !== window.top) { window.stop(); }
+</script>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/> <!-- SEO META TAGS -->
 <title id="pageTitle">CBUSEVENTS — Columbus Ohio Event Venues & Nightlife Directory</title>
@@ -6165,6 +6169,23 @@ async function init(){
 }
 
 // ── HELPERS ───────────────────────────────────────────────────
+
+async function loadSavedState() {
+  try {
+    const { data: { user } } = await sb.auth.getUser();
+    currentUser = user;
+    if (user) {
+      const [vSaves, eSaves] = await Promise.all([
+        sb.from('customer_saved_venues').select('venue_id').eq('user_id', user.id),
+        sb.from('customer_saved_events').select('event_id').eq('user_id', user.id)
+      ]);
+      savedVenueIds = new Set((vSaves.data || []).map(s => s.venue_id));
+      savedEventIds = new Set((eSaves.data || []).map(s => s.event_id));
+    }
+  } catch (e) {
+    console.warn("User state could not be loaded:", e);
+  }
+}// ── HELPERS ───────────────────────────────────────────────────
 function fmt(dt){ return new Date(dt).toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'}); }
 function fmtTime(dt){ return new Date(dt).toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'}); }
 function isThisWeek(dt){ const d=new Date(dt),n=new Date(); return d>=n&&d<=new Date(n.getTime()+7*24*60*60*1000); }
