@@ -1,10 +1,26 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<script>
-  /* CIRCUIT BREAKER: Stops the infinite loop immediately */
-  if (window.self !== window.top) { window.stop(); }
-</script>
+  <script>if (window.self !== window.top) { window.stop(); }</script>
+  
+  <script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": "CBUSEVENTS",
+    "url": "https://cbusevents.com",
+    "description": "Columbus Ohio event venue and nightlife directory",
+    "potentialAction": {
+      "@type": "SearchAction",
+      "target": "https://cbusevents.com/?search={search_term_string}",
+      "query-input": "required name=search_term_string"
+    }
+  }
+  </script>
+
+  <title>CBUSEVENTS</title>
+  ...
+</head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/> <!-- SEO META TAGS -->
 <title id="pageTitle">CBUSEVENTS — Columbus Ohio Event Venues & Nightlife Directory</title>
@@ -836,18 +852,6 @@ async function renderVenueDetail(venue){
 <meta name="twitter:description" content="The Columbus event directory. Discover bars, comedy clubs, and unique event spaces.">
 <meta name="twitter:image" content="https://cbusevents.com/og-image.png"> <!-- Structured Data for Google -->
 <script type="application/ld+json">
-{
- "@context": "https://schema.org",
- "@type": "WebSite",
- "name": "CBUSEVENTS",
- "url": "https://cbusevents.com",
- "description": "Columbus Ohio event venue and nightlife directory",
- "potentialAction": {
- "@type": "SearchAction",
- "target": "https://cbusevents.com/?search={search_term_string}",
- "query-input": "required name=search_term_string"
- }
-}
 </script> <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"> <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
