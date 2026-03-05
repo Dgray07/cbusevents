@@ -8,6 +8,14 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/> <!-- SEO META TAGS -->
 <title id="pageTitle">CBUSEVENTS — Columbus Ohio Event Venues & Nightlife Directory</title>
+<script>
+  // EMERGENCY MUZZLE: Blocks the broken Unsplash link from ever loading
+  window.addEventListener('error', function(e) {
+      if (e.target.src && e.target.src.includes('1510380527185')) {
+          e.target.src = 'https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?w=800&q=80';
+      }
+  }, true);
+</script>
 <meta name="description" content="Discover the best bars, comedy clubs, concert halls, and event spaces in Columbus, Ohio. Browse upcoming events or list your venue on CBUSEVENTS — Columbus's event directory.">
 <meta name="keywords" content="Columbus Ohio venues, Columbus bars, Columbus comedy clubs, Short North bars, Columbus events, event spaces Columbus Ohio, nightlife Columbus">
 <meta name="robots" content="index, follow">
