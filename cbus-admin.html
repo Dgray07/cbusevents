@@ -840,6 +840,7 @@ async function openAddEvent(){
   document.getElementById('ee-price-min').value='';
   document.getElementById('ee-price-max').value='';
   document.getElementById('ee-description').value='';
+  document.getElementById('ee-ticket-url').value='';
   document.getElementById('ee-cover').value='';
   document.getElementById('ee-cover-preview').style.display='none';
   document.getElementById('ee-status').value='published';
@@ -862,6 +863,7 @@ async function openEditEvent(id){
   document.getElementById('ee-price-min').value=e.price_min||e.min_price||'';
   document.getElementById('ee-price-max').value=e.price_max||e.max_price||'';
   document.getElementById('ee-description').value=e.description||'';
+  document.getElementById('ee-ticket-url').value=e.ticket_url||'';
   document.getElementById('ee-cover').value=e.cover_image_url||'';
   document.getElementById('ee-status').value=e.status||'published';
   document.getElementById('ee-msg').textContent='';
@@ -907,6 +909,7 @@ async function saveEventEdit(){
     price_max:parseFloat(document.getElementById('ee-price-max').value)||priceMin,
     is_free:priceMin===0,
     description:document.getElementById('ee-description').value.trim(),
+    ticket_url:document.getElementById('ee-ticket-url').value.trim()||null,
     cover_image_url:document.getElementById('ee-cover').value.trim()||null,
     status:document.getElementById('ee-status').value,
   };
@@ -1369,6 +1372,7 @@ async function rejectClaim(venueId, venueName){
         <input id="ee-cover" class="form-input" placeholder="Or paste image URL..."/>
         <img id="ee-cover-preview" src="" alt="" style="display:none;width:100%;height:140px;object-fit:cover;border-radius:8px;margin-top:8px;border:1px solid #25252f;"/>
       </div>
+      <div class="field"><label>Ticket URL</label><input id="ee-ticket-url" class="form-input" placeholder="https://..."/></div>
       <div class="field"><label>Status</label>
         <select id="ee-status" class="form-input"><option value="published">Published</option><option value="draft">Draft</option></select>
       </div>
