@@ -1,5 +1,4 @@
-<
-!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8"/>
@@ -626,9 +625,27 @@ function renderEvents(){
 }
 
 function renderEventRows(events){
- if(!events.length)return'<tr class="empty-row"><td colspan="6">No events found</td></tr>';
- return events.map(e=>`
- <tr data-eid="${e.id}"> <td><strong>${e.title}</strong>${e.is_free?'<span style="color:var(--green);font-size:11px;margin-left:6px">FREE</span>':e.price_min?`<span style="font-size:11px;color:var(--sub);margin-left:6px">$${e.price_min}</span>`:''}</td> <td style="color:var(--sub)">${e.venues?.name||'—'}</td> <td style="color:var(--muted)">${new Date(e.start_time).toLocaleDateString()} ${new Date(e.start_time).toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'})}</td> <td style="color:var(--sub)">${e.category||'—'}</td> <td><span class="badge ${e.status==='published'?'badge-green':'badge-muted'}">${e.status}</span></td> <td>${e.is_boosted?`<span class="badge badge-gold"> ${e.boost_type||'boosted'}</span>`:`<span class="badge badge-muted">—</span>`}</td> <td><div style="display:flex;gap:5px;flex-wrap:wrap"> <button class="btn btn-ghost btn-sm" onclick="toggleEventBoost(\'${e.id}\',${!e.is_boosted})">${e.is_boosted?\'Unboost\':\'Boost\'}</button> <button class="btn btn-ghost btn-sm" onclick="openEditEvent(\'${e.id}\')">✏️ Edit</button> <button class="btn btn-danger btn-sm" onclick="deleteEvent('${e.id}','${e.title.replace(/'/g,"\\'")}')">Delete</button> </div></td> </tr>`).join('');
+  if(!events.length)return '<tr class="empty-row"><td colspan="7">No events found</td></tr>';
+  return events.map(function(e){
+    var boosted=e.is_boosted?'<span class="badge badge-gold">'+( e.boost_type||'boosted')+'</span>':'<span class="badge badge-muted">-</span>';
+    var boostLabel=e.is_boosted?'Unboost':'Boost';
+    var featureLabel=(e.promoted_until&&new Date(e.promoted_until)>new Date())?'Unfeature':'Feature';
+    var featureStyle=(e.promoted_until&&new Date(e.promoted_until)>new Date())?'background:#f59e0b;color:#000':'background:#22c55e;color:#000';
+    var titleBadge=e.is_free?'<span style="color:var(--green);font-size:11px;margin-left:6px">FREE</span>':(e.price_min?'<span style="font-size:11px;color:var(--sub);margin-left:6px">$'+e.price_min+'</span>':'');
+    return '<tr data-eid="'+e.id+'">'
+      +'<td><strong>'+e.title+'</strong>'+titleBadge+'</td>'
+      +'<td style="color:var(--sub)">'+(e.venues&&e.venues.name?e.venues.name:'-')+'</td>'
+      +'<td style="color:var(--muted)">'+new Date(e.start_time).toLocaleDateString()+' '+new Date(e.start_time).toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'})+'</td>'
+      +'<td style="color:var(--sub)">'+(e.category||'-')+'</td>'
+      +'<td><span class="badge '+(e.status==='published'?'badge-green':'badge-muted')+'">'+e.status+'</span></td>'
+      +'<td>'+boosted+'</td>'
+      +'<td><div style="display:flex;gap:5px;flex-wrap:wrap">'
+      +'<button class="btn btn-ghost btn-sm" onclick="toggleEventBoost(\''+e.id+'\','+(!e.is_boosted)+')">'+boostLabel+'</button>'
+      +'<button class="btn btn-sm" style="'+featureStyle+';border:none;border-radius:6px;padding:4px 10px;font-size:12px;cursor:pointer" onclick="toggleEventPromote(\''+e.id+'\','+(!(e.promoted_until&&new Date(e.promoted_until)>new Date()))+')">'+featureLabel+'</button>'
+      +'<button class="btn btn-ghost btn-sm" onclick="openEditEvent(\''+e.id+'\')">Edit</button>'
+      +'<button class="btn btn-danger btn-sm" onclick="deleteEvent(\''+e.id+"\',\'"+e.title.replace(/'/g,"\\'")+"\')">Delete</button>"
+      +'</div></td></tr>';
+  }).join('');
 }
 
 function injectFeatureBtns(){
