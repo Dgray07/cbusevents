@@ -546,8 +546,8 @@ async function init(){
 }
 
 // ── HELPERS ───────────────────────────────────────────────────
-function fmt(dt){ return new Date(dt).toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'}); }
-function fmtTime(dt){ return new Date(dt).toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'}); }
+function fmt(dt){ return new Date(dt).toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric',timeZone:'America/New_York'}); }
+function fmtTime(dt){ return new Date(dt).toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit',timeZone:'America/New_York'}); }
 function isThisWeek(dt){ const d=new Date(dt),n=new Date(); return d>=n&&d<=new Date(n.getTime()+7*24*60*60*1000); }
 function isPromoted(e){ return e.promoted_until && new Date(e.promoted_until)>new Date(); }
 function slug(name){ return name.toLowerCase().replace(/[^a-z0-9]+/g,'-'); }
