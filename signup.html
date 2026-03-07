@@ -1025,6 +1025,15 @@
     }
 
     loadCounts();
+
+    // ── AUTO-SELECT ROLE FROM URL PARAM ──
+    const urlRole = new URLSearchParams(window.location.search).get('role');
+    if (['venue', 'vendor', 'planner'].includes(urlRole)) {
+      selectRole(urlRole);
+      setTimeout(() => {
+        document.getElementById('formCard').scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 300);
+    }
   </script>
 </body>
 </html>
