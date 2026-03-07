@@ -1,4 +1,5 @@
-<!DOCTYPE html>
+<
+ injectFeatureBtns();!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8"/>
@@ -621,14 +622,32 @@ function renderEvents(){
  <button class="filter-chip${eventFilter===f?' active':''}" onclick="eventFilter='${f}';renderEvents()">${f.charAt(0).toUpperCase()+f.slice(1)} (${(filters[f]||[]).length})</button> `).join('')}
  <input class="search-input" placeholder="Search events..." oninput="searchEvents(this.value)" style="margin-left:auto"> </div> <table> <thead><tr><th>Event</th><th>Venue</th><th>Date</th><th>Category</th><th>Status</th><th>Boost</th><th>Actions</th></tr></thead> <tbody id="eventTableBody"> ${renderEventRows(filtered)}
  </tbody> </table> </div> `;
+ injectFeatureBtns();
 }
 
 function renderEventRows(events){
  if(!events.length)return'<tr class="empty-row"><td colspan="6">No events found</td></tr>';
  return events.map(e=>`
- <tr> <td><strong>${e.title}</strong>${e.is_free?'<span style="color:var(--green);font-size:11px;margin-left:6px">FREE</span>':e.price_min?`<span style="font-size:11px;color:var(--sub);margin-left:6px">$${e.price_min}</span>`:''}</td> <td style="color:var(--sub)">${e.venues?.name||'—'}</td> <td style="color:var(--muted)">${new Date(e.start_time).toLocaleDateString()} ${new Date(e.start_time).toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'})}</td> <td style="color:var(--sub)">${e.category||'—'}</td> <td><span class="badge ${e.status==='published'?'badge-green':'badge-muted'}">${e.status}</span></td> <td>${e.is_boosted?`<span class="badge badge-gold"> ${e.boost_type||'boosted'}</span>`:`<span class="badge badge-muted">—</span>`}</td> <td><div style="display:flex;gap:5px;flex-wrap:wrap"> <button class="btn btn-ghost btn-sm" onclick="toggleEventBoost(\'${e.id}\',${!e.is_boosted})">${e.is_boosted?\'Unboost\':\'Boost\'}</button> <button class="btn btn-sm" style="${isPromotedAdmin(e)?\'background:#f59e0b;color:#000\':\'background:#22c55e;color:#000\'}" onclick="toggleEventPromote(\'${e.id}\',${!isPromotedAdmin(e)})">${isPromotedAdmin(e)?\'Unfeature\':\'Feature\'}</button> <button class="btn btn-ghost btn-sm" onclick="openEditEvent(\'${e.id}\')">✏️ Edit</button> <button class="btn btn-danger btn-sm" onclick="deleteEvent('${e.id}','${e.title.replace(/'/g,"\\'")}')">Delete</button> </div></td> </tr>`).join('');
+ <tr data-eid="${e.id}"> <td><strong>${e.title}</strong>${e.is_free?'<span style="color:var(--green);font-size:11px;margin-left:6px">FREE</span>':e.price_min?`<span style="font-size:11px;color:var(--sub);margin-left:6px">$${e.price_min}</span>`:''}</td> <td style="color:var(--sub)">${e.venues?.name||'—'}</td> <td style="color:var(--muted)">${new Date(e.start_time).toLocaleDateString()} ${new Date(e.start_time).toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'})}</td> <td style="color:var(--sub)">${e.category||'—'}</td> <td><span class="badge ${e.status==='published'?'badge-green':'badge-muted'}">${e.status}</span></td> <td>${e.is_boosted?`<span class="badge badge-gold"> ${e.boost_type||'boosted'}</span>`:`<span class="badge badge-muted">—</span>`}</td> <td><div style="display:flex;gap:5px;flex-wrap:wrap"> <button class="btn btn-ghost btn-sm" onclick="toggleEventBoost(\'${e.id}\',${!e.is_boosted})">${e.is_boosted?\'Unboost\':\'Boost\'}</button> <button class="btn btn-ghost btn-sm" onclick="openEditEvent(\'${e.id}\')">✏️ Edit</button> <button class="btn btn-danger btn-sm" onclick="deleteEvent('${e.id}','${e.title.replace(/'/g,"\\'")}')">Delete</button> </div></td> </tr>`).join('');
 }
 
+function injectFeatureBtns(){
+  document.querySelectorAll('tr[data-eid]').forEach(function(row){
+    var id=row.getAttribute('data-eid');
+    var ev=allEvents.find(function(e){return e.id===id;});
+    if(!ev)return;
+    var boostBtn=row.querySelector('button');
+    if(!boostBtn)return;
+    var existing=row.querySelector('.feature-btn');
+    if(existing)existing.remove();
+    var btn=document.createElement('button');
+    btn.className='btn btn-sm feature-btn';
+    btn.style.cssText='background:'+(isPromotedAdmin(ev)?'#f59e0b':'#22c55e')+';color:#000;border:none;border-radius:6px;padding:4px 10px;font-size:12px;cursor:pointer';
+    btn.textContent=isPromotedAdmin(ev)?'Unfeature':'Feature';
+    btn.onclick=function(){toggleEventPromote(id,!isPromotedAdmin(ev));};
+    boostBtn.insertAdjacentElement('afterend',btn);
+  });
+}
 function searchEvents(q){
  const f=allEvents.filter(e=>e.title.toLowerCase().includes(q.toLowerCase())||(e.venues?.name||'').toLowerCase().includes(q.toLowerCase()));
  const el=document.getElementById('eventTableBody');
@@ -1030,6 +1049,15 @@ async function toggleEventPromote(id,val){
   var res = await sb.from('events').update({promoted_until:until}).eq('id',id);
   if(res.error){toast('Error: '+res.error.message,'error');return;}
   await loadEvents();
+  toast(val?'Event featured on homepage!':'Feature removed');
+}
+function isPromotedAdmin(e){ return e.promoted_until && new Date(e.promoted_until) > new Date(); }
+async function toggleEventPromote(id,val){
+  var until = val ? new Date(Date.now()+30*24*60*60*1000).toISOString() : null;
+  var res = await sb.from('events').update({promoted_until:until}).eq('id',id);
+  if(res.error){toast('Error: '+res.error.message,'error');return;}
+  await loadEvents();
+  injectFeatureBtns();
   toast(val?'Event featured on homepage!':'Feature removed');
 }
 async function toggleEventBoost(id,val){
