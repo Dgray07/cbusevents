@@ -772,6 +772,7 @@ async function openEditVenue(id){
   document.getElementById('ev-capacity').value=v.capacity||'';
   document.getElementById('ev-description').value=v.description||'';
   document.getElementById('ev-website').value=v.website||'';
+  document.getElementById('ev-ticket-url').value=v.ticket_url||'';
   document.getElementById('ev-instagram').value=v.instagram||'';
   document.getElementById('ev-cover').value=v.cover_image_url||'';
   const prev=document.getElementById('ev-cover-preview');
@@ -815,6 +816,7 @@ async function saveVenueEdit(){
     capacity:document.getElementById('ev-capacity').value||null,
     description:document.getElementById('ev-description').value.trim(),
     website:document.getElementById('ev-website').value.trim(),
+    ticket_url:document.getElementById('ev-ticket-url').value.trim()||null,
     instagram:document.getElementById('ev-instagram').value.trim(),
     cover_image_url:document.getElementById('ev-cover').value.trim()||null,
   };
@@ -971,7 +973,7 @@ async function saveTier(id){
 
 function openAddVenueModal(){
  document.getElementById('modalContainer').innerHTML=`
- <div class="modal-overlay" onclick="if(event.target===this)closeModal()"> <div class="modal"> <div class="modal-header"> <div class="modal-title">Add Venue Manually</div> <button onclick="closeModal()" style="background:none;border:none;color:var(--sub);font-size:18px;cursor:pointer"></button> </div> <div class="modal-body"> <div class="field"><label>Venue Name *</label><input id="avName" placeholder="e.g. The Basement"></div> <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px"> <div class="field"><label>Type</label><input id="avType" placeholder="e.g. Bar & Grill"></div> <div class="field"><label>Neighborhood</label><input id="avHood" placeholder="e.g. Short North"></div> </div> <div class="field"><label>Description</label><textarea id="avDesc" placeholder="Brief description..."></textarea></div> <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px"> <div class="field"><label>Plan</label><select id="avTier"><option value="free">Free</option><option value="standard">Standard</option><option value="premium">Premium</option></select></div> <div class="field"><label>Status</label><select id="avStatus"><option value="approved">Approved</option><option value="pending">Pending</option></select></div> </div> </div> <div class="modal-footer"> <button class="btn btn-primary" onclick="addVenue()">Add Venue →</button> <button class="btn btn-ghost" onclick="closeModal()">Cancel</button> </div> </div> </div>`;
+ <div class="modal-overlay" onclick="if(event.target===this)closeModal()"> <div class="modal"> <div class="modal-header"> <div class="modal-title">Add Venue Manually</div> <button onclick="closeModal()" style="background:none;border:none;color:var(--sub);font-size:18px;cursor:pointer"></button> </div> <div class="modal-body"> <div class="field"><label>Venue Name *</label><input id="avName" placeholder="e.g. The Basement"></div> <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px"> <div class="field"><label>Type</label><input id="avType" placeholder="e.g. Bar & Grill"></div> <div class="field"><label>Neighborhood</label><input id="avHood" placeholder="e.g. Short North"></div> </div> <div class="field"><label>Description</label><textarea id="avDesc" placeholder="Brief description..."></textarea></div> <div class="field"><label>Website</label><input id="avWebsite" placeholder="https://..."/></div> <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px"> <div class="field"><label>Plan</label><select id="avTier"><option value="free">Free</option><option value="standard">Standard</option><option value="premium">Premium</option></select></div> <div class="field"><label>Status</label><select id="avStatus"><option value="approved">Approved</option><option value="pending">Pending</option></select></div> </div> </div> <div class="modal-footer"> <button class="btn btn-primary" onclick="addVenue()">Add Venue →</button> <button class="btn btn-ghost" onclick="closeModal()">Cancel</button> </div> </div> </div>`;
 }
 
 async function addVenue(){
@@ -981,6 +983,7 @@ async function addVenue(){
  name,venue_type:document.getElementById('avType').value||null,
  neighborhood:document.getElementById('avHood').value||null,
  description:document.getElementById('avDesc').value||null,
+ website:document.getElementById('avWebsite').value.trim()||null,
  tier:document.getElementById('avTier').value,
  status:document.getElementById('avStatus').value,
  city:'Columbus',state:'OH',
@@ -1318,6 +1321,7 @@ async function rejectClaim(venueId, venueName){
       <div class="field"><label>Capacity</label><input id="ev-capacity" type="number" class="form-input"/></div>
       <div class="field"><label>Description</label><textarea id="ev-description" class="form-input" rows="3"></textarea></div>
       <div class="field"><label>Website</label><input id="ev-website" class="form-input"/></div>
+      <div class="field"><label>Ticket URL</label><input id="ev-ticket-url" class="form-input" placeholder="https://..."/></div>
       <div class="field"><label>Instagram</label><input id="ev-instagram" class="form-input"/></div>
       <div class="field">
         <label>Cover Photo</label>
