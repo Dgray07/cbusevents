@@ -624,28 +624,9 @@ function renderEvents(){
 }
 
 function renderEventRows(events){
-  if(!events.length)return '<tr class="empty-row"><td colspan="7">No events found</td></tr>';
-  return events.map(function(e){
-    var price=e.is_free?'<span style="color:var(--green);font-size:11px;margin-left:6px">FREE</span>':(e.price_min?'<span style="font-size:11px;color:var(--sub);margin-left:6px">$'+e.price_min+'</span>':'');
-    var venue=e.venues&&e.venues.name?e.venues.name:'-';
-    var date=new Date(e.start_time).toLocaleDateString()+' '+new Date(e.start_time).toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
-    var status='<span class="badge '+(e.status==='published'?'badge-green':'badge-muted')+'">'+e.status+'</span>';
-    var boost=e.is_boosted?'<span class="badge badge-gold">'+(e.boost_type||'boosted')+'</span>':'<span class="badge badge-muted">-</span>';
-    var actions='<div style="display:flex;gap:5px;flex-wrap:wrap">'
-      +'<button class="btn btn-ghost btn-sm" onclick="toggleEventBoost(''+e.id+'','+((!e.is_boosted)+'')+')">'+(e.is_boosted?'Unboost':'Boost')+'</button>'
-      +'<button class="btn btn-ghost btn-sm" onclick="openEditEvent(''+e.id+'')">Edit</button>'
-      +'<button class="btn btn-danger btn-sm" onclick="deleteEvent(''+e.id+'',''+e.title.replace(/'/g,"\'")+'')">Delete</button>'
-      +'</div>';
-    return '<tr>'
-      +'<td><strong>'+e.title+'</strong>'+price+'</td>'
-      +'<td style="color:var(--sub)">'+venue+'</td>'
-      +'<td style="color:var(--muted)">'+date+'</td>'
-      +'<td style="color:var(--sub)">'+(e.category||'-')+'</td>'
-      +'<td>'+status+'</td>'
-      +'<td>'+boost+'</td>'
-      +'<td>'+actions+'</td>'
-      +'</tr>';
-  }).join('');
+ if(!events.length)return'<tr class="empty-row"><td colspan="6">No events found</td></tr>';
+ return events.map(e=>`
+ <tr> <td><strong>${e.title}</strong>${e.is_free?'<span style="color:var(--green);font-size:11px;margin-left:6px">FREE</span>':e.price_min?`<span style="font-size:11px;color:var(--sub);margin-left:6px">$${e.price_min}</span>`:''}</td> <td style="color:var(--sub)">${e.venues?.name||'—'}</td> <td style="color:var(--muted)">${new Date(e.start_time).toLocaleDateString()} ${new Date(e.start_time).toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'})}</td> <td style="color:var(--sub)">${e.category||'—'}</td> <td><span class="badge ${e.status==='published'?'badge-green':'badge-muted'}">${e.status}</span></td> <td>${e.is_boosted?`<span class="badge badge-gold"> ${e.boost_type||'boosted'}</span>`:`<span class="badge badge-muted">—</span>`}</td> <td><div style="display:flex;gap:5px;flex-wrap:wrap"> <button class="btn btn-ghost btn-sm" onclick="toggleEventBoost('${e.id}',${!e.is_boosted})">${e.is_boosted?'↓ Unboost':' Boost'}</button> <button class="btn btn-ghost btn-sm" onclick="openEditEvent('${e.id}')">✏️ Edit</button> <button class="btn btn-danger btn-sm" onclick="deleteEvent('${e.id}','${e.title.replace(/'/g,"\\'")}')">Delete</button> </div></td> </tr>`).join('');
 }
 
 function searchEvents(q){
@@ -791,7 +772,6 @@ async function openEditVenue(id){
   document.getElementById('ev-capacity').value=v.capacity||'';
   document.getElementById('ev-description').value=v.description||'';
   document.getElementById('ev-website').value=v.website||'';
-  document.getElementById('ev-ticket-url').value=v.ticket_url||'';
   document.getElementById('ev-instagram').value=v.instagram||'';
   document.getElementById('ev-cover').value=v.cover_image_url||'';
   const prev=document.getElementById('ev-cover-preview');
@@ -835,7 +815,6 @@ async function saveVenueEdit(){
     capacity:document.getElementById('ev-capacity').value||null,
     description:document.getElementById('ev-description').value.trim(),
     website:document.getElementById('ev-website').value.trim(),
-    ticket_url:document.getElementById('ev-ticket-url').value.trim()||null,
     instagram:document.getElementById('ev-instagram').value.trim(),
     cover_image_url:document.getElementById('ev-cover').value.trim()||null,
   };
@@ -859,7 +838,6 @@ async function openAddEvent(){
   document.getElementById('ee-price-min').value='';
   document.getElementById('ee-price-max').value='';
   document.getElementById('ee-description').value='';
-  document.getElementById('ee-ticket-url').value='';
   document.getElementById('ee-cover').value='';
   document.getElementById('ee-cover-preview').style.display='none';
   document.getElementById('ee-status').value='published';
@@ -882,7 +860,6 @@ async function openEditEvent(id){
   document.getElementById('ee-price-min').value=e.price_min||e.min_price||'';
   document.getElementById('ee-price-max').value=e.price_max||e.max_price||'';
   document.getElementById('ee-description').value=e.description||'';
-  document.getElementById('ee-ticket-url').value=e.ticket_url||'';
   document.getElementById('ee-cover').value=e.cover_image_url||'';
   document.getElementById('ee-status').value=e.status||'published';
   document.getElementById('ee-msg').textContent='';
@@ -928,7 +905,6 @@ async function saveEventEdit(){
     price_max:parseFloat(document.getElementById('ee-price-max').value)||priceMin,
     is_free:priceMin===0,
     description:document.getElementById('ee-description').value.trim(),
-    ticket_url:document.getElementById('ee-ticket-url').value.trim()||null,
     cover_image_url:document.getElementById('ee-cover').value.trim()||null,
     status:document.getElementById('ee-status').value,
   };
@@ -995,7 +971,7 @@ async function saveTier(id){
 
 function openAddVenueModal(){
  document.getElementById('modalContainer').innerHTML=`
- <div class="modal-overlay" onclick="if(event.target===this)closeModal()"> <div class="modal"> <div class="modal-header"> <div class="modal-title">Add Venue Manually</div> <button onclick="closeModal()" style="background:none;border:none;color:var(--sub);font-size:18px;cursor:pointer"></button> </div> <div class="modal-body"> <div class="field"><label>Venue Name *</label><input id="avName" placeholder="e.g. The Basement"></div> <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px"> <div class="field"><label>Type</label><input id="avType" placeholder="e.g. Bar & Grill"></div> <div class="field"><label>Neighborhood</label><input id="avHood" placeholder="e.g. Short North"></div> </div> <div class="field"><label>Description</label><textarea id="avDesc" placeholder="Brief description..."></textarea></div> <div class="field"><label>Website</label><input id="avWebsite" placeholder="https://..."/></div> <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px"> <div class="field"><label>Plan</label><select id="avTier"><option value="free">Free</option><option value="standard">Standard</option><option value="premium">Premium</option></select></div> <div class="field"><label>Status</label><select id="avStatus"><option value="approved">Approved</option><option value="pending">Pending</option></select></div> </div> </div> <div class="modal-footer"> <button class="btn btn-primary" onclick="addVenue()">Add Venue →</button> <button class="btn btn-ghost" onclick="closeModal()">Cancel</button> </div> </div> </div>`;
+ <div class="modal-overlay" onclick="if(event.target===this)closeModal()"> <div class="modal"> <div class="modal-header"> <div class="modal-title">Add Venue Manually</div> <button onclick="closeModal()" style="background:none;border:none;color:var(--sub);font-size:18px;cursor:pointer"></button> </div> <div class="modal-body"> <div class="field"><label>Venue Name *</label><input id="avName" placeholder="e.g. The Basement"></div> <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px"> <div class="field"><label>Type</label><input id="avType" placeholder="e.g. Bar & Grill"></div> <div class="field"><label>Neighborhood</label><input id="avHood" placeholder="e.g. Short North"></div> </div> <div class="field"><label>Description</label><textarea id="avDesc" placeholder="Brief description..."></textarea></div> <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px"> <div class="field"><label>Plan</label><select id="avTier"><option value="free">Free</option><option value="standard">Standard</option><option value="premium">Premium</option></select></div> <div class="field"><label>Status</label><select id="avStatus"><option value="approved">Approved</option><option value="pending">Pending</option></select></div> </div> </div> <div class="modal-footer"> <button class="btn btn-primary" onclick="addVenue()">Add Venue →</button> <button class="btn btn-ghost" onclick="closeModal()">Cancel</button> </div> </div> </div>`;
 }
 
 async function addVenue(){
@@ -1005,7 +981,6 @@ async function addVenue(){
  name,venue_type:document.getElementById('avType').value||null,
  neighborhood:document.getElementById('avHood').value||null,
  description:document.getElementById('avDesc').value||null,
- website:document.getElementById('avWebsite').value.trim()||null,
  tier:document.getElementById('avTier').value,
  status:document.getElementById('avStatus').value,
  city:'Columbus',state:'OH',
@@ -1343,7 +1318,6 @@ async function rejectClaim(venueId, venueName){
       <div class="field"><label>Capacity</label><input id="ev-capacity" type="number" class="form-input"/></div>
       <div class="field"><label>Description</label><textarea id="ev-description" class="form-input" rows="3"></textarea></div>
       <div class="field"><label>Website</label><input id="ev-website" class="form-input"/></div>
-      <div class="field"><label>Ticket URL</label><input id="ev-ticket-url" class="form-input" placeholder="https://..."/></div>
       <div class="field"><label>Instagram</label><input id="ev-instagram" class="form-input"/></div>
       <div class="field">
         <label>Cover Photo</label>
@@ -1391,7 +1365,6 @@ async function rejectClaim(venueId, venueName){
         <input id="ee-cover" class="form-input" placeholder="Or paste image URL..."/>
         <img id="ee-cover-preview" src="" alt="" style="display:none;width:100%;height:140px;object-fit:cover;border-radius:8px;margin-top:8px;border:1px solid #25252f;"/>
       </div>
-      <div class="field"><label>Ticket URL</label><input id="ee-ticket-url" class="form-input" placeholder="https://..."/></div>
       <div class="field"><label>Status</label>
         <select id="ee-status" class="form-input"><option value="published">Published</option><option value="draft">Draft</option></select>
       </div>
