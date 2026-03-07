@@ -664,26 +664,82 @@ function renderHome(){
  <div id="featuredEventSlot"></div> <!-- THIS WEEK --> ${thisWeek.length?`
  <section class="section section-alt"> <div class="section-header"> <div><div class="section-title"> Happening This Week</div><div class="section-sub">Events in Columbus in the next 7 days</div></div> <button class="see-all" onclick="showPage('events')">See all events →</button> </div> <div class="event-grid">${thisWeek.map(e=>eventCard(e)).join('')}</div> </section>`:''}
 
- <!-- FEATURED VENUES --> <section class="section"> <div class="section-header"> <div><div class="section-title"> Featured Venues</div><div class="section-sub">${allVenues.length} venues across Columbus</div></div> <button class="see-all" onclick="showPage('venues')">Browse all →</button> </div> <div class="venue-grid" id="homeVenueGrid">${allVenues.slice(0,8).map(v=>venueCard(v)).join('')}</div> </section>
+ <!-- DAY ONE VENUES -->
+ <section class="section">
+   <div class="section-header">
+     <div>
+       <div style="display:inline-flex;align-items:center;gap:6px;background:#f59e0b20;color:#f59e0b;border:1px solid #f59e0b40;border-radius:20px;padding:3px 12px;font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px"> Day One Venues</div>
+       <div class="section-title">The Venues That Started It All</div>
+       <div class="section-sub">Columbus venues that believed in this platform from day one</div>
+     </div>
+     <button class="see-all" onclick="showPage('venues')">Browse all venues →</button>
+   </div>
+   <div class="venue-grid" id="dayOneGrid">
+     ${(()=>{
+       const founding=['groundxgrind','1313','ground x grind','1313 venue'];
+       const foundingVenues=allVenues.filter(v=>founding.some(f=>v.name.toLowerCase().includes(f))).slice(0,2);
+       const cards=foundingVenues.map(v=>{
+         const img=getVenueImg(v);
+         const venueEvents=allEvents.filter(e=>e.venue_id===v.id&&isThisWeek(e.start_time)).length;
+         return`<div class="venue-card" onclick="showPage('venue',allVenues.find(x=>x.id==='${v.id}'))" style="border-color:#f59e0b40;background:linear-gradient(160deg,#1a1200,#1a1a24)">
+           <div class="venue-card-img" style="position:relative">
+             ${img?`<img src="${img}" alt="${v.name}" style="width:100%;height:100%;object-fit:cover" onerror="this.parentNode.innerHTML='<div style=width:100%;height:170px;display:flex;align-items:center;justify-content:center;font-size:44px>${venueEmoji(v.venue_type)}</div>'">`:`<div style="width:100%;height:170px;display:flex;align-items:center;justify-content:center;font-size:44px">${venueEmoji(v.venue_type)}</div>`}
+             <div style="position:absolute;top:10px;left:10px;background:#f59e0b;color:#000;border-radius:20px;padding:3px 10px;font-size:10px;font-weight:800;letter-spacing:0.5px"> DAY ONE</div>
+             ${venueEvents?`<div style="position:absolute;bottom:8px;left:8px;background:#22c55e;color:#000;border-radius:20px;padding:2px 10px;font-size:10px;font-weight:700">${venueEvents} event${venueEvents>1?'s':''} this week</div>`:''}
+           </div>
+           <div class="venue-card-body">
+             <div class="venue-card-type" style="color:#f59e0b">${v.venue_type||'Venue'}</div>
+             <div class="venue-card-name">${v.name}</div>
+             <div class="venue-card-desc">${v.description||'A founding Columbus venue on CBUSEVENTS.'}</div>
+             <div class="venue-card-footer">
+               <span class="venue-card-loc"> ${v.neighborhood||'Columbus'}</span>
+               ${v.capacity?`<span style="font-size:12px;color:var(--muted)"> ${v.capacity}</span>`:''}
+             </div>
+             <div style="margin-top:10px;padding:8px 10px;background:#f59e0b15;border:1px solid #f59e0b30;border-radius:8px;font-size:11px;color:#f59e0b;font-weight:600"> Founding Venue · Listed Day One</div>
+           </div>
+         </div>`;
+       });
+       const ctaCard=`<div class="venue-card" onclick="window.location.href='signup.html?role=venue'" style="border:1.5px dashed #FF6B3550;background:linear-gradient(160deg,#1a0800,#0b0b0f);cursor:pointer;transition:all 0.25s;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:36px 24px;min-height:320px" onmouseover="this.style.borderColor='#FF6B35';this.style.transform='translateY(-3px)'" onmouseout="this.style.borderColor='#FF6B3550';this.style.transform=''">
+         <div style="width:56px;height:56px;border-radius:50%;border:2px dashed #FF6B3560;display:flex;align-items:center;justify-content:center;font-size:24px;margin-bottom:16px;color:#FF6B35">+</div>
+         <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:17px;margin-bottom:8px;color:var(--text)">Be a Founding Venue</div>
+         <div style="color:var(--sub);font-size:13px;line-height:1.6;margin-bottom:20px;max-width:200px">Early listings get permanent featured placement as Columbus grows.</div>
+         <div style="background:#FF6B35;color:#fff;border-radius:8px;padding:10px 20px;font-size:13px;font-weight:700">List Your Venue Free →</div>
+       </div>`;
+       return [...cards, ctaCard].join('');
+     })()}
+   </div>
+ </section>
 
  <!-- FEATURED VENDORS -->
- <section class="section">
-   <div class="sect-head">
+ <section class="section section-alt">
+   <div class="section-header">
      <div>
-       <div class="sect-label">Columbus Vendors</div>
-       <h2 class="sect-title">Trusted Event Professionals</h2>
+       <div class="section-title"> Columbus Vendors</div>
+       <div class="section-sub">Event professionals serving Columbus</div>
      </div>
-     <a href="https://cbusevents.com/vendors.html" class="see-all">Browse all →</a>
+     <a href="https://cbusevents.com/vendors.html" class="see-all" style="color:var(--orange);font-size:13px;font-weight:600;background:none;border:none;white-space:nowrap;cursor:pointer;text-decoration:none">Browse all →</a>
    </div>
    <div class="venue-grid" id="homeVendorGrid">
-     ${allVendors&&allVendors.length?allVendors.slice(0,8).map(v=>vendorCard(v)).join(''):'<div class="empty-state"><p>Vendors coming soon</p></div>'}
+     ${allVendors&&allVendors.length?allVendors.slice(0,6).map(v=>vendorCard(v)).join('')+`
+       <div class="venue-card" onclick="window.location.href='signup.html?role=vendor'" style="border:1.5px dashed #60a5fa40;background:linear-gradient(160deg,#001520,#0b0b0f);cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:36px 24px;min-height:280px;transition:all 0.25s" onmouseover="this.style.borderColor='#60a5fa';this.style.transform='translateY(-3px)'" onmouseout="this.style.borderColor='#60a5fa40';this.style.transform=''">
+         <div style="font-size:28px;margin-bottom:12px">🎯</div>
+         <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:15px;margin-bottom:8px;color:var(--text)">List Your Services</div>
+         <div style="color:var(--sub);font-size:12px;line-height:1.6;margin-bottom:16px;max-width:180px">Get booked by Columbus planners and venues.</div>
+         <div style="background:#60a5fa20;color:#60a5fa;border:1px solid #60a5fa40;border-radius:8px;padding:8px 16px;font-size:12px;font-weight:700">Join as Vendor →</div>
+       </div>`
+     :`<div onclick="window.location.href='signup.html?role=vendor'" style="grid-column:1/-1;background:linear-gradient(135deg,#001520,#0b0b0f);border:1.5px dashed #60a5fa40;border-radius:16px;padding:52px 32px;text-align:center;cursor:pointer;transition:all 0.25s" onmouseover="this.style.borderColor='#60a5fa'" onmouseout="this.style.borderColor='#60a5fa40'">
+       <div style="font-size:36px;margin-bottom:14px">🎯</div>
+       <div style="font-family:'Syne',sans-serif;font-size:20px;font-weight:800;margin-bottom:8px">Be Columbus's First Listed Vendor</div>
+       <div style="color:var(--sub);font-size:14px;line-height:1.65;margin-bottom:24px;max-width:440px;margin-left:auto;margin-right:auto">Photographers, DJs, caterers, florists — planners are already on CBUSEVENTS looking for vendors like you. Get your free listing before your competition does.</div>
+       <div style="display:inline-block;background:#60a5fa;color:#fff;border-radius:10px;padding:12px 28px;font-size:14px;font-weight:700">List Your Services Free →</div>
+     </div>`}
    </div>
  </section>
 
  <!-- UPCOMING EVENTS --> ${upcoming.length?`
  <section class="section section-alt"> <div class="section-header"> <div><div class="section-title"> Upcoming Events</div><div class="section-sub">What's on in Columbus</div></div> <button class="see-all" onclick="showPage('events')">View calendar →</button> </div> <div class="event-grid">${upcoming.map(e=>eventCard(e)).join('')}</div> </section>`:''}
 
- <!-- CTA --> <div style="height:52px"></div> <!-- PLANNER CTA SECTION --> <section class="section section-alt"> <div style="max-width:900px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;gap:32px;flex-wrap:wrap"> <div> <div style="display:inline-flex;align-items:center;gap:6px;background:#60a5fa20;color:var(--blue);border:1px solid #60a5fa30;border-radius:20px;padding:4px 14px;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-bottom:14px"> For Event Planners</div> <h2 style="font-family:'Syne',sans-serif;font-size:26px;font-weight:800;margin-bottom:10px">Planning an event in Columbus?</h2> <p style="color:var(--sub);font-size:15px;line-height:1.65;max-width:480px">Browse venues, send booking inquiries, track your requests, and list your events — all from a free planner dashboard.</p> <div style="display:flex;gap:16px;margin-top:16px;flex-wrap:wrap"> <div style="display:flex;align-items:center;gap:6px;font-size:13px;color:var(--sub)"> Free forever</div> <div style="display:flex;align-items:center;gap:6px;font-size:13px;color:var(--sub)"> Send venue inquiries</div> <div style="display:flex;align-items:center;gap:6px;font-size:13px;color:var(--sub)"> List your events</div> <div style="display:flex;align-items:center;gap:6px;font-size:13px;color:var(--sub)"> Boost for more reach</div> </div> </div> <div style="display:flex;flex-direction:column;gap:10px;flex-shrink:0"> <button class="btn-primary" style="padding:14px 28px;font-size:15px;font-weight:700;border-radius:10px;background:var(--blue)" onclick="window.open('https://cbusevents.com/cbus-planner-portal.html','_blank')">Create Free Planner Account →</button> <button class="btn-outline" style="padding:12px 24px;font-size:14px;border-radius:10px" onclick="window.open('https://cbusevents.com/cbus-planner-portal.html','_blank')">Sign In to Planner Portal</button> </div> </div> </section> <div style="height:52px"></div> <div class="cta-banner"> <div> <h2>Own a venue or host events?</h2> <p>Get discovered by thousands of Columbus event organizers. List your space free — upgrade to get featured in the hero slider and unlock premium placement across CBUSEVENTS.</p> </div> <div class="cta-actions"> <button class="btn-primary" onclick="window.open('https://cbusevents.com/cbus-venue-portal.html','_blank')">List Your Venue Free →</button> <button class="btn-secondary" onclick="showPricing()">View Pricing Plans</button> </div> </div> ${footer()}
+ <!-- CTA --> <div style="height:52px"></div> <!-- PLANNER CTA SECTION --> <section class="section section-alt"> <div style="max-width:900px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;gap:32px;flex-wrap:wrap"> <div> <div style="display:inline-flex;align-items:center;gap:6px;background:#60a5fa20;color:var(--blue);border:1px solid #60a5fa30;border-radius:20px;padding:4px 14px;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-bottom:14px"> For Event Planners</div> <h2 style="font-family:'Syne',sans-serif;font-size:26px;font-weight:800;margin-bottom:10px">Planning an event in Columbus?</h2> <p style="color:var(--sub);font-size:15px;line-height:1.65;max-width:480px">Browse venues, send booking inquiries, track your requests, and list your events — all from a free planner dashboard.</p> <div style="display:flex;gap:16px;margin-top:16px;flex-wrap:wrap"> <div style="display:flex;align-items:center;gap:6px;font-size:13px;color:var(--sub)"> Free forever</div> <div style="display:flex;align-items:center;gap:6px;font-size:13px;color:var(--sub)"> Send venue inquiries</div> <div style="display:flex;align-items:center;gap:6px;font-size:13px;color:var(--sub)"> List your events</div> <div style="display:flex;align-items:center;gap:6px;font-size:13px;color:var(--sub)"> Boost for more reach</div> </div> </div> <div style="display:flex;flex-direction:column;gap:10px;flex-shrink:0"> <button class="btn-primary" style="padding:14px 28px;font-size:15px;font-weight:700;border-radius:10px;background:var(--blue)" onclick="window.location.href='signup.html?role=planner'">Create Free Planner Account →</button> <button class="btn-outline" style="padding:12px 24px;font-size:14px;border-radius:10px" onclick="window.location.href='https://cbusevents.com/auth.html'">Sign In to Planner Portal</button> </div> </div> </section> <div style="height:52px"></div> <div class="cta-banner"> <div> <h2>Own a venue or host events?</h2> <p>Get discovered by thousands of Columbus event organizers. List your space free — upgrade to get featured in the hero slider and unlock premium placement across CBUSEVENTS.</p> </div> <div class="cta-actions"> <button class="btn-primary" onclick="window.location.href='signup.html?role=venue'">List Your Venue Free →</button> <button class="btn-secondary" onclick="showPricing()">View Pricing Plans</button> </div> </div> ${footer()}
  `;
 
  buildHeroSlidesFromVenues();
