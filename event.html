@@ -46,11 +46,13 @@ body{background:#0d0d14;color:#fff;font-family:'Inter',sans-serif;min-height:100
 const SB_URL="https://toblgvatvsjljbqogzsv.supabase.co";
 const SB_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRvYmxndmF0dnNqbGpicW9nenN2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMDgwNTAsImV4cCI6MjA4NzY4NDA1MH0._WJEQPizNDiQfDXQB_DHPaQhixPGpMdmYQSmyWmm_FQ";
 
+function stripTZ(dt){ return dt.replace(' ','T').replace(/(\.\d+)?(Z|[+-]\d{2}:?\d{2})?$/,''); }
 function fmt(dt){
   if(!dt)return'';
-  const d=new Date(dt);
+  const d=new Date(stripTZ(dt));
   return d.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'})+' \u00b7 '+d.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
 }
+function fmtTime(dt){ if(!dt)return''; return new Date(stripTZ(dt)).toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'}); }
 
 async function load(){
   const params=new URLSearchParams(location.search);
@@ -89,7 +91,7 @@ async function load(){
       <div class="title">${title}</div>
       <div class="pills">
         ${e.start_time?`<span class="pill">&#128197; ${fmt(e.start_time)}</span>`:''}
-        ${e.end_time?`<span class="pill">Until ${new Date(e.end_time).toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'})}</span>`:''}
+        ${e.end_time?`<span class="pill">Until ${fmtTime(e.end_time)}</span>`:''}
         ${priceStr?`<span class="pill">&#128181; ${priceStr}</span>`:''}
       </div>
       ${venue.name?`<div class="venue-box"><div class="venue-name">${venue.name}</div><div class="venue-sub">${venue.neighborhood?venue.neighborhood+' \u2014 ':''}<a href="https://cbusevents.com" style="color:#f97316;text-decoration:none">View on CBUSEVENTS</a></div></div>`:''}
