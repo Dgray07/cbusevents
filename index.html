@@ -1335,6 +1335,596 @@ async function toggleSaveEvent(eventId, btn, e){
   }
 }
 
+<!-- ============================================================
+     CBUSEVENTS Floating Chat Bubble
+     Paste this snippet just before </body> on any page.
+     Make sure chat.html is also in your repo root.
+     ============================================================ -->
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;600&display=swap" rel="stylesheet" />
+
+<style>
+  /* ── Keyframes ── */
+  @keyframes cbus-pop-in {
+    from { opacity: 0; transform: scale(0.85) translateY(12px); }
+    to   { opacity: 1; transform: scale(1)    translateY(0); }
+  }
+  @keyframes cbus-pop-out {
+    from { opacity: 1; transform: scale(1)    translateY(0); }
+    to   { opacity: 0; transform: scale(0.85) translateY(12px); }
+  }
+  @keyframes cbus-pulse {
+    0%, 100% { box-shadow: 0 0 0 0   rgba(249,115,22,0.55), 0 8px 28px rgba(249,115,22,0.45); }
+    50%       { box-shadow: 0 0 0 10px rgba(249,115,22,0),   0 8px 28px rgba(249,115,22,0.45); }
+  }
+  @keyframes cbus-badge-bounce {
+    0%,100% { transform: scale(1); }
+    40%     { transform: scale(1.25); }
+  }
+  @keyframes cbus-dot-bounce {
+    0%,80%,100% { transform: scale(0.7); opacity: 0.4; }
+    40%         { transform: scale(1);   opacity: 1;   }
+  }
+  @keyframes cbus-msg-in {
+    from { opacity: 0; transform: translateY(6px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ── Launcher button ── */
+  #cbus-launcher {
+    position: fixed;
+    bottom: clamp(18px, 4vw, 28px);
+    right:  clamp(18px, 4vw, 28px);
+    z-index: 9998;
+    width:  clamp(52px, 12vw, 62px);
+    height: clamp(52px, 12vw, 62px);
+    border-radius: 50%;
+    border: none;
+    background: linear-gradient(135deg, #f97316, #c2410c);
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    animation: cbus-pulse 2.8s ease-in-out infinite;
+    transition: transform 0.2s;
+  }
+  #cbus-launcher:hover  { transform: scale(1.08); }
+  #cbus-launcher:active { transform: scale(0.95); }
+
+  #cbus-launcher-icon {
+    font-size: clamp(22px, 5vw, 26px);
+    transition: transform 0.3s ease, opacity 0.2s;
+    line-height: 1;
+    user-select: none;
+  }
+
+  /* Notification badge */
+  #cbus-badge {
+    position: absolute;
+    top: -2px; right: -2px;
+    width: 18px; height: 18px;
+    border-radius: 50%;
+    background: #22c55e;
+    border: 2px solid #0f172a;
+    font-size: 10px;
+    font-weight: 700;
+    color: #fff;
+    font-family: 'DM Sans', sans-serif;
+    display: flex; align-items: center; justify-content: center;
+    animation: cbus-badge-bounce 1s ease-in-out 1.2s 2;
+  }
+  #cbus-badge.hidden { display: none; }
+
+  /* Tooltip */
+  #cbus-tooltip {
+    position: fixed;
+    bottom: clamp(86px, 18vw, 102px);
+    right:  clamp(18px, 4vw, 28px);
+    z-index: 9997;
+    background: #1e293b;
+    border: 1px solid rgba(249,115,22,0.25);
+    border-radius: 14px 14px 4px 14px;
+    padding: 10px 14px;
+    max-width: 220px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    line-height: 1.45;
+    color: #e2e8f0;
+    box-shadow: 0 8px 28px rgba(0,0,0,0.35);
+    animation: cbus-pop-in 0.3s ease forwards;
+    pointer-events: none;
+  }
+  #cbus-tooltip strong { color: #f97316; }
+  #cbus-tooltip.hiding {
+    animation: cbus-pop-out 0.25s ease forwards;
+  }
+
+  /* ── Panel ── */
+  #cbus-panel {
+    position: fixed;
+    bottom: clamp(88px, 19vw, 108px);
+    right:  clamp(12px, 3vw, 24px);
+    z-index: 9999;
+    width:  clamp(300px, 90vw, 400px);
+    height: clamp(420px, 65vh, 560px);
+    border-radius: 20px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    background: linear-gradient(160deg, #0d0d1f 0%, #0f172a 60%, #160800 100%);
+    border: 1px solid rgba(249,115,22,0.18);
+    box-shadow: 0 20px 60px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.04);
+    font-family: 'DM Sans', sans-serif;
+    animation: cbus-pop-in 0.3s cubic-bezier(0.34,1.56,0.64,1) forwards;
+    transform-origin: bottom right;
+  }
+  #cbus-panel.hiding {
+    animation: cbus-pop-out 0.22s ease forwards;
+  }
+  #cbus-panel.cbus-hidden { display: none; }
+
+  /* Panel header */
+  .cbus-ph {
+    padding: 14px 16px 12px;
+    border-bottom: 1px solid rgba(255,255,255,0.07);
+    display: flex; align-items: center; gap: 10px;
+    background: rgba(10,10,26,0.85);
+    backdrop-filter: blur(16px);
+    flex-shrink: 0;
+  }
+  .cbus-ph-icon {
+    width: 34px; height: 34px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, #f97316, #ea580c);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px;
+    box-shadow: 0 3px 12px rgba(249,115,22,0.4);
+    flex-shrink: 0;
+  }
+  .cbus-ph-title {
+    font-size: 14px; font-weight: 700;
+    color: #fff; letter-spacing: -0.3px;
+  }
+  .cbus-ph-title span { color: #f97316; }
+  .cbus-ph-sub { font-size: 11px; color: #64748b; margin-top: 1px; }
+  .cbus-ph-status { color: #22c55e; margin-right: 4px; font-size: 0.8em; }
+  .cbus-ph-actions { margin-left: auto; display: flex; gap: 6px; }
+
+  .cbus-icon-btn {
+    width: 28px; height: 28px;
+    border-radius: 8px;
+    border: none;
+    background: rgba(255,255,255,0.06);
+    color: #64748b;
+    font-size: 13px;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.18s;
+  }
+  .cbus-icon-btn:hover { background: rgba(255,255,255,0.12); color: #e2e8f0; }
+
+  /* Messages */
+  .cbus-msgs {
+    flex: 1;
+    overflow-y: auto;
+    padding: 14px 12px;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(249,115,22,0.2) transparent;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+  }
+  .cbus-msgs::-webkit-scrollbar { width: 3px; }
+  .cbus-msgs::-webkit-scrollbar-thumb { background: rgba(249,115,22,0.2); border-radius: 4px; }
+
+  .cbus-row {
+    display: flex;
+    margin-bottom: 10px;
+    gap: 7px;
+    align-items: flex-end;
+    animation: cbus-msg-in 0.25s ease forwards;
+  }
+  .cbus-row.user   { justify-content: flex-end; }
+  .cbus-row.assistant { justify-content: flex-start; }
+
+  .cbus-av {
+    width: 24px; height: 24px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; flex-shrink: 0;
+  }
+  .cbus-av.assistant {
+    background: linear-gradient(135deg, #f97316, #ea580c);
+    box-shadow: 0 2px 8px rgba(249,115,22,0.35);
+  }
+  .cbus-av.user {
+    background: linear-gradient(135deg, #334155, #1e293b);
+    border: 1px solid rgba(255,255,255,0.1);
+  }
+
+  .cbus-bubble {
+    max-width: 78%;
+    padding: 9px 12px;
+    font-size: 13px;
+    line-height: 1.6;
+    color: #f1f5f9;
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+  .cbus-bubble.assistant {
+    border-radius: 14px 14px 14px 3px;
+    background: rgba(255,255,255,0.07);
+    border: 1px solid rgba(255,255,255,0.09);
+  }
+  .cbus-bubble.user {
+    border-radius: 14px 14px 3px 14px;
+    background: linear-gradient(135deg, #1a1a2e, #16213e);
+    border: 1px solid rgba(249,115,22,0.25);
+  }
+
+  /* Typing */
+  .cbus-typing-row {
+    display: flex; align-items: flex-end;
+    gap: 7px; margin-bottom: 10px;
+    animation: cbus-msg-in 0.25s ease forwards;
+  }
+  .cbus-typing-bubble {
+    background: rgba(255,255,255,0.07);
+    border: 1px solid rgba(255,255,255,0.09);
+    border-radius: 14px 14px 14px 3px;
+    padding: 11px 14px;
+    display: flex; gap: 4px; align-items: center;
+  }
+  .cbus-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%; background: #f97316;
+    display: inline-block;
+  }
+
+  /* Error */
+  .cbus-error {
+    text-align: center; color: #ef4444;
+    font-size: 12px; margin: 4px 0 8px;
+    padding: 6px 12px;
+    background: rgba(239,68,68,0.08);
+    border-radius: 8px;
+    border: 1px solid rgba(239,68,68,0.18);
+  }
+
+  /* Suggestions */
+  .cbus-sugg-wrap {
+    padding: 0 12px 8px;
+    display: flex; flex-wrap: wrap; gap: 6px;
+    flex-shrink: 0;
+  }
+  .cbus-chip {
+    padding: 5px 11px;
+    border-radius: 16px;
+    border: 1px solid rgba(249,115,22,0.28);
+    background: rgba(249,115,22,0.08);
+    color: #fb923c;
+    font-size: 11.5px;
+    cursor: pointer;
+    transition: all 0.18s;
+    font-family: 'DM Sans', sans-serif;
+    white-space: nowrap;
+  }
+  .cbus-chip:hover {
+    background: rgba(249,115,22,0.18);
+    transform: translateY(-1px);
+  }
+
+  /* Input */
+  .cbus-input-wrap {
+    padding: 8px 10px 12px;
+    border-top: 1px solid rgba(255,255,255,0.07);
+    background: rgba(10,10,26,0.85);
+    backdrop-filter: blur(16px);
+    flex-shrink: 0;
+  }
+  .cbus-input-box {
+    display: flex; gap: 8px; align-items: flex-end;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 13px;
+    padding: 7px 7px 7px 13px;
+    transition: border-color 0.2s;
+  }
+  .cbus-input-box:focus-within { border-color: rgba(249,115,22,0.35); }
+
+  #cbus-textarea {
+    flex: 1; background: transparent;
+    border: none; outline: none;
+    color: #f1f5f9; font-size: 13px;
+    resize: none;
+    font-family: 'DM Sans', sans-serif;
+    line-height: 1.5; max-height: 80px;
+    overflow-y: auto; padding-top: 2px;
+    scrollbar-width: none;
+    caret-color: #f97316;
+  }
+  #cbus-textarea::-webkit-scrollbar { display: none; }
+  #cbus-textarea::placeholder { color: #3d4f63; }
+
+  #cbus-send {
+    width: 32px; height: 32px;
+    border-radius: 9px; border: none;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 15px; flex-shrink: 0;
+    cursor: not-allowed;
+    background: rgba(255,255,255,0.07);
+    color: #475569;
+    transition: all 0.2s;
+  }
+  #cbus-send.active {
+    background: linear-gradient(135deg, #f97316, #ea580c);
+    box-shadow: 0 3px 12px rgba(249,115,22,0.4);
+    color: #fff; cursor: pointer;
+  }
+  #cbus-send.active:hover  { transform: scale(1.08); }
+  #cbus-send.active:active { transform: scale(0.95); }
+
+  /* Open full chat link */
+  .cbus-fullpage {
+    text-align: center;
+    font-size: 11px;
+    color: #334155;
+    margin-top: 6px;
+  }
+  .cbus-fullpage a {
+    color: #f97316; text-decoration: none;
+    border-bottom: 1px solid rgba(249,115,22,0.3);
+    transition: border-color 0.2s;
+  }
+  .cbus-fullpage a:hover { border-color: #f97316; }
+
+  @media (max-width: 380px) {
+    #cbus-panel { right: 0; bottom: 74px; width: 100vw; border-radius: 16px 16px 0 0; }
+    #cbus-launcher { bottom: 14px; right: 14px; }
+  }
+</style>
+
+<!-- Launcher button -->
+<button id="cbus-launcher" aria-label="Open CBUSEVENTS Chat" onclick="cbusToggle()">
+  <span id="cbus-launcher-icon">⚡</span>
+  <span id="cbus-badge">1</span>
+</button>
+
+<!-- Tooltip -->
+<div id="cbus-tooltip" style="display:none;">
+  <strong>Hey there! 👋</strong><br/>Ask me anything about Columbus events &amp; venues.
+</div>
+
+<!-- Chat panel -->
+<div id="cbus-panel" class="cbus-hidden">
+  <!-- Header -->
+  <div class="cbus-ph">
+    <div class="cbus-ph-icon">⚡</div>
+    <div>
+      <div class="cbus-ph-title">CBUS<span>EVENTS</span></div>
+      <div class="cbus-ph-sub"><span class="cbus-ph-status">●</span>AI Assistant</div>
+    </div>
+    <div class="cbus-ph-actions">
+      <button class="cbus-icon-btn" title="Clear chat" onclick="cbusClear()">↺</button>
+      <button class="cbus-icon-btn" title="Close" onclick="cbusClose()">✕</button>
+    </div>
+  </div>
+
+  <!-- Messages -->
+  <div class="cbus-msgs" id="cbus-msgs"></div>
+
+  <!-- Suggestions -->
+  <div class="cbus-sugg-wrap" id="cbus-sugg"></div>
+
+  <!-- Input -->
+  <div class="cbus-input-wrap">
+    <div class="cbus-input-box">
+      <textarea id="cbus-textarea" rows="1" placeholder="Ask about Columbus events..."></textarea>
+      <button id="cbus-send" onclick="cbusSend()">↑</button>
+    </div>
+    <div class="cbus-fullpage"><a href="/chat" target="_blank">Open full chat →</a></div>
+  </div>
+</div>
+
+<script>
+(function () {
+  const SYSTEM = `You are an AI assistant for CBUSEVENTS, a Columbus, Ohio event platform connecting venues, vendors, planners, and attendees. You help users discover events, find venues, connect with vendors, and plan events in Columbus. Be friendly, knowledgeable about Columbus, and concise. Keep responses brief since this is a small chat widget. If asked about specific real-time data, direct users to cbusevents.com.`;
+  const SUGGESTIONS = ["What venues are listed?", "How do I get listed?", "Find vendors", "Upcoming events?"];
+
+  let messages = [];
+  let loading = false;
+  let isOpen = false;
+  let tooltipTimer = null;
+  let tooltipEl = document.getElementById('cbus-tooltip');
+
+  const panel     = document.getElementById('cbus-panel');
+  const msgsEl    = document.getElementById('cbus-msgs');
+  const suggEl    = document.getElementById('cbus-sugg');
+  const textarea  = document.getElementById('cbus-textarea');
+  const sendBtn   = document.getElementById('cbus-send');
+  const badge     = document.getElementById('cbus-badge');
+  const icon      = document.getElementById('cbus-launcher-icon');
+
+  // Build suggestion chips
+  SUGGESTIONS.forEach(s => {
+    const b = document.createElement('button');
+    b.className = 'cbus-chip';
+    b.textContent = s;
+    b.onclick = () => { textarea.value = s; cbusAutoResize(); cbusUpdateBtn(); textarea.focus(); };
+    suggEl.appendChild(b);
+  });
+
+  // Greet on load
+  cbusAddMsg('assistant', "Hey! 👋 I'm your CBUSEVENTS assistant. Ask me anything about Columbus events, venues, or vendors!");
+
+  // Show tooltip after 2s
+  tooltipTimer = setTimeout(() => {
+    if (!isOpen) {
+      tooltipEl.style.display = 'block';
+      tooltipEl.classList.remove('hiding');
+      setTimeout(() => {
+        tooltipEl.classList.add('hiding');
+        setTimeout(() => { tooltipEl.style.display = 'none'; }, 250);
+      }, 4000);
+    }
+  }, 2000);
+
+  window.cbusToggle = function () {
+    isOpen ? cbusClose() : cbusOpen();
+  };
+
+  window.cbusOpen = function () {
+    isOpen = true;
+    tooltipEl.style.display = 'none';
+    clearTimeout(tooltipTimer);
+    badge.classList.add('hidden');
+    panel.classList.remove('cbus-hidden', 'hiding');
+    panel.style.animation = 'none';
+    panel.offsetHeight; // reflow
+    panel.style.animation = '';
+    icon.textContent = '✕';
+    setTimeout(() => textarea.focus(), 320);
+    scrollCbus();
+  };
+
+  window.cbusClose = function () {
+    isOpen = false;
+    panel.classList.add('hiding');
+    icon.textContent = '⚡';
+    setTimeout(() => {
+      panel.classList.add('cbus-hidden');
+      panel.classList.remove('hiding');
+    }, 220);
+  };
+
+  window.cbusClear = function () {
+    messages = [];
+    msgsEl.innerHTML = '';
+    suggEl.style.display = '';
+    cbusAddMsg('assistant', "Hey! 👋 I'm your CBUSEVENTS assistant. Ask me anything about Columbus events, venues, or vendors!");
+  };
+
+  function cbusAddMsg(role, content) {
+    messages.push({ role, content });
+
+    const row = document.createElement('div');
+    row.className = `cbus-row ${role}`;
+
+    if (role === 'assistant') {
+      const av = document.createElement('div');
+      av.className = 'cbus-av assistant';
+      av.textContent = '⚡';
+      row.appendChild(av);
+    }
+
+    const bub = document.createElement('div');
+    bub.className = `cbus-bubble ${role}`;
+    bub.textContent = content;
+    row.appendChild(bub);
+
+    if (role === 'user') {
+      const av = document.createElement('div');
+      av.className = 'cbus-av user';
+      av.textContent = '👤';
+      row.appendChild(av);
+      suggEl.style.display = 'none';
+    }
+
+    msgsEl.appendChild(row);
+    scrollCbus();
+  }
+
+  function cbusShowTyping() {
+    const row = document.createElement('div');
+    row.className = 'cbus-typing-row';
+    row.id = 'cbus-typing';
+    const av = document.createElement('div');
+    av.className = 'cbus-av assistant';
+    av.textContent = '⚡';
+    row.appendChild(av);
+    const bub = document.createElement('div');
+    bub.className = 'cbus-typing-bubble';
+    [0,1,2].forEach(i => {
+      const d = document.createElement('span');
+      d.className = 'cbus-dot';
+      d.style.animation = `cbus-dot-bounce 1.2s ease-in-out ${i*0.2}s infinite`;
+      bub.appendChild(d);
+    });
+    row.appendChild(bub);
+    msgsEl.appendChild(row);
+    scrollCbus();
+  }
+
+  function cbusHideTyping() {
+    const el = document.getElementById('cbus-typing');
+    if (el) el.remove();
+  }
+
+  function scrollCbus() {
+    setTimeout(() => { msgsEl.scrollTop = msgsEl.scrollHeight; }, 30);
+  }
+
+  function cbusAutoResize() {
+    textarea.style.height = 'auto';
+    textarea.style.height = Math.min(textarea.scrollHeight, 80) + 'px';
+  }
+
+  function cbusUpdateBtn() {
+    if (textarea.value.trim() && !loading) {
+      sendBtn.classList.add('active');
+      sendBtn.disabled = false;
+    } else {
+      sendBtn.classList.remove('active');
+      sendBtn.disabled = true;
+    }
+  }
+
+  textarea.addEventListener('input', () => { cbusAutoResize(); cbusUpdateBtn(); });
+  textarea.addEventListener('keydown', e => {
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); cbusSend(); }
+  });
+
+  window.cbusSend = async function () {
+    const text = textarea.value.trim();
+    if (!text || loading) return;
+
+    loading = true;
+    textarea.value = '';
+    cbusAutoResize();
+    cbusUpdateBtn();
+
+    cbusAddMsg('user', text);
+    cbusShowTyping();
+
+    try {
+      const res = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          model: 'claude-sonnet-4-20250514',
+          max_tokens: 1000,
+          system: SYSTEM,
+          messages: messages.map(m => ({ role: m.role, content: m.content })),
+        }),
+      });
+      const data = await res.json();
+      const reply = data?.content?.[0]?.text || "Sorry, couldn't get a response.";
+      cbusHideTyping();
+      cbusAddMsg('assistant', reply);
+    } catch {
+      cbusHideTyping();
+      const err = document.createElement('div');
+      err.className = 'cbus-error';
+      err.textContent = 'Connection error. Please try again.';
+      msgsEl.appendChild(err);
+      scrollCbus();
+    } finally {
+      loading = false;
+      cbusUpdateBtn();
+      textarea.focus();
+    }
+  };
+
+  cbusUpdateBtn();
+})();  
 </script>
 </body>
 </html>
