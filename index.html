@@ -617,17 +617,25 @@ window.addEventListener('popstate',(e)=>{
  else showPage('home',null,false);
 });
 
-function featuredEventHTML(){
-  const fe=allEvents.find(e=>isPromoted(e));
-  if(!fe) return '';
-  const img=fe.cover_image_url?'<div style="position:relative;height:180px;overflow:hidden"><img src="'+fe.cover_image_url+'" style="width:100%;height:100%;object-fit:cover"/><div style="position:absolute;inset:0;background:linear-gradient(to bottom,transparent 30%,#0f0a00 100%)"></div></div>':'';
-  const datePill='<span style="background:#1a1a24;border-radius:8px;padding:6px 12px;font-size:13px">&#128197; '+fmt(fe.start_time)+'</span>';
-  const timePill='<span style="background:#1a1a24;border-radius:8px;padding:6px 12px;font-size:13px">&#128336; '+fmtTime(fe.start_time)+(fe.end_time?'  '+fmtTime(fe.end_time):'')+'</span>';
-  const pricePill=fe.is_free?'<span style="background:#0a2a14;border:1px solid #22c55e40;border-radius:8px;padding:6px 12px;font-size:13px;color:#22c55e;font-weight:700">Free</span>':(fe.price_min?'<span style="background:#1a1a24;border-radius:8px;padding:6px 12px;font-size:13px">From $'+fe.price_min+'</span>':'');
-  const venue=fe.venues?.name?'<div style="font-size:13px;color:#8888a0;margin-bottom:6px">&#128205; '+fe.venues.name+(fe.venues.neighborhood?' &middot; '+fe.venues.neighborhood:'')+'</div>':'';
-  const desc=fe.description?'<div style="font-size:13px;color:#8888a0;max-width:480px;line-height:1.6">'+fe.description+'</div>':'';
-  const ticketBtn=fe.ticket_url?'<a href="'+fe.ticket_url+'" target="_blank" style="display:block;background:#FF6B35;color:#fff;border-radius:10px;padding:14px 28px;font-size:15px;font-weight:700;text-decoration:none;text-align:center">Get Tickets &rarr;</a>':'';
-  return '<section class="section" style="padding-top:36px;padding-bottom:0"><div style="background:linear-gradient(135deg,#0f0a00,#1a1200,#0b0b0f);border:1px solid #f59e0b50;border-radius:18px;overflow:hidden">'+img+'<div style="padding:24px 28px;display:flex;justify-content:space-between;align-items:center;gap:24px;flex-wrap:wrap"><div><div style="display:inline-flex;align-items:center;gap:6px;background:#f59e0b;color:#000;border-radius:20px;padding:3px 12px;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-bottom:10px">&#11088; Featured Event</div><div style="font-size:11px;color:#f59e0b;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">'+(fe.category||'Event')+'</div><div style="font-family:Syne,sans-serif;font-size:22px;font-weight:800;margin-bottom:12px">'+fe.title+'</div><div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px">'+datePill+timePill+pricePill+'</div>'+venue+desc+'</div><div style="flex-shrink:0;display:flex;flex-direction:column;gap:10px">'+ticketBtn+'<button onclick="openEventModal(\"'+fe.id+'\")" style="background:transparent;color:var(--text);border:1px solid var(--border);border-radius:10px;padding:12px 24px;font-size:14px;cursor:pointer;font-family:DM Sans,sans-serif">View Details</button><div style="font-size:11px;color:#55556a;text-align:center">Powered by CBUSEVENTS</div></div></div></div></section>';
+
+
+function renderFeaturedEvent(){
+  var slot=document.getElementById('featuredEventSlot');
+  if(!slot)return;
+  var fe=allEvents.find(function(e){return isPromoted(e);});
+  if(!fe){slot.innerHTML='';return;}
+  var img=fe.cover_image_url?'<div style="position:relative;height:180px;overflow:hidden"><img src="'+fe.cover_image_url+'" style="width:100%;height:100%;object-fit:cover"/><div style="position:absolute;inset:0;background:linear-gradient(to bottom,transparent 30%,#0f0a00 100%)"></div></div>':'';
+  var price=fe.is_free?'<span style="background:#0a2a14;border:1px solid #22c55e40;border-radius:8px;padding:6px 12px;font-size:13px;color:#22c55e;font-weight:700">Free</span>':(fe.price_min?'<span style="background:#1a1a24;border-radius:8px;padding:6px 12px;font-size:13px">From $'+fe.price_min+'</span>':'');
+  var venueLine=(fe.venues&&fe.venues.name)?'<div style="font-size:13px;color:#8888a0;margin-bottom:6px">'+fe.venues.name+(fe.venues.neighborhood?' - '+fe.venues.neighborhood:'')+'</div>':'';
+  var desc=fe.description?'<div style="font-size:13px;color:#8888a0;max-width:480px;line-height:1.6">'+fe.description+'</div>':'';
+  var ticket=fe.ticket_url?'<a href="'+fe.ticket_url+'" target="_blank" style="display:block;background:#FF6B35;color:#fff;border-radius:10px;padding:14px 28px;font-size:15px;font-weight:700;text-decoration:none;text-align:center;margin-bottom:10px">Get Tickets</a>':'';
+  var viewBtn=document.createElement('button');
+  viewBtn.textContent='View Details';
+  viewBtn.style.cssText='background:transparent;color:var(--text);border:1px solid var(--border);border-radius:10px;padding:12px 24px;font-size:14px;cursor:pointer;font-family:DM Sans,sans-serif';
+  viewBtn.onclick=function(){openEventModal(fe.id);};
+  slot.innerHTML='<section class="section" style="padding-top:36px;padding-bottom:0"><div style="background:linear-gradient(135deg,#0f0a00,#1a1200,#0b0b0f);border:1px solid #f59e0b50;border-radius:18px;overflow:hidden">'+img+'<div style="padding:24px 28px;display:flex;justify-content:space-between;align-items:center;gap:24px;flex-wrap:wrap"><div><div style="display:inline-flex;background:#f59e0b;color:#000;border-radius:20px;padding:3px 12px;font-size:11px;font-weight:700;text-transform:uppercase;margin-bottom:10px">Featured Event</div><div style="font-size:11px;color:#f59e0b;font-weight:700;text-transform:uppercase;margin-bottom:6px">'+(fe.category||'Event')+'</div><div style="font-family:Syne,sans-serif;font-size:22px;font-weight:800;margin-bottom:12px">'+fe.title+'</div><div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px"><span style="background:#1a1a24;border-radius:8px;padding:6px 12px;font-size:13px">'+fmt(fe.start_time)+'</span><span style="background:#1a1a24;border-radius:8px;padding:6px 12px;font-size:13px">'+fmtTime(fe.start_time)+(fe.end_time?' - '+fmtTime(fe.end_time):'')+'</span>'+price+'</div>'+venueLine+desc+'</div><div id="featuredBtns" style="flex-shrink:0;display:flex;flex-direction:column;gap:10px">'+ticket+'<div style="font-size:11px;color:#55556a;text-align:center">Powered by CBUSEVENTS</div></div></div></div></section>';
+  var btns=document.getElementById('featuredBtns');
+  if(btns) btns.insertBefore(viewBtn, btns.children[btns.children.length-1]);
 }
 
 // ── HOME ──────────────────────────────────────────────────────
@@ -653,7 +661,7 @@ function renderHome(){
  return`<div onclick="showPage('venues');setTimeout(()=>{const sel=document.getElementById('vHood');if(sel){sel.value='${hood}';filterVenues();}},100)" style="background:#1a1a24;border:1px solid #25252f;border-radius:12px;padding:16px 20px;flex-shrink:0;cursor:pointer;transition:all 0.2s;text-align:center;min-width:130px" onmouseover="this.style.borderColor='#FF6B35';this.style.background='#1a0800'" onmouseout="this.style.borderColor='#25252f';this.style.background='#1a1a24'"> <div style="font-size:24px;margin-bottom:6px">${icons[i]}</div> <div style="font-weight:700;font-size:13px;margin-bottom:3px">${hood}</div> <div style="color:#8888a0;font-size:11px">${count} venue${count!==1?'s':''}</div> </div>`;
  }).join('')}
  </div> </section>
- ${featuredEventHTML()} <!-- THIS WEEK --> ${thisWeek.length?`
+ <div id="featuredEventSlot"></div> <!-- THIS WEEK --> ${thisWeek.length?`
  <section class="section section-alt"> <div class="section-header"> <div><div class="section-title"> Happening This Week</div><div class="section-sub">Events in Columbus in the next 7 days</div></div> <button class="see-all" onclick="showPage('events')">See all events →</button> </div> <div class="event-grid">${thisWeek.map(e=>eventCard(e)).join('')}</div> </section>`:''}
 
  <!-- FEATURED VENUES --> <section class="section"> <div class="section-header"> <div><div class="section-title"> Featured Venues</div><div class="section-sub">${allVenues.length} venues across Columbus</div></div> <button class="see-all" onclick="showPage('venues')">Browse all →</button> </div> <div class="venue-grid" id="homeVenueGrid">${allVenues.slice(0,8).map(v=>venueCard(v)).join('')}</div> </section>
@@ -681,6 +689,7 @@ function renderHome(){
  buildHeroSlidesFromVenues();
  initHero();
  buildHeroCards();
+ renderFeaturedEvent();
 }
 
 function initHero(){
