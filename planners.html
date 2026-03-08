@@ -98,10 +98,38 @@ footer{background:var(--surface);border-top:1px solid var(--border);padding:24px
 .footer-copy{color:var(--muted);font-size:12px;}
 .footer-admin{color:var(--muted);font-size:11px;opacity:0.4;transition:opacity 0.2s;text-decoration:none;}
 .footer-admin:hover{opacity:1;}
+
+/* ── HAMBURGER NAV (mobile) ── */
+.nav-hamburger{display:none;flex-direction:column;gap:5px;cursor:pointer;padding:6px;background:none;border:none;z-index:110;}
+.nav-hamburger span{display:block;width:22px;height:2px;background:var(--text);border-radius:2px;transition:all 0.3s ease;}
+.nav-hamburger.open span:nth-child(1){transform:translateY(7px) rotate(45deg);}
+.nav-hamburger.open span:nth-child(2){opacity:0;}
+.nav-hamburger.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg);}
+.nav-mobile-menu{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(11,11,15,0.98);backdrop-filter:blur(20px);z-index:105;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:80px 24px 40px;}
+.nav-mobile-menu.open{display:flex;}
+.nav-mobile-link{font-family:'Syne',sans-serif;font-size:26px;font-weight:700;color:var(--text);text-decoration:none;padding:12px 24px;border-radius:12px;transition:color 0.2s;text-align:center;width:100%;cursor:pointer;border:none;background:none;font-family:'DM Sans',sans-serif;}
+.nav-mobile-link:hover,.nav-mobile-link.active{color:var(--orange);}
+.nav-mobile-divider{width:40px;height:1px;background:var(--border);margin:6px 0;}
+.nav-mobile-cta{margin-top:12px;background:var(--orange) !important;color:#fff !important;border-radius:12px;padding:14px 32px !important;font-size:16px !important;}
+@media(max-width:680px){
+  .nav-hamburger{display:flex;}
+  .nav-links{display:none !important;}
+  html,body{overflow-x:hidden;}
+}
+
 </style>
 </head>
 <body> <nav> <a class="nav-logo" href="https://cbusevents.com"> CBUS<span>EVENTS</span> </a> <div class="nav-links"> <a href="https://cbusevents.com" class="nav-link">Home</a> <div class="dropdown"> <a class="nav-link" onclick="toggleDrop(event)" style="color:var(--text);cursor:pointer">Join ▾</a> <div class="dropdown-menu"> <a href="https://cbusevents.com/venues.html" class="dropdown-item"> Venues</a> <a href="https://cbusevents.com/vendors.html" class="dropdown-item"> Vendors</a> <a href="https://cbusevents.com/planners.html" class="dropdown-item active"> Planners</a> <a href="https://cbusevents.com/attendees.html" class="dropdown-item"> Attendees</a> </div> </div> </div> <a href="https://cbusevents.com/auth.html?role=planner" class="nav-cta">Join as Planner →</a>
-</nav> <section class="hero"> <div class="hero-eyebrow"> For Event Planners</div> <h1>Plan Better Events<br>Faster in <span>Columbus</span></h1> <p>Browse every available venue, connect with trusted vendors, and manage your events all in one place built for Columbus planners.</p> <div class="hero-btns"> <a href="https://cbusevents.com/auth.html?role=planner" class="btn-hero btn-hero-primary">Join Free →</a> <a href="https://cbusevents.com/cbus-planner-portal.html" class="btn-hero btn-hero-ghost">Sign In</a> </div>
+<button class="nav-hamburger" id="navHamburger" aria-label="Menu"><span></span><span></span><span></span></button>
+</nav>
+<div id="navMobileMenu" class="nav-mobile-menu">
+  <a href="https://cbusevents.com" class="nav-mobile-link">Home</a>
+  <a href="https://cbusevents.com/venues.html" class="nav-mobile-link">Venues</a>
+  <a href="https://cbusevents.com/vendors.html" class="nav-mobile-link">Vendors</a>
+  <a href="https://cbusevents.com/planners.html" class="nav-mobile-link active">Planners</a>
+  <div class="nav-mobile-divider"></div>
+  <a href="https://cbusevents.com/auth.html?role=planner" class="nav-mobile-link nav-mobile-cta">Join as Planner →</a>
+</div> <section class="hero"> <div class="hero-eyebrow"> For Event Planners</div> <h1>Plan Better Events<br>Faster in <span>Columbus</span></h1> <p>Browse every available venue, connect with trusted vendors, and manage your events all in one place built for Columbus planners.</p> <div class="hero-btns"> <a href="https://cbusevents.com/auth.html?role=planner" class="btn-hero btn-hero-primary">Join Free →</a> <a href="https://cbusevents.com/cbus-planner-portal.html" class="btn-hero btn-hero-ghost">Sign In</a> </div>
 </section> <section class="slider-section"> <div class="slider-label">Upcoming Events on CBUSEVENTS</div> <div style="overflow:hidden"> <div class="slider-track" id="eventsSlider"></div> </div>
 </section> <section class="features"> <div class="section-label">Why CBUSEVENTS</div> <div class="section-title">Your Columbus event<br>command center</div> <div class="section-sub">Everything you need to find, book, and execute exceptional events in one platform.</div> <div class="features-grid"> <div class="feature-card"> <div class="feature-title">Browse All Venues</div> <div class="feature-desc">Filter Columbus venues by capacity, neighborhood, type, and availability. Send inquiries directly from the platform.</div> </div> <div class="feature-card"> <div class="feature-title">Find Trusted Vendors</div> <div class="feature-desc">Browse DJs, photographers, caterers, and every other service provider with real portfolios and reviews.</div> </div> <div class="feature-card"> <div class="feature-title">Manage Your Events</div> <div class="feature-desc">Create and publish events, manage ticket sales, and track attendance all from your planner dashboard.</div> </div> <div class="feature-card"> <div class="feature-title">Receive Proposals</div> <div class="feature-desc">Premium vendors on CBUSEVENTS can send you proposals for your events — you get the best talent reaching out first.</div> </div> <div class="feature-card"> <div class="feature-title">Sell Tickets</div> <div class="feature-desc">Built-in ticketing with Stripe. Sell tickets to your events and receive payouts directly with just an 8% platform fee.</div> </div> <div class="feature-card"> <div class="feature-title">Build Relationships</div> <div class="feature-desc">Follow venues, save your favorite vendors, and build a Columbus network that makes every future event easier.</div> </div> </div>
 </section> <!-- LEAD CAPTURE FORM -->
@@ -217,6 +245,28 @@ async function handlePlannerSubmit(btn) {
     window.location.href = 'https://cbusevents.com/auth.html?' + params.toString();
   }, 800);
 }
+</script>
+<script>
+(function(){
+  var btn=document.getElementById('navHamburger');
+  var menu=document.getElementById('navMobileMenu');
+  if(!btn||!menu)return;
+  btn.addEventListener('click',function(e){
+    e.stopPropagation();
+    btn.classList.toggle('open');
+    menu.classList.toggle('open');
+    document.body.style.overflow=menu.classList.contains('open')?'hidden':'';
+  });
+  document.addEventListener('keydown',function(e){
+    if(e.key==='Escape'){btn.classList.remove('open');menu.classList.remove('open');document.body.style.overflow='';}
+  });
+  // Close on link click
+  menu.querySelectorAll('a,.nav-mobile-link').forEach(function(el){
+    el.addEventListener('click',function(){
+      btn.classList.remove('open');menu.classList.remove('open');document.body.style.overflow='';
+    });
+  });
+})();
 </script>
 </body>
 </html>

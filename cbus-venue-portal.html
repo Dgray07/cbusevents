@@ -18,6 +18,29 @@ input:focus, textarea:focus, select:focus { border-color: #FF6B35; }
 label { display: block; font-size: 13px; color: #8888a0; margin-bottom: 6px; font-weight: 500; }
 textarea { resize: vertical; min-height: 90px; }
 @keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── MOBILE PORTAL ── */
+@media(max-width:680px){
+  html,body{overflow-x:hidden;}
+  .portal-nav{padding:0 16px !important;height:54px !important;}
+  .portal-sidebar{display:none !important;}
+  .portal-main{margin-left:0 !important;padding:16px !important;}
+  .portal-content{padding:16px !important;}
+  .stats-grid{grid-template-columns:1fr 1fr !important;gap:10px !important;}
+  .modal-inner,.modal-box{width:calc(100vw - 32px) !important;max-width:100% !important;margin:16px !important;}
+  table{display:block;overflow-x:auto;-webkit-overflow-scrolling:touch;}
+  .form-row{grid-template-columns:1fr !important;}
+  .grid-2,.grid-3{grid-template-columns:1fr !important;}
+  .card-grid{grid-template-columns:1fr !important;}
+  .btn-row{flex-direction:column !important;}
+  input,select,textarea{font-size:16px !important;}
+  .page-header{padding:16px !important;}
+  .section-pad{padding:16px !important;}
+}
+@media(max-width:900px){
+  .portal-sidebar{width:200px !important;}
+}
+
 </style>
 </head>
 <body>
