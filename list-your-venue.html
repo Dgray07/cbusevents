@@ -50,6 +50,7 @@
     font-size: 28px;
     letter-spacing: 2px;
     color: var(--text);
+    text-decoration: none;
   }
   .logo span { color: var(--gold); }
 
@@ -735,8 +736,13 @@
 
 <!-- NAV -->
 <nav>
-  <div class="logo">CBUS<span>EVENTS</span></div>
-  <a href="#signup" class="nav-cta">List Your Venue</a>
+  <a href="https://cbusevents.com" class="logo">CBUS<span>EVENTS</span></a>
+  <div style="display:flex;align-items:center;gap:8px;">
+    <a href="https://cbusevents.com" style="color:var(--text-muted);font-size:13px;font-weight:500;text-decoration:none;padding:8px 14px;border-radius:4px;transition:color 0.15s;" onmouseover="this.style.color='var(--text)'" onmouseout="this.style.color='var(--text-muted)'">Home</a>
+    <a href="https://cbusevents.com/vendors.html" style="color:var(--text-muted);font-size:13px;font-weight:500;text-decoration:none;padding:8px 14px;border-radius:4px;transition:color 0.15s;" onmouseover="this.style.color='var(--text)'" onmouseout="this.style.color='var(--text-muted)'">Vendors</a>
+    <a href="https://cbusevents.com/planners.html" style="color:var(--text-muted);font-size:13px;font-weight:500;text-decoration:none;padding:8px 14px;border-radius:4px;transition:color 0.15s;" onmouseover="this.style.color='var(--text)'" onmouseout="this.style.color='var(--text-muted)'">Planners</a>
+    <a href="#signup" class="nav-cta">List Your Venue</a>
+  </div>
 </nav>
 
 <!-- HERO -->

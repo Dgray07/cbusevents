@@ -555,19 +555,5 @@ function Root() {
 
 ReactDOM.createRoot(document.getElementById("root")).render(<Root/>);
 </script>
-<script>
-// CBUSEVENTS Chat Widget — Venue Portal
-window.CBUS_CHAT_CONFIG = {
-  role: 'venue_owner',
-  supabaseUrl: 'https://toblgvatvsjljbqogzsv.supabase.co',
-  supabaseKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRvYmxndmF0dnNqbGpicW9nenN2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMDgwNTAsImV4cCI6MjA4NzY4NDA1MH0._WJEQPizNDiQfDXQB_DHPaQhixPGpMdmYQSmyWmm_FQ',
-  // Pull name from React portal once it mounts
-  get userName() {
-    const el = document.querySelector('[style*="full_name"], .nav-user, [data-username]');
-    return el?.textContent?.trim()?.split('@')[0] || null;
-  }
-};
-</script>
-<script src="chat-widget.js"></script>
 </body>
 </html>
