@@ -153,7 +153,7 @@ nav{position:sticky;top:0;z-index:100;background:rgba(11,11,15,0.95);backdrop-fi
 }
 </style>
 </head>
-<body> <nav id="topNav"> <div class="nav-logo" onclick="currentUser?nav('dashboard'):showAuth('login')"> CBUS<span>EVENTS</span> <span class="nav-logo-sub">Planner</span> </div> <div class="nav-links" id="navLinks" style="display:none"> <button class="nav-btn" onclick="window.location.href='https://cbusevents.com'"> Home</button> <button class="nav-btn" id="nav-dashboard" onclick="nav('dashboard')">Dashboard</button> <button class="nav-btn" id="nav-venues" onclick="nav('venues')">Find Venues</button> <button class="nav-btn" id="nav-inquiries" onclick="nav('inquiries')">My Inquiries</button> <button class="nav-btn" id="nav-events" onclick="nav('events')">My Events</button> <button class="nav-btn" id="nav-profile" onclick="nav('profile')">My Profile</button> </div> <div class="nav-right" id="navRight"> <button class="nav-outline" onclick="showAuth('login')">Sign In</button> <button class="nav-cta" onclick="showAuth('signup')">Get Started Free →</button> </div>
+<body> <nav id="topNav"> <div class="nav-logo" onclick="currentUser?nav('dashboard'):showAuth('login')"> CBUS<span>EVENTS</span> <span class="nav-logo-sub">Planner</span> </div> <div class="nav-links" id="navLinks" style="display:none"> <button class="nav-btn" onclick="window.location.href='https://cbusevents.com'"> Home</button> <button class="nav-btn" id="nav-dashboard" onclick="nav('dashboard')">Dashboard</button> <button class="nav-btn" id="nav-venues" onclick="nav('venues')">Find Venues</button> <button class="nav-btn" id="nav-inquiries" onclick="nav('inquiries')">My Inquiries</button> <button class="nav-btn" id="nav-events" onclick="nav('events')">My Events</button> <button class="nav-btn" id="nav-profile" onclick="nav('profile')">My Profile</button> <button class="nav-btn" id="nav-billing" onclick="nav('billing')">Plan & Billing</button> </div> <div class="nav-right" id="navRight"> <button class="nav-outline" onclick="showAuth('login')">Sign In</button> <button class="nav-cta" onclick="showAuth('signup')">Get Started Free →</button> </div>
 </nav> <div id="app"></div>
 <div id="modal"></div>
 <div id="toast" class="toast"></div> <script src="https://unpkg.com/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
@@ -366,7 +366,10 @@ async function doLogin(){
  const{error,data}=await sb.auth.signInWithPassword({email,password:pass});
  if(error){const el=document.getElementById('aErr');if(el){el.textContent=error.message;el.style.display='block';}return;}
  currentUser=data.user;
- await loadData();await handleBoostReturn();setLoggedInNav();nav('events');
+ await loadData();await handleBoostReturn();setLoggedInNav();
+ const upgradeParam=new URLSearchParams(window.location.search).get('upgrade');
+ if(upgradeParam&&['pro','agency'].includes(upgradeParam)) nav('billing');
+ else nav('events');
 }
 
 async function doSignup(){
@@ -394,6 +397,55 @@ function nav(page){
  else if(page==='inquiries')renderInquiries();
  else if(page==='events')renderEvents();
  else if(page==='profile')renderProfile();
+ else if(page==='billing')renderBilling();
+}
+
+// ── BILLING ───────────────────────────────────────────────────
+function renderBilling(){
+ const planParam=new URLSearchParams(window.location.search).get('upgrade');
+ document.getElementById('app').innerHTML=`
+ <div class="page">
+   <div class="section-title">Plan & Billing</div>
+   <div class="section-sub" style="margin-bottom:32px">Upgrade to unlock the full Columbus planner network</div>
+   ${planParam==='success'?`<div style="background:#0a2a14;border:1px solid #1a4a24;border-radius:10px;padding:14px 18px;margin-bottom:28px;color:#22c55e;font-size:14px;font-weight:600;">Upgrade successful! Your plan will be activated within a minute.</div>`:''}
+   <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:18px">
+     <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:28px">
+       <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:18px;margin-bottom:8px">Free</div>
+       <div style="font-family:'Syne',sans-serif;font-size:36px;font-weight:800;line-height:1;margin-bottom:20px">$0<span style="font-size:14px;color:var(--sub)">/mo</span></div>
+       <div style="display:flex;flex-direction:column;gap:9px;margin-bottom:24px;font-size:13px;color:var(--sub)">
+         <div>Browse all Columbus venues</div><div>Send venue inquiries</div><div>Create and publish events</div>
+       </div>
+       <div style="text-align:center;padding:10px;background:var(--surface);border:1px solid var(--border);border-radius:8px;font-size:13px;color:var(--muted)">Current Plan</div>
+     </div>
+     <div style="background:var(--card);border:2px solid #a855f7;border-radius:14px;padding:28px;position:relative">
+       <div style="position:absolute;top:-11px;left:50%;transform:translateX(-50%);background:#a855f7;color:#fff;border-radius:20px;padding:2px 14px;font-size:11px;font-weight:700;white-space:nowrap">MOST POPULAR</div>
+       <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:18px;color:#a855f7;margin-bottom:8px">Pro</div>
+       <div style="font-family:'Syne',sans-serif;font-size:36px;font-weight:800;line-height:1;color:#a855f7;margin-bottom:20px">$19<span style="font-size:14px;color:var(--sub)">/mo</span></div>
+       <div style="display:flex;flex-direction:column;gap:9px;margin-bottom:24px;font-size:13px;color:var(--sub)">
+         <div style="color:var(--text)">Full vendor directory access</div>
+         <div style="color:var(--text)">Receive vendor proposals</div>
+         <div style="color:var(--text)">Featured planner profile</div>
+         <div>Everything in Free</div>
+       </div>
+       <button onclick="alert('Stripe billing coming soon — contact info@cbusevents.com to upgrade')" style="width:100%;padding:11px;background:#a855f7;color:#fff;border:none;border-radius:8px;font-weight:700;font-size:14px;cursor:pointer">Upgrade to Pro →</button>
+     </div>
+     <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:28px">
+       <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:18px;color:var(--gold);margin-bottom:8px">Agency</div>
+       <div style="font-family:'Syne',sans-serif;font-size:36px;font-weight:800;line-height:1;color:var(--gold);margin-bottom:20px">$49<span style="font-size:14px;color:var(--sub)">/mo</span></div>
+       <div style="display:flex;flex-direction:column;gap:9px;margin-bottom:24px;font-size:13px;color:var(--sub)">
+         <div style="color:var(--text)">Priority venue responses</div>
+         <div style="color:var(--text)">Homepage featured planner slot</div>
+         <div style="color:var(--text)">Dedicated account support</div>
+         <div>Everything in Pro</div>
+       </div>
+       <button onclick="alert('Stripe billing coming soon — contact info@cbusevents.com to upgrade')" style="width:100%;padding:11px;background:var(--gold);color:#000;border:none;border-radius:8px;font-weight:700;font-size:14px;cursor:pointer">Upgrade to Agency →</button>
+     </div>
+   </div>
+   <div style="margin-top:28px;padding:18px;background:var(--surface);border:1px solid var(--border);border-radius:12px">
+     <div style="font-weight:700;font-size:14px;margin-bottom:6px">Billing & Cancellation</div>
+     <div style="color:var(--sub);font-size:13px;line-height:1.7">Subscriptions are billed monthly and can be cancelled anytime. To manage or cancel your subscription, contact <a href="mailto:info@cbusevents.com" style="color:var(--orange)">info@cbusevents.com</a>.</div>
+   </div>
+ </div>`;
 }
 
 // ── DASHBOARD ─────────────────────────────────────────────────
@@ -595,5 +647,20 @@ async function submitEvent(){
 // ── START ─────────────────────────────────────────────────────
 init();
 </script>
+<script>
+window.CBUS_CHAT_CONFIG = {
+  role: 'planner',
+  supabaseUrl: 'https://toblgvatvsjljbqogzsv.supabase.co',
+  supabaseKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRvYmxndmF0dnNqbGpicW9nenN2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMDgwNTAsImV4cCI6MjA4NzY4NDA1MH0._WJEQPizNDiQfDXQB_DHPaQhixPGpMdmYQSmyWmm_FQ',
+  get userName() {
+    return (typeof currentUser !== 'undefined' && currentUser?.user_metadata?.full_name)
+      ? currentUser.user_metadata.full_name.split(' ')[0]
+      : (typeof currentUser !== 'undefined' && currentUser?.email)
+        ? currentUser.email.split('@')[0]
+        : null;
+  }
+};
+</script>
+<script src="chat-widget.js"></script>
 </body>
 </html>

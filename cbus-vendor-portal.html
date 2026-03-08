@@ -792,5 +792,19 @@ function closeModal(){document.getElementById('modalContainer').innerHTML='';}
 // ── INIT ──────────────────────────────────────────────────────
 init();
 </script>
+<script>
+window.CBUS_CHAT_CONFIG = {
+  role: 'vendor',
+  supabaseUrl: 'https://toblgvatvsjljbqogzsv.supabase.co',
+  supabaseKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRvYmxndmF0dnNqbGpicW9nenN2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMDgwNTAsImV4cCI6MjA4NzY4NDA1MH0._WJEQPizNDiQfDXQB_DHPaQhixPGpMdmYQSmyWmm_FQ',
+  get userName() {
+    // vendorProfile is set globally in this portal after login
+    return (typeof vendorProfile !== 'undefined' && vendorProfile?.business_name)
+      ? vendorProfile.business_name.split(' ')[0]
+      : null;
+  }
+};
+</script>
+<script src="chat-widget.js"></script>
 </body>
 </html>
