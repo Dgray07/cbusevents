@@ -1010,14 +1010,15 @@
 
   <div class="signup-form">
     <div class="form-row">
-      <input type="text" class="form-input" placeholder="Your name">
-      <input type="email" class="form-input" placeholder="Email address">
+      <input type="text" id="lyvName" class="form-input" placeholder="Your name">
+      <input type="email" id="lyvEmail" class="form-input" placeholder="Email address">
     </div>
     <div class="form-row">
-      <input type="text" class="form-input" placeholder="Venue / business name">
-      <input type="tel" class="form-input" placeholder="Phone number">
+      <input type="text" id="lyvVenue" class="form-input" placeholder="Venue / business name">
+      <input type="tel" id="lyvPhone" class="form-input" placeholder="Phone number">
     </div>
-    <button class="form-submit" onclick="handleSubmit(this)">List My Venue Free →</button>
+    <div id="lyvError" style="color:#ef4444;font-size:13px;margin-bottom:8px;display:none;"></div>
+    <button class="form-submit" id="lyvBtn" onclick="handleSubmit(this)">List My Venue Free →</button>
     <div class="form-proof">
       12+ Columbus venues joined this week
     </div>
@@ -1092,11 +1093,65 @@
   }, 4000);
 
   // Form submit
-  function handleSubmit(btn) {
-    btn.textContent = 'You\'re on the list! We\'ll be in touch.';
-    btn.style.background = '#2ECC71';
-    btn.style.color = '#fff';
+  // Form submit — save lead to Supabase then redirect to signup
+  const SB_URL = 'https://toblgvatvsjljbqogzsv.supabase.co';
+  const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRvYmxndmF0dnNqbGpicW9nenN2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMDgwNTAsImV4cCI6MjA4NzY4NDA1MH0._WJEQPizNDiQfDXQB_DHPaQhixPGpMdmYQSmyWmm_FQ';
+
+  async function handleSubmit(btn) {
+    const name  = document.getElementById('lyvName').value.trim();
+    const email = document.getElementById('lyvEmail').value.trim();
+    const venue = document.getElementById('lyvVenue').value.trim();
+    const phone = document.getElementById('lyvPhone').value.trim();
+    const errEl = document.getElementById('lyvError');
+
+    errEl.style.display = 'none';
+
+    if (!name || !email) {
+      errEl.textContent = 'Please enter your name and email.';
+      errEl.style.display = 'block';
+      return;
+    }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      errEl.textContent = 'Please enter a valid email address.';
+      errEl.style.display = 'block';
+      return;
+    }
+
+    btn.textContent = 'Saving your spot...';
     btn.disabled = true;
+
+    // Save lead to Supabase (non-blocking — don't let DB failure stop signup)
+    try {
+      await fetch(`${SB_URL}/rest/v1/venue_leads`, {
+        method: 'POST',
+        headers: {
+          'apikey': SB_KEY,
+          'Authorization': 'Bearer ' + SB_KEY,
+          'Content-Type': 'application/json',
+          'Prefer': 'return=minimal',
+        },
+        body: JSON.stringify({
+          name,
+          email,
+          venue_name: venue || null,
+          phone: phone || null,
+          source: 'list-your-venue',
+          created_at: new Date().toISOString(),
+        }),
+      });
+    } catch (e) {
+      // Silently continue — don't block signup flow
+    }
+
+    btn.textContent = "You're in! Taking you to signup...";
+    btn.style.background = '#22c55e';
+
+    // Redirect to auth with role + pre-fill email
+    const params = new URLSearchParams({ role: 'venue_owner' });
+    if (email) params.set('email', email);
+    setTimeout(() => {
+      window.location.href = 'https://cbusevents.com/auth.html?' + params.toString();
+    }, 800);
   }
 </script>
 

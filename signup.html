@@ -747,7 +747,7 @@
 
           <p class="terms">
             By joining, you agree to the <a href="https://cbusevents.com/terms">Terms of Service</a> and <a href="https://cbusevents.com/privacy">Privacy Policy</a>.<br/>
-            Already have an account? <a href="https://cbusevents.com/login.html">Sign in here</a>
+            Already have an account? <a href="https://cbusevents.com/auth.html">Sign in here</a>
           </p>
         </form>
       </div>
@@ -767,9 +767,9 @@
 
     // ── PORTAL REDIRECTS ──
     const PORTALS = {
-      venue: 'https://cbusevents.com/venue-portal.html',
-      vendor: 'https://cbusevents.com/vendor-portal.html',
-      planner: 'https://cbusevents.com/customer-portal.html'
+      venue: 'https://cbusevents.com/cbus-venue-portal.html',
+      vendor: 'https://cbusevents.com/cbus-vendor-portal.html',
+      planner: 'https://cbusevents.com/cbus-planner-portal.html'
     };
 
     const SUCCESS_COPY = {
@@ -927,10 +927,12 @@
         if (error) throw error;
 
         // Insert role into user_roles table
+        // Map UI role names to DB-expected values
+        const roleMap = { venue: 'venue_owner', vendor: 'vendor', planner: 'planner' };
         if (data.user) {
           await sb.from('user_roles').upsert({
             user_id: data.user.id,
-            role: selectedRole
+            role: roleMap[selectedRole] || selectedRole
           });
 
           // Insert business info if venue/vendor
@@ -952,7 +954,7 @@
         btn.classList.remove('loading');
         const msg = err.message || 'Something went wrong. Please try again.';
         if (msg.includes('already registered') || msg.includes('already been registered')) {
-          showError('This email is already registered. <a href="https://cbusevents.com/login.html" style="color:#ff9966">Sign in instead →</a>');
+          showError('This email is already registered. <a href="https://cbusevents.com/auth.html" style="color:#ff9966">Sign in instead →</a>');
         } else {
           showError(msg);
         }
