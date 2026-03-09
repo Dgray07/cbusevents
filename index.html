@@ -50,7 +50,7 @@
 <meta name="twitter:image" content="https://cbusevents.com/og-image.png"> <!-- Structured Data for Google -->
 <script type="application/ld+json">
 </script> <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"> <style>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:wght@300;400;500;600&family=Bebas+Neue&family=Barlow:wght@400;600;700;900&family=Barlow+Condensed:wght@400;600;700;900&display=swap" rel="stylesheet"> <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
 :root {
  --bg:#0b0b0f; --surface:#13131a; --card:#1a1a24; --border:#25252f;
@@ -439,6 +439,350 @@ footer { background:var(--surface); border-top:1px solid var(--border); padding:
   html,body{overflow-x:hidden;}
 }
 
+/* ═══ REDESIGN HOME STYLES ═══ */
+.rh-hero {
+  min-height:100vh; display:flex; flex-direction:column; justify-content:flex-end;
+  padding:120px 48px 56px; position:relative; overflow:hidden; background:var(--bg);
+}
+@media(max-width:768px){.rh-hero{padding:100px 24px 48px;}}
+.rh-hero-bg {
+  position:absolute; inset:0;
+  background: radial-gradient(ellipse 80% 60% at 70% 40%, rgba(255,107,53,0.12) 0%, transparent 60%),
+              radial-gradient(ellipse 60% 80% at 20% 80%, rgba(255,107,53,0.06) 0%, transparent 50%);
+}
+.rh-hero-grid {
+  position:absolute; inset:0;
+  background-image: linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
+                    linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
+  background-size:40px 40px;
+  mask-image:linear-gradient(to bottom, transparent 0%, black 30%, black 70%, transparent 100%);
+}
+.rh-ticker {
+  position:absolute; top:62px; left:0; right:0; overflow:hidden;
+  padding:10px 0; border-top:1px solid rgba(255,255,255,0.06);
+  border-bottom:1px solid rgba(255,255,255,0.06); background:rgba(255,107,53,0.04);
+}
+.rh-ticker-track {
+  display:flex; gap:48px; animation:rh-ticker 24s linear infinite; white-space:nowrap;
+}
+.rh-ticker-item {
+  font-family:'Barlow Condensed',sans-serif; font-weight:600; font-size:11px;
+  letter-spacing:2px; color:var(--orange); text-transform:uppercase;
+  display:flex; align-items:center; gap:12px; flex-shrink:0;
+}
+.rh-ticker-dot { width:4px; height:4px; background:var(--orange); border-radius:50%; }
+@keyframes rh-ticker { from{transform:translateX(0);} to{transform:translateX(-50%);} }
+.rh-hero-content { position:relative; z-index:2; max-width:620px; }
+.rh-toggle { display:flex; gap:8px; margin-bottom:28px; flex-wrap:wrap; }
+.rh-pill {
+  font-family:'Barlow Condensed',sans-serif; font-weight:700; font-size:12px;
+  letter-spacing:1px; text-transform:uppercase; padding:7px 16px;
+  border-radius:100px; border:1px solid rgba(255,255,255,0.1);
+  cursor:pointer; transition:all 0.2s; color:rgba(255,255,255,0.45); background:transparent;
+}
+.rh-pill.active { background:var(--orange); border-color:var(--orange); color:#fff; }
+.rh-eyebrow {
+  font-family:'Barlow Condensed',sans-serif; font-weight:700; font-size:12px;
+  letter-spacing:3px; text-transform:uppercase; color:var(--orange); margin-bottom:16px;
+}
+.rh-headline {
+  font-family:'Bebas Neue',sans-serif; font-size:clamp(60px,12vw,96px);
+  line-height:0.92; letter-spacing:1px; margin-bottom:22px;
+}
+.rh-headline .rh-accent { color:var(--orange); }
+.rh-headline .rh-outline {
+  -webkit-text-stroke:1.5px rgba(255,255,255,0.25); color:transparent;
+}
+.rh-sub {
+  font-size:16px; color:rgba(255,255,255,0.6); line-height:1.65;
+  max-width:400px; margin-bottom:36px;
+}
+.rh-sub strong { color:#fff; font-weight:600; }
+.rh-ctas { display:flex; gap:12px; margin-bottom:48px; flex-wrap:wrap; }
+.rh-btn-primary {
+  display:inline-flex; align-items:center; gap:8px;
+  background:var(--orange); color:#fff; border:none;
+  padding:16px 28px; border-radius:10px;
+  font-family:'Barlow Condensed',sans-serif; font-weight:700; font-size:16px;
+  letter-spacing:0.5px; cursor:pointer; transition:all 0.2s; text-decoration:none;
+}
+.rh-btn-primary:hover { background:#e55a1a; transform:translateY(-1px); }
+.rh-btn-secondary {
+  display:inline-flex; align-items:center; gap:8px;
+  background:transparent; color:#fff; border:1px solid rgba(255,255,255,0.15);
+  padding:14px 24px; border-radius:10px;
+  font-family:'Barlow Condensed',sans-serif; font-weight:600; font-size:15px;
+  letter-spacing:0.5px; cursor:pointer; transition:all 0.2s; text-decoration:none;
+}
+.rh-btn-secondary:hover { border-color:rgba(255,255,255,0.35); background:rgba(255,255,255,0.04); }
+.rh-proof {
+  display:flex; gap:32px; padding-top:28px;
+  border-top:1px solid rgba(255,255,255,0.08); flex-wrap:wrap;
+}
+.rh-proof-num {
+  font-family:'Bebas Neue',sans-serif; font-size:30px; color:var(--orange); line-height:1;
+}
+.rh-proof-label {
+  font-size:11px; font-weight:600; letter-spacing:1px; text-transform:uppercase;
+  color:rgba(255,255,255,0.4); margin-top:3px;
+}
+/* Urgency banner */
+.rh-urgency {
+  margin:0 0 0; padding:24px 48px; background:var(--bg);
+}
+@media(max-width:768px){.rh-urgency{padding:16px 24px;}}
+.rh-urgency-inner {
+  background:linear-gradient(135deg,rgba(255,107,53,0.12),rgba(255,107,53,0.04));
+  border:1px solid rgba(255,107,53,0.28); border-radius:14px;
+  padding:20px 24px; display:flex; align-items:center; gap:16px; cursor:pointer;
+}
+.rh-urgency-icon {
+  width:44px; height:44px; background:var(--orange); border-radius:10px;
+  display:flex; align-items:center; justify-content:center; font-size:20px; flex-shrink:0;
+}
+.rh-urgency-title {
+  font-family:'Barlow Condensed',sans-serif; font-weight:700; font-size:16px; letter-spacing:0.3px;
+}
+.rh-urgency-desc { font-size:13px; color:rgba(255,255,255,0.5); line-height:1.4; margin-top:2px; }
+.rh-urgency-desc strong { color:var(--orange); }
+/* Sections */
+.rh-section { padding:64px 48px; }
+@media(max-width:768px){.rh-section{padding:48px 24px;}}
+.rh-section.dark { background:var(--surface); }
+.rh-section-label {
+  font-family:'Barlow Condensed',sans-serif; font-weight:700; font-size:11px;
+  letter-spacing:3px; text-transform:uppercase; color:var(--orange); margin-bottom:12px;
+}
+.rh-section-title {
+  font-family:'Bebas Neue',sans-serif; font-size:clamp(40px,8vw,60px);
+  line-height:0.95; margin-bottom:16px;
+}
+.rh-section-sub {
+  font-size:15px; color:rgba(255,255,255,0.5); line-height:1.65; margin-bottom:36px; max-width:560px;
+}
+/* Benefits */
+.rh-benefits { display:grid; grid-template-columns:repeat(2,1fr); gap:12px; }
+@media(max-width:600px){.rh-benefits{grid-template-columns:1fr;}}
+.rh-benefit {
+  background:var(--card); border:1px solid var(--border); border-radius:14px;
+  padding:20px; display:flex; gap:16px; align-items:flex-start;
+  transition:border-color 0.2s;
+}
+.rh-benefit:hover { border-color:rgba(255,107,53,0.3); }
+.rh-benefit-icon {
+  width:44px; height:44px; border-radius:10px; display:flex;
+  align-items:center; justify-content:center; font-size:20px; flex-shrink:0;
+  background:rgba(255,107,53,0.1);
+}
+.rh-benefit-title {
+  font-family:'Barlow Condensed',sans-serif; font-weight:700; font-size:16px;
+  letter-spacing:0.3px; margin-bottom:5px;
+}
+.rh-benefit-desc { font-size:13px; color:rgba(255,255,255,0.5); line-height:1.5; }
+.rh-tag {
+  display:inline-block; margin-top:8px;
+  background:rgba(34,197,94,0.1); color:var(--green);
+  border:1px solid rgba(34,197,94,0.2); border-radius:100px;
+  font-size:10px; font-weight:700; letter-spacing:0.5px; padding:3px 10px;
+}
+/* Steps */
+.rh-steps { display:flex; flex-direction:column; }
+.rh-step {
+  display:flex; gap:20px; padding:24px 0;
+  border-bottom:1px solid rgba(255,255,255,0.06);
+}
+.rh-step:last-child { border-bottom:none; }
+.rh-step-num {
+  font-family:'Bebas Neue',sans-serif; font-size:52px;
+  color:rgba(255,107,53,0.2); line-height:1; flex-shrink:0; width:52px;
+}
+.rh-step-title {
+  font-family:'Barlow Condensed',sans-serif; font-weight:700;
+  font-size:18px; letter-spacing:0.3px; margin-bottom:6px; padding-top:4px;
+}
+.rh-step-desc { font-size:13px; color:rgba(255,255,255,0.5); line-height:1.6; }
+.rh-step-badge {
+  display:inline-block; margin-top:10px;
+  background:rgba(255,107,53,0.1); color:var(--orange); border-radius:6px;
+  font-size:10px; font-weight:700; letter-spacing:0.5px; padding:4px 10px;
+}
+/* Founding card */
+.rh-founding-card {
+  background:linear-gradient(135deg,rgba(255,107,53,0.1),rgba(255,107,53,0.02));
+  border:1px solid rgba(255,107,53,0.22); border-radius:20px;
+  padding:36px 28px; position:relative; overflow:hidden;
+}
+.rh-founding-card::before {
+  content:''; position:absolute; top:-40px; right:-40px;
+  width:160px; height:160px; border-radius:50%;
+  background:radial-gradient(circle,rgba(255,107,53,0.15),transparent 70%);
+}
+.rh-founding-badge {
+  display:inline-block; background:var(--orange); color:#fff;
+  font-family:'Barlow Condensed',sans-serif; font-weight:700; font-size:11px;
+  letter-spacing:2px; text-transform:uppercase; padding:5px 14px;
+  border-radius:100px; margin-bottom:20px;
+}
+.rh-founding-title {
+  font-family:'Bebas Neue',sans-serif; font-size:52px; line-height:0.92; margin-bottom:16px;
+}
+.rh-founding-title span { color:var(--orange); }
+.rh-founding-desc { font-size:14px; color:rgba(255,255,255,0.6); line-height:1.7; margin-bottom:24px; }
+.rh-perks { display:flex; flex-direction:column; gap:10px; margin-bottom:24px; }
+.rh-perk { display:flex; align-items:center; gap:12px; font-size:14px; color:rgba(255,255,255,0.8); }
+.rh-perk-check {
+  width:20px; height:20px; border-radius:50%;
+  background:rgba(34,197,94,0.12); border:1px solid rgba(34,197,94,0.3);
+  display:flex; align-items:center; justify-content:center;
+  font-size:10px; flex-shrink:0; color:var(--green);
+}
+.rh-spots-text {
+  font-family:'Barlow Condensed',sans-serif; font-size:13px; font-weight:600;
+  letter-spacing:0.5px; color:var(--orange); margin-bottom:8px;
+}
+.rh-spots-bar {
+  height:4px; background:rgba(255,255,255,0.08); border-radius:100px;
+  margin-bottom:24px; overflow:hidden;
+}
+.rh-spots-fill { height:100%; width:44%; background:var(--orange); border-radius:100px; }
+/* Community cards */
+.rh-communities { display:grid; grid-template-columns:repeat(2,1fr); gap:12px; }
+@media(max-width:600px){.rh-communities{grid-template-columns:1fr;}}
+.rh-community {
+  border-radius:14px; padding:24px; border:1px solid var(--border); transition:all 0.2s;
+  text-decoration:none; color:var(--text); display:block;
+}
+.rh-community:hover { transform:translateY(-2px); }
+.rh-community.venues { background:linear-gradient(135deg,rgba(255,107,53,0.1),rgba(255,107,53,0.02)); border-color:rgba(255,107,53,0.22); }
+.rh-community.vendors { background:linear-gradient(135deg,rgba(96,165,250,0.08),rgba(96,165,250,0.01)); border-color:rgba(96,165,250,0.18); }
+.rh-community.planners { background:linear-gradient(135deg,rgba(168,139,250,0.08),rgba(168,139,250,0.01)); border-color:rgba(168,139,250,0.18); }
+.rh-community.attendees { background:linear-gradient(135deg,rgba(34,197,94,0.07),rgba(34,197,94,0.01)); border-color:rgba(34,197,94,0.15); }
+.rh-community-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:10px; }
+.rh-community-label {
+  font-family:'Barlow Condensed',sans-serif; font-weight:700; font-size:20px; letter-spacing:0.5px;
+}
+.rh-community-free {
+  font-size:10px; font-weight:700; letter-spacing:1px; color:var(--green);
+  background:rgba(34,197,94,0.1); border:1px solid rgba(34,197,94,0.2);
+  padding:3px 10px; border-radius:100px;
+}
+.rh-community-desc { font-size:13px; color:rgba(255,255,255,0.5); line-height:1.6; margin-bottom:14px; }
+.rh-community-link {
+  font-family:'Barlow Condensed',sans-serif; font-weight:700; font-size:14px;
+  letter-spacing:0.5px; display:flex; align-items:center; gap:6px; transition:gap 0.2s;
+}
+.rh-community.venues .rh-community-link { color:var(--orange); }
+.rh-community.vendors .rh-community-link { color:var(--blue); }
+.rh-community.planners .rh-community-link { color:#c084fc; }
+.rh-community.attendees .rh-community-link { color:var(--green); }
+/* Venues scroll */
+.rh-venues-scroll {
+  display:flex; gap:12px; overflow-x:auto; padding-bottom:8px; scrollbar-width:none;
+}
+.rh-venues-scroll::-webkit-scrollbar { display:none; }
+.rh-venue-card {
+  flex:0 0 200px; background:var(--card); border:1px solid var(--border);
+  border-radius:14px; overflow:hidden; transition:all 0.2s; cursor:pointer;
+}
+.rh-venue-card:hover { border-color:rgba(255,107,53,0.4); transform:translateY(-2px); }
+.rh-venue-img { height:110px; position:relative; display:flex; align-items:flex-start; padding:10px; overflow:hidden; }
+.rh-venue-img img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
+.rh-venue-tag {
+  position:relative; z-index:1;
+  font-family:'Barlow Condensed',sans-serif; font-weight:700; font-size:10px;
+  letter-spacing:1px; text-transform:uppercase; background:rgba(0,0,0,0.55);
+  color:rgba(255,255,255,0.8); padding:3px 8px; border-radius:4px;
+}
+.rh-venue-info { padding:12px 14px 14px; }
+.rh-venue-name {
+  font-family:'Barlow Condensed',sans-serif; font-weight:700;
+  font-size:15px; letter-spacing:0.3px; margin-bottom:3px;
+}
+.rh-venue-meta { font-size:11px; color:rgba(255,255,255,0.45); margin-bottom:8px; }
+.rh-venue-badge {
+  display:inline-block; font-family:'Barlow Condensed',sans-serif; font-weight:700;
+  font-size:10px; letter-spacing:1px; text-transform:uppercase;
+  background:rgba(255,107,53,0.12); color:var(--orange);
+  border:1px solid rgba(255,107,53,0.25); padding:3px 8px; border-radius:4px;
+}
+/* Events list */
+.rh-events-list { display:flex; flex-direction:column; gap:10px; }
+.rh-event {
+  background:var(--card); border:1px solid var(--border); border-radius:12px;
+  display:flex; align-items:center; overflow:hidden; cursor:pointer;
+  transition:all 0.2s;
+}
+.rh-event:hover { border-color:rgba(255,255,255,0.14); transform:translateX(3px); }
+.rh-event-bar { width:4px; min-height:88px; flex-shrink:0; }
+.rh-event-body { flex:1; padding:14px 16px; }
+.rh-event-cat {
+  font-family:'Barlow Condensed',sans-serif; font-weight:700; font-size:10px;
+  letter-spacing:2px; color:rgba(255,255,255,0.4); margin-bottom:4px;
+}
+.rh-event-name {
+  font-family:'Barlow Condensed',sans-serif; font-weight:700;
+  font-size:17px; letter-spacing:0.3px; margin-bottom:3px;
+}
+.rh-event-venue { font-size:12px; color:rgba(255,255,255,0.45); margin-bottom:8px; }
+.rh-event-chips { display:flex; gap:6px; flex-wrap:wrap; }
+.rh-chip {
+  font-size:11px; font-weight:600; background:rgba(255,255,255,0.06);
+  color:rgba(255,255,255,0.65); padding:3px 8px; border-radius:4px;
+}
+.rh-chip.free { background:rgba(34,197,94,0.12); color:var(--green); }
+.rh-chip.paid { background:rgba(255,107,53,0.12); color:var(--orange); }
+.rh-event-arrow { font-size:22px; color:rgba(255,255,255,0.25); padding:0 16px; flex-shrink:0; }
+/* Testimonial */
+.rh-testimonial {
+  background:var(--card); border:1px solid var(--border); border-radius:16px; padding:28px 24px;
+}
+.rh-quote-mark {
+  font-family:'Bebas Neue',sans-serif; font-size:64px; color:var(--orange);
+  line-height:0.5; margin-bottom:20px; opacity:0.35;
+}
+.rh-quote-text { font-size:16px; font-weight:600; line-height:1.65; margin-bottom:20px; }
+.rh-author { display:flex; align-items:center; gap:12px; }
+.rh-avatar {
+  width:40px; height:40px; border-radius:50%;
+  background:linear-gradient(135deg,var(--orange),rgba(255,107,53,0.3));
+  display:flex; align-items:center; justify-content:center;
+  font-family:'Bebas Neue',sans-serif; font-size:16px; flex-shrink:0;
+}
+.rh-author-name { font-family:'Barlow Condensed',sans-serif; font-weight:700; font-size:15px; }
+.rh-author-role { font-size:12px; color:rgba(255,255,255,0.45); }
+.rh-proof-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:12px; margin-top:20px; }
+.rh-stat {
+  background:var(--card); border:1px solid var(--border);
+  border-radius:12px; padding:20px 16px; text-align:center;
+}
+.rh-stat-num {
+  font-family:'Bebas Neue',sans-serif; font-size:38px; color:var(--orange); line-height:1;
+}
+.rh-stat-label {
+  font-size:11px; font-weight:600; letter-spacing:1px; text-transform:uppercase;
+  color:rgba(255,255,255,0.4); margin-top:4px;
+}
+/* Final CTA */
+.rh-final {
+  background:linear-gradient(135deg,rgba(255,107,53,0.08),rgba(255,107,53,0.01));
+  border-top:1px solid rgba(255,107,53,0.18);
+  padding:72px 48px; text-align:center;
+}
+@media(max-width:768px){.rh-final{padding:56px 24px;}}
+.rh-final-title {
+  font-family:'Bebas Neue',sans-serif; font-size:clamp(52px,12vw,80px);
+  line-height:0.92; margin-bottom:16px;
+}
+.rh-final-title span { color:var(--orange); }
+.rh-final-sub { font-size:15px; color:rgba(255,255,255,0.5); line-height:1.65; max-width:360px; margin:0 auto 36px; }
+.rh-final-btns { display:flex; flex-direction:column; gap:12px; align-items:center; }
+.rh-final-btns .rh-btn-primary, .rh-final-btns .rh-btn-secondary { width:100%; max-width:360px; justify-content:center; }
+.rh-section-header-row { display:flex; align-items:flex-end; justify-content:space-between; margin-bottom:8px; }
+.rh-view-all {
+  font-family:'Barlow Condensed',sans-serif; font-weight:700; font-size:14px;
+  color:var(--orange); text-decoration:none; letter-spacing:0.5px; white-space:nowrap;
+}
+.rh-view-all:hover { text-decoration:underline; }
 </style>
 </head>
 <body> <!-- NAV -->
@@ -672,15 +1016,296 @@ function renderFeaturedEvent(){
 
 // ── HOME ──────────────────────────────────────────────────────
 function renderHome(){
- const thisWeek=allEvents.filter(e=>isThisWeek(e.start_time)).slice(0,8);
- const upcoming=allEvents.filter(e=>!isThisWeek(e.start_time)).slice(0,8);
- const neighborhoods=[...new Set(allVenues.map(v=>v.neighborhood).filter(Boolean))];
+ const thisWeek=allEvents.filter(e=>isThisWeek(e.start_time)).slice(0,4);
+ const upcoming=allEvents.filter(e=>!isThisWeek(e.start_time)).slice(0,4);
+ const allUpcoming=[...thisWeek,...upcoming].slice(0,4);
 
- // Category counts
- const barVenues=allVenues.filter(v=>['bar','tavern','pub','dive','speakeasy','cocktail','brewery','rooftop','nightlife','lounge'].some(k=>(v.venue_type||'').toLowerCase().includes(k)));
- const comedyVenues=allVenues.filter(v=>['comedy','improv','sketch','performance'].some(k=>(v.venue_type||'').toLowerCase().includes(k)));
+ // Venue cards for scroll — real photos first
+ const venueScroll=allVenues.filter(v=>getVenueImg(v)).slice(0,6);
+
+ // Founding venues
+ const foundingNames=['groundxgrind','1313','ground x grind'];
+ const foundingVenues=allVenues.filter(v=>foundingNames.some(f=>v.name.toLowerCase().includes(f))).slice(0,3);
+
+ const tickerItems=['Venue Listings Open','Columbus\'s #1 Event Platform','Free to List Your Venue','Founding Spots Available','Vendors Welcome','Planners Searching Now'];
+ const tickerHTML=(items)=>items.map(t=>`<span class="rh-ticker-item"><span class="rh-ticker-dot"></span>${t}</span>`).join('');
 
  document.getElementById('app').innerHTML=`
+
+ <!-- ═══ HERO ═══ -->
+ <section class="rh-hero">
+   <div class="rh-hero-bg"></div>
+   <div class="rh-hero-grid"></div>
+   <div class="rh-ticker">
+     <div class="rh-ticker-track">${tickerHTML(tickerItems)}${tickerHTML(tickerItems)}</div>
+   </div>
+   <div class="rh-hero-content">
+     <div class="rh-toggle">
+       <button class="rh-pill active" onclick="rhSwitch('venues',this)">Venue Owners</button>
+       <button class="rh-pill" onclick="rhSwitch('vendors',this)">Vendors</button>
+       <button class="rh-pill" onclick="rhSwitch('planners',this)">Planners</button>
+       <button class="rh-pill" onclick="rhSwitch('attendees',this)">Attendees</button>
+     </div>
+     <p class="rh-eyebrow">Columbus, Ohio</p>
+     <h1 class="rh-headline" id="rhHeadline">Your Venue.<br>Every <span class="rh-accent">Planner</span><br>In Columbus.</h1>
+     <p class="rh-sub" id="rhSub"><strong>Stop waiting for word of mouth.</strong> Get your space in front of the planners, organizers, and bookers who are actively searching — right now.</p>
+     <div class="rh-ctas" id="rhCtas">
+       <a href="https://cbusevents.com/list-your-venue.html" class="rh-btn-primary">List Your Venue Free →</a>
+       <button class="rh-btn-secondary" onclick="showPage('venues')">Browse Venues</button>
+     </div>
+     <div class="rh-proof">
+       <div><div class="rh-proof-num">49.6M</div><div class="rh-proof-label">Annual Columbus Visitors</div></div>
+       <div><div class="rh-proof-num">$6.6B</div><div class="rh-proof-label">Spent on Events Yearly</div></div>
+       <div><div class="rh-proof-num">#2</div><div class="rh-proof-label">Fastest-Growing U.S. City</div></div>
+     </div>
+   </div>
+ </section>
+
+ <!-- ═══ URGENCY BANNER ═══ -->
+ <div class="rh-urgency">
+   <div class="rh-urgency-inner" onclick="window.location.href='https://cbusevents.com/list-your-venue.html'">
+     <div class="rh-urgency-icon">🔥</div>
+     <div style="flex:1">
+       <div class="rh-urgency-title">Founding Venue Spots Closing</div>
+       <div class="rh-urgency-desc">Early venues get <strong>permanent featured placement</strong> as Columbus grows. Don't let your competitor claim it first.</div>
+     </div>
+     <div style="font-size:20px;color:var(--orange);flex-shrink:0">›</div>
+   </div>
+ </div>
+
+ <!-- ═══ WHY LIST HERE ═══ -->
+ <section class="rh-section">
+   <p class="rh-section-label">Why list on CBUSEVENTS</p>
+   <h2 class="rh-section-title">Built to fill<br>your calendar</h2>
+   <p class="rh-section-sub">Every feature was designed with one goal: getting your venue more bookings from Columbus's most active event community.</p>
+   <div class="rh-benefits">
+     <div class="rh-benefit">
+       <div class="rh-benefit-icon">📍</div>
+       <div>
+         <div class="rh-benefit-title">Direct Booking Inquiries</div>
+         <div class="rh-benefit-desc">Planners send inquiries straight to your inbox. No middlemen, no commission on leads.</div>
+         <span class="rh-tag">FREE FEATURE</span>
+       </div>
+     </div>
+     <div class="rh-benefit">
+       <div class="rh-benefit-icon">🎯</div>
+       <div>
+         <div class="rh-benefit-title">Columbus-Only Audience</div>
+         <div class="rh-benefit-desc">Every person on this platform is local. No wasted impressions from outside your market.</div>
+       </div>
+     </div>
+     <div class="rh-benefit">
+       <div class="rh-benefit-icon">📅</div>
+       <div>
+         <div class="rh-benefit-title">Publish Events & Sell Tickets</div>
+         <div class="rh-benefit-desc">List your own events, keep your venue top-of-mind between private bookings.</div>
+         <span class="rh-tag">FREE FEATURE</span>
+       </div>
+     </div>
+     <div class="rh-benefit">
+       <div class="rh-benefit-icon">🚀</div>
+       <div>
+         <div class="rh-benefit-title">Hero Placement When You Boost</div>
+         <div class="rh-benefit-desc">Get your venue in the rotating hero slider — first thing every visitor sees. Columbus-scale visibility.</div>
+       </div>
+     </div>
+   </div>
+ </section>
+
+ <!-- ═══ HOW IT WORKS ═══ -->
+ <section class="rh-section dark">
+   <p class="rh-section-label">How it works</p>
+   <h2 class="rh-section-title">Listed in<br>under 10 min</h2>
+   <p class="rh-section-sub">No sales calls. No approval wait. Fill in your details and you're live.</p>
+   <div class="rh-steps">
+     <div class="rh-step">
+       <div class="rh-step-num">01</div>
+       <div>
+         <div class="rh-step-title">Create Your Free Account</div>
+         <div class="rh-step-desc">Sign up in 60 seconds. No credit card. Your dashboard is ready immediately.</div>
+         <span class="rh-step-badge">FREE FOREVER</span>
+       </div>
+     </div>
+     <div class="rh-step">
+       <div class="rh-step-num">02</div>
+       <div>
+         <div class="rh-step-title">Build Your Venue Profile</div>
+         <div class="rh-step-desc">Add photos, capacity, amenities, pricing, and contact info. More detail = more inquiries.</div>
+       </div>
+     </div>
+     <div class="rh-step">
+       <div class="rh-step-num">03</div>
+       <div>
+         <div class="rh-step-title">Go Live & Get Discovered</div>
+         <div class="rh-step-desc">Your venue is instantly visible to every planner, organizer, and attendee searching Columbus.</div>
+       </div>
+     </div>
+     <div class="rh-step">
+       <div class="rh-step-num">04</div>
+       <div>
+         <div class="rh-step-title">Receive Inquiries & Bookings</div>
+         <div class="rh-step-desc">Planners reach out directly. You own the relationship — we just made the intro.</div>
+         <span class="rh-step-badge">YOU KEEP 100%</span>
+       </div>
+     </div>
+   </div>
+ </section>
+
+ <!-- ═══ FOUNDING VENUE CTA ═══ -->
+ <section class="rh-section">
+   <div class="rh-founding-card">
+     <span class="rh-founding-badge">Limited Availability</span>
+     <h2 class="rh-founding-title">Be A<br><span>Founding</span><br>Venue</h2>
+     <p class="rh-founding-desc">Columbus is growing fast. The venues that list now become the platform's anchor listings — the ones every planner sees first when they join.</p>
+     <div class="rh-perks">
+       <div class="rh-perk"><div class="rh-perk-check">✓</div>Permanent "Founding Venue" badge on your profile</div>
+       <div class="rh-perk"><div class="rh-perk-check">✓</div>Priority placement as the platform scales</div>
+       <div class="rh-perk"><div class="rh-perk-check">✓</div>First access to new features and tools</div>
+       <div class="rh-perk"><div class="rh-perk-check">✓</div>Free forever — no listing fees, ever</div>
+     </div>
+     <div class="rh-spots-text">22 of 50 founding spots claimed</div>
+     <div class="rh-spots-bar"><div class="rh-spots-fill"></div></div>
+     <a href="https://cbusevents.com/list-your-venue.html" class="rh-btn-primary" style="width:100%;justify-content:center;">Claim Your Spot Free →</a>
+   </div>
+ </section>
+
+ <!-- ═══ FOUR COMMUNITIES ═══ -->
+ <section class="rh-section dark">
+   <p class="rh-section-label">Built for everyone</p>
+   <h2 class="rh-section-title">One platform.<br>Four communities.</h2>
+   <p class="rh-section-sub">Whether you're running a venue, building a business, planning events, or finding what's next in Columbus.</p>
+   <div class="rh-communities">
+     <a href="https://cbusevents.com/list-your-venue.html" class="rh-community venues">
+       <div class="rh-community-header"><div class="rh-community-label">Venue Owners</div><span class="rh-community-free">FREE</span></div>
+       <div class="rh-community-desc">Get discovered, receive booking inquiries, publish events, and sell tickets — all from one dashboard built for Columbus venues.</div>
+       <div class="rh-community-link">List your venue →</div>
+     </a>
+     <a href="https://cbusevents.com/vendors.html" class="rh-community vendors">
+       <div class="rh-community-header"><div class="rh-community-label">Vendors</div><span class="rh-community-free">FREE</span></div>
+       <div class="rh-community-desc">Showcase your services, build your Columbus portfolio, and get booked by planners and venues actively looking for your skills.</div>
+       <div class="rh-community-link">List your services →</div>
+     </a>
+     <a href="https://cbusevents.com/planners.html" class="rh-community planners">
+       <div class="rh-community-header"><div class="rh-community-label">Event Planners</div><span class="rh-community-free">FREE</span></div>
+       <div class="rh-community-desc">Browse venues, send booking inquiries, hire vendors, and manage your events — the whole Columbus ecosystem in one place.</div>
+       <div class="rh-community-link">Join as a planner →</div>
+     </a>
+     <a href="https://cbusevents.com/attendees.html" class="rh-community attendees">
+       <div class="rh-community-header"><div class="rh-community-label">Attendees</div><span class="rh-community-free">FREE</span></div>
+       <div class="rh-community-desc">Discover what's happening in Columbus, follow your favorite venues, buy tickets, and never miss another event worth going to.</div>
+       <div class="rh-community-link">Find events →</div>
+     </a>
+   </div>
+ </section>
+
+ <!-- ═══ FEATURED VENUES ═══ -->
+ <section class="rh-section">
+   <div class="rh-section-header-row">
+     <div>
+       <p class="rh-section-label">Now Listed</p>
+       <h2 class="rh-section-title" style="margin-bottom:0">Columbus Venues</h2>
+     </div>
+     <a class="rh-view-all" onclick="showPage('venues')" style="cursor:pointer;padding-bottom:4px;">View all →</a>
+   </div>
+   <p class="rh-section-sub" style="margin-top:10px">Bars, rooftops, event spaces, and more — all on CBUSEVENTS.</p>
+   <div class="rh-venues-scroll">
+     ${(venueScroll.length?venueScroll:allVenues.slice(0,6)).map(v=>{
+       const img=getVenueImg(v);
+       return`<div class="rh-venue-card" onclick="showPage('venue',allVenues.find(x=>x.id==='${v.id}'))">
+         <div class="rh-venue-img" style="${!img?'background:var(--card)':''}">
+           ${img?`<img src="${img}" alt="${v.name}" onerror="this.style.display='none'">`:''}
+           <span class="rh-venue-tag">${v.venue_type||'Venue'}</span>
+         </div>
+         <div class="rh-venue-info">
+           <div class="rh-venue-name">${v.name}</div>
+           <div class="rh-venue-meta">${v.neighborhood||'Columbus'}${v.capacity?` · Cap. ${v.capacity}`:''}</div>
+           ${foundingNames.some(f=>v.name.toLowerCase().includes(f))?'<span class="rh-venue-badge">DAY ONE</span>':''}
+         </div>
+       </div>`;
+     }).join('')}
+     <div class="rh-venue-card" onclick="window.location.href='https://cbusevents.com/list-your-venue.html'" style="border-style:dashed;border-color:rgba(255,107,53,0.3);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:24px 16px;background:rgba(255,107,53,0.03)">
+       <div style="font-size:28px;margin-bottom:10px">+</div>
+       <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:14px;margin-bottom:6px">Your Venue</div>
+       <div style="font-size:11px;color:rgba(255,255,255,0.4);margin-bottom:12px">Join free</div>
+       <span class="rh-venue-badge">List Yours</span>
+     </div>
+   </div>
+   <button class="rh-btn-secondary" onclick="showPage('venues')" style="width:100%;justify-content:center;margin-top:20px;">Browse All Columbus Venues →</button>
+ </section>
+
+ <!-- ═══ UPCOMING EVENTS ═══ -->
+ ${allUpcoming.length?`
+ <section class="rh-section dark">
+   <div class="rh-section-header-row">
+     <div>
+       <p class="rh-section-label">What's On</p>
+       <h2 class="rh-section-title" style="margin-bottom:0">Upcoming Events</h2>
+     </div>
+     <a class="rh-view-all" onclick="showPage('events')" style="cursor:pointer;padding-bottom:4px;">View all →</a>
+   </div>
+   <p class="rh-section-sub" style="margin-top:10px">Events happening across Columbus — find something worth going to.</p>
+   <div class="rh-events-list">
+     ${allUpcoming.map(e=>{
+       const colors=['#F59E0B','#EF4444','#22C55E','#60A5FA','#A78BFA','#F97316'];
+       const color=colors[Math.floor(Math.random()*colors.length)];
+       return`<div class="rh-event" onclick="openEventModal('${e.id}')">
+         <div class="rh-event-bar" style="background:${color}"></div>
+         <div class="rh-event-body">
+           <div class="rh-event-cat">${e.category||'Event'}</div>
+           <div class="rh-event-name">${e.title}</div>
+           <div class="rh-event-venue">${e.venues?.name||'Columbus Venue'}</div>
+           <div class="rh-event-chips">
+             <span class="rh-chip">${fmt(e.start_time)}</span>
+             <span class="rh-chip">${fmtTime(e.start_time)}</span>
+             ${e.is_free?'<span class="rh-chip free">Free</span>':e.price_min?`<span class="rh-chip paid">From $${e.price_min}</span>`:''}
+           </div>
+         </div>
+         <div class="rh-event-arrow">›</div>
+       </div>`;
+     }).join('')}
+   </div>
+   <button class="rh-btn-secondary" onclick="showPage('events')" style="width:100%;justify-content:center;margin-top:20px;">See All Columbus Events →</button>
+ </section>`:''}
+
+ <!-- ═══ SOCIAL PROOF ═══ -->
+ <section class="rh-section">
+   <p class="rh-section-label">Early Believers</p>
+   <h2 class="rh-section-title">Columbus is<br>already here</h2>
+   <p class="rh-section-sub">Real venues and vendors who saw the vision early and got in first.</p>
+   <div class="rh-testimonial">
+     <div class="rh-quote-mark">"</div>
+     <div class="rh-quote-text">"Columbus needed something built specifically for this city. CBUSEVENTS gets it — they're not a national platform that just happens to include us."</div>
+     <div class="rh-author">
+       <div class="rh-avatar">M</div>
+       <div>
+         <div class="rh-author-name">Manny Larcher</div>
+         <div class="rh-author-role">Colaeb · Day One Partner</div>
+       </div>
+     </div>
+   </div>
+   <div class="rh-proof-grid">
+     <div class="rh-stat"><div class="rh-stat-num">49.6M</div><div class="rh-stat-label">Trips to Columbus annually</div></div>
+     <div class="rh-stat"><div class="rh-stat-num">$6.6B</div><div class="rh-stat-label">Visitor spending per year</div></div>
+     <div class="rh-stat"><div class="rh-stat-num">933K</div><div class="rh-stat-label">Residents — Ohio's largest city</div></div>
+     <div class="rh-stat"><div class="rh-stat-num">#2</div><div class="rh-stat-label">Fastest-growing U.S. city</div></div>
+   </div>
+   <p style="font-size:11px;color:rgba(255,255,255,0.2);margin-top:14px;line-height:1.5">Sources: Experience Columbus 2023 · Bank of America 2024 · U.S. Census Bureau</p>
+ </section>
+
+ <!-- ═══ FINAL CTA ═══ -->
+ <section class="rh-final">
+   <p class="rh-section-label" style="text-align:center">Don't wait</p>
+   <h2 class="rh-final-title">Your next<br>booking starts<br><span>here.</span></h2>
+   <p class="rh-final-sub">Columbus is growing. The venues and vendors that get in now build the authority every newcomer sees first. It's free to start.</p>
+   <div class="rh-final-btns">
+     <a href="https://cbusevents.com/list-your-venue.html" class="rh-btn-primary">List Your Venue Free →</a>
+     <a href="https://cbusevents.com/vendors.html" class="rh-btn-secondary">List Your Services →</a>
+     <a href="https://cbusevents.com/planners.html" class="rh-btn-secondary">Join as a Planner →</a>
+   </div>
+ </section>
+
+ ${footer()}
+ `;
  <!-- HERO --> <section class="hero"> <div class="hero-slides" id="heroSlides"></div> <div class="hero-overlay"></div> <div class="hero-overlay2"></div> <div class="hero-content"> <div class="hero-eyebrow">Columbus, Ohio</div> <h1 class="hero-title">Find the perfect<br><span>Columbus venue</span><br>for your event</h1> <p class="hero-sub">Discover bars, comedy clubs, rooftops, and unique spaces. Browse events or list your venue to reach thousands of Columbus organizers.</p> <div class="hero-actions"> <button class="btn-primary" onclick="showPage('venues')">Browse Venues →</button> <button class="btn-outline" onclick="showPage('events')">View Events</button> <button class="btn-outline" style="border-color:#60a5fa40;color:var(--blue)" onclick="window.location.href='https://cbusevents.com/planners.html'"> I'm a Planner</button> <button class="btn-outline" style="border-color:#FF6B3540;color:#FF6B35" onclick="window.location.href='https://cbusevents.com/list-your-venue.html'"> List Your Venue</button> </div> <div class="hero-dots" id="heroDots"></div> </div> <div class="hero-cards" id="heroCards"></div> <div class="hero-stats"> <div class="hero-stat"><div class="hero-stat-num">${allVenues.length}</div><div class="hero-stat-label">Listed Venues</div></div> <div class="hero-stat"><div class="hero-stat-num">${allEvents.length}</div><div class="hero-stat-label">Upcoming Events</div></div> <div class="hero-stat"><div class="hero-stat-num">${neighborhoods.length}</div><div class="hero-stat-label">Neighborhoods</div></div> <div class="hero-stat"><div class="hero-stat-num">Free</div><div class="hero-stat-label">To List Your Venue</div></div> </div> </section> <!-- SEARCH --> <div class="search-section"> <div class="search-inner"> <div class="search-bar"> <div class="search-wrap"> <span class="search-icon"></span> <input class="search-input" placeholder="Search venues, events, neighborhoods..." oninput="homeSearch(this.value)" onkeydown="if(event.key==='Enter')homeSearch(this.value)"> </div> <select class="search-select" onchange="homeTypeFilter(this.value)"> <option>All Types</option> <option>Bars & Nightlife</option> <option>Comedy Clubs</option> <option>Rooftop</option> <option>Live Music</option> </select> </div> <div class="filter-chips"> ${['All',...new Set(allVenues.map(v=>v.neighborhood).filter(Boolean))].map(n=> `<button class="chip${n==='All'?' active':''}" onclick="homeNeighborhood('${n}',this)">${n}</button>`
  ).join('')}
  </div> </div> </div> <!-- CATEGORIES --> <section class="section"> <div class="section-header"> <div><div class="section-title">Browse by Category</div></div> </div> <div class="cat-pills"> <div class="cat-pill" onclick="showPage('category','bars')"> <div><div class="cat-pill-name">Bars & Nightlife</div><div class="cat-pill-count">${barVenues.length} venues</div></div> </div> <div class="cat-pill" onclick="showPage('category','comedy')"> <div><div class="cat-pill-name">Comedy Clubs</div><div class="cat-pill-count">${comedyVenues.length} venues</div></div> </div> <div class="cat-pill" onclick="showPage('category','rooftop')"> <div><div class="cat-pill-name">Rooftop Bars</div><div class="cat-pill-count">${allVenues.filter(v=>(v.venue_type||'').toLowerCase().includes('rooftop')).length} venues</div></div> </div> <div class="cat-pill" onclick="showPage('category','music')"> <div><div class="cat-pill-name">Live Music</div><div class="cat-pill-count">${allVenues.filter(v=>(v.amenities||[]).join(' ').toLowerCase().includes('stage')).length} venues</div></div> </div> <div class="cat-pill" onclick="showPage('category','dive')"> <div><div class="cat-pill-name">Dive Bars</div><div class="cat-pill-count">${allVenues.filter(v=>(v.venue_type||'').toLowerCase().includes('dive')).length} venues</div></div> </div> <div class="cat-pill" onclick="showPage('category','events')"> <div><div class="cat-pill-name">Private Events</div><div class="cat-pill-count">${allVenues.filter(v=>(v.tags||[]).join(' ').toLowerCase().includes('private')).length} venues</div></div> </div> </div> </section> <!-- MISSION SECTION --> <section class="mission-pad" style="padding:80px 48px;max-width:1200px;margin:0 auto;box-sizing:border-box"> <div class="mission-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center"> <div> <div style="display:inline-flex;align-items:center;gap:6px;background:#FF6B3520;color:#FF6B35;border:1px solid #FF6B3540;border-radius:20px;padding:5px 16px;font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:20px"> Our Mission</div> <h2 style="font-family:'Syne',sans-serif;font-size:clamp(28px,4vw,44px);font-weight:800;line-height:1.1;margin-bottom:20px">Becoming Columbus'<br><span style="color:#FF6B35">#1 Event Platform</span></h2> <p style="color:#8888a0;font-size:16px;line-height:1.8;margin-bottom:16px">Columbus is one of the fastest-growing cities in America — and its event scene deserves a platform built specifically for it. CBUSEVENTS is that platform.</p> <p style="color:#8888a0;font-size:16px;line-height:1.8;margin-bottom:28px">We're building the single source of truth for everything happening in Columbus — connecting venues, vendors, planners, and attendees in one place so the city's culture can thrive.</p> <div style="display:flex;flex-direction:column;gap:14px"> <div style="display:flex;align-items:flex-start;gap:12px"> <div style="background:#FF6B3520;border:1px solid #FF6B3540;border-radius:8px;width:36px;height:36px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0"></div> <div><div style="font-weight:700;font-size:14px;margin-bottom:3px">Hyper-local, always</div><div style="color:#8888a0;font-size:13px;line-height:1.6">We're not a national platform that happens to include Columbus. We're built from the ground up for this city and this city only.</div></div> </div> <div style="display:flex;align-items:flex-start;gap:12px"> <div style="background:#22c55e20;border:1px solid #22c55e30;border-radius:8px;width:36px;height:36px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0"></div> <div><div style="font-weight:700;font-size:14px;margin-bottom:3px">Every seat at the table</div><div style="color:#8888a0;font-size:13px;line-height:1.6">Venues, vendors, planners, and attendees all have their own portal. Everyone benefits. Everyone grows together.</div></div> </div> <div style="display:flex;align-items:flex-start;gap:12px"> <div style="background:#60a5fa20;border:1px solid #60a5fa30;border-radius:8px;width:36px;height:36px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0"></div> <div><div style="font-weight:700;font-size:14px;margin-bottom:3px">Built to grow with you</div><div style="color:#8888a0;font-size:13px;line-height:1.6">Whether you're just getting started or you're Columbus's most iconic venue, CBUSEVENTS scales with your ambition.</div></div> </div> </div> </div> <div class="mission-stats" style="display:grid;grid-template-columns:1fr 1fr;gap:14px"> <div style="background:#1a1a24;border:1px solid #25252f;border-radius:16px;padding:24px;text-align:center"> <div style="
@@ -768,16 +1393,8 @@ function renderHome(){
    </div>
  </section>
 
- <!-- UPCOMING EVENTS --> ${upcoming.length?`
- <section class="section section-alt"> <div class="section-header"> <div><div class="section-title"> Upcoming Events</div><div class="section-sub">What's on in Columbus</div></div> <button class="see-all" onclick="showPage('events')">View calendar →</button> </div> <div class="event-grid">${upcoming.map(e=>eventCard(e)).join('')}</div> </section>`:''}
-
- <!-- CTA --> <div style="height:52px"></div> <!-- PLANNER CTA SECTION --> <section class="section section-alt"> <div style="max-width:900px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;gap:32px;flex-wrap:wrap"> <div> <div style="display:inline-flex;align-items:center;gap:6px;background:#60a5fa20;color:var(--blue);border:1px solid #60a5fa30;border-radius:20px;padding:4px 14px;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-bottom:14px"> For Event Planners</div> <h2 style="font-family:'Syne',sans-serif;font-size:26px;font-weight:800;margin-bottom:10px">Planning an event in Columbus?</h2> <p style="color:var(--sub);font-size:15px;line-height:1.65;max-width:480px">Browse venues, send booking inquiries, track your requests, and list your events — all from a free planner dashboard.</p> <div style="display:flex;gap:16px;margin-top:16px;flex-wrap:wrap"> <div style="display:flex;align-items:center;gap:6px;font-size:13px;color:var(--sub)"> Free forever</div> <div style="display:flex;align-items:center;gap:6px;font-size:13px;color:var(--sub)"> Send venue inquiries</div> <div style="display:flex;align-items:center;gap:6px;font-size:13px;color:var(--sub)"> List your events</div> <div style="display:flex;align-items:center;gap:6px;font-size:13px;color:var(--sub)"> Boost for more reach</div> </div> </div> <div style="display:flex;flex-direction:column;gap:10px;flex-shrink:0"> <button class="btn-primary" style="padding:14px 28px;font-size:15px;font-weight:700;border-radius:10px;background:var(--blue)" onclick="window.location.href='https://cbusevents.com/planners.html'">Create Free Planner Account →</button> <button class="btn-outline" style="padding:12px 24px;font-size:14px;border-radius:10px" onclick="window.location.href='https://cbusevents.com/auth.html'">Sign In to Planner Portal</button> </div> </div> </section> <div style="height:52px"></div> <div class="cta-banner"> <div> <h2>Own a venue or host events?</h2> <p>Get discovered by thousands of Columbus event organizers. List your space free — upgrade to get featured in the hero slider and unlock premium placement across CBUSEVENTS.</p> </div> <div class="cta-actions"> <button class="btn-primary" onclick="window.location.href='https://cbusevents.com/list-your-venue.html'">List Your Venue Free →</button> <button class="btn-secondary" onclick="showPricing()">View Pricing Plans</button> </div> </div> ${footer()}
+ ${footer()}
  `;
-
- buildHeroSlidesFromVenues();
- initHero();
- buildHeroCards();
- renderFeaturedEvent();
 }
 
 function initHero(){
@@ -828,6 +1445,45 @@ function buildHeroCards(){
    </div>`).join('');
 }
 
+
+// ── REDESIGN HOME AUDIENCE TOGGLE ────────────────────────────
+const RH_AUDIENCES={
+ venues:{
+   headline:'Your Venue.<br>Every <span class="rh-accent">Planner</span><br>In Columbus.',
+   sub:'<strong>Stop waiting for word of mouth.</strong> Get your space in front of the planners, organizers, and bookers who are actively searching — right now.',
+   ctas:`<a href="https://cbusevents.com/list-your-venue.html" class="rh-btn-primary">List Your Venue Free →</a><button class="rh-btn-secondary" onclick="showPage('venues')">Browse Venues</button>`
+ },
+ vendors:{
+   headline:'Get Booked By<br>Columbus <span class="rh-accent">Planners</span><br>&amp; Venues.',
+   sub:'<strong>Your next client is already on CBUSEVENTS.</strong> Showcase your services, build your Columbus portfolio, and start receiving booking requests from active local planners and venues.',
+   ctas:`<a href="https://cbusevents.com/vendors.html" class="rh-btn-primary">List Your Services Free →</a><button class="rh-btn-secondary" onclick="showPage('venues')">Browse Venues</button>`
+ },
+ planners:{
+   headline:'Every Columbus<br>Venue. One<br><span class="rh-accent">Dashboard.</span>',
+   sub:'<strong>Stop juggling spreadsheets and DMs.</strong> Browse every Columbus venue, send booking inquiries, hire vendors, and manage your events — all in one free planner portal.',
+   ctas:`<a href="https://cbusevents.com/planners.html" class="rh-btn-primary">Create Free Planner Account →</a><button class="rh-btn-secondary" onclick="showPage('venues')">Browse Venues</button>`
+ },
+ attendees:{
+   headline:'Columbus Is<br><span class="rh-accent">Always On.</span><br>Are You?',
+   sub:'<strong>Never miss another night.</strong> Discover what\'s happening across Columbus — bars, comedy, live music, rooftops, pop-ups, and events you won\'t find anywhere else.',
+   ctas:`<button class="rh-btn-primary" onclick="showPage('events')">Browse Columbus Events →</button><a href="https://cbusevents.com/attendees.html" class="rh-btn-secondary">Find My Scene</a>`
+ }
+};
+function rhSwitch(key,pill){
+ const d=RH_AUDIENCES[key];
+ if(!d)return;
+ const h=document.getElementById('rhHeadline');
+ const s=document.getElementById('rhSub');
+ const c=document.getElementById('rhCtas');
+ if(!h)return;
+ [h,s,c].forEach(el=>{el.style.transition='opacity 0.18s,transform 0.18s';el.style.opacity='0';el.style.transform='translateY(8px)';});
+ setTimeout(()=>{
+   h.innerHTML=d.headline;s.innerHTML=d.sub;c.innerHTML=d.ctas;
+   [h,s,c].forEach(el=>{el.style.opacity='1';el.style.transform='translateY(0)';});
+ },180);
+ document.querySelectorAll('.rh-pill').forEach(p=>p.classList.remove('active'));
+ if(pill)pill.classList.add('active');
+}
 
 function homeSearch(q){
  if(!q.trim()) return;
