@@ -331,7 +331,7 @@ async function doAuth(){
  const{data,error:e}=await sb.auth.signUp({email,password:pass});
  error=e;
  if(!error&&data.user){
- await sb.from('vendors').upsert({user_id:data.user.id,email,business_name:name||email,name:name||email,subscription_tier:'FREE',subscription_status:'free'},{onConflict:'user_id'});
+ await sb.from('vendors').upsert({user_id:data.user.id,email,business_name:name&&name!==email?name:null,name:name&&name!==email?name:null,subscription_tier:'FREE',subscription_status:'free'},{onConflict:'user_id'});
  }
  }
  if(error){errEl.textContent=error.message;btn.disabled=false;btn.textContent=currentTab==='signin'?'Sign In':'Create Account';}
@@ -369,7 +369,7 @@ async function enterPortal(){
  const{data}=await sb.from('vendors').select('*').eq('user_id',currentUser.id).maybeSingle();
  if(!data){
  // Create profile if doesn't exist
- const{data:newVendor}=await sb.from('vendors').insert({user_id:currentUser.id,email:currentUser.email,business_name:currentUser.email,subscription_tier:'FREE',subscription_status:'free'}).select().single() ?? {data:null};
+ const{data:newVendor}=await sb.from('vendors').insert({user_id:currentUser.id,email:currentUser.email,business_name:null,subscription_tier:'FREE',subscription_status:'free'}).select().single() ?? {data:null};
  vendorProfile=newVendor;
  } else {
  vendorProfile=data;
@@ -420,8 +420,10 @@ function showPage(p){
 
 // ── DASHBOARD ─────────────────────────────────────────────────
 async function renderDashboard(){
- const name=vendorProfile?.business_name||currentUser?.email||'';
- document.getElementById('dashSub').textContent=`Welcome back${name?', '+name:''}! Here's your vendor overview.`;
+ const rawName=vendorProfile?.business_name||'';
+ const hasRealName=rawName&&!rawName.includes('@')&&rawName.trim().length>0;
+ const displayName=hasRealName?rawName:(currentUser?.email||'');
+ document.getElementById('dashSub').textContent=`Welcome back${hasRealName?', '+rawName:''}! Here's your vendor overview.`;
 
  const tier=(vendorProfile?.subscription_tier||'FREE').toUpperCase();
  const sentProposals=await sb.from('vendor_proposals').select('id,status').eq('vendor_id',vendorProfile?.id) ?? {data:[]};
@@ -433,20 +435,30 @@ async function renderDashboard(){
 
  // Status cards
  const checks=[
- {done:!!vendorProfile?.business_name&&vendorProfile?.business_name!==currentUser?.email,label:'Complete your profile',action:"showPage('profile')",btn:'Set Up Profile'},
+ {done:hasRealName,label:'Add your business name & bio',action:"showPage('profile')",btn:'Complete Profile'},
  {done:selectedServices.size>0,label:'Add your services',action:"showPage('services')",btn:'Add Services'},
  {done:portfolioPhotos.length>0,label:'Upload portfolio photos',action:"showPage('portfolio')",btn:'Add Photos'},
  {done:tier!=='FREE',label:'Get featured in the directory',action:"showPage('plan')",btn:'Upgrade Plan'},
  ];
  const incomplete=checks.filter(c=>!c.done);
 
- document.getElementById('dashContent').innerHTML=incomplete.length?`
+ // Show urgent banner if they haven't set a business name — they're invisible on the site
+ const urgentBanner=!hasRealName?`
+ <div style="background:linear-gradient(135deg,#1a0800,#0d0d0d);border:1.5px solid #FF6B35;border-radius:14px;padding:18px 20px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap">
+   <div>
+     <div style="font-weight:700;font-size:15px;color:#FF6B35;margin-bottom:4px"> Your profile is hidden from Columbus planners</div>
+     <div style="font-size:13px;color:var(--sub)">You need a business name before your listing goes live. Takes 30 seconds.</div>
+   </div>
+   <button class="btn btn-orange" onclick="showPage('profile')" style="flex-shrink:0;white-space:nowrap">Complete Profile →</button>
+ </div>`:'';
+
+ document.getElementById('dashContent').innerHTML=urgentBanner+(incomplete.length?`
  <div class="card"> <div class="card-header"><div class="card-title"> Complete your setup</div><div style="font-size:13px;color:var(--sub)">${checks.filter(c=>c.done).length}/${checks.length} done</div></div> <div class="card-body" style="display:flex;flex-direction:column;gap:10px"> ${checks.map(c=>`
  <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 14px;background:${c.done?'var(--surface)':'var(--bg)'};border:1px solid ${c.done?'#22c55e30':'var(--border)'};border-radius:10px;gap:12px"> <div style="display:flex;align-items:center;gap:10px"> <span style="font-size:16px">${c.done?'':'⬜'}</span> <span style="font-size:13px;font-weight:500;${c.done?'color:var(--muted);text-decoration:line-through':''}">${c.label}</span> </div> ${!c.done?`<button class="btn btn-orange btn-sm" onclick="${c.action}">${c.btn}</button>`:''}
  </div>`).join('')}
  </div> </div>`:`
  <div style="background:#0a1a0a;border:1px solid #22c55e30;border-radius:14px;padding:20px 24px;display:flex;align-items:center;gap:12px;color:var(--green);font-size:14px;font-weight:500"> Your profile is fully set up and live on CBUSEVENTS!
- </div>`;
+ </div>`);
 }
 
 // ── PROFILE ───────────────────────────────────────────────────
@@ -538,7 +550,7 @@ function toggleService(key){
 async function saveServices(){
  if(!vendorProfile){
    // Create vendor row if missing
-   const{data}=await sb.from('vendors').insert({user_id:currentUser.id,email:currentUser.email,business_name:currentUser.email,subscription_tier:'FREE',subscription_status:'free'}).select().single();
+   const{data}=await sb.from('vendors').insert({user_id:currentUser.id,email:currentUser.email,business_name:null,subscription_tier:'FREE',subscription_status:'free'}).select().single();
    vendorProfile=data;
    if(!vendorProfile){toast('Could not save — try refreshing','error');return;}
  }
@@ -655,7 +667,7 @@ async function savePortfolio(){
    } else {
      const{data:created,error:ce}=await sb.from('vendors').insert({
        user_id:currentUser.id,email:currentUser.email,
-       business_name:currentUser.email,tier:'FREE',
+       business_name:null,tier:'FREE',
        portfolio_photos:[]
      }).select().single();
      if(ce){toast('Could not create profile: '+ce.message,'error');return;}
