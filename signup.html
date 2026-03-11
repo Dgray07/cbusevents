@@ -181,7 +181,7 @@
 
     .role-selector {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
+      grid-template-columns: repeat(2, 1fr);
       gap: 16px;
       margin-bottom: 40px;
     }
@@ -256,6 +256,11 @@
     .role-card[data-role="venue"].active .role-check { background: var(--venue-color); border-color: var(--venue-color); }
     .role-card[data-role="vendor"].active .role-check { background: var(--vendor-color); border-color: var(--vendor-color); }
     .role-card[data-role="planner"].active .role-check { background: var(--planner-color); border-color: var(--planner-color); }
+    .role-card[data-role="attendee"]::before { background: radial-gradient(circle at 50% 0%, rgba(34,197,94,0.15), transparent 70%); }
+    .role-card[data-role="attendee"].active { border-color: #22C55E; box-shadow: 0 0 30px rgba(34,197,94,0.2); }
+    .role-card[data-role="attendee"] .role-title { color: var(--text); }
+    .role-card[data-role="attendee"].active .role-title { color: #22C55E; }
+    .role-card[data-role="attendee"].active .role-check { background: #22C55E; border-color: #22C55E; }
     .role-card.active .role-check::after { content: '✓'; color: white; font-weight: bold; }
 
     /* ── FORM ── */
@@ -543,7 +548,7 @@
     @media (max-width: 640px) {
       nav { padding: 16px 20px; }
       .hero { padding: 50px 20px 40px; }
-      .role-selector { grid-template-columns: 1fr; gap: 12px; }
+      .role-selector { grid-template-columns: 1fr 1fr; gap: 12px; }
       .form-card { padding: 24px 20px; }
       .form-grid { grid-template-columns: 1fr; }
       .proof-strip { gap: 20px; padding: 24px 20px; }
@@ -640,8 +645,14 @@
         <div class="role-card" data-role="planner" onclick="selectRole('planner')">
           <div class="role-check"></div>
           <span class="role-icon">📋</span>
-          <div class="role-title">Planner / Attendee</div>
-          <div class="role-desc">Find venues, book vendors, and manage your event — all in one place.</div>
+          <div class="role-title">Event Planner</div>
+          <div class="role-desc">Find venues, book vendors, and manage your events — all in one place.</div>
+        </div>
+        <div class="role-card" data-role="attendee" onclick="selectRole('attendee')">
+          <div class="role-check"></div>
+          <span class="role-icon">🎟️</span>
+          <div class="role-title">Attendee</div>
+          <div class="role-desc">Browse Columbus events, save favorites, and get your tickets — your city, your scene.</div>
         </div>
       </div>
 
@@ -785,13 +796,15 @@
     const PORTALS = {
       venue: 'https://cbusevents.com/cbus-venue-portal.html',
       vendor: 'https://cbusevents.com/cbus-vendor-portal.html',
-      planner: 'https://cbusevents.com/cbus-planner-portal.html'
+      planner: 'https://cbusevents.com/cbus-planner-portal.html',
+      attendee: 'https://cbusevents.com/customer-portal.html'
     };
 
     const SUCCESS_COPY = {
       venue: { title: "YOUR VENUE IS IN.", msg: "Welcome to Columbus's event marketplace. Let's get you listed.", icon: "🏛️" },
       vendor: { title: "YOU'RE LISTED.", msg: "Columbus planners are about to find you.", icon: "🎯" },
-      planner: { title: "LET'S PLAN.", msg: "Every Columbus venue and vendor — all in one place.", icon: "📋" }
+      planner: { title: "LET'S PLAN.", msg: "Every Columbus venue and vendor — all in one place.", icon: "📋" },
+      attendee: { title: "YOU'RE IN.", msg: "Columbus's best events are waiting for you.", icon: "🎟️" }
     };
 
     let selectedRole = null;

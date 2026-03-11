@@ -238,7 +238,7 @@ footer{background:var(--surface);border-top:1px solid var(--border);padding:20px
    </div>
   </details>
   <div id="portfolioMsg" style="color:var(--green);font-size:13px;margin-top:8px;min-height:18px"></div>
- </div> </div> <!-- PROPOSALS --> <div class="page" id="page-proposals"> <div class="page-title">My Proposals</div> <div class="page-sub">Track proposals you've sent to venues and event planners</div> <div id="proposalsContent"><div class="spinner"></div></div> </div> <!-- BROWSE EVENTS --> <div class="page" id="page-events"> <div class="page-title">Browse Events</div> <div class="page-sub">Find upcoming events and send proposals to the organizers</div> <div id="eventsContent"><div class="spinner"></div></div> </div> <!-- PLAN --> <div class="page" id="page-plan"> <div class="page-title">Plan & Billing</div> <div class="page-sub">Upgrade to get featured and send proposals directly to venues & planners</div> <div id="planContent"></div> </div> </main> </div> <footer> <span class="footer-copy">© 2026 CBUSEVENTS · Columbus, Ohio</span> <div style="display:flex;align-items:center;gap:20px"> <span class="footer-copy">Made for Columbus </span> <a href="https://cbusevents.com/cbus-admin.html" class="footer-admin">Admin</a> </div> </footer>
+ </div> </div> <!-- PROPOSALS --> <div class="page" id="page-proposals"> <div class="page-title">My Proposals</div> <div class="page-sub">Track proposals you've sent to venues and event planners</div> <div id="proposalsContent"><div class="spinner"></div></div> </div> <!-- BROWSE EVENTS --> <div class="page" id="page-events"> <div class="page-title">Browse Events</div> <div class="page-sub">Find upcoming events and send proposals to the organizers</div> <div id="eventsContent"><div class="spinner"></div></div> </div> <!-- PLAN --> <div class="page" id="page-plan"> <div class="page-title">Plan & Billing</div> <div class="page-sub">Upgrade to get featured and send proposals directly to venues & planners</div> <div id="planContent"></div> </div> </main> </div> <footer> <span class="footer-copy">© 2026 CBUSEVENTS · Columbus, Ohio</span> <div style="display:flex;align-items:center;gap:20px"> <span class="footer-copy">Made for Columbus </span> <a href="https://cbusevents.com/cbus-admin.html" class="footer-admin" id="adminFooterLink" style="display:none">Admin</a> </div> </footer>
 </div> <div id="toast" class="toast"></div>
 <div id="modalContainer"></div> <script src="https://unpkg.com/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <script>
@@ -423,7 +423,8 @@ async function renderDashboard(){
  const rawName=vendorProfile?.business_name||'';
  const hasRealName=rawName&&!rawName.includes('@')&&rawName.trim().length>0;
  const displayName=hasRealName?rawName:(currentUser?.email||'');
- document.getElementById('dashSub').textContent=`Welcome back${hasRealName?', '+rawName:''}! Here's your vendor overview.`;
+ document.getElementById('page-dashboard').querySelector('.page-title').textContent = hasRealName ? `Welcome back, ${rawName}!` : 'Welcome to CBUSEVENTS!';
+  document.getElementById('dashSub').textContent = hasRealName ? "Here's your vendor overview." : "Let's get your services in front of Columbus planners.";
 
  const tier=(vendorProfile?.subscription_tier||'FREE').toUpperCase();
  const sentProposals=await sb.from('vendor_proposals').select('id,status').eq('vendor_id',vendorProfile?.id) ?? {data:[]};
@@ -827,5 +828,20 @@ function closeModal(){document.getElementById('modalContainer').innerHTML='';}
 // ── INIT ──────────────────────────────────────────────────────
 init();
 </script>
+
+  // Show admin footer link only for admin users
+  (function() {
+    var link = document.getElementById('adminFooterLink');
+    if (!link) return;
+    var stored = localStorage.getItem('sb-toblgvatvsjljbqogzsv-auth-token');
+    if (stored) {
+      try {
+        var parsed = JSON.parse(stored);
+        var email = parsed && parsed.user && parsed.user.email;
+        var adminEmails = ['deante90@gmail.com'];
+        if (email && adminEmails.indexOf(email) > -1) link.style.display = 'inline';
+      } catch(e) {}
+    }
+  })();
 </body>
 </html>
