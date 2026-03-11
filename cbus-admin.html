@@ -493,13 +493,15 @@ async function loadData(){
  allInquiries=iRes.data||[];
  allDesignRequests=dRes.data||[];
  allVendors=vendRes.data||[];
- // Fetch planner and attendee counts from user_roles
- const[plannerRes,attendeeRes]=await Promise.all([
-   sb.from('user_roles').select('user_id',{count:'exact',head:true}).eq('role','planner').catch(()=>({count:0})),
-   sb.from('user_roles').select('user_id',{count:'exact',head:true}).eq('role','attendee').catch(()=>({count:0})),
- ]);
- plannerCount=plannerRes.count||0;
- attendeeCount=attendeeRes.count||0;
+ // Fetch planner and attendee counts — wrapped so any failure is silent
+ try{
+   const[pRes,aRes]=await Promise.all([
+     sb.from('user_roles').select('*',{count:'exact',head:true}).eq('role','planner'),
+     sb.from('user_roles').select('*',{count:'exact',head:true}).eq('role','attendee'),
+   ]);
+   plannerCount=pRes.count||0;
+   attendeeCount=aRes.count||0;
+ }catch(e){plannerCount=0;attendeeCount=0;}
 }
 
 // ── SHELL ─────────────────────────────────────────────────────
