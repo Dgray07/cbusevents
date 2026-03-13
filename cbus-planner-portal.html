@@ -578,10 +578,37 @@ function renderEvents(){
 
 function eventItemHTML(e){
  const promoted=isPromoted(e);
- return`<div class="event-item" style="${promoted?'border-color:#f59e0b40;background:linear-gradient(135deg,var(--card),#1a1200)':''}"> <div style="flex:1;min-width:0"> <div class="event-title">${e.title}${boostLabel(e)}</div> <div class="event-meta"> ${fmt(e.start_time)} · ${fmtTime(e.start_time)} · ${e.venues?.name||'Columbus'} · ${e.category||'Event'}</div> ${promoted?`<div style="font-size:11px;color:#f59e0b;margin-top:3px">Boost active until ${new Date(e.promoted_until).toLocaleDateString()}</div>`:''}
- </div> <div style="display:flex;flex-direction:column;gap:6px;align-items:flex-end;flex-shrink:0"> <span class="badge ${e.status==='published'?'badge-green':'badge-muted'}">${e.status}</span> ${e.status==='published'?`<button class="btn btn-sm" style="background:#FF6B3520;color:#FF6B35;border:1px solid #FF6B3540;white-space:nowrap" onclick="openShareModal('${e.id}')"> Share</button>`:''}
- ${!promoted?`<button class="btn btn-sm" style="background:#f59e0b20;color:#f59e0b;border:1px solid #f59e0b40;white-space:nowrap" onclick="openBoostModal('${e.id}')"> Boost</button>`:''}
- </div> </div>`;
+ return '<div class="event-item" style="'+(promoted?'border-color:#f59e0b40;background:linear-gradient(135deg,var(--card),#1a1200)':'')+'">'
+   +'<div style="flex:1;min-width:0">'
+   +'<div class="event-title">'+e.title+boostLabel(e)+'</div>'
+   +'<div class="event-meta">'+fmt(e.start_time)+' · '+fmtTime(e.start_time)+' · '+(e.venues?.name||'Columbus')+' · '+(e.category||'Event')+'</div>'
+   +(promoted?'<div style="font-size:11px;color:#f59e0b;margin-top:3px">Boost active until '+new Date(e.promoted_until).toLocaleDateString()+'</div>':'')
+   +'</div>'
+   +'<div style="display:flex;flex-direction:column;gap:6px;align-items:flex-end;flex-shrink:0">'
+   +'<span class="badge '+(e.status==='published'?'badge-green':'badge-muted')+'">'+e.status+'</span>'
+   +'<button class="btn btn-sm" style="background:#1a1a24;color:#e8e8f0;border:1px solid #25252f;white-space:nowrap" onclick="editEvent(''+e.id+'')">Edit</button>'
+   +(e.status==='published'?'<button class="btn btn-sm" style="background:#FF6B3520;color:#FF6B35;border:1px solid #FF6B3540;white-space:nowrap" onclick="openShareModal(''+e.id+'')">Share</button>':'')
+   +(!promoted?'<button class="btn btn-sm" style="background:#f59e0b20;color:#f59e0b;border:1px solid #f59e0b40;white-space:nowrap" onclick="openBoostModal(''+e.id+'')">Boost</button>':'')
+   +'<button class="btn btn-sm" style="background:#2a0a0a;color:#ef4444;border:1px solid #4a1010;white-space:nowrap" onclick="deleteEvent(''+e.id+'')">× Delete</button>'
+   +'</div></div>';
+}
+
+async function editEvent(id){
+ const e=myEvents.find(function(x){return x.id===id;});
+ if(!e)return;
+ // Load tiers
+ const{data:tiers}=await sb.from('ticket_tiers').select('*').eq('event_id',id).order('price',{ascending:true});
+ e._tiers=tiers||[];
+ openAddEventModal(e);
+}
+
+async function deleteEvent(id){
+ if(!confirm('Delete this event? This cannot be undone.'))return;
+ await sb.from('ticket_tiers').delete().eq('event_id',id);
+ await sb.from('events').delete().eq('id',id);
+ await loadData();
+ toast('Event deleted.');
+ nav('events');
 }
 
 function openBoostModal(eventId){
@@ -624,46 +651,143 @@ async function submitInquiry(venueId){
 }
 
 // ── ADD EVENT MODAL ───────────────────────────────────────────
-function openAddEventModal(){
- document.getElementById('modal').innerHTML=`
- <div class="modal-overlay" onclick="if(event.target===this)closeModal()"> <div class="modal"> <div class="modal-header"> <div class="modal-title">List Your Event</div> <button onclick="closeModal()" style="background:none;border:none;color:var(--sub);font-size:18px;cursor:pointer"></button> </div> <div class="modal-body"> <div class="field"><label>Event Title *</label><input id="evTitle" placeholder="e.g. Columbus Tech Mixer 2026"></div> <div class="field-row"> <div class="field"><label>Date *</label><input id="evDate" type="date"></div> <div class="field"><label>Start Time *</label><input id="evTime" type="time" value="19:00"></div> </div> <div class="field-row"> <div class="field"><label>Category</label> <select id="evCat"> <option>Networking</option> <option>Comedy</option> <option>Concert</option> <option>Party</option> <option>Corporate</option> <option>Festival</option> <option>Charity</option> <option>Other</option> </select> </div> <div class="field"><label>Venue</label> <select id="evVenue"> <option value="">-- Select a venue --</option> ${allVenues.map(v=>`<option value="${v.id}">${v.name}</option>`).join('')}
- </select> </div> </div> <div class="field-row"> <div class="field"><label>Ticket Price (blank = free)</label><input id="evPrice" type="number" placeholder="0" min="0"></div> <div class="field"><label>Ticket URL (optional)</label><input id="evTicket" placeholder="https://..."></div> </div> <div class="field"><label>Description</label><textarea id="evDesc" placeholder="Tell people what to expect..."></textarea></div> <div id="evErr" style="color:#ef4444;font-size:13px;margin-bottom:8px;display:none"></div> </div> <div class="modal-footer"> <button class="btn btn-primary" onclick="submitEvent()">Publish Event →</button> <button class="btn btn-ghost" onclick="closeModal()">Cancel</button> </div> </div> </div>`;
+function openAddEventModal(editEvent){
+ const ev=editEvent||null;
+ const vOpts=allVenues.map(v=>'<option value="'+v.id+'"'+(ev&&ev.venue_id===v.id?' selected':'')+'>'+v.name+'</option>').join('');
+ const cats=['Networking','Comedy','Concert','Party','Corporate','Festival','Charity','Sports','Arts','Food & Drink','Other'];
+ const catOpts=cats.map(c=>'<option'+(ev&&ev.category===c?' selected':'')+'>'+c+'</option>').join('');
+ let tiersHtml='';
+ if(ev&&ev._tiers&&ev._tiers.length){tiersHtml=ev._tiers.map(function(t,i){return buildTierRow(i,t);}).join('');}
+ document.getElementById('modal').innerHTML=
+ '<div class="modal-overlay" onclick="if(event.target===this)closeModal()">'+
+ '<div class="modal" style="max-width:600px;width:100%">'+
+   '<div class="modal-header">'+
+     '<div class="modal-title">'+(ev?'Edit Event':'List Your Event')+'</div>'+
+     '<button onclick="closeModal()" style="background:none;border:none;color:var(--sub);font-size:20px;cursor:pointer">&times;</button>'+
+   '</div>'+
+   '<div class="modal-body" style="max-height:72vh;overflow-y:auto">'+
+     '<div class="field"><label>Event Title *</label><input id="evTitle" placeholder="e.g. Columbus Tech Mixer 2026" value="'+(ev?ev.title:'')+'"></div>'+
+     '<div class="field"><label>Description</label><textarea id="evDesc" placeholder="Tell people what to expect..." style="min-height:80px">'+(ev?ev.description||'':'')+'</textarea></div>'+
+     '<div class="field-row">'+
+       '<div class="field"><label>Category</label><select id="evCat">'+catOpts+'</select></div>'+
+       '<div class="field"><label>Venue on CBUSEVENTS</label><select id="evVenue"><option value="">-- Select venue --</option>'+vOpts+'</select></div>'+
+     '</div>'+
+     '<div class="field-row">'+
+       '<div class="field"><label>Date *</label><input id="evDate" type="date" value="'+(ev&&ev.start_time?ev.start_time.slice(0,10):'')+'"></div>'+
+       '<div class="field"><label>Start Time *</label><input id="evTime" type="time" value="'+(ev&&ev.start_time?ev.start_time.slice(11,16):'19:00')+'"></div>'+
+     '</div>'+
+     '<div class="field-row">'+
+       '<div class="field"><label>End Date</label><input id="evEndDate" type="date" value="'+(ev&&ev.end_time?ev.end_time.slice(0,10):'')+'"></div>'+
+       '<div class="field"><label>End Time</label><input id="evEndTime" type="time" value="'+(ev&&ev.end_time?ev.end_time.slice(11,16):'')+'"></div>'+
+     '</div>'+
+     '<div class="field"><label>Cover Image URL</label><input id="evCover" placeholder="https://... paste an image link" value="'+(ev?ev.cover_image_url||'':'')+'"></div>'+
+     '<div style="height:1px;background:var(--border);margin:16px 0"></div>'+
+     '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">'+
+       '<div><div style="font-family:\'Syne\',sans-serif;font-weight:700;font-size:13px">Ticket Tiers</div>'+
+       '<div style="color:var(--muted);font-size:12px;margin-top:2px">Add GA, VIP etc. with Stripe Payment Links</div></div>'+
+       '<button type="button" onclick="addTierRow()" style="background:#FF6B3520;color:#FF6B35;border:1px solid #FF6B3540;border-radius:6px;padding:5px 12px;font-size:12px;font-weight:700;cursor:pointer;font-family:\'DM Sans\',sans-serif">+ Add Tier</button>'+
+     '</div>'+
+     '<div id="tiersList" style="margin-bottom:8px">'+(tiersHtml||'<div id="noTiers" style="background:var(--surface);border:1px dashed var(--border);border-radius:8px;padding:12px;text-align:center;color:var(--muted);font-size:13px">No ticket tiers \u2014 add GA, VIP, etc. or leave blank for a free event</div>')+'</div>'+
+     '<div id="evErr" style="color:#ef4444;font-size:13px;margin-bottom:8px;display:none"></div>'+
+   '</div>'+
+   '<div class="modal-footer">'+
+     '<button class="btn btn-primary" onclick="submitEvent(\''+(ev?ev.id:'')+'\')">'+( ev?'Save Changes':'Publish Event \u2192')+'</button>'+
+     '<button class="btn btn-ghost" onclick="closeModal()">Cancel</button>'+
+   '</div>'+
+ '</div></div>';
 }
 
-async function submitEvent(){
+function buildTierRow(i,t){
+ t=t||{};
+ return '<div class="tier-row" style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-bottom:8px">'+
+   '<div style="display:grid;grid-template-columns:1fr 90px 90px auto;gap:8px;margin-bottom:8px;align-items:end">'+
+     '<div><label style="font-size:11px;color:var(--muted);display:block;margin-bottom:3px">Tier Name</label><input class="tier-name" value="'+(t.name||'General Admission')+'" placeholder="General Admission" style="background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:7px 9px;color:var(--text);font-size:13px;width:100%;font-family:\'DM Sans\',sans-serif"></div>'+
+     '<div><label style="font-size:11px;color:var(--muted);display:block;margin-bottom:3px">Price ($)</label><input class="tier-price" type="number" min="0" value="'+(t.price||'')+'" placeholder="25" style="background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:7px 9px;color:var(--text);font-size:13px;width:100%;font-family:\'DM Sans\',sans-serif"></div>'+
+     '<div><label style="font-size:11px;color:var(--muted);display:block;margin-bottom:3px">Qty</label><input class="tier-qty" type="number" min="1" value="'+(t.quantity||'')+'" placeholder="100" style="background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:7px 9px;color:var(--text);font-size:13px;width:100%;font-family:\'DM Sans\',sans-serif"></div>'+
+     '<div style="padding-bottom:1px"><button type="button" onclick="this.closest(\'.tier-row\').remove()" style="background:#2a0a0a;color:#ef4444;border:1px solid #4a1010;border-radius:6px;padding:7px 10px;font-size:12px;cursor:pointer;margin-top:16px">\u2715</button></div>'+
+   '</div>'+
+   '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">'+
+     '<div><label style="font-size:11px;color:var(--muted);display:block;margin-bottom:3px">Perks (optional)</label><input class="tier-desc" value="'+(t.description||'')+'" placeholder="Includes 1 drink, front row..." style="background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:7px 9px;color:var(--text);font-size:13px;width:100%;font-family:\'DM Sans\',sans-serif"></div>'+
+     '<div><label style="font-size:11px;color:var(--muted);display:block;margin-bottom:3px">Stripe Payment Link <span style="color:#FF6B35">*</span></label><input class="tier-link" value="'+(t.payment_link||'')+'" placeholder="https://buy.stripe.com/..." style="background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:7px 9px;color:var(--text);font-size:13px;width:100%;font-family:\'DM Sans\',sans-serif"></div>'+
+   '</div>'+
+ '</div>';
+}
+
+function addTierRow(){
+ var list=document.getElementById('tiersList');
+ var noTiers=document.getElementById('noTiers');
+ if(noTiers)noTiers.remove();
+ var div=document.createElement('div');
+ div.innerHTML=buildTierRow(Date.now(),null);
+ list.appendChild(div.firstElementChild);
+}
+
+async function submitEvent(editId){
  const title=document.getElementById('evTitle')?.value.trim();
  const date=document.getElementById('evDate')?.value;
  const time=document.getElementById('evTime')?.value||'19:00';
  const errEl=document.getElementById('evErr');
  if(!title||!date){if(errEl){errEl.textContent='Please fill in event title and date.';errEl.style.display='block';}return;}
-
- const startTime=new Date(`${date}T${time}:00`);
- const price=document.getElementById('evPrice')?.value;
- const venueId=document.getElementById('evVenue')?.value||null;
-
+ const startTime=new Date(date+'T'+time+':00');
  const endDate=document.getElementById('evEndDate')?.value;
  const endTime=document.getElementById('evEndTime')?.value;
- const endDateTime=(endDate&&endTime)?new Date(`${endDate}T${endTime}:00`).toISOString():null;
+ const endDateTime=(endDate&&endTime)?new Date(endDate+'T'+endTime+':00').toISOString():null;
+ const venueId=document.getElementById('evVenue')?.value||null;
+ const cover=document.getElementById('evCover')?.value||null;
 
- const{error}=await sb.from('events').insert({
- title,
- start_time:startTime.toISOString(),
- end_time:endDateTime,
- category:document.getElementById('evCat')?.value||'Other',
- venue_id:venueId||null,
- description:document.getElementById('evDesc')?.value||null,
- ticket_url:document.getElementById('evTicket')?.value||null,
- price_min:price?parseFloat(price):null,
- price_max:price?parseFloat(price):null,
- is_free:!price||parseFloat(price)===0,
- status:'published',
- owner_id:currentUser.id,
- planner_email:currentUser.email,
+ // Collect tiers
+ const tierRows=document.querySelectorAll('.tier-row');
+ const tiers=[];
+ tierRows.forEach(function(row){
+   const name=row.querySelector('.tier-name')?.value.trim();
+   const price=row.querySelector('.tier-price')?.value;
+   const qty=row.querySelector('.tier-qty')?.value;
+   const desc=row.querySelector('.tier-desc')?.value.trim();
+   const link=row.querySelector('.tier-link')?.value.trim();
+   if(name)tiers.push({name,price:parseFloat(price)||0,quantity:qty?parseInt(qty):null,quantity_remaining:qty?parseInt(qty):null,description:desc||null,payment_link:link||null});
  });
+
+ const priceVals=tiers.map(function(t){return t.price;}).filter(function(p){return p>0;});
+ const isFree=priceVals.length===0;
+
+ const payload={
+   title,
+   start_time:startTime.toISOString(),
+   end_time:endDateTime,
+   category:document.getElementById('evCat')?.value||'Other',
+   venue_id:venueId||null,
+   description:document.getElementById('evDesc')?.value||null,
+   cover_image_url:cover,
+   price_min:isFree?null:(priceVals.length?Math.min.apply(null,priceVals):null),
+   price_max:isFree?null:(priceVals.length?Math.max.apply(null,priceVals):null),
+   is_free:isFree,
+   status:'published',
+   owner_id:currentUser.id,
+   planner_email:currentUser.email,
+ };
+
+ let eventId=editId||null;
+ let error;
+ if(editId){
+   const res=await sb.from('events').update(payload).eq('id',editId);
+   error=res.error;
+ } else {
+   const res=await sb.from('events').insert(payload).select().single();
+   error=res.error;
+   if(!error)eventId=res.data.id;
+ }
  if(error){if(errEl){errEl.textContent=error.message;errEl.style.display='block';}return;}
+
+ // Save ticket tiers
+ if(eventId&&tiers.length>0){
+   await sb.from('ticket_tiers').delete().eq('event_id',eventId);
+   const tierRows=tiers.map(function(t){return Object.assign({},t,{event_id:eventId});});
+   await sb.from('ticket_tiers').insert(tierRows);
+ }
+
  closeModal();
  await loadData();
- toast(' Event published to CBUSEVENTS!');
+ toast(editId?'Event updated!':'\uD83C\uDF89 Event published to CBUSEVENTS!');
  nav('events');
 }
 
