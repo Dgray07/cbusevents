@@ -1786,28 +1786,98 @@ function eventCard(e){
 }
 
 // ── EVENT MODAL ───────────────────────────────────────────────
-function openEventModal(id){
+async function openEventModal(id){
  const e=allEvents.find(x=>x.id===id);
  if(!e)return;
  const venue=allVenues.find(v=>v.id===e.venue_id);
+
+ // Fetch ticket tiers from Supabase
+ let tiers=[];
+ if(!e.is_free){
+   const {data}=await sb.from('ticket_tiers').select('*').eq('event_id',e.id).order('price',{ascending:true});
+   tiers=data||[];
+ }
+
+ const tiersHtml=()=>{
+   if(e.is_free)return`<div style="background:#0a2a14;border:1px solid #1a4a24;border-radius:10px;padding:14px 16px;margin-bottom:16px;display:flex;align-items:center;gap:10px"><span style="font-size:20px">&#127903;&#65039;</span><div><div style="font-weight:700;color:#22c55e">Free Event</div><div style="font-size:12px;color:#888;margin-top:2px">No ticket required</div></div></div>`;
+   if(tiers.length===0){
+     if(e.ticket_url)return`<a href="${e.ticket_url}" target="_blank" style="display:block;margin-bottom:16px"><button class="btn-primary" style="width:100%">Get Tickets &#8594;</button></a>`;
+     return'';
+   }
+   const tierRows=tiers.map(t=>{
+     const remaining=t.quantity_remaining;
+     const soldOut=remaining!==null&&remaining<=0;
+     return`<div style="display:flex;justify-content:space-between;align-items:center;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px 16px;margin-bottom:8px">
+       <div>
+         <div style="font-weight:700;font-size:14px">${t.name}</div>
+         ${t.description?`<div style="font-size:12px;color:var(--sub);margin-top:2px">${t.description}</div>`:''}
+         ${remaining!==null?`<div style="font-size:11px;color:${remaining<10?'#ef4444':'#888'};margin-top:3px">${remaining} left</div>`:''}
+       </div>
+       <div style="display:flex;align-items:center;gap:10px;flex-shrink:0">
+         <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:16px;color:${t.price===0?'#22c55e':'var(--orange)'}">${t.price===0?'Free':'$'+t.price}</div>
+         ${soldOut
+           ?`<button disabled style="background:#1a1a24;color:#555;border:1px solid #25252f;border-radius:8px;padding:8px 16px;font-size:13px;font-weight:700;cursor:not-allowed;font-family:'DM Sans',sans-serif">Sold Out</button>`
+           :`<button onclick="buyTicket('${e.id}','${t.id}','${t.name.replace(/'/g,"\\'")}',${t.price})" style="background:#FF6B35;color:#fff;border:none;border-radius:8px;padding:8px 16px;font-size:13px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif">Buy &#8594;</button>`
+         }
+       </div>
+     </div>`;
+   }).join('');
+   return`<div style="margin-bottom:16px"><div style="font-size:12px;font-weight:700;color:#8888a0;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">Tickets</div>${tierRows}</div>`;
+ };
+
  document.getElementById('eventModalContent').innerHTML=`
- <div style="position:relative"> ${e.cover_image_url?`<img src="${e.cover_image_url}" alt="${e.title}" style="width:100%;height:200px;object-fit:cover" onerror="this.style.display='none'">`:
- `<div style="width:100%;height:140px;display:flex;align-items:center;justify-content:center;font-size:52px;background:var(--surface)"></div>`}
- <button class="modal-close-btn" onclick="closeEventModal()">×</button> ${isThisWeek(e.start_time)?`<div style="position:absolute;top:12px;left:12px;background:var(--green);color:#000;border-radius:20px;padding:3px 12px;font-size:11px;font-weight:700">THIS WEEK</div>`:''}
- </div> <div style="padding:24px"> <div style="font-size:11px;color:var(--orange);font-weight:700;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px">${e.category||'Event'}</div> <h2 style="font-family:'Syne',sans-serif;font-size:22px;font-weight:800;margin-bottom:14px">${e.title}</h2> <div style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:16px"> <span style="background:var(--surface);border-radius:8px;padding:6px 12px;font-size:13px"> ${fmt(e.start_time)}</span> <span style="background:var(--surface);border-radius:8px;padding:6px 12px;font-size:13px"> ${fmtTime(e.start_time)}</span> ${e.end_time?`<span style="background:var(--surface);border-radius:8px;padding:6px 12px;font-size:13px">Until ${fmtTime(e.end_time)}</span>`:''}
- ${e.is_free?`<span style="background:#0a2a14;border:1px solid #1a4a24;border-radius:8px;padding:6px 12px;font-size:13px;color:var(--green)"> Free</span>`:e.price_min?`<span style="background:var(--surface);border-radius:8px;padding:6px 12px;font-size:13px"> From $${e.price_min}${e.price_max?` – $${e.price_max}`:''}</span>`:''}
- </div> ${venue?`<div style="display:flex;align-items:center;gap:10px;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-bottom:16px;cursor:pointer" onclick="closeEventModal();showPage('venue',allVenues.find(x=>x.id==='${venue.id}'))"> <div style="font-size:24px">${venueEmoji(venue.venue_type)}</div> <div><div style="font-weight:600;font-size:14px">${venue.name}</div><div style="font-size:12px;color:var(--sub)"> ${venue.neighborhood||venue.city} — click to view venue</div></div> </div>`:''}
- ${e.description?`<p style="color:var(--sub);font-size:14px;line-height:1.7;margin-bottom:20px">${e.description}</p>`:''}
- <div style="display:flex;gap:10px;flex-wrap:wrap"> ${e.ticket_url?`<a href="${e.ticket_url}" target="_blank"><button class="btn-primary">Get Tickets →</button></a>`:''}
- ${venue?`<button class="btn-secondary" onclick="closeEventModal();showPage('venue',allVenues.find(x=>x.id==='${venue.id}'))">View Venue</button>`:''}
- <button onclick="(function(){var url='https://cbusevents.com/event.html?id=${e.id}';if(navigator.share){navigator.share({title:'${e.title}',url:url});}else{navigator.clipboard.writeText(url).then(function(){alert('Link copied!');});};})()" style="background:var(--surface);color:var(--sub);border:1px solid var(--border);border-radius:8px;padding:10px 16px;font-size:14px;cursor:pointer;font-family:'DM Sans',sans-serif;">🔗 Share</button> <button id="modalSaveBtn" onclick="toggleSaveEvent('${e.id}',this,event)" style="background:${savedEventIds.has(e.id)?'#FF6B3520':'var(--surface)'};color:${savedEventIds.has(e.id)?'var(--orange)':'var(--sub)'};border:1px solid var(--border);border-radius:8px;padding:10px 16px;font-size:14px;cursor:pointer;font-family:'DM Sans',sans-serif;">${savedEventIds.has(e.id)?'♥ Saved':'♡ Save Event'}</button>
- </div> </div> `;
+ <div style="position:relative">
+   ${e.cover_image_url?`<img src="${e.cover_image_url}" alt="${e.title}" style="width:100%;height:200px;object-fit:cover" onerror="this.style.display='none'">`:`<div style="width:100%;height:140px;display:flex;align-items:center;justify-content:center;font-size:52px;background:var(--surface)">&#127881;</div>`}
+   <button class="modal-close-btn" onclick="closeEventModal()">&times;</button>
+   ${isThisWeek(e.start_time)?`<div style="position:absolute;top:12px;left:12px;background:var(--green);color:#000;border-radius:20px;padding:3px 12px;font-size:11px;font-weight:700">THIS WEEK</div>`:''}
+ </div>
+ <div style="padding:24px">
+   <div style="font-size:11px;color:var(--orange);font-weight:700;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px">${e.category||'Event'}</div>
+   <h2 style="font-family:'Syne',sans-serif;font-size:22px;font-weight:800;margin-bottom:14px">${e.title}</h2>
+   <div style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:16px">
+     <span style="background:var(--surface);border-radius:8px;padding:6px 12px;font-size:13px">&#128197; ${fmt(e.start_time)}</span>
+     <span style="background:var(--surface);border-radius:8px;padding:6px 12px;font-size:13px">&#128336; ${fmtTime(e.start_time)}</span>
+     ${e.end_time?`<span style="background:var(--surface);border-radius:8px;padding:6px 12px;font-size:13px">Until ${fmtTime(e.end_time)}</span>`:''}
+     ${e.is_free?`<span style="background:#0a2a14;border:1px solid #1a4a24;border-radius:8px;padding:6px 12px;font-size:13px;color:var(--green)">Free</span>`:e.price_min!=null?`<span style="background:var(--surface);border-radius:8px;padding:6px 12px;font-size:13px">From $${e.price_min}${e.price_max&&e.price_max!==e.price_min?` \u2013 $${e.price_max}`:''}</span>`:''}
+   </div>
+   ${venue?`<div style="display:flex;align-items:center;gap:10px;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-bottom:16px;cursor:pointer" onclick="closeEventModal();showPage('venue',allVenues.find(x=>x.id==='${venue.id}'))"><div style="font-size:24px">${venueEmoji(venue.venue_type)}</div><div><div style="font-weight:600;font-size:14px">${venue.name}</div><div style="font-size:12px;color:var(--sub)">${venue.neighborhood||venue.city} \u2014 click to view venue</div></div></div>`:''}
+   ${e.description?`<p style="color:var(--sub);font-size:14px;line-height:1.7;margin-bottom:20px">${e.description}</p>`:''}
+   ${tiersHtml()}
+   <div id="ticketMsg" style="display:none;background:#13131a;border-radius:10px;padding:14px;margin-bottom:16px;font-size:13px;text-align:center;color:#8888a0"></div>
+   <div style="display:flex;gap:10px;flex-wrap:wrap">
+     ${venue?`<button class="btn-secondary" onclick="closeEventModal();showPage('venue',allVenues.find(x=>x.id==='${venue.id}'))">View Venue</button>`:''}
+     <button onclick="(function(){var url='https://cbusevents.com/event.html?id=${e.id}';if(navigator.share){navigator.share({title:'${e.title}',url:url});}else{navigator.clipboard.writeText(url).then(function(){alert('Link copied!');});}})()" style="background:var(--surface);color:var(--sub);border:1px solid var(--border);border-radius:8px;padding:10px 16px;font-size:14px;cursor:pointer;font-family:'DM Sans',sans-serif;">&#128279; Share</button>
+     <button id="modalSaveBtn" onclick="toggleSaveEvent('${e.id}',this,event)" style="background:${savedEventIds.has(e.id)?'#FF6B3520':'var(--surface)'};color:${savedEventIds.has(e.id)?'var(--orange)':'var(--sub)'};border:1px solid var(--border);border-radius:8px;padding:10px 16px;font-size:14px;cursor:pointer;font-family:'DM Sans',sans-serif;">${savedEventIds.has(e.id)?'\u2665 Saved':'\u2661 Save Event'}</button>
+   </div>
+ </div>`;
  document.getElementById('eventModal').style.display='flex';
  document.body.style.overflow='hidden';
+}
+async function buyTicket(eventId, tierId, tierName, price){
+ const msgEl=document.getElementById('ticketMsg');
+ if(msgEl){msgEl.style.display='block';msgEl.style.color='#8888a0';msgEl.textContent='Redirecting to checkout...';}
+ try {
+   const {data:{session}}=await sb.auth.getSession();
+   const headers={'Content-Type':'application/json','apikey':SB_KEY};
+   if(session?.access_token)headers['Authorization']='Bearer '+session.access_token;
+   const res=await fetch('https://toblgvatvsjljbqogzsv.supabase.co/functions/v1/create-checkout',{
+     method:'POST',headers,
+     body:JSON.stringify({event_id:eventId,tier_id:tierId,tier_name:tierName,price,quantity:1,
+       success_url:window.location.origin+'/ticket-success.html?session_id={CHECKOUT_SESSION_ID}',
+       cancel_url:window.location.href})
+   });
+   const data=await res.json();
+   if(data.url){window.location.href=data.url;}
+   else{if(msgEl){msgEl.style.color='#ef4444';msgEl.textContent=data.error||'Checkout failed. Please try again.';}}
+ } catch(err){
+   if(msgEl){msgEl.style.color='#ef4444';msgEl.textContent='Network error. Please try again.';}
+ }
 }
 function closeEventModal(){
  document.getElementById('eventModal').style.display='none';
  document.body.style.overflow='';
+}
+
 }
 function openVendorModal(id){
  const v=allVendors.find(x=>x.id===id);

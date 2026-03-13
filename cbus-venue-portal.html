@@ -324,45 +324,115 @@ function VenueForm({venue,onSave}) {
 
 // Events
 const ECATS=["Concert","Sports","Comedy","Theater","Networking","Wedding","Corporate","Food & Drink","Arts","Other"];
+const blankTier=()=>({id:null,name:"General Admission",price:"",quantity:"",description:""});
+
+function TicketTierBuilder({tiers,setTiers,isFree}){
+  if(isFree)return null;
+  const add=()=>setTiers(t=>[...t,blankTier()]);
+  const remove=i=>setTiers(t=>t.filter((_,idx)=>idx!==i));
+  const update=(i,k,v)=>setTiers(t=>t.map((tier,idx)=>idx===i?{...tier,[k]:v}:tier));
+  return(
+    <div style={{marginBottom:18}}>
+      <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:10}}>
+        <label style={{marginBottom:0,fontSize:13,color:"#8888a0",fontWeight:500}}>Ticket Tiers</label>
+        <button type="button" onClick={add} style={{background:"#FF6B3520",color:"#FF6B35",border:"1px solid #FF6B3540",borderRadius:6,padding:"4px 12px",fontSize:12,fontWeight:700,cursor:"pointer",fontFamily:"'DM Sans',sans-serif"}}>+ Add Tier</button>
+      </div>
+      {tiers.length===0&&<div style={{background:"#13131a",border:"1px dashed #25252f",borderRadius:8,padding:"14px",textAlign:"center",color:"#55556a",fontSize:13}}>No ticket tiers yet — add GA, VIP, etc.</div>}
+      {tiers.map((tier,i)=>(
+        <div key={i} style={{background:"#13131a",border:"1px solid #25252f",borderRadius:10,padding:"14px",marginBottom:10}}>
+          <div style={{display:"grid",gridTemplateColumns:"1fr 100px 100px",gap:10,marginBottom:8}}>
+            <div><label style={{fontSize:11,color:"#8888a0",display:"block",marginBottom:4}}>Tier Name</label><input value={tier.name} onChange={e=>update(i,"name",e.target.value)} placeholder="General Admission" style={{background:"#0b0b0f",border:"1px solid #25252f",borderRadius:6,padding:"7px 10px",color:"#e8e8f0",fontSize:13,width:"100%",fontFamily:"'DM Sans',sans-serif"}}/></div>
+            <div><label style={{fontSize:11,color:"#8888a0",display:"block",marginBottom:4}}>Price ($)</label><input type="number" min="0" value={tier.price} onChange={e=>update(i,"price",e.target.value)} placeholder="25" style={{background:"#0b0b0f",border:"1px solid #25252f",borderRadius:6,padding:"7px 10px",color:"#e8e8f0",fontSize:13,width:"100%",fontFamily:"'DM Sans',sans-serif"}}/></div>
+            <div><label style={{fontSize:11,color:"#8888a0",display:"block",marginBottom:4}}>Qty</label><input type="number" min="1" value={tier.quantity} onChange={e=>update(i,"quantity",e.target.value)} placeholder="100" style={{background:"#0b0b0f",border:"1px solid #25252f",borderRadius:6,padding:"7px 10px",color:"#e8e8f0",fontSize:13,width:"100%",fontFamily:"'DM Sans',sans-serif"}}/></div>
+          </div>
+          <div style={{display:"flex",gap:10,alignItems:"flex-end"}}>
+            <div style={{flex:1}}><label style={{fontSize:11,color:"#8888a0",display:"block",marginBottom:4}}>Perks (optional)</label><input value={tier.description} onChange={e=>update(i,"description",e.target.value)} placeholder="Front row access, 1 drink included..." style={{background:"#0b0b0f",border:"1px solid #25252f",borderRadius:6,padding:"7px 10px",color:"#e8e8f0",fontSize:13,width:"100%",fontFamily:"'DM Sans',sans-serif"}}/></div>
+            <button type="button" onClick={()=>remove(i)} style={{background:"#2a0a0a",color:"#ef4444",border:"1px solid #4a1010",borderRadius:6,padding:"7px 10px",fontSize:12,cursor:"pointer",fontFamily:"'DM Sans',sans-serif",flexShrink:0}}>Remove</button>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
 
 function EventModal({event,venueId,venueTier,currentEventCount,onClose,onSave}) {
  const {user}=useAuth();
- const blank={title:"",description:"",category:"Other",start_time:"",end_time:"",is_free:false,price_min:"",price_max:"",ticket_url:"",cover_image_url:"",status:"draft"};
+ const blank={title:"",description:"",category:"Other",start_time:"",end_time:"",is_free:false,price_min:"",price_max:"",cover_image_url:"",status:"draft"};
  const [f,setF]=useState(event?{...event,start_time:event.start_time?new Date(event.start_time).toISOString().slice(0,16):"",end_time:event.end_time?new Date(event.end_time).toISOString().slice(0,16):""}:blank);
+ const [tiers,setTiers]=useState([]);
  const [busy,setBusy]=useState(false);
  const [err,setErr]=useState("");
  const set=k=>e=>setF(p=>({...p,[k]:e.target.type==="checkbox"?e.target.checked:e.target.value}));
+
+ // Load existing tiers when editing
+ useEffect(()=>{
+   if(event?.id){
+     sb.from("ticket_tiers").select("*").eq("event_id",event.id).order("price",{ascending:true})
+       .then(({data})=>setTiers((data||[]).map(t=>({...t,price:String(t.price||""),quantity:String(t.quantity||"")}))))
+   }
+ },[event?.id]);
+
  const save=async()=>{
  if(!f.title.trim()){setErr("Title required.");return;}
  if(!f.start_time){setErr("Start time required.");return;}
- // Enforce event limits for new events (not edits)
+ if(!f.is_free&&tiers.some(t=>!t.name||t.price==="")){setErr("Each ticket tier needs a name and price.");return;}
  if(!event?.id){
- const tier=venueTier||"free";
- const limit=tier==="premium"?null:tier==="standard"?20:4;
- if(limit!==null&&currentEventCount>=limit){
- setErr(`Your ${tier} plan is limited to ${limit} events. Upgrade to add more.`);
- setBusy(false);return;
- }
+   const tier=venueTier||"free";
+   const limit=tier==="premium"?null:tier==="standard"?20:4;
+   if(limit!==null&&currentEventCount>=limit){setErr(`Your ${tier} plan is limited to ${limit} events. Upgrade to add more.`);return;}
  }
  setBusy(true);setErr("");
+ const priceValues=tiers.filter(t=>t.price!=="").map(t=>parseFloat(t.price));
  const payload={
-  ...f,
-  venue_id:venueId,
-  owner_id:user.id,
-  price_min:f.price_min||null,
-  price_max:f.price_max||null,
-  start_time:f.start_time||null,
-  end_time:f.end_time&&f.end_time.trim()!==''?f.end_time:null,
-};
- const {error}=event?.id?await sb.from("events").update(payload).eq("id",event.id):await sb.from("events").insert(payload);
- setBusy(false);
- if(error)setErr(error.message);else{onSave();onClose();}
+   ...f,
+   venue_id:venueId,
+   owner_id:user.id,
+   price_min:f.is_free?0:(priceValues.length?Math.min(...priceValues):null),
+   price_max:f.is_free?0:(priceValues.length?Math.max(...priceValues):null),
+   start_time:f.start_time||null,
+   end_time:f.end_time&&f.end_time.trim()!==''?f.end_time:null,
+ };
+ // Remove ticket_url from payload (no longer used)
+ delete payload.ticket_url;
+ const {data:evData,error}=event?.id
+   ?await sb.from("events").update(payload).eq("id",event.id).select().single()
+   :await sb.from("events").insert(payload).select().single();
+ if(error){setBusy(false);setErr(error.message);return;}
+ const eventId=evData.id;
+ // Save ticket tiers
+ if(!f.is_free&&tiers.length>0){
+   // Delete old tiers then reinsert
+   await sb.from("ticket_tiers").delete().eq("event_id",eventId);
+   const tierRows=tiers.map(t=>({event_id:eventId,venue_id:venueId,name:t.name,price:parseFloat(t.price)||0,quantity:parseInt(t.quantity)||null,quantity_remaining:parseInt(t.quantity)||null,description:t.description||null}));
+   const {error:tierErr}=await sb.from("ticket_tiers").insert(tierRows);
+   if(tierErr){setBusy(false);setErr("Event saved but tiers failed: "+tierErr.message);return;}
+ }
+ setBusy(false);onSave();onClose();
  };
  return (
- <div style={{position:"fixed",inset:0,background:"rgba(0,0,0,0.8)",zIndex:100,display:"flex",alignItems:"center",justifyContent:"center",padding:20}} onClick={onClose}> <div style={{background:"#1a1a24",border:"1px solid #25252f",borderRadius:16,padding:28,width:"100%",maxWidth:560,maxHeight:"90vh",overflowY:"auto"}} onClick={e=>e.stopPropagation()}> <h3 style={{fontFamily:"Syne,sans-serif",fontWeight:800,fontSize:18,marginBottom:20}}>{event?"Edit Event":"New Event"}</h3> {err&&<div style={{background:"#2a0a0a",color:"#ef4444",border:"1px solid #4a1010",borderRadius:8,padding:"10px",marginBottom:14,fontSize:14}}> {err}</div>}
- <Field label="Title *"><input value={f.title} onChange={set("title")} placeholder="Comedy Night Live"/></Field> <Field label="Description"><textarea value={f.description} onChange={set("description")} placeholder="What should attendees expect?"/></Field> <Grid2> <Field label="Category"><select value={f.category} onChange={set("category")}>{ECATS.map(c=><option key={c}>{c}</option>)}</select></Field> <Field label="Status"><select value={f.status} onChange={set("status")}><option value="draft">Draft</option><option value="published">Published</option><option value="cancelled">Cancelled</option></select></Field> </Grid2> <Grid2> <Field label="Start *"><input type="datetime-local" value={f.start_time} onChange={set("start_time")}/></Field> <Field label="End"><input type="datetime-local" value={f.end_time} onChange={set("end_time")}/></Field> </Grid2> <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:18}}> <input type="checkbox" id="fc" checked={f.is_free} onChange={set("is_free")} style={{width:"auto",cursor:"pointer"}}/> <label htmlFor="fc" style={{marginBottom:0,cursor:"pointer"}}>Free event</label> </div> {!f.is_free&&<Grid2><Field label="Min Price ($)"><input type="number" value={f.price_min} onChange={set("price_min")} placeholder="10"/></Field><Field label="Max Price ($)"><input type="number" value={f.price_max} onChange={set("price_max")} placeholder="75"/></Field></Grid2>}
- <Field label="Ticket URL"><input value={f.ticket_url} onChange={set("ticket_url")} placeholder="https://..."/></Field> <Field label="Cover Image URL"><input value={f.cover_image_url} onChange={set("cover_image_url")} placeholder="https://..."/></Field> {f.cover_image_url&&<img src={f.cover_image_url} alt="" style={{width:"100%",height:100,objectFit:"cover",borderRadius:8,marginBottom:14,border:"1px solid #25252f"}} onError={e=>e.target.style.display="none"}/>}
- <div style={{display:"flex",gap:10,marginTop:8}}> <Btn onClick={save} disabled={busy}>{busy?"Saving...":event?"Save Changes":"Create Event"}</Btn> <Btn variant="ghost" onClick={onClose}>Cancel</Btn> </div> </div> </div> );
+ <div style={{position:"fixed",inset:0,background:"rgba(0,0,0,0.8)",zIndex:100,display:"flex",alignItems:"center",justifyContent:"center",padding:20}} onClick={onClose}> <div style={{background:"#1a1a24",border:"1px solid #25252f",borderRadius:16,padding:28,width:"100%",maxWidth:580,maxHeight:"92vh",overflowY:"auto"}} onClick={e=>e.stopPropagation()}> <h3 style={{fontFamily:"Syne,sans-serif",fontWeight:800,fontSize:18,marginBottom:20}}>{event?"Edit Event":"New Event"}</h3> {err&&<div style={{background:"#2a0a0a",color:"#ef4444",border:"1px solid #4a1010",borderRadius:8,padding:"10px",marginBottom:14,fontSize:14}}>{err}</div>}
+ <Field label="Title *"><input value={f.title} onChange={set("title")} placeholder="Comedy Night Live"/></Field>
+ <Field label="Description"><textarea value={f.description} onChange={set("description")} placeholder="What should attendees expect?"/></Field>
+ <Grid2>
+   <Field label="Category"><select value={f.category} onChange={set("category")}>{ECATS.map(c=><option key={c}>{c}</option>)}</select></Field>
+   <Field label="Status"><select value={f.status} onChange={set("status")}><option value="draft">Draft</option><option value="published">Published</option><option value="cancelled">Cancelled</option></select></Field>
+ </Grid2>
+ <Grid2>
+   <Field label="Start *"><input type="datetime-local" value={f.start_time} onChange={set("start_time")}/></Field>
+   <Field label="End"><input type="datetime-local" value={f.end_time} onChange={set("end_time")}/></Field>
+ </Grid2>
+ <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:18}}>
+   <input type="checkbox" id="fc" checked={f.is_free} onChange={set("is_free")} style={{width:"auto",cursor:"pointer"}}/>
+   <label htmlFor="fc" style={{marginBottom:0,cursor:"pointer"}}>Free event (no tickets needed)</label>
+ </div>
+ <TicketTierBuilder tiers={tiers} setTiers={setTiers} isFree={f.is_free}/>
+ <Field label="Cover Image URL"><input value={f.cover_image_url} onChange={set("cover_image_url")} placeholder="https://..."/></Field>
+ {f.cover_image_url&&<img src={f.cover_image_url} alt="" style={{width:"100%",height:100,objectFit:"cover",borderRadius:8,marginBottom:14,border:"1px solid #25252f"}} onError={e=>e.target.style.display="none"}/>}
+ <div style={{display:"flex",gap:10,marginTop:8}}>
+   <Btn onClick={save} disabled={busy}>{busy?"Saving...":event?"Save Changes":"Create Event"}</Btn>
+   <Btn variant="ghost" onClick={onClose}>Cancel</Btn>
+ </div>
+ </div></div>);
 }
 
 function EventsManager({venue,events,onRefresh}) {

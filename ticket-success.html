@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Ticket Confirmed — CBUSEVENTS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<!-- QR Code library -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:#0b0b0f;color:#e8e8f0;font-family:'DM Sans',sans-serif;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;}
+.logo{font-family:'Syne',sans-serif;font-weight:800;font-size:20px;margin-bottom:32px;letter-spacing:0.5px;}
+.logo span{color:#FF6B35;}
+.card{background:#13131a;border:1px solid #25252f;border-radius:20px;width:100%;max-width:460px;overflow:hidden;}
+.card-top{background:linear-gradient(135deg,#0f0800,#1a1000,#0b0b0f);border-bottom:1px dashed #25252f;padding:32px 28px;text-align:center;}
+.check{width:64px;height:64px;background:#22c55e20;border:2px solid #22c55e50;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:28px;margin:0 auto 16px;}
+.confirm-title{font-family:'Syne',sans-serif;font-weight:800;font-size:24px;margin-bottom:6px;}
+.confirm-sub{color:#8888a0;font-size:14px;line-height:1.5;}
+.card-body{padding:24px 28px;}
+.ticket-stub{background:#0b0b0f;border:1px solid #25252f;border-radius:14px;padding:20px;margin-bottom:20px;}
+.stub-event{font-family:'Syne',sans-serif;font-weight:800;font-size:18px;margin-bottom:4px;}
+.stub-venue{color:#FF6B35;font-size:13px;font-weight:600;margin-bottom:12px;}
+.stub-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid #1a1a24;font-size:13px;}
+.stub-row:last-child{border-bottom:none;}
+.stub-label{color:#8888a0;}
+.stub-val{font-weight:600;}
+.qr-wrap{text-align:center;margin:20px 0 4px;}
+.qr-wrap>div{display:inline-block;background:#fff;padding:10px;border-radius:10px;}
+.qr-label{text-align:center;font-size:11px;color:#55556a;margin-bottom:20px;letter-spacing:1px;text-transform:uppercase;}
+.ticket-code{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:#FF6B35;letter-spacing:4px;text-align:center;margin-bottom:20px;background:#1a1a24;border-radius:10px;padding:14px;}
+.btn{display:block;width:100%;border:none;border-radius:10px;padding:14px;font-family:'DM Sans',sans-serif;font-weight:700;font-size:15px;cursor:pointer;text-align:center;text-decoration:none;margin-bottom:10px;}
+.btn-primary{background:#FF6B35;color:#fff;}
+.btn-secondary{background:#1a1a24;color:#e8e8f0;border:1px solid #25252f;}
+.loading{text-align:center;padding:48px 24px;color:#8888a0;}
+.spinner{width:36px;height:36px;border:3px solid #25252f;border-top-color:#FF6B35;border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 16px;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.error{background:#2a0a0a;color:#ef4444;border:1px solid #4a1010;border-radius:10px;padding:16px;text-align:center;font-size:14px;}
+@media(max-width:500px){
+  .card-top{padding:24px 20px;}
+  .card-body{padding:20px;}
+  .confirm-title{font-size:20px;}
+}
+</style>
+</head>
+<body>
+<div class="logo">CBUS<span>EVENTS</span></div>
+<div class="card">
+  <div id="content">
+    <div class="loading"><div class="spinner"></div>Confirming your ticket...</div>
+  </div>
+</div>
+<script>
+const SB_URL="https://toblgvatvsjljbqogzsv.supabase.co";
+const SB_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRvYmxndmF0dnNqbGpicW9nenN2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMDgwNTAsImV4cCI6MjA4NzY4NDA1MH0._WJEQPizNDiQfDXQB_DHPaQhixPGpMdmYQSmyWmm_FQ";
+const sb=supabase.createClient(SB_URL,SB_KEY);
+
+function stripTZ(dt){return dt?dt.replace(' ','T').replace(/(\.\d+)?(Z|[+-]\d{2}:?\d{2})?$/,''):''}
+function fmt(dt){
+  if(!dt)return'';
+  const d=new Date(stripTZ(dt));
+  return d.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric'})+' \u00b7 '+d.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
+}
+
+async function load(){
+  const params=new URLSearchParams(location.search);
+  const sessionId=params.get('session_id');
+  const ticketCode=params.get('ticket_code');
+  const content=document.getElementById('content');
+
+  // Try to find ticket by session_id or ticket_code
+  let ticket=null;
+  if(ticketCode){
+    const{data}=await sb.from('tickets').select('*,events(title,start_time,venues(name,neighborhood))').eq('ticket_code',ticketCode).single();
+    ticket=data;
+  } else if(sessionId&&sessionId!=='{CHECKOUT_SESSION_ID}'){
+    const{data}=await sb.from('tickets').select('*,events(title,start_time,venues(name,neighborhood))').eq('stripe_session_id',sessionId).single();
+    ticket=data;
+  }
+
+  if(!ticket){
+    // Show a generic success — webhook may still be processing
+    content.innerHTML=`
+    <div class="card-top">
+      <div class="check">&#10003;</div>
+      <div class="confirm-title">Payment Received!</div>
+      <div class="confirm-sub">Your ticket is being confirmed.<br>Check your email for details.</div>
+    </div>
+    <div class="card-body">
+      <div style="color:#8888a0;font-size:14px;text-align:center;line-height:1.7;margin-bottom:20px">
+        If your ticket doesn't appear in your account within a few minutes, contact us at <a href="mailto:hello@cbusevents.com" style="color:#FF6B35">hello@cbusevents.com</a>
+      </div>
+      <a href="https://cbusevents.com/customer-portal.html" class="btn btn-primary">View My Tickets</a>
+      <a href="https://cbusevents.com" class="btn btn-secondary">Back to CBUSEVENTS</a>
+    </div>`;
+    return;
+  }
+
+  const event=ticket.events||{};
+  const venue=(event.venues)||{};
+  const code=ticket.ticket_code||'—';
+  const qrData=`CBUSEVENTS:${code}:${ticket.id}`;
+
+  content.innerHTML=`
+  <div class="card-top">
+    <div class="check">&#127903;&#65039;</div>
+    <div class="confirm-title">You're In!</div>
+    <div class="confirm-sub">Your ticket for <strong>${event.title||'the event'}</strong> is confirmed.</div>
+  </div>
+  <div class="card-body">
+    <div class="ticket-stub">
+      <div class="stub-event">${event.title||'Event'}</div>
+      <div class="stub-venue">${venue.name||''}</div>
+      <div class="stub-row"><span class="stub-label">Date & Time</span><span class="stub-val">${fmt(event.start_time)}</span></div>
+      <div class="stub-row"><span class="stub-label">Tier</span><span class="stub-val">${ticket.tier_name||'General Admission'}</span></div>
+      <div class="stub-row"><span class="stub-label">Qty</span><span class="stub-val">${ticket.quantity||1}</span></div>
+      <div class="stub-row"><span class="stub-label">Total Paid</span><span class="stub-val">$${((ticket.amount_paid||0)/100).toFixed(2)}</span></div>
+    </div>
+    <div class="ticket-code">${code}</div>
+    <div class="qr-wrap"><div id="qrcode"></div></div>
+    <div class="qr-label">Show at door for entry</div>
+    <button class="btn btn-primary" onclick="window.print()">&#128247; Save / Print Ticket</button>
+    <a href="https://cbusevents.com/customer-portal.html" class="btn btn-secondary">View All My Tickets</a>
+    <a href="https://cbusevents.com" class="btn btn-secondary" style="margin-bottom:0">Browse More Events</a>
+  </div>`;
+
+  // Generate QR code
+  new QRCode(document.getElementById('qrcode'),{
+    text:qrData,width:140,height:140,
+    colorDark:"#000000",colorLight:"#ffffff",
+    correctLevel:QRCode.CorrectLevel.H
+  });
+}
+
+load();
+</script>
+</body>
+</html>
