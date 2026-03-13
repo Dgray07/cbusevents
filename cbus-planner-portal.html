@@ -176,7 +176,7 @@ nav{position:sticky;top:0;z-index:100;background:rgba(11,11,15,0.95);backdrop-fi
 
 </style>
 </head>
-<body> <nav id="topNav"> <div class="nav-logo" onclick="currentUser?nav('dashboard'):showAuth('login')"> CBUS<span>EVENTS</span> <span class="nav-logo-sub">Planner</span> </div> <div class="nav-links" id="navLinks" style="display:none"> <button class="nav-btn" onclick="window.location.href='https://cbusevents.com'"> Home</button> <button class="nav-btn" id="nav-dashboard" onclick="nav('dashboard')">Dashboard</button> <button class="nav-btn" id="nav-venues" onclick="nav('venues')">Find Venues</button> <button class="nav-btn" id="nav-inquiries" onclick="nav('inquiries')">My Inquiries</button> <button class="nav-btn" id="nav-events" onclick="nav('events')">My Events</button> <button class="nav-btn" id="nav-profile" onclick="nav('profile')">My Profile</button> <button class="nav-btn" id="nav-billing" onclick="nav('billing')">Plan & Billing</button> </div> <div class="nav-right" id="navRight"> <button class="nav-outline" onclick="showAuth('login')">Sign In</button> <button class="nav-cta" onclick="showAuth('signup')">Get Started Free →</button> </div>
+<body> <nav id="topNav"> <div class="nav-logo" onclick="currentUser?nav('dashboard'):showAuth('login')"> CBUS<span>EVENTS</span> <span class="nav-logo-sub">Planner</span> </div> <div class="nav-links" id="navLinks" style="display:none"> <button class="nav-btn" onclick="window.location.href='https://cbusevents.com'"> Home</button> <button class="nav-btn" id="nav-dashboard" onclick="nav('dashboard')">Dashboard</button> <button class="nav-btn" id="nav-venues" onclick="nav('venues')">Find Venues</button> <button class="nav-btn" id="nav-inquiries" onclick="nav('inquiries')">My Inquiries</button> <button class="nav-btn" id="nav-events" onclick="nav('events')">My Events</button> <button class="nav-btn" id="nav-payouts" onclick="nav('payouts')">Payouts</button> <button class="nav-btn" id="nav-profile" onclick="nav('profile')">My Profile</button> <button class="nav-btn" id="nav-billing" onclick="nav('billing')">Plan & Billing</button> </div> <div class="nav-right" id="navRight"> <button class="nav-outline" onclick="showAuth('login')">Sign In</button> <button class="nav-cta" onclick="showAuth('signup')">Get Started Free →</button> </div>
 </nav> <div id="app"></div>
 <div id="modal"></div>
 <div id="toast" class="toast"></div> <script src="https://unpkg.com/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
@@ -421,10 +421,126 @@ function nav(page){
  else if(page==='events')renderEvents();
  else if(page==='profile')renderProfile();
  else if(page==='billing')renderBilling();
+  else if(page==='payouts')renderPayouts();
 }
 
 // ── BILLING ───────────────────────────────────────────────────
+const SB_FUNCTIONS_URL='https://toblgvatvsjljbqogzsv.supabase.co/functions/v1';
+
+async function getAuthToken(){
+  const s=await sb.auth.getSession();
+  return s.data.session?.access_token||'';
+}
+
+async function startConnectOnboard(){
+  toast('Redirecting to Stripe setup...');
+  try{
+    const res=await fetch(SB_FUNCTIONS_URL+'/stripe-connect-onboard',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+await getAuthToken()},
+      body:JSON.stringify({action:'onboard'})
+    });
+    const data=await res.json();
+    if(data.url) window.location.href=data.url;
+    else toast('Error: '+data.error);
+  }catch(e){toast('Error connecting to Stripe');}
+}
+
+async function openStripeDashboard(){
+  try{
+    const res=await fetch(SB_FUNCTIONS_URL+'/stripe-connect-onboard',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+await getAuthToken()},
+      body:JSON.stringify({action:'dashboard'})
+    });
+    const data=await res.json();
+    if(data.url) window.open(data.url,'_blank');
+    else toast('Error: '+data.error);
+  }catch(e){toast('Error opening dashboard');}
+}
+
+async function renderPayouts(){
+  document.getElementById('app').innerHTML='<div class="page"><div class="section-title">Payouts</div><div style="color:var(--sub);font-size:14px;margin-top:8px">Loading...</div></div>';
+
+  let sd={connected:false,status:'none'};
+  try{
+    const res=await fetch(SB_FUNCTIONS_URL+'/stripe-connect-onboard',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+await getAuthToken()},
+      body:JSON.stringify({action:'status'})
+    });
+    sd=await res.json();
+  }catch(e){}
+
+  const connected=sd.connected;
+  const status=sd.status||'none';
+  const statusLabel=connected?'Active - payouts enabled':status==='pending'?'Pending - finish Stripe onboarding':status==='incomplete'?'Incomplete - resume setup':'Not connected';
+  const statusColor=connected?'#22c55e':status==='pending'?'#f59e0b':'var(--muted)';
+  const borderColor=connected?'#22c55e40':'#FF6B3540';
+  const icon=connected?'<span style="font-size:20px">&#x2705;</span>':'<span style="font-size:20px">&#x1F4B3;</span>';
+
+  const connectBtn=connected
+    ?('<div style="display:flex;gap:10px">'
+      +'<button onclick="openStripeDashboard()" style="flex:1;padding:11px;background:#635bff;color:#fff;border:none;border-radius:8px;font-weight:700;font-size:14px;cursor:pointer">Open Stripe Dashboard</button>'
+      +'<button onclick="startConnectOnboard()" style="padding:11px 16px;background:var(--surface);color:var(--sub);border:1px solid var(--border);border-radius:8px;font-size:13px;cursor:pointer">Update</button>'
+      +'</div>')
+    :('<button onclick="startConnectOnboard()" style="width:100%;padding:13px;background:#FF6B35;color:#fff;border:none;border-radius:8px;font-weight:700;font-size:15px;cursor:pointer">'
+      +(status==='pending'||status==='incomplete'?'Resume Stripe Setup &rarr;':'Connect Stripe Account &rarr;')
+      +'</button>');
+
+  document.getElementById('app').innerHTML=
+    '<div class="page">'
+    +'<div style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:6px"><div class="section-title">Payouts</div></div>'
+    +'<div class="section-sub" style="margin-bottom:24px">Connect your Stripe account to sell tickets and receive payouts directly</div>'
+
+    // Status card
+    +'<div style="background:var(--card);border:1px solid '+borderColor+';border-radius:16px;padding:28px;max-width:580px;margin-bottom:24px">'
+      +'<div style="display:flex;align-items:center;gap:12px;margin-bottom:20px">'
+        +'<div style="width:44px;height:44px;border-radius:50%;background:'+(connected?'#22c55e20':'#FF6B3520')+';display:flex;align-items:center;justify-content:center">'+icon+'</div>'
+        +'<div>'
+          +'<div style="font-family:\'Syne\',sans-serif;font-weight:700;font-size:16px">'+(connected?'Stripe Connected':'Connect Your Stripe Account')+'</div>'
+          +'<div style="font-size:12px;margin-top:2px;color:'+statusColor+'">'+statusLabel+'</div>'
+        +'</div>'
+      +'</div>'
+      +'<div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px 16px;margin-bottom:20px">'
+        +'<div style="font-size:13px;font-weight:600;margin-bottom:8px">How it works</div>'
+        +'<div style="display:flex;flex-direction:column;gap:7px;font-size:13px;color:var(--sub)">'
+          +'<div>&#x1F3DF; Attendees buy tickets directly on CBUSEVENTS</div>'
+          +'<div>&#x1F4B8; Stripe deposits your share to your bank in 2 business days</div>'
+          +'<div>&#x1F4CA; CBUSEVENTS takes 6.5% + $1.00 per ticket sold</div>'
+          +'<div>&#x1F511; You keep the rest &mdash; no monthly fees</div>'
+        +'</div>'
+      +'</div>'
+      +connectBtn
+    +'</div>'
+
+    // Earnings example
+    +'<div style="background:var(--card);border:1px solid var(--border);border-radius:16px;padding:24px;max-width:580px">'
+      +'<div style="font-family:\'Syne\',sans-serif;font-weight:700;font-size:15px;margin-bottom:16px">Example Earnings</div>'
+      +'<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px">'
+        +['$25','$50','$100'].map(function(price,i){
+          var p=parseInt(price.replace('$',''));
+          var fee=Math.round(p*100*0.065)+100;
+          var stripe_fee=Math.round(p*100*0.029)+30;
+          var net=p*100-fee-stripe_fee;
+          return '<div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px;text-align:center">'
+            +'<div style="font-size:11px;color:var(--muted);margin-bottom:4px">'+price+' ticket</div>'
+            +'<div style="font-family:\'Syne\',sans-serif;font-size:22px;font-weight:800;color:#22c55e">$'+(net/100).toFixed(2)+'</div>'
+            +'<div style="font-size:11px;color:var(--muted);margin-top:4px">you receive</div>'
+            +'<div style="font-size:11px;color:var(--muted);margin-top:8px;padding-top:8px;border-top:1px solid var(--border)">'
+              +'CBUS: $'+(fee/100).toFixed(2)+' &bull; Stripe: $'+(stripe_fee/100).toFixed(2)
+            +'</div>'
+          +'</div>';
+        }).join('')
+      +'</div>'
+    +'</div>'
+    +'</div>';
+}
+
 function renderBilling(){
+ const stripeParam=new URLSearchParams(window.location.search).get('stripe');
+ if(stripeParam==='success'){toast('Stripe account connected! You can now sell tickets.');nav('payouts');}
+ else if(stripeParam==='refresh'){toast('Stripe onboarding refreshed.');nav('payouts');}
  const planParam=new URLSearchParams(window.location.search).get('upgrade');
  document.getElementById('app').innerHTML=`
  <div class="page">
@@ -586,10 +702,10 @@ function eventItemHTML(e){
    +'</div>'
    +'<div style="display:flex;flex-direction:column;gap:6px;align-items:flex-end;flex-shrink:0">'
    +'<span class="badge '+(e.status==='published'?'badge-green':'badge-muted')+'">'+e.status+'</span>'
-   +'<button class="btn btn-sm" style="background:#1a1a24;color:#e8e8f0;border:1px solid #25252f;white-space:nowrap" onclick="editEvent(&quot;'+e.id+'&quot;)">Edit</button>'
-   +(e.status==='published'?'<button class="btn btn-sm" style="background:#FF6B3520;color:#FF6B35;border:1px solid #FF6B3540;white-space:nowrap" onclick="openShareModal(&quot;'+e.id+'&quot;)">Share</button>':'')
-   +(!promoted?'<button class="btn btn-sm" style="background:#f59e0b20;color:#f59e0b;border:1px solid #f59e0b40;white-space:nowrap" onclick="openBoostModal(&quot;'+e.id+'&quot;)">Boost</button>':'')
-   +'<button class="btn btn-sm" style="background:#2a0a0a;color:#ef4444;border:1px solid #4a1010;white-space:nowrap" onclick="deleteEvent(&quot;'+e.id+'&quot;)">× Delete</button>'
+   +'<button class="btn btn-sm" style="background:#1a1a24;color:#e8e8f0;border:1px solid #25252f;white-space:nowrap" data-action="edit" data-id="'+e.id+'">Edit</button>'
+   +(e.status==='published'?'<button class="btn btn-sm" style="background:#FF6B3520;color:#FF6B35;border:1px solid #FF6B3540;white-space:nowrap" data-action="share" data-id="'+e.id+'">Share</button>':'')
+   +(!promoted?'<button class="btn btn-sm" style="background:#f59e0b20;color:#f59e0b;border:1px solid #f59e0b40;white-space:nowrap" data-action="boost" data-id="'+e.id+'">Boost</button>':'')
+   +'<button class="btn btn-sm" style="background:#2a0a0a;color:#ef4444;border:1px solid #4a1010;white-space:nowrap" data-action="delete" data-id="'+e.id+'">× Delete</button>'
    +'</div></div>';
 }
 
@@ -790,6 +906,18 @@ async function submitEvent(editId){
  toast(editId?'Event updated!':'\uD83C\uDF89 Event published to CBUSEVENTS!');
  nav('events');
 }
+
+// ── DELEGATED EVENT ACTIONS ──────────────────────────────────
+document.addEventListener('click', function(e){
+  const btn = e.target.closest('[data-action]');
+  if(!btn) return;
+  const action = btn.dataset.action;
+  const id = btn.dataset.id;
+  if(action==='edit') editEvent(id);
+  else if(action==='share') openShareModal(id);
+  else if(action==='boost') openBoostModal(id);
+  else if(action==='delete') deleteEvent(id);
+});
 
 // ── START ─────────────────────────────────────────────────────
 init();
