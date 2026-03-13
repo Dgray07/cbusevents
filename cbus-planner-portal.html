@@ -586,10 +586,10 @@ function eventItemHTML(e){
    +'</div>'
    +'<div style="display:flex;flex-direction:column;gap:6px;align-items:flex-end;flex-shrink:0">'
    +'<span class="badge '+(e.status==='published'?'badge-green':'badge-muted')+'">'+e.status+'</span>'
-   +'<button class="btn btn-sm" style="background:#1a1a24;color:#e8e8f0;border:1px solid #25252f;white-space:nowrap" onclick="editEvent(''+e.id+'')">Edit</button>'
-   +(e.status==='published'?'<button class="btn btn-sm" style="background:#FF6B3520;color:#FF6B35;border:1px solid #FF6B3540;white-space:nowrap" onclick="openShareModal(''+e.id+'')">Share</button>':'')
-   +(!promoted?'<button class="btn btn-sm" style="background:#f59e0b20;color:#f59e0b;border:1px solid #f59e0b40;white-space:nowrap" onclick="openBoostModal(''+e.id+'')">Boost</button>':'')
-   +'<button class="btn btn-sm" style="background:#2a0a0a;color:#ef4444;border:1px solid #4a1010;white-space:nowrap" onclick="deleteEvent(''+e.id+'')">× Delete</button>'
+   +'<button class="btn btn-sm" style="background:#1a1a24;color:#e8e8f0;border:1px solid #25252f;white-space:nowrap" onclick="editEvent(&quot;'+e.id+'&quot;)">Edit</button>'
+   +(e.status==='published'?'<button class="btn btn-sm" style="background:#FF6B3520;color:#FF6B35;border:1px solid #FF6B3540;white-space:nowrap" onclick="openShareModal(&quot;'+e.id+'&quot;)">Share</button>':'')
+   +(!promoted?'<button class="btn btn-sm" style="background:#f59e0b20;color:#f59e0b;border:1px solid #f59e0b40;white-space:nowrap" onclick="openBoostModal(&quot;'+e.id+'&quot;)">Boost</button>':'')
+   +'<button class="btn btn-sm" style="background:#2a0a0a;color:#ef4444;border:1px solid #4a1010;white-space:nowrap" onclick="deleteEvent(&quot;'+e.id+'&quot;)">× Delete</button>'
    +'</div></div>';
 }
 
