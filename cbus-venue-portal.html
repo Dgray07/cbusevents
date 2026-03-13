@@ -324,7 +324,7 @@ function VenueForm({venue,onSave}) {
 
 // Events
 const ECATS=["Concert","Sports","Comedy","Theater","Networking","Wedding","Corporate","Food & Drink","Arts","Other"];
-const blankTier=()=>({id:null,name:"General Admission",price:"",quantity:"",description:""});
+const blankTier=()=>({id:null,name:"General Admission",price:"",quantity:"",description:"",payment_link:""});
 
 function TicketTierBuilder({tiers,setTiers,isFree}){
   if(isFree)return null;
@@ -348,6 +348,7 @@ function TicketTierBuilder({tiers,setTiers,isFree}){
           <div style={{display:"flex",gap:10,alignItems:"flex-end"}}>
             <div style={{flex:1}}><label style={{fontSize:11,color:"#8888a0",display:"block",marginBottom:4}}>Perks (optional)</label><input value={tier.description} onChange={e=>update(i,"description",e.target.value)} placeholder="Front row access, 1 drink included..." style={{background:"#0b0b0f",border:"1px solid #25252f",borderRadius:6,padding:"7px 10px",color:"#e8e8f0",fontSize:13,width:"100%",fontFamily:"'DM Sans',sans-serif"}}/></div>
             <button type="button" onClick={()=>remove(i)} style={{background:"#2a0a0a",color:"#ef4444",border:"1px solid #4a1010",borderRadius:6,padding:"7px 10px",fontSize:12,cursor:"pointer",fontFamily:"'DM Sans',sans-serif",flexShrink:0}}>Remove</button>
+          <div style={{width:"100%",marginTop:8}}><label style={{fontSize:11,color:"#8888a0",display:"block",marginBottom:4}}>Stripe Payment Link <span style={{color:"#FF6B35"}}>*</span></label><input value={tier.payment_link||""} onChange={e=>update(i,"payment_link",e.target.value)} placeholder="https://buy.stripe.com/..." style={{background:"#0b0b0f",border:"1px solid #25252f",borderRadius:6,padding:"7px 10px",color:"#e8e8f0",fontSize:13,width:"100%",fontFamily:"'DM Sans',sans-serif"}}/></div>
           </div>
         </div>
       ))}
@@ -368,7 +369,7 @@ function EventModal({event,venueId,venueTier,currentEventCount,onClose,onSave}) 
  useEffect(()=>{
    if(event?.id){
      sb.from("ticket_tiers").select("*").eq("event_id",event.id).order("price",{ascending:true})
-       .then(({data})=>setTiers((data||[]).map(t=>({...t,price:String(t.price||""),quantity:String(t.quantity||"")}))))
+       .then(({data})=>setTiers((data||[]).map(t=>({...t,price:String(t.price||""),quantity:String(t.quantity||""),payment_link:t.payment_link||""}))))
    }
  },[event?.id]);
 
@@ -403,7 +404,7 @@ function EventModal({event,venueId,venueTier,currentEventCount,onClose,onSave}) 
  if(!f.is_free&&tiers.length>0){
    // Delete old tiers then reinsert
    await sb.from("ticket_tiers").delete().eq("event_id",eventId);
-   const tierRows=tiers.map(t=>({event_id:eventId,venue_id:venueId,name:t.name,price:parseFloat(t.price)||0,quantity:parseInt(t.quantity)||null,quantity_remaining:parseInt(t.quantity)||null,description:t.description||null}));
+   const tierRows=tiers.map(t=>({event_id:eventId,venue_id:venueId,name:t.name,price:parseFloat(t.price)||0,quantity:parseInt(t.quantity)||null,quantity_remaining:parseInt(t.quantity)||null,description:t.description||null,payment_link:t.payment_link||null}));
    const {error:tierErr}=await sb.from("ticket_tiers").insert(tierRows);
    if(tierErr){setBusy(false);setErr("Event saved but tiers failed: "+tierErr.message);return;}
  }
@@ -658,10 +659,5 @@ ReactDOM.createRoot(document.getElementById("root")).render(<Root/>);
       try {
         var parsed = JSON.parse(stored);
         var email = parsed && parsed.user && parsed.user.email;
-        var adminEmails = ['deante90@gmail.com'];
-        if (email && adminEmails.indexOf(email) > -1) link.style.display = 'inline';
-      } catch(e) {}
-    }
-  })();
-</body>
-</html>
+        var adminEmails = ['<a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="88ecede9e6fcedb1b8c8efe5e9e1e4a6ebe7e5">[email&#160;protected]</a>'];
+        if (em

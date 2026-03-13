@@ -1814,7 +1814,7 @@ async function openEventModal(id){
      var priceColor=t.price===0?'#22c55e':'var(--orange)';
      var btn=soldOut
        ?'<button disabled style="background:#1a1a24;color:#555;border:1px solid #25252f;border-radius:8px;padding:8px 16px;font-size:13px;font-weight:700;cursor:not-allowed;font-family:DM Sans,sans-serif">Sold Out</button>'
-       :'<button class="cbus-buy-btn" data-eid="'+e.id+'" data-tid="'+t.id+'" data-tname="'+t.name.replace(/"/g,'&quot;')+'" data-price="'+t.price+'" style="background:#FF6B35;color:#fff;border:none;border-radius:8px;padding:8px 16px;font-size:13px;font-weight:700;cursor:pointer;font-family:DM Sans,sans-serif">Buy &rarr;</button>';
+       :'<button class="cbus-buy-btn" data-eid="'+e.id+'" data-tid="'+t.id+'" data-tname="'+t.name.replace(/"/g,'&quot;')+'" data-price="'+t.price+'" data-link="'+( t.payment_link||'')+'" style="background:#FF6B35;color:#fff;border:none;border-radius:8px;padding:8px 16px;font-size:13px;font-weight:700;cursor:pointer;font-family:DM Sans,sans-serif">Buy &rarr;</button>';
      rows+='<div style="display:flex;justify-content:space-between;align-items:center;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px 16px;margin-bottom:8px">'
        +'<div>'
        +'<div style="font-weight:700;font-size:14px">'+t.name+'</div>'
@@ -1858,25 +1858,14 @@ async function openEventModal(id){
  document.getElementById('eventModal').style.display='flex';
  document.body.style.overflow='hidden';
 }
-async function buyTicket(eventId, tierId, tierName, price){
- const msgEl=document.getElementById('ticketMsg');
- if(msgEl){msgEl.style.display='block';msgEl.style.color='#8888a0';msgEl.textContent='Redirecting to checkout...';}
- try {
-   const {data:{session}}=await sb.auth.getSession();
-   const headers={'Content-Type':'application/json','apikey':SB_KEY};
-   if(session?.access_token)headers['Authorization']='Bearer '+session.access_token;
-   const res=await fetch('https://toblgvatvsjljbqogzsv.supabase.co/functions/v1/create-checkout',{
-     method:'POST',headers,
-     body:JSON.stringify({event_id:eventId,tier_id:tierId,tier_name:tierName,price,quantity:1,
-       success_url:window.location.origin+'/ticket-success.html?session_id={CHECKOUT_SESSION_ID}',
-       cancel_url:window.location.href})
-   });
-   const data=await res.json();
-   if(data.url){window.location.href=data.url;}
-   else{if(msgEl){msgEl.style.color='#ef4444';msgEl.textContent=data.error||'Checkout failed. Please try again.';}}
- } catch(err){
-   if(msgEl){msgEl.style.color='#ef4444';msgEl.textContent='Network error. Please try again.';}
+function buyTicket(eventId, tierId, tierName, price, paymentLink){
+ // If tier has a Stripe Payment Link, go directly — no Edge Function needed
+ if(paymentLink){
+   window.location.href=paymentLink;
+   return;
  }
+ const msgEl=document.getElementById('ticketMsg');
+ if(msgEl){msgEl.style.display='block';msgEl.style.color='#ef4444';msgEl.textContent='Tickets unavailable right now. Please contact the venue.';}
 }
 function closeEventModal(){
  document.getElementById('eventModal').style.display='none';
@@ -1886,7 +1875,7 @@ function closeEventModal(){
 document.addEventListener('click',function(ev){
  var btn=ev.target.closest('.cbus-buy-btn');
  if(!btn)return;
- buyTicket(btn.dataset.eid,btn.dataset.tid,btn.dataset.tname,parseFloat(btn.dataset.price));
+ buyTicket(btn.dataset.eid,btn.dataset.tid,btn.dataset.tname,parseFloat(btn.dataset.price),btn.dataset.link||null);
 });
 
 function openVendorModal(id){
