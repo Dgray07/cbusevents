@@ -547,7 +547,7 @@ async function doSignUp(){
     const msg=authErr.message||'';
     const lmsg=msg.toLowerCase();
     if(lmsg.includes('already registered')||lmsg.includes('already exists')||lmsg.includes('duplicate')){
-      document.getElementById('suErr').innerHTML='An account with this email already exists. <button onclick="setMode('signin')" style="background:none;border:none;color:var(--orange);font-size:13px;cursor:pointer;text-decoration:underline;padding:0">Sign in instead →</button>';
+      document.getElementById('suErr').innerHTML='An account with this email already exists. <button onclick="setMode(\'signin\')" style="background:none;border:none;color:var(--orange);font-size:13px;cursor:pointer;text-decoration:underline;padding:0">Sign in instead →</button>';
     } else {
       document.getElementById('suErr').textContent=msg||'Signup failed — please try again.';
     }
