@@ -882,8 +882,11 @@ h1,h2,h3,h4,h5,h6{font-family:Inter,sans-serif;letter-spacing:-0.02em;}
       });
 
       // Set required fields per role
-      document.getElementById('venueName').required = role === 'venue';
-      document.getElementById('businessName').required = role === 'vendor';
+      // NOTE: We do NOT use HTML required on role-specific fields because
+      // Chrome/Safari refuse to submit forms with required fields that are hidden (display:none)
+      // Validation is handled manually in handleSubmit instead
+      document.getElementById('venueName').required = false;
+      document.getElementById('businessName').required = false;
 
       // Update button
       const btn = document.getElementById('submitBtn');
@@ -930,6 +933,25 @@ h1,h2,h3,h4,h5,h6{font-family:Inter,sans-serif;letter-spacing:-0.02em;}
       const password = document.getElementById('password').value;
       const firstName = document.getElementById('firstName').value.trim();
       const lastName = document.getElementById('lastName').value.trim();
+
+      // Manual validation for role-specific required fields
+      // (HTML5 required can't be used on hidden fields — Chrome/Safari block submission)
+      if (selectedRole === 'venue') {
+        const venueName = document.getElementById('venueName').value.trim();
+        if (!venueName) {
+          btn.classList.remove('loading');
+          showError('Please enter your venue name.');
+          return;
+        }
+      }
+      if (selectedRole === 'vendor') {
+        const bizName = document.getElementById('businessName').value.trim();
+        if (!bizName) {
+          btn.classList.remove('loading');
+          showError('Please enter your business name.');
+          return;
+        }
+      }
 
       // Build metadata
       const meta = {
@@ -981,7 +1003,7 @@ h1,h2,h3,h4,h5,h6{font-family:Inter,sans-serif;letter-spacing:-0.02em;}
 
         // If email confirmation is disabled (instant session), do the DB writes now
         if (userId && data.session) {
-          const roleMap = { venue: 'venue_owner', vendor: 'vendor', planner: 'planner' };
+          const roleMap = { venue: 'venue_owner', vendor: 'vendor', planner: 'planner', attendee: 'customer' };
           await sb.from('user_roles').upsert({
             user_id: userId,
             role: roleMap[selectedRole] || selectedRole

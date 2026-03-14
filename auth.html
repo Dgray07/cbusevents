@@ -186,7 +186,7 @@ sb.auth.onAuthStateChange(async (event, session) => {
     if (pending) {
       try {
         const { role, stepData: sd, selectedClaimId: claimId } = JSON.parse(pending);
-        const roleMap = { venue: 'venue_owner', vendor: 'vendor', planner: 'planner' };
+        const roleMap = { venue: 'venue_owner', vendor: 'vendor', planner: 'planner', attendee: 'customer' };
         const dbRole = roleMap[role] || role;
 
         await sb.from('user_roles').upsert({ user_id: userId, role: dbRole });
@@ -551,7 +551,7 @@ async function doSignUp(){
   document.getElementById('loadingMsg').textContent='Setting up your profile…';
 
   // 3. Set role — retry up to 3 times since session may not be ready
-  const roleMap={}; // all roles map to themselves
+  const roleMap={ venue_owner:'venue_owner', vendor:'vendor', planner:'planner', customer:'customer' }; // roles map to themselves
   const dbRole=roleMap[selectedRole]||selectedRole;
   let roleWritten=false;
   for(let attempt=0;attempt<3;attempt++){
