@@ -366,7 +366,14 @@ function nextStep(n){
  }
 }
 
-function goBack(n){showStep(n);}
+function goBack(n){
+  showStep(n);
+  // Always reset submit button state when going back — prevents stuck disabled state
+  const b=document.getElementById('suBtn');
+  if(b){b.disabled=false;b.textContent='Create Account →';b.onclick=doSignUp;}
+  const err=document.getElementById('suErr');
+  if(err){err.textContent='';err.style.color='#ef4444';}
+}
 
 function buildStep2(){
  const configs={
@@ -514,56 +521,49 @@ async function doSignUp(){
   const email=document.getElementById('suEmail').value.trim();
   const pass=document.getElementById('suPass').value;
   const errEl=document.getElementById('suErr');
-  const btn=document.getElementById('suBtn');
   if(!email||!pass){errEl.textContent='Email and password required.';return;}
   if(pass.length<6){errEl.textContent='Password must be at least 6 characters.';return;}
-  btn.disabled=true;btn.textContent='Creating account…';errEl.textContent='';
+
+  // Always re-query btn so we have a fresh reference after step transitions
+  const btn=document.getElementById('suBtn');
+  btn.disabled=true;btn.textContent='Creating account…';
+  errEl.textContent='';errEl.style.color='#ef4444';
+
+  // Helper to fully reset the button — always re-queries the DOM
+  const resetBtn=()=>{
+    const b=document.getElementById('suBtn');
+    if(b){b.disabled=false;b.textContent='Create Account →';b.onclick=doSignUp;}
+  };
 
   showStep('Loading');
   document.getElementById('loadingMsg').textContent='Creating your account…';
 
   // 1. Create auth user
   const{data,error:authErr}=await sb.auth.signUp({email,password:pass,options:{emailRedirectTo:'https://cbusevents.com/auth.html'}});
-  console.log('SIGNUP RESPONSE:', JSON.stringify({
-    user: data?.user?.id,
-    email: data?.user?.email,
-    confirmed: data?.user?.email_confirmed_at,
-    session: !!data?.session,
-    error: authErr?.message,
-    status: authErr?.status,
-  }));
+
   if(authErr){
     showStep(3);
+    resetBtn();
     const msg=authErr.message||'';
     const lmsg=msg.toLowerCase();
     if(lmsg.includes('already registered')||lmsg.includes('already exists')||lmsg.includes('duplicate')){
-      document.getElementById('suErr').innerHTML='An account with this email already exists. <button onclick="setMode(&apos;signin&apos;)" style="background:none;border:none;color:var(--orange);font-size:13px;cursor:pointer;text-decoration:underline;padding:0">Sign in instead →</button>';
-    } else if(lmsg.includes('database')||lmsg.includes('error saving')){
-      // Supabase returns this when email confirmation is on — account WAS created
-      document.getElementById('suErr').style.color='#4ade80';
-      document.getElementById('suErr').innerHTML='Account created! <button onclick="setMode(&apos;signin&apos;)" style="background:none;border:none;color:var(--orange);font-size:13px;cursor:pointer;text-decoration:underline;padding:0">Sign in to continue →</button>';
-      btn.textContent='Sign In →';
-      btn.onclick=()=>setMode('signin');
-      btn.disabled=false;
+      document.getElementById('suErr').innerHTML='An account with this email already exists. <button onclick="setMode('signin')" style="background:none;border:none;color:var(--orange);font-size:13px;cursor:pointer;text-decoration:underline;padding:0">Sign in instead →</button>';
     } else {
-      // Show the EXACT error so we can diagnose
       document.getElementById('suErr').textContent=msg||'Signup failed — please try again.';
-      console.error('SIGNUP AUTH ERROR:', authErr);
-      btn.disabled=false;btn.textContent='Create Account →';
     }
     return;
   }
+
   const userId=data.user?.id;
   if(!userId){
     showStep(3);
+    resetBtn();
     document.getElementById('suErr').textContent='Signup failed — please try again.';
-    btn.disabled=false;btn.textContent='Create Account →';
     return;
   }
 
   // If no session, email confirmation is required
   if(!data.session){
-    // Store everything so onAuthStateChange finishes setup after confirmation
     localStorage.setItem('cbusevents_pending_role', JSON.stringify({
       role: selectedRole,
       stepData: stepData,
@@ -575,7 +575,6 @@ async function doSignUp(){
   }
 
   let finalUserId = userId;
-  let finalSession = data.session;
 
   // Short wait for session to be available
   await new Promise(r=>setTimeout(r,600));
