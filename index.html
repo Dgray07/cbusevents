@@ -22,9 +22,9 @@
 <script src="https://api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.js"></script>
 <style>
 *{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;}
-body{font-family:"Inter",sans-serif;}
-h1,h2,h3,h4,h5,h6{font-family:"Inter",sans-serif;letter-spacing:-0.02em;}
-.nav-logo,.auth-logo,.login-logo,.sidebar-logo-text{font-family:"Inter",sans-serif!important;font-weight:800!important;letter-spacing:-0.04em!important;text-transform:uppercase;}
+body{font-family:Inter,sans-serif;}
+h1,h2,h3,h4,h5,h6{font-family:Inter,sans-serif;letter-spacing:-0.02em;}
+.nav-logo,.auth-logo,.login-logo,.sidebar-logo-text{font-family:Inter,sans-serif!important;font-weight:800!important;letter-spacing:-0.04em!important;text-transform:uppercase;}
 .nav-logo span,.auth-logo span,.login-logo span,.sidebar-logo-text span{color:#FF6B35;}
 </style>
 </head>
@@ -63,9 +63,9 @@ h1,h2,h3,h4,h5,h6{font-family:"Inter",sans-serif;letter-spacing:-0.02em;}
  --orange:#FF6B35; --green:#22c55e; --gold:#f59e0b; --blue:#60a5fa;
 }
 html { scroll-behavior: smooth; }
-body { background:var(--bg); color:var(--text); font-family:'Inter',sans-serif; }
+body { background:var(--bg); color:var(--text); font-family:Inter,sans-serif; }
 a { text-decoration:none; color:inherit; }
-button { cursor:pointer; font-family:'Inter',sans-serif; border:none; }
+button { cursor:pointer; font-family:Inter,sans-serif; border:none; }
 @keyframes spin { to { transform:rotate(360deg); } }
 @keyframes fadeUp { from { opacity:0; transform:translateY(24px); } to { opacity:1; transform:translateY(0); } }
 @keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
@@ -79,7 +79,7 @@ nav {
  display:flex; align-items:center; justify-content:space-between;
  padding:0 48px; height:62px;
 }
-.nav-logo { font-family:'Inter',sans-serif; font-weight:800; font-size:20px; cursor:pointer; }
+.nav-logo { font-family:Inter,sans-serif; font-weight:800; font-size:20px; cursor:pointer; }
 .nav-logo span { color:var(--orange); }
 .nav-links { display:flex; gap:4px; }
 .nav-link {
@@ -115,7 +115,7 @@ nav {
  letter-spacing:1.5px; text-transform:uppercase; margin-bottom:18px;
 }
 .hero-title {
- font-family:'Inter',sans-serif; font-weight:800;
+ font-family:Inter,sans-serif; font-weight:800;
  font-size:clamp(34px,5vw,56px); line-height:1.08; margin-bottom:16px;
 }
 .hero-title span { color:var(--orange); }
@@ -157,7 +157,7 @@ nav {
 }
 .hero-stat { flex:1; padding:14px 24px; border-right:1px solid rgba(255,255,255,0.06); text-align:center; }
 .hero-stat:last-child { border-right:none; }
-.hero-stat-num { font-family:'Inter',sans-serif; font-size:22px; font-weight:800; color:var(--orange); }
+.hero-stat-num { font-family:Inter,sans-serif; font-size:22px; font-weight:800; color:var(--orange); }
 .hero-stat-label { font-size:11px; color:var(--sub); margin-top:2px; }
 
 /* ── SEARCH ── */
@@ -168,13 +168,13 @@ nav {
 .search-icon { position:absolute; left:14px; top:50%; transform:translateY(-50%); color:var(--muted); }
 .search-input {
  width:100%; background:var(--card); border:1px solid var(--border); border-radius:10px;
- padding:13px 16px 13px 42px; color:var(--text); font-family:'Inter',sans-serif;
+ padding:13px 16px 13px 42px; color:var(--text); font-family:Inter,sans-serif;
  font-size:15px; outline:none; transition:border-color 0.2s;
 }
 .search-input:focus { border-color:var(--orange); }
 .search-select {
  background:var(--card); border:1px solid var(--border); border-radius:10px;
- padding:13px 16px; color:var(--text); font-family:'Inter',sans-serif;
+ padding:13px 16px; color:var(--text); font-family:Inter,sans-serif;
  font-size:14px; outline:none; min-width:160px;
 }
 .filter-chips { display:flex; gap:8px; flex-wrap:wrap; margin-top:14px; }
@@ -190,7 +190,7 @@ nav {
 .section { padding:52px 48px; }
 .section-alt { background:var(--surface); }
 .section-header { display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:28px; }
-.section-title { font-family:'Inter',sans-serif; font-size:22px; font-weight:800; }
+.section-title { font-family:Inter,sans-serif; font-size:22px; font-weight:800; }
 .section-sub { color:var(--sub); font-size:13px; margin-top:4px; }
 .see-all { color:var(--orange); font-size:13px; font-weight:600; background:none; border:none; white-space:nowrap; }
 
@@ -220,7 +220,7 @@ nav {
 .tier-standard { background:#3b82f6; color:#fff; }
 .venue-card-body { padding:16px; flex:1; display:flex; flex-direction:column; }
 .venue-card-type { font-size:11px; color:var(--orange); font-weight:600; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:5px; }
-.venue-card-name { font-family:'Inter',sans-serif; font-weight:700; font-size:17px; margin-bottom:7px; }
+.venue-card-name { font-family:Inter,sans-serif; font-weight:700; font-size:17px; margin-bottom:7px; }
 .venue-card-desc { color:var(--sub); font-size:13px; line-height:1.55; margin-bottom:12px; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; flex:1; }
 .venue-card-footer { display:flex; justify-content:space-between; align-items:center; }
 .venue-card-loc { font-size:12px; color:var(--muted); }
@@ -254,7 +254,7 @@ nav {
 .venue-detail-overlay { position:absolute; inset:0; background:linear-gradient(to top, rgba(11,11,15,1) 0%, rgba(11,11,15,0.3) 100%); }
 .venue-detail-meta { position:relative; z-index:2; padding:32px 48px; width:100%; }
 .venue-detail-type { font-size:12px; color:var(--orange); font-weight:700; text-transform:uppercase; letter-spacing:1px; margin-bottom:8px; }
-.venue-detail-name { font-family:'Inter',sans-serif; font-size:clamp(28px,4vw,44px); font-weight:800; }
+.venue-detail-name { font-family:Inter,sans-serif; font-size:clamp(28px,4vw,44px); font-weight:800; }
 
 .venue-detail-body { padding:40px 48px; max-width:1100px; }
 .venue-detail-grid { display:grid; grid-template-columns:1fr 360px; gap:40px; align-items:start; }
@@ -264,12 +264,12 @@ nav {
 .amenity-chip { background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:6px 12px; font-size:13px; }
 
 .inquiry-card { background:var(--card); border:1px solid var(--border); border-radius:16px; padding:24px; position:sticky; top:80px; }
-.inquiry-card h3 { font-family:'Inter',sans-serif; font-size:18px; font-weight:700; margin-bottom:20px; }
+.inquiry-card h3 { font-family:Inter,sans-serif; font-size:18px; font-weight:700; margin-bottom:20px; }
 .field { margin-bottom:14px; }
 .field label { display:block; font-size:12px; color:var(--sub); font-weight:500; margin-bottom:5px; }
 .field input, .field textarea, .field select {
  width:100%; background:var(--bg); border:1px solid var(--border); border-radius:8px;
- padding:10px 13px; color:var(--text); font-family:'Inter',sans-serif; font-size:14px; outline:none;
+ padding:10px 13px; color:var(--text); font-family:Inter,sans-serif; font-size:14px; outline:none;
 }
 .field input:focus, .field textarea:focus { border-color:var(--orange); }
 .field textarea { min-height:80px; resize:vertical; }
@@ -280,7 +280,7 @@ nav {
  background:linear-gradient(135deg, #130800 0%, #1a1000 50%, #0b0b0f 100%);
  border-bottom:1px solid var(--border); padding:52px 48px;
 }
-.cat-hero-title { font-family:'Inter',sans-serif; font-size:clamp(28px,4vw,48px); font-weight:800; margin-bottom:10px; }
+.cat-hero-title { font-family:Inter,sans-serif; font-size:clamp(28px,4vw,48px); font-weight:800; margin-bottom:10px; }
 .cat-hero-sub { color:var(--sub); font-size:16px; max-width:560px; line-height:1.6; }
 .breadcrumb { display:flex; align-items:center; gap:8px; margin-bottom:20px; font-size:13px; color:var(--muted); }
 .breadcrumb span { color:var(--text); }
@@ -310,7 +310,7 @@ nav {
  border:1px solid #FF6B3530; padding:52px 56px;
  display:flex; justify-content:space-between; align-items:center; gap:32px;
 }
-.cta-banner h2 { font-family:'Inter',sans-serif; font-size:28px; font-weight:800; margin-bottom:10px; }
+.cta-banner h2 { font-family:Inter,sans-serif; font-size:28px; font-weight:800; margin-bottom:10px; }
 .cta-banner p { color:var(--sub); font-size:15px; line-height:1.6; max-width:480px; }
 .cta-actions { display:flex; flex-direction:column; gap:10px; flex-shrink:0; }
 .btn-secondary { background:var(--card); color:var(--text); border:1px solid var(--border); padding:13px 24px; border-radius:10px; font-size:14px; font-weight:500; transition:all 0.15s; }
@@ -319,7 +319,7 @@ nav {
 /* ── FOOTER ── */
 footer { background:var(--surface); border-top:1px solid var(--border); padding:52px 48px 32px; }
 .footer-grid { display:grid; grid-template-columns:2fr 1fr 1fr 1fr; gap:40px; margin-bottom:40px; }
-.footer-logo { font-family:'Inter',sans-serif; font-size:22px; font-weight:800; margin-bottom:10px; }
+.footer-logo { font-family:Inter,sans-serif; font-size:22px; font-weight:800; margin-bottom:10px; }
 .footer-logo span { color:var(--orange); }
 .footer-desc { color:var(--sub); font-size:13px; line-height:1.7; max-width:260px; }
 .footer-col h4 { font-weight:700; font-size:13px; margin-bottom:14px; }
@@ -334,7 +334,7 @@ footer { background:var(--surface); border-top:1px solid var(--border); padding:
 /* ── EMPTY ── */
 .empty { text-align:center; padding:60px 20px; color:var(--sub); }
 .empty-icon { font-size:48px; margin-bottom:16px; }
-.empty h3 { font-family:'Inter',sans-serif; font-size:18px; font-weight:700; margin-bottom:8px; color:var(--text); }
+.empty h3 { font-family:Inter,sans-serif; font-size:18px; font-weight:700; margin-bottom:8px; color:var(--text); }
 
 /* ── RESPONSIVE ── */
 /* ── TABLET ── */
@@ -434,7 +434,7 @@ footer { background:var(--surface); border-top:1px solid var(--border); padding:
 .nav-hamburger.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg);}
 .nav-mobile-menu{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(11,11,15,0.98);backdrop-filter:blur(20px);z-index:105;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:80px 24px 40px;}
 .nav-mobile-menu.open{display:flex;}
-.nav-mobile-link{font-family:'Inter',sans-serif;font-size:26px;font-weight:700;color:var(--text);text-decoration:none;padding:12px 24px;border-radius:12px;transition:color 0.2s;text-align:center;width:100%;cursor:pointer;border:none;background:none;font-family:'Inter',sans-serif;}
+.nav-mobile-link{font-family:Inter,sans-serif;font-size:26px;font-weight:700;color:var(--text);text-decoration:none;padding:12px 24px;border-radius:12px;transition:color 0.2s;text-align:center;width:100%;cursor:pointer;border:none;background:none;font-family:Inter,sans-serif;}
 .nav-mobile-link:hover,.nav-mobile-link.active{color:var(--orange);}
 .nav-mobile-divider{width:40px;height:1px;background:var(--border);margin:6px 0;}
 .nav-mobile-cta{margin-top:12px;background:var(--orange) !important;color:#fff !important;border-radius:12px;padding:14px 32px !important;font-size:16px !important;}
@@ -471,7 +471,7 @@ footer { background:var(--surface); border-top:1px solid var(--border); padding:
   display:flex; gap:48px; animation:rh-ticker 24s linear infinite; white-space:nowrap;
 }
 .rh-ticker-item {
-  font-family:'Inter',sans-serif; font-weight:600; font-size:11px;
+  font-family:Inter,sans-serif; font-weight:600; font-size:11px;
   letter-spacing:2px; color:var(--orange); text-transform:uppercase;
   display:flex; align-items:center; gap:12px; flex-shrink:0;
 }
@@ -480,18 +480,18 @@ footer { background:var(--surface); border-top:1px solid var(--border); padding:
 .rh-hero-content { position:relative; z-index:2; max-width:620px; }
 .rh-toggle { display:flex; gap:8px; margin-bottom:28px; flex-wrap:wrap; }
 .rh-pill {
-  font-family:'Inter',sans-serif; font-weight:700; font-size:12px;
+  font-family:Inter,sans-serif; font-weight:700; font-size:12px;
   letter-spacing:1px; text-transform:uppercase; padding:7px 16px;
   border-radius:100px; border:1px solid rgba(255,255,255,0.1);
   cursor:pointer; transition:all 0.2s; color:rgba(255,255,255,0.45); background:transparent;
 }
 .rh-pill.active { background:var(--orange); border-color:var(--orange); color:#fff; }
 .rh-eyebrow {
-  font-family:'Inter',sans-serif; font-weight:700; font-size:12px;
+  font-family:Inter,sans-serif; font-weight:700; font-size:12px;
   letter-spacing:3px; text-transform:uppercase; color:var(--orange); margin-bottom:16px;
 }
 .rh-headline {
-  font-family:'Inter',sans-serif; font-size:clamp(60px,12vw,96px);
+  font-family:Inter,sans-serif; font-size:clamp(60px,12vw,96px);
   line-height:0.92; letter-spacing:1px; margin-bottom:22px;
 }
 .rh-headline .rh-accent { color:var(--orange); }
@@ -508,7 +508,7 @@ footer { background:var(--surface); border-top:1px solid var(--border); padding:
   display:inline-flex; align-items:center; gap:8px;
   background:var(--orange); color:#fff; border:none;
   padding:16px 28px; border-radius:10px;
-  font-family:'Inter',sans-serif; font-weight:700; font-size:16px;
+  font-family:Inter,sans-serif; font-weight:700; font-size:16px;
   letter-spacing:0.5px; cursor:pointer; transition:all 0.2s; text-decoration:none;
 }
 .rh-btn-primary:hover { background:#e55a1a; transform:translateY(-1px); }
@@ -516,7 +516,7 @@ footer { background:var(--surface); border-top:1px solid var(--border); padding:
   display:inline-flex; align-items:center; gap:8px;
   background:transparent; color:#fff; border:1px solid rgba(255,255,255,0.15);
   padding:14px 24px; border-radius:10px;
-  font-family:'Inter',sans-serif; font-weight:600; font-size:15px;
+  font-family:Inter,sans-serif; font-weight:600; font-size:15px;
   letter-spacing:0.5px; cursor:pointer; transition:all 0.2s; text-decoration:none;
 }
 .rh-btn-secondary:hover { border-color:rgba(255,255,255,0.35); background:rgba(255,255,255,0.04); }
@@ -525,7 +525,7 @@ footer { background:var(--surface); border-top:1px solid var(--border); padding:
   border-top:1px solid rgba(255,255,255,0.08); flex-wrap:wrap;
 }
 .rh-proof-num {
-  font-family:'Inter',sans-serif; font-size:30px; color:var(--orange); line-height:1;
+  font-family:Inter,sans-serif; font-size:30px; color:var(--orange); line-height:1;
 }
 .rh-proof-label {
   font-size:11px; font-weight:600; letter-spacing:1px; text-transform:uppercase;
@@ -546,7 +546,7 @@ footer { background:var(--surface); border-top:1px solid var(--border); padding:
   display:flex; align-items:center; justify-content:center; font-size:20px; flex-shrink:0;
 }
 .rh-urgency-title {
-  font-family:'Inter',sans-serif; font-weight:700; font-size:16px; letter-spacing:0.3px;
+  font-family:Inter,sans-serif; font-weight:700; font-size:16px; letter-spacing:0.3px;
 }
 .rh-urgency-desc { font-size:13px; color:rgba(255,255,255,0.5); line-height:1.4; margin-top:2px; }
 .rh-urgency-desc strong { color:var(--orange); }
@@ -555,11 +555,11 @@ footer { background:var(--surface); border-top:1px solid var(--border); padding:
 @media(max-width:768px){.rh-section{padding:48px 24px;}}
 .rh-section.dark { background:var(--surface); }
 .rh-section-label {
-  font-family:'Inter',sans-serif; font-weight:700; font-size:11px;
+  font-family:Inter,sans-serif; font-weight:700; font-size:11px;
   letter-spacing:3px; text-transform:uppercase; color:var(--orange); margin-bottom:12px;
 }
 .rh-section-title {
-  font-family:'Inter',sans-serif; font-size:clamp(40px,8vw,60px);
+  font-family:Inter,sans-serif; font-size:clamp(40px,8vw,60px);
   line-height:0.95; margin-bottom:16px;
 }
 .rh-section-sub {
@@ -580,7 +580,7 @@ footer { background:var(--surface); border-top:1px solid var(--border); padding:
   background:rgba(255,107,53,0.1);
 }
 .rh-benefit-title {
-  font-family:'Inter',sans-serif; font-weight:700; font-size:16px;
+  font-family:Inter,sans-serif; font-weight:700; font-size:16px;
   letter-spacing:0.3px; margin-bottom:5px;
 }
 .rh-benefit-desc { font-size:13px; color:rgba(255,255,255,0.5); line-height:1.5; }
@@ -598,11 +598,11 @@ footer { background:var(--surface); border-top:1px solid var(--border); padding:
 }
 .rh-step:last-child { border-bottom:none; }
 .rh-step-num {
-  font-family:'Inter',sans-serif; font-size:52px;
+  font-family:Inter,sans-serif; font-size:52px;
   color:rgba(255,107,53,0.2); line-height:1; flex-shrink:0; width:52px;
 }
 .rh-step-title {
-  font-family:'Inter',sans-serif; font-weight:700;
+  font-family:Inter,sans-serif; font-weight:700;
   font-size:18px; letter-spacing:0.3px; margin-bottom:6px; padding-top:4px;
 }
 .rh-step-desc { font-size:13px; color:rgba(255,255,255,0.5); line-height:1.6; }
@@ -624,12 +624,12 @@ footer { background:var(--surface); border-top:1px solid var(--border); padding:
 }
 .rh-founding-badge {
   display:inline-block; background:var(--orange); color:#fff;
-  font-family:'Inter',sans-serif; font-weight:700; font-size:11px;
+  font-family:Inter,sans-serif; font-weight:700; font-size:11px;
   letter-spacing:2px; text-transform:uppercase; padding:5px 14px;
   border-radius:100px; margin-bottom:20px;
 }
 .rh-founding-title {
-  font-family:'Inter',sans-serif; font-size:52px; line-height:0.92; margin-bottom:16px;
+  font-family:Inter,sans-serif; font-size:52px; line-height:0.92; margin-bottom:16px;
 }
 .rh-founding-title span { color:var(--orange); }
 .rh-founding-desc { font-size:14px; color:rgba(255,255,255,0.6); line-height:1.7; margin-bottom:24px; }
@@ -642,7 +642,7 @@ footer { background:var(--surface); border-top:1px solid var(--border); padding:
   font-size:10px; flex-shrink:0; color:var(--green);
 }
 .rh-spots-text {
-  font-family:'Inter',sans-serif; font-size:13px; font-weight:600;
+  font-family:Inter,sans-serif; font-size:13px; font-weight:600;
   letter-spacing:0.5px; color:var(--orange); margin-bottom:8px;
 }
 .rh-spots-bar {
@@ -664,7 +664,7 @@ footer { background:var(--surface); border-top:1px solid var(--border); padding:
 .rh-community.attendees { background:linear-gradient(135deg,rgba(34,197,94,0.07),rgba(34,197,94,0.01)); border-color:rgba(34,197,94,0.15); }
 .rh-community-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:10px; }
 .rh-community-label {
-  font-family:'Inter',sans-serif; font-weight:700; font-size:20px; letter-spacing:0.5px;
+  font-family:Inter,sans-serif; font-weight:700; font-size:20px; letter-spacing:0.5px;
 }
 .rh-community-free {
   font-size:10px; font-weight:700; letter-spacing:1px; color:var(--green);
@@ -673,7 +673,7 @@ footer { background:var(--surface); border-top:1px solid var(--border); padding:
 }
 .rh-community-desc { font-size:13px; color:rgba(255,255,255,0.5); line-height:1.6; margin-bottom:14px; }
 .rh-community-link {
-  font-family:'Inter',sans-serif; font-weight:700; font-size:14px;
+  font-family:Inter,sans-serif; font-weight:700; font-size:14px;
   letter-spacing:0.5px; display:flex; align-items:center; gap:6px; transition:gap 0.2s;
 }
 .rh-community.venues .rh-community-link { color:var(--orange); }
@@ -694,18 +694,18 @@ footer { background:var(--surface); border-top:1px solid var(--border); padding:
 .rh-venue-img img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
 .rh-venue-tag {
   position:relative; z-index:1;
-  font-family:'Inter',sans-serif; font-weight:700; font-size:10px;
+  font-family:Inter,sans-serif; font-weight:700; font-size:10px;
   letter-spacing:1px; text-transform:uppercase; background:rgba(0,0,0,0.55);
   color:rgba(255,255,255,0.8); padding:3px 8px; border-radius:4px;
 }
 .rh-venue-info { padding:12px 14px 14px; }
 .rh-venue-name {
-  font-family:'Inter',sans-serif; font-weight:700;
+  font-family:Inter,sans-serif; font-weight:700;
   font-size:15px; letter-spacing:0.3px; margin-bottom:3px;
 }
 .rh-venue-meta { font-size:11px; color:rgba(255,255,255,0.45); margin-bottom:8px; }
 .rh-venue-badge {
-  display:inline-block; font-family:'Inter',sans-serif; font-weight:700;
+  display:inline-block; font-family:Inter,sans-serif; font-weight:700;
   font-size:10px; letter-spacing:1px; text-transform:uppercase;
   background:rgba(255,107,53,0.12); color:var(--orange);
   border:1px solid rgba(255,107,53,0.25); padding:3px 8px; border-radius:4px;
@@ -721,11 +721,11 @@ footer { background:var(--surface); border-top:1px solid var(--border); padding:
 .rh-event-bar { width:4px; min-height:88px; flex-shrink:0; }
 .rh-event-body { flex:1; padding:14px 16px; }
 .rh-event-cat {
-  font-family:'Inter',sans-serif; font-weight:700; font-size:10px;
+  font-family:Inter,sans-serif; font-weight:700; font-size:10px;
   letter-spacing:2px; color:rgba(255,255,255,0.4); margin-bottom:4px;
 }
 .rh-event-name {
-  font-family:'Inter',sans-serif; font-weight:700;
+  font-family:Inter,sans-serif; font-weight:700;
   font-size:17px; letter-spacing:0.3px; margin-bottom:3px;
 }
 .rh-event-venue { font-size:12px; color:rgba(255,255,255,0.45); margin-bottom:8px; }
@@ -744,7 +744,7 @@ footer { background:var(--surface); border-top:1px solid var(--border); padding:
   border-radius:12px; padding:20px 16px; text-align:center;
 }
 .rh-stat-num {
-  font-family:'Inter',sans-serif; font-size:38px; color:var(--orange); line-height:1;
+  font-family:Inter,sans-serif; font-size:38px; color:var(--orange); line-height:1;
 }
 .rh-stat-label {
   font-size:11px; font-weight:600; letter-spacing:1px; text-transform:uppercase;
@@ -758,7 +758,7 @@ footer { background:var(--surface); border-top:1px solid var(--border); padding:
 }
 @media(max-width:768px){.rh-final{padding:56px 24px;}}
 .rh-final-title {
-  font-family:'Inter',sans-serif; font-size:clamp(52px,12vw,80px);
+  font-family:Inter,sans-serif; font-size:clamp(52px,12vw,80px);
   line-height:0.92; margin-bottom:16px;
 }
 .rh-final-title span { color:var(--orange); }
@@ -767,7 +767,7 @@ footer { background:var(--surface); border-top:1px solid var(--border); padding:
 .rh-final-btns .rh-btn-primary, .rh-final-btns .rh-btn-secondary { width:100%; max-width:360px; justify-content:center; }
 .rh-section-header-row { display:flex; align-items:flex-end; justify-content:space-between; margin-bottom:8px; }
 .rh-view-all {
-  font-family:'Inter',sans-serif; font-weight:700; font-size:14px;
+  font-family:Inter,sans-serif; font-weight:700; font-size:14px;
   color:var(--orange); text-decoration:none; letter-spacing:0.5px; white-space:nowrap;
 }
 .rh-view-all:hover { text-decoration:underline; }
@@ -787,7 +787,7 @@ footer { background:var(--surface); border-top:1px solid var(--border); padding:
   <a href="https://cbusevents.com/blog.html" class="nav-mobile-link" style="color:var(--orange)">Blog</a>
   <div class="nav-mobile-divider"></div>
   <a href="https://cbusevents.com/auth.html" class="nav-mobile-link nav-mobile-cta">Sign In</a>
-</div> <div id="app"> <div style="min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px"> <div style="font-family:'Inter',sans-serif;font-weight:800;font-size:28px">CBUS<span style="color:#FF6B35">EVENTS</span></div> <div style="width:32px;height:32px;border:3px solid #25252f;border-top-color:#FF6B35;border-radius:50%;animation:spin 0.8s linear infinite"></div> <div style="color:#8888a0;font-size:13px">Loading Columbus venues...</div> </div>
+</div> <div id="app"> <div style="min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px"> <div style="font-family:Inter,sans-serif;font-weight:800;font-size:28px">CBUS<span style="color:#FF6B35">EVENTS</span></div> <div style="width:32px;height:32px;border:3px solid #25252f;border-top-color:#FF6B35;border-radius:50%;animation:spin 0.8s linear infinite"></div> <div style="color:#8888a0;font-size:13px">Loading Columbus venues...</div> </div>
 </div> <!-- EVENT MODAL -->
 <div id="eventModal" style="display:none" class="modal-overlay" onclick="if(event.target===this)closeEventModal()"> <div class="modal" id="eventModalContent"></div>
 </div>
@@ -995,9 +995,9 @@ function renderFeaturedEvent(){
   var ticket=fe.ticket_url?'<a href="'+fe.ticket_url+'" target="_blank" style="display:block;background:#FF6B35;color:#fff;border-radius:10px;padding:14px 28px;font-size:15px;font-weight:700;text-decoration:none;text-align:center;margin-bottom:10px">Get Tickets</a>':'';
   var viewBtn=document.createElement('button');
   viewBtn.textContent='View Details';
-  viewBtn.style.cssText='background:transparent;color:var(--text);border:1px solid var(--border);border-radius:10px;padding:12px 24px;font-size:14px;cursor:pointer;font-family:'Inter',sans-serif';
+  viewBtn.style.cssText='background:transparent;color:var(--text);border:1px solid var(--border);border-radius:10px;padding:12px 24px;font-size:14px;cursor:pointer;font-family:Inter,sans-serif';
   viewBtn.onclick=function(){openEventModal(fe.id);};
-  slot.innerHTML='<section class="section" style="padding-top:36px;padding-bottom:0"><div style="background:linear-gradient(135deg,#0f0a00,#1a1200,#0b0b0f);border:1px solid #f59e0b50;border-radius:18px;overflow:hidden">'+img+'<div style="padding:24px 28px;display:flex;justify-content:space-between;align-items:center;gap:24px;flex-wrap:wrap"><div><div style="display:inline-flex;background:#f59e0b;color:#000;border-radius:20px;padding:3px 12px;font-size:11px;font-weight:700;text-transform:uppercase;margin-bottom:10px">Featured Event</div><div style="font-size:11px;color:#f59e0b;font-weight:700;text-transform:uppercase;margin-bottom:6px">'+(fe.category||'Event')+'</div><div style="font-family:'Inter',sans-serif;font-size:22px;font-weight:800;margin-bottom:12px">'+fe.title+'</div><div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px"><span style="background:#1a1a24;border-radius:8px;padding:6px 12px;font-size:13px">'+fmt(fe.start_time)+'</span><span style="background:#1a1a24;border-radius:8px;padding:6px 12px;font-size:13px">'+fmtTime(fe.start_time)+(fe.end_time?' - '+fmtTime(fe.end_time):'')+'</span>'+price+'</div>'+venueLine+desc+'</div><div id="featuredBtns" style="flex-shrink:0;display:flex;flex-direction:column;gap:10px">'+ticket+'<div style="font-size:11px;color:#55556a;text-align:center">Powered by CBUSEVENTS</div></div></div></div></section>';
+  slot.innerHTML='<section class="section" style="padding-top:36px;padding-bottom:0"><div style="background:linear-gradient(135deg,#0f0a00,#1a1200,#0b0b0f);border:1px solid #f59e0b50;border-radius:18px;overflow:hidden">'+img+'<div style="padding:24px 28px;display:flex;justify-content:space-between;align-items:center;gap:24px;flex-wrap:wrap"><div><div style="display:inline-flex;background:#f59e0b;color:#000;border-radius:20px;padding:3px 12px;font-size:11px;font-weight:700;text-transform:uppercase;margin-bottom:10px">Featured Event</div><div style="font-size:11px;color:#f59e0b;font-weight:700;text-transform:uppercase;margin-bottom:6px">'+(fe.category||'Event')+'</div><div style="font-family:Inter,sans-serif;font-size:22px;font-weight:800;margin-bottom:12px">'+fe.title+'</div><div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px"><span style="background:#1a1a24;border-radius:8px;padding:6px 12px;font-size:13px">'+fmt(fe.start_time)+'</span><span style="background:#1a1a24;border-radius:8px;padding:6px 12px;font-size:13px">'+fmtTime(fe.start_time)+(fe.end_time?' - '+fmtTime(fe.end_time):'')+'</span>'+price+'</div>'+venueLine+desc+'</div><div id="featuredBtns" style="flex-shrink:0;display:flex;flex-direction:column;gap:10px">'+ticket+'<div style="font-size:11px;color:#55556a;text-align:center">Powered by CBUSEVENTS</div></div></div></div></section>';
   var btns=document.getElementById('featuredBtns');
   if(btns) btns.insertBefore(viewBtn, btns.children[btns.children.length-1]);
 }
@@ -1213,7 +1213,7 @@ function renderHome(){
      }).join('')}
      <div class="rh-venue-card" onclick="window.location.href='https://cbusevents.com/list-your-venue.html'" style="border-style:dashed;border-color:rgba(255,107,53,0.3);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:24px 16px;background:rgba(255,107,53,0.03)">
        <div style="font-size:28px;margin-bottom:10px">+</div>
-       <div style="font-family:'Inter',sans-serif;font-weight:700;font-size:14px;margin-bottom:6px">Your Venue</div>
+       <div style="font-family:Inter,sans-serif;font-weight:700;font-size:14px;margin-bottom:6px">Your Venue</div>
        <div style="font-size:11px;color:rgba(255,255,255,0.4);margin-bottom:12px">Join free</div>
        <span class="rh-venue-badge">List Yours</span>
      </div>
@@ -1263,21 +1263,21 @@ function renderHome(){
    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:4px;">
      <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:22px 20px;">
        <div style="font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--orange);margin-bottom:10px;">Venue</div>
-       <div style="font-family:'Inter',sans-serif;font-size:15px;font-weight:700;margin-bottom:4px;">1313 E. Broad Street</div>
+       <div style="font-family:Inter,sans-serif;font-size:15px;font-weight:700;margin-bottom:4px;">1313 E. Broad Street</div>
        <div style="font-size:12px;color:var(--sub);">Downtown · Founding Venue</div>
      </div>
      <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:22px 20px;">
        <div style="font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--orange);margin-bottom:10px;">Media & Strategy</div>
-       <div style="font-family:'Inter',sans-serif;font-size:15px;font-weight:700;margin-bottom:4px;">Colaeb</div>
+       <div style="font-family:Inter,sans-serif;font-size:15px;font-weight:700;margin-bottom:4px;">Colaeb</div>
        <div style="font-size:12px;color:var(--sub);">Brand & Media · Day One Partner</div>
      </div>
      <div style="background:var(--card);border:1px solid rgba(255,107,53,0.2);border-radius:14px;padding:22px 20px;">
        <div style="font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--orange);margin-bottom:10px;">Your Category</div>
-       <div style="font-family:'Inter',sans-serif;font-size:15px;font-weight:700;margin-bottom:4px;">Founding spot open</div>
+       <div style="font-family:Inter,sans-serif;font-size:15px;font-weight:700;margin-bottom:4px;">Founding spot open</div>
        <div style="font-size:12px;color:var(--sub);">Be the first in your space</div>
      </div>
      <div style="background:var(--card);border:1px solid rgba(255,255,255,0.06);border-radius:14px;padding:22px 20px;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:6px;">
-       <div style="font-family:'Inter',sans-serif;font-size:28px;font-weight:800;color:var(--orange);">22</div>
+       <div style="font-family:Inter,sans-serif;font-size:28px;font-weight:800;color:var(--orange);">22</div>
        <div style="font-size:12px;color:var(--sub);text-align:center;">Founding spots claimed.<br>28 remaining.</div>
      </div>
    </div>
@@ -1427,14 +1427,14 @@ function renderVenues(){
  document.getElementById('app').innerHTML=`
  <div class="search-section"> <div class="search-inner">
    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:12px">
-     <div><h1 style="font-family:'Inter',sans-serif;font-size:28px;font-weight:800;margin-bottom:4px">Columbus Venues</h1>
+     <div><h1 style="font-family:Inter,sans-serif;font-size:28px;font-weight:800;margin-bottom:4px">Columbus Venues</h1>
      <p style="color:var(--sub);font-size:14px">${allVenues.length} spaces for events, parties, and experiences</p></div>
      <div style="display:flex;gap:8px;align-items:center">
-       <button id="btnGrid" onclick="setVenueView('grid')" style="display:flex;align-items:center;gap:6px;padding:8px 14px;border-radius:8px;border:1px solid var(--orange);background:var(--orange);color:#fff;font-size:13px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;">
+       <button id="btnGrid" onclick="setVenueView('grid')" style="display:flex;align-items:center;gap:6px;padding:8px 14px;border-radius:8px;border:1px solid var(--orange);background:var(--orange);color:#fff;font-size:13px;font-weight:600;cursor:pointer;font-family:Inter,sans-serif;">
          <svg width="14" height="14" fill="currentColor" viewBox="0 0 16 16"><path d="M1 2.5A1.5 1.5 0 0 1 2.5 1h3A1.5 1.5 0 0 1 7 2.5v3A1.5 1.5 0 0 1 5.5 7h-3A1.5 1.5 0 0 1 1 5.5v-3zm8 0A1.5 1.5 0 0 1 10.5 1h3A1.5 1.5 0 0 1 15 2.5v3A1.5 1.5 0 0 1 13.5 7h-3A1.5 1.5 0 0 1 9 5.5v-3zm-8 8A1.5 1.5 0 0 1 2.5 9h3A1.5 1.5 0 0 1 7 10.5v3A1.5 1.5 0 0 1 5.5 15h-3A1.5 1.5 0 0 1 1 13.5v-3zm8 0A1.5 1.5 0 0 1 10.5 9h3A1.5 1.5 0 0 1 15 10.5v3A1.5 1.5 0 0 1 13.5 15h-3A1.5 1.5 0 0 1 9 13.5v-3z"/></svg>
          Grid
        </button>
-       <button id="btnMap" onclick="setVenueView('map')" style="display:flex;align-items:center;gap:6px;padding:8px 14px;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--sub);font-size:13px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;">
+       <button id="btnMap" onclick="setVenueView('map')" style="display:flex;align-items:center;gap:6px;padding:8px 14px;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--sub);font-size:13px;font-weight:600;cursor:pointer;font-family:Inter,sans-serif;">
          <svg width="14" height="14" fill="currentColor" viewBox="0 0 16 16"><path d="M8 16s6-5.686 6-10A6 6 0 0 0 2 6c0 4.314 6 10 6 10zm0-7a3 3 0 1 1 0-6 3 3 0 0 1 0 6z"/></svg>
          Map
        </button>
@@ -1454,9 +1454,9 @@ function renderVenues(){
      <div id="mapPopup" style="display:none;position:absolute;bottom:24px;left:50%;transform:translateX(-50%);background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px 16px;min-width:240px;max-width:300px;box-shadow:0 8px 32px rgba(0,0,0,0.5);z-index:10;cursor:pointer;">
        <div id="mapPopupImg" style="width:100%;height:120px;border-radius:8px;overflow:hidden;margin-bottom:10px;background:var(--surface);"></div>
        <div id="mapPopupType" style="font-size:11px;color:var(--orange);font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:3px;"></div>
-       <div id="mapPopupName" style="font-family:'Inter',sans-serif;font-weight:800;font-size:16px;margin-bottom:3px;"></div>
+       <div id="mapPopupName" style="font-family:Inter,sans-serif;font-weight:800;font-size:16px;margin-bottom:3px;"></div>
        <div id="mapPopupHood" style="font-size:13px;color:var(--sub);margin-bottom:10px;"></div>
-       <button onclick="window._mapPopupVenue&&showPage('venue',window._mapPopupVenue)" style="width:100%;padding:9px;background:var(--orange);color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;">View Venue →</button>
+       <button onclick="window._mapPopupVenue&&showPage('venue',window._mapPopupVenue)" style="width:100%;padding:9px;background:var(--orange);color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:Inter,sans-serif;">View Venue →</button>
      </div>
    </div>
  </section> ${footer()}
@@ -1572,7 +1572,7 @@ function renderEvents(){
  const tw=allEvents.filter(e=>isThisWeek(e.start_time));
  const later=allEvents.filter(e=>!isThisWeek(e.start_time));
  document.getElementById('app').innerHTML=`
- <div class="search-section"> <div class="search-inner"> <div style="margin-bottom:16px"> <h1 style="font-family:'Inter',sans-serif;font-size:28px;font-weight:800;margin-bottom:4px">Columbus Events</h1> <p style="color:var(--sub);font-size:14px">${allEvents.length} upcoming events across Columbus</p> </div> <div class="search-bar"> <div class="search-wrap"> <span class="search-icon"></span> <input class="search-input" id="eSearch" placeholder="Search events..." oninput="filterEvents()"> </div> <select class="search-select" id="eCat" onchange="filterEvents()"> ${cats.map(c=>`<option>${c}</option>`).join('')}
+ <div class="search-section"> <div class="search-inner"> <div style="margin-bottom:16px"> <h1 style="font-family:Inter,sans-serif;font-size:28px;font-weight:800;margin-bottom:4px">Columbus Events</h1> <p style="color:var(--sub);font-size:14px">${allEvents.length} upcoming events across Columbus</p> </div> <div class="search-bar"> <div class="search-wrap"> <span class="search-icon"></span> <input class="search-input" id="eSearch" placeholder="Search events..." oninput="filterEvents()"> </div> <select class="search-select" id="eCat" onchange="filterEvents()"> ${cats.map(c=>`<option>${c}</option>`).join('')}
  </select> </div> </div> </div> <section class="section"> <div id="eventResults"> ${tw.length?`<div class="section-header" style="margin-bottom:16px"><div><div class="section-title"> This Week</div></div></div><div class="event-grid" style="margin-bottom:40px">${tw.map(e=>eventCard(e)).join('')}</div>`:''}
  ${later.length?`<div class="section-header" style="margin-bottom:16px"><div><div class="section-title"> Coming Up</div></div></div><div class="event-grid">${later.map(e=>eventCard(e)).join('')}</div>`:''}
  ${!allEvents.length?'<div class="empty"><h3>No upcoming events yet</h3><p>Check back soon!</p></div>':''}
@@ -1615,19 +1615,19 @@ async function renderVenueDetail(venue){
  ${venue.website?`<div class="info-row"> <a href="${venue.website}" target="_blank" style="color:var(--orange);font-weight:600">Visit Website</a></div>`:''}
  ${venue.email?`<div class="info-row"> <a href="mailto:${venue.email}" style="color:var(--orange)">${venue.email}</a></div>`:''}
  </div> <!-- MAP --> <div id="venueMapWrap" style="border-radius:12px;overflow:hidden;margin-bottom:28px;display:none"><div id="venueMap" style="width:100%;height:220px;background:var(--surface)"></div><div id="venueMapAddr" style="background:var(--surface);border-top:1px solid var(--border);padding:10px 14px;font-size:13px;color:var(--sub)"></div></div>
- <!-- Description --> <h2 style="font-family:'Inter',sans-serif;font-size:18px;font-weight:700;margin-bottom:12px">About</h2> <p style="color:var(--sub);font-size:15px;line-height:1.75;margin-bottom:28px">${venue.description||'A great Columbus venue.'}</p> <!-- Amenities --> ${venue.amenities?.length?`
- <h2 style="font-family:'Inter',sans-serif;font-size:18px;font-weight:700;margin-bottom:12px">Amenities</h2> <div class="amenity-chips" style="margin-bottom:28px"> ${venue.amenities.map(a=>`<span class="amenity-chip"> ${a}</span>`).join('')}
+ <!-- Description --> <h2 style="font-family:Inter,sans-serif;font-size:18px;font-weight:700;margin-bottom:12px">About</h2> <p style="color:var(--sub);font-size:15px;line-height:1.75;margin-bottom:28px">${venue.description||'A great Columbus venue.'}</p> <!-- Amenities --> ${venue.amenities?.length?`
+ <h2 style="font-family:Inter,sans-serif;font-size:18px;font-weight:700;margin-bottom:12px">Amenities</h2> <div class="amenity-chips" style="margin-bottom:28px"> ${venue.amenities.map(a=>`<span class="amenity-chip"> ${a}</span>`).join('')}
  </div>`:''}
 
  <!-- Space Photos -->
- ${(venue.photos&&venue.photos.length>0)?`<h2 style="font-family:'Inter',sans-serif;font-size:18px;font-weight:700;margin-bottom:12px">The Space</h2><div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;margin-bottom:28px">${venue.photos.map(p=>`<img src="${p}" alt="venue" style="width:100%;height:160px;object-fit:cover;border-radius:10px;border:1px solid #25252f" onerror="this.style.display='none'">`).join('')}</div>`:''}
+ ${(venue.photos&&venue.photos.length>0)?`<h2 style="font-family:Inter,sans-serif;font-size:18px;font-weight:700;margin-bottom:12px">The Space</h2><div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;margin-bottom:28px">${venue.photos.map(p=>`<img src="${p}" alt="venue" style="width:100%;height:160px;object-fit:cover;border-radius:10px;border:1px solid #25252f" onerror="this.style.display='none'">`).join('')}</div>`:''}
    
  <!-- Tags --> ${venue.tags?.length?`
- <h2 style="font-family:'Inter',sans-serif;font-size:18px;font-weight:700;margin-bottom:12px">Perfect For</h2> <div class="tags" style="margin-bottom:28px"> ${venue.tags.map(t=>`<span class="tag" style="font-size:13px;padding:5px 12px">${t}</span>`).join('')}
+ <h2 style="font-family:Inter,sans-serif;font-size:18px;font-weight:700;margin-bottom:12px">Perfect For</h2> <div class="tags" style="margin-bottom:28px"> ${venue.tags.map(t=>`<span class="tag" style="font-size:13px;padding:5px 12px">${t}</span>`).join('')}
  </div>`:''}
 
  <!-- Events at this venue --> ${events?.length?`
- <h2 style="font-family:'Inter',sans-serif;font-size:18px;font-weight:700;margin-bottom:16px">Upcoming Events Here</h2> <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:28px"> ${events.map(e=>`
+ <h2 style="font-family:Inter,sans-serif;font-size:18px;font-weight:700;margin-bottom:16px">Upcoming Events Here</h2> <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:28px"> ${events.map(e=>`
  <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px 16px;display:flex;justify-content:space-between;align-items:center;gap:12px"> <div> <div style="font-weight:600;font-size:14px;margin-bottom:3px">${e.title}</div> <div style="font-size:12px;color:var(--sub)">${fmt(e.start_time)} · ${fmtTime(e.start_time)} · ${e.category}
  ${isThisWeek(e.start_time)?'<span class="week-badge" style="margin-left:4px">THIS WEEK</span>':''}</div> </div> <div style="display:flex;gap:8px;align-items:center;flex-shrink:0"> <span style="font-size:13px;font-weight:600;color:${e.is_free?'var(--green)':'var(--text)'}">${e.is_free?'Free':e.price_min?`$${e.price_min}`:''}</span> ${e.ticket_url?`<a href="${e.ticket_url}" target="_blank"><button class="btn-primary" style="padding:7px 14px;font-size:12px">Tickets</button></a>`:''}
  </div> </div>`).join('')}
@@ -1748,7 +1748,7 @@ function venueCard(v){
  ${tw?`<div style="position:absolute;bottom:8px;left:8px;background:var(--green);color:#000;border-radius:20px;padding:2px 10px;font-size:10px;font-weight:700">${tw} event${tw>1?'s':''} this week</div>`:''}
  </div> <div class="venue-card-body"> <div class="venue-card-type">${v.venue_type||'Venue'}</div> <div class="venue-card-name">${v.name}</div> <div class="venue-card-desc">${v.description||''}</div> <div class="venue-card-footer"> <span class="venue-card-loc"> ${v.neighborhood||v.city}</span> ${v.capacity?`<span style="font-size:12px;color:var(--muted)"> ${v.capacity}</span>`:''}
  </div> <div class="tags">${(v.tags||[]).slice(0,3).map(t=>`<span class="tag">${t}</span>`).join('')}</div>
- <button onclick="toggleSaveVenue('${v.id}',this,event)" style="margin-top:8px;background:${savedVenueIds.has(v.id)?'#FF6B3520':'transparent'};color:${savedVenueIds.has(v.id)?'var(--orange)':'var(--sub)'};border:1px solid var(--border);border-radius:6px;padding:5px 12px;font-size:12px;cursor:pointer;width:100%;font-family:'Inter',sans-serif;">${savedVenueIds.has(v.id)?'♥ Saved':'♡ Save'}</button>
+ <button onclick="toggleSaveVenue('${v.id}',this,event)" style="margin-top:8px;background:${savedVenueIds.has(v.id)?'#FF6B3520':'transparent'};color:${savedVenueIds.has(v.id)?'var(--orange)':'var(--sub)'};border:1px solid var(--border);border-radius:6px;padding:5px 12px;font-size:12px;cursor:pointer;width:100%;font-family:Inter,sans-serif;">${savedVenueIds.has(v.id)?'♥ Saved':'♡ Save'}</button>
  </div> </div>`;
 }
 function vendorCard(v){
@@ -1788,7 +1788,7 @@ function eventCard(e){
  return`<div class="event-card" onclick="openEventModal('${e.id}')" style="${promo?'border-color:#f59e0b60;background:linear-gradient(135deg,var(--card),#1a1200)':''}"> <div class="event-accent${tw?' green':''}" style="${promo?'background:#f59e0b':''}"></div> <div class="event-body"> <div class="event-cat"> ${promo?'<span style="background:#f59e0b20;color:#f59e0b;border:1px solid #f59e0b40;border-radius:20px;padding:2px 8px;font-size:10px;font-weight:700;margin-right:4px"> FEATURED</span>':''}
  ${e.category||'Event'}${tw?'<span class="week-badge">THIS WEEK</span>':''}
  </div> <div class="event-title">${e.title}</div> <div class="event-venue"> ${e.venues?.name||'Columbus Venue'}</div> <div class="event-pills"> <span class="event-pill"> ${fmt(e.start_time)}</span> <span class="event-pill"> ${fmtTime(e.start_time)}</span> ${e.is_free?'<span class="event-pill free">Free</span>':e.price_min?`<span class="event-pill">From $${e.price_min}</span>`:''}
- </div> <button onclick="toggleSaveEvent('${e.id}',this,event)" style="margin-top:6px;background:${savedEventIds.has(e.id)?'#FF6B3520':'transparent'};color:${savedEventIds.has(e.id)?'var(--orange)':'var(--sub)'};border:1px solid var(--border);border-radius:6px;padding:4px 10px;font-size:11px;cursor:pointer;font-family:'Inter',sans-serif;">${savedEventIds.has(e.id)?'♥ Saved':'♡ Save'}</button>
+ </div> <button onclick="toggleSaveEvent('${e.id}',this,event)" style="margin-top:6px;background:${savedEventIds.has(e.id)?'#FF6B3520':'transparent'};color:${savedEventIds.has(e.id)?'var(--orange)':'var(--sub)'};border:1px solid var(--border);border-radius:6px;padding:4px 10px;font-size:11px;cursor:pointer;font-family:Inter,sans-serif;">${savedEventIds.has(e.id)?'♥ Saved':'♡ Save'}</button>
  </div> </div>`;
 }
 
@@ -1820,8 +1820,8 @@ async function openEventModal(id){
      var priceLabel=t.price===0?'Free':'$'+t.price;
      var priceColor=t.price===0?'#22c55e':'var(--orange)';
      var btn=soldOut
-       ?'<button disabled style="background:#1a1a24;color:#555;border:1px solid #25252f;border-radius:8px;padding:8px 16px;font-size:13px;font-weight:700;cursor:not-allowed;font-family:'Inter',sans-serif">Sold Out</button>'
-       :'<button class="cbus-buy-btn" data-eid="'+e.id+'" data-tid="'+t.id+'" data-tname="'+t.name.replace(/"/g,'&quot;')+'" data-price="'+t.price+'" style="background:#FF6B35;color:#fff;border:none;border-radius:8px;padding:8px 16px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif">Buy &rarr;</button>';
+       ?'<button disabled style="background:#1a1a24;color:#555;border:1px solid #25252f;border-radius:8px;padding:8px 16px;font-size:13px;font-weight:700;cursor:not-allowed;font-family:Inter,sans-serif">Sold Out</button>'
+       :'<button class="cbus-buy-btn" data-eid="'+e.id+'" data-tid="'+t.id+'" data-tname="'+t.name.replace(/"/g,'&quot;')+'" data-price="'+t.price+'" style="background:#FF6B35;color:#fff;border:none;border-radius:8px;padding:8px 16px;font-size:13px;font-weight:700;cursor:pointer;font-family:Inter,sans-serif">Buy &rarr;</button>';
      rows+='<div style="display:flex;justify-content:space-between;align-items:center;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px 16px;margin-bottom:8px">'
        +'<div>'
        +'<div style="font-weight:700;font-size:14px">'+t.name+'</div>'
@@ -1829,7 +1829,7 @@ async function openEventModal(id){
        +(remaining!==null?'<div style="font-size:11px;color:'+(remaining<10?'#ef4444':'#888')+';margin-top:3px">'+remaining+' left</div>':'')
        +'</div>'
        +'<div style="display:flex;align-items:center;gap:10px;flex-shrink:0">'
-       +'<div style="font-family:'Inter',sans-serif;font-weight:800;font-size:16px;color:'+priceColor+'">'+priceLabel+'</div>'
+       +'<div style="font-family:Inter,sans-serif;font-weight:800;font-size:16px;color:'+priceColor+'">'+priceLabel+'</div>'
        +btn
        +'</div>'
        +'</div>';
@@ -1845,7 +1845,7 @@ async function openEventModal(id){
  </div>
  <div style="padding:24px">
    <div style="font-size:11px;color:var(--orange);font-weight:700;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px">${e.category||'Event'}</div>
-   <h2 style="font-family:'Inter',sans-serif;font-size:22px;font-weight:800;margin-bottom:14px">${e.title}</h2>
+   <h2 style="font-family:Inter,sans-serif;font-size:22px;font-weight:800;margin-bottom:14px">${e.title}</h2>
    <div style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:16px">
      <span style="background:var(--surface);border-radius:8px;padding:6px 12px;font-size:13px">&#128197; ${fmt(e.start_time)}</span>
      <span style="background:var(--surface);border-radius:8px;padding:6px 12px;font-size:13px">&#128336; ${fmtTime(e.start_time)}</span>
@@ -1858,8 +1858,8 @@ async function openEventModal(id){
    <div id="ticketMsg" style="display:none;background:#13131a;border-radius:10px;padding:14px;margin-bottom:16px;font-size:13px;text-align:center;color:#8888a0"></div>
    <div style="display:flex;gap:10px;flex-wrap:wrap">
      ${venue?`<button class="btn-secondary" onclick="closeEventModal();showPage('venue',allVenues.find(x=>x.id==='${venue.id}'))">View Venue</button>`:''}
-     <button onclick="(function(){var url='https://cbusevents.com/event.html?id=${e.id}';if(navigator.share){navigator.share({title:'${e.title}',url:url});}else{navigator.clipboard.writeText(url).then(function(){alert('Link copied!');});}})()" style="background:var(--surface);color:var(--sub);border:1px solid var(--border);border-radius:8px;padding:10px 16px;font-size:14px;cursor:pointer;font-family:'Inter',sans-serif;">&#128279; Share</button>
-     <button id="modalSaveBtn" onclick="toggleSaveEvent('${e.id}',this,event)" style="background:${savedEventIds.has(e.id)?'#FF6B3520':'var(--surface)'};color:${savedEventIds.has(e.id)?'var(--orange)':'var(--sub)'};border:1px solid var(--border);border-radius:8px;padding:10px 16px;font-size:14px;cursor:pointer;font-family:'Inter',sans-serif;">${savedEventIds.has(e.id)?'\u2665 Saved':'\u2661 Save Event'}</button>
+     <button onclick="(function(){var url='https://cbusevents.com/event.html?id=${e.id}';if(navigator.share){navigator.share({title:'${e.title}',url:url});}else{navigator.clipboard.writeText(url).then(function(){alert('Link copied!');});}})()" style="background:var(--surface);color:var(--sub);border:1px solid var(--border);border-radius:8px;padding:10px 16px;font-size:14px;cursor:pointer;font-family:Inter,sans-serif;">&#128279; Share</button>
+     <button id="modalSaveBtn" onclick="toggleSaveEvent('${e.id}',this,event)" style="background:${savedEventIds.has(e.id)?'#FF6B3520':'var(--surface)'};color:${savedEventIds.has(e.id)?'var(--orange)':'var(--sub)'};border:1px solid var(--border);border-radius:8px;padding:10px 16px;font-size:14px;cursor:pointer;font-family:Inter,sans-serif;">${savedEventIds.has(e.id)?'\u2665 Saved':'\u2661 Save Event'}</button>
    </div>
  </div>`;
  document.getElementById('eventModal').style.display='flex';
@@ -1918,7 +1918,7 @@ function openVendorModal(id){
  <div style="padding:24px">
    ${promoted?'<div style="display:inline-block;background:#f59e0b;color:#000;border-radius:20px;padding:3px 12px;font-size:11px;font-weight:700;margin-bottom:10px">Featured Vendor</div>':''}
    <div style="font-size:11px;color:#60a5fa;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px">${cat}</div>
-   <h2 style="font-family:'Inter',sans-serif;font-size:22px;font-weight:800;margin-bottom:16px">${name}</h2>
+   <h2 style="font-family:Inter,sans-serif;font-size:22px;font-weight:800;margin-bottom:16px">${name}</h2>
    ${v.description?`<p style="color:#aaa;font-size:14px;line-height:1.7;margin-bottom:16px">${v.description}</p>`:''}
    <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px">
      ${v.neighborhood?`<span style="background:#1e1e2e;border-radius:20px;padding:5px 12px;font-size:12px"> ${v.neighborhood}</span>`:''}
@@ -1932,7 +1932,7 @@ function openVendorModal(id){
      ${v.portfolio_photos.slice(0,6).map(p=>`<img src="${p}" alt="${name}" style="width:100%;height:80px;object-fit:cover;border-radius:6px;border:1px solid #25252f" onerror="this.style.display='none'">`).join('')}
    </div>`:''}
    <div style="display:flex;gap:10px">
-     <button onclick="closeVendorModal()" style="flex:1;background:#1e1e2e;color:#ccc;border:1px solid #25252f;border-radius:10px;padding:12px;font-size:14px;cursor:pointer;font-family:'Inter',sans-serif;">Close</button>
+     <button onclick="closeVendorModal()" style="flex:1;background:#1e1e2e;color:#ccc;border:1px solid #25252f;border-radius:10px;padding:12px;font-size:14px;cursor:pointer;font-family:Inter,sans-serif;">Close</button>
      ${v.email?`<a href="mailto:${v.email}" style="flex:2;background:var(--orange);color:#fff;border:none;border-radius:10px;padding:12px;font-size:14px;font-weight:700;cursor:pointer;text-align:center;text-decoration:none;display:block">Contact Vendor →</a>`:''}
    </div>
  </div>`;
@@ -1956,7 +1956,7 @@ function footer(){
 function renderVenueLanding(){
  setNavActive('');
  document.getElementById('app').innerHTML=`
- <div style="max-width:960px;margin:0 auto;padding:52px 32px"> <!-- Hero --> <div style="text-align:center;margin-bottom:60px"> <div style="display:inline-flex;align-items:center;gap:6px;background:#FF6B3520;color:#FF6B35;border:1px solid #FF6B3540;border-radius:20px;padding:4px 14px;font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:16px"> For Venue Owners</div> <h1 style="font-family:'Inter',sans-serif;font-size:clamp(28px,5vw,48px);font-weight:800;margin-bottom:14px;line-height:1.1">Get your Columbus venue in front of<br><span style="color:#FF6B35">thousands of event planners</span></h1> <p style="color:#8888a0;font-size:16px;max-width:540px;margin:0 auto 28px;line-height:1.65">CBUSEVENTS is Columbus's go-to directory for bars, comedy clubs, rooftops, and unique event spaces. List free and start getting discovered today.</p> <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-bottom:14px"> <button onclick="window.open('https://cbusevents.com/cbus-venue-portal.html','_blank')" style="background:#FF6B35;color:#fff;border:none;border-radius:10px;padding:14px 32px;font-size:16px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif">Create Free Listing →</button> <button onclick="window.open('https://cbusevents.com/cbus-venue-portal.html','_blank')" style="background:transparent;color:#e8e8f0;border:1.5px solid #25252f;border-radius:10px;padding:13px 24px;font-size:15px;font-weight:500;cursor:pointer;font-family:'Inter',sans-serif">Sign In</button> </div> <p style="color:#55556a;font-size:13px">Free to list · No credit card needed · Takes 5 minutes</p> </div> <!-- Benefits grid --> <div style="margin-bottom:60px"> <h2 style="font-family:'Inter',sans-serif;font-size:22px;font-weight:800;text-align:center;margin-bottom:32px">Everything your venue needs to grow bookings</h2> <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px"> ${[
+ <div style="max-width:960px;margin:0 auto;padding:52px 32px"> <!-- Hero --> <div style="text-align:center;margin-bottom:60px"> <div style="display:inline-flex;align-items:center;gap:6px;background:#FF6B3520;color:#FF6B35;border:1px solid #FF6B3540;border-radius:20px;padding:4px 14px;font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:16px"> For Venue Owners</div> <h1 style="font-family:Inter,sans-serif;font-size:clamp(28px,5vw,48px);font-weight:800;margin-bottom:14px;line-height:1.1">Get your Columbus venue in front of<br><span style="color:#FF6B35">thousands of event planners</span></h1> <p style="color:#8888a0;font-size:16px;max-width:540px;margin:0 auto 28px;line-height:1.65">CBUSEVENTS is Columbus's go-to directory for bars, comedy clubs, rooftops, and unique event spaces. List free and start getting discovered today.</p> <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-bottom:14px"> <button onclick="window.open('https://cbusevents.com/cbus-venue-portal.html','_blank')" style="background:#FF6B35;color:#fff;border:none;border-radius:10px;padding:14px 32px;font-size:16px;font-weight:700;cursor:pointer;font-family:Inter,sans-serif">Create Free Listing →</button> <button onclick="window.open('https://cbusevents.com/cbus-venue-portal.html','_blank')" style="background:transparent;color:#e8e8f0;border:1.5px solid #25252f;border-radius:10px;padding:13px 24px;font-size:15px;font-weight:500;cursor:pointer;font-family:Inter,sans-serif">Sign In</button> </div> <p style="color:#55556a;font-size:13px">Free to list · No credit card needed · Takes 5 minutes</p> </div> <!-- Benefits grid --> <div style="margin-bottom:60px"> <h2 style="font-family:Inter,sans-serif;font-size:22px;font-weight:800;text-align:center;margin-bottom:32px">Everything your venue needs to grow bookings</h2> <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px"> ${[
  {icon:'',title:'Get Discovered',desc:'Show up when Columbus locals and event planners search for bars, comedy clubs, rooftops, and unique event spaces.',badge:''},
  {icon:'',title:'Manage Your Events',desc:'Add and publish events directly from your dashboard. Keep your calendar live and visible to thousands.',badge:''},
  {icon:'',title:'Receive Booking Requests',desc:'Event planners send inquiries straight to your portal inbox. Name, email, date, guest count — everything you need.',badge:''},
@@ -1966,17 +1966,17 @@ function renderVenueLanding(){
  {icon:'',title:'Free Flyer Design',desc:'Get custom event flyers designed for your social media and print — included with Premium.',badge:'Premium'},
  {icon:'',title:'Merch On Demand',desc:'Branded shirts, hats, and more printed via heat press and ready for your staff and events.',badge:'Premium'},
  ].map(b=>`
- <div style="background:#1a1a24;border:1px solid #25252f;border-radius:14px;padding:22px"> <div style="font-size:28px;margin-bottom:10px">${b.icon}</div> <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px"> <div style="font-family:'Inter',sans-serif;font-weight:700;font-size:15px">${b.title}</div> ${b.badge?`<span style="background:#FF6B3520;color:#FF6B35;border:1px solid #FF6B3530;border-radius:20px;padding:1px 8px;font-size:10px;font-weight:700">${b.badge}</span>`:''}
+ <div style="background:#1a1a24;border:1px solid #25252f;border-radius:14px;padding:22px"> <div style="font-size:28px;margin-bottom:10px">${b.icon}</div> <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px"> <div style="font-family:Inter,sans-serif;font-weight:700;font-size:15px">${b.title}</div> ${b.badge?`<span style="background:#FF6B3520;color:#FF6B35;border:1px solid #FF6B3530;border-radius:20px;padding:1px 8px;font-size:10px;font-weight:700">${b.badge}</span>`:''}
  </div> <div style="color:#8888a0;font-size:13px;line-height:1.6">${b.desc}</div> </div>`).join('')}
- </div> </div> <!-- Pricing --> <div style="margin-bottom:60px"> <h2 style="font-family:'Inter',sans-serif;font-size:22px;font-weight:800;text-align:center;margin-bottom:8px">Simple, transparent pricing</h2> <p style="color:#8888a0;font-size:14px;text-align:center;margin-bottom:32px">Start free. Upgrade when you're ready to grow.</p> <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:16px"> ${[
+ </div> </div> <!-- Pricing --> <div style="margin-bottom:60px"> <h2 style="font-family:Inter,sans-serif;font-size:22px;font-weight:800;text-align:center;margin-bottom:8px">Simple, transparent pricing</h2> <p style="color:#8888a0;font-size:14px;text-align:center;margin-bottom:32px">Start free. Upgrade when you're ready to grow.</p> <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:16px"> ${[
  {name:'Free',price:0,color:'#8888a0',perks:['1 venue listing','Up to 4 events','Basic search placement','Public venue page']},
  {name:'Standard',price:29,color:'#60a5fa',perks:['Up to 20 events/month','Priority search placement','Inquiry form enabled','Email support','Analytics dashboard']},
  {name:'Premium',price:79,color:'#FF6B35',popular:true,perks:['Unlimited events','Hero slider feature','Top of every page','Full analytics',' Free flyer design',' Merch on demand']},
  ].map(p=>`
  <div style="background:${p.popular?'linear-gradient(135deg,#1a0800,#1a0f00)':'#13131a'};border:${p.popular?'2px solid #FF6B3550':'1px solid #25252f'};border-radius:14px;padding:24px;position:relative"> ${p.popular?'<div style="position:absolute;top:-12px;left:50%;transform:translateX(-50%);background:#FF6B35;color:#fff;border-radius:20px;padding:2px 14px;font-size:11px;font-weight:700;white-space:nowrap">MOST POPULAR</div>':''}
- <div style="font-size:11px;color:${p.color};font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">${p.name}</div> <div style="font-family:'Inter',sans-serif;font-size:24px;font-weight:800;letter-spacing:-0.03em;margin-bottom:16px">${p.price===0?'Free':'$'+p.price}<span style="font-size:14px;color:#8888a0;font-weight:400">${p.price>0?'/mo':''}</span></div> <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:20px"> ${p.perks.map(k=>'<div style="display:flex;gap:8px;font-size:13px;color:#8888a0">'+k+'</div>').join('')}
- </div> <button onclick="window.open('https://cbusevents.com/cbus-venue-portal.html','_blank')" style="width:100%;background:${p.popular?'#FF6B35':'#1a1a24'};color:${p.popular?'#fff':'#e8e8f0'};border:1px solid ${p.popular?'#FF6B35':'#25252f'};border-radius:8px;padding:10px;font-size:14px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif">Get Started →</button> </div>`).join('')}
- </div> </div> <!-- Social proof --> <div style="background:#13131a;border:1px solid #25252f;border-radius:16px;padding:36px;text-align:center;margin-bottom:32px"> <div style="font-size:36px;margin-bottom:12px"></div> <h3 style="font-family:'Inter',sans-serif;font-size:20px;font-weight:800;margin-bottom:8px">Join 23+ Columbus venues already on CBUSEVENTS</h3> <p style="color:#8888a0;font-size:14px;margin-bottom:24px;line-height:1.65">Dick's Den, Lincoln Social Rooftop, Columbus Funny Bone, Sacred Palm, The Hashtag Comedy Club and more are already getting discovered daily.</p> <button onclick="window.open('https://cbusevents.com/cbus-venue-portal.html','_blank')" style="background:#FF6B35;color:#fff;border:none;border-radius:10px;padding:13px 32px;font-size:15px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif">Create Your Free Listing →</button> </div> </div> `;
+ <div style="font-size:11px;color:${p.color};font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">${p.name}</div> <div style="font-family:Inter,sans-serif;font-size:24px;font-weight:800;letter-spacing:-0.03em;margin-bottom:16px">${p.price===0?'Free':'$'+p.price}<span style="font-size:14px;color:#8888a0;font-weight:400">${p.price>0?'/mo':''}</span></div> <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:20px"> ${p.perks.map(k=>'<div style="display:flex;gap:8px;font-size:13px;color:#8888a0">'+k+'</div>').join('')}
+ </div> <button onclick="window.open('https://cbusevents.com/cbus-venue-portal.html','_blank')" style="width:100%;background:${p.popular?'#FF6B35':'#1a1a24'};color:${p.popular?'#fff':'#e8e8f0'};border:1px solid ${p.popular?'#FF6B35':'#25252f'};border-radius:8px;padding:10px;font-size:14px;font-weight:600;cursor:pointer;font-family:Inter,sans-serif">Get Started →</button> </div>`).join('')}
+ </div> </div> <!-- Social proof --> <div style="background:#13131a;border:1px solid #25252f;border-radius:16px;padding:36px;text-align:center;margin-bottom:32px"> <div style="font-size:36px;margin-bottom:12px"></div> <h3 style="font-family:Inter,sans-serif;font-size:20px;font-weight:800;margin-bottom:8px">Join 23+ Columbus venues already on CBUSEVENTS</h3> <p style="color:#8888a0;font-size:14px;margin-bottom:24px;line-height:1.65">Dick's Den, Lincoln Social Rooftop, Columbus Funny Bone, Sacred Palm, The Hashtag Comedy Club and more are already getting discovered daily.</p> <button onclick="window.open('https://cbusevents.com/cbus-venue-portal.html','_blank')" style="background:#FF6B35;color:#fff;border:none;border-radius:10px;padding:13px 32px;font-size:15px;font-weight:700;cursor:pointer;font-family:Inter,sans-serif">Create Your Free Listing →</button> </div> </div> `;
  window.scrollTo({top:0,behavior:'smooth'});
 }
 
@@ -1999,7 +1999,7 @@ function showPricing(){
    <div style="background:#1a1a24;border:1px solid #25252f;border-radius:20px;width:100%;max-width:860px;overflow:hidden">
     <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 20px;border-bottom:1px solid #25252f">
      <div>
-      <div style="font-family:'Inter',sans-serif;font-size:20px;font-weight:800">Simple, transparent pricing</div>
+      <div style="font-family:Inter,sans-serif;font-size:20px;font-weight:800">Simple, transparent pricing</div>
       <div style="color:#8888a0;font-size:13px;margin-top:3px">Get your venue in front of Columbus every day</div>
      </div>
      <button onclick="document.getElementById('pricingModal').remove();document.body.style.overflow='';document.body.style.overflow=''" style="background:#25252f;border:none;color:#8888a0;border-radius:8px;width:36px;height:36px;font-size:20px;cursor:pointer;flex-shrink:0">×</button>
@@ -2010,26 +2010,26 @@ function showPricing(){
       <div style="background:${p.popular?'linear-gradient(135deg,#1a1000,#1a0f00)':'#13131a'};border:${p.popular?'2px solid #FF6B3550':'1px solid #25252f'};border-radius:16px;padding:22px;display:flex;flex-direction:column;position:relative;${p.popular?'margin-top:8px':''}">
        ${p.popular?`<div style="position:absolute;top:-12px;left:50%;transform:translateX(-50%);background:#FF6B35;color:#fff;border-radius:20px;padding:3px 14px;font-size:11px;font-weight:700;white-space:nowrap">MOST POPULAR</div>`:''}
        <div style="font-size:11px;color:${p.color};font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">${p.label}</div>
-       <div style="font-family:'Inter',sans-serif;font-size:26px;font-weight:800;letter-spacing:-0.03em;margin-bottom:2px">${p.price}<span style="font-size:14px;font-weight:400;color:#8888a0">${p.price==='$0'?'':'/mo'}</span></div>
+       <div style="font-family:Inter,sans-serif;font-size:26px;font-weight:800;letter-spacing:-0.03em;margin-bottom:2px">${p.price}<span style="font-size:14px;font-weight:400;color:#8888a0">${p.price==='$0'?'':'/mo'}</span></div>
        <div style="color:#8888a0;font-size:12px;margin-bottom:18px">${p.sub}</div>
        <div style="flex:1;display:flex;flex-direction:column;gap:8px;margin-bottom:20px">
         ${p.features.map(f=>`<div style="display:flex;align-items:center;gap:7px;font-size:13px"><span style="color:${p.color};font-size:14px">✓</span>${f}</div>`).join('')}
        </div>
-       <button onclick="window.open('https://cbusevents.com/${p.link}','_blank');document.getElementById('pricingModal').remove();document.body.style.overflow=''" style="width:100%;${p.btnStyle};border:none;border-radius:9px;padding:12px;font-size:14px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif">${p.btn}</button>
+       <button onclick="window.open('https://cbusevents.com/${p.link}','_blank');document.getElementById('pricingModal').remove();document.body.style.overflow=''" style="width:100%;${p.btnStyle};border:none;border-radius:9px;padding:12px;font-size:14px;font-weight:700;cursor:pointer;font-family:Inter,sans-serif">${p.btn}</button>
       </div>`).join('')}
     </div>
     <div style="margin:0 20px 20px;background:#13131a;border:1px solid #f59e0b30;border-radius:14px;padding:18px 20px">
-     <div style="font-family:'Inter',sans-serif;font-weight:700;font-size:15px;margin-bottom:4px">
+     <div style="font-family:Inter,sans-serif;font-weight:700;font-size:15px;margin-bottom:4px">
       Event Boost Add-on <span style="font-size:12px;background:#f59e0b20;color:#f59e0b;border-radius:20px;padding:2px 8px;font-weight:600;margin-left:6px">For Planners</span>
      </div>
      <div style="color:#8888a0;font-size:13px;margin-bottom:14px">Pin your event to the top · Hero slider · Highlighted in categories</div>
      <div style="display:flex;gap:10px">
       <div style="text-align:center;background:#0b0b0f;border:1px solid #f59e0b30;border-radius:10px;padding:10px 20px">
-       <div style="font-family:'Inter',sans-serif;font-size:22px;font-weight:800;color:#f59e0b">$10</div>
+       <div style="font-family:Inter,sans-serif;font-size:22px;font-weight:800;color:#f59e0b">$10</div>
        <div style="color:#8888a0;font-size:11px">7 days</div>
       </div>
       <div style="text-align:center;background:#0b0b0f;border:1px solid #f59e0b30;border-radius:10px;padding:10px 20px">
-       <div style="font-family:'Inter',sans-serif;font-size:22px;font-weight:800;color:#f59e0b">$20</div>
+       <div style="font-family:Inter,sans-serif;font-size:22px;font-weight:800;color:#f59e0b">$20</div>
        <div style="color:#8888a0;font-size:11px">30 days</div>
       </div>
      </div>
