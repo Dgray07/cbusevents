@@ -5,23 +5,23 @@
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
 <title>Ticket Confirmed — CBUSEVENTS</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 <script src="https://unpkg.com/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <!-- QR Code library -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;}
-body{background:#0b0b0f;color:#e8e8f0;font-family:'DM Sans',sans-serif;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;}
-.logo{font-family:'Syne',sans-serif;font-weight:800;font-size:20px;margin-bottom:32px;letter-spacing:0.5px;}
+body{background:#0b0b0f;color:#e8e8f0;font-family:'Inter',sans-serif;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;}
+.logo{font-family:'Inter',sans-serif;font-weight:800;font-size:20px;margin-bottom:32px;letter-spacing:0.5px;}
 .logo span{color:#FF6B35;}
 .card{background:#13131a;border:1px solid #25252f;border-radius:20px;width:100%;max-width:460px;overflow:hidden;}
 .card-top{background:linear-gradient(135deg,#0f0800,#1a1000,#0b0b0f);border-bottom:1px dashed #25252f;padding:32px 28px;text-align:center;}
 .check{width:64px;height:64px;background:#22c55e20;border:2px solid #22c55e50;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:28px;margin:0 auto 16px;}
-.confirm-title{font-family:'Syne',sans-serif;font-weight:800;font-size:24px;margin-bottom:6px;}
+.confirm-title{font-family:'Inter',sans-serif;font-weight:800;font-size:24px;margin-bottom:6px;}
 .confirm-sub{color:#8888a0;font-size:14px;line-height:1.5;}
 .card-body{padding:24px 28px;}
 .ticket-stub{background:#0b0b0f;border:1px solid #25252f;border-radius:14px;padding:20px;margin-bottom:20px;}
-.stub-event{font-family:'Syne',sans-serif;font-weight:800;font-size:18px;margin-bottom:4px;}
+.stub-event{font-family:'Inter',sans-serif;font-weight:800;font-size:18px;margin-bottom:4px;}
 .stub-venue{color:#FF6B35;font-size:13px;font-weight:600;margin-bottom:12px;}
 .stub-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid #1a1a24;font-size:13px;}
 .stub-row:last-child{border-bottom:none;}
@@ -30,8 +30,8 @@ body{background:#0b0b0f;color:#e8e8f0;font-family:'DM Sans',sans-serif;min-heigh
 .qr-wrap{text-align:center;margin:20px 0 4px;}
 .qr-wrap>div{display:inline-block;background:#fff;padding:10px;border-radius:10px;}
 .qr-label{text-align:center;font-size:11px;color:#55556a;margin-bottom:20px;letter-spacing:1px;text-transform:uppercase;}
-.ticket-code{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:#FF6B35;letter-spacing:4px;text-align:center;margin-bottom:20px;background:#1a1a24;border-radius:10px;padding:14px;}
-.btn{display:block;width:100%;border:none;border-radius:10px;padding:14px;font-family:'DM Sans',sans-serif;font-weight:700;font-size:15px;cursor:pointer;text-align:center;text-decoration:none;margin-bottom:10px;}
+.ticket-code{font-family:'Inter',sans-serif;font-size:22px;font-weight:800;color:#FF6B35;letter-spacing:4px;text-align:center;margin-bottom:20px;background:#1a1a24;border-radius:10px;padding:14px;}
+.btn{display:block;width:100%;border:none;border-radius:10px;padding:14px;font-family:'Inter',sans-serif;font-weight:700;font-size:15px;cursor:pointer;text-align:center;text-decoration:none;margin-bottom:10px;}
 .btn-primary{background:#FF6B35;color:#fff;}
 .btn-secondary{background:#1a1a24;color:#e8e8f0;border:1px solid #25252f;}
 .loading{text-align:center;padding:48px 24px;color:#8888a0;}
@@ -43,6 +43,13 @@ body{background:#0b0b0f;color:#e8e8f0;font-family:'DM Sans',sans-serif;min-heigh
   .card-body{padding:20px;}
   .confirm-title{font-size:20px;}
 }
+</style>
+<style>
+*{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;}
+body{font-family:"Inter",sans-serif;}
+h1,h2,h3,h4,h5,h6{font-family:"Inter",sans-serif;letter-spacing:-0.02em;}
+.nav-logo,.auth-logo,.login-logo,.sidebar-logo-text{font-family:"Inter",sans-serif!important;font-weight:800!important;letter-spacing:-0.04em!important;text-transform:uppercase;}
+.nav-logo span,.auth-logo span,.login-logo span,.sidebar-logo-text span{color:#FF6B35;}
 </style>
 </head>
 <body>

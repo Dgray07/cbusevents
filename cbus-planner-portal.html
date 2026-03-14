@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>CBUSEVENTS — Planner Portal</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
 :root{
@@ -13,16 +13,16 @@
  --text:#e8e8f0;--sub:#8888a0;--muted:#55556a;
  --orange:#FF6B35;--green:#22c55e;--blue:#60a5fa;--gold:#f59e0b;
 }
-body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min-height:100vh;}
+body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;min-height:100vh;}
 a{text-decoration:none;color:inherit;}
-button{cursor:pointer;font-family:'DM Sans',sans-serif;border:none;}
-input,textarea,select{font-family:'DM Sans',sans-serif;}
+button{cursor:pointer;font-family:'Inter',sans-serif;border:none;}
+input,textarea,select{font-family:'Inter',sans-serif;}
 @keyframes spin{to{transform:rotate(360deg);}}
 @keyframes fadeUp{from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:translateY(0);}}
 
 /* NAV */
 nav{position:sticky;top:0;z-index:100;background:rgba(11,11,15,0.95);backdrop-filter:blur(16px);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 40px;height:60px;}
-.nav-logo{font-family:'Syne',sans-serif;font-weight:800;font-size:18px;cursor:pointer;}
+.nav-logo{font-family:'Inter',sans-serif;font-weight:800;font-size:18px;cursor:pointer;}
 .nav-logo span{color:var(--orange);}
 .nav-logo-sub{font-size:10px;color:var(--muted);font-weight:400;margin-left:6px;letter-spacing:1px;text-transform:uppercase;}
 .nav-links{display:flex;gap:4px;}
@@ -37,26 +37,26 @@ nav{position:sticky;top:0;z-index:100;background:rgba(11,11,15,0.95);backdrop-fi
 
 /* HERO */
 .planner-hero{background:linear-gradient(135deg,#130800 0%,#1a1000 40%,#0b0b0f 100%);border-bottom:1px solid var(--border);padding:56px 40px;text-align:center;}
-.planner-hero h1{font-family:'Syne',sans-serif;font-size:clamp(28px,4vw,48px);font-weight:800;margin-bottom:12px;}
+.planner-hero h1{font-family:'Inter',sans-serif;font-size:clamp(28px,4vw,48px);font-weight:800;margin-bottom:12px;}
 .planner-hero h1 span{color:var(--orange);}
 .planner-hero p{color:var(--sub);font-size:16px;max-width:500px;margin:0 auto 28px;line-height:1.65;}
 .hero-btns{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;}
 
 /* LAYOUT */
 .page{padding:36px 40px;animation:fadeUp 0.3s ease;max-width:1100px;margin:0 auto;}
-.section-title{font-family:'Syne',sans-serif;font-size:20px;font-weight:800;margin-bottom:6px;}
+.section-title{font-family:'Inter',sans-serif;font-size:20px;font-weight:800;margin-bottom:6px;}
 .section-sub{color:var(--sub);font-size:13px;margin-bottom:24px;}
 
 /* STAT CARDS */
 .stat-row{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:28px;}
 .stat-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:18px 20px;}
-.stat-num{font-family:'Syne',sans-serif;font-size:26px;font-weight:800;margin-bottom:3px;}
+.stat-num{font-family:'Inter',sans-serif;font-size:26px;font-weight:800;margin-bottom:3px;}
 .stat-label{font-size:12px;color:var(--sub);}
 
 /* CARDS */
 .card{background:var(--card);border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:16px;}
 .card-header{display:flex;justify-content:space-between;align-items:center;padding:16px 20px;border-bottom:1px solid var(--border);}
-.card-title{font-family:'Syne',sans-serif;font-size:15px;font-weight:700;}
+.card-title{font-family:'Inter',sans-serif;font-size:15px;font-weight:700;}
 .card-body{padding:20px;}
 
 /* VENUE GRID */
@@ -67,7 +67,7 @@ nav{position:sticky;top:0;z-index:100;background:rgba(11,11,15,0.95);backdrop-fi
 .venue-card-img img{width:100%;height:100%;object-fit:cover;}
 .venue-card-body{padding:14px 16px;}
 .venue-card-type{font-size:11px;color:var(--orange);font-weight:600;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;}
-.venue-card-name{font-family:'Syne',sans-serif;font-weight:700;font-size:16px;margin-bottom:6px;}
+.venue-card-name{font-family:'Inter',sans-serif;font-weight:700;font-size:16px;margin-bottom:6px;}
 .venue-card-desc{color:var(--sub);font-size:12px;line-height:1.5;margin-bottom:10px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
 .venue-card-footer{display:flex;justify-content:space-between;align-items:center;}
 .venue-card-loc{font-size:11px;color:var(--muted);}
@@ -91,7 +91,7 @@ nav{position:sticky;top:0;z-index:100;background:rgba(11,11,15,0.95);backdrop-fi
 .badge-muted{background:var(--surface);color:var(--muted);border:1px solid var(--border);}
 
 /* BUTTONS */
-.btn{border:none;border-radius:8px;padding:9px 18px;font-size:13px;font-weight:600;cursor:pointer;transition:all 0.15s;font-family:'DM Sans',sans-serif;}
+.btn{border:none;border-radius:8px;padding:9px 18px;font-size:13px;font-weight:600;cursor:pointer;transition:all 0.15s;font-family:'Inter',sans-serif;}
 .btn-primary{background:var(--orange);color:#fff;}
 .btn-primary:hover{opacity:0.85;}
 .btn-outline{background:transparent;border:1.5px solid var(--border);color:var(--text);}
@@ -120,14 +120,14 @@ nav{position:sticky;top:0;z-index:100;background:rgba(11,11,15,0.95);backdrop-fi
 .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:200;display:flex;align-items:flex-start;justify-content:center;padding:40px 20px;overflow-y:auto;}
 .modal{background:var(--card);border:1px solid var(--border);border-radius:16px;width:100%;max-width:580px;animation:fadeUp 0.3s ease;}
 .modal-header{display:flex;justify-content:space-between;align-items:center;padding:20px 24px;border-bottom:1px solid var(--border);}
-.modal-title{font-family:'Syne',sans-serif;font-size:17px;font-weight:700;}
+.modal-title{font-family:'Inter',sans-serif;font-size:17px;font-weight:700;}
 .modal-body{padding:24px;}
 .modal-footer{padding:16px 24px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:8px;}
 
 /* AUTH */
 .auth-wrap{min-height:calc(100vh - 60px);display:flex;align-items:center;justify-content:center;padding:40px 20px;}
 .auth-card{background:var(--card);border:1px solid var(--border);border-radius:18px;padding:40px;width:100%;max-width:420px;}
-.auth-logo{font-family:'Syne',sans-serif;font-size:20px;font-weight:800;margin-bottom:4px;}
+.auth-logo{font-family:'Inter',sans-serif;font-size:20px;font-weight:800;margin-bottom:4px;}
 .auth-logo span{color:var(--orange);}
 .auth-tabs{display:flex;gap:4px;background:var(--surface);border-radius:10px;padding:4px;margin-bottom:24px;}
 .auth-tab{flex:1;padding:8px;border-radius:7px;font-size:13px;font-weight:600;color:var(--sub);background:none;border:none;cursor:pointer;transition:all 0.15s;}
@@ -136,7 +136,7 @@ nav{position:sticky;top:0;z-index:100;background:rgba(11,11,15,0.95);backdrop-fi
 /* EMPTY */
 .empty{text-align:center;padding:48px 20px;color:var(--sub);}
 .empty-icon{font-size:40px;margin-bottom:12px;}
-.empty h3{font-family:'Syne',sans-serif;font-size:17px;font-weight:700;margin-bottom:6px;color:var(--text);}
+.empty h3{font-family:'Inter',sans-serif;font-size:17px;font-weight:700;margin-bottom:6px;color:var(--text);}
 
 /* TOAST */
 .toast{position:fixed;bottom:24px;right:24px;z-index:999;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:12px 18px;font-size:13px;font-weight:500;animation:fadeUp 0.3s ease;box-shadow:0 8px 32px rgba(0,0,0,0.4);display:none;}
@@ -174,6 +174,13 @@ nav{position:sticky;top:0;z-index:100;background:rgba(11,11,15,0.95);backdrop-fi
   .portal-sidebar{width:200px !important;}
 }
 
+</style>
+<style>
+*{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;}
+body{font-family:"Inter",sans-serif;}
+h1,h2,h3,h4,h5,h6{font-family:"Inter",sans-serif;letter-spacing:-0.02em;}
+.nav-logo,.auth-logo,.login-logo,.sidebar-logo-text{font-family:"Inter",sans-serif!important;font-weight:800!important;letter-spacing:-0.04em!important;text-transform:uppercase;}
+.nav-logo span,.auth-logo span,.login-logo span,.sidebar-logo-text span{color:#FF6B35;}
 </style>
 </head>
 <body> <nav id="topNav"> <div class="nav-logo" onclick="currentUser?nav('dashboard'):showAuth('login')"> CBUS<span>EVENTS</span> <span class="nav-logo-sub">Planner</span> </div> <div class="nav-links" id="navLinks" style="display:none"> <button class="nav-btn" onclick="window.location.href='https://cbusevents.com'"> Home</button> <button class="nav-btn" id="nav-dashboard" onclick="nav('dashboard')">Dashboard</button> <button class="nav-btn" id="nav-venues" onclick="nav('venues')">Find Venues</button> <button class="nav-btn" id="nav-inquiries" onclick="nav('inquiries')">My Inquiries</button> <button class="nav-btn" id="nav-events" onclick="nav('events')">My Events</button> <button class="nav-btn" id="nav-payouts" onclick="nav('payouts')">Payouts</button> <button class="nav-btn" id="nav-profile" onclick="nav('profile')">My Profile</button> <button class="nav-btn" id="nav-billing" onclick="nav('billing')">Plan & Billing</button> </div> <div class="nav-right" id="navRight"> <button class="nav-outline" onclick="showAuth('login')">Sign In</button> <button class="nav-cta" onclick="showAuth('signup')">Get Started Free →</button> </div>
@@ -252,7 +259,7 @@ async function renderProfile(){
  const{data}=await sb.from('customer_profiles').select('*').eq('user_id',currentUser.id).maybeSingle() ?? {data:{}};
  plannerProfile=data||{};
  document.getElementById('app').innerHTML=`
- <div class="page"> <div class="section-title">My Profile</div> <div class="section-sub" style="margin-bottom:24px">Your public profile and social links</div> <div class="card" style="max-width:600px;padding:28px;display:flex;flex-direction:column;gap:14px"> <div class="field"><label>Display Name</label><input id="pName" value="${plannerProfile.display_name||''}" placeholder="Your name or company"/></div> <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px"> <div class="field"><label>Email</label><input id="pEmail" value="${currentUser.email||''}" disabled style="opacity:0.5"/></div> <div class="field"><label>Phone</label><input id="pPhone" value="${plannerProfile.phone||''}" placeholder="(614) 555-0000"/></div> </div> <div class="field"><label>Website</label><input id="pWebsite" value="${plannerProfile.website||''}" placeholder="https://yoursite.com"/></div> <div style="height:1px;background:var(--border);margin:4px 0"></div> <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:13px;color:var(--sub);text-transform:uppercase;letter-spacing:1px"> Social Media</div> <div style="color:var(--sub);font-size:13px;margin-top:-8px">Link your accounts — share your events to your followers with one click.</div> <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px"> <div class="field"><label>Instagram</label><input id="pInsta" value="${plannerProfile.instagram||''}" placeholder="@yourhandle"/></div> <div class="field"><label>TikTok</label><input id="pTiktok" value="${plannerProfile.tiktok||''}" placeholder="@yourhandle"/></div> <div class="field"><label>Facebook Page URL</label><input id="pFacebook" value="${plannerProfile.facebook||''}" placeholder="https://facebook.com/yourpage"/></div> <div class="field"><label>X / Twitter</label><input id="pTwitter" value="${plannerProfile.twitter||''}" placeholder="@yourhandle"/></div> </div> <div id="profileMsg" style="color:var(--green);font-size:13px;min-height:18px"></div> <button class="btn btn-primary" onclick="savePlannerProfile()" style="align-self:flex-start;padding:10px 24px">Save Profile →</button> </div> </div>`;
+ <div class="page"> <div class="section-title">My Profile</div> <div class="section-sub" style="margin-bottom:24px">Your public profile and social links</div> <div class="card" style="max-width:600px;padding:28px;display:flex;flex-direction:column;gap:14px"> <div class="field"><label>Display Name</label><input id="pName" value="${plannerProfile.display_name||''}" placeholder="Your name or company"/></div> <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px"> <div class="field"><label>Email</label><input id="pEmail" value="${currentUser.email||''}" disabled style="opacity:0.5"/></div> <div class="field"><label>Phone</label><input id="pPhone" value="${plannerProfile.phone||''}" placeholder="(614) 555-0000"/></div> </div> <div class="field"><label>Website</label><input id="pWebsite" value="${plannerProfile.website||''}" placeholder="https://yoursite.com"/></div> <div style="height:1px;background:var(--border);margin:4px 0"></div> <div style="font-family:'Inter',sans-serif;font-weight:700;font-size:13px;color:var(--sub);text-transform:uppercase;letter-spacing:1px"> Social Media</div> <div style="color:var(--sub);font-size:13px;margin-top:-8px">Link your accounts — share your events to your followers with one click.</div> <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px"> <div class="field"><label>Instagram</label><input id="pInsta" value="${plannerProfile.instagram||''}" placeholder="@yourhandle"/></div> <div class="field"><label>TikTok</label><input id="pTiktok" value="${plannerProfile.tiktok||''}" placeholder="@yourhandle"/></div> <div class="field"><label>Facebook Page URL</label><input id="pFacebook" value="${plannerProfile.facebook||''}" placeholder="https://facebook.com/yourpage"/></div> <div class="field"><label>X / Twitter</label><input id="pTwitter" value="${plannerProfile.twitter||''}" placeholder="@yourhandle"/></div> </div> <div id="profileMsg" style="color:var(--green);font-size:13px;min-height:18px"></div> <button class="btn btn-primary" onclick="savePlannerProfile()" style="align-self:flex-start;padding:10px 24px">Save Profile →</button> </div> </div>`;
 }
 
 async function savePlannerProfile(){
@@ -357,7 +364,7 @@ function renderHero(){
  {icon:'',title:'Track Requests',desc:'See the status of all your venue inquiries. Never lose track of a conversation.'},
  {icon:'',title:'List Your Events',desc:'Publish your events to the CBUSEVENTS directory for free. Reach Columbus.'},
  ].map(f=>`
- <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:24px"> <div style="font-size:28px;margin-bottom:10px">${f.icon}</div> <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:16px;margin-bottom:6px">${f.title}</div> <div style="color:var(--sub);font-size:13px;line-height:1.6">${f.desc}</div> </div>`).join('')}
+ <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:24px"> <div style="font-size:28px;margin-bottom:10px">${f.icon}</div> <div style="font-family:'Inter',sans-serif;font-weight:700;font-size:16px;margin-bottom:6px">${f.title}</div> <div style="color:var(--sub);font-size:13px;line-height:1.6">${f.desc}</div> </div>`).join('')}
  </div> <!-- Preview venues --> <div style="margin-bottom:12px;display:flex;justify-content:space-between;align-items:center"> <div class="section-title">Featured Columbus Venues</div> <button class="btn btn-ghost btn-sm" onclick="showAuth('signup')">See All →</button> </div> <div class="venue-grid"> ${allVenues.slice(0,4).map(v=>venueCardHTML(v,true)).join('')}
  </div> </div> `;
  // Load venues for preview
@@ -517,7 +524,7 @@ async function renderPayouts(){
       +'<div style="display:flex;align-items:center;gap:12px;margin-bottom:20px">'
         +'<div style="width:44px;height:44px;border-radius:50%;background:'+(connected?'#22c55e20':'#FF6B3520')+';display:flex;align-items:center;justify-content:center">'+icon+'</div>'
         +'<div>'
-          +'<div style="font-family:\'Syne\',sans-serif;font-weight:700;font-size:16px">'+(connected?'Stripe Connected':'Connect Your Stripe Account')+'</div>'
+          +'<div style="font-family:\'Inter\',sans-serif;font-weight:700;font-size:16px">'+(connected?'Stripe Connected':'Connect Your Stripe Account')+'</div>'
           +'<div style="font-size:12px;margin-top:2px;color:'+statusColor+'">'+statusLabel+'</div>'
         +'</div>'
       +'</div>'
@@ -535,7 +542,7 @@ async function renderPayouts(){
 
     // Earnings example
     +'<div style="background:var(--card);border:1px solid var(--border);border-radius:16px;padding:24px;max-width:580px">'
-      +'<div style="font-family:\'Syne\',sans-serif;font-weight:700;font-size:15px;margin-bottom:16px">Example Earnings</div>'
+      +'<div style="font-family:\'Inter\',sans-serif;font-weight:700;font-size:15px;margin-bottom:16px">Example Earnings</div>'
       +'<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px">'
         +['$25','$50','$100'].map(function(price,i){
           var p=parseInt(price.replace('$',''));
@@ -544,7 +551,7 @@ async function renderPayouts(){
           var net=p*100-fee-stripe_fee;
           return '<div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px;text-align:center">'
             +'<div style="font-size:11px;color:var(--muted);margin-bottom:4px">'+price+' ticket</div>'
-            +'<div style="font-family:\'Syne\',sans-serif;font-size:22px;font-weight:800;color:#22c55e">$'+(net/100).toFixed(2)+'</div>'
+            +'<div style="font-family:\'Inter\',sans-serif;font-size:22px;font-weight:800;color:#22c55e">$'+(net/100).toFixed(2)+'</div>'
             +'<div style="font-size:11px;color:var(--muted);margin-top:4px">you receive</div>'
             +'<div style="font-size:11px;color:var(--muted);margin-top:8px;padding-top:8px;border-top:1px solid var(--border)">'
               +'CBUS: $'+(fee/100).toFixed(2)+' &bull; Stripe: $'+(stripe_fee/100).toFixed(2)
@@ -565,8 +572,8 @@ function renderBilling(){
    ${planParam==='success'?`<div style="background:#0a2a14;border:1px solid #1a4a24;border-radius:10px;padding:14px 18px;margin-bottom:28px;color:#22c55e;font-size:14px;font-weight:600;">Upgrade successful! Your plan will be activated within a minute.</div>`:''}
    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:18px">
      <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:28px">
-       <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:18px;margin-bottom:8px">Free</div>
-       <div style="font-family:'Syne',sans-serif;font-size:36px;font-weight:800;line-height:1;margin-bottom:20px">$0<span style="font-size:14px;color:var(--sub)">/mo</span></div>
+       <div style="font-family:'Inter',sans-serif;font-weight:800;font-size:18px;margin-bottom:8px">Free</div>
+       <div style="font-family:'Inter',sans-serif;font-size:28px;font-weight:800;letter-spacing:-0.03em;line-height:1;margin-bottom:20px">$0<span style="font-size:14px;color:var(--sub)">/mo</span></div>
        <div style="display:flex;flex-direction:column;gap:9px;margin-bottom:24px;font-size:13px;color:var(--sub)">
          <div>Browse all Columbus venues</div><div>Send venue inquiries</div><div>Create and publish events</div>
        </div>
@@ -574,8 +581,8 @@ function renderBilling(){
      </div>
      <div style="background:var(--card);border:2px solid #FF6B35;border-radius:14px;padding:28px;position:relative">
        <div style="position:absolute;top:-11px;left:50%;transform:translateX(-50%);background:#FF6B35;color:#fff;border-radius:20px;padding:2px 14px;font-size:11px;font-weight:700;white-space:nowrap">FOUNDING MEMBER</div>
-       <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:18px;color:#FF6B35;margin-bottom:8px">Pro</div>
-       <div style="font-family:'Syne',sans-serif;font-size:36px;font-weight:800;line-height:1;color:#FF6B35;margin-bottom:4px">$15<span style="font-size:14px;color:var(--sub)">/mo</span></div>
+       <div style="font-family:'Inter',sans-serif;font-weight:800;font-size:18px;color:#FF6B35;margin-bottom:8px">Pro</div>
+       <div style="font-family:'Inter',sans-serif;font-size:28px;font-weight:800;letter-spacing:-0.03em;line-height:1;color:#FF6B35;margin-bottom:4px">$15<span style="font-size:14px;color:var(--sub)">/mo</span></div>
        <div style="font-size:11px;color:var(--muted);margin-bottom:20px">Rate locked forever</div>
        <div style="display:flex;flex-direction:column;gap:9px;margin-bottom:24px;font-size:13px;color:var(--sub)">
          <div style="color:var(--text)">Full vendor directory access</div>
@@ -601,9 +608,9 @@ function renderDashboard(){
  const readInq=myInquiries.filter(i=>i.status==='read').length;
 
  document.getElementById('app').innerHTML=`
- <div class="page"> <div style="margin-bottom:28px"> <h1 style="font-family:'Syne',sans-serif;font-size:26px;font-weight:800;margin-bottom:4px">Welcome back, ${name.split(' ')[0]}! </h1> <p style="color:var(--sub);font-size:14px">Here's your event planning dashboard</p> </div> <div class="stat-row"> <div class="stat-card"> <div class="stat-num">${myInquiries.length}</div> <div class="stat-label">Total Inquiries Sent</div> </div> <div class="stat-card"> <div class="stat-num" style="color:${newInq?'var(--orange)':'var(--text)'}">${newInq}</div> <div class="stat-label">Awaiting Response</div> </div> <div class="stat-card"> <div class="stat-num">${myEvents.length}</div> <div class="stat-label">Events Listed</div> </div> </div> <!-- Quick actions --> <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:28px"> <div style="background:linear-gradient(135deg,#1a0f00,#250e00);border:1px solid #FF6B3330;border-radius:14px;padding:24px;cursor:pointer" onclick="nav('venues')"> <div style="
- <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:16px;margin-bottom:4px">Find a Venue</div> <div style="color:var(--sub);font-size:13px">${allVenues.length} venues available in Columbus</div> </div> <div style="background:linear-gradient(135deg,#0a1a2a,#0a1520);border:1px solid #60a5fa30;border-radius:14px;padding:24px;cursor:pointer" onclick="openAddEventModal()"> <div style="
- <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:16px;margin-bottom:4px">List an Event</div> <div style="color:var(--sub);font-size:13px">Publish your event to the Columbus directory</div> </div> </div> <!-- Recent inquiries --> <div class="card"> <div class="card-header"> <div class="card-title">Recent Inquiries</div> <button class="btn btn-ghost btn-sm" onclick="nav('inquiries')">View All →</button> </div> <div class="card-body"> ${myInquiries.length?myInquiries.slice(0,3).map(i=>inquiryItemHTML(i)).join(''):`
+ <div class="page"> <div style="margin-bottom:28px"> <h1 style="font-family:'Inter',sans-serif;font-size:26px;font-weight:800;margin-bottom:4px">Welcome back, ${name.split(' ')[0]}! </h1> <p style="color:var(--sub);font-size:14px">Here's your event planning dashboard</p> </div> <div class="stat-row"> <div class="stat-card"> <div class="stat-num">${myInquiries.length}</div> <div class="stat-label">Total Inquiries Sent</div> </div> <div class="stat-card"> <div class="stat-num" style="color:${newInq?'var(--orange)':'var(--text)'}">${newInq}</div> <div class="stat-label">Awaiting Response</div> </div> <div class="stat-card"> <div class="stat-num">${myEvents.length}</div> <div class="stat-label">Events Listed</div> </div> </div> <!-- Quick actions --> <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:28px"> <div style="background:linear-gradient(135deg,#1a0f00,#250e00);border:1px solid #FF6B3330;border-radius:14px;padding:24px;cursor:pointer" onclick="nav('venues')"> <div style="
+ <div style="font-family:'Inter',sans-serif;font-weight:700;font-size:16px;margin-bottom:4px">Find a Venue</div> <div style="color:var(--sub);font-size:13px">${allVenues.length} venues available in Columbus</div> </div> <div style="background:linear-gradient(135deg,#0a1a2a,#0a1520);border:1px solid #60a5fa30;border-radius:14px;padding:24px;cursor:pointer" onclick="openAddEventModal()"> <div style="
+ <div style="font-family:'Inter',sans-serif;font-weight:700;font-size:16px;margin-bottom:4px">List an Event</div> <div style="color:var(--sub);font-size:13px">Publish your event to the Columbus directory</div> </div> </div> <!-- Recent inquiries --> <div class="card"> <div class="card-header"> <div class="card-title">Recent Inquiries</div> <button class="btn btn-ghost btn-sm" onclick="nav('inquiries')">View All →</button> </div> <div class="card-body"> ${myInquiries.length?myInquiries.slice(0,3).map(i=>inquiryItemHTML(i)).join(''):`
  <div class="empty"> <h3>No inquiries yet</h3> <p style="font-size:13px;margin-bottom:16px">Browse venues and send your first booking request</p> <button class="btn btn-primary" onclick="nav('venues')">Browse Venues →</button> </div>`}
  </div> </div> ${myEvents.length?`
  <div class="card" style="margin-top:16px"> <div class="card-header"> <div class="card-title">My Events</div> <button class="btn btn-ghost btn-sm" onclick="nav('events')">View All →</button> </div> <div class="card-body"> ${myEvents.slice(0,3).map(e=>eventItemHTML(e)).join('')}
@@ -645,7 +652,7 @@ function openVenueModal(id){
  const img=getImg(v);
  document.getElementById('modal').innerHTML=`
  <div class="modal-overlay" onclick="if(event.target===this)closeModal()"> <div class="modal"> <div style="position:relative"> ${img?`<img src="${img}" alt="${v.name}" style="width:100%;height:180px;object-fit:cover" onerror="this.style.display='none'">`:`<div style="height:120px;background:var(--surface);display:flex;align-items:center;justify-content:center;font-size:48px">${venueEmoji(v.venue_type)}</div>`}
- <button onclick="closeModal()" style="position:absolute;top:10px;right:10px;background:rgba(0,0,0,0.6);border:none;color:#fff;border-radius:7px;width:32px;height:32px;font-size:16px;cursor:pointer"></button> </div> <div class="modal-body"> <div style="font-size:11px;color:var(--orange);font-weight:700;text-transform:uppercase;margin-bottom:6px">${v.venue_type||'Venue'}</div> <h2 style="font-family:'Syne',sans-serif;font-size:22px;font-weight:800;margin-bottom:14px">${v.name}</h2> <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px"> ${v.neighborhood?`<span style="background:var(--surface);border-radius:7px;padding:5px 10px;font-size:12px"> ${v.neighborhood}</span>`:''}
+ <button onclick="closeModal()" style="position:absolute;top:10px;right:10px;background:rgba(0,0,0,0.6);border:none;color:#fff;border-radius:7px;width:32px;height:32px;font-size:16px;cursor:pointer"></button> </div> <div class="modal-body"> <div style="font-size:11px;color:var(--orange);font-weight:700;text-transform:uppercase;margin-bottom:6px">${v.venue_type||'Venue'}</div> <h2 style="font-family:'Inter',sans-serif;font-size:22px;font-weight:800;margin-bottom:14px">${v.name}</h2> <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px"> ${v.neighborhood?`<span style="background:var(--surface);border-radius:7px;padding:5px 10px;font-size:12px"> ${v.neighborhood}</span>`:''}
  ${v.capacity?`<span style="background:var(--surface);border-radius:7px;padding:5px 10px;font-size:12px"> Up to ${v.capacity}</span>`:''}
  ${v.phone?`<span style="background:var(--surface);border-radius:7px;padding:5px 10px;font-size:12px"> ${v.phone}</span>`:''}
  </div> ${v.description?`<p style="color:var(--sub);font-size:14px;line-height:1.7;margin-bottom:16px">${v.description}</p>`:''}
@@ -694,7 +701,7 @@ function boostLabel(e){
 function renderEvents(){
  const boosted=myEvents.filter(e=>isPromoted(e));
  document.getElementById('app').innerHTML=`
- <div class="page"> <div style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:6px"> <div class="section-title">My Events</div> <button class="btn btn-primary btn-sm" onclick="openAddEventModal()">+ List an Event</button> </div> <div class="section-sub">${myEvents.length} events · ${boosted.length} currently boosted</div> <div style="background:linear-gradient(135deg,#1a1000,#251500);border:1px solid #f59e0b30;border-radius:14px;padding:20px 24px;margin-bottom:20px;display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap"> <div> <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:16px;margin-bottom:4px"> Boost Your Event</div> <div style="color:var(--sub);font-size:13px">Pin to top · Hero slider · Highlighted in categories</div> </div> <div style="display:flex;gap:8px;flex-shrink:0"> <div style="background:var(--card);border:1px solid #f59e0b40;border-radius:10px;padding:10px 16px;text-align:center"> <div style="font-family:'Syne',sans-serif;font-size:18px;font-weight:800;color:#f59e0b">$10</div> <div style="color:var(--muted);font-size:11px">7 days</div> </div> <div style="background:var(--card);border:1px solid #f59e0b40;border-radius:10px;padding:10px 16px;text-align:center"> <div style="font-family:'Syne',sans-serif;font-size:18px;font-weight:800;color:#f59e0b">$20</div> <div style="color:var(--muted);font-size:11px">30 days</div> </div> </div> </div> ${myEvents.length?myEvents.map(e=>eventItemHTML(e)).join(''):`
+ <div class="page"> <div style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:6px"> <div class="section-title">My Events</div> <button class="btn btn-primary btn-sm" onclick="openAddEventModal()">+ List an Event</button> </div> <div class="section-sub">${myEvents.length} events · ${boosted.length} currently boosted</div> <div style="background:linear-gradient(135deg,#1a1000,#251500);border:1px solid #f59e0b30;border-radius:14px;padding:20px 24px;margin-bottom:20px;display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap"> <div> <div style="font-family:'Inter',sans-serif;font-weight:700;font-size:16px;margin-bottom:4px"> Boost Your Event</div> <div style="color:var(--sub);font-size:13px">Pin to top · Hero slider · Highlighted in categories</div> </div> <div style="display:flex;gap:8px;flex-shrink:0"> <div style="background:var(--card);border:1px solid #f59e0b40;border-radius:10px;padding:10px 16px;text-align:center"> <div style="font-family:'Inter',sans-serif;font-size:18px;font-weight:800;color:#f59e0b">$10</div> <div style="color:var(--muted);font-size:11px">7 days</div> </div> <div style="background:var(--card);border:1px solid #f59e0b40;border-radius:10px;padding:10px 16px;text-align:center"> <div style="font-family:'Inter',sans-serif;font-size:18px;font-weight:800;color:#f59e0b">$20</div> <div style="color:var(--muted);font-size:11px">30 days</div> </div> </div> </div> ${myEvents.length?myEvents.map(e=>eventItemHTML(e)).join(''):`
  <div class="empty" style="border:1px solid var(--border);border-radius:14px"> <h3>No events listed yet</h3> <p style="font-size:13px;margin-bottom:16px">List your event on CBUSEVENTS to reach Columbus</p> <button class="btn btn-primary" onclick="openAddEventModal()">List Your First Event →</button> </div>`}
  </div>`;
 }
@@ -738,7 +745,7 @@ function openBoostModal(eventId){
  const e=myEvents.find(x=>x.id===eventId);
  if(!e)return;
  document.getElementById('modal').innerHTML=`
- <div class="modal-overlay" onclick="if(event.target===this)closeModal()"> <div class="modal"> <div class="modal-header"> <div class="modal-title"> Boost "${e.title}"</div> <button onclick="closeModal()" style="background:none;border:none;color:var(--sub);font-size:18px;cursor:pointer"></button> </div> <div class="modal-body"> <p style="color:var(--sub);font-size:14px;line-height:1.65;margin-bottom:20px">Boosted events get pinned to the top of the events page, featured in the homepage hero slider, and highlighted across category pages.</p> <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px"> <div style="background:var(--surface);border:1.5px solid #f59e0b40;border-radius:12px;padding:20px;text-align:center;cursor:pointer" onclick="boostCheckout('${eventId}','7')"> <div style="font-family:'Syne',sans-serif;font-size:28px;font-weight:800;color:#f59e0b">$10</div> <div style="font-weight:700;font-size:14px;margin:4px 0">7-Day Boost</div> <div style="color:var(--sub);font-size:12px;line-height:1.5">Featured for one week · Perfect for upcoming events</div> <button class="btn btn-sm" style="margin-top:12px;background:#f59e0b;color:#000;font-weight:700;width:100%">Boost for $10 →</button> </div> <div style="background:var(--surface);border:1.5px solid #f59e0b;border-radius:12px;padding:20px;text-align:center;cursor:pointer;position:relative" onclick="boostCheckout('${eventId}','30')"> <div style="position:absolute;top:-10px;left:50%;transform:translateX(-50%);background:#f59e0b;color:#000;border-radius:20px;padding:2px 12px;font-size:10px;font-weight:700;white-space:nowrap">BEST VALUE</div> <div style="font-family:'Syne',sans-serif;font-size:28px;font-weight:800;color:#f59e0b">$20</div> <div style="font-weight:700;font-size:14px;margin:4px 0">30-Day Boost</div> <div style="color:var(--sub);font-size:12px;line-height:1.5">Featured all month · Max exposure for your event</div> <button class="btn btn-sm" style="margin-top:12px;background:#f59e0b;color:#000;font-weight:700;width:100%">Boost for $20 →</button> </div> </div> </div> </div> </div>`;
+ <div class="modal-overlay" onclick="if(event.target===this)closeModal()"> <div class="modal"> <div class="modal-header"> <div class="modal-title"> Boost "${e.title}"</div> <button onclick="closeModal()" style="background:none;border:none;color:var(--sub);font-size:18px;cursor:pointer"></button> </div> <div class="modal-body"> <p style="color:var(--sub);font-size:14px;line-height:1.65;margin-bottom:20px">Boosted events get pinned to the top of the events page, featured in the homepage hero slider, and highlighted across category pages.</p> <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px"> <div style="background:var(--surface);border:1.5px solid #f59e0b40;border-radius:12px;padding:20px;text-align:center;cursor:pointer" onclick="boostCheckout('${eventId}','7')"> <div style="font-family:'Inter',sans-serif;font-size:28px;font-weight:800;color:#f59e0b">$10</div> <div style="font-weight:700;font-size:14px;margin:4px 0">7-Day Boost</div> <div style="color:var(--sub);font-size:12px;line-height:1.5">Featured for one week · Perfect for upcoming events</div> <button class="btn btn-sm" style="margin-top:12px;background:#f59e0b;color:#000;font-weight:700;width:100%">Boost for $10 →</button> </div> <div style="background:var(--surface);border:1.5px solid #f59e0b;border-radius:12px;padding:20px;text-align:center;cursor:pointer;position:relative" onclick="boostCheckout('${eventId}','30')"> <div style="position:absolute;top:-10px;left:50%;transform:translateX(-50%);background:#f59e0b;color:#000;border-radius:20px;padding:2px 12px;font-size:10px;font-weight:700;white-space:nowrap">BEST VALUE</div> <div style="font-family:'Inter',sans-serif;font-size:28px;font-weight:800;color:#f59e0b">$20</div> <div style="font-weight:700;font-size:14px;margin:4px 0">30-Day Boost</div> <div style="color:var(--sub);font-size:12px;line-height:1.5">Featured all month · Max exposure for your event</div> <button class="btn btn-sm" style="margin-top:12px;background:#f59e0b;color:#000;font-weight:700;width:100%">Boost for $20 →</button> </div> </div> </div> </div> </div>`;
 }
 
 function boostCheckout(eventId, tier){
@@ -806,9 +813,9 @@ function openAddEventModal(editEvent){
      '<div class="field"><label>Cover Image URL</label><input id="evCover" placeholder="https://... paste an image link" value="'+(ev?ev.cover_image_url||'':'')+'"></div>'+
      '<div style="height:1px;background:var(--border);margin:16px 0"></div>'+
      '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">'+
-       '<div><div style="font-family:\'Syne\',sans-serif;font-weight:700;font-size:13px">Ticket Tiers</div>'+
+       '<div><div style="font-family:\'Inter\',sans-serif;font-weight:700;font-size:13px">Ticket Tiers</div>'+
        '<div style="color:var(--muted);font-size:12px;margin-top:2px">Add GA, VIP etc. with Stripe Payment Links</div></div>'+
-       '<button type="button" onclick="addTierRow()" style="background:#FF6B3520;color:#FF6B35;border:1px solid #FF6B3540;border-radius:6px;padding:5px 12px;font-size:12px;font-weight:700;cursor:pointer;font-family:\'DM Sans\',sans-serif">+ Add Tier</button>'+
+       '<button type="button" onclick="addTierRow()" style="background:#FF6B3520;color:#FF6B35;border:1px solid #FF6B3540;border-radius:6px;padding:5px 12px;font-size:12px;font-weight:700;cursor:pointer;font-family:\'Inter\',sans-serif">+ Add Tier</button>'+
      '</div>'+
      '<div id="tiersList" style="margin-bottom:8px">'+(tiersHtml||'<div id="noTiers" style="background:var(--surface);border:1px dashed var(--border);border-radius:8px;padding:12px;text-align:center;color:var(--muted);font-size:13px">No ticket tiers \u2014 add GA, VIP, etc. or leave blank for a free event</div>')+'</div>'+
      '<div id="evErr" style="color:#ef4444;font-size:13px;margin-bottom:8px;display:none"></div>'+
@@ -824,14 +831,14 @@ function buildTierRow(i,t){
  t=t||{};
  return '<div class="tier-row" style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-bottom:8px">'+
    '<div style="display:grid;grid-template-columns:1fr 90px 90px auto;gap:8px;margin-bottom:8px;align-items:end">'+
-     '<div><label style="font-size:11px;color:var(--muted);display:block;margin-bottom:3px">Tier Name</label><input class="tier-name" value="'+(t.name||'General Admission')+'" placeholder="General Admission" style="background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:7px 9px;color:var(--text);font-size:13px;width:100%;font-family:\'DM Sans\',sans-serif"></div>'+
-     '<div><label style="font-size:11px;color:var(--muted);display:block;margin-bottom:3px">Price ($)</label><input class="tier-price" type="number" min="0" value="'+(t.price||'')+'" placeholder="25" style="background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:7px 9px;color:var(--text);font-size:13px;width:100%;font-family:\'DM Sans\',sans-serif"></div>'+
-     '<div><label style="font-size:11px;color:var(--muted);display:block;margin-bottom:3px">Qty</label><input class="tier-qty" type="number" min="1" value="'+(t.quantity||'')+'" placeholder="100" style="background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:7px 9px;color:var(--text);font-size:13px;width:100%;font-family:\'DM Sans\',sans-serif"></div>'+
+     '<div><label style="font-size:11px;color:var(--muted);display:block;margin-bottom:3px">Tier Name</label><input class="tier-name" value="'+(t.name||'General Admission')+'" placeholder="General Admission" style="background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:7px 9px;color:var(--text);font-size:13px;width:100%;font-family:\'Inter\',sans-serif"></div>'+
+     '<div><label style="font-size:11px;color:var(--muted);display:block;margin-bottom:3px">Price ($)</label><input class="tier-price" type="number" min="0" value="'+(t.price||'')+'" placeholder="25" style="background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:7px 9px;color:var(--text);font-size:13px;width:100%;font-family:\'Inter\',sans-serif"></div>'+
+     '<div><label style="font-size:11px;color:var(--muted);display:block;margin-bottom:3px">Qty</label><input class="tier-qty" type="number" min="1" value="'+(t.quantity||'')+'" placeholder="100" style="background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:7px 9px;color:var(--text);font-size:13px;width:100%;font-family:\'Inter\',sans-serif"></div>'+
      '<div style="padding-bottom:1px"><button type="button" onclick="this.closest(\'.tier-row\').remove()" style="background:#2a0a0a;color:#ef4444;border:1px solid #4a1010;border-radius:6px;padding:7px 10px;font-size:12px;cursor:pointer;margin-top:16px">\u2715</button></div>'+
    '</div>'+
    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">'+
-     '<div><label style="font-size:11px;color:var(--muted);display:block;margin-bottom:3px">Perks (optional)</label><input class="tier-desc" value="'+(t.description||'')+'" placeholder="Includes 1 drink, front row..." style="background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:7px 9px;color:var(--text);font-size:13px;width:100%;font-family:\'DM Sans\',sans-serif"></div>'+
-     '<div><label style="font-size:11px;color:var(--muted);display:block;margin-bottom:3px">Stripe Payment Link <span style="color:#FF6B35">*</span></label><input class="tier-link" value="'+(t.payment_link||'')+'" placeholder="https://buy.stripe.com/..." style="background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:7px 9px;color:var(--text);font-size:13px;width:100%;font-family:\'DM Sans\',sans-serif"></div>'+
+     '<div><label style="font-size:11px;color:var(--muted);display:block;margin-bottom:3px">Perks (optional)</label><input class="tier-desc" value="'+(t.description||'')+'" placeholder="Includes 1 drink, front row..." style="background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:7px 9px;color:var(--text);font-size:13px;width:100%;font-family:\'Inter\',sans-serif"></div>'+
+     '<div><label style="font-size:11px;color:var(--muted);display:block;margin-bottom:3px">Stripe Payment Link <span style="color:#FF6B35">*</span></label><input class="tier-link" value="'+(t.payment_link||'')+'" placeholder="https://buy.stripe.com/..." style="background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:7px 9px;color:var(--text);font-size:13px;width:100%;font-family:\'Inter\',sans-serif"></div>'+
    '</div>'+
  '</div>';
 }
