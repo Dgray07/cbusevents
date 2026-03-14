@@ -546,7 +546,7 @@ function renderBilling(){
  document.getElementById('app').innerHTML=`
  <div class="page">
    <div class="section-title">Plan & Billing</div>
-   <div class="section-sub" style="margin-bottom:32px">Upgrade to unlock the full Columbus planner network</div>
+   <div class="section-sub" style="margin-bottom:32px">Founding member pricing — locked in forever while spots last</div>
    ${planParam==='success'?`<div style="background:#0a2a14;border:1px solid #1a4a24;border-radius:10px;padding:14px 18px;margin-bottom:28px;color:#22c55e;font-size:14px;font-weight:600;">Upgrade successful! Your plan will be activated within a minute.</div>`:''}
    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:18px">
      <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:28px">
@@ -557,28 +557,19 @@ function renderBilling(){
        </div>
        <div style="text-align:center;padding:10px;background:var(--surface);border:1px solid var(--border);border-radius:8px;font-size:13px;color:var(--muted)">Current Plan</div>
      </div>
-     <div style="background:var(--card);border:2px solid #a855f7;border-radius:14px;padding:28px;position:relative">
-       <div style="position:absolute;top:-11px;left:50%;transform:translateX(-50%);background:#a855f7;color:#fff;border-radius:20px;padding:2px 14px;font-size:11px;font-weight:700;white-space:nowrap">MOST POPULAR</div>
-       <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:18px;color:#a855f7;margin-bottom:8px">Pro</div>
-       <div style="font-family:'Syne',sans-serif;font-size:36px;font-weight:800;line-height:1;color:#a855f7;margin-bottom:20px">$19<span style="font-size:14px;color:var(--sub)">/mo</span></div>
+     <div style="background:var(--card);border:2px solid #FF6B35;border-radius:14px;padding:28px;position:relative">
+       <div style="position:absolute;top:-11px;left:50%;transform:translateX(-50%);background:#FF6B35;color:#fff;border-radius:20px;padding:2px 14px;font-size:11px;font-weight:700;white-space:nowrap">FOUNDING MEMBER</div>
+       <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:18px;color:#FF6B35;margin-bottom:8px">Pro</div>
+       <div style="font-family:'Syne',sans-serif;font-size:36px;font-weight:800;line-height:1;color:#FF6B35;margin-bottom:4px">$15<span style="font-size:14px;color:var(--sub)">/mo</span></div>
+       <div style="font-size:11px;color:var(--muted);margin-bottom:20px">Rate locked forever</div>
        <div style="display:flex;flex-direction:column;gap:9px;margin-bottom:24px;font-size:13px;color:var(--sub)">
          <div style="color:var(--text)">Full vendor directory access</div>
          <div style="color:var(--text)">Receive vendor proposals</div>
          <div style="color:var(--text)">Featured planner profile</div>
+         <div style="color:var(--text)">Sell tickets through CBUSEVENTS</div>
          <div>Everything in Free</div>
        </div>
-       <button onclick="alert('Stripe billing coming soon — contact info@cbusevents.com to upgrade')" style="width:100%;padding:11px;background:#a855f7;color:#fff;border:none;border-radius:8px;font-weight:700;font-size:14px;cursor:pointer">Upgrade to Pro →</button>
-     </div>
-     <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:28px">
-       <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:18px;color:var(--gold);margin-bottom:8px">Agency</div>
-       <div style="font-family:'Syne',sans-serif;font-size:36px;font-weight:800;line-height:1;color:var(--gold);margin-bottom:20px">$49<span style="font-size:14px;color:var(--sub)">/mo</span></div>
-       <div style="display:flex;flex-direction:column;gap:9px;margin-bottom:24px;font-size:13px;color:var(--sub)">
-         <div style="color:var(--text)">Priority venue responses</div>
-         <div style="color:var(--text)">Homepage featured planner slot</div>
-         <div style="color:var(--text)">Dedicated account support</div>
-         <div>Everything in Pro</div>
-       </div>
-       <button onclick="alert('Stripe billing coming soon — contact info@cbusevents.com to upgrade')" style="width:100%;padding:11px;background:var(--gold);color:#000;border:none;border-radius:8px;font-weight:700;font-size:14px;cursor:pointer">Upgrade to Agency →</button>
+       <button onclick="window.location.href='https://buy.stripe.com/3cI3cv3vWcAOgRN0Nic3m01'" style="width:100%;padding:11px;background:#FF6B35;color:#fff;border:none;border-radius:8px;font-weight:700;font-size:14px;cursor:pointer">Claim Founding Rate →</button>
      </div>
    </div>
    <div style="margin-top:28px;padding:18px;background:var(--surface);border:1px solid var(--border);border-radius:12px">
