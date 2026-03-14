@@ -1,718 +1,505 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Sign In — CBUSEVENTS</title>
-<meta name="robots" content="noindex,nofollow"/>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
-*{box-sizing:border-box;margin:0;padding:0;}
-:root{--bg:#0b0b0f;--surface:#13131a;--card:#1a1a24;--border:#25252f;--text:#e8e8f0;--sub:#8888a0;--muted:#55556a;--orange:#FF6B35;--green:#22c55e;--gold:#f59e0b;--blue:#60a5fa;--red:#ef4444;}
-body{background:var(--bg);color:var(--text);font-family:Inter,sans-serif;min-height:100vh;display:flex;flex-direction:column;}
-@keyframes spin{to{transform:rotate(360deg);}}
-@keyframes fadeUp{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);}}
-@keyframes slideIn{from{opacity:0;transform:translateX(30px);}to{opacity:1;transform:translateX(0);}}
+  :root {
+    --bg: #0b0b0f;
+    --surface: #13131a;
+    --border: #1e1e28;
+    --border-hover: #2e2e3e;
+    --text: #e8e8f0;
+    --sub: #8888a0;
+    --muted: #44445a;
+    --orange: #FF6B35;
+    --orange-dim: rgba(255,107,53,0.12);
+    --orange-glow: rgba(255,107,53,0.25);
+  }
 
-/* NAV */
-nav{background:rgba(11,11,15,0.95);backdrop-filter:blur(16px);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 48px;height:62px;}
-.nav-logo{font-family:Inter,sans-serif;font-weight:800;font-size:20px;cursor:pointer;text-decoration:none;color:var(--text);}
-.nav-logo span{color:var(--orange);}
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-/* LAYOUT */
-.auth-wrap{flex:1;display:flex;align-items:center;justify-content:center;padding:40px 24px;}
-.auth-container{width:100%;max-width:480px;animation:fadeUp 0.4s ease;}
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    overflow-x: hidden;
+  }
 
-/* CARD */
-.auth-card{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:40px;overflow:hidden;}
-.auth-logo{font-family:Inter,sans-serif;font-size:22px;font-weight:800;text-align:center;margin-bottom:4px;}
-.auth-logo span{color:var(--orange);}
-.auth-sub{color:var(--sub);font-size:13px;text-align:center;margin-bottom:28px;line-height:1.5;}
+  /* Background grid */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(255,107,53,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,107,53,0.03) 1px, transparent 1px);
+    background-size: 48px 48px;
+    pointer-events: none;
+    z-index: 0;
+  }
 
-/* TABS */
-.auth-tabs{display:grid;grid-template-columns:1fr 1fr;background:var(--surface);border-radius:10px;padding:4px;margin-bottom:24px;}
-.auth-tab{background:none;border:none;color:var(--sub);padding:9px;border-radius:7px;font-size:14px;font-weight:500;cursor:pointer;transition:all 0.15s;font-family:Inter,sans-serif;}
-.auth-tab.active{background:var(--card);color:var(--text);font-weight:600;}
+  /* Glow blob */
+  body::after {
+    content: '';
+    position: fixed;
+    top: -200px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 600px;
+    height: 400px;
+    background: radial-gradient(ellipse, rgba(255,107,53,0.08) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+  }
 
-/* FORM */
-.field{margin-bottom:14px;}
-.field label{display:block;font-size:12px;color:var(--sub);font-weight:500;margin-bottom:5px;}
-.field input{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:10px 14px;color:var(--text);font-family:Inter,sans-serif;font-size:14px;outline:none;transition:border-color 0.15s;}
-.field input:focus{border-color:var(--orange);}
-.auth-err{color:var(--red);font-size:13px;margin-bottom:10px;min-height:18px;}
-.btn-primary{background:var(--orange);color:#fff;border:none;border-radius:8px;padding:12px;font-size:14px;font-weight:700;width:100%;cursor:pointer;font-family:Inter,sans-serif;transition:opacity 0.15s;}
-.btn-primary:hover{opacity:0.85;}
-.btn-primary:disabled{opacity:0.5;cursor:not-allowed;}
+  .wrap {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-width: 480px;
+  }
 
-/* ONBOARDING STEPS */
-.step{display:none;animation:slideIn 0.3s ease;}
-.step.active{display:block;}
-.step-indicator{display:flex;gap:6px;justify-content:center;margin-bottom:24px;}
-.step-dot{width:8px;height:8px;border-radius:50%;background:var(--border);transition:all 0.3s;}
-.step-dot.active{background:var(--orange);width:24px;border-radius:4px;}
-.step-dot.done{background:var(--green);}
-.step-title{font-family:Inter,sans-serif;font-size:18px;font-weight:800;margin-bottom:6px;text-align:center;}
-.step-sub{color:var(--sub);font-size:13px;text-align:center;margin-bottom:24px;}
+  /* Logo */
+  .logo {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 22px;
+    letter-spacing: -0.03em;
+    text-align: center;
+    margin-bottom: 8px;
+    text-decoration: none;
+    color: var(--text);
+    display: block;
+  }
+  .logo span { color: var(--orange); }
 
-/* ROLE CARDS */
-.role-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px;}
-.role-card{background:var(--surface);border:1.5px solid var(--border);border-radius:12px;padding:18px 14px;cursor:pointer;transition:all 0.2s;text-align:center;}
-.role-card:hover{border-color:var(--orange);}
-.role-card.selected{border-color:var(--orange);background:#FF6B3510;}
-.role-icon{font-size:30px;margin-bottom:8px;}
-.role-name{font-weight:700;font-size:14px;margin-bottom:3px;}
-.role-desc{font-size:11px;color:var(--sub);line-height:1.4;}
+  .tagline {
+    text-align: center;
+    color: var(--sub);
+    font-size: 13px;
+    font-weight: 400;
+    margin-bottom: 36px;
+    letter-spacing: 0.02em;
+  }
 
-/* CLAIM STEP */
-.claim-card{background:var(--surface);border:1.5px solid var(--border);border-radius:12px;padding:16px 18px;cursor:pointer;transition:all 0.2s;margin-bottom:10px;display:flex;align-items:center;gap:14px;}
-.claim-card:hover{border-color:var(--orange);}
-.claim-card.selected{border-color:var(--orange);background:#FF6B3510;}
-.claim-card-icon{font-size:28px;flex-shrink:0;}
-.claim-card-name{font-weight:700;font-size:14px;margin-bottom:2px;}
-.claim-card-meta{font-size:12px;color:var(--sub);}
-.claim-check{margin-left:auto;width:20px;height:20px;border-radius:50%;border:2px solid var(--border);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:11px;transition:all 0.15s;}
-.claim-card.selected .claim-check{background:var(--orange);border-color:var(--orange);color:#fff;}
+  /* Main card */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 32px;
+    margin-bottom: 16px;
+  }
 
-/* BACK LINK */
-.back-btn{background:none;border:none;color:var(--sub);font-size:13px;cursor:pointer;display:flex;align-items:center;gap:4px;margin-bottom:16px;font-family:Inter,sans-serif;padding:0;}
-.back-btn:hover{color:var(--text);}
+  .card-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 6px;
+    letter-spacing: -0.02em;
+  }
 
-/* LOADER */
-.auth-loader{text-align:center;padding:20px 0;}
-.spinner{width:32px;height:32px;border:3px solid var(--border);border-top-color:var(--orange);border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 12px;}
+  .card-sub {
+    color: var(--sub);
+    font-size: 13px;
+    margin-bottom: 24px;
+    line-height: 1.5;
+  }
 
-/* ── HAMBURGER NAV (mobile) ── */
-.nav-hamburger{display:none;flex-direction:column;gap:5px;cursor:pointer;padding:6px;background:none;border:none;z-index:110;}
-.nav-hamburger span{display:block;width:22px;height:2px;background:var(--text);border-radius:2px;transition:all 0.3s ease;}
-.nav-hamburger.open span:nth-child(1){transform:translateY(7px) rotate(45deg);}
-.nav-hamburger.open span:nth-child(2){opacity:0;}
-.nav-hamburger.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg);}
-.nav-mobile-menu{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(11,11,15,0.98);backdrop-filter:blur(20px);z-index:105;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:80px 24px 40px;}
-.nav-mobile-menu.open{display:flex;}
-.nav-mobile-link{font-family:Inter,sans-serif;font-size:26px;font-weight:700;color:var(--text);text-decoration:none;padding:12px 24px;border-radius:12px;transition:color 0.2s;text-align:center;width:100%;cursor:pointer;border:none;background:none;font-family:Inter,sans-serif;}
-.nav-mobile-link:hover,.nav-mobile-link.active{color:var(--orange);}
-.nav-mobile-divider{width:40px;height:1px;background:var(--border);margin:6px 0;}
-.nav-mobile-cta{margin-top:12px;background:var(--orange) !important;color:#fff !important;border-radius:12px;padding:14px 32px !important;font-size:16px !important;}
-@media(max-width:680px){
-  .nav-hamburger{display:flex;}
-  .nav-links{display:none !important;}
-  html,body{overflow-x:hidden;}
-}
+  /* Portal tiles */
+  .portal-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 24px;
+  }
 
-</style>
-<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDqS7QcHow2PDpVLI6J74Ada_tYkj5BWmg&libraries=places" async defer></script>
-<style>
-*{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;}
-body{font-family:Inter,sans-serif;}
-h1,h2,h3,h4,h5,h6{font-family:Inter,sans-serif;letter-spacing:-0.02em;}
-.nav-logo,.auth-logo,.login-logo,.sidebar-logo-text{font-family:Inter,sans-serif!important;font-weight:800!important;letter-spacing:-0.04em!important;text-transform:uppercase;}
-.nav-logo span,.auth-logo span,.login-logo span,.sidebar-logo-text span{color:#FF6B35;}
+  .portal-tile {
+    background: var(--bg);
+    border: 1.5px solid var(--border);
+    border-radius: 14px;
+    padding: 18px 16px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-align: left;
+    position: relative;
+    overflow: hidden;
+    text-decoration: none;
+    display: block;
+  }
+
+  .portal-tile::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--orange-dim);
+    opacity: 0;
+    transition: opacity 0.2s;
+    border-radius: 12px;
+  }
+
+  .portal-tile:hover {
+    border-color: var(--orange);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(255,107,53,0.15);
+  }
+
+  .portal-tile:hover::before { opacity: 1; }
+
+  .portal-icon {
+    font-size: 22px;
+    margin-bottom: 10px;
+    display: block;
+    position: relative;
+    z-index: 1;
+  }
+
+  .portal-name {
+    font-family: 'Syne', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 3px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .portal-desc {
+    font-size: 11px;
+    color: var(--sub);
+    line-height: 1.4;
+    position: relative;
+    z-index: 1;
+  }
+
+  .portal-arrow {
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    color: var(--muted);
+    font-size: 13px;
+    transition: color 0.2s, transform 0.2s;
+    z-index: 1;
+  }
+
+  .portal-tile:hover .portal-arrow {
+    color: var(--orange);
+    transform: translate(2px, -2px);
+  }
+
+  /* Divider */
+  .divider {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+  .divider::before, .divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+  .divider span {
+    color: var(--muted);
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  /* Quick sign in form */
+  .field { margin-bottom: 14px; }
+  .field label {
+    display: block;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--sub);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+  .field input {
+    width: 100%;
+    background: var(--bg);
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    padding: 11px 14px;
+    color: var(--text);
+    font-size: 14px;
+    font-family: 'DM Sans', sans-serif;
+    transition: border-color 0.2s;
+    outline: none;
+  }
+  .field input:focus { border-color: var(--orange); }
+  .field input::placeholder { color: var(--muted); }
+
+  .btn-primary {
+    width: 100%;
+    background: var(--orange);
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    padding: 13px;
+    font-size: 15px;
+    font-weight: 700;
+    font-family: 'Syne', sans-serif;
+    cursor: pointer;
+    transition: opacity 0.2s, transform 0.15s;
+    letter-spacing: 0.01em;
+    margin-top: 4px;
+  }
+  .btn-primary:hover { opacity: 0.9; transform: translateY(-1px); }
+  .btn-primary:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+
+  .auth-err {
+    color: #ef4444;
+    font-size: 13px;
+    margin-bottom: 12px;
+    min-height: 18px;
+    line-height: 1.4;
+  }
+
+  /* Footer links */
+  .foot-links {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 16px;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .foot-link {
+    color: var(--sub);
+    font-size: 12px;
+    cursor: pointer;
+    background: none;
+    border: none;
+    font-family: 'DM Sans', sans-serif;
+    transition: color 0.2s;
+    text-decoration: none;
+  }
+  .foot-link:hover { color: var(--orange); }
+  .foot-link.highlight { color: var(--orange); font-weight: 600; }
+
+  /* Reset view */
+  #resetView { display: none; }
+  .back-btn {
+    background: none;
+    border: none;
+    color: var(--sub);
+    font-size: 13px;
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    margin-bottom: 20px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    transition: color 0.2s;
+  }
+  .back-btn:hover { color: var(--orange); }
+
+  /* Loading spinner */
+  .spinner {
+    width: 18px; height: 18px;
+    border: 2px solid rgba(255,255,255,0.3);
+    border-top-color: #fff;
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+    display: inline-block;
+    margin-right: 8px;
+    vertical-align: middle;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* Fade in */
+  .wrap { animation: fadeUp 0.4s ease both; }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  @media (max-width: 420px) {
+    .portal-grid { grid-template-columns: 1fr; }
+    .card { padding: 24px 20px; }
+  }
 </style>
 </head>
 <body>
-<nav>
-  <a class="nav-logo" href="https://cbusevents.com"> CBUS<span>EVENTS</span> </a>
-  <a href="https://cbusevents.com" style="color:var(--sub);font-size:13px;text-decoration:none;">← Back to site</a>
-<button class="nav-hamburger" id="navHamburger" aria-label="Menu"><span></span><span></span><span></span></button>
-</nav>
-<div id="navMobileMenu" class="nav-mobile-menu">
-  <a href="https://cbusevents.com" class="nav-mobile-link">Home</a>
-  <a href="https://cbusevents.com/venues.html" class="nav-mobile-link">Venues</a>
-  <a href="https://cbusevents.com/vendors.html" class="nav-mobile-link">Vendors</a>
-  <a href="https://cbusevents.com/planners.html" class="nav-mobile-link">Planners</a>
+
+<div class="wrap">
+  <a class="logo" href="https://cbusevents.com">CBUS<span>EVENTS</span></a>
+  <p class="tagline">Columbus's event ecosystem</p>
+
+  <div class="card">
+
+    <!-- SIGN IN VIEW -->
+    <div id="signinView">
+      <div class="card-title">Welcome back</div>
+      <p class="card-sub">Sign in to your account and we'll take you to your portal.</p>
+
+      <div class="field">
+        <label>Email</label>
+        <input type="email" id="siEmail" placeholder="you@email.com" onkeydown="if(event.key==='Enter')doSignIn()"/>
+      </div>
+      <div class="field">
+        <label>Password</label>
+        <input type="password" id="siPass" placeholder="••••••••" onkeydown="if(event.key==='Enter')doSignIn()"/>
+      </div>
+      <div class="auth-err" id="siErr"></div>
+      <button class="btn-primary" id="siBtn" onclick="doSignIn()">Sign In →</button>
+
+      <div class="foot-links">
+        <button class="foot-link" onclick="showReset()">Forgot password?</button>
+        <span style="color:var(--muted);font-size:12px">No account?</span>
+      </div>
+
+      <div class="divider" style="margin-top:20px;"><span>or sign up as</span></div>
+
+      <div class="portal-grid">
+        <a class="portal-tile" href="https://cbusevents.com/cbus-venue-portal.html">
+          <span class="portal-icon">🏛</span>
+          <div class="portal-name">Venue Owner</div>
+          <div class="portal-desc">List your space</div>
+          <span class="portal-arrow">↗</span>
+        </a>
+        <a class="portal-tile" href="https://cbusevents.com/cbus-vendor-portal.html">
+          <span class="portal-icon">🎛</span>
+          <div class="portal-name">Vendor</div>
+          <div class="portal-desc">Offer your services</div>
+          <span class="portal-arrow">↗</span>
+        </a>
+        <a class="portal-tile" href="https://cbusevents.com/cbus-planner-portal.html">
+          <span class="portal-icon">📋</span>
+          <div class="portal-name">Event Planner</div>
+          <div class="portal-desc">Plan & manage events</div>
+          <span class="portal-arrow">↗</span>
+        </a>
+        <a class="portal-tile" href="https://cbusevents.com/customer-portal.html">
+          <span class="portal-icon">🎟</span>
+          <div class="portal-name">Attendee</div>
+          <div class="portal-desc">Discover events</div>
+          <span class="portal-arrow">↗</span>
+        </a>
+      </div>
+    </div>
+
+    <!-- RESET VIEW -->
+    <div id="resetView">
+      <button class="back-btn" onclick="showSignin()">← Back to sign in</button>
+      <div class="card-title">Reset password</div>
+      <p class="card-sub">Enter your email and we'll send you a reset link.</p>
+      <div class="field">
+        <label>Email</label>
+        <input type="email" id="rstEmail" placeholder="you@email.com" onkeydown="if(event.key==='Enter')doReset()"/>
+      </div>
+      <div class="auth-err" id="rstErr"></div>
+      <button class="btn-primary" id="rstBtn" onclick="doReset()">Send Reset Email →</button>
+    </div>
+
+  </div>
+
+  <p style="text-align:center;color:var(--muted);font-size:11px;">By signing in you agree to our terms of service</p>
 </div>
-<div class="auth-wrap">
-  <div class="auth-container">
-    <div class="auth-card">
-      <div class="auth-logo">CBUS<span>EVENTS</span></div>
-      <p class="auth-sub" id="authSub">Welcome to Columbus</p>
 
-      <!-- SIGN IN HEADER — no signup tab, this page is sign-in only -->
-      <div class="auth-tabs" style="margin-bottom:24px;">
-        <button class="auth-tab active" id="tabSignin" style="width:100%;">Sign In</button>
-      </div>
-
-      <!-- SIGN IN VIEW -->
-      <div id="signinView">
-        <div class="field"><label>Email</label><input type="email" id="siEmail" placeholder="you@email.com" onkeydown="if(event.key==='Enter')doSignIn()"/></div>
-        <div class="field"><label>Password</label><input type="password" id="siPass" placeholder="••••••••" onkeydown="if(event.key==='Enter')doSignIn()"/></div>
-        <div class="auth-err" id="siErr"></div>
-        <button class="btn-primary" id="siBtn" onclick="doSignIn()">Sign In →</button>
-        <div style="text-align:center;margin-top:14px">
-          <button onclick="setMode('reset')" style="background:none;border:none;color:var(--muted);font-size:12px;cursor:pointer">Forgot password?</button>
-        </div>
-        <div style="text-align:center;margin-top:16px;padding-top:16px;border-top:1px solid var(--border)">
-          <span style="color:var(--sub);font-size:13px">Don't have an account? </span>
-          <a href="https://cbusevents.com/signup.html" style="color:var(--orange);font-size:13px;font-weight:600;text-decoration:none;">Sign up free →</a>
-        </div>
-      </div>
-
-      <!-- RESET VIEW -->
-      <div id="resetView" style="display:none">
-        <div class="field"><label>Email</label><input type="email" id="rstEmail" placeholder="you@email.com"/></div>
-        <div class="auth-err" id="rstErr"></div>
-        <button class="btn-primary" onclick="doReset()">Send Reset Email →</button>
-        <div style="text-align:center;margin-top:14px">
-          <button onclick="setMode('signin')" style="background:none;border:none;color:var(--orange);font-size:13px;cursor:pointer">← Back to sign in</button>
-        </div>
-      </div>
-
-      <!-- SIGNUP VIEW -->
-      <div id="signupView" style="display:none"> <!-- Step indicators --> <div class="step-indicator"> <div class="step-dot active" id="dot1"></div> <div class="step-dot" id="dot2"></div> <div class="step-dot" id="dot3"></div> <div class="step-dot" id="dot4"></div> </div> <!-- STEP 1: Role selection --> <div class="step active" id="step1"> <div class="step-title">What brings you to CBUSEVENTS?</div> <div class="step-sub">We'll set up the right account for you</div> <div class="role-grid"> <div class="role-card" id="role-venue_owner" onclick="selectRole('venue_owner')"> <div class="role-name">Venue Owner</div> <div class="role-desc">I own or manage an event space or bar</div> </div> <div class="role-card" id="role-vendor" onclick="selectRole('vendor')"> <div class="role-name">Vendor</div> <div class="role-desc">I offer services like DJ, catering, photography</div> </div> <div class="role-card" id="role-planner" onclick="selectRole('planner')"> <div class="role-name">Event Planner</div> <div class="role-desc">I plan and organize events for clients</div> </div> <div class="role-card" id="role-customer" onclick="selectRole('customer')"> <div class="role-name">Attendee</div> <div class="role-desc">I want to discover events in Columbus</div> </div> </div> <div class="auth-err" id="step1Err"></div> <button class="btn-primary" onclick="nextStep(2)">Continue →</button> </div> <!-- STEP 2: Details based on role --> <div class="step" id="step2"> <button class="back-btn" onclick="goBack(1)">← Back</button> <div class="step-title" id="step2Title">Tell us about yourself</div> <div class="step-sub" id="step2Sub">Just a few quick details</div> <div id="step2Fields"></div> <div class="auth-err" id="step2Err"></div> <button class="btn-primary" onclick="nextStep(3)">Continue →</button> </div> <!-- STEP 2b: Claim existing listing --> <div class="step" id="stepClaim"> <button class="back-btn" onclick="goBack(2)">← Back</button> <div class="step-title">We found a match!</div> <div class="step-sub" id="claimSub">Is this your venue? Claim it to take ownership.</div> <div id="claimResults"></div> <div class="auth-err" id="claimErr"></div> <button class="btn-primary" id="claimBtn" onclick="proceedWithClaim()">Claim This Listing →</button> <button onclick="goBack(2)" style="background:none;border:none;color:var(--sub);font-size:13px;cursor:pointer;width:100%;margin-top:10px;padding:8px;">Not my venue — create a new listing</button> </div> <!-- STEP 3: Account creation --> <div class="step" id="step3"> <button class="back-btn" onclick="goBack(2)">← Back</button> <div class="step-title">Create your account</div> <div class="step-sub" id="step3Sub">Almost there!</div> <div class="field"><label>Email</label><input type="email" id="suEmail" placeholder="you@email.com" onkeydown="if(event.key==='Enter')doSignUp()"/></div> <div class="field"><label>Password</label><input type="password" id="suPass" placeholder="At least 6 characters" onkeydown="if(event.key==='Enter')doSignUp()"/></div> <div class="auth-err" id="suErr"></div> <button class="btn-primary" id="suBtn" onclick="doSignUp()">Create Account →</button> </div> <!-- LOADING --> <div class="step" id="stepLoading"> <div class="auth-loader"> <div class="spinner"></div> <div style="color:var(--sub);font-size:14px" id="loadingMsg">Setting up your account…</div> </div> </div> </div> </div> <div style="text-align:center;margin-top:16px;color:var(--muted);font-size:12px"> By creating an account you agree to our terms of service
- </div> </div>
-</div> <script src="https://unpkg.com/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="https://unpkg.com/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <script>
-const SB_URL="https://toblgvatvsjljbqogzsv.supabase.co";
-const SB_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRvYmxndmF0dnNqbGpicW9nenN2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMDgwNTAsImV4cCI6MjA4NzY4NDA1MH0._WJEQPizNDiQfDXQB_DHPaQhixPGpMdmYQSmyWmm_FQ";
-const sb=supabase.createClient(SB_URL,SB_KEY);
+const SB_URL = "https://toblgvatvsjljbqogzsv.supabase.co";
+const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRvYmxndmF0dnNqbGpicW9nenN2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMDgwNTAsImV4cCI6MjA4NzY4NDA1MH0._WJEQPizNDiQfDXQB_DHPaQhixPGpMdmYQSmyWmm_FQ";
+const sb = supabase.createClient(SB_URL, SB_KEY);
 
-const PORTAL_URLS={
- venue_owner:'https://cbusevents.com/cbus-venue-portal.html',
- vendor:'https://cbusevents.com/cbus-vendor-portal.html',
- planner:'https://cbusevents.com/cbus-planner-portal.html',
- customer:'https://cbusevents.com/customer-portal.html',
- admin:'https://cbusevents.com/cbus-admin.html',
+const PORTAL_URLS = {
+  venue_owner: 'https://cbusevents.com/cbus-venue-portal.html',
+  vendor:      'https://cbusevents.com/cbus-vendor-portal.html',
+  planner:     'https://cbusevents.com/cbus-planner-portal.html',
+  customer:    'https://cbusevents.com/customer-portal.html',
+  admin:       'https://cbusevents.com/cbus-admin.html',
 };
 
-let selectedRole=null;
-let stepData={};
-let currentStep=1;
-let claimMatches=[];
-let selectedClaimId=null;
+// If already logged in, redirect immediately
+(async () => {
+  const { data: { session } } = await sb.auth.getSession();
+  if (session?.user) await redirectByRole(session.user.id);
+})();
 
-// ── EMAIL CONFIRMATION CALLBACK ───────────────────────────────
+// Handle password recovery link
 sb.auth.onAuthStateChange(async (event, session) => {
   if (event === 'PASSWORD_RECOVERY') {
-    // Show a password reset form
-    document.getElementById('app').innerHTML = `
-      <div style="min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;background:#0b0b0f;">
-        <div style="width:100%;max-width:400px;background:#13131a;border:1px solid #25252f;border-radius:16px;padding:32px;">
-          <div style="font-family:Inter,sans-serif;font-weight:800;font-size:20px;margin-bottom:4px;">CBUS<span style="color:#FF6B35">EVENTS</span></div>
-          <div style="color:#8888a0;font-size:13px;margin-bottom:28px;">Set a new password</div>
-          <div style="margin-bottom:16px;">
-            <label style="font-size:13px;color:#8888a0;display:block;margin-bottom:6px;">New Password</label>
-            <input id="newPw" type="password" placeholder="At least 6 characters" style="width:100%;background:#0b0b0f;border:1px solid #25252f;border-radius:8px;padding:10px 14px;color:#e8e8f0;font-size:14px;font-family:Inter,sans-serif;box-sizing:border-box;" />
-          </div>
-          <div id="pwErr" style="color:#ef4444;font-size:13px;margin-bottom:12px;display:none;"></div>
-          <button onclick="doPasswordReset()" style="width:100%;background:#FF6B35;color:#fff;border:none;border-radius:8px;padding:12px;font-size:14px;font-weight:700;cursor:pointer;font-family:Inter,sans-serif;">Set New Password →</button>
-        </div>
-      </div>`;
-    window._recoverySession = session;
-    return;
-  }
-
-  if (event === 'SIGNED_IN' && session?.user) {
-    const userId = session.user.id;
-    const email = session.user.email;
-    const pending = localStorage.getItem('cbusevents_pending_role');
-    if (pending) {
-      try {
-        const { role, stepData: sd, selectedClaimId: claimId } = JSON.parse(pending);
-        const roleMap = { venue: 'venue_owner', vendor: 'vendor', planner: 'planner', attendee: 'customer' };
-        const dbRole = roleMap[role] || role;
-
-        await sb.from('user_roles').upsert({ user_id: userId, role: dbRole });
-
-        if (role === 'venue_owner' || role === 'venue') {
-          const venueName = sd?.venueName;
-          if (claimId && claimId !== 'new') {
-            await sb.from('venues').update({
-              owner_id: userId, claim_status: 'pending',
-              claimed_at: new Date().toISOString(), claim_email: email,
-            }).eq('id', claimId);
-          } else if (venueName) {
-            await sb.from('venues').insert({
-              name: venueName,
-              venue_type: sd?.venueType || null,
-              address: sd?.venueAddress || null,
-              neighborhood: sd?.venueNeighborhood || null,
-              owner_id: userId, status: 'pending', tier: 'free',
-              city: 'Columbus', state: 'OH', email: email,
-            });
-          }
-        } else if (role === 'vendor') {
-          const bizName = sd?.bizName;
-          if (bizName) {
-            await sb.from('vendors').upsert({
-              user_id: userId,
-              business_name: bizName,
-              category: sd?.bizCategory || null,
-              email: email,
-              subscription_tier: 'FREE',
-              subscription_status: 'free',
-            });
-          }
-        }
-        localStorage.removeItem('cbusevents_pending_role');
-      } catch(e) {
-        console.error('Pending role setup failed:', e);
-        localStorage.removeItem('cbusevents_pending_role');
-      }
-    }
-    await redirectByRole(userId);
+    const pw = prompt('Enter your new password (min 6 characters):');
+    if (!pw || pw.length < 6) return;
+    const { error } = await sb.auth.updateUser({ password: pw });
+    if (error) { alert('Error: ' + error.message); return; }
+    if (session?.user) await redirectByRole(session.user.id);
+    else window.location.href = 'https://cbusevents.com/auth.html';
   }
 });
 
-async function doPasswordReset(){
- const pw=document.getElementById('newPw')?.value;
- const errEl=document.getElementById('pwErr');
- if(!pw||pw.length<6){errEl.textContent='Password must be at least 6 characters.';errEl.style.display='block';return;}
- const{error}=await sb.auth.updateUser({password:pw});
- if(error){errEl.textContent=error.message;errEl.style.display='block';return;}
- // Password updated — redirect to their portal
- const{data:{session}}=await sb.auth.getSession();
- if(session?.user) await redirectByRole(session.user.id);
- else window.location.href='https://cbusevents.com/auth.html';
+async function redirectByRole(userId) {
+  const { data } = await sb.from('user_roles').select('role').eq('user_id', userId).maybeSingle();
+  const role = data?.role || 'customer';
+  window.location.href = PORTAL_URLS[role] || PORTAL_URLS.customer;
 }
 
-// ── CHECK IF ALREADY LOGGED IN ────────────────────────────────
-async function init(){
- const params=new URLSearchParams(window.location.search);
- const roleParam=params.get('role');
- const emailParam=params.get('email');
-
- // Always check session first — redirect logged-in users to their portal
- const{data:{session}}=await sb.auth.getSession();
- if(session?.user){ await redirectByRole(session.user.id); return; }
-
- if(roleParam&&['venue_owner','vendor','planner','customer'].includes(roleParam)){
-   setMode('signup');
-   selectedRole=roleParam;
-   buildStep2();
-   showStep(2);
-   if(emailParam) window._prefillEmail = emailParam;
-   return;
- }
-
- // If URL has ?signup, redirect to the dedicated signup page
- if(params.get('signup')) { window.location.href='https://cbusevents.com/signup.html'; return; }
-}
-
-// ── MODE SWITCHING ────────────────────────────────────────────
-function setMode(mode){
-  // auth.html is sign-in only — redirect signup attempts to dedicated page
-  if(mode==='signup'){ window.location.href='https://cbusevents.com/signup.html'; return; }
-  document.getElementById('signinView').style.display = (mode==='signin') ? 'block' : 'none';
-  document.getElementById('resetView').style.display  = (mode==='reset')  ? 'block' : 'none';
-  document.getElementById('signupView').style.display = 'none';
-}
-
-// ── SIGN IN ───────────────────────────────────────────────────
-async function doSignIn(){
- const email=document.getElementById('siEmail').value.trim();
- const pass=document.getElementById('siPass').value;
- const err=document.getElementById('siErr');
- const btn=document.getElementById('siBtn');
- if(!email||!pass){err.textContent='Email and password required.';return;}
- btn.disabled=true;btn.textContent='Signing in…';err.textContent='';
- const{data,error}=await sb.auth.signInWithPassword({email,password:pass});
- if(error){err.textContent=error.message;btn.disabled=false;btn.textContent='Sign In →';return;}
- await redirectByRole(data.user.id);
-}
-
-async function redirectByRole(userId){
- const{data}=await sb.from('user_roles').select('role').eq('user_id',userId).maybeSingle();
- const role=data?.role||'customer';
- window.location.href=PORTAL_URLS[role]||PORTAL_URLS.customer;
-}
-
-// ── RESET ─────────────────────────────────────────────────────
-async function doReset(){
- const email=document.getElementById('rstEmail').value.trim();
- const err=document.getElementById('rstErr');
- if(!email){err.textContent='Enter your email.';return;}
- const{error}=await sb.auth.resetPasswordForEmail(email,{redirectTo:'https://cbusevents.com/auth.html'});
- if(error){err.textContent=error.message;return;}
- err.style.color='var(--green)';err.textContent=' Reset email sent! Check your inbox.';
-}
-
-// ── ROLE SELECTION ────────────────────────────────────────────
-function selectRole(role){
- selectedRole=role;
- document.querySelectorAll('.role-card').forEach(c=>c.classList.remove('selected'));
- document.getElementById('role-'+role)?.classList.add('selected');
- document.getElementById('step1Err').textContent='';
-}
-
-// ── STEP NAVIGATION ───────────────────────────────────────────
-function showStep(n){
- currentStep=n;
- document.querySelectorAll('.step').forEach(s=>s.classList.remove('active'));
- document.getElementById('step'+n)?.classList.add('active');
- // Update dots — claim counts as step 2.5 visually
- const dotN = n==='Claim'?2 : n==='Loading'?4 : n;
- [1,2,3,4].forEach(i=>{
- const dot=document.getElementById('dot'+i);
- if(!dot)return;
- dot.classList.remove('active','done');
- if(i<dotN)dot.classList.add('done');
- else if(i===dotN)dot.classList.add('active');
- });
-}
-
-function nextStep(n){
- if(n===2){
- if(!selectedRole){document.getElementById('step1Err').textContent='Please select an account type.';return;}
- buildStep2();
- showStep(2);
- } else if(n===3){
- if(!validateStep2())return;
- if(selectedRole==='venue_owner'){
- checkForExistingVenue();
- } else {
- buildStep3Summary();
- showStep(3);
- }
- }
-}
-
-function goBack(n){
-  showStep(n);
-  // Always reset submit button state when going back — prevents stuck disabled state
-  const b=document.getElementById('suBtn');
-  if(b){b.disabled=false;b.textContent='Create Account →';b.onclick=doSignUp;}
-  const err=document.getElementById('suErr');
-  if(err){err.textContent='';err.style.color='#ef4444';}
-}
-
-function buildStep2(){
- const configs={
- venue_owner:{title:'Tell us about your venue',sub:'You can add more details in your portal',fields:[
- {id:'venueName',label:'Venue Name *',placeholder:'e.g. The Basement Bar'},
- {id:'venueType',label:'Type of Venue',placeholder:'e.g. Bar, Event Space, Comedy Club'},
- {id:'venueAddress',label:'Address',placeholder:'Start typing your address…',maps:true},
- {id:'venueNeighborhood',label:'Neighborhood',placeholder:'e.g. Short North, Downtown',datalist:['Short North','Downtown','German Village','Arena District','Easton','Clintonville','OSU / Campus','Grandview','Brewery District','Italian Village','Polaris','Dublin','Westerville','Gahanna','Grove City','Hilliard','Upper Arlington','Worthington','Bexley','Whitehall']},
- ]},
- vendor:{title:'Tell us about your business',sub:'You can fill out your full profile in the vendor portal',fields:[
- {id:'bizName',label:'Business Name *',placeholder:'e.g. Columbus Creative Co.'},
- {id:'bizCategory',label:'What do you offer?',placeholder:'e.g. DJ, Photography, Catering'},
- ]},
- planner:{title:'Tell us about yourself',sub:'You can complete your profile in the planner portal',fields:[
- {id:'plannerName',label:'Your Name *',placeholder:'e.g. Jordan Smith'},
- {id:'plannerCompany',label:'Company (optional)',placeholder:'e.g. Columbus Events Co.'},
- ]},
- customer:{title:'What are you into?',sub:'We\'ll personalize your Columbus event feed',fields:[
- {id:'displayName',label:'Your Name',placeholder:'e.g. Alex'},
- ]},
- };
- const c=configs[selectedRole];
- document.getElementById('step2Title').textContent=c.title;
- document.getElementById('step2Sub').textContent=c.sub;
- document.getElementById('step2Fields').innerHTML=c.fields.map(f=>`
- <div class="field"><label>${f.label}</label>
- ${f.datalist?`
-   <input id="${f.id}" placeholder="${f.placeholder}" list="${f.id}_list" onkeydown="if(event.key==='Enter')nextStep(3)" autocomplete="off"/>
-   <datalist id="${f.id}_list">${f.datalist.map(o=>`<option value="${o}">`).join('')}</datalist>
- `:`<input id="${f.id}" placeholder="${f.placeholder}" onkeydown="if(event.key==='Enter')nextStep(3)"/>`}
- </div>`).join('');
-}
-
-function validateStep2(){
- const required={venue_owner:'venueName',vendor:'bizName',planner:'plannerName',customer:null};
- const reqId=required[selectedRole];
- if(reqId){
- const val=document.getElementById(reqId)?.value?.trim();
- if(!val){document.getElementById('step2Err').textContent='Please fill in the required field.';return false;}
- }
- // Store step 2 data
- // Attach Google Places autocomplete for venue address
- if(selectedRole==='venue_owner'){
-   setTimeout(()=>{
-     const addrInput=document.getElementById('venueAddress');
-     if(addrInput && window.google?.maps?.places){
-       const ac=new google.maps.places.Autocomplete(addrInput,{
-         componentRestrictions:{country:'us'},
-         fields:['formatted_address','geometry','address_components'],
-         types:['establishment','geocode'],
-       });
-       ac.addListener('place_changed',()=>{
-         const place=ac.getPlace();
-         if(place.formatted_address) addrInput.value=place.formatted_address;
-         // Auto-fill neighborhood from address components
-         const hood=place.address_components?.find(c=>c.types.includes('neighborhood')||c.types.includes('sublocality'));
-         if(hood){
-           const nField=document.getElementById('venueNeighborhood');
-           if(nField&&!nField.value) nField.value=hood.long_name;
-         }
-       });
-     }
-   },300);
- }
- const allInputs=document.getElementById('step2Fields').querySelectorAll('input');
- allInputs.forEach(inp=>{stepData[inp.id]=inp.value.trim();});
- return true;
-}
-
-function buildStep3Summary(){
- const labels={venue_owner:'Venue Owner',vendor:'Vendor',planner:'Event Planner',customer:'Attendee'};
- document.getElementById('step3Sub').textContent=`Creating your ${labels[selectedRole]} account`;
- // Pre-fill email if passed from landing page CTA
- if(window._prefillEmail){
-   const emailField=document.getElementById('suEmail');
-   if(emailField && !emailField.value) emailField.value=window._prefillEmail;
- }
-}
-
-// ── CLAIM FLOW ────────────────────────────────────────────────
-async function checkForExistingVenue(){
- const name = stepData.venueName || '';
- if(!name){buildStep3Summary();showStep(3);return;}
-
- // Search for unclaimed venues with similar name
- const{data:matches}=await sb.from('venues')
- .select('id,name,venue_type,neighborhood,status,cover_image_url')
- .is('owner_id',null)
- .ilike('name','%'+name.split(' ')[0]+'%')
- .limit(5)
- .catch(()=>({data:[]}));
-
- // Also check claimed venues with same name (to warn of duplicates)
- const{data:claimed}=await sb.from('venues')
- .select('id,name,owner_id')
- .ilike('name','%'+name+'%')
- .not('owner_id','is',null)
- .limit(3)
- .catch(()=>({data:[]}));
-
- const unclaimedMatches=(matches||[]).filter(m=>!m.owner_id);
-
- if(!unclaimedMatches.length){
- // No match — just create new
- buildStep3Summary();
- showStep(3);
- return;
- }
-
- // Show claim step
- claimMatches=unclaimedMatches;
- selectedClaimId=null;
- document.getElementById('claimSub').textContent=`We found ${unclaimedMatches.length} existing listing${unclaimedMatches.length>1?'s':''} that match "${name}". Is one of these yours?`;
- document.getElementById('claimResults').innerHTML=unclaimedMatches.map(v=>`
- <div class="claim-card" id="claim-${v.id}" onclick="selectClaim('${v.id}')"> <div class="claim-card-icon">${v.cover_image_url?`<img src="${v.cover_image_url}" style="width:44px;height:44px;border-radius:8px;object-fit:cover" onerror="this.outerHTML=''"/>`:''}</div> <div style="flex:1"> <div class="claim-card-name">${v.name}</div> <div class="claim-card-meta">${v.venue_type||'Venue'}${v.neighborhood?' · '+v.neighborhood:''} · <span style="color:${v.status==='approved'?'#22c55e':'#f59e0b'}">${v.status==='approved'?'Live':'Pending'}</span></div> </div> <div class="claim-check" id="check-${v.id}"></div> </div>`).join('')+`
- <div class="claim-card" id="claim-new" onclick="selectClaim('new')" style="border-style:dashed"> <div style="flex:1"> <div class="claim-card-name">Create a new listing for "${name}"</div> <div class="claim-card-meta">My venue isn't listed above</div> </div> <div class="claim-check" id="check-new"></div> </div>`;
- document.getElementById('claimErr').textContent='';
- showStep('Claim');
-}
-
-function selectClaim(id){
- selectedClaimId=id;
- document.querySelectorAll('.claim-card').forEach(c=>c.classList.remove('selected'));
- document.querySelectorAll('.claim-check').forEach(c=>c.textContent='');
- document.getElementById('claim-'+id)?.classList.add('selected');
- const chk=document.getElementById('check-'+id);
- if(chk)chk.textContent='';
- document.getElementById('claimErr').textContent='';
-}
-
-function proceedWithClaim(){
- if(!selectedClaimId){document.getElementById('claimErr').textContent='Please select an option.';return;}
- buildStep3Summary();
- if(selectedClaimId==='new'){
- document.getElementById('step3Sub').textContent='Creating your Venue Owner account — new listing';
- } else {
- const v=claimMatches.find(m=>m.id===selectedClaimId);
- document.getElementById('step3Sub').textContent=`Creating your account and claiming "${v?.name||'venue'}"`;
- }
- showStep(3);
-}
-
-// ── SIGN UP ───────────────────────────────────────────────────
-async function doSignUp(){
-  const email=document.getElementById('suEmail').value.trim();
-  const pass=document.getElementById('suPass').value;
-  const errEl=document.getElementById('suErr');
-  if(!email||!pass){errEl.textContent='Email and password required.';return;}
-  if(pass.length<6){errEl.textContent='Password must be at least 6 characters.';return;}
-
-  // Always re-query btn so we have a fresh reference after step transitions
-  const btn=document.getElementById('suBtn');
-  btn.disabled=true;btn.textContent='Creating account…';
-  errEl.textContent='';errEl.style.color='#ef4444';
-
-  // Helper to fully reset the button — always re-queries the DOM
-  const resetBtn=()=>{
-    const b=document.getElementById('suBtn');
-    if(b){b.disabled=false;b.textContent='Create Account →';b.onclick=doSignUp;}
-  };
-
-  showStep('Loading');
-  document.getElementById('loadingMsg').textContent='Creating your account…';
-
-  // 1. Create auth user
-  const{data,error:authErr}=await sb.auth.signUp({email,password:pass,options:{emailRedirectTo:'https://cbusevents.com/auth.html'}});
-
-  if(authErr){
-    showStep(3);
-    resetBtn();
-    const msg=authErr.message||'';
-    const lmsg=msg.toLowerCase();
-    if(lmsg.includes('already registered')||lmsg.includes('already exists')||lmsg.includes('duplicate')){
-      document.getElementById('suErr').innerHTML='An account with this email already exists. <button onclick="setMode(\'signin\')" style="background:none;border:none;color:var(--orange);font-size:13px;cursor:pointer;text-decoration:underline;padding:0">Sign in instead →</button>';
-    } else {
-      document.getElementById('suErr').textContent=msg||'Signup failed — please try again.';
-    }
+async function doSignIn() {
+  const email = document.getElementById('siEmail').value.trim();
+  const pass  = document.getElementById('siPass').value;
+  const err   = document.getElementById('siErr');
+  const btn   = document.getElementById('siBtn');
+  err.textContent = '';
+  if (!email || !pass) { err.textContent = 'Email and password required.'; return; }
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span>Signing in...';
+  const { data, error } = await sb.auth.signInWithPassword({ email, password: pass });
+  if (error) {
+    err.textContent = error.message;
+    btn.disabled = false;
+    btn.textContent = 'Sign In →';
     return;
   }
-
-  const userId=data.user?.id;
-  if(!userId){
-    showStep(3);
-    resetBtn();
-    document.getElementById('suErr').textContent='Signup failed — please try again.';
-    return;
-  }
-
-  // If no session, email confirmation is required
-  if(!data.session){
-    localStorage.setItem('cbusevents_pending_role', JSON.stringify({
-      role: selectedRole,
-      stepData: stepData,
-      selectedClaimId: selectedClaimId || null
-    }));
-    showStep('Loading');
-    document.getElementById('loadingMsg').innerHTML=`Check your email!<br><span style="font-size:13px;color:var(--sub);margin-top:8px;display:block">We sent a confirmation link to <strong>${email}</strong>.<br>Click it to activate your account and access your portal.</span>`;
-    return;
-  }
-
-  let finalUserId = userId;
-
-  // Short wait for session to be available
-  await new Promise(r=>setTimeout(r,600));
-  document.getElementById('loadingMsg').textContent='Setting up your profile…';
-
-  // 3. Set role — retry up to 3 times since session may not be ready
-  const roleMap={ venue_owner:'venue_owner', vendor:'vendor', planner:'planner', customer:'customer' }; // roles map to themselves
-  const dbRole=roleMap[selectedRole]||selectedRole;
-  let roleWritten=false;
-  for(let attempt=0;attempt<3;attempt++){
-    try {
-      const{error:re}=await sb.from('user_roles').upsert({user_id:finalUserId,role:dbRole},{onConflict:'user_id'});
-      if(!re){roleWritten=true;break;}
-      console.warn(`Role attempt ${attempt+1} failed:`,re.message);
-      await new Promise(r=>setTimeout(r,500));
-    } catch(e){
-      console.warn(`Role attempt ${attempt+1} error:`,e?.message);
-      await new Promise(r=>setTimeout(r,500));
-    }
-  }
-  if(!roleWritten) console.error('Role write failed after 3 attempts — user will need manual role assignment');
-
-  // 4. Create profile — fire and forget, NEVER block redirect on DB errors
-  const destUrl = PORTAL_URLS[selectedRole]||PORTAL_URLS.customer;
-
-  (async()=>{
-    try {
-      if(selectedRole==='venue_owner'){
-        if(selectedClaimId&&selectedClaimId!=='new'){
-          await sb.from('venues').update({
-            owner_id:finalUserId, claim_status:'pending',
-            claimed_at:new Date().toISOString(), claim_email:email,
-          }).eq('id',selectedClaimId);
-          try { await sb.from('user_roles').update({claim_venue_id:selectedClaimId}).eq('user_id',finalUserId); } catch(e){}
-        } else {
-          await sb.from('venues').insert({
-            name:stepData.venueName||'My Venue',
-            venue_type:stepData.venueType||null,
-            address:stepData.venueAddress||null,
-            neighborhood:stepData.venueNeighborhood||null,
-            owner_id:finalUserId, status:'pending', tier:'free', city:'Columbus', state:'OH',
-            email:email,
-          });
-        }
-      } else if(selectedRole==='vendor'){
-        await sb.from('vendors').upsert({
-          user_id:finalUserId,
-          business_name:stepData.bizName||'My Business',
-          category:stepData.bizCategory||null,
-          email:email,
-          subscription_tier:'FREE',
-          subscription_status:'active',
-        },{onConflict:'user_id'});
-      } else {
-        // planner and attendee both use customer_profiles
-        await sb.from('customer_profiles').upsert({
-          user_id:finalUserId,
-          display_name:stepData.plannerName||stepData.displayName||null,
-        },{onConflict:'user_id'});
-      }
-    } catch(profileErr){
-      // Profile insert failed — not critical, user can complete profile in portal
-      console.warn('Profile setup error (non-blocking):', profileErr?.message);
-    }
-  })();
-
-  // Send welcome email (non-blocking)
-  const roleLabels={venue_owner:'Venue Owner',vendor:'Vendor',planner:'Event Planner',customer:'Attendee'};
-  const portalLabels={venue_owner:'Venue Portal',vendor:'Vendor Portal',planner:'Planner Portal',customer:'My Account'};
-  sendEmail({
-    to: email,
-    subject: 'Welcome to CBUSEVENTS 🎉',
-    html: `
-      <div style="font-family:sans-serif;max-width:520px;margin:0 auto;background:#0b0b0f;color:#e8e8f0;padding:40px;border-radius:16px">
-        <div style="font-size:24px;font-weight:800;margin-bottom:4px">CBUS<span style="color:#FF6B35">EVENTS</span></div>
-        <div style="color:#8888a0;font-size:13px;margin-bottom:32px">Columbus Event Directory</div>
-        <h1 style="font-size:22px;font-weight:800;margin-bottom:12px">You're in! 🎊</h1>
-        <p style="color:#c8c8d8;line-height:1.7;margin-bottom:20px">
-          Your <strong>${roleLabels[selectedRole]||'CBUSEVENTS'}</strong> account has been created.
-          ${selectedRole==='venue_owner'?'Your venue listing is currently <strong style="color:#f59e0b">pending review</strong>. We\'ll approve it within 24 hours and send you a confirmation.':'You can now access your portal and start using CBUSEVENTS.'}
-        </p>
-        <a href="${destUrl}" style="display:inline-block;background:#FF6B35;color:#fff;text-decoration:none;padding:12px 28px;border-radius:10px;font-weight:700;font-size:15px;margin-bottom:32px">Go to ${portalLabels[selectedRole]||'My Account'} →</a>
-        <div style="border-top:1px solid #25252f;padding-top:20px;color:#55556a;font-size:12px">
-          Questions? Reply to this email or contact us at <a href="mailto:info@cbusevents.com" style="color:#FF6B35">info@cbusevents.com</a><br>
-          © 2026 CBUSEVENTS · Columbus, Ohio
-        </div>
-      </div>`
-  }).catch(()=>{});
-
-  // Redirect immediately — don't wait for profile insert
-  document.getElementById('loadingMsg').textContent='Redirecting to your portal…';
-  setTimeout(()=>{ window.location.href=destUrl; }, 600);
+  await redirectByRole(data.user.id);
 }
 
-// ── EMAIL ─────────────────────────────────────────────────────
-const RESEND_API_KEY='re_3mMuHqrV_Eov9mW1voin7wYpAUTjUi3xt';
-const FROM_EMAIL='CBUSEVENTS <noreply@cbusevents.com>';
-
-async function sendEmail({to,subject,html}){
-  if(!RESEND_API_KEY||RESEND_API_KEY.startsWith('PASTE')){
-    console.warn('Resend API key not set — email not sent');
+async function doReset() {
+  const email = document.getElementById('rstEmail').value.trim();
+  const err   = document.getElementById('rstErr');
+  const btn   = document.getElementById('rstBtn');
+  err.textContent = '';
+  if (!email) { err.textContent = 'Enter your email.'; return; }
+  btn.disabled = true;
+  btn.textContent = 'Sending...';
+  const { error } = await sb.auth.resetPasswordForEmail(email, { redirectTo: 'https://cbusevents.com/auth.html' });
+  if (error) {
+    err.textContent = error.message;
+    btn.disabled = false;
+    btn.textContent = 'Send Reset Email →';
     return;
   }
-  try {
-    const res=await fetch('https://api.resend.com/emails',{
-      method:'POST',
-      headers:{'Content-Type':'application/json','Authorization':'Bearer '+RESEND_API_KEY},
-      body:JSON.stringify({from:FROM_EMAIL,to:[to],subject,html})
-    });
-    const d=await res.json();
-    if(!res.ok) console.warn('Email error:',d);
-  } catch(e){ console.warn('Email send failed:',e); }
+  err.style.color = '#22c55e';
+  err.textContent = 'Reset link sent — check your inbox.';
+  btn.textContent = 'Sent!';
 }
 
-init();
-</script>
-<script>
-(function(){
-  var btn=document.getElementById('navHamburger');
-  var menu=document.getElementById('navMobileMenu');
-  if(!btn||!menu)return;
-  btn.addEventListener('click',function(e){
-    e.stopPropagation();
-    btn.classList.toggle('open');
-    menu.classList.toggle('open');
-    document.body.style.overflow=menu.classList.contains('open')?'hidden':'';
-  });
-  document.addEventListener('keydown',function(e){
-    if(e.key==='Escape'){btn.classList.remove('open');menu.classList.remove('open');document.body.style.overflow='';}
-  });
-  // Close on link click
-  menu.querySelectorAll('a,.nav-mobile-link').forEach(function(el){
-    el.addEventListener('click',function(){
-      btn.classList.remove('open');menu.classList.remove('open');document.body.style.overflow='';
-    });
-  });
-})();
+function showReset() {
+  document.getElementById('signinView').style.display = 'none';
+  document.getElementById('resetView').style.display  = 'block';
+}
+
+function showSignin() {
+  document.getElementById('resetView').style.display  = 'none';
+  document.getElementById('signinView').style.display = 'block';
+}
 </script>
 </body>
 </html>
