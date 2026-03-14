@@ -179,6 +179,25 @@ let selectedClaimId=null;
 
 // ── EMAIL CONFIRMATION CALLBACK ───────────────────────────────
 sb.auth.onAuthStateChange(async (event, session) => {
+  if (event === 'PASSWORD_RECOVERY') {
+    // Show a password reset form
+    document.getElementById('app').innerHTML = `
+      <div style="min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;background:#0b0b0f;">
+        <div style="width:100%;max-width:400px;background:#13131a;border:1px solid #25252f;border-radius:16px;padding:32px;">
+          <div style="font-family:Inter,sans-serif;font-weight:800;font-size:20px;margin-bottom:4px;">CBUS<span style="color:#FF6B35">EVENTS</span></div>
+          <div style="color:#8888a0;font-size:13px;margin-bottom:28px;">Set a new password</div>
+          <div style="margin-bottom:16px;">
+            <label style="font-size:13px;color:#8888a0;display:block;margin-bottom:6px;">New Password</label>
+            <input id="newPw" type="password" placeholder="At least 6 characters" style="width:100%;background:#0b0b0f;border:1px solid #25252f;border-radius:8px;padding:10px 14px;color:#e8e8f0;font-size:14px;font-family:Inter,sans-serif;box-sizing:border-box;" />
+          </div>
+          <div id="pwErr" style="color:#ef4444;font-size:13px;margin-bottom:12px;display:none;"></div>
+          <button onclick="doPasswordReset()" style="width:100%;background:#FF6B35;color:#fff;border:none;border-radius:8px;padding:12px;font-size:14px;font-weight:700;cursor:pointer;font-family:Inter,sans-serif;">Set New Password →</button>
+        </div>
+      </div>`;
+    window._recoverySession = session;
+    return;
+  }
+
   if (event === 'SIGNED_IN' && session?.user) {
     const userId = session.user.id;
     const email = session.user.email;
@@ -230,6 +249,18 @@ sb.auth.onAuthStateChange(async (event, session) => {
     await redirectByRole(userId);
   }
 });
+
+async function doPasswordReset(){
+ const pw=document.getElementById('newPw')?.value;
+ const errEl=document.getElementById('pwErr');
+ if(!pw||pw.length<6){errEl.textContent='Password must be at least 6 characters.';errEl.style.display='block';return;}
+ const{error}=await sb.auth.updateUser({password:pw});
+ if(error){errEl.textContent=error.message;errEl.style.display='block';return;}
+ // Password updated — redirect to their portal
+ const{data:{session}}=await sb.auth.getSession();
+ if(session?.user) await redirectByRole(session.user.id);
+ else window.location.href='https://cbusevents.com/auth.html';
+}
 
 // ── CHECK IF ALREADY LOGGED IN ────────────────────────────────
 async function init(){

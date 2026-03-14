@@ -130,8 +130,8 @@ function AuthPage() {
  setBusy(true); setErr(""); setMsg("");
  try {
  if (mode==="signin") { const {error}=await sb.auth.signInWithPassword({email,password:pw}); if(error) setErr(error.message); }
- else if (mode==="signup") { const {error}=await sb.auth.signUp({email,password:pw,options:{data:{full_name:name}}}); if(error) setErr(error.message); else setMsg("Check your email to confirm, then sign in!"); }
- else { const {error}=await sb.auth.resetPasswordForEmail(email); if(error) setErr(error.message); else setMsg("Reset email sent!"); }
+ else if (mode==="signup") { const {error}=await sb.auth.signUp({email,password:pw,options:{emailRedirectTo:'https://cbusevents.com/auth.html',data:{full_name:name}}}); if(error) setErr(error.message); else setMsg("Check your email to confirm, then sign in!"); }
+ else { const {error}=await sb.auth.resetPasswordForEmail(email,{redirectTo:'https://cbusevents.com/auth.html'}); if(error) setErr(error.message); else setMsg("Reset email sent! Check your inbox."); }
  } catch(e) { setErr("Network error. Check your connection."); }
  setBusy(false);
  };

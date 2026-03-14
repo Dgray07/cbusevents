@@ -335,7 +335,7 @@ async function doAuth(){
  if(currentTab==='signin'){
  ({error}=await sb.auth.signInWithPassword({email,password:pass}));
  } else {
- const{data,error:e}=await sb.auth.signUp({email,password:pass});
+ const{data,error:e}=await sb.auth.signUp({email,password:pass,options:{emailRedirectTo:'https://cbusevents.com/auth.html'}});
  error=e;
  if(!error){
    if(!data.session){

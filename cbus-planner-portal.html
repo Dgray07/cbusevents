@@ -417,7 +417,7 @@ async function doSignup(){
  const email=document.getElementById('aEmail')?.value.trim();
  const pass=document.getElementById('aPass')?.value;
  if(!first||!email||!pass){const el=document.getElementById('aErr');if(el){el.textContent='Please fill in all fields.';el.style.display='block';}return;}
- const{error,data}=await sb.auth.signUp({email,password:pass,options:{data:{full_name:`${first} ${last}`.trim()}}});
+ const{error,data}=await sb.auth.signUp({email,password:pass,options:{emailRedirectTo:'https://cbusevents.com/auth.html',data:{full_name:`${first} ${last}`.trim()}}});
  if(error){const el=document.getElementById('aErr');if(el){el.textContent=error.message;el.style.display='block';}return;}
  if(!data.session){
    // Email confirmation required — show message, wait for onAuthStateChange
