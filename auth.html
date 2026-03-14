@@ -128,10 +128,9 @@ h1,h2,h3,h4,h5,h6{font-family:Inter,sans-serif;letter-spacing:-0.02em;}
       <div class="auth-logo">CBUS<span>EVENTS</span></div>
       <p class="auth-sub" id="authSub">Welcome to Columbus</p>
 
-      <!-- TABS — always visible -->
-      <div class="auth-tabs">
-        <button class="auth-tab active" id="tabSignin" onclick="setMode('signin')">Sign In</button>
-        <button class="auth-tab" id="tabSignup" onclick="setMode('signup')">Create Account</button>
+      <!-- SIGN IN HEADER — no signup tab, this page is sign-in only -->
+      <div class="auth-tabs" style="margin-bottom:24px;">
+        <button class="auth-tab active" id="tabSignin" style="width:100%;">Sign In</button>
       </div>
 
       <!-- SIGN IN VIEW -->
@@ -142,6 +141,10 @@ h1,h2,h3,h4,h5,h6{font-family:Inter,sans-serif;letter-spacing:-0.02em;}
         <button class="btn-primary" id="siBtn" onclick="doSignIn()">Sign In →</button>
         <div style="text-align:center;margin-top:14px">
           <button onclick="setMode('reset')" style="background:none;border:none;color:var(--muted);font-size:12px;cursor:pointer">Forgot password?</button>
+        </div>
+        <div style="text-align:center;margin-top:16px;padding-top:16px;border-top:1px solid var(--border)">
+          <span style="color:var(--sub);font-size:13px">Don't have an account? </span>
+          <a href="https://cbusevents.com/signup.html" style="color:var(--orange);font-size:13px;font-weight:600;text-decoration:none;">Sign up free →</a>
         </div>
       </div>
 
@@ -281,20 +284,17 @@ async function init(){
    return;
  }
 
- // If URL has ?signup or came from a CTA, default to Create Account tab
- if(params.get('signup')||document.referrer.includes('cbusevents.com')){
-   setMode('signup');
- }
+ // If URL has ?signup, redirect to the dedicated signup page
+ if(params.get('signup')) { window.location.href='https://cbusevents.com/signup.html'; return; }
 }
 
 // ── MODE SWITCHING ────────────────────────────────────────────
 function setMode(mode){
+  // auth.html is sign-in only — redirect signup attempts to dedicated page
+  if(mode==='signup'){ window.location.href='https://cbusevents.com/signup.html'; return; }
   document.getElementById('signinView').style.display = (mode==='signin') ? 'block' : 'none';
   document.getElementById('resetView').style.display  = (mode==='reset')  ? 'block' : 'none';
-  document.getElementById('signupView').style.display = (mode==='signup') ? 'block' : 'none';
-  document.getElementById('tabSignin').classList.toggle('active', mode==='signin'||mode==='reset');
-  document.getElementById('tabSignup').classList.toggle('active', mode==='signup');
-  if(mode==='signup'){ currentStep=1; showStep(1); }
+  document.getElementById('signupView').style.display = 'none';
 }
 
 // ── SIGN IN ───────────────────────────────────────────────────
