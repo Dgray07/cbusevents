@@ -541,9 +541,6 @@ async function renderPayouts(){
 }
 
 function renderBilling(){
- const stripeParam=new URLSearchParams(window.location.search).get('stripe');
- if(stripeParam==='success'){toast('Stripe account connected! You can now sell tickets.');nav('payouts');}
- else if(stripeParam==='refresh'){toast('Stripe onboarding refreshed.');nav('payouts');}
  const planParam=new URLSearchParams(window.location.search).get('upgrade');
  document.getElementById('app').innerHTML=`
  <div class="page">
