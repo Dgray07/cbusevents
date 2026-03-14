@@ -189,9 +189,10 @@ let loadedPages=new Set();
 
 // ── AUTH ────────────────────────────────────────────────────────
 async function init(){
+ const params=new URLSearchParams(window.location.search);
  const{data:{session}}=await sb.auth.getSession();
  if(session?.user){currentUser=session.user;enterPortal();}
- else{window.location.href="https://cbusevents.com/auth.html";return;}
+ else if(params.get("tab")==="signup"){setTimeout(()=>switchTab("signup"),100);}
  sb.auth.onAuthStateChange((_,session)=>{
  currentUser=session?.user??null;
  if(currentUser)enterPortal(); else exitPortal();

@@ -304,9 +304,10 @@ function openVendorShareModal(eventId, eventTitle, venueName, eventDate){
 
 // ── AUTH ──────────────────────────────────────────────────────
 async function init(){
+ const params=new URLSearchParams(window.location.search);
  const{data:{session}}=await sb.auth.getSession();
  if(session?.user){currentUser=session.user;await enterPortal();}
- else{window.location.href="https://cbusevents.com/auth.html";return;}
+ else if(params.get("tab")==="signup"){setTimeout(()=>switchTab("signup"),100);}
  sb.auth.onAuthStateChange(async(_,session)=>{
  currentUser=session?.user??null;
  if(currentUser)await enterPortal(); else exitPortal();

@@ -304,7 +304,9 @@ async function init(){
  setLoggedInNav();
  nav('dashboard');
  } else {
- window.location.href = "https://cbusevents.com/auth.html";
+ const _p=new URLSearchParams(window.location.search);
+ if(_p.get("signup")==="1"){renderHero();setTimeout(()=>showAuth("signup"),200);}
+ else{renderHero();}
  }
 }
 
