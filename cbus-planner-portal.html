@@ -463,14 +463,17 @@ async function renderPayouts(){
   document.getElementById('app').innerHTML='<div class="page"><div class="section-title">Payouts</div><div style="color:var(--sub);font-size:14px;margin-top:8px">Loading...</div></div>';
 
   let sd={connected:false,status:'none'};
-  try{
-    const res=await fetch(SB_FUNCTIONS_URL+'/stripe-connect-onboard',{
-      method:'POST',
-      headers:{'Content-Type':'application/json','Authorization':'Bearer '+await getAuthToken()},
-      body:JSON.stringify({action:'status'})
-    });
-    sd=await res.json();
-  }catch(e){}
+  const token=await getAuthToken();
+  if(token){
+    try{
+      const res=await fetch(SB_FUNCTIONS_URL+'/stripe-connect-onboard',{
+        method:'POST',
+        headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},
+        body:JSON.stringify({action:'status'})
+      });
+      sd=await res.json();
+    }catch(e){console.log('status check failed',e);}
+  }
 
   const connected=sd.connected;
   const status=sd.status||'none';
