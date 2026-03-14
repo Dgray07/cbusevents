@@ -216,8 +216,16 @@ async function doAuth(){
  } else {
  const{data,error:e}=await sb.auth.signUp({email,password:pass});
  error=e;
- if(!error&&name&&data.user){
- await sb.from('customer_profiles').upsert({user_id:data.user.id,display_name:name},{onConflict:'user_id'});
+ if(!error){
+   if(!data.session){
+     errEl.style.color='#22c55e';
+     errEl.textContent=`Check your email — we sent a confirmation link to ${email}.`;
+     btn.disabled=false;btn.textContent='Create Account';
+     return;
+   }
+   if(name&&data.user){
+     await sb.from('customer_profiles').upsert({user_id:data.user.id,display_name:name},{onConflict:'user_id'});
+   }
  }
  }
  if(error){errEl.textContent=error.message;btn.disabled=false;btn.textContent=currentTab==='signin'?'Sign In':'Create Account';}

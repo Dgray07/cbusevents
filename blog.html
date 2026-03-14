@@ -160,7 +160,7 @@ async function init(){
   const{data:{session}}=await sb.auth.getSession();
   if(session?.user){
     document.getElementById('navCta').textContent='My Account';
-    document.getElementById('navCta').href='https://cbusevents.com/auth.html';
+    document.getElementById('navCta').href='https://cbusevents.com/signup.html';
   }
 
   // Load articles

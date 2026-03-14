@@ -273,6 +273,15 @@ async function savePlannerProfile(){
  setTimeout(()=>{if(msg)msg.textContent='';},3000);
 }
 
+sb.auth.onAuthStateChange(async(event, session)=>{
+ if(event==='SIGNED_IN' && session?.user && !currentUser){
+   currentUser=session.user;
+   await loadData();setLoggedInNav();nav('dashboard');
+ } else if(event==='SIGNED_OUT'){
+   currentUser=null;renderHero();
+ }
+});
+
 async function init(){
  document.getElementById('app').innerHTML=`<div style="min-height:60vh;display:flex;align-items:center;justify-content:center"><div style="width:32px;height:32px;border:3px solid var(--border);border-top-color:var(--orange);border-radius:50%;animation:spin 0.8s linear infinite"></div></div>`;
  const{data:{session}}=await sb.auth.getSession();
@@ -403,9 +412,15 @@ async function doSignup(){
  if(!first||!email||!pass){const el=document.getElementById('aErr');if(el){el.textContent='Please fill in all fields.';el.style.display='block';}return;}
  const{error,data}=await sb.auth.signUp({email,password:pass,options:{data:{full_name:`${first} ${last}`.trim()}}});
  if(error){const el=document.getElementById('aErr');if(el){el.textContent=error.message;el.style.display='block';}return;}
+ if(!data.session){
+   // Email confirmation required — show message, wait for onAuthStateChange
+   const el=document.getElementById('aErr');
+   if(el){el.style.color='#22c55e';el.textContent=`Check your email — we sent a confirmation link to ${email}.`;el.style.display='block';}
+   return;
+ }
  currentUser=data.user;
  await loadData();setLoggedInNav();nav('dashboard');
- toast('Welcome to CBUSEVENTS! ');
+ toast('Welcome to CBUSEVENTS!');
 }
 
 // ── NAV ───────────────────────────────────────────────────────

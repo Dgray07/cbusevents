@@ -167,61 +167,81 @@ const PORTAL_URLS={
 let selectedRole=null;
 let stepData={};
 let currentStep=1;
+let claimMatches=[];
+let selectedClaimId=null;
 
-// ── HANDLE EMAIL CONFIRMATION CALLBACK ───────────────────────
+// ── EMAIL CONFIRMATION CALLBACK ───────────────────────────────
 sb.auth.onAuthStateChange(async (event, session) => {
   if (event === 'SIGNED_IN' && session?.user) {
     const userId = session.user.id;
-    // Check for pending role data from signup.html
+    const email = session.user.email;
     const pending = localStorage.getItem('cbusevents_pending_role');
     if (pending) {
       try {
-        const { role, meta } = JSON.parse(pending);
+        const { role, stepData: sd, selectedClaimId: claimId } = JSON.parse(pending);
         const roleMap = { venue: 'venue_owner', vendor: 'vendor', planner: 'planner' };
         const dbRole = roleMap[role] || role;
 
-        await sb.from('user_roles').upsert({
-          user_id: userId,
-          role: dbRole
-        });
+        await sb.from('user_roles').upsert({ user_id: userId, role: dbRole });
 
-        if (role === 'venue' && meta?.venue_name) {
-          await sb.from('venues').insert({
-            user_id: userId,
-            name: meta.venue_name,
-            venue_type: meta.venue_type || null,
-            capacity: meta.capacity ? parseInt(meta.capacity) : null,
-            phone: meta.phone || null,
-            status: 'draft'
-          });
+        if (role === 'venue_owner' || role === 'venue') {
+          const venueName = sd?.venueName;
+          if (claimId && claimId !== 'new') {
+            await sb.from('venues').update({
+              owner_id: userId, claim_status: 'pending',
+              claimed_at: new Date().toISOString(), claim_email: email,
+            }).eq('id', claimId);
+          } else if (venueName) {
+            await sb.from('venues').insert({
+              name: venueName,
+              venue_type: sd?.venueType || null,
+              address: sd?.venueAddress || null,
+              neighborhood: sd?.venueNeighborhood || null,
+              owner_id: userId, status: 'pending', tier: 'free',
+              city: 'Columbus', state: 'OH', email: email,
+            });
+          }
+        } else if (role === 'vendor') {
+          const bizName = sd?.bizName;
+          if (bizName) {
+            await sb.from('vendors').upsert({
+              user_id: userId,
+              business_name: bizName,
+              category: sd?.bizCategory || null,
+              email: email,
+              subscription_tier: 'FREE',
+              subscription_status: 'free',
+            });
+          }
         }
-
         localStorage.removeItem('cbusevents_pending_role');
       } catch(e) {
         console.error('Pending role setup failed:', e);
+        localStorage.removeItem('cbusevents_pending_role');
       }
     }
-    // Redirect to the right portal
     await redirectByRole(userId);
   }
 });
 
 // ── CHECK IF ALREADY LOGGED IN ────────────────────────────────
 async function init(){
- // Check role param FIRST before anything else
  const params=new URLSearchParams(window.location.search);
  const roleParam=params.get('role');
+ const emailParam=params.get('email');
+
+ // Always check session first — redirect logged-in users to their portal
+ const{data:{session}}=await sb.auth.getSession();
+ if(session?.user){ await redirectByRole(session.user.id); return; }
+
  if(roleParam&&['venue_owner','vendor','planner','customer'].includes(roleParam)){
    setMode('signup');
    selectedRole=roleParam;
    buildStep2();
    showStep(2);
-   return; // Don't check session — let them sign up
+   if(emailParam) window._prefillEmail = emailParam;
+   return;
  }
-
- // No role param — check if already logged in
- const{data:{session}}=await sb.auth.getSession();
- if(session?.user){ await redirectByRole(session.user.id); return; }
 
  // If URL has ?signup or came from a CTA, default to Create Account tab
  if(params.get('signup')||document.referrer.includes('cbusevents.com')){
@@ -381,6 +401,11 @@ function validateStep2(){
 function buildStep3Summary(){
  const labels={venue_owner:'Venue Owner',vendor:'Vendor',planner:'Event Planner',customer:'Attendee'};
  document.getElementById('step3Sub').textContent=`Creating your ${labels[selectedRole]} account`;
+ // Pre-fill email if passed from landing page CTA
+ if(window._prefillEmail){
+   const emailField=document.getElementById('suEmail');
+   if(emailField && !emailField.value) emailField.value=window._prefillEmail;
+ }
 }
 
 // ── CLAIM FLOW ────────────────────────────────────────────────
@@ -497,25 +522,22 @@ async function doSignUp(){
     btn.disabled=false;btn.textContent='Create Account →';
     return;
   }
-  // 2. If no session (edge case), try signing in immediately with same credentials
+
+  // If no session, email confirmation is required
+  if(!data.session){
+    // Store everything so onAuthStateChange finishes setup after confirmation
+    localStorage.setItem('cbusevents_pending_role', JSON.stringify({
+      role: selectedRole,
+      stepData: stepData,
+      selectedClaimId: selectedClaimId || null
+    }));
+    showStep('Loading');
+    document.getElementById('loadingMsg').innerHTML=`Check your email!<br><span style="font-size:13px;color:var(--sub);margin-top:8px;display:block">We sent a confirmation link to <strong>${email}</strong>.<br>Click it to activate your account and access your portal.</span>`;
+    return;
+  }
+
   let finalUserId = userId;
   let finalSession = data.session;
-  if(!finalSession){
-    const{data:siData, error:siErr} = await sb.auth.signInWithPassword({email, password:pass});
-    if(!siErr && siData?.session){
-      finalSession = siData.session;
-      finalUserId = siData.user?.id || userId;
-    } else {
-      // Still no session - account may need a moment, just redirect to sign in
-      showStep(3);
-      document.getElementById('suErr').style.color='#4ade80';
-      document.getElementById('suErr').innerHTML='Account created! <button onclick="setMode(&apos;signin&apos;)" style="background:none;border:none;color:var(--orange);font-size:13px;cursor:pointer;text-decoration:underline;padding:0">Sign in to continue →</button>';
-      btn.textContent='Sign In →';
-      btn.onclick=()=>setMode('signin');
-      btn.disabled=false;
-      return;
-    }
-  }
 
   // Short wait for session to be available
   await new Promise(r=>setTimeout(r,600));

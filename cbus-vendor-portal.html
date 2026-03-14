@@ -330,8 +330,17 @@ async function doAuth(){
  } else {
  const{data,error:e}=await sb.auth.signUp({email,password:pass});
  error=e;
- if(!error&&data.user){
- await sb.from('vendors').upsert({user_id:data.user.id,email,business_name:name&&name!==email?name:null,name:name&&name!==email?name:null,subscription_tier:'FREE',subscription_status:'free'},{onConflict:'user_id'});
+ if(!error){
+   if(!data.session){
+     // Email confirmation required
+     errEl.style.color='#22c55e';
+     errEl.textContent=`Check your email — we sent a confirmation link to ${email}.`;
+     btn.disabled=false;btn.textContent='Create Account';
+     return;
+   }
+   if(data.user){
+     await sb.from('vendors').upsert({user_id:data.user.id,email,business_name:name&&name!==email?name:null,name:name&&name!==email?name:null,subscription_tier:'FREE',subscription_status:'free'},{onConflict:'user_id'});
+   }
  }
  }
  if(error){errEl.textContent=error.message;btn.disabled=false;btn.textContent=currentTab==='signin'?'Sign In':'Create Account';}
