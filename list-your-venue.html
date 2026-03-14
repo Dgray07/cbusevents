@@ -776,7 +776,7 @@
   <a href="https://cbusevents.com" class="nav-mobile-link">Home</a>
   <a href="https://cbusevents.com/venues.html" class="nav-mobile-link">Venues</a>
   <div class="nav-mobile-divider"></div>
-  <a href="https://cbusevents.com/auth.html?role=venue_owner" class="nav-mobile-link nav-mobile-cta">Get Started →</a>
+  <a href="https://cbusevents.com/signup.html?role=venue" class="nav-mobile-link nav-mobile-cta">Get Started →</a>
 </div>
 
 <!-- HERO -->
@@ -1188,10 +1188,10 @@
     btn.style.background = '#22c55e';
 
     // Redirect to auth with role + pre-fill email
-    const params = new URLSearchParams({ role: 'venue_owner' });
+    const params = new URLSearchParams({ role: 'venue' });
     if (email) params.set('email', email);
     setTimeout(() => {
-      window.location.href = 'https://cbusevents.com/auth.html?' + params.toString();
+      window.location.href = 'https://cbusevents.com/signup.html?' + params.toString();
     }, 800);
   }
 </script>

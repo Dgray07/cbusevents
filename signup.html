@@ -1092,11 +1092,16 @@
 
     // ── AUTO-SELECT ROLE FROM URL PARAM ──
     const urlRole = new URLSearchParams(window.location.search).get('role');
+    const urlEmail = new URLSearchParams(window.location.search).get('email');
     if (['venue', 'vendor', 'planner'].includes(urlRole)) {
       selectRole(urlRole);
       setTimeout(() => {
         document.getElementById('formCard').scrollIntoView({ behavior: 'smooth', block: 'start' });
       }, 300);
+    }
+    if (urlEmail) {
+      const emailField = document.getElementById('email');
+      if (emailField) emailField.value = urlEmail;
     }
   </script>
 </body>
