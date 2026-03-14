@@ -191,6 +191,7 @@ let loadedPages=new Set();
 async function init(){
  const{data:{session}}=await sb.auth.getSession();
  if(session?.user){currentUser=session.user;enterPortal();}
+ else{window.location.href="https://cbusevents.com/auth.html";return;}
  sb.auth.onAuthStateChange((_,session)=>{
  currentUser=session?.user??null;
  if(currentUser)enterPortal(); else exitPortal();
@@ -221,7 +222,7 @@ async function doAuth(){
  if(currentTab==='signin'){
  ({error}=await sb.auth.signInWithPassword({email,password:pass}));
  } else {
- const{data,error:e}=await sb.auth.signUp({email,password:pass,options:{emailRedirectTo:'https://cbusevents.com/auth.html'}});
+ const{data,error:e}=await sb.auth.signUp({email,password:pass});
  error=e;
  if(!error){
    if(!data.session){

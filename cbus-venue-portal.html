@@ -98,8 +98,9 @@ function AuthProvider({ children }) {
  return () => subscription.unsubscribe();
  }, []);
  async function fetchProfile(id) {
- const { data } = await sb.from("profiles").select("*").eq("id", id).single();
- setProfile(data); setLoading(false);
+ sb.from("profiles").select("*").eq("id", id).single().then(({data}) => {
+   setProfile(data); setLoading(false);
+ }).catch(() => setLoading(false));
  }
  return <AuthCtx.Provider value={{ user, profile, loading }}>{children}</AuthCtx.Provider>;
 }
