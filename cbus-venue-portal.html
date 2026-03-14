@@ -492,8 +492,8 @@ function Inquiries({venue}) {
 }
 
 // Stripe config
-const PAYMENT_LINK_STANDARD="https://buy.stripe.com/28E9AT0jK7gufNJ2Vqc3m00";
-const PAYMENT_LINK_PREMIUM="https://buy.stripe.com/28E9AT0jK7gufNJ2Vqc3m00";
+const PAYMENT_LINK_STANDARD="https://buy.stripe.com/28E9AT0jK7gufNJ2Vqc3m00"; // Founding $40/mo
+const PAYMENT_LINK_PREMIUM="https://buy.stripe.com/28E9AT0jK7gufNJ2Vqc3m00";  // TODO: replace with Premium Stripe link when ready
 
 
 
@@ -553,9 +553,9 @@ function PlanBilling({venue}) {
  const [err,setErr]=React.useState(null);
 
  const plans=[
- {id:"free", name:"Free", price:0, priceId:null, perks:["1 venue listing","Up to 3 events","Basic search placement","Public venue page"]},
- {id:"standard",name:"Founding Member",price:40, priceId:"standard", perks:["Up to 20 events/month","Priority search placement","Inquiry inbox enabled","Email support","Analytics dashboard","Founding rate locked forever"]},
- {id:"premium", name:"Founding Member", price:40, priceId:"premium", perks:["Up to 20 events/month","Priority search placement","Inquiry inbox enabled","Email support","Analytics dashboard","Founding rate locked forever"]},
+ {id:"free", name:"Free", price:0, priceId:null, perks:["1 venue listing","Up to 4 events/month","Basic search placement","Public venue page"]},
+ {id:"standard",name:"Standard", price:40, priceId:"standard", perks:["Up to 20 events/month","Priority search placement","Inquiry inbox enabled","Email support","Analytics dashboard","Founding rate — locked forever"]},
+ {id:"premium", name:"Premium", price:79, priceId:"premium", perks:["Unlimited events","Top of all search results","Homepage feature slot","Flyer & merch design included","Dedicated support","Founding rate — locked forever"]},
  ];
 
  const checkout=(plan)=>{
