@@ -535,29 +535,22 @@ async function doSignUp() {
   }
 
   const userId = data.user?.id;
-  if (!userId) {
-    // Email confirmation required
-    ok.style.display = 'block';
-    ok.textContent = 'Check your email to confirm your account, then sign in!';
-    btn.textContent = 'Email sent!';
-    return;
-  }
 
-  // 2. Insert role
-  await sb.from('user_roles').upsert({ user_id: userId, role: dbRole });
-
-  // 3. Role-specific record
-  if (role === 'vendor' && name) {
-    await sb.from('vendors').upsert({
-      user_id: userId,
-      business_name: name,
-      email: email,
-      subscription_tier: 'FREE',
-      subscription_status: 'free',
-    });
-  } else if (role === 'venue' && name) {
-    await sb.from('venues').insert({
-      name: name,
+  // Always show confirmation message — never redirect until email confirmed + signed in
+  // Insert role/record if we have userId (unconfirmed users still get an id)
+  if (userId) {
+    await sb.from('user_roles').upsert({ user_id: userId, role: dbRole });
+    if (role === 'vendor' && name) {
+      await sb.from('vendors').upsert({
+        user_id: userId,
+        business_name: name,
+        email: email,
+        subscription_tier: 'FREE',
+        subscription_status: 'free',
+      });
+    } else if (role === 'venue' && name) {
+      await sb.from('venues').insert({
+        name: name,
       owner_id: userId,
       status: 'pending',
       tier: 'free',
@@ -565,9 +558,10 @@ async function doSignUp() {
       state: 'OH',
       email: email,
     });
+    }
   }
 
-  // 4. Redirect to portal
+  // Confirmation is disabled — session is active immediately, redirect to portal
   window.location.href = PORTAL_URLS[role];
 }
 
