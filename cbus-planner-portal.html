@@ -426,6 +426,7 @@ function nav(page){
 
 // ── BILLING ───────────────────────────────────────────────────
 const SB_FUNCTIONS_URL='https://toblgvatvsjljbqogzsv.supabase.co/functions/v1';
+const CONNECT_FN=SB_FUNCTIONS_URL+'/stripeconnectonboard';
 
 async function getAuthToken(){
   const s=await sb.auth.getSession();
@@ -435,7 +436,7 @@ async function getAuthToken(){
 async function startConnectOnboard(){
   toast('Redirecting to Stripe setup...');
   try{
-    const res=await fetch(SB_FUNCTIONS_URL+'/stripe-connect-onboard',{
+    const res=await fetch(CONNECT_FN,{
       method:'POST',
       headers:{'Content-Type':'application/json','Authorization':'Bearer '+await getAuthToken()},
       body:JSON.stringify({action:'onboard'})
@@ -448,7 +449,7 @@ async function startConnectOnboard(){
 
 async function openStripeDashboard(){
   try{
-    const res=await fetch(SB_FUNCTIONS_URL+'/stripe-connect-onboard',{
+    const res=await fetch(CONNECT_FN,{
       method:'POST',
       headers:{'Content-Type':'application/json','Authorization':'Bearer '+await getAuthToken()},
       body:JSON.stringify({action:'dashboard'})
@@ -466,7 +467,7 @@ async function renderPayouts(){
   const token=await getAuthToken();
   if(token){
     try{
-      const res=await fetch(SB_FUNCTIONS_URL+'/stripe-connect-onboard',{
+      const res=await fetch(CONNECT_FN,{
         method:'POST',
         headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},
         body:JSON.stringify({action:'status'})
