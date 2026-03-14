@@ -982,12 +982,15 @@
 
           if (selectedRole === 'venue' && meta.venue_name) {
             await sb.from('venues').insert({
-              user_id: userId,
+              owner_id: userId,
               name: meta.venue_name,
               venue_type: meta.venue_type || null,
               capacity: meta.capacity ? parseInt(meta.capacity) : null,
               phone: meta.phone || null,
-              status: 'draft'
+              status: 'pending',
+              tier: 'free',
+              city: 'Columbus',
+              state: 'OH'
             });
           }
           showSuccess(selectedRole);
