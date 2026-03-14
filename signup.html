@@ -955,29 +955,43 @@
 
         if (error) throw error;
 
-        // Insert role into user_roles table
-        // Map UI role names to DB-expected values
-        const roleMap = { venue: 'venue_owner', vendor: 'vendor', planner: 'planner' };
-        if (data.user) {
+        // data.user exists but data.session is null when email confirmation is required.
+        // In that case we store the pending role/business info in localStorage so the
+        // portal can finish the setup after the user confirms and logs in.
+        const userId = data.user?.id;
+        const needsConfirmation = data.user && !data.session;
+
+        if (needsConfirmation) {
+          // Stash everything for post-confirmation setup
+          localStorage.setItem('cbusevents_pending_role', JSON.stringify({
+            user_id: userId,
+            role: selectedRole,
+            meta
+          }));
+          showConfirmation(email, selectedRole);
+          return;
+        }
+
+        // If email confirmation is disabled (instant session), do the DB writes now
+        if (userId && data.session) {
+          const roleMap = { venue: 'venue_owner', vendor: 'vendor', planner: 'planner' };
           await sb.from('user_roles').upsert({
-            user_id: data.user.id,
+            user_id: userId,
             role: roleMap[selectedRole] || selectedRole
           });
 
-          // Insert business info if venue/vendor
           if (selectedRole === 'venue' && meta.venue_name) {
             await sb.from('venues').insert({
-              user_id: data.user.id,
+              user_id: userId,
               name: meta.venue_name,
               venue_type: meta.venue_type || null,
               capacity: meta.capacity ? parseInt(meta.capacity) : null,
               phone: meta.phone || null,
               status: 'draft'
-            }).select().single();
+            });
           }
+          showSuccess(selectedRole);
         }
-
-        showSuccess(selectedRole);
 
       } catch (err) {
         btn.classList.remove('loading');
@@ -1023,6 +1037,25 @@
           window.location.href = PORTALS[role];
         }
       }, 1000);
+    }
+
+    function showConfirmation(email, role) {
+      const overlay = document.getElementById('successOverlay');
+      const icon = document.getElementById('successIcon');
+      const title = document.getElementById('successTitle');
+      const msg = document.getElementById('successMsg');
+      const fill = document.getElementById('redirectFill');
+      const label = document.getElementById('redirectLabel');
+
+      icon.textContent = '✉️';
+      icon.className = `success-icon ${role}`;
+      title.textContent = 'CHECK YOUR EMAIL';
+      msg.textContent = `We sent a confirmation link to ${email}. Click it to activate your account and access your dashboard.`;
+      fill.className = `redirect-fill ${role}`;
+      fill.style.animation = 'none';
+      label.textContent = 'Check your inbox (and spam folder just in case)';
+
+      overlay.classList.add('visible');
     }
 
     // ── LOAD LIVE COUNTS FROM SUPABASE ──
