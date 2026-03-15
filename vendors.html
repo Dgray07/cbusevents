@@ -227,6 +227,19 @@
   .footer-logo span { color: var(--orange); }
   .footer-text { font-size: 12px; color: var(--text-muted); margin-bottom: 4px; }
 
+  /* VENDOR SLIDER */
+  .vendor-slider-section{padding:60px 0;overflow:hidden;border-top:1px solid rgba(59,130,246,0.12);border-bottom:1px solid rgba(59,130,246,0.12);background:var(--dark-2);}
+  .vendor-slider-label{text-align:center;font-size:11px;font-weight:700;color:#555;letter-spacing:2px;text-transform:uppercase;margin-bottom:24px;}
+  .vendor-slider-track{display:flex;gap:16px;width:max-content;animation:vendorScroll 40s linear infinite;}
+  .vendor-slider-track:hover{animation-play-state:paused;}
+  @keyframes vendorScroll{0%{transform:translateX(0);}100%{transform:translateX(-50%);}}
+  .vendor-slide-card{background:var(--dark);border:1px solid var(--dark-4);border-radius:14px;overflow:hidden;width:220px;flex-shrink:0;cursor:pointer;transition:border-color 0.2s;padding:20px 18px;}
+  .vendor-slide-card:hover{border-color:var(--blue);}
+  .vendor-slide-avatar{width:48px;height:48px;border-radius:12px;background:rgba(59,130,246,0.15);display:flex;align-items:center;justify-content:center;font-size:22px;margin-bottom:12px;}
+  .vendor-slide-cat{font-size:10px;color:var(--blue-light);font-weight:700;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;}
+  .vendor-slide-name{font-weight:700;font-size:14px;margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .vendor-slide-badge{display:inline-block;background:rgba(245,158,11,0.15);color:#f59e0b;border:1px solid rgba(245,158,11,0.25);border-radius:20px;padding:2px 8px;font-size:10px;font-weight:700;margin-top:6px;}
+
   @media(max-width:900px) {
     .stats-grid { grid-template-columns: repeat(2, 1fr); }
     .benefits-grid { grid-template-columns: 1fr 1fr; }
@@ -307,6 +320,14 @@ h1,h2,h3,h4,h5,h6{font-family:Inter,sans-serif;letter-spacing:-0.02em;}
       <div class="av" style="background:#3d2200">J</div>
     </div>
     <div class="trust-text">Trusted by Columbus vendors • <strong>Free to list</strong></div>
+  </div>
+</section>
+
+<!-- VENDOR SLIDER -->
+<section class="vendor-slider-section">
+  <div class="vendor-slider-label">Columbus Vendors on the Platform</div>
+  <div style="overflow:hidden;">
+    <div class="vendor-slider-track" id="vendorSlider"></div>
   </div>
 </section>
 
@@ -665,6 +686,58 @@ h1,h2,h3,h4,h5,h6{font-family:Inter,sans-serif;letter-spacing:-0.02em;}
     document.addEventListener('keydown', function(e) { if (e.key === 'Escape') { btn.classList.remove('open'); menu.classList.remove('open'); document.body.style.overflow = ''; } });
     menu.querySelectorAll('a').forEach(function(el) { el.addEventListener('click', function() { btn.classList.remove('open'); menu.classList.remove('open'); document.body.style.overflow = ''; }); });
   })();
+</script>
+
+<script src="https://unpkg.com/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script>
+(async function(){
+  const sb = supabase.createClient(
+    'https://toblgvatvsjljbqogzsv.supabase.co',
+    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRvYmxndmF0dnNqbGpicW9nenN2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMDgwNTAsImV4cCI6MjA4NzY4NDA1MH0._WJEQPizNDiQfDXQB_DHPaQhixPGpMdmYQSmyWmm_FQ'
+  );
+
+  const categoryIcons = {
+    'Photography': '📸', 'Videography': '🎥', 'DJ / Music': '🎵',
+    'Live Music / Band': '🎸', 'Catering': '🍽️', 'Florals & Decor': '🌸',
+    'Photo Booth': '🎪', 'Bakery & Desserts': '🎂', 'Event Coordination': '📋',
+    'Lighting & AV': '✨', 'Hair & Makeup': '💄', 'Entertainment / Performers': '🎭',
+    'Rentals (Linens, Furniture)': '🪑', 'Other': '⭐'
+  };
+
+  const placeholders = [
+    {business_name:'Columbus Photo Co',category:'Photography',subscription_tier:'FOUNDING'},
+    {business_name:'614 DJ Services',category:'DJ / Music',subscription_tier:'FOUNDING'},
+    {business_name:'Bloom & Co Florals',category:'Florals & Decor',subscription_tier:null},
+    {business_name:'Capture Columbus',category:'Videography',subscription_tier:'FOUNDING'},
+    {business_name:'Sweet Treats Bakery',category:'Bakery & Desserts',subscription_tier:null},
+    {business_name:'Elite AV Columbus',category:'Lighting & AV',subscription_tier:'FOUNDING'},
+  ];
+
+  const { data: vendors } = await sb
+    .from('vendors')
+    .select('id,business_name,name,category,subscription_tier,admin_promoted')
+    .order('rank_score', { ascending: false })
+    .limit(14);
+
+  const items = (vendors && vendors.length) ? vendors : placeholders;
+
+  const makeCard = (v) => {
+    const displayName = v.business_name || v.name || 'Columbus Vendor';
+    const icon = categoryIcons[v.category] || '⭐';
+    const tier = (v.subscription_tier || '').toUpperCase();
+    const isFounding = tier === 'FOUNDING' || v.admin_promoted;
+    return `<div class="vendor-slide-card">
+      <div class="vendor-slide-avatar">${icon}</div>
+      <div class="vendor-slide-cat">${v.category || 'Vendor'}</div>
+      <div class="vendor-slide-name">${displayName}</div>
+      ${isFounding ? '<span class="vendor-slide-badge">⭐ Founding</span>' : ''}
+    </div>`;
+  };
+
+  const track = document.getElementById('vendorSlider');
+  const html = items.map(makeCard).join('');
+  track.innerHTML = html + html; // duplicate for seamless loop
+})();
 </script>
 </body>
 </html>
