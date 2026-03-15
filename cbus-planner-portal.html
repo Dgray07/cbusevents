@@ -357,9 +357,9 @@ async function handleBoostReturn(){
 
 async function loadData(){
  const[vRes,iRes,eRes]=await Promise.all([
- sb.from('venues').select('*').eq('status','approved').order('tier',{ascending:false}),
- sb.from('inquiries').select('*,venues(name,venue_type,neighborhood)').eq('email',currentUser.email).order('created_at',{ascending:false}),
- sb.from('events').select('*,venues(name)').eq('status','published').gte('start_time',new Date().toISOString()).order('start_time',{ascending:true}),
+  sb.from('venues').select('*').eq('status','approved').order('tier',{ascending:false}).then(r=>r).catch(()=>({data:[]})),
+  sb.from('inquiries').select('*,venues(name,venue_type,neighborhood)').eq('planner_id',currentUser.id).order('created_at',{ascending:false}).then(r=>r).catch(()=>({data:[]})),
+  sb.from('events').select('*,venues(name)').eq('status','published').gte('start_time',new Date().toISOString()).order('start_time',{ascending:true}).then(r=>r).catch(()=>({data:[]})),
  ]);
  allVenues=vRes.data||[];
  myInquiries=iRes.data||[];
