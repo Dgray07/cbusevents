@@ -1022,6 +1022,32 @@ h1,h2,h3,h4,h5,h6{font-family:Inter,sans-serif;letter-spacing:-0.02em;}
               state: 'OH'
             });
           }
+
+          if (selectedRole === 'vendor') {
+            await sb.from('vendors').upsert({
+              user_id: userId,
+              email: email,
+              business_name: meta.business_name || null,
+              category: meta.vendor_type || null,
+              phone: meta.phone || null,
+              subscription_status: 'active',
+              subscription_tier: 'FREE',
+              created_at: new Date().toISOString(),
+              updated_at: new Date().toISOString(),
+            }, { onConflict: 'user_id' });
+          }
+
+          if (selectedRole === 'planner') {
+            await sb.from('planners').upsert({
+              user_id: userId,
+              email: email,
+              name: meta.full_name || null,
+              phone: meta.phone || null,
+              planner_type: meta.planner_type || null,
+              created_at: new Date().toISOString(),
+            }, { onConflict: 'user_id' }).catch(() => {});
+            // planners table may not exist yet — user_roles entry is the source of truth
+          }
           showSuccess(selectedRole);
         }
 
