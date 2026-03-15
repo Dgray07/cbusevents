@@ -290,8 +290,6 @@ sb.auth.onAuthStateChange(async(event, session)=>{
 });
 
 async function init(){
- document.getElementById('app').innerHTML=`<div style="min-height:60vh;display:flex;align-items:center;justify-content:center"><div style="width:32px;height:32px;border:3px solid var(--border);border-top-color:var(--orange);border-radius:50%;animation:spin 0.8s linear infinite"></div></div>`;
-
  // Safety net — if getSession hangs for 5s, show the hero anyway
  const safetyTimer = setTimeout(()=>{ if(!currentUser) renderHero(); }, 5000);
 
@@ -322,7 +320,7 @@ async function init(){
 
 function setLoggedInNav(){
  document.getElementById('navLinks').style.display='flex';
- const name=currentUser.user_metadata?.full_name||currentUser.email.split('@')[0];
+ const rawName=currentUser.user_metadata?.full_name||currentUser.user_metadata?.display_name||''; const name=rawName||'there';
  document.getElementById('navRight').innerHTML=`
  <span class="nav-user"> ${name}</span> <button class="nav-outline" onclick="signOut()">Sign Out</button> `;
 }
@@ -620,7 +618,7 @@ function renderBilling(){
 
 // ── DASHBOARD ─────────────────────────────────────────────────
 function renderDashboard(){
- const name=currentUser.user_metadata?.full_name||currentUser.email.split('@')[0];
+ const rawName=currentUser.user_metadata?.full_name||currentUser.user_metadata?.display_name||''; const name=rawName||'there';
  const newInq=myInquiries.filter(i=>i.status==='new').length;
  const readInq=myInquiries.filter(i=>i.status==='read').length;
 
