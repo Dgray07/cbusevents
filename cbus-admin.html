@@ -1107,14 +1107,69 @@ async function deletePlanner(userId){
 
 function renderVendors(){
  document.getElementById('pageContent').innerHTML=`
- <div class="table-card"> <div class="table-header"> <div class="table-title">All Vendors (${allVendors.length})</div> <input class="search-input" placeholder="Search vendors..." oninput="searchVendors(this.value)"> </div> <table> <thead><tr><th>Business</th><th>Category</th><th>Tier</th><th>Sub Status</th><th>Promoted</th><th>Actions</th></tr></thead> <tbody id="vendorTableBody"> ${renderVendorRows(allVendors)}
- </tbody> </table> </div>`;
+ <div class="table-card">
+   <div class="table-header">
+     <div class="table-title">All Vendors (${allVendors.length})</div>
+     <input class="search-input" placeholder="Search vendors..." oninput="searchVendors(this.value)">
+   </div>
+   <table>
+     <thead><tr><th>Business</th><th>Category</th><th>Tier</th><th>Sub Status</th><th>Promoted</th><th>Actions</th></tr></thead>
+     <tbody id="vendorTableBody">${renderVendorRows(allVendors)}</tbody>
+   </table>
+ </div>
+
+ <!-- Vendor Edit Modal -->
+ <div id="vendorEditModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:1000;display:none;align-items:center;justify-content:center">
+   <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:28px;width:100%;max-width:500px;max-height:90vh;overflow-y:auto">
+     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+       <div style="font-family:Inter,sans-serif;font-size:16px;font-weight:700">Edit Vendor</div>
+       <button onclick="closeVendorEdit()" style="background:none;border:none;color:var(--muted);font-size:20px;cursor:pointer">×</button>
+     </div>
+     <div class="field"><label>Business Name</label><input id="ve-name" class="input"/></div>
+     <div class="field"><label>Email</label><input id="ve-email" class="input"/></div>
+     <div class="field"><label>Category</label>
+       <select id="ve-category" style="width:100%;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:10px 12px;color:var(--text);font-size:14px">
+         <option>Photography</option><option>Videography</option><option>DJ / Music</option>
+         <option>Live Music / Band</option><option>Catering</option><option>Florals & Decor</option>
+         <option>Photo Booth</option><option>Bakery & Desserts</option><option>Event Coordination</option>
+         <option>Lighting & AV</option><option>Hair & Makeup</option><option>Entertainment / Performers</option>
+         <option>Rentals (Linens, Furniture)</option><option>Design</option><option>Other</option>
+       </select>
+     </div>
+     <div class="field"><label>Description</label><textarea id="ve-desc" style="width:100%;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:10px 12px;color:var(--text);font-size:14px;min-height:80px;resize:vertical;font-family:inherit"></textarea></div>
+     <div class="field"><label>Phone</label><input id="ve-phone" class="input"/></div>
+     <div class="field"><label>Website</label><input id="ve-website" class="input"/></div>
+     <div class="field"><label>Instagram</label><input id="ve-instagram" class="input" placeholder="@handle"/></div>
+     <div class="field"><label>Subscription Tier</label>
+       <select id="ve-tier" style="width:100%;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:10px 12px;color:var(--text);font-size:14px">
+         <option value="">FREE</option><option value="STANDARD">STANDARD</option><option value="PREMIUM">PREMIUM</option><option value="FOUNDING">FOUNDING</option>
+       </select>
+     </div>
+     <div style="display:flex;gap:10px;margin-top:20px">
+       <button onclick="closeVendorEdit()" class="btn btn-ghost" style="flex:1">Cancel</button>
+       <button onclick="saveVendorEdit()" class="btn btn-primary" style="flex:2">Save Changes →</button>
+     </div>
+   </div>
+ </div>`;
 }
 
 function renderVendorRows(vendors){
- if(!vendors.length)return'<tr class="empty-row"><td colspan="6">No vendors found</td></tr>';
+ if(!vendors.length)return'<tr class="empty-row"><td colspan="7">No vendors found</td></tr>';
  return vendors.map(v=>`
- <tr> <td><strong>${v.business_name||v.name||'—'}</strong><div style="font-size:11px;color:var(--muted)">${v.email||''}</div></td> <td style="color:var(--sub)">${v.category||'—'}</td> <td><span class="badge ${v.subscription_tier==='PREMIUM'||v.tier==='premium'?'badge-gold':v.subscription_tier==='STANDARD'||v.tier==='standard'?'badge-blue':'badge-muted'}">${v.subscription_tier||v.tier||'free'}</span></td> <td><span class="badge ${v.subscription_status==='active'?'badge-green':'badge-muted'}">${v.subscription_status||'—'}</span></td> <td>${v.admin_promoted?'<span class="badge badge-gold">⭐ Yes</span>':'<span class="badge badge-muted">—</span>'}</td> <td><button class="btn ${v.admin_promoted?'btn-ghost':'btn-success'} btn-sm" onclick="toggleVendorPromo('${v.id}',${!v.admin_promoted})">${v.admin_promoted?'Remove Promo':'⭐ Promote'}</button></td> </tr>`).join('');
+ <tr>
+   <td><strong>${v.business_name||v.name||'—'}</strong><div style="font-size:11px;color:var(--muted)">${v.email||''}</div></td>
+   <td style="color:var(--sub)">${v.category||'—'}</td>
+   <td><span class="badge ${v.subscription_tier==='PREMIUM'||v.tier==='premium'?'badge-gold':v.subscription_tier==='STANDARD'||v.tier==='standard'?'badge-blue':'badge-muted'}">${v.subscription_tier||v.tier||'FREE'}</span></td>
+   <td><span class="badge ${v.subscription_status==='active'?'badge-green':'badge-muted'}">${v.subscription_status||'—'}</span></td>
+   <td>${v.admin_promoted?'<span class="badge badge-gold">⭐ Yes</span>':'<span class="badge badge-muted">—</span>'}</td>
+   <td>
+     <div style="display:flex;gap:5px;flex-wrap:wrap">
+       <button class="btn ${v.admin_promoted?'btn-ghost':'btn-success'} btn-sm" onclick="toggleVendorPromo('${v.id}',${!v.admin_promoted})">${v.admin_promoted?'Remove Promo':'⭐ Promote'}</button>
+       <button class="btn btn-ghost btn-sm" onclick="openEditVendor('${v.id}')">✏️ Edit</button>
+       <button class="btn btn-danger btn-sm" onclick="deleteVendor('${v.id}','${(v.business_name||v.name||'this vendor').replace(/'/g,"\\'")}')">Delete</button>
+     </div>
+   </td>
+ </tr>`).join('');
 }
 
 function searchVendors(q){
@@ -1127,6 +1182,57 @@ async function toggleVendorPromo(id,val){
  await sb.from('vendors').update({admin_promoted:val}).eq('id',id);
  await loadData();renderPage();
  toast(val?'⭐ Vendor promoted!':'Promotion removed');
+}
+
+let editingVendorId=null;
+
+async function openEditVendor(id){
+ const v=allVendors.find(x=>x.id===id);
+ if(!v)return;
+ editingVendorId=id;
+ const modal=document.getElementById('vendorEditModal');
+ document.getElementById('ve-name').value=v.business_name||v.name||'';
+ document.getElementById('ve-email').value=v.email||'';
+ document.getElementById('ve-category').value=v.category||'';
+ document.getElementById('ve-desc').value=v.description||'';
+ document.getElementById('ve-phone').value=v.phone||'';
+ document.getElementById('ve-website').value=v.website||'';
+ document.getElementById('ve-instagram').value=v.instagram||'';
+ document.getElementById('ve-tier').value=v.subscription_tier||'';
+ modal.style.display='flex';
+}
+
+function closeVendorEdit(){
+ document.getElementById('vendorEditModal').style.display='none';
+ editingVendorId=null;
+}
+
+async function saveVendorEdit(){
+ if(!editingVendorId)return;
+ const updates={
+   business_name:document.getElementById('ve-name').value.trim()||null,
+   email:document.getElementById('ve-email').value.trim()||null,
+   category:document.getElementById('ve-category').value||null,
+   description:document.getElementById('ve-desc').value.trim()||null,
+   phone:document.getElementById('ve-phone').value.trim()||null,
+   website:document.getElementById('ve-website').value.trim()||null,
+   instagram:document.getElementById('ve-instagram').value.trim()||null,
+   subscription_tier:document.getElementById('ve-tier').value||null,
+   updated_at:new Date().toISOString(),
+ };
+ const{error}=await sb.from('vendors').update(updates).eq('id',editingVendorId);
+ if(error){toast('Error: '+error.message,'error');return;}
+ closeVendorEdit();
+ await loadData();renderPage();
+ toast('Vendor updated');
+}
+
+async function deleteVendor(id,name){
+ if(!confirm(`Delete "${name}"? This cannot be undone.`))return;
+ const{error}=await sb.from('vendors').delete().eq('id',id);
+ if(error){toast('Error: '+error.message,'error');return;}
+ await loadData();renderPage();
+ toast('Vendor deleted');
 }
 
 // ── SUBSCRIPTIONS ─────────────────────────────────────────────
@@ -1184,6 +1290,7 @@ async function renderUsers(){
        <option value="vendor" ${u.role==='vendor'?'selected':''}>Vendor</option>
        <option value="planner" ${u.role==='planner'?'selected':''}>Planner</option>
      </select></td>
+     <td><button class="btn btn-danger btn-sm" onclick="deleteUser('${u.user_id}','${email.replace(/'/g,"\\'")}')">Delete</button></td>
    </tr>`;
  }
 
@@ -1199,7 +1306,7 @@ async function renderUsers(){
    byRole[role]?.length?`
    <div class="table-card" style="margin-bottom:20px" id="filter-${role}">
      <div class="table-header"><div class="table-title">${label} (${byRole[role].length})</div></div>
-     <table><thead><tr><th>Name / Email</th><th>Role</th><th>User ID</th><th>Change Role</th></tr></thead>
+     <table><thead><tr><th>Name / Email</th><th>Role</th><th>User ID</th><th>Change Role</th><th>Actions</th></tr></thead>
      <tbody>${byRole[role].map(u=>userRow(u)).join('')}</tbody></table>
    </div>`:''
  ).join('')}`;
@@ -1210,6 +1317,16 @@ async function doUserSearch(){}
 async function setUserRole(userId,role){
  await sb.from('user_roles').upsert({user_id:userId,role},{onConflict:'user_id'}).catch(()=>{});
  toast(`Role set → ${role}`);
+}
+
+async function deleteUser(userId,email){
+ if(!confirm(`Delete user "${email}"?\n\nThis removes their role record. Their auth account remains in Supabase — delete from Supabase Auth dashboard if needed.`))return;
+ const{error}=await sb.from('user_roles').delete().eq('user_id',userId);
+ if(error){toast('Error: '+error.message,'error');return;}
+ // Also remove from vendors/venues if present
+ await sb.from('vendors').delete().eq('user_id',userId).catch(()=>{});
+ toast('User record deleted');
+ await renderUsers();
 }
 
 // ── OVERRIDES ─────────────────────────────────────────────────
