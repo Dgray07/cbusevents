@@ -774,13 +774,13 @@ h1,h2,h3,h4,h5,h6{font-family:Inter,sans-serif;letter-spacing:-0.02em;}
 </style>
 </head>
 <body> <!-- NAV -->
-<nav id="topNav"> <div class="nav-logo" onclick="showPage('home')"> CBUS<span>EVENTS</span> </div> <div class="nav-links"> <button class="nav-link" id="nav-home" onclick="showPage('home')">Home</button> <button class="nav-link" id="nav-venues" onclick="showPage('venues')">Venues</button> <button class="nav-link" id="nav-events" onclick="showPage('events')">Events</button> <a class="nav-link" href="https://cbusevents.com/blog.html" style="text-decoration:none">Blog</a> </div> <div style="display:flex;align-items:center;gap:10px"> <div style="position:relative" id="joinDropdown"> <button class="nav-link" onclick="toggleJoinMenu()" style="display:flex;align-items:center;gap:4px">Join ▾</button> <div id="joinMenu" style="display:none;position:absolute;top:calc(100% + 8px);right:0;background:#1a1a24;border:1px solid #25252f;border-radius:12px;padding:8px;min-width:190px;box-shadow:0 16px 40px rgba(0,0,0,0.5);z-index:200;"> <a href="https://cbusevents.com/list-your-venue.html" style="display:flex;align-items:center;gap:8px;padding:9px 14px;border-radius:8px;font-size:13px;font-weight:500;color:#8888a0;text-decoration:none;transition:all 0.15s;" onmouseover="this.style.background='#13131a';this.style.color='#e8e8f0'" onmouseout="this.style.background='';this.style.color='#8888a0'"> List Your Venue</a> <a href="https://cbusevents.com/vendors.html" style="display:flex;align-items:center;gap:8px;padding:9px 14px;border-radius:8px;font-size:13px;font-weight:500;color:#8888a0;text-decoration:none;transition:all 0.15s;" onmouseover="this.style.background='#13131a';this.style.color='#e8e8f0'" onmouseout="this.style.background='';this.style.color='#8888a0'"> List Your Services</a> <a href="https://cbusevents.com/planners.html" style="display:flex;align-items:center;gap:8px;padding:9px 14px;border-radius:8px;font-size:13px;font-weight:500;color:#8888a0;text-decoration:none;transition:all 0.15s;" onmouseover="this.style.background='#13131a';this.style.color='#e8e8f0'" onmouseout="this.style.background='';this.style.color='#8888a0'"> Event Planners</a> <div style="height:1px;background:#25252f;margin:4px 8px;"></div> <a href="https://cbusevents.com/attendees.html" style="display:flex;align-items:center;gap:8px;padding:9px 14px;border-radius:8px;font-size:13px;font-weight:500;color:#8888a0;text-decoration:none;transition:all 0.15s;" onmouseover="this.style.background='#13131a';this.style.color='#e8e8f0'" onmouseout="this.style.background='';this.style.color='#8888a0'"> Find Events</a> <div style="height:1px;background:#25252f;margin:4px 8px;"></div> <a href="https://cbusevents.com/blog.html" style="display:flex;align-items:center;gap:8px;padding:9px 14px;border-radius:8px;font-size:13px;font-weight:600;color:#FF6B35;text-decoration:none;transition:all 0.15s;" onmouseover="this.style.background='#13131a'" onmouseout="this.style.background=''"> Columbus Blog</a> </div> </div> <a href="https://cbusevents.com/auth.html" class="nav-cta" style="text-decoration:none">Sign In</a> </div>
+<nav id="topNav"> <div class="nav-logo" onclick="showPage('home')"> CBUS<span>EVENTS</span> </div> <div class="nav-links"> <button class="nav-link" id="nav-home" onclick="showPage('home')">Home</button> <button class="nav-link" id="nav-venues" onclick="showPage('venues')">Venues</button> <button class="nav-link" id="nav-vendors" onclick="showPage('vendors')">Vendors</button> <button class="nav-link" id="nav-events" onclick="showPage('events')">Events</button> <a class="nav-link" href="https://cbusevents.com/blog.html" style="text-decoration:none">Blog</a> </div> <div style="display:flex;align-items:center;gap:10px"> <div style="position:relative" id="joinDropdown"> <button class="nav-link" onclick="toggleJoinMenu()" style="display:flex;align-items:center;gap:4px">Join ▾</button> <div id="joinMenu" style="display:none;position:absolute;top:calc(100% + 8px);right:0;background:#1a1a24;border:1px solid #25252f;border-radius:12px;padding:8px;min-width:190px;box-shadow:0 16px 40px rgba(0,0,0,0.5);z-index:200;"> <a href="https://cbusevents.com/list-your-venue.html" style="display:flex;align-items:center;gap:8px;padding:9px 14px;border-radius:8px;font-size:13px;font-weight:500;color:#8888a0;text-decoration:none;transition:all 0.15s;" onmouseover="this.style.background='#13131a';this.style.color='#e8e8f0'" onmouseout="this.style.background='';this.style.color='#8888a0'"> List Your Venue</a> <a href="https://cbusevents.com/vendors.html" style="display:flex;align-items:center;gap:8px;padding:9px 14px;border-radius:8px;font-size:13px;font-weight:500;color:#8888a0;text-decoration:none;transition:all 0.15s;" onmouseover="this.style.background='#13131a';this.style.color='#e8e8f0'" onmouseout="this.style.background='';this.style.color='#8888a0'"> List Your Services</a> <a href="https://cbusevents.com/planners.html" style="display:flex;align-items:center;gap:8px;padding:9px 14px;border-radius:8px;font-size:13px;font-weight:500;color:#8888a0;text-decoration:none;transition:all 0.15s;" onmouseover="this.style.background='#13131a';this.style.color='#e8e8f0'" onmouseout="this.style.background='';this.style.color='#8888a0'"> Event Planners</a> <div style="height:1px;background:#25252f;margin:4px 8px;"></div> <a href="https://cbusevents.com/attendees.html" style="display:flex;align-items:center;gap:8px;padding:9px 14px;border-radius:8px;font-size:13px;font-weight:500;color:#8888a0;text-decoration:none;transition:all 0.15s;" onmouseover="this.style.background='#13131a';this.style.color='#e8e8f0'" onmouseout="this.style.background='';this.style.color='#8888a0'"> Find Events</a> <div style="height:1px;background:#25252f;margin:4px 8px;"></div> <a href="https://cbusevents.com/blog.html" style="display:flex;align-items:center;gap:8px;padding:9px 14px;border-radius:8px;font-size:13px;font-weight:600;color:#FF6B35;text-decoration:none;transition:all 0.15s;" onmouseover="this.style.background='#13131a'" onmouseout="this.style.background=''"> Columbus Blog</a> </div> </div> <a href="https://cbusevents.com/auth.html" class="nav-cta" style="text-decoration:none">Sign In</a> </div>
 <button class="nav-hamburger" id="navHamburger" aria-label="Menu"><span></span><span></span><span></span></button>
 </nav>
 <div id="navMobileMenu" class="nav-mobile-menu">
   <a href="https://cbusevents.com" class="nav-mobile-link">Home</a>
   <a href="https://cbusevents.com/venues.html" class="nav-mobile-link">Venues</a>
-  <a href="https://cbusevents.com/vendors.html" class="nav-mobile-link">Vendors</a>
+  <a onclick="showPage('vendors')" class="nav-mobile-link" style="cursor:pointer">Vendors</a>
   <a href="https://cbusevents.com/planners.html" class="nav-mobile-link">Planners</a>
   <div class="nav-mobile-divider"></div>
   <a href="https://cbusevents.com/attendees.html" class="nav-mobile-link">Find Events</a>
@@ -943,16 +943,18 @@ function showPage(page,data=null,pushState=true){
  window.scrollTo({top:0,behavior:'smooth'});
  if(page==='home')renderHome();
  else if(page==='venues')renderVenues();
+ else if(page==='vendors')renderVendors();
  else if(page==='events')renderEvents();
  else if(page==='venue')renderVenueDetail(data);
  else if(page==='category')renderCategory(data);
  else if(page==='listVenue')renderVenueLanding();
 
  // Update URL and SEO title
- const titles={home:'CBUSEVENTS — Columbus Ohio Venues & Events',venues:'Columbus Venues — CBUSEVENTS',events:'Columbus Events — CBUSEVENTS'};
+ const titles={home:'CBUSEVENTS — Columbus Ohio Venues & Events',venues:'Columbus Venues — CBUSEVENTS',vendors:'Columbus Vendors — CBUSEVENTS',events:'Columbus Events — CBUSEVENTS'};
  let url='/';
  let title=titles[page]||document.title;
  if(page==='venues'){url='/venues';}
+ else if(page==='vendors'){url='/vendors';}
  else if(page==='events'){url='/events';}
  else if(page==='venue'&&data){
    const slug=data.slug||toSlug(data.name);
@@ -1564,6 +1566,49 @@ function filterVenues(){
  });
  const g=document.getElementById('venueGrid');
  if(g)g.innerHTML=f.map(v=>venueCard(v)).join('')||'<div class="empty"><h3>No venues match your filters</h3></div>';
+}
+
+// ── VENDORS PAGE ─────────────────────────────────────────────
+function renderVendors(){
+ const cats=['All',...new Set(allVendors.map(v=>v.category).filter(Boolean))].sort();
+ document.getElementById('app').innerHTML=`
+ <div class="search-section"><div class="search-inner">
+   <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:12px">
+     <div>
+       <h1 style="font-family:Inter,sans-serif;font-size:28px;font-weight:800;margin-bottom:4px">Columbus Vendors</h1>
+       <p style="color:var(--sub);font-size:14px">${allVendors.length} vendors available for Columbus events</p>
+     </div>
+     <a href="https://cbusevents.com/vendors.html" style="background:var(--orange);color:#fff;padding:9px 20px;border-radius:8px;font-size:13px;font-weight:700;text-decoration:none;">List Your Services →</a>
+   </div>
+   <div class="search-bar">
+     <div class="search-wrap"><span class="search-icon"></span>
+       <input class="search-input" id="vdSearch" placeholder="Search vendors by name or service..." oninput="filterVendors()">
+     </div>
+     <select class="search-select" id="vdCat" onchange="filterVendors()">
+       ${cats.map(c=>`<option>${c}</option>`).join('')}
+     </select>
+   </div>
+ </div></div>
+ <section class="section">
+   <div id="vendorGrid" class="venue-grid">
+     ${allVendors.length ? allVendors.map(v=>vendorCard(v)).join('') : '<div class="empty"><h3>No vendors listed yet</h3><p>Be the first Columbus vendor on the platform.</p><a href="https://cbusevents.com/vendors.html" style="display:inline-block;margin-top:16px;background:var(--orange);color:#fff;padding:10px 24px;border-radius:8px;font-weight:700;text-decoration:none">List Your Services Free →</a></div>'}
+   </div>
+ </section> ${footer()}`;
+}
+
+function filterVendors(){
+ const q=(document.getElementById('vdSearch')?.value||'').toLowerCase();
+ const cat=document.getElementById('vdCat')?.value||'All';
+ const f=allVendors.filter(v=>{
+   const name=(v.business_name||v.name||'').toLowerCase();
+   const desc=(v.description||'').toLowerCase();
+   const vcat=(v.category||'').toLowerCase();
+   const mQ=!q||name.includes(q)||desc.includes(q)||vcat.includes(q);
+   const mC=cat==='All'||(v.category||'')=== cat;
+   return mQ&&mC;
+ });
+ const g=document.getElementById('vendorGrid');
+ if(g)g.innerHTML=f.map(v=>vendorCard(v)).join('')||'<div class="empty"><h3>No vendors match your search</h3></div>';
 }
 
 // ── EVENTS PAGE ───────────────────────────────────────────────
