@@ -285,6 +285,7 @@ function toggleMobileMenu(){
  {id:'overrides',label:' Overrides'},
  {id:'claims',label:' Claims'},
  {id:'blog',label:' Blog & SEO'},
+ {id:'outreach',label:' Outreach'},
  ];
  items.innerHTML=pages.map(p=>`
  <div onclick="closeMobileNav('${p.id}')" style="padding:12px 20px;font-size:14px;font-weight:500;color:${p.id===currentPage?'var(--orange)':'var(--sub)'};cursor:pointer;border-bottom:1px solid var(--border);background:${p.id===currentPage?'var(--card)':'transparent'}">${p.label}</div> `).join('') + `
@@ -521,7 +522,7 @@ function renderShell(){
  <div class="sidebar"> <div class="sidebar-logo"> <div class="sidebar-logo-text">CBUS<span>EVENTS</span></div> <div style="font-size:11px;color:var(--muted);margin-top:3px">Admin Portal</div> </div> <div class="sidebar-section">Main</div> <div class="nav-item" onclick="window.location.href='https://cbusevents.com'" style="border-bottom:1px solid var(--border);margin-bottom:4px;padding-bottom:12px"> Home</div> <div class="nav-item ${currentPage==='dashboard'?'active':''}" onclick="nav('dashboard')"> Dashboard</div> <div class="nav-item ${currentPage==='venues'?'active':''}" onclick="nav('venues')"> Venues ${pendingVenues?`<span class="badge">${pendingVenues}</span>`:''}</div> <div class="nav-item ${currentPage==='events'?'active':''}" onclick="nav('events')"> Events</div> <div class="nav-item ${currentPage==='inquiries'?'active':''}" onclick="nav('inquiries')"> Inquiries ${newInquiries?`<span class="badge green">${newInquiries}</span>`:''}</div> <div class="sidebar-section">Revenue</div> <div class="nav-item ${currentPage==='revenue'?'active':''}" onclick="nav('revenue')"> Revenue</div> <div class="nav-item ${currentPage==='design'?'active':''}" onclick="nav('design')"> Design Requests ${allDesignRequests.filter(d=>d.status==='new').length?`<span class="badge">${allDesignRequests.filter(d=>d.status==='new').length}</span>`:''}</div> <div class="sidebar-section">Platform</div> <div class="nav-item ${currentPage==='vendors'?'active':''}" onclick="nav('vendors')"> Vendors</div>
  <div class="nav-item ${currentPage==='planners'?'active':''}" onclick="nav('planners')"> Planners</div> <div class="nav-item ${currentPage==='subscriptions'?'active':''}" onclick="nav('subscriptions')"> Subscriptions</div> <div class="nav-item ${currentPage==='users'?'active':''}" onclick="nav('users')"> Users</div> <div class="nav-item ${currentPage==='overrides'?'active':''}" onclick="nav('overrides')"> Overrides</div> <div class="nav-item ${currentPage==='claims'?'active':''}" onclick="nav('claims')"> Claims <span style='background:#ef4444;color:#fff;border-radius:20px;padding:1px 7px;font-size:10px;font-weight:700;margin-left:auto' id='claimsBadge' style='display:none'></span></div>
  <div class="sidebar-section">Content</div>
- <div class="nav-item ${currentPage==='blog'?'active':''}" onclick="nav('blog')"> Blog & SEO</div> <div class="sidebar-bottom"> <div class="admin-tag"> Admin</div> <button onclick="sb.auth.signOut().then(()=>renderLogin())" style="width:100%;margin-top:10px;background:none;border:1px solid var(--border);border-radius:7px;padding:7px;color:var(--muted);font-size:12px;cursor:pointer;font-family:Inter,sans-serif">Sign Out</button> </div> </div> <div class="main"> <div class="topbar"> <div style="display:flex;align-items:center;gap:12px"> <button id="mobileMenuBtn" onclick="toggleMobileMenu()" style="display:none;background:none;border:none;color:var(--text);font-size:22px;cursor:pointer;padding:4px;line-height:1">☰</button> <div class="topbar-title" id="topbarTitle">Dashboard</div> </div> <div class="topbar-right"> <span class="topbar-time" id="topbarTime"></span> <button class="topbar-site-btn" onclick="window.open('https://cbusevents.com','_blank')">View Site ↗</button> <button class="topbar-site-btn" onclick="window.open('https://cbusevents.com/cbus-venue-portal.html','_blank')">Venue Portal ↗</button> </div> </div> <div id="mobileMenuOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:300;" onclick="toggleMobileMenu()" style="cursor:pointer">×</div> <div id="mobileMenuDrawer" style="display:none;position:fixed;left:0;top:0;bottom:0;width:240px;background:var(--surface);border-right:1px solid var(--border);z-index:301;overflow-y:auto;padding-bottom:32px;transform:translateX(-100%);transition:transform 0.25s ease;"> <div style="padding:20px 16px 16px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center"> <div style="font-family:Inter,sans-serif;font-size:17px;font-weight:800">CBUS<span style="color:#FF6B35">EVENTS</span></div> <button onclick="toggleMobileMenu()" style="background:none;border:none;color:var(--sub);font-size:20px;cursor:pointer">✕</button> </div> <div id="mobileMenuItems"></div> </div> <div class="content" id="pageContent"></div> </div> <div id="modalContainer"></div> `;
+ <div class="nav-item ${currentPage==='blog'?'active':''}" onclick="nav('blog')"> Blog & SEO</div> <div class="nav-item ${currentPage==='outreach'?'active':''}" onclick="nav('outreach')" style="color:${currentPage==='outreach'?'var(--text)':'var(--orange)'}"> Outreach</div> <div class="sidebar-bottom"> <div class="admin-tag"> Admin</div> <button onclick="sb.auth.signOut().then(()=>renderLogin())" style="width:100%;margin-top:10px;background:none;border:1px solid var(--border);border-radius:7px;padding:7px;color:var(--muted);font-size:12px;cursor:pointer;font-family:Inter,sans-serif">Sign Out</button> </div> </div> <div class="main"> <div class="topbar"> <div style="display:flex;align-items:center;gap:12px"> <button id="mobileMenuBtn" onclick="toggleMobileMenu()" style="display:none;background:none;border:none;color:var(--text);font-size:22px;cursor:pointer;padding:4px;line-height:1">☰</button> <div class="topbar-title" id="topbarTitle">Dashboard</div> </div> <div class="topbar-right"> <span class="topbar-time" id="topbarTime"></span> <button class="topbar-site-btn" onclick="window.open('https://cbusevents.com','_blank')">View Site ↗</button> <button class="topbar-site-btn" onclick="window.open('https://cbusevents.com/cbus-venue-portal.html','_blank')">Venue Portal ↗</button> </div> </div> <div id="mobileMenuOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:300;" onclick="toggleMobileMenu()" style="cursor:pointer">×</div> <div id="mobileMenuDrawer" style="display:none;position:fixed;left:0;top:0;bottom:0;width:240px;background:var(--surface);border-right:1px solid var(--border);z-index:301;overflow-y:auto;padding-bottom:32px;transform:translateX(-100%);transition:transform 0.25s ease;"> <div style="padding:20px 16px 16px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center"> <div style="font-family:Inter,sans-serif;font-size:17px;font-weight:800">CBUS<span style="color:#FF6B35">EVENTS</span></div> <button onclick="toggleMobileMenu()" style="background:none;border:none;color:var(--sub);font-size:20px;cursor:pointer">✕</button> </div> <div id="mobileMenuItems"></div> </div> <div class="content" id="pageContent"></div> </div> <div id="modalContainer"></div> `;
 
  // Live clock
  setInterval(()=>{
@@ -536,7 +537,7 @@ function nav(page){
  currentPage=page;
  document.querySelectorAll('.nav-item').forEach(el=>el.classList.remove('active'));
  document.querySelectorAll('.nav-item').forEach(el=>{if(el.textContent.trim().toLowerCase().includes(page))el.classList.add('active');});
- const title={dashboard:'Dashboard',venues:'Venues',events:'Events',inquiries:'Inquiries',revenue:'Revenue',design:'Design Requests',vendors:'Vendors',subscriptions:'Subscriptions',users:'Users',overrides:'Overrides',claims:'Listing Claims',blog:'Blog & SEO',planners:'Planners'};
+ const title={dashboard:'Dashboard',venues:'Venues',events:'Events',inquiries:'Inquiries',revenue:'Revenue',design:'Design Requests',vendors:'Vendors',subscriptions:'Subscriptions',users:'Users',overrides:'Overrides',claims:'Listing Claims',blog:'Blog & SEO',planners:'Planners',outreach:'Venue Outreach'};
  const el=document.getElementById('topbarTitle');
  if(el)el.textContent=title[page]||page;
  renderPage();
@@ -556,6 +557,7 @@ function renderPage(){
  else if(currentPage==='overrides')renderOverrides();
  else if(currentPage==='claims')renderClaims();
  else if(currentPage==='blog')renderBlog();
+ else if(currentPage==='outreach')renderOutreach();
 }
 
 // ── DASHBOARD ─────────────────────────────────────────────────
@@ -1369,6 +1371,214 @@ async function applyOverride(){
  toast(' Override applied!');
  await loadData();
  renderOverrides();
+}
+
+// ── VENUE OUTREACH ─────────────────────────────────────────────
+const OUTREACH_VENUES=[
+ {id:'half-baked',name:'Half Baked',address:'765 N High St',type:'Bar / Brewery / Arcade',events:'Live music, game nights, THC drink showcases',rating:'4.7',phone:'614-670-4020'},
+ {id:'forno',name:'Forno Kitchen + Bar',address:'721 N High St',type:'Restaurant / Speakeasy',events:'Private dinners, speakeasy events, happy hours',rating:'4.5',phone:'614-469-0053'},
+ {id:'guild-house',name:'The Guild House',address:'624 N High St',type:'Upscale Restaurant',events:'Corporate dinners, brunch events, holiday parties',rating:'4.5',phone:'614-280-9780'},
+ {id:'bernards',name:'Bernards Tavern',address:'630 N High St',type:'Bar & Grill',events:'Birthday bar nights, sports watch parties, DJ nights',rating:'4.2',phone:'614-223-9601'},
+ {id:'lemongrass',name:'Lemongrass Fusion Bistro',address:'641 N High St',type:'Asian Fusion Restaurant',events:'Cultural dining events, group dinners, happy hours',rating:'4.1',phone:'614-224-1414'},
+ {id:'mandrake',name:'Mandrake Rooftop',address:'810 N High St',type:'Rooftop Restaurant / Bar',events:'DJ nights, sunset happy hours, birthday dinners',rating:'4.2',phone:'614-793-1500'},
+ {id:'northstar',name:'Northstar Cafe',address:'951 N High St',type:'Cafe / Restaurant',events:'Daytime pop-ups, morning networking, wellness meetups',rating:'4.5',phone:'614-298-9999'},
+ {id:'standard-hall',name:'Standard Hall',address:'1100 N High St',type:'Multi-bar Complex',events:'DJ/brunch events, bottle service nights, large-scale events',rating:'4.2',phone:'614-381-1112'},
+ {id:'lincoln-social',name:'Lincoln Social Rooftop',address:'711 N High St 9th Fl',type:'Rooftop Lounge',events:'Cocktail events, networking mixers, birthday parties',rating:'4.5',phone:'614-300-9494'},
+ {id:'columbus-museum',name:'Columbus Museum of Art',address:'480 E Broad St',type:'Art Museum',events:'Art galas, Candlelight concerts, private buyouts',rating:'4.7',phone:'614-221-6801'},
+ {id:'barleys',name:"Barley's Brewing Company",address:'467 N High St',type:'Brewpub',events:'Craft beer tastings, trivia nights, casual group outings',rating:'4.5',phone:'614-221-9767'},
+ {id:'arch-city',name:'Arch City Tavern',address:'862 N High St',type:'Bar & Grill',events:'Sports events, birthday dinners, group outings',rating:'4.6',phone:'614-725-5620'},
+ {id:'plas',name:"['plas]",address:'21 E 5th Ave #101',type:'Fine Dining',events:'Milestone dinners, intimate group events, corporate dining',rating:'4.8',phone:'614-725-5700'},
+ {id:'denmark',name:'DENMARK',address:'463 N High St 2nd Fl',type:'Cocktail Bar',events:'Craft cocktail showcases, private birthday buyouts',rating:'4.7',phone:''},
+ {id:'townhall',name:'TownHall',address:'792 N High St',type:'Health-Focused Restaurant / Bar',events:'Wellness brunches, DJ brunch events, community meetups',rating:'4.3',phone:'614-639-8600'},
+ {id:'roaming-goat',name:'Roaming Goat Coffee',address:'849 N High St',type:'Coffee Shop',events:'Morning networking, pop-up vendor markets, community meetups',rating:'4.4',phone:'614-294-2489'},
+ {id:'oddfellows',name:'Oddfellows Liquor Bar',address:'1038 N High St',type:'Bar',events:'Karaoke nights, themed events, late-night social gatherings',rating:'4.4',phone:'614-923-9631'},
+ {id:'pint-house',name:'Short North Pint House',address:'780 N High St',type:'Bar / Beer Garden',events:'Sports watch parties, beer tastings, large group outings',rating:'4.4',phone:'614-429-3986'},
+ {id:'sn-tavern',name:'Short North Tavern',address:'674 N High St',type:'Bar',events:'Low-key happy hours, casual meetups, birthday bar crawls',rating:'4.4',phone:'614-221-2432'},
+ {id:'voodoo',name:'Voodoo Brewing Co',address:'958 N High St',type:'Brewpub',events:'Comedy open mic, game day watch parties, craft beer events',rating:'4.7',phone:'614-564-9469'},
+ {id:'daily-bar',name:'The Daily Bar',address:'883 N 4th St',type:'Bar',events:'Intimate networking, craft cocktail events, private gatherings',rating:'4.7',phone:''},
+ {id:'wiseguy',name:'Wiseguy Lounge',address:'608 N High St',type:'Speakeasy / Cocktail Bar',events:'Private buyouts, whiskey tastings, upscale happy hours',rating:'4.8',phone:'614-484-0277'},
+ {id:'alibi',name:'The Alibi Bourbon & Cocktail Lounge',address:'843 N High St',type:'Cocktail Bar',events:'Networking happy hours, bourbon tastings, private celebrations',rating:'4.6',phone:'614-914-6477'},
+ {id:'the-pearl',name:'The Pearl',address:'641 N High St',type:'Seafood Restaurant / Bar',events:'Oyster bar pop-ups, holiday dinners, upscale brunch parties',rating:'4.6',phone:'614-227-0151'},
+];
+
+const OUTREACH_STATUSES=['Not Contacted','Visited — No Answer','Left Info','Spoke to Staff','Decision Maker Reached','Interested','Signed Up','Not Interested'];
+const STATUS_COLORS={'Not Contacted':'badge-muted','Visited — No Answer':'badge-gold','Left Info':'badge-blue','Spoke to Staff':'badge-blue','Decision Maker Reached':'badge-orange','Interested':'badge-orange','Signed Up':'badge-green','Not Interested':'badge-red'};
+
+function getOutreachData(){
+ try{return JSON.parse(localStorage.getItem('cbusevents_outreach')||'{}');}catch(e){return{};}
+}
+function saveOutreachData(data){
+ localStorage.setItem('cbusevents_outreach',JSON.stringify(data));
+}
+
+function renderOutreach(){
+ const data=getOutreachData();
+ const signed=OUTREACH_VENUES.filter(v=>(data[v.id]?.status||'Not Contacted')==='Signed Up').length;
+ const interested=OUTREACH_VENUES.filter(v=>(data[v.id]?.status||'Not Contacted')==='Interested').length;
+ const contacted=OUTREACH_VENUES.filter(v=>!['Not Contacted'].includes(data[v.id]?.status||'Not Contacted')).length;
+ const total=OUTREACH_VENUES.length;
+
+ document.getElementById('pageContent').innerHTML=`
+ <div style="margin-bottom:24px">
+   <div style="font-family:Inter,sans-serif;font-size:20px;font-weight:800;margin-bottom:6px">Venue Outreach — Short North</div>
+   <div style="color:var(--sub);font-size:13px">${total} venues · Track your field visits in real time · Saves automatically</div>
+ </div>
+
+ <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:24px">
+   <div class="stat-card">
+     <div class="stat-card-num" style="color:var(--orange)">${contacted}</div>
+     <div class="stat-card-label">Contacted</div>
+     <div class="stat-card-sub" style="color:var(--sub)">of ${total} total</div>
+   </div>
+   <div class="stat-card">
+     <div class="stat-card-num" style="color:var(--blue)">${interested}</div>
+     <div class="stat-card-label">Interested</div>
+   </div>
+   <div class="stat-card">
+     <div class="stat-card-num" style="color:var(--green)">${signed}</div>
+     <div class="stat-card-label">Signed Up</div>
+   </div>
+   <div class="stat-card">
+     <div class="stat-card-num" style="color:var(--sub)">${total-contacted}</div>
+     <div class="stat-card-label">Remaining</div>
+   </div>
+ </div>
+
+ <div style="background:var(--surface);border:1px solid var(--border);border-radius:8px;height:8px;margin-bottom:24px;overflow:hidden">
+   <div style="height:100%;background:var(--orange);width:${Math.round((contacted/total)*100)}%;transition:width 0.4s ease;border-radius:8px"></div>
+ </div>
+
+ <div class="table-card">
+   <div class="table-header">
+     <div class="table-title">All Venues</div>
+     <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+       <input class="search-input" placeholder="Search venues..." style="min-width:160px" oninput="filterOutreachTable(this.value)">
+       <select class="search-input" onchange="filterOutreachStatus(this.value)" style="min-width:160px">
+         <option value="">All Statuses</option>
+         ${OUTREACH_STATUSES.map(s=>`<option value="${s}">${s}</option>`).join('')}
+       </select>
+       <button class="btn btn-ghost btn-sm" onclick="resetOutreach()">Reset All</button>
+     </div>
+   </div>
+
+   <table id="outreachTable">
+     <thead><tr>
+       <th style="width:22%">Venue</th>
+       <th style="width:14%">Type</th>
+       <th style="width:18%">Best For</th>
+       <th style="width:10%">Rating</th>
+       <th style="width:16%">Status</th>
+       <th style="width:20%">Notes</th>
+     </tr></thead>
+     <tbody id="outreachBody">
+       ${renderOutreachRows(OUTREACH_VENUES,data)}
+     </tbody>
+   </table>
+ </div>`;
+}
+
+function renderOutreachRows(venues,data){
+ return venues.map(v=>{
+   const d=data[v.id]||{};
+   const status=d.status||'Not Contacted';
+   const notes=d.notes||'';
+   const colorClass=STATUS_COLORS[status]||'badge-muted';
+   return`<tr id="row-${v.id}">
+     <td>
+       <div style="font-weight:600;font-size:13px">${v.name}</div>
+       <div style="font-size:11px;color:var(--muted);margin-top:2px">${v.address}</div>
+       ${v.phone?`<div style="font-size:11px;color:var(--orange);margin-top:1px"><a href="tel:${v.phone}" style="color:var(--orange);text-decoration:none">${v.phone}</a></div>`:''}
+     </td>
+     <td style="font-size:12px;color:var(--sub)">${v.type}</td>
+     <td style="font-size:11px;color:var(--muted);line-height:1.5">${v.events}</td>
+     <td><span class="badge badge-gold" style="font-size:11px">${v.rating}</span></td>
+     <td>
+       <select onchange="updateOutreachStatus('${v.id}',this.value)"
+         style="background:var(--bg);border:1px solid var(--border);border-radius:7px;padding:5px 8px;color:var(--text);font-size:12px;font-family:Inter,sans-serif;width:100%;cursor:pointer">
+         ${OUTREACH_STATUSES.map(s=>`<option value="${s}" ${status===s?'selected':''}>${s}</option>`).join('')}
+       </select>
+       <span class="badge ${colorClass}" style="margin-top:5px;font-size:10px;display:inline-flex">${status}</span>
+     </td>
+     <td>
+       <textarea
+         placeholder="Notes..."
+         onblur="updateOutreachNotes('${v.id}',this.value)"
+         style="width:100%;background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:6px 8px;color:var(--text);font-size:12px;font-family:Inter,sans-serif;resize:vertical;min-height:52px;outline:none"
+         onfocus="this.style.borderColor='var(--orange)'"
+       >${notes}</textarea>
+     </td>
+   </tr>`;
+ }).join('');
+}
+
+let _outreachFilter='';
+let _outreachStatusFilter='';
+
+function filterOutreachTable(q){
+ _outreachFilter=q.toLowerCase();
+ _applyOutreachFilter();
+}
+function filterOutreachStatus(s){
+ _outreachStatusFilter=s;
+ _applyOutreachFilter();
+}
+function _applyOutreachFilter(){
+ const data=getOutreachData();
+ const filtered=OUTREACH_VENUES.filter(v=>{
+   const matchQ=!_outreachFilter||v.name.toLowerCase().includes(_outreachFilter)||v.type.toLowerCase().includes(_outreachFilter)||v.events.toLowerCase().includes(_outreachFilter);
+   const status=data[v.id]?.status||'Not Contacted';
+   const matchS=!_outreachStatusFilter||status===_outreachStatusFilter;
+   return matchQ&&matchS;
+ });
+ const el=document.getElementById('outreachBody');
+ if(el)el.innerHTML=renderOutreachRows(filtered,data);
+}
+
+function updateOutreachStatus(id,status){
+ const data=getOutreachData();
+ if(!data[id])data[id]={};
+ data[id].status=status;
+ data[id].updatedAt=new Date().toISOString();
+ saveOutreachData(data);
+ // Refresh badge inline
+ const row=document.getElementById('row-'+id);
+ if(row){
+   const badge=row.querySelector('.badge');
+   if(badge){
+     badge.className='badge '+(STATUS_COLORS[status]||'badge-muted');
+     badge.textContent=status;
+   }
+ }
+ // Refresh stat cards without full re-render
+ const d2=getOutreachData();
+ const signed=OUTREACH_VENUES.filter(v=>(d2[v.id]?.status||'Not Contacted')==='Signed Up').length;
+ const interested=OUTREACH_VENUES.filter(v=>(d2[v.id]?.status||'Not Contacted')==='Interested').length;
+ const contacted=OUTREACH_VENUES.filter(v=>!['Not Contacted'].includes(d2[v.id]?.status||'Not Contacted')).length;
+ const total=OUTREACH_VENUES.length;
+ document.querySelectorAll('.stat-card-num').forEach((el,i)=>{
+   if(i===0)el.textContent=contacted;
+   if(i===1)el.textContent=interested;
+   if(i===2)el.textContent=signed;
+   if(i===3)el.textContent=total-contacted;
+ });
+ const bar=document.querySelector('[style*="background:var(--orange)"][style*="width:"]');
+ if(bar)bar.style.width=Math.round((contacted/total)*100)+'%';
+ toast(status==='Signed Up'?' Venue signed up!':status==='Interested'?'Marked interested':'Updated');
+}
+
+function updateOutreachNotes(id,notes){
+ const data=getOutreachData();
+ if(!data[id])data[id]={};
+ data[id].notes=notes;
+ data[id].updatedAt=new Date().toISOString();
+ saveOutreachData(data);
+}
+
+function resetOutreach(){
+ if(!confirm('Reset ALL outreach progress? This cannot be undone.'))return;
+ localStorage.removeItem('cbusevents_outreach');
+ renderOutreach();
+ toast('Outreach reset');
 }
 
 // ── START ─────────────────────────────────────────────────────
