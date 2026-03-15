@@ -207,6 +207,7 @@ const VENUE_IMGS={
 
 let currentUser=null,currentPage='home';
 let allVenues=[],myInquiries=[],myEvents=[];
+let _initDone=false; // guard against onAuthStateChange double-fire on page load
 
 // ── HELPERS ───────────────────────────────────────────────────
 function toast(msg,type='success'){
@@ -281,7 +282,9 @@ async function savePlannerProfile(){
 }
 
 sb.auth.onAuthStateChange(async(event, session)=>{
- if(event==='SIGNED_IN' && session?.user && !currentUser){
+ // Only handle SIGNED_IN here for events that happen AFTER init (e.g. email confirm callback)
+ // init() handles the initial session restore itself — _initDone guards against double-fire
+ if(event==='SIGNED_IN' && session?.user && !currentUser && _initDone){
    currentUser=session.user;
    await loadData();setLoggedInNav();nav('dashboard');
  } else if(event==='SIGNED_OUT'){
@@ -290,37 +293,30 @@ sb.auth.onAuthStateChange(async(event, session)=>{
 });
 
 async function init(){
- // Safety net — if getSession hangs for 5s, show the hero anyway
- const safetyTimer = setTimeout(()=>{ if(!currentUser) renderHero(); }, 5000);
-
- try {
-  const{data:{session}}=await sb.auth.getSession();
-  clearTimeout(safetyTimer);
-  if(session){
-   currentUser=session.user;
-   const{data:rd}=await sb.from('user_roles').select('role').eq('user_id',currentUser.id).maybeSingle();
-   const role=rd?.role;
-   if(role==='vendor'){window.location.href='https://cbusevents.com/cbus-vendor-portal.html';return;}
-   if(role==='venue_owner'){window.location.href='https://cbusevents.com/cbus-venue-portal.html';return;}
-   await loadData();
-   await handleBoostReturn();
-   setLoggedInNav();
-   nav('dashboard');
-  } else {
-   const _p=new URLSearchParams(window.location.search);
-   if(_p.get("signup")==="1"){renderHero();setTimeout(()=>showAuth("signup"),200);}
-   else{renderHero();}
-  }
- } catch(e) {
-  clearTimeout(safetyTimer);
-  console.error('init error:',e);
-  renderHero();
+ document.getElementById('app').innerHTML=`<div style="min-height:60vh;display:flex;align-items:center;justify-content:center"><div style="width:32px;height:32px;border:3px solid var(--border);border-top-color:var(--orange);border-radius:50%;animation:spin 0.8s linear infinite"></div></div>`;
+ const{data:{session}}=await sb.auth.getSession();
+ if(session){
+ currentUser=session.user;
+ // Redirect if wrong portal
+ const{data:rd}=await sb.from('user_roles').select('role').eq('user_id',currentUser.id).maybeSingle();
+ const role=rd?.role;
+ if(role==='vendor'){window.location.href='https://cbusevents.com/cbus-vendor-portal.html';return;}
+ if(role==='venue_owner'){window.location.href='https://cbusevents.com/cbus-venue-portal.html';return;}
+ await loadData();
+ await handleBoostReturn();
+ setLoggedInNav();
+ nav('dashboard');
+ } else {
+ const _p=new URLSearchParams(window.location.search);
+ if(_p.get("signup")==="1"){renderHero();setTimeout(()=>showAuth("signup"),200);}
+ else{renderHero();}
  }
+ _initDone=true; // allow onAuthStateChange to handle future events (email confirm, etc.)
 }
 
 function setLoggedInNav(){
  document.getElementById('navLinks').style.display='flex';
- const rawName=currentUser.user_metadata?.full_name||currentUser.user_metadata?.display_name||''; const name=rawName||'there';
+ const name=currentUser.user_metadata?.full_name||currentUser.email.split('@')[0];
  document.getElementById('navRight').innerHTML=`
  <span class="nav-user"> ${name}</span> <button class="nav-outline" onclick="signOut()">Sign Out</button> `;
 }
@@ -355,9 +351,9 @@ async function handleBoostReturn(){
 
 async function loadData(){
  const[vRes,iRes,eRes]=await Promise.all([
-  sb.from('venues').select('*').eq('status','approved').order('tier',{ascending:false}).then(r=>r).catch(()=>({data:[]})),
-  sb.from('inquiries').select('*,venues(name,venue_type,neighborhood)').eq('planner_id',currentUser.id).order('created_at',{ascending:false}).then(r=>r).catch(()=>({data:[]})),
-  sb.from('events').select('*,venues(name)').eq('status','published').gte('start_time',new Date().toISOString()).order('start_time',{ascending:true}).then(r=>r).catch(()=>({data:[]})),
+ sb.from('venues').select('*').eq('status','approved').order('tier',{ascending:false}),
+ sb.from('inquiries').select('*,venues(name,venue_type,neighborhood)').eq('email',currentUser.email).order('created_at',{ascending:false}),
+ sb.from('events').select('*,venues(name)').eq('status','published').gte('start_time',new Date().toISOString()).order('start_time',{ascending:true}),
  ]);
  allVenues=vRes.data||[];
  myInquiries=iRes.data||[];
@@ -367,7 +363,6 @@ async function loadData(){
 
 // ── HERO ──────────────────────────────────────────────────────
 function renderHero(){
- try{
  document.getElementById('app').innerHTML=`
  <div class="planner-hero"> <div style="display:inline-flex;align-items:center;gap:6px;background:var(--orange);color:#fff;border-radius:20px;padding:4px 14px;font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:16px"> For Event Planners</div> <h1>Plan your next Columbus<br>event the <span>right way</span></h1> <p>Browse venues, send booking inquiries, track your requests, and list your events — all in one free dashboard.</p> <div class="hero-btns"> <button class="btn btn-primary" style="padding:13px 28px;font-size:15px" onclick="showAuth('signup')">Create Free Account →</button> <button class="btn btn-outline" style="padding:13px 24px;font-size:15px" onclick="showAuth('login')">Sign In</button> </div> </div> <div style="padding:52px 40px;max-width:1100px;margin:0 auto"> <div style="text-align:center;margin-bottom:40px"> <div class="section-title" style="font-size:24px">Everything a Columbus planner needs</div> <div class="section-sub" style="font-size:15px">Free forever for event planners</div> </div> <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:20px;margin-bottom:52px"> ${[
  {icon:'',title:'Browse Venues',desc:'Filter by type, neighborhood, and capacity. Find the perfect space for any event.'},
@@ -380,10 +375,6 @@ function renderHero(){
  </div> </div> `;
  // Load venues for preview
  loadVenuesPreview();
- }catch(e){
-   console.error('renderHero error:',e);
-   document.getElementById('app').innerHTML=renderLoggedOutNav();
- }
 }
 
 async function loadVenuesPreview(){
@@ -435,13 +426,15 @@ async function doSignup(){
  const{error,data}=await sb.auth.signUp({email,password:pass,options:{data:{full_name:`${first} ${last}`.trim()}}});
  if(error){const el=document.getElementById('aErr');if(el){el.textContent=error.message;el.style.display='block';}return;}
  if(!data.session){
-   // Email confirmation required — show message, wait for onAuthStateChange
+   // Email confirmation required
    const el=document.getElementById('aErr');
    if(el){el.style.color='#22c55e';el.textContent=`Check your email — we sent a confirmation link to ${email}.`;el.style.display='block';}
    return;
  }
  currentUser=data.user;
- await loadData();setLoggedInNav();nav('dashboard');
+ await loadData();
+ setLoggedInNav();
+ nav('dashboard');
  toast('Welcome to CBUSEVENTS!');
 }
 
@@ -618,7 +611,7 @@ function renderBilling(){
 
 // ── DASHBOARD ─────────────────────────────────────────────────
 function renderDashboard(){
- const rawName=currentUser.user_metadata?.full_name||currentUser.user_metadata?.display_name||''; const name=rawName||'there';
+ const name=currentUser.user_metadata?.full_name||currentUser.email.split('@')[0];
  const newInq=myInquiries.filter(i=>i.status==='new').length;
  const readInq=myInquiries.filter(i=>i.status==='read').length;
 
