@@ -1321,40 +1321,6 @@ function renderHome(){
    <button class="rh-btn-secondary" onclick="showPage('venues')" style="width:100%;justify-content:center;margin-top:20px;">Browse All Columbus Venues →</button>
  </section>
 
- <!-- ═══ UPCOMING EVENTS ═══ -->
- ${allUpcoming.length?`
- <section class="rh-section dark">
-   <div class="rh-section-header-row">
-     <div>
-       <p class="rh-section-label">What's On</p>
-       <h2 class="rh-section-title" style="margin-bottom:0">Upcoming Events</h2>
-     </div>
-     <a class="rh-view-all" onclick="showPage('events')" style="cursor:pointer;padding-bottom:4px;">View all →</a>
-   </div>
-   <p class="rh-section-sub" style="margin-top:10px">Events happening across Columbus — find something worth going to.</p>
-   <div class="rh-events-list">
-     ${allUpcoming.map(e=>{
-       const colors=['#F59E0B','#EF4444','#22C55E','#60A5FA','#A78BFA','#F97316'];
-       const color=colors[Math.floor(Math.random()*colors.length)];
-       return`<div class="rh-event" onclick="openEventModal('${e.id}')">
-         <div class="rh-event-bar" style="background:${color}"></div>
-         <div class="rh-event-body">
-           <div class="rh-event-cat">${e.category||'Event'}</div>
-           <div class="rh-event-name">${e.title}</div>
-           <div class="rh-event-venue">${e.venues?.name||'Columbus Venue'}</div>
-           <div class="rh-event-chips">
-             <span class="rh-chip">${fmt(e.start_time)}</span>
-             <span class="rh-chip">${fmtTime(e.start_time)}</span>
-             ${e.is_free?'<span class="rh-chip free">Free</span>':e.price_min?`<span class="rh-chip paid">From $${e.price_min}</span>`:''}
-           </div>
-         </div>
-         <div class="rh-event-arrow">›</div>
-       </div>`;
-     }).join('')}
-   </div>
-   <button class="rh-btn-secondary" onclick="showPage('events')" style="width:100%;justify-content:center;margin-top:20px;">See All Columbus Events →</button>
- </section>`:''}
-
  <!-- ═══ SOCIAL PROOF ═══ -->
  <section class="rh-section">
    <p class="rh-section-label">Early Believers</p>
