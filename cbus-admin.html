@@ -1374,32 +1374,57 @@ async function applyOverride(){
 }
 
 // ── VENUE OUTREACH ─────────────────────────────────────────────
-const OUTREACH_VENUES=[
- {id:'half-baked',name:'Half Baked',address:'765 N High St',type:'Bar / Brewery / Arcade',events:'Live music, game nights, THC drink showcases',rating:'4.7',phone:'6146704020'},
- {id:'forno',name:'Forno Kitchen + Bar',address:'721 N High St',type:'Restaurant / Speakeasy',events:'Private dinners, speakeasy events, happy hours',rating:'4.5',phone:'6144690053'},
- {id:'guild-house',name:'The Guild House',address:'624 N High St',type:'Upscale Restaurant',events:'Corporate dinners, brunch events, holiday parties',rating:'4.5',phone:'6142809780'},
- {id:'bernards',name:'Bernards Tavern',address:'630 N High St',type:'Bar & Grill',events:'Birthday bar nights, sports watch parties, DJ nights',rating:'4.2',phone:'6142239601'},
- {id:'lemongrass',name:'Lemongrass Fusion Bistro',address:'641 N High St',type:'Asian Fusion Restaurant',events:'Cultural dining events, group dinners, happy hours',rating:'4.1',phone:'6142241414'},
- {id:'mandrake',name:'Mandrake Rooftop',address:'810 N High St',type:'Rooftop Restaurant / Bar',events:'DJ nights, sunset happy hours, birthday dinners',rating:'4.2',phone:'6147931500'},
- {id:'northstar',name:'Northstar Cafe',address:'951 N High St',type:'Cafe / Restaurant',events:'Daytime pop-ups, morning networking, wellness meetups',rating:'4.5',phone:'6142989999'},
- {id:'standard-hall',name:'Standard Hall',address:'1100 N High St',type:'Multi-bar Complex',events:'DJ/brunch events, bottle service nights, large-scale events',rating:'4.2',phone:'6143811112'},
- {id:'lincoln-social',name:'Lincoln Social Rooftop',address:'711 N High St 9th Fl',type:'Rooftop Lounge',events:'Cocktail events, networking mixers, birthday parties',rating:'4.5',phone:'6143009494'},
- {id:'columbus-museum',name:'Columbus Museum of Art',address:'480 E Broad St',type:'Art Museum / Event Space',events:'Art galas, Candlelight concerts, private buyouts',rating:'4.7',phone:'6142216801'},
- {id:'barleys',name:"Barley's Brewing Company",address:'467 N High St',type:'Brewpub',events:'Craft beer tastings, trivia nights, casual group outings',rating:'4.5',phone:'6142219767'},
- {id:'arch-city',name:'Arch City Tavern',address:'862 N High St',type:'Bar & Grill',events:'Sports events, birthday dinners, group outings',rating:'4.6',phone:'6147255620'},
- {id:'plas',name:"['plas]",address:'21 E 5th Ave #101',type:'Fine Dining',events:'Milestone dinners, intimate group events, corporate dining',rating:'4.8',phone:'6147255700'},
- {id:'denmark',name:'DENMARK',address:'463 N High St 2nd Fl',type:'Cocktail Bar',events:'Craft cocktail showcases, private birthday buyouts',rating:'4.7',phone:''},
- {id:'townhall',name:'TownHall',address:'792 N High St',type:'Health-Focused Restaurant / Bar',events:'Wellness brunches, DJ brunch events, community meetups',rating:'4.3',phone:'6146398600'},
- {id:'roaming-goat',name:'Roaming Goat Coffee',address:'849 N High St',type:'Coffee Shop',events:'Morning networking, pop-up vendor markets',rating:'4.4',phone:'6142942489'},
- {id:'oddfellows',name:'Oddfellows Liquor Bar',address:'1038 N High St',type:'Bar',events:'Karaoke nights, themed events, late-night social gatherings',rating:'4.4',phone:'6149239631'},
- {id:'pint-house',name:'Short North Pint House',address:'780 N High St',type:'Bar / Beer Garden',events:'Sports watch parties, beer tastings, large group outings',rating:'4.4',phone:'6144293986'},
- {id:'sn-tavern',name:'Short North Tavern',address:'674 N High St',type:'Bar',events:'Low-key happy hours, casual meetups, birthday bar crawls',rating:'4.4',phone:'6142212432'},
- {id:'voodoo',name:'Voodoo Brewing Co',address:'958 N High St',type:'Brewpub',events:'Comedy open mic, game day watch parties, craft beer events',rating:'4.7',phone:'6145649469'},
- {id:'daily-bar',name:'The Daily Bar',address:'883 N 4th St',type:'Bar',events:'Intimate networking, craft cocktail events, private gatherings',rating:'4.7',phone:''},
- {id:'wiseguy',name:'Wiseguy Lounge',address:'608 N High St',type:'Speakeasy / Cocktail Bar',events:'Private buyouts, whiskey tastings, upscale happy hours',rating:'4.8',phone:'6144840277'},
- {id:'alibi',name:'The Alibi Bourbon & Cocktail Lounge',address:'843 N High St',type:'Cocktail Bar',events:'Networking happy hours, bourbon tastings, private celebrations',rating:'4.6',phone:'6149146477'},
- {id:'the-pearl',name:'The Pearl',address:'641 N High St',type:'Seafood Restaurant / Bar',events:'Oyster bar pop-ups, holiday dinners, upscale brunch parties',rating:'4.6',phone:'6142270151'},
-];
+const OUTREACH_DISTRICTS={
+ 'short-north':{
+   label:'Short North',
+   venues:[
+     {id:'sn-half-baked',name:'Half Baked',address:'765 N High St',type:'Bar / Brewery / Arcade',events:'Live music, game nights, THC drink showcases',rating:'4.7',phone:'6146704020'},
+     {id:'sn-forno',name:'Forno Kitchen + Bar',address:'721 N High St',type:'Restaurant / Speakeasy',events:'Private dinners, speakeasy events, happy hours',rating:'4.5',phone:'6144690053'},
+     {id:'sn-guild-house',name:'The Guild House',address:'624 N High St',type:'Upscale Restaurant',events:'Corporate dinners, brunch events, holiday parties',rating:'4.5',phone:'6142809780'},
+     {id:'sn-bernards',name:'Bernards Tavern',address:'630 N High St',type:'Bar & Grill',events:'Birthday bar nights, sports watch parties, DJ nights',rating:'4.2',phone:'6142239601'},
+     {id:'sn-lemongrass',name:'Lemongrass Fusion Bistro',address:'641 N High St',type:'Asian Fusion Restaurant',events:'Cultural dining events, group dinners, happy hours',rating:'4.1',phone:'6142241414'},
+     {id:'sn-mandrake',name:'Mandrake Rooftop',address:'810 N High St',type:'Rooftop Restaurant / Bar',events:'DJ nights, sunset happy hours, birthday dinners',rating:'4.2',phone:'6147931500'},
+     {id:'sn-northstar',name:'Northstar Cafe',address:'951 N High St',type:'Cafe / Restaurant',events:'Daytime pop-ups, morning networking, wellness meetups',rating:'4.5',phone:'6142989999'},
+     {id:'sn-standard-hall',name:'Standard Hall',address:'1100 N High St',type:'Multi-bar Complex',events:'DJ/brunch events, bottle service nights, large-scale events',rating:'4.2',phone:'6143811112'},
+     {id:'sn-lincoln-social',name:'Lincoln Social Rooftop',address:'711 N High St 9th Fl',type:'Rooftop Lounge',events:'Cocktail events, networking mixers, birthday parties',rating:'4.5',phone:'6143009494'},
+     {id:'sn-columbus-museum',name:'Columbus Museum of Art',address:'480 E Broad St',type:'Art Museum / Event Space',events:'Art galas, Candlelight concerts, private buyouts',rating:'4.7',phone:'6142216801'},
+     {id:'sn-barleys',name:"Barley's Brewing Co",address:'467 N High St',type:'Brewpub',events:'Craft beer tastings, trivia nights, casual group outings',rating:'4.5',phone:'6142219767'},
+     {id:'sn-arch-city',name:'Arch City Tavern',address:'862 N High St',type:'Bar & Grill',events:'Sports events, birthday dinners, group outings',rating:'4.6',phone:'6147255620'},
+     {id:'sn-plas',name:"['plas]",address:'21 E 5th Ave #101',type:'Fine Dining',events:'Milestone dinners, intimate group events, corporate dining',rating:'4.8',phone:'6147255700'},
+     {id:'sn-denmark',name:'DENMARK',address:'463 N High St 2nd Fl',type:'Cocktail Bar',events:'Craft cocktail showcases, private birthday buyouts',rating:'4.7',phone:''},
+     {id:'sn-townhall',name:'TownHall',address:'792 N High St',type:'Health-Focused Restaurant / Bar',events:'Wellness brunches, DJ brunch events, community meetups',rating:'4.3',phone:'6146398600'},
+     {id:'sn-roaming-goat',name:'Roaming Goat Coffee',address:'849 N High St',type:'Coffee Shop',events:'Morning networking, pop-up vendor markets',rating:'4.4',phone:'6142942489'},
+     {id:'sn-oddfellows',name:'Oddfellows Liquor Bar',address:'1038 N High St',type:'Bar',events:'Karaoke nights, themed events, late-night social gatherings',rating:'4.4',phone:'6149239631'},
+     {id:'sn-pint-house',name:'Short North Pint House',address:'780 N High St',type:'Bar / Beer Garden',events:'Sports watch parties, beer tastings, large group outings',rating:'4.4',phone:'6144293986'},
+     {id:'sn-sn-tavern',name:'Short North Tavern',address:'674 N High St',type:'Bar',events:'Low-key happy hours, casual meetups, birthday bar crawls',rating:'4.4',phone:'6142212432'},
+     {id:'sn-voodoo',name:'Voodoo Brewing Co',address:'958 N High St',type:'Brewpub',events:'Comedy open mic, game day watch parties, craft beer events',rating:'4.7',phone:'6145649469'},
+     {id:'sn-daily-bar',name:'The Daily Bar',address:'883 N 4th St',type:'Bar',events:'Intimate networking, craft cocktail events, private gatherings',rating:'4.7',phone:''},
+     {id:'sn-wiseguy',name:'Wiseguy Lounge',address:'608 N High St',type:'Speakeasy / Cocktail Bar',events:'Private buyouts, whiskey tastings, upscale happy hours',rating:'4.8',phone:'6144840277'},
+     {id:'sn-alibi',name:'The Alibi Bourbon & Cocktail Lounge',address:'843 N High St',type:'Cocktail Bar',events:'Networking happy hours, bourbon tastings, private celebrations',rating:'4.6',phone:'6149146477'},
+     {id:'sn-pearl',name:'The Pearl',address:'641 N High St',type:'Seafood Restaurant / Bar',events:'Oyster bar pop-ups, holiday dinners, upscale brunch parties',rating:'4.6',phone:'6142270151'},
+   ]
+ },
+ 'dublin':{
+   label:'Dublin',
+   venues:[
+     {id:'dub-market-bar',name:'Market Bar',address:'6750 Longshore St',type:'Bar / Bridge Park',events:'Happy hours, group events, open-carry district walks',rating:'4.7',phone:'6144017674'},
+     {id:'dub-roosevelt',name:'The Roosevelt Room',address:'6544 Longshore St',type:'Cocktail Lounge / Nightclub',events:'Cocktail events, networking mixers, private buyouts',rating:'4.2',phone:'6146025585'},
+     {id:'dub-village-tavern',name:'Dublin Village Tavern',address:'27 S High St',type:'Irish Pub',events:'Trivia nights, patio parties, Irish-themed events',rating:'4.6',phone:'6147666250'},
+     {id:'dub-getaway',name:'The Getaway Brewing Co.',address:'108 N High St',type:'Brewery / Event Space',events:'Private event buyouts, baby showers, beer tastings',rating:'4.7',phone:'6143890137'},
+     {id:'dub-palm-valley',name:'Palm Valley Cocktails',address:'6770 Riverside Dr',type:'Cocktail Bar',events:'Birthday events, seasonal themed nights, patio events',rating:'4.7',phone:'3802142814'},
+     {id:'dub-fado',name:'Fado Pub & Kitchen',address:'6652 Riverside Dr',type:'Irish Pub / Restaurant',events:'Irish pub events, brunch parties, waterfront dining',rating:'4.5',phone:'6144081500'},
+     {id:'dub-urban-meyer',name:"Urban Meyer's Pint House",address:'6632 Longshore St',type:'Sports Bar & Grill',events:'Sports watch parties, game day events, large group outings',rating:'4.2',phone:'6143897856'},
+     {id:'dub-vaso',name:'VASO Rooftop Lounge',address:'6540 Riverside Dr',type:'Rooftop Tapas Bar',events:'Rooftop cocktail events, anniversary dinners, happy hour pop-ups',rating:'4.3',phone:'6146982525'},
+     {id:'dub-apothecary',name:'Apothecary Bourbon & Cigar Lounge',address:'30 S High St',type:'Bourbon / Cigar Lounge',events:'Bourbon tastings, fire pit events, private date nights',rating:'4.7',phone:'6148876342'},
+     {id:'dub-coast-wine',name:'Coast Wine House',address:'75 S High St',type:'Wine Bar',events:'Wine tastings, fondue events, intimate celebrations',rating:'4.6',phone:'6145537227'},
+     {id:'dub-pearl',name:'The Pearl Dublin',address:'88 N High St',type:'Seafood Restaurant / Bar',events:'Oyster bar events, brunch parties, anniversary dinners',rating:'4.6',phone:'6146956255'},
+     {id:'dub-exchange',name:'The Exchange at Bridge Park',address:'6520 Riverside Dr',type:'Event Venue / Catering',events:'Weddings, corporate events, large private buyouts',rating:'4.8',phone:'6147932263'},
+     {id:'dub-mezzo',name:'Mezzo',address:'12 W Bridge St',type:'Italian Restaurant / Event Space',events:'Rehearsal dinners, private rooms, upscale group dining',rating:'4.4',phone:'6148896100'},
+     {id:'dub-kitchen-social',name:'Kitchen Social',address:'6791 Longshore St',type:'American Restaurant',events:'Brunch events, group dinners, birthday celebrations',rating:'4.7',phone:'6147631770'},
+     {id:'dub-napa',name:'NAPA Kitchen + Bar',address:'7148 Muirfield Dr',type:'Wine Bar / Restaurant',events:'Wine events, private dinners, corporate happy hours',rating:'4.5',phone:'6147269799'},
+   ]
+ }
+};
 
 const OUTREACH_STATUSES=['Not Contacted','Visited — No Answer','Left Info','Spoke to Staff','Decision Maker Reached','Interested','Signed Up','Not Interested'];
 const STATUS_COLORS={'Not Contacted':'badge-muted','Visited — No Answer':'badge-gold','Left Info':'badge-blue','Spoke to Staff':'badge-blue','Decision Maker Reached':'badge-orange','Interested':'badge-orange','Signed Up':'badge-green','Not Interested':'badge-red'};
@@ -1407,20 +1432,21 @@ const STATUS_COLORS={'Not Contacted':'badge-muted','Visited — No Answer':'badg
 function getOutreachData(){try{return JSON.parse(localStorage.getItem('cbusevents_outreach')||'{}');}catch(e){return{};}}
 function saveOutreachData(d){localStorage.setItem('cbusevents_outreach',JSON.stringify(d));}
 
-let _orQ='',_orS='';
+let _orDistrict='short-north',_orQ='',_orS='';
 
 function renderOutreach(){
  const data=getOutreachData();
- const total=OUTREACH_VENUES.length;
- const signed=OUTREACH_VENUES.filter(v=>(data[v.id]?.status||'Not Contacted')==='Signed Up').length;
- const interested=OUTREACH_VENUES.filter(v=>(data[v.id]?.status||'Not Contacted')==='Interested').length;
- const contacted=OUTREACH_VENUES.filter(v=>(data[v.id]?.status||'Not Contacted')!=='Not Contacted').length;
+ const allVenues=Object.values(OUTREACH_DISTRICTS).flatMap(d=>d.venues);
+ const total=allVenues.length;
+ const signed=allVenues.filter(v=>(data[v.id]?.status||'Not Contacted')==='Signed Up').length;
+ const interested=allVenues.filter(v=>(data[v.id]?.status||'Not Contacted')==='Interested').length;
+ const contacted=allVenues.filter(v=>(data[v.id]?.status||'Not Contacted')!=='Not Contacted').length;
  const pct=Math.round((contacted/total)*100);
 
  document.getElementById('pageContent').innerHTML=`
  <div style="margin-bottom:20px">
-   <div style="font-size:20px;font-weight:800;margin-bottom:4px">Venue Outreach — Short North</div>
-   <div style="color:var(--sub);font-size:13px">${total} venues · Saves automatically to this device</div>
+   <div style="font-size:20px;font-weight:800;margin-bottom:4px">Venue Outreach</div>
+   <div style="color:var(--sub);font-size:13px">${total} venues across ${Object.keys(OUTREACH_DISTRICTS).length} districts · Saves automatically</div>
  </div>
  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px">
    <div class="stat-card"><div class="stat-card-num" style="color:var(--orange)">${contacted}</div><div class="stat-card-label">Contacted</div><div class="stat-card-sub" style="color:var(--muted)">of ${total}</div></div>
@@ -1431,13 +1457,19 @@ function renderOutreach(){
  <div style="background:var(--surface);border:1px solid var(--border);border-radius:6px;height:6px;margin-bottom:20px;overflow:hidden">
    <div id="orProgress" style="height:100%;background:var(--orange);width:${pct}%;border-radius:6px;transition:width 0.4s"></div>
  </div>
- <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap">
-   <input class="search-input" placeholder="Search venues..." style="flex:1;min-width:140px" oninput="_orQ=this.value.toLowerCase();renderOutreachCards()">
-   <select class="search-input" onchange="_orS=this.value;renderOutreachCards()" style="min-width:150px">
+ <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;align-items:center">
+   <div style="display:flex;background:var(--surface);border:1px solid var(--border);border-radius:8px;overflow:hidden;flex-shrink:0">
+     ${Object.entries(OUTREACH_DISTRICTS).map(([key,d])=>`
+     <button onclick="_orDistrict='${key}';_orQ='';_orS='';renderOutreachCards()" id="tab-${key}"
+       style="padding:7px 16px;font-size:13px;font-weight:600;font-family:Inter,sans-serif;border:none;cursor:pointer;transition:all 0.15s;background:${key===_orDistrict?'var(--orange)':'transparent'};color:${key===_orDistrict?'#fff':'var(--sub)'}"
+       >${d.label}</button>`).join('')}
+   </div>
+   <input class="search-input" placeholder="Search..." style="flex:1;min-width:120px" oninput="_orQ=this.value.toLowerCase();renderOutreachCards()" id="orSearch">
+   <select class="search-input" onchange="_orS=this.value;renderOutreachCards()" style="min-width:150px" id="orStatusFilter">
      <option value="">All Statuses</option>
      ${OUTREACH_STATUSES.map(s=>`<option value="${s}">${s}</option>`).join('')}
    </select>
-   <button class="btn btn-ghost btn-sm" onclick="if(confirm('Reset all outreach progress?')){localStorage.removeItem('cbusevents_outreach');_orQ='';_orS='';renderOutreach();}">Reset</button>
+   <button class="btn btn-ghost btn-sm" onclick="if(confirm('Reset all outreach progress?')){localStorage.removeItem('cbusevents_outreach');renderOutreach();}">Reset</button>
  </div>
  <div id="outreachCards"></div>`;
  renderOutreachCards();
@@ -1445,7 +1477,14 @@ function renderOutreach(){
 
 function renderOutreachCards(){
  const data=getOutreachData();
- const venues=OUTREACH_VENUES.filter(v=>{
+ const district=OUTREACH_DISTRICTS[_orDistrict];
+ if(!district)return;
+ // Update tab styles
+ Object.keys(OUTREACH_DISTRICTS).forEach(k=>{
+   const t=document.getElementById('tab-'+k);
+   if(t){t.style.background=k===_orDistrict?'var(--orange)':'transparent';t.style.color=k===_orDistrict?'#fff':'var(--sub)';}
+ });
+ const venues=district.venues.filter(v=>{
    const status=data[v.id]?.status||'Not Contacted';
    const mQ=!_orQ||v.name.toLowerCase().includes(_orQ)||v.type.toLowerCase().includes(_orQ)||v.events.toLowerCase().includes(_orQ)||v.address.toLowerCase().includes(_orQ);
    const mS=!_orS||status===_orS;
@@ -1459,8 +1498,8 @@ function renderOutreachCards(){
    const status=d.status||'Not Contacted';
    const notes=d.notes||'';
    const cc=STATUS_COLORS[status]||'badge-muted';
-   const statusColor={'badge-green':'#22c55e','badge-orange':'#FF6B35','badge-blue':'#60a5fa','badge-gold':'#f59e0b','badge-red':'#ef4444','badge-muted':'#55556a'}[cc]||'#55556a';
-   return`<div id="ocard-${v.id}" style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:10px;border-left:3px solid ${statusColor}">
+   const borderColor={'badge-green':'#22c55e','badge-orange':'#FF6B35','badge-blue':'#60a5fa','badge-gold':'#f59e0b','badge-red':'#ef4444','badge-muted':'#25252f'}[cc]||'#25252f';
+   return`<div id="ocard-${v.id}" style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:10px;border-left:3px solid ${borderColor}">
      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:10px">
        <div style="flex:1">
          <div style="font-weight:700;font-size:14px;margin-bottom:2px">${v.name}</div>
@@ -1485,7 +1524,7 @@ function renderOutreachCards(){
        <textarea placeholder="Contact name, what they said, follow-up needed..."
          onblur="updateOutreachNotes('${v.id}',this.value)"
          style="width:100%;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:9px 12px;color:var(--text);font-size:13px;font-family:Inter,sans-serif;resize:vertical;min-height:60px;outline:none"
-         onfocus="this.style.borderColor='#FF6B35'" onblurX="this.style.borderColor='var(--border)'"
+         onfocus="this.style.borderColor='#FF6B35'"
        >${notes}</textarea>
      </div>
    </div>`;
@@ -1498,16 +1537,15 @@ function updateOutreachStatus(id,status){
  data[id].status=status;
  data[id].updatedAt=new Date().toISOString();
  saveOutreachData(data);
- // Update card border color live
- const statusColor={'badge-green':'#22c55e','badge-orange':'#FF6B35','badge-blue':'#60a5fa','badge-gold':'#f59e0b','badge-red':'#ef4444','badge-muted':'#55556a'}[STATUS_COLORS[status]||'badge-muted']||'#55556a';
+ const borderColor={'badge-green':'#22c55e','badge-orange':'#FF6B35','badge-blue':'#60a5fa','badge-gold':'#f59e0b','badge-red':'#ef4444','badge-muted':'#25252f'}[STATUS_COLORS[status]||'badge-muted']||'#25252f';
  const card=document.getElementById('ocard-'+id);
- if(card)card.style.borderLeftColor=statusColor;
- // Refresh stats
+ if(card)card.style.borderLeftColor=borderColor;
  const d2=getOutreachData();
- const total=OUTREACH_VENUES.length;
- const signed=OUTREACH_VENUES.filter(v=>(d2[v.id]?.status||'Not Contacted')==='Signed Up').length;
- const interested=OUTREACH_VENUES.filter(v=>(d2[v.id]?.status||'Not Contacted')==='Interested').length;
- const contacted=OUTREACH_VENUES.filter(v=>(d2[v.id]?.status||'Not Contacted')!=='Not Contacted').length;
+ const allVenues=Object.values(OUTREACH_DISTRICTS).flatMap(d=>d.venues);
+ const total=allVenues.length;
+ const signed=allVenues.filter(v=>(d2[v.id]?.status||'Not Contacted')==='Signed Up').length;
+ const interested=allVenues.filter(v=>(d2[v.id]?.status||'Not Contacted')==='Interested').length;
+ const contacted=allVenues.filter(v=>(d2[v.id]?.status||'Not Contacted')!=='Not Contacted').length;
  const nums=document.querySelectorAll('.stat-card-num');
  if(nums[0])nums[0].textContent=contacted;
  if(nums[1])nums[1].textContent=interested;
@@ -1515,8 +1553,7 @@ function updateOutreachStatus(id,status){
  if(nums[3])nums[3].textContent=total-contacted;
  const bar=document.getElementById('orProgress');
  if(bar)bar.style.width=Math.round((contacted/total)*100)+'%';
- const msg=status==='Signed Up'?'Venue signed up!':status==='Interested'?'Marked interested':'Updated';
- toast(msg);
+ toast(status==='Signed Up'?'Venue signed up!':status==='Interested'?'Marked interested':'Updated');
 }
 
 function updateOutreachNotes(id,notes){
