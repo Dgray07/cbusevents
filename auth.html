@@ -437,6 +437,7 @@ async function doSignIn() {
   const err   = document.getElementById('siErr');
   const btn   = document.getElementById('siBtn');
   err.textContent = '';
+  if (!name && role !== 'customer') { err.textContent = 'Please enter your name.'; return; }
   if (!email || !pass) { err.textContent = 'Email and password required.'; return; }
   btn.disabled = true;
   btn.innerHTML = '<span class="spinner"></span>Signing in...';
@@ -508,6 +509,7 @@ async function doSignUp() {
   err.textContent = '';
   ok.style.display = 'none';
 
+  if (!name && role !== 'customer') { err.textContent = 'Please enter your name.'; return; }
   if (!email || !pass) { err.textContent = 'Email and password required.'; return; }
   if (pass.length < 6) { err.textContent = 'Password must be at least 6 characters.'; return; }
 
