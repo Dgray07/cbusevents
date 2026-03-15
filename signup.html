@@ -1122,11 +1122,11 @@ h1,h2,h3,h4,h5,h6{font-family:Inter,sans-serif;letter-spacing:-0.02em;}
         const [venues, vendors, planners] = await Promise.all([
           sb.from('venues').select('id', { count: 'exact', head: true }),
           sb.from('vendors').select('id', { count: 'exact', head: true }),
-          sb.from('user_roles').select('id', { count: 'exact', head: true }).eq('role', 'planner')
+          sb.from('user_roles').select('user_id').eq('role', 'planner')
         ]);
         animateCount('venueCount', venues.count || 0);
         animateCount('vendorCount', vendors.count || 0);
-        animateCount('plannerCount', planners.count || 0);
+        animateCount('plannerCount', (planners.data || []).length);
       } catch(e) {
         document.getElementById('venueCount').textContent = '—';
         document.getElementById('vendorCount').textContent = '—';
