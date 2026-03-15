@@ -67,19 +67,19 @@ button { cursor:pointer; font-family:Inter,sans-serif; border:none; }
 /* ── NAV ── */
 nav {
  position:sticky; top:0; z-index:100;
- background:rgba(11,11,15,0.92); backdrop-filter:blur(16px);
- border-bottom:1px solid var(--border);
+ background:#0f0f0f;
+ border-bottom:1px solid rgba(255,255,255,0.07);
  display:flex; align-items:center; justify-content:space-between;
  padding:0 48px; height:62px;
 }
-.nav-logo { font-family:Inter,sans-serif; font-weight:800; font-size:20px; cursor:pointer; }
+.nav-logo { font-family:Inter,sans-serif; font-weight:800; font-size:20px; cursor:pointer; color:#fff; }
 .nav-logo span { color:var(--orange); }
 .nav-links { display:flex; gap:4px; }
 .nav-link {
- background:none; border:none; color:var(--sub); font-size:14px;
+ background:none; border:none; color:rgba(255,255,255,0.45); font-size:14px;
  padding:7px 16px; border-radius:8px; font-weight:500; transition:all 0.15s;
 }
-.nav-link:hover,.nav-link.active { background:var(--card); color:var(--text); }
+.nav-link:hover,.nav-link.active { background:rgba(255,255,255,0.07); color:#fff; }
 .nav-cta {
  background:var(--orange); color:#fff; padding:8px 20px;
  border-radius:8px; font-size:13px; font-weight:700; transition:opacity 0.15s;
@@ -438,96 +438,123 @@ footer { background:var(--surface); border-top:1px solid var(--border); padding:
 }
 
 /* ═══ REDESIGN HOME STYLES ═══ */
+/* ── NEW HERO ── */
+@import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;800;900&display=swap');
+@keyframes heroFadeUp { from { opacity:0; transform:translateY(22px); } to { opacity:1; transform:translateY(0); } }
+@keyframes heroPulse { 0%,100%{opacity:1;transform:scale(1);}50%{opacity:0.4;transform:scale(0.75);} }
+
 .rh-hero {
-  min-height:100vh; display:flex; flex-direction:column; justify-content:flex-end;
-  padding:120px 48px 56px; position:relative; overflow:hidden; background:var(--bg);
+  min-height:100vh; display:flex; flex-direction:column;
+  align-items:center; justify-content:center;
+  text-align:center; padding:110px 24px 72px;
+  position:relative; overflow:hidden;
+  background:#fff;
 }
-@media(max-width:768px){.rh-hero{padding:100px 24px 48px;}}
-.rh-hero-bg {
-  position:absolute; inset:0;
-  background: radial-gradient(ellipse 80% 60% at 70% 40%, rgba(255,107,53,0.12) 0%, transparent 60%),
-              radial-gradient(ellipse 60% 80% at 20% 80%, rgba(255,107,53,0.06) 0%, transparent 50%);
+#heroParticleCanvas { position:absolute; inset:0; z-index:0; pointer-events:none; }
+.rh-hero-bg { display:none; }
+.rh-hero-grid { display:none; }
+.rh-ticker { display:none; }
+.rh-hero-content { position:relative; z-index:2; max-width:840px; text-align:center; }
+.rh-toggle { display:none; }
+
+.hero-city-tag {
+  display:inline-flex; align-items:center; gap:7px;
+  background:#fff5f0; border:1px solid rgba(255,107,53,0.2); border-radius:4px;
+  padding:5px 14px;
+  font-family:'Barlow Condensed',sans-serif;
+  font-size:11px; font-weight:700; letter-spacing:2.5px; text-transform:uppercase;
+  color:var(--orange); margin-bottom:28px;
+  animation:heroFadeUp 0.6s ease both;
 }
-.rh-hero-grid {
-  position:absolute; inset:0;
-  background-image: linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
-                    linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
-  background-size:40px 40px;
-  mask-image:linear-gradient(to bottom, transparent 0%, black 30%, black 70%, transparent 100%);
-}
-.rh-ticker {
-  position:absolute; top:62px; left:0; right:0; overflow:hidden;
-  padding:10px 0; border-top:1px solid rgba(255,255,255,0.06);
-  border-bottom:1px solid rgba(255,255,255,0.06); background:rgba(255,107,53,0.04);
-}
-.rh-ticker-track {
-  display:flex; gap:48px; animation:rh-ticker 24s linear infinite; white-space:nowrap;
-}
-.rh-ticker-item {
-  font-family:Inter,sans-serif; font-weight:600; font-size:11px;
-  letter-spacing:2px; color:var(--orange); text-transform:uppercase;
-  display:flex; align-items:center; gap:12px; flex-shrink:0;
-}
-.rh-ticker-dot { width:4px; height:4px; background:var(--orange); border-radius:50%; }
-@keyframes rh-ticker { from{transform:translateX(0);} to{transform:translateX(-50%);} }
-.rh-hero-content { position:relative; z-index:2; max-width:620px; }
-.rh-toggle { display:flex; gap:8px; margin-bottom:28px; flex-wrap:wrap; }
-.rh-pill {
-  font-family:Inter,sans-serif; font-weight:700; font-size:12px;
-  letter-spacing:1px; text-transform:uppercase; padding:7px 16px;
-  border-radius:100px; border:1px solid rgba(255,255,255,0.1);
-  cursor:pointer; transition:all 0.2s; color:rgba(255,255,255,0.45); background:transparent;
-}
-.rh-pill.active { background:var(--orange); border-color:var(--orange); color:#fff; }
-.rh-eyebrow {
-  font-family:Inter,sans-serif; font-weight:700; font-size:12px;
-  letter-spacing:3px; text-transform:uppercase; color:var(--orange); margin-bottom:16px;
-}
+.hero-city-dot { width:6px; height:6px; border-radius:50%; background:var(--orange); animation:heroPulse 2s infinite; }
+
 .rh-headline {
-  font-family:Inter,sans-serif; font-size:clamp(60px,12vw,96px);
-  line-height:0.92; letter-spacing:1px; margin-bottom:22px;
+  font-family:'Barlow Condensed',sans-serif; font-weight:900;
+  font-size:clamp(72px,13vw,130px); line-height:0.9;
+  letter-spacing:-1px; text-transform:uppercase; color:#0f0f0f;
+  margin-bottom:24px; animation:heroFadeUp 0.6s 0.08s ease both;
 }
 .rh-headline .rh-accent { color:var(--orange); }
-.rh-headline .rh-outline {
-  -webkit-text-stroke:1.5px rgba(255,255,255,0.25); color:transparent;
-}
+.rh-headline .rh-outline { color:#0f0f0f; }
+
 .rh-sub {
-  font-size:16px; color:rgba(255,255,255,0.6); line-height:1.65;
-  max-width:400px; margin-bottom:36px;
+  font-size:18px; color:#555; line-height:1.65;
+  max-width:520px; margin:0 auto 36px; font-weight:400;
+  animation:heroFadeUp 0.6s 0.14s ease both;
 }
-.rh-sub strong { color:#fff; font-weight:600; }
-.rh-ctas { display:flex; gap:12px; margin-bottom:48px; flex-wrap:wrap; }
+.rh-sub strong { color:#111; font-weight:600; }
+
+.rh-ctas {
+  display:flex; align-items:center; justify-content:center;
+  gap:12px; flex-wrap:wrap; margin-bottom:44px;
+  animation:heroFadeUp 0.6s 0.2s ease both;
+}
 .rh-btn-primary {
   display:inline-flex; align-items:center; gap:8px;
   background:var(--orange); color:#fff; border:none;
-  padding:16px 28px; border-radius:10px;
-  font-family:Inter,sans-serif; font-weight:700; font-size:16px;
-  letter-spacing:0.5px; cursor:pointer; transition:all 0.2s; text-decoration:none;
+  font-family:'Barlow Condensed',sans-serif; font-weight:800; font-size:19px;
+  letter-spacing:0.5px; text-transform:uppercase;
+  padding:16px 52px; border-radius:6px;
+  cursor:pointer; transition:all 0.2s; text-decoration:none;
 }
-.rh-btn-primary:hover { background:#e55a1a; transform:translateY(-1px); }
+.rh-btn-primary:hover { transform:translateY(-2px); box-shadow:0 10px 32px rgba(255,107,53,0.35); background:var(--orange); }
 .rh-btn-secondary {
   display:inline-flex; align-items:center; gap:8px;
-  background:transparent; color:#fff; border:1px solid rgba(255,255,255,0.15);
-  padding:14px 24px; border-radius:10px;
+  background:transparent; color:#111; border:1.5px solid #e8e8e8;
   font-family:Inter,sans-serif; font-weight:600; font-size:15px;
-  letter-spacing:0.5px; cursor:pointer; transition:all 0.2s; text-decoration:none;
+  padding:15px 28px; border-radius:6px;
+  cursor:pointer; transition:all 0.2s; text-decoration:none;
 }
-.rh-btn-secondary:hover { border-color:rgba(255,255,255,0.35); background:rgba(255,255,255,0.04); }
+.rh-btn-secondary:hover { border-color:#aaa; background:transparent; }
+
 .rh-proof {
-  display:flex; gap:32px; padding-top:28px;
-  border-top:1px solid rgba(255,255,255,0.08); flex-wrap:wrap;
+  display:flex; align-items:center; justify-content:center;
+  gap:28px; flex-wrap:wrap;
+  animation:heroFadeUp 0.6s 0.26s ease both;
+  border-top:none; padding-top:0;
 }
-.rh-proof-num {
-  font-family:Inter,sans-serif; font-size:30px; color:var(--orange); line-height:1;
+.rh-proof-num { font-family:'Barlow Condensed',sans-serif; font-size:15px; color:#111; font-weight:700; letter-spacing:0.3px; }
+.rh-proof-label { display:none; }
+.proof-sep { width:1px; height:18px; background:#e8e8e8; }
+
+/* Trust bar */
+.rh-trust-bar {
+  background:#f7f6f4; border-top:1px solid #e8e8e8; border-bottom:1px solid #e8e8e8;
+  padding:14px 48px; display:flex; align-items:center; justify-content:center;
+  gap:36px; flex-wrap:wrap;
 }
-.rh-proof-label {
-  font-size:11px; font-weight:600; letter-spacing:1px; text-transform:uppercase;
-  color:rgba(255,255,255,0.4); margin-top:3px;
+.rh-trust-item { font-size:12px; font-weight:700; letter-spacing:1px; text-transform:uppercase; color:#999; display:flex; align-items:center; gap:7px; }
+.rh-trust-check { width:16px; height:16px; border-radius:50%; background:var(--orange); display:flex; align-items:center; justify-content:center; font-size:9px; color:#fff; font-weight:900; flex-shrink:0; }
+
+/* Events section */
+.rh-events-section { padding:64px 48px; max-width:1140px; margin:0 auto; }
+@media(max-width:768px){ .rh-events-section{padding:48px 20px;} }
+.rh-events-header { display:flex; align-items:flex-end; justify-content:space-between; margin-bottom:28px; flex-wrap:wrap; gap:12px; }
+.rh-events-label { font-family:'Barlow Condensed',sans-serif; font-weight:900; font-size:clamp(28px,4vw,42px); text-transform:uppercase; color:#0f0f0f; line-height:1; }
+.rh-events-label span { color:var(--orange); }
+.rh-view-all { font-size:13px; font-weight:700; color:var(--orange); background:none; border:none; cursor:pointer; font-family:Inter,sans-serif; }
+.rh-events-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:16px; }
+@media(max-width:900px){ .rh-events-grid{grid-template-columns:1fr 1fr;} }
+@media(max-width:560px){ .rh-events-grid{grid-template-columns:1fr;} }
+
+.rh-event-card { background:#fff; border:1px solid #e8e8e8; border-radius:12px; overflow:hidden; cursor:pointer; transition:all 0.2s; }
+.rh-event-card:hover { transform:translateY(-4px); box-shadow:0 16px 40px rgba(0,0,0,0.09); border-color:#ccc; }
+.rh-event-card-img { height:156px; background:#f7f6f4; display:flex; align-items:center; justify-content:center; font-size:44px; position:relative; overflow:hidden; }
+.rh-event-card-img img { width:100%; height:100%; object-fit:cover; }
+.rh-badge-featured { position:absolute; top:10px; left:10px; background:var(--orange); color:#fff; font-size:10px; font-weight:800; letter-spacing:1px; text-transform:uppercase; padding:3px 9px; border-radius:4px; }
+.rh-badge-free { position:absolute; top:10px; right:10px; background:#111; color:#fff; font-size:10px; font-weight:800; padding:3px 9px; border-radius:4px; }
+.rh-event-card-body { padding:16px; }
+.rh-event-card-cat { font-size:10px; font-weight:700; letter-spacing:1.5px; text-transform:uppercase; color:var(--orange); margin-bottom:6px; }
+.rh-event-card-title { font-family:'Barlow Condensed',sans-serif; font-weight:800; font-size:18px; text-transform:uppercase; line-height:1.1; color:#0f0f0f; margin-bottom:8px; }
+.rh-event-card-venue { font-size:12px; color:#999; margin-bottom:10px; }
+.rh-event-card-date { display:inline-flex; align-items:center; gap:5px; background:#f7f6f4; border-radius:5px; padding:5px 10px; font-size:12px; font-weight:600; color:#111; }
+
+@media(max-width:768px){
+  .rh-hero{ padding:90px 20px 52px; }
+  .rh-trust-bar{ padding:14px 20px; gap:20px; }
 }
-/* Urgency banner */
-.rh-urgency {
-  margin:0 0 0; padding:24px 48px; background:var(--bg);
-}
+/* Keep urgency and sections below intact */
+.rh-urgency { margin:0; padding:24px 48px; background:var(--bg); }
 @media(max-width:768px){.rh-urgency{padding:16px 24px;}}
 .rh-urgency-inner {
   background:linear-gradient(135deg,rgba(255,107,53,0.12),rgba(255,107,53,0.04));
@@ -1004,6 +1031,76 @@ function renderFeaturedEvent(){
   if(btns) btns.insertBefore(viewBtn, btns.children[btns.children.length-1]);
 }
 
+// ── HOME EVENT CARDS ─────────────────────────────────────────
+const HOME_EVENT_ICONS=['🎵','🎉','🎭','🎤','🥂','🎸','🏆','🎊'];
+const HOME_EVENT_PLACEHOLDERS=[
+  {title:'Columbus Night Market',category:'Nightlife',venueName:'Short North',dateStr:'Sat Mar 22',is_free:true},
+  {title:'Live Jazz Evening',category:'Music',venueName:'German Village',dateStr:'Fri Mar 21',is_free:false},
+  {title:'Comedy Night Out',category:'Comedy',venueName:'Arena District',dateStr:'Sun Mar 23',is_free:false},
+  {title:'Rooftop Social',category:'Networking',venueName:'Downtown Columbus',dateStr:'Thu Mar 20',is_free:true},
+];
+function renderHomeEventCards(events){
+  const items=events&&events.length?events.slice(0,4):null;
+  if(!items){
+    return HOME_EVENT_PLACEHOLDERS.map((e,i)=>`
+      <div class="rh-event-card" style="opacity:0.6">
+        <div class="rh-event-card-img"><span>${HOME_EVENT_ICONS[i]}</span>${e.is_free?'<div class="rh-badge-free">Free</div>':''}</div>
+        <div class="rh-event-card-body">
+          <div class="rh-event-card-cat">${e.category}</div>
+          <div class="rh-event-card-title">${e.title}</div>
+          <div class="rh-event-card-venue">📍 ${e.venueName}</div>
+          <div class="rh-event-card-date">📅 ${e.dateStr}</div>
+        </div>
+      </div>`).join('');
+  }
+  return items.map((e,i)=>`
+    <div class="rh-event-card" onclick="openEventModal('${e.id}')">
+      <div class="rh-event-card-img">
+        ${e.cover_image_url?`<img src="${e.cover_image_url}" alt="${e.title}" onerror="this.parentNode.innerHTML='<span>${HOME_EVENT_ICONS[i]}</span>'">`:`<span>${HOME_EVENT_ICONS[i%HOME_EVENT_ICONS.length]}</span>`}
+        ${e.is_boosted?'<div class="rh-badge-featured">Featured</div>':''}
+        ${e.is_free?'<div class="rh-badge-free">Free</div>':''}
+      </div>
+      <div class="rh-event-card-body">
+        <div class="rh-event-card-cat">${e.category||'Event'}</div>
+        <div class="rh-event-card-title">${e.title}</div>
+        <div class="rh-event-card-venue">📍 ${e.venues?.name||'Columbus Venue'}</div>
+        <div class="rh-event-card-date">📅 ${fmt(e.start_time)}</div>
+      </div>
+    </div>`).join('');
+}
+
+function initHeroParticles(){
+  const canvas=document.getElementById('heroParticleCanvas');
+  if(!canvas)return;
+  const ctx=canvas.getContext('2d');
+  let W,H,particles=[];
+  function resize(){W=canvas.width=canvas.parentElement.offsetWidth;H=canvas.height=canvas.parentElement.offsetHeight;}
+  function rand(a,b){return a+Math.random()*(b-a);}
+  function mkP(){
+    const inLeft=Math.random()>0.5;
+    return{x:inLeft?rand(0,W*0.18):rand(W*0.82,W),y:rand(0,H),size:rand(3,12),opacity:rand(0.05,0.2),vx:rand(-0.12,0.12),vy:rand(-0.25,-0.06),phase:rand(0,Math.PI*2),phaseSpeed:rand(0.007,0.018),shape:Math.random()>0.55?'circle':'square'};
+  }
+  function init(){resize();particles=Array.from({length:32},mkP);}
+  function draw(){
+    ctx.clearRect(0,0,W,H);
+    particles.forEach(p=>{
+      p.phase+=p.phaseSpeed;
+      ctx.globalAlpha=p.opacity*(0.65+0.35*Math.sin(p.phase));
+      ctx.fillStyle='#FF6B35';
+      if(p.shape==='circle'){ctx.beginPath();ctx.arc(p.x,p.y,p.size/2,0,Math.PI*2);ctx.fill();}
+      else{ctx.save();ctx.translate(p.x,p.y);ctx.rotate(p.phase*0.5);const s=p.size*0.72;ctx.fillRect(-s/2,-s/2,s,s);ctx.restore();}
+      p.x+=p.vx;p.y+=p.vy;
+      if(p.y<-20)p.y=H+20;
+      if(p.x<-20)p.x=W+20;
+      if(p.x>W+20)p.x=-20;
+    });
+    ctx.globalAlpha=1;
+    requestAnimationFrame(draw);
+  }
+  window.addEventListener('resize',init);
+  init();draw();
+}
+
 // ── HOME ──────────────────────────────────────────────────────
 function renderHome(){
  const thisWeek=allEvents.filter(e=>isThisWeek(e.start_time)).slice(0,4);
@@ -1024,42 +1121,42 @@ function renderHome(){
 
  <!-- ═══ HERO ═══ -->
  <section class="rh-hero">
-   <div class="rh-hero-bg"></div>
-   <div class="rh-hero-grid"></div>
-   <div class="rh-ticker">
-     <div class="rh-ticker-track">${tickerHTML(tickerItems)}${tickerHTML(tickerItems)}</div>
-   </div>
+   <canvas id="heroParticleCanvas"></canvas>
    <div class="rh-hero-content">
-     <div class="rh-toggle">
-       <button class="rh-pill active" onclick="rhSwitch('venues',this)">Venue Owners</button>
-       <button class="rh-pill" onclick="rhSwitch('vendors',this)">Vendors</button>
-       <button class="rh-pill" onclick="rhSwitch('planners',this)">Planners</button>
-       <button class="rh-pill" onclick="rhSwitch('attendees',this)">Attendees</button>
-     </div>
-     <p class="rh-eyebrow">Columbus, Ohio</p>
-     <h1 class="rh-headline" id="rhHeadline">Your Venue.<br>Every <span class="rh-accent">Planner</span><br>In Columbus.</h1>
-     <p class="rh-sub" id="rhSub"><strong>Stop waiting for word of mouth.</strong> Get your space in front of the planners, organizers, and bookers who are actively searching — right now.</p>
+     <div class="hero-city-tag"><div class="hero-city-dot"></div> Columbus, Ohio</div>
+     <h1 class="rh-headline" id="rhHeadline">Columbus<br><span class="rh-accent">Events</span><br><span class="rh-outline">Start Here.</span></h1>
+     <p class="rh-sub" id="rhSub">The platform connecting <strong>venues, vendors, planners, and attendees</strong> across Columbus. One ecosystem. Every event.</p>
      <div class="rh-ctas" id="rhCtas">
-       <a href="https://cbusevents.com/list-your-venue.html" class="rh-btn-primary">List Your Venue Free →</a>
-       <button class="rh-btn-secondary" onclick="showPage('venues')">Browse Venues</button>
+       <a href="https://cbusevents.com/auth.html?new=true" class="rh-btn-primary">Join Free Today</a>
+       <button class="rh-btn-secondary" onclick="showPage('events')">Browse Events →</button>
      </div>
      <div class="rh-proof">
-       <div><div class="rh-proof-num">49.6M</div><div class="rh-proof-label">Annual Columbus Visitors</div></div>
-       <div><div class="rh-proof-num">$6.6B</div><div class="rh-proof-label">Spent on Events Yearly</div></div>
-       <div><div class="rh-proof-num">#2</div><div class="rh-proof-label">Fastest-Growing U.S. City</div></div>
+       <div class="rh-proof-num">📍 <strong>Columbus-Only</strong> Platform</div>
+       <div class="proof-sep"></div>
+       <div class="rh-proof-num">🎟️ <strong>Free</strong> to Start</div>
+       <div class="proof-sep"></div>
+       <div class="rh-proof-num">⚡ <strong>Live</strong> Ticketing Built In</div>
      </div>
    </div>
  </section>
 
- <!-- ═══ URGENCY BANNER ═══ -->
- <div class="rh-urgency">
-   <div class="rh-urgency-inner" onclick="window.location.href='https://cbusevents.com/list-your-venue.html'">
-     <div class="rh-urgency-icon">🔥</div>
-     <div style="flex:1">
-       <div class="rh-urgency-title">Founding Venue Spots Closing</div>
-       <div class="rh-urgency-desc">Early venues get <strong>permanent featured placement</strong> as Columbus grows. Don't let your competitor claim it first.</div>
+ <!-- ═══ TRUST BAR ═══ -->
+ <div class="rh-trust-bar">
+   <div class="rh-trust-item"><div class="rh-trust-check">✓</div> No contracts</div>
+   <div class="rh-trust-item"><div class="rh-trust-check">✓</div> Free to list</div>
+   <div class="rh-trust-item"><div class="rh-trust-check">✓</div> Live ticketing</div>
+   <div class="rh-trust-item"><div class="rh-trust-check">✓</div> Direct connections</div>
+   <div class="rh-trust-item"><div class="rh-trust-check">✓</div> Columbus-built</div>
+ </div>
+
+ <!-- ═══ LIVE EVENTS ═══ -->
+ <div style="background:#fff;">
+   <div class="rh-events-section">
+     <div class="rh-events-header">
+       <div class="rh-events-label">Happening in <span>Columbus</span></div>
+       <button class="rh-view-all" onclick="showPage('events')">View All Events →</button>
      </div>
-     <div style="font-size:20px;color:var(--orange);flex-shrink:0">›</div>
+     <div class="rh-events-grid" id="homeEventsGrid">${renderHomeEventCards(allUpcoming)}</div>
    </div>
  </div>
 
@@ -1298,7 +1395,7 @@ function renderHome(){
    <h2 class="rh-final-title">Your next<br>booking starts<br><span>here.</span></h2>
    <p class="rh-final-sub">Columbus is growing. The venues and vendors that get in now build the authority every newcomer sees first. It's free to start.</p>
    <div class="rh-final-btns">
-     <a href="https://cbusevents.com/list-your-venue.html" class="rh-btn-primary">List Your Venue Free →</a>
+     <a href="https://cbusevents.com/auth.html?new=true" class="rh-btn-primary">Join Free Today →</a>
      <a href="https://cbusevents.com/vendors.html" class="rh-btn-secondary">List Your Services →</a>
      <a href="https://cbusevents.com/planners.html" class="rh-btn-secondary">Join as a Planner →</a>
    </div>
@@ -1306,6 +1403,7 @@ function renderHome(){
 
  ${footer()}
  `;
+ requestAnimationFrame(initHeroParticles);
 }
 
 function initHero(){

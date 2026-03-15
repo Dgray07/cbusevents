@@ -209,8 +209,47 @@
   }
   @keyframes spin { to { transform: rotate(360deg); } }
 
+  /* New user view */
+  #newUserView { display: none; }
+  .role-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 9px;
+    margin-bottom: 4px;
+  }
+  .role-tile {
+    background: var(--bg);
+    border: 1.5px solid var(--border);
+    border-radius: 12px;
+    padding: 16px 14px;
+    text-decoration: none;
+    display: block;
+    transition: all 0.18s;
+    position: relative;
+    cursor: pointer;
+  }
+  .role-tile:hover {
+    border-color: var(--orange);
+    background: rgba(255,107,53,0.07);
+    transform: translateY(-2px);
+  }
+  .role-icon { font-size: 22px; margin-bottom: 8px; display: block; }
+  .role-name {
+    font-family: 'Syne', sans-serif;
+    font-size: 14px; font-weight: 700;
+    color: var(--text); margin-bottom: 3px;
+  }
+  .role-desc { font-size: 11px; color: var(--sub); line-height: 1.4; }
+  .role-arrow {
+    position: absolute; top: 11px; right: 11px;
+    color: var(--muted); font-size: 11px;
+    transition: color 0.2s;
+  }
+  .role-tile:hover .role-arrow { color: var(--orange); }
+
   @media (max-width: 400px) {
     .portal-grid { grid-template-columns: 1fr; }
+    .role-grid { grid-template-columns: 1fr; }
   }
 </style>
 </head>
@@ -220,6 +259,42 @@
   <p class="tagline">Columbus's event ecosystem</p>
 
   <div class="card">
+
+    <!-- NEW USER — shown when ?new=true -->
+    <div id="newUserView">
+      <div class="section-title">Create your free account</div>
+      <p class="section-sub">Pick your role to get started. Free forever to join.</p>
+
+      <div class="role-grid">
+        <a class="role-tile" href="https://cbusevents.com/cbus-venue-portal.html">
+          <span class="role-icon">🏛</span>
+          <div class="role-name">Venue Owner</div>
+          <div class="role-desc">List your space, get discovered by planners</div>
+          <span class="role-arrow">↗</span>
+        </a>
+        <a class="role-tile" href="https://cbusevents.com/cbus-planner-portal.html">
+          <span class="role-icon">📋</span>
+          <div class="role-name">Event Planner</div>
+          <div class="role-desc">Browse venues, hire vendors, manage events</div>
+          <span class="role-arrow">↗</span>
+        </a>
+        <a class="role-tile" href="https://cbusevents.com/cbus-vendor-portal.html">
+          <span class="role-icon">🎛</span>
+          <div class="role-name">Vendor</div>
+          <div class="role-desc">Offer your services, get booked by planners</div>
+          <span class="role-arrow">↗</span>
+        </a>
+        <a class="role-tile" href="https://cbusevents.com/customer-portal.html">
+          <span class="role-icon">🎟</span>
+          <div class="role-name">Attendee</div>
+          <div class="role-desc">Discover events happening across Columbus</div>
+          <span class="role-arrow">↗</span>
+        </a>
+      </div>
+
+      <div class="divider"><span>Already have an account?</span></div>
+      <button class="btn-primary" style="background:var(--surface);border:1.5px solid var(--border);color:var(--text);" onclick="showSignin()">Sign In →</button>
+    </div>
 
     <!-- SIGN IN -->
     <div id="signinView">
@@ -307,6 +382,13 @@ const PORTAL_URLS = {
   if (session?.user) await redirectByRole(session.user.id);
 })();
 
+// Show new user signup view if ?new=true
+const urlParams = new URLSearchParams(window.location.search);
+if (urlParams.get('new') === 'true') {
+  document.getElementById('newUserView').style.display = 'block';
+  document.getElementById('signinView').style.display = 'none';
+}
+
 // Password recovery
 sb.auth.onAuthStateChange(async (event, session) => {
   if (event === 'PASSWORD_RECOVERY') {
@@ -367,10 +449,12 @@ async function doReset() {
 
 function showReset() {
   document.getElementById('signinView').style.display = 'none';
+  document.getElementById('newUserView').style.display = 'none';
   document.getElementById('resetView').style.display  = 'block';
 }
 function showSignin() {
   document.getElementById('resetView').style.display  = 'none';
+  document.getElementById('newUserView').style.display = 'none';
   document.getElementById('signinView').style.display = 'block';
 }
 </script>
