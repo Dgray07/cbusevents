@@ -979,10 +979,7 @@ h1,h2,h3,h4,h5,h6{font-family:Inter,sans-serif;letter-spacing:-0.02em;}
         const { data, error } = await sb.auth.signUp({
           email,
           password,
-          options: {
-            data: meta,
-            emailRedirectTo: 'https://cbusevents.com/auth.html'
-          }
+          options: { data: meta }
         });
 
         if (error) throw error;
@@ -1098,7 +1095,7 @@ h1,h2,h3,h4,h5,h6{font-family:Inter,sans-serif;letter-spacing:-0.02em;}
       try {
         const [venues, vendors, planners] = await Promise.all([
           sb.from('venues').select('id', { count: 'exact', head: true }),
-          sb.from('user_roles').select('id', { count: 'exact', head: true }).eq('role', 'vendor'),
+          sb.from('vendors').select('id', { count: 'exact', head: true }),
           sb.from('user_roles').select('id', { count: 'exact', head: true }).eq('role', 'planner')
         ]);
         animateCount('venueCount', venues.count || 0);
