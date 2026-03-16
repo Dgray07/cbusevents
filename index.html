@@ -825,16 +825,29 @@ h1,h2,h3,h4,h5,h6{font-family:Inter,sans-serif;letter-spacing:-0.02em;}
   body.sticky-cta-active { padding-bottom: 88px; }
 }
 #sticky-cta-bar.is-visible { transform: translateY(0); }
+#sticky-cta-row {
+  display: flex; gap: 8px; align-items: center;
+}
 #sticky-cta-btn {
-  display: flex; align-items: center; justify-content: center; gap: 8px;
-  width: 100%; background: #FF6B35; color: #fff;
-  font-family: Inter,sans-serif; font-weight: 800; font-size: 16px;
-  padding: 15px 24px; border-radius: 12px; border: none; cursor: pointer;
+  display: flex; align-items: center; justify-content: center; gap: 6px;
+  flex: 1; background: #FF6B35; color: #fff;
+  font-family: Inter,sans-serif; font-weight: 800; font-size: 15px;
+  padding: 14px 16px; border-radius: 12px; border: none; cursor: pointer;
   text-decoration: none;
   box-shadow: 0 0 0 1px rgba(255,107,53,0.25), 0 8px 24px rgba(255,107,53,0.3);
   transition: opacity 0.15s, transform 0.15s;
 }
 #sticky-cta-btn:active { opacity: 0.9; transform: scale(0.985); }
+.sticky-nav-btn {
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px;
+  flex: 0 0 64px; background: rgba(255,255,255,0.05); color: rgba(255,255,255,0.65);
+  font-family: Inter,sans-serif; font-weight: 600; font-size: 10px;
+  padding: 10px 8px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.08);
+  cursor: pointer; text-decoration: none; letter-spacing: 0.3px;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+.sticky-nav-btn:active { background: rgba(255,107,53,0.12); color: #FF6B35; border-color: rgba(255,107,53,0.3); }
+.sticky-nav-btn-icon { font-size: 18px; line-height: 1; }
 #sticky-cta-sub {
   text-align: center; font-size: 11px; color: rgba(255,255,255,0.32);
   font-family: Inter,sans-serif; margin-top: 6px; letter-spacing: 0.3px;
@@ -2447,10 +2460,18 @@ async function toggleSaveEvent(eventId, btn, e){
 </script>
 <!-- STICKY CTA BAR -->
 <div id="sticky-cta-bar" aria-label="Join CBUSEVENTS free">
-  <a id="sticky-cta-btn" href="https://cbusevents.com/auth.html?new=true">
-    🎟️ Join Free Today
-  </a>
-  <div id="sticky-cta-sub">No credit card &nbsp;·&nbsp; Listed in under 10 min</div>
+  <div id="sticky-cta-row">
+    <button class="sticky-nav-btn" onclick="showPage('events')">
+      <span class="sticky-nav-btn-icon">🎟️</span>Events
+    </button>
+    <a id="sticky-cta-btn" href="https://cbusevents.com/auth.html?new=true">
+      Join Free Today
+    </a>
+    <button class="sticky-nav-btn" onclick="showPage('venues')">
+      <span class="sticky-nav-btn-icon">📍</span>Venues
+    </button>
+  </div>
+  <div id="sticky-cta-sub">No credit card &nbsp;·&nbsp; Free to start</div>
 </div>
 <script>
 (function(){
