@@ -1404,6 +1404,34 @@ const OUTREACH_DISTRICTS={
      {id:'sn-pearl',name:'The Pearl',address:'641 N High St',type:'Seafood Restaurant / Bar',events:'Oyster bar pop-ups, holiday dinners, upscale brunch parties',rating:'4.6',phone:'6142270151'},
    ]
  },
+ 'east-columbus':{
+   label:'East Columbus',
+   venues:[
+     {id:'ec-the-kee',name:'The Kee',address:'225 Neilston St, Columbus 43215',type:'Bar / Event Venue / Restaurant',events:'Private parties, birthday brunch, pool tables, art gallery events, DJ nights',rating:'4.3',phone:'3802155500'},
+     {id:'ec-genesis-downtown',name:'GENESIS Downtown',address:'174 E Long St #100, Columbus 43215',type:'Event Venue',events:'Weddings, corporate events, birthday parties — 92-person capacity',rating:'5.0',phone:'6147267360'},
+     {id:'ec-legacy-house-614',name:'Legacy House 614',address:'208 E State St, Columbus 43215',type:'Boutique Event Venue',events:'Themed parties, workshops, bridal showers, pop-ups — velvet/gold aesthetic',rating:'5.0',phone:'6142184042'},
+     {id:'ec-the-walrus',name:'The Walrus',address:'143 E Main St, Columbus 43215',type:'Bar / Grill / Live Music',events:'Live music nights, sports watch parties, birthday bar events, DJ nights',rating:'4.4',phone:'6148171710'},
+     {id:'ec-the-kitchen',name:'The Kitchen',address:'231 E Livingston Ave, Columbus 43215',type:'Event Venue / Participatory Dining',events:'Corporate parties, cooking competitions, rehearsal dinners, receptions',rating:'4.6',phone:'6142258940'},
+     {id:'ec-hickory-room',name:'Hickory Room at Wolf\'s Ridge Brewing',address:'215 N 4th St, Columbus 43215',type:'Private Event Room / Brewery',events:'Corporate events, birthday parties — private bar, coat room, restrooms',rating:'4.7',phone:'6144293936'},
+     {id:'ec-wells-barn',name:'The Wells Barn at Franklin Park',address:'1851 E Broad St, Columbus 43205',type:'Rustic Event Venue',events:'Weddings, receptions, galas, speaking events — fireplace, indoor/outdoor',rating:'4.7',phone:'6147158000'},
+     {id:'ec-loft-91',name:'Loft 91 Event Venue',address:'889 E Long St, Columbus 43203',type:'Loft / Event Space',events:'Private events, pop-ups, photoshoots — exposed brick, aesthetic space',rating:'5.0',phone:'6145822978'},
+     {id:'ec-columbus-brewing',name:'Columbus Brewing Company Beer Hall',address:'200 Kelton Ave, Columbus 43205',type:'Brewery / Restaurant',events:'Private events, beer tastings, corporate gatherings, parties',rating:'4.5',phone:'6142745199'},
+     {id:'ec-den-parsons-north',name:'The Den at Parsons North',address:'689 Parsons Ave, Columbus 43206',type:'Bar / Private Event Room',events:'Rehearsal dinners, welcome parties, bridal showers — dedicated bar + bartender',rating:'4.7',phone:'6144004536'},
+     {id:'ec-ms-vikkis',name:'Ms Vikki\'s Restaurant & Banquet',address:'2167 E Livingston Ave, Columbus 43209',type:'Restaurant / Banquet Hall',events:'Birthday parties, family events, repasts — full-service, affordable',rating:'4.5',phone:'6142354997'},
+     {id:'ec-apex-events',name:'Apex Events Venue',address:'1381 S Hamilton Rd, Columbus 43227',type:'Event Venue',events:'Engagements, birthdays, baby showers — BYO food/drinks, patio, 4.9 stars',rating:'4.9',phone:'6149570709'},
+     {id:'ec-social-club',name:'The Social Club Lounge and Event Venue',address:'4419 Crossroads Center, Columbus 43232',type:'Bar & Grill / Event Lounge',events:'Community events, bar nights, private parties — SE Columbus',rating:'4.2',phone:''},
+     {id:'ec-ave-space',name:'The Ave Space',address:'4284 Macsway Ave, Columbus 43232',type:'Large Event Hall',events:'Gospel nights, comedy shows, corporate events — 240+ capacity, stage, kitchen',rating:'5.0',phone:'6144012267'},
+     {id:'ec-duggie-sports-bar',name:'The Duggie Sports Bar',address:'14952 E Broad St, Reynoldsburg 43068',type:'Sports Bar / Event Venue',events:'Watch parties, karaoke, DJ nights, pool — heated patio bar',rating:'4.3',phone:'7409195140'},
+     {id:'ec-derby-east',name:'The Derby East',address:'6224 E Livingston Ave, Reynoldsburg 43068',type:'Bar',events:'Karaoke, pool tables, outdoor seating — neighborhood anchor',rating:'4.2',phone:'6149869295'},
+     {id:'ec-jillys-saloon',name:"Jilly's Saloon",address:'6842 E Main St, Reynoldsburg 43068',type:'Bar',events:'Karaoke Fridays, pool table — BYO food allowed',rating:'4.4',phone:'6148619813'},
+     {id:'ec-creekside',name:'Creekside Conference & Event Center',address:'101 Mill St Ste 300, Gahanna 43230',type:'Full-Service Event Center / Banquet Hall',events:'Weddings, corporate events, galas — catering, DJ, bar, creek-side setting',rating:'4.6',phone:'6144168188'},
+     {id:'ec-gahanna-sanctuary',name:'Gahanna Sanctuary',address:'82 N High St, Gahanna 43230',type:'Historic Church Venue',events:'Weddings, receptions — stained glass, hardwood floors, cocktail room, budget-friendly',rating:'4.5',phone:'6144142065'},
+     {id:'ec-la-navona',name:'La Navona',address:'154 N Hamilton Rd, Gahanna 43230',type:'Full-Service Event Venue',events:'Weddings, receptions — in-house DJ, catering, coordinator, 5-star reviews',rating:'4.7',phone:'6145325711'},
+     {id:'ec-the-well-gahanna',name:'The Well (Gahanna)',address:'140 N High St, Gahanna 43230',type:'Cafe / Community Event Space',events:'Meetings, private room rental, small gatherings — coffee + community',rating:'5.0',phone:''},
+     {id:'ec-edison-venues',name:'Edison Venues (The Peak)',address:'781 Science Blvd, Gahanna 43230',type:'Modern Event Venue',events:'Weddings, corporate events — floor-to-ceiling windows, industrial chic, airport-adjacent',rating:'4.9',phone:'6147626201'},
+     {id:'ec-moment-to-remember',name:'A Moment to Remember Events & Rentals',address:'5600 Gender Rd, Canal Winchester 43110',type:'DIY Event Space',events:'Weddings, baby showers, birthdays — DIY-friendly, bar space, no restrictions',rating:'4.8',phone:'6146193524'},
+   ]
+ },
  'dublin':{
    label:'Dublin',
    venues:[
@@ -1432,7 +1460,7 @@ const STATUS_COLORS={'Not Contacted':'badge-muted','Visited — No Answer':'badg
 function getOutreachData(){try{return JSON.parse(localStorage.getItem('cbusevents_outreach')||'{}');}catch(e){return{};}}
 function saveOutreachData(d){localStorage.setItem('cbusevents_outreach',JSON.stringify(d));}
 
-let _orDistrict='short-north',_orQ='',_orS='';
+let _orDistrict='east-columbus',_orQ='',_orS='';
 
 function renderOutreach(){
  const data=getOutreachData();
@@ -1520,9 +1548,13 @@ function renderOutreachCards(){
        </select>
      </div>
      <div>
-       <div style="font-size:10px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:1px;margin-bottom:5px">Notes</div>
+       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px">
+         <div style="font-size:10px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:1px">Notes</div>
+         <div id="note-saved-${v.id}" style="font-size:10px;color:var(--green);opacity:0;transition:opacity 0.3s">✓ Saved</div>
+       </div>
        <textarea placeholder="Contact name, what they said, follow-up needed..."
-         onblur="updateOutreachNotes('${v.id}',this.value)"
+         oninput="debounceSaveNote('${v.id}',this.value)"
+         onblur="saveNoteNow('${v.id}',this.value);this.style.borderColor='var(--border)'"
          style="width:100%;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:9px 12px;color:var(--text);font-size:13px;font-family:Inter,sans-serif;resize:vertical;min-height:60px;outline:none"
          onfocus="this.style.borderColor='#FF6B35'"
        >${notes}</textarea>
@@ -1560,7 +1592,20 @@ function updateOutreachNotes(id,notes){
  const data=getOutreachData();
  if(!data[id])data[id]={};
  data[id].notes=notes;
+ data[id].updatedAt=new Date().toISOString();
  saveOutreachData(data);
+ const ind=document.getElementById('note-saved-'+id);
+ if(ind){ind.style.opacity='1';setTimeout(()=>{ind.style.opacity='0';},1800);}
+}
+
+const _noteTimers={};
+function debounceSaveNote(id,val){
+ clearTimeout(_noteTimers[id]);
+ _noteTimers[id]=setTimeout(()=>updateOutreachNotes(id,val),600);
+}
+function saveNoteNow(id,val){
+ clearTimeout(_noteTimers[id]);
+ updateOutreachNotes(id,val);
 }
 
 // ── START ─────────────────────────────────────────────────────
