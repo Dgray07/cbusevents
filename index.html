@@ -799,6 +799,144 @@ h1,h2,h3,h4,h5,h6{font-family:Inter,sans-serif;letter-spacing:-0.02em;}
 .nav-logo,.auth-logo,.login-logo,.sidebar-logo-text{font-family:Inter,sans-serif!important;font-weight:800!important;letter-spacing:-0.04em!important;text-transform:uppercase;}
 .nav-logo span,.auth-logo span,.login-logo span,.sidebar-logo-text span{color:#FF6B35;}
 </style>
+
+<style>
+/* ═══════════════════════════════════════════════════════
+   CBUSEVENTS CONVERSION OVERRIDES
+═══════════════════════════════════════════════════════ */
+
+/* ── 1. STICKY CTA BAR (mobile only) ── */
+#sticky-cta-bar {
+  display: none;
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  z-index: 999;
+  background: rgba(11,11,15,0.88);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border-top: 1px solid rgba(255,107,53,0.18);
+  padding: 12px 20px;
+  padding-bottom: max(16px, env(safe-area-inset-bottom));
+  transform: translateY(100%);
+  transition: transform 0.32s cubic-bezier(0.34,1.56,0.64,1);
+}
+@media(max-width:768px){
+  #sticky-cta-bar { display: block; }
+  body.sticky-cta-active { padding-bottom: 88px; }
+}
+#sticky-cta-bar.is-visible { transform: translateY(0); }
+#sticky-cta-btn {
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  width: 100%; background: #FF6B35; color: #fff;
+  font-family: Inter,sans-serif; font-weight: 800; font-size: 16px;
+  padding: 15px 24px; border-radius: 12px; border: none; cursor: pointer;
+  text-decoration: none;
+  box-shadow: 0 0 0 1px rgba(255,107,53,0.25), 0 8px 24px rgba(255,107,53,0.3);
+  transition: opacity 0.15s, transform 0.15s;
+}
+#sticky-cta-btn:active { opacity: 0.9; transform: scale(0.985); }
+#sticky-cta-sub {
+  text-align: center; font-size: 11px; color: rgba(255,255,255,0.32);
+  font-family: Inter,sans-serif; margin-top: 6px; letter-spacing: 0.3px;
+}
+
+/* ── 2. BUTTON HIERARCHY — ghost secondary ── */
+.rh-btn-secondary {
+  background: transparent !important;
+  color: #FF6B35 !important;
+  border: 1.5px solid rgba(255,107,53,0.6) !important;
+  transition: background 0.2s, color 0.2s !important;
+}
+.rh-btn-secondary:hover {
+  background: rgba(255,107,53,0.08) !important;
+  border-color: #FF6B35 !important;
+}
+/* Primary subtle pulse */
+.rh-btn-primary { animation: primaryPulse 3s ease-in-out infinite; }
+.rh-btn-primary:hover { animation: none; box-shadow: 0 8px 28px rgba(255,107,53,0.38); }
+@keyframes primaryPulse {
+  0%,100% { box-shadow: 0 0 0 0 rgba(255,107,53,0); }
+  50%      { box-shadow: 0 0 0 6px rgba(255,107,53,0.14); }
+}
+
+/* ── 3. FOUNDING VENUE CARD — glow + gradient border ── */
+.rh-founding-card {
+  border: 1px solid transparent !important;
+  background-clip: padding-box !important;
+  box-shadow:
+    0 0 0 1px rgba(255,107,53,0.28),
+    0 0 40px rgba(255,107,53,0.13),
+    0 24px 60px rgba(0,0,0,0.45) !important;
+  position: relative !important;
+}
+.rh-founding-card::after {
+  content:''; position:absolute; inset:0; border-radius:20px; padding:1px;
+  background: linear-gradient(135deg, rgba(255,107,53,0.7) 0%, rgba(255,107,53,0.15) 45%, rgba(255,107,53,0.4) 100%);
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor; mask-composite: exclude;
+  pointer-events: none; z-index: 0;
+}
+.rh-founding-card > * { position: relative; z-index: 1; }
+
+/* Premium progress bar */
+.rh-spots-bar {
+  height: 7px !important;
+  background: rgba(255,255,255,0.07) !important;
+  border-radius: 100px !important;
+  overflow: visible !important;
+}
+.rh-spots-fill {
+  height: 100% !important; width: 44% !important;
+  border-radius: 100px !important;
+  background: linear-gradient(90deg,#FF6B35 0%,#ff8c61 50%,#FF6B35 100%) !important;
+  background-size: 200% 100% !important;
+  box-shadow: 0 0 10px rgba(255,107,53,0.5) !important;
+  animation: barShimmer 2.4s ease-in-out infinite !important;
+}
+@keyframes barShimmer {
+  0%   { background-position: 100% 0; }
+  50%  { background-position:   0% 0; }
+  100% { background-position: 100% 0; }
+}
+.rh-spots-text { animation: scarcityPulse 2.4s ease-in-out infinite; }
+@keyframes scarcityPulse {
+  0%,100% { opacity: 1; } 50% { opacity: 0.7; }
+}
+
+/* ── 4. COMMUNITY CARDS — spacing + scale hover ── */
+.rh-communities { gap: 18px !important; }
+.rh-community {
+  padding: 28px !important;
+  transition: transform 0.22s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.22s ease, border-color 0.22s ease !important;
+}
+.rh-community-desc { font-size: 13.5px !important; line-height: 1.65 !important; margin-bottom: 16px !important; }
+.rh-community.venues:hover,
+.rh-community.vendors:hover { transform: scale(1.02) translateY(-1px) !important; }
+.rh-community.venues:hover  { border-color: rgba(255,107,53,0.45) !important; box-shadow: 0 12px 36px rgba(255,107,53,0.12) !important; }
+.rh-community.vendors:hover { border-color: rgba(96,165,250,0.38) !important;  box-shadow: 0 12px 36px rgba(96,165,250,0.1) !important; }
+.rh-community.planners:hover,
+.rh-community.attendees:hover { transform: translateY(-3px) !important; }
+.rh-community:hover .rh-community-link { gap: 10px !important; }
+
+/* ── 5. TRUST BADGES ── */
+.trust-badge {
+  display: inline-flex; align-items: center; gap: 5px;
+  font-size: 11px; font-weight: 600; color: rgba(255,255,255,0.4);
+  font-family: Inter,sans-serif; letter-spacing: 0.2px;
+}
+.trust-badge.green { color: rgba(34,197,94,0.75); }
+.trust-badges-row { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; margin-top: 10px; }
+.founding-trust-row {
+  display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
+  margin-top: 14px; padding-top: 14px;
+  border-top: 1px solid rgba(255,255,255,0.06);
+}
+.community-trust { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 14px; }
+
+/* Benefit card micro-interaction */
+.rh-benefit { transition: border-color 0.2s, transform 0.2s, box-shadow 0.2s !important; }
+.rh-benefit:hover { transform: scale(1.01) !important; box-shadow: 0 8px 24px rgba(0,0,0,0.25) !important; }
+</style>
 </head>
 <body> <!-- NAV -->
 <nav id="topNav"> <div class="nav-logo" onclick="showPage('home')"> CBUS<span>EVENTS</span> </div> <div class="nav-links"> <button class="nav-link" id="nav-home" onclick="showPage('home')">Home</button> <button class="nav-link" id="nav-venues" onclick="showPage('venues')">Venues</button> <button class="nav-link" id="nav-vendors" onclick="showPage('vendors')">Vendors</button> <button class="nav-link" id="nav-events" onclick="showPage('events')">Events</button> <a class="nav-link" href="https://cbusevents.com/blog.html" style="text-decoration:none">Blog</a> </div> <div style="display:flex;align-items:center;gap:10px"> <div style="position:relative" id="joinDropdown"> <button class="nav-link" onclick="toggleJoinMenu()" style="display:flex;align-items:center;gap:4px">Join ▾</button> <div id="joinMenu" style="display:none;position:absolute;top:calc(100% + 8px);right:0;background:#1a1a24;border:1px solid #25252f;border-radius:12px;padding:8px;min-width:190px;box-shadow:0 16px 40px rgba(0,0,0,0.5);z-index:200;"> <a href="https://cbusevents.com/list-your-venue.html" style="display:flex;align-items:center;gap:8px;padding:9px 14px;border-radius:8px;font-size:13px;font-weight:500;color:#8888a0;text-decoration:none;transition:all 0.15s;" onmouseover="this.style.background='#13131a';this.style.color='#e8e8f0'" onmouseout="this.style.background='';this.style.color='#8888a0'"> List Your Venue</a> <a href="https://cbusevents.com/vendors.html" style="display:flex;align-items:center;gap:8px;padding:9px 14px;border-radius:8px;font-size:13px;font-weight:500;color:#8888a0;text-decoration:none;transition:all 0.15s;" onmouseover="this.style.background='#13131a';this.style.color='#e8e8f0'" onmouseout="this.style.background='';this.style.color='#8888a0'"> List Your Services</a> <a href="https://cbusevents.com/planners.html" style="display:flex;align-items:center;gap:8px;padding:9px 14px;border-radius:8px;font-size:13px;font-weight:500;color:#8888a0;text-decoration:none;transition:all 0.15s;" onmouseover="this.style.background='#13131a';this.style.color='#e8e8f0'" onmouseout="this.style.background='';this.style.color='#8888a0'"> Event Planners</a> <div style="height:1px;background:#25252f;margin:4px 8px;"></div> <a href="https://cbusevents.com/attendees.html" style="display:flex;align-items:center;gap:8px;padding:9px 14px;border-radius:8px;font-size:13px;font-weight:500;color:#8888a0;text-decoration:none;transition:all 0.15s;" onmouseover="this.style.background='#13131a';this.style.color='#e8e8f0'" onmouseout="this.style.background='';this.style.color='#8888a0'"> Find Events</a> <div style="height:1px;background:#25252f;margin:4px 8px;"></div> <a href="https://cbusevents.com/blog.html" style="display:flex;align-items:center;gap:8px;padding:9px 14px;border-radius:8px;font-size:13px;font-weight:600;color:#FF6B35;text-decoration:none;transition:all 0.15s;" onmouseover="this.style.background='#13131a'" onmouseout="this.style.background=''"> Columbus Blog</a> </div> </div> <a href="https://cbusevents.com/auth.html" class="nav-cta" style="text-decoration:none">Sign In</a> </div>
@@ -1131,6 +1269,11 @@ function renderHome(){
        <a href="https://cbusevents.com/auth.html?new=true" class="rh-btn-primary">Join Free Today</a>
        <button class="rh-btn-secondary" onclick="showPage('events')">Browse Events →</button>
      </div>
+     <div class="trust-badges-row" style="margin-bottom:28px">
+       <span class="trust-badge green"><span>🛡️</span> No credit card</span>
+       <span class="trust-badge"><span>⏱️</span> Under 10 min to list</span>
+       <span class="trust-badge"><span>🔒</span> Free forever</span>
+     </div>
      <div class="rh-proof">
        <div class="rh-proof-num">📍 <strong>Columbus-Only</strong> Platform</div>
        <div class="proof-sep"></div>
@@ -1254,6 +1397,11 @@ function renderHome(){
      <div class="rh-spots-text">22 of 50 founding spots claimed</div>
      <div class="rh-spots-bar"><div class="rh-spots-fill"></div></div>
      <a href="https://cbusevents.com/list-your-venue.html" class="rh-btn-primary" style="width:100%;justify-content:center;">Claim Your Spot Free →</a>
+     <div class="founding-trust-row">
+       <span class="trust-badge green"><span>🛡️</span> No credit card required</span>
+       <span class="trust-badge"><span>⏱️</span> Under 10 min to list</span>
+       <span class="trust-badge"><span>🔒</span> Founding rate locked forever</span>
+     </div>
    </div>
  </section>
 
@@ -1266,11 +1414,19 @@ function renderHome(){
      <a href="https://cbusevents.com/list-your-venue.html" class="rh-community venues">
        <div class="rh-community-header"><div class="rh-community-label">Venue Owners</div><span class="rh-community-free">FREE</span></div>
        <div class="rh-community-desc">Get discovered, receive booking inquiries, publish events, and sell tickets — all from one dashboard built for Columbus venues.</div>
+       <div class="community-trust">
+         <span class="trust-badge green"><span>🛡️</span> No card needed</span>
+         <span class="trust-badge"><span>⏱️</span> Live in minutes</span>
+       </div>
        <div class="rh-community-link">List your venue →</div>
      </a>
      <a href="https://cbusevents.com/vendors.html" class="rh-community vendors">
        <div class="rh-community-header"><div class="rh-community-label">Vendors</div><span class="rh-community-free">FREE</span></div>
        <div class="rh-community-desc">Showcase your services, build your Columbus portfolio, and get booked by planners and venues actively looking for your skills.</div>
+       <div class="community-trust">
+         <span class="trust-badge green"><span>🛡️</span> No card needed</span>
+         <span class="trust-badge"><span>🤝</span> Planners actively searching</span>
+       </div>
        <div class="rh-community-link">List your services →</div>
      </a>
      <a href="https://cbusevents.com/planners.html" class="rh-community planners">
@@ -2287,6 +2443,35 @@ async function toggleSaveEvent(eventId, btn, e){
       btn.classList.remove('open');menu.classList.remove('open');document.body.style.overflow='';
     });
   });
+})();
+</script>
+<!-- STICKY CTA BAR -->
+<div id="sticky-cta-bar" aria-label="Join CBUSEVENTS free">
+  <a id="sticky-cta-btn" href="https://cbusevents.com/auth.html?new=true">
+    🎟️ Join Free Today
+  </a>
+  <div id="sticky-cta-sub">No credit card &nbsp;·&nbsp; Listed in under 10 min</div>
+</div>
+<script>
+(function(){
+  var bar=document.getElementById('sticky-cta-bar');
+  if(!bar)return;
+  var visible=false;
+  function onScroll(){
+    var scrolled=window.scrollY||window.pageYOffset;
+    var shouldShow=scrolled>520;
+    if(shouldShow&&!visible){
+      visible=true;
+      bar.classList.add('is-visible');
+      document.body.classList.add('sticky-cta-active');
+    } else if(!shouldShow&&visible){
+      visible=false;
+      bar.classList.remove('is-visible');
+      document.body.classList.remove('sticky-cta-active');
+    }
+  }
+  window.addEventListener('scroll',onScroll,{passive:true});
+  onScroll();
 })();
 </script>
 </body>
