@@ -349,7 +349,7 @@ async function doAuth(){
    }
    if(data.user){
      await sb.from('vendors').upsert({user_id:data.user.id,email,business_name:name&&name!==email?name:null,name:name&&name!==email?name:null,subscription_tier:'FREE',subscription_status:'free'},{onConflict:'user_id'});
-     await sb.from('user_roles').upsert({user_id:data.user.id,role:'vendor'},{onConflict:'user_id'});
+     await sb.from('user_roles').insert({user_id:data.user.id,role:'vendor'}).select().maybeSingle().catch(()=>{});
    }
  }
  }

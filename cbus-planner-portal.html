@@ -432,7 +432,7 @@ async function doSignup(){
    return;
  }
  currentUser=data.user;
- await sb.from('user_roles').upsert({user_id:data.user.id,role:'planner'},{onConflict:'user_id'});
+ await sb.from('user_roles').insert({user_id:data.user.id,role:'planner'}).select().maybeSingle().catch(()=>{});
  await loadData();
  setLoggedInNav();
  nav('dashboard');
