@@ -307,16 +307,16 @@ async function openArticleEditor(id){
      <button class="btn btn-ghost btn-sm" onclick="document.getElementById('articleEditor').style.display='none'">Cancel</button>
    </div>
    <div style="padding:24px;display:grid;grid-template-columns:1fr 1fr;gap:16px">
-     <div class="field" style="grid-column:1/-1"><label>Title *</label><input id="artTitle" value="${article?.title||''}" placeholder="Best Event Venues in Columbus Ohio 2026"/></div>
-     <div class="field" style="grid-column:1/-1"><label>Subtitle</label><input id="artSubtitle" value="${article?.subtitle||''}" placeholder="Short description shown on the blog listing"/></div>
-     <div class="field"><label>Slug * (URL-friendly)</label><input id="artSlug" value="${article?.slug||''}" placeholder="best-event-venues-columbus"/></div>
-     <div class="field"><label>Category</label><input id="artCat" value="${article?.category||'Columbus'}" placeholder="Columbus, Venues, Events..."/></div>
-     <div class="field"><label>Author</label><input id="artAuthor" value="${article?.author||'CBUSEVENTS'}" placeholder="CBUSEVENTS"/></div>
-     <div class="field"><label>Cover Image URL</label><input id="artImage" value="${article?.cover_image_url||''}" placeholder="https://..."/></div>
-     <div class="field" style="grid-column:1/-1"><label>SEO Title (60 chars max)</label><input id="artSeoTitle" value="${article?.seo_title||''}" placeholder="Best Event Venues Columbus Ohio | CBUSEVENTS" maxlength="70"/></div>
-     <div class="field" style="grid-column:1/-1"><label>SEO Description (160 chars max)</label><textarea id="artSeoDesc" maxlength="170" style="height:70px" placeholder="Compelling summary for Google...">${article?.seo_description||''}</textarea></div>
+     <div class="field" style="grid-column:1/-1"><label for="artTitle">Title *</label><input id="artTitle" value="${article?.title||''}" placeholder="Best Event Venues in Columbus Ohio 2026"/></div>
+     <div class="field" style="grid-column:1/-1"><label for="artSubtitle">Subtitle</label><input id="artSubtitle" value="${article?.subtitle||''}" placeholder="Short description shown on the blog listing"/></div>
+     <div class="field"><label for="artSlug">Slug * (URL-friendly)</label><input id="artSlug" value="${article?.slug||''}" placeholder="best-event-venues-columbus"/></div>
+     <div class="field"><label for="artCat">Category</label><input id="artCat" value="${article?.category||'Columbus'}" placeholder="Columbus, Venues, Events..."/></div>
+     <div class="field"><label for="artAuthor">Author</label><input id="artAuthor" value="${article?.author||'CBUSEVENTS'}" placeholder="CBUSEVENTS"/></div>
+     <div class="field"><label for="artImage">Cover Image URL</label><input id="artImage" value="${article?.cover_image_url||''}" placeholder="https://..."/></div>
+     <div class="field" style="grid-column:1/-1"><label for="artSeoTitle">SEO Title (60 chars max)</label><input id="artSeoTitle" value="${article?.seo_title||''}" placeholder="Best Event Venues Columbus Ohio | CBUSEVENTS" maxlength="70"/></div>
+     <div class="field" style="grid-column:1/-1"><label for="artSeoDesc">SEO Description (160 chars max)</label><textarea id="artSeoDesc" maxlength="170" style="height:70px" placeholder="Compelling summary for Google...">${article?.seo_description||''}</textarea></div>
      <div class="field" style="grid-column:1/-1">
-       <label>Body (HTML supported)</label>
+       <label for="artBody">Body (HTML supported)</label>
        <div style="display:flex;gap:6px;margin-bottom:8px;flex-wrap:wrap">
          <button class="btn btn-ghost btn-sm" onclick="insertTag('h2')">H2</button>
          <button class="btn btn-ghost btn-sm" onclick="insertTag('h3')">H3</button>
@@ -415,7 +415,7 @@ async function init(){
 
 function renderLogin(){
  document.getElementById('app').innerHTML=`
- <div class="login-wrap"> <div class="login-card"> <div class="login-logo">CBUS<span>EVENTS</span></div> <div style="color:var(--sub);font-size:13px;margin-bottom:28px">Admin Portal — restricted access</div> <div class="field"><label>Email</label><input id="lEmail" type="email" placeholder="admin@email.com"></div> <div class="field"><label>Password</label><input id="lPass" type="password" placeholder="••••••••"></div> <div id="lErr" style="color:var(--red);font-size:13px;margin-bottom:12px;display:none"></div> <button onclick="doLogin()" style="width:100%;background:var(--orange);color:#fff;border:none;border-radius:8px;padding:12px;font-size:14px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif">Sign In →</button> </div> </div>`;
+ <div class="login-wrap"> <div class="login-card"> <div class="login-logo">CBUS<span>EVENTS</span></div> <div style="color:var(--sub);font-size:13px;margin-bottom:28px">Admin Portal — restricted access</div> <div class="field"><label for="lEmail">Email</label><input id="lEmail" type="email" placeholder="admin@email.com"></div> <div class="field"><label for="lPass">Password</label><input id="lPass" type="password" placeholder="••••••••"></div> <div id="lErr" style="color:var(--red);font-size:13px;margin-bottom:12px;display:none"></div> <button onclick="doLogin()" style="width:100%;background:var(--orange);color:#fff;border:none;border-radius:8px;padding:12px;font-size:14px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif">Sign In →</button> </div> </div>`;
 }
 
 async function doLogin(){
@@ -1097,7 +1097,7 @@ function openTierModal(id){
  const v=allVenues.find(x=>x.id===id);
  if(!v)return;
  document.getElementById('modalContainer').innerHTML=`
- <div class="modal-overlay" onclick="if(event.target===this)closeModal()"> <div class="modal"> <div class="modal-header"> <div class="modal-title">Change Plan — ${v.name}</div> <button onclick="closeModal()" style="background:none;border:none;color:var(--sub);font-size:18px;cursor:pointer"></button> </div> <div class="modal-body"> <div class="field"> <label>Plan Tier</label> <select id="tierSelect"> <option value="free" ${v.tier==='free'||!v.tier?'selected':''}>Free</option> <option value="standard" ${v.tier==='standard'?'selected':''}>Standard ($29/mo)</option> <option value="premium" ${v.tier==='premium'?'selected':''}>Premium ($79/mo)</option> </select> </div> <div class="field"> <label>Status</label> <select id="statusSelect"> <option value="approved" ${v.status==='approved'?'selected':''}>Approved</option> <option value="pending" ${v.status==='pending'?'selected':''}>Pending</option> <option value="rejected" ${v.status==='rejected'?'selected':''}>Rejected</option> </select> </div> </div> <div class="modal-footer"> <button class="btn btn-primary" onclick="saveTier('${id}')">Save Changes</button> <button class="btn btn-ghost" onclick="closeModal()">Cancel</button> </div> </div> </div>`;
+ <div class="modal-overlay" onclick="if(event.target===this)closeModal()"> <div class="modal"> <div class="modal-header"> <div class="modal-title">Change Plan — ${v.name}</div> <button onclick="closeModal()" style="background:none;border:none;color:var(--sub);font-size:18px;cursor:pointer"></button> </div> <div class="modal-body"> <div class="field"> <label for="tierSelect">Plan Tier</label> <select id="tierSelect"> <option value="free" ${v.tier==='free'||!v.tier?'selected':''}>Free</option> <option value="standard" ${v.tier==='standard'?'selected':''}>Standard ($29/mo)</option> <option value="premium" ${v.tier==='premium'?'selected':''}>Premium ($79/mo)</option> </select> </div> <div class="field"> <label for="statusSelect">Status</label> <select id="statusSelect"> <option value="approved" ${v.status==='approved'?'selected':''}>Approved</option> <option value="pending" ${v.status==='pending'?'selected':''}>Pending</option> <option value="rejected" ${v.status==='rejected'?'selected':''}>Rejected</option> </select> </div> </div> <div class="modal-footer"> <button class="btn btn-primary" onclick="saveTier('${id}')">Save Changes</button> <button class="btn btn-ghost" onclick="closeModal()">Cancel</button> </div> </div> </div>`;
 }
 
 async function saveTier(id){
@@ -1110,7 +1110,7 @@ async function saveTier(id){
 
 function openAddVenueModal(){
  document.getElementById('modalContainer').innerHTML=`
- <div class="modal-overlay" onclick="if(event.target===this)closeModal()"> <div class="modal"> <div class="modal-header"> <div class="modal-title">Add Venue Manually</div> <button onclick="closeModal()" style="background:none;border:none;color:var(--sub);font-size:18px;cursor:pointer"></button> </div> <div class="modal-body"> <div class="field"><label>Venue Name *</label><input id="avName" placeholder="e.g. The Basement"></div> <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px"> <div class="field"><label>Type</label><input id="avType" placeholder="e.g. Bar & Grill"></div> <div class="field"><label>Neighborhood</label><input id="avHood" placeholder="e.g. Short North"></div> </div> <div class="field"><label>Description</label><textarea id="avDesc" placeholder="Brief description..."></textarea></div> <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px"> <div class="field"><label>Plan</label><select id="avTier"><option value="free">Free</option><option value="standard">Standard</option><option value="premium">Premium</option></select></div> <div class="field"><label>Status</label><select id="avStatus"><option value="approved">Approved</option><option value="pending">Pending</option></select></div> </div> </div> <div class="modal-footer"> <button class="btn btn-primary" onclick="addVenue()">Add Venue →</button> <button class="btn btn-ghost" onclick="closeModal()">Cancel</button> </div> </div> </div>`;
+ <div class="modal-overlay" onclick="if(event.target===this)closeModal()"> <div class="modal"> <div class="modal-header"> <div class="modal-title">Add Venue Manually</div> <button onclick="closeModal()" style="background:none;border:none;color:var(--sub);font-size:18px;cursor:pointer"></button> </div> <div class="modal-body"> <div class="field"><label for="avName">Venue Name *</label><input id="avName" placeholder="e.g. The Basement"></div> <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px"> <div class="field"><label for="avType">Type</label><input id="avType" placeholder="e.g. Bar & Grill"></div> <div class="field"><label for="avHood">Neighborhood</label><input id="avHood" placeholder="e.g. Short North"></div> </div> <div class="field"><label for="avDesc">Description</label><textarea id="avDesc" placeholder="Brief description..."></textarea></div> <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px"> <div class="field"><label for="avTier">Plan</label><select id="avTier"><option value="free">Free</option><option value="standard">Standard</option><option value="premium">Premium</option></select></div> <div class="field"><label for="avStatus">Status</label><select id="avStatus"><option value="approved">Approved</option><option value="pending">Pending</option></select></div> </div> </div> <div class="modal-footer"> <button class="btn btn-primary" onclick="addVenue()">Add Venue →</button> <button class="btn btn-ghost" onclick="closeModal()">Cancel</button> </div> </div> </div>`;
 }
 
 async function addVenue(){
@@ -1249,9 +1249,9 @@ function renderVendors(){
        <div style="font-size:16px;font-weight:700;letter-spacing:-0.02em;">Edit Vendor</div>
        <button onclick="closeVendorEdit()" style="background:rgba(255,255,255,0.06);border:1px solid var(--border);border-radius:8px;color:var(--sub);font-size:16px;cursor:pointer;width:32px;height:32px;display:flex;align-items:center;justify-content:center;line-height:1;">×</button>
      </div>
-     <div class="field"><label>Business Name</label><input id="ve-name" class="form-input"/></div>
-     <div class="field"><label>Email</label><input id="ve-email" class="form-input"/></div>
-     <div class="field"><label>Category</label>
+     <div class="field"><label for="ve-name">Business Name</label><input id="ve-name" class="form-input"/></div>
+     <div class="field"><label for="ve-email">Email</label><input id="ve-email" class="form-input"/></div>
+     <div class="field"><label for="ve-category">Category</label>
        <select id="ve-category" class="form-input">
          <option>Photography</option><option>Videography</option><option>DJ / Music</option>
          <option>Live Music / Band</option><option>Catering</option><option>Florals & Decor</option>
@@ -1260,13 +1260,13 @@ function renderVendors(){
          <option>Rentals (Linens, Furniture)</option><option>Design</option><option>Other</option>
        </select>
      </div>
-     <div class="field"><label>Description</label><textarea id="ve-desc" class="form-input" style="min-height:80px;resize:vertical;"></textarea></div>
+     <div class="field"><label for="ve-desc">Description</label><textarea id="ve-desc" class="form-input" style="min-height:80px;resize:vertical;"></textarea></div>
      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
-       <div class="field"><label>Phone</label><input id="ve-phone" class="form-input"/></div>
-       <div class="field"><label>Instagram</label><input id="ve-instagram" class="form-input" placeholder="@handle"/></div>
+       <div class="field"><label for="ve-phone">Phone</label><input id="ve-phone" class="form-input"/></div>
+       <div class="field"><label for="ve-instagram">Instagram</label><input id="ve-instagram" class="form-input" placeholder="@handle"/></div>
      </div>
-     <div class="field"><label>Website</label><input id="ve-website" class="form-input"/></div>
-     <div class="field"><label>Subscription Tier</label>
+     <div class="field"><label for="ve-website">Website</label><input id="ve-website" class="form-input"/></div>
+     <div class="field"><label for="ve-tier">Subscription Tier</label>
        <select id="ve-tier" class="form-input">
          <option value="">FREE</option><option value="STANDARD">STANDARD</option><option value="PREMIUM">PREMIUM</option><option value="FOUNDING">FOUNDING</option>
        </select>
@@ -1471,7 +1471,7 @@ async function renderOverrides(){
  .catch(()=>({data:[]}));
 
  document.getElementById('pageContent').innerHTML=`
- <div style="display:grid;grid-template-columns:380px 1fr;gap:24px;align-items:start"> <!-- Form --> <div class="table-card"> <div class="table-header"><div class="table-title">Apply Override</div></div> <div style="padding:20px;display:flex;flex-direction:column;gap:12px"> <div class="field"> <label>Entity Type</label> <select id="ov-entity-type"><option value="venue">Venue</option><option value="event">Event</option><option value="vendor">Vendor</option><option value="user">User</option></select> </div> <div class="field"><label>Entity UUID</label><input id="ov-entity-id" placeholder="Paste the row UUID"/></div> <div class="field"> <label>Override Action</label> <select id="ov-key"> <option value="feature_listing">Feature Listing</option> <option value="admin_boost">Admin Boost</option> <option value="promote_vendor">Promote Vendor</option> <option value="event_boost">Event Boost</option> <option value="suspend">Suspend Account</option> </select> </div> <div class="field"><label>Value (optional)</label><input id="ov-value" placeholder="e.g. true / false"/></div> <div class="field"><label>Reason</label><input id="ov-reason" placeholder="Why are you applying this?"/></div> <div class="field"><label>Expires At (optional)</label><input type="datetime-local" id="ov-expires"/></div> <button class="btn btn-primary" onclick="applyOverride()">Apply Override →</button> </div> </div> <!-- Log --> <div class="table-card"> <div class="table-header"><div class="table-title">Override Log (recent 50)</div></div> <table> <thead><tr><th>Type</th><th>Entity</th><th>Action</th><th>Reason</th><th>Applied</th><th>Expires</th></tr></thead> <tbody> ${(data||[]).length?(data||[]).map(function(o){ return '<tr><td><span class="badge badge-muted">'+o.entity_type+'</span></td><td style="font-weight:600">'+o.entity_name+'</td><td><span class="badge '+(o.override_tier==='premium'?'badge-gold':o.override_tier==='standard'?'badge-blue':'badge-muted')+'">'+o.override_tier+'</span></td><td style="color:var(--muted);font-size:12px">'+new Date(o.created_at).toLocaleDateString()+'</td><td><button class="btn btn-danger btn-sm" onclick="removeOverride(\''+o.id+'\')">Remove</button></td></tr>'; }).join(''):'<tr class="empty-row"><td colspan="6">No overrides yet</td></tr>'}
+ <div style="display:grid;grid-template-columns:380px 1fr;gap:24px;align-items:start"> <!-- Form --> <div class="table-card"> <div class="table-header"><div class="table-title">Apply Override</div></div> <div style="padding:20px;display:flex;flex-direction:column;gap:12px"> <div class="field"> <label for="ov-entity-type">Entity Type</label> <select id="ov-entity-type"><option value="venue">Venue</option><option value="event">Event</option><option value="vendor">Vendor</option><option value="user">User</option></select> </div> <div class="field"><label for="ov-entity-id">Entity UUID</label><input id="ov-entity-id" placeholder="Paste the row UUID"/></div> <div class="field"> <label for="ov-key">Override Action</label> <select id="ov-key"> <option value="feature_listing">Feature Listing</option> <option value="admin_boost">Admin Boost</option> <option value="promote_vendor">Promote Vendor</option> <option value="event_boost">Event Boost</option> <option value="suspend">Suspend Account</option> </select> </div> <div class="field"><label for="ov-value">Value (optional)</label><input id="ov-value" placeholder="e.g. true / false"/></div> <div class="field"><label for="ov-reason">Reason</label><input id="ov-reason" placeholder="Why are you applying this?"/></div> <div class="field"><label for="ov-expires">Expires At (optional)</label><input type="datetime-local" id="ov-expires"/></div> <button class="btn btn-primary" onclick="applyOverride()">Apply Override →</button> </div> </div> <!-- Log --> <div class="table-card"> <div class="table-header"><div class="table-title">Override Log (recent 50)</div></div> <table> <thead><tr><th>Type</th><th>Entity</th><th>Action</th><th>Reason</th><th>Applied</th><th>Expires</th></tr></thead> <tbody> ${(data||[]).length?(data||[]).map(function(o){ return '<tr><td><span class="badge badge-muted">'+o.entity_type+'</span></td><td style="font-weight:600">'+o.entity_name+'</td><td><span class="badge '+(o.override_tier==='premium'?'badge-gold':o.override_tier==='standard'?'badge-blue':'badge-muted')+'">'+o.override_tier+'</span></td><td style="color:var(--muted);font-size:12px">'+new Date(o.created_at).toLocaleDateString()+'</td><td><button class="btn btn-danger btn-sm" onclick="removeOverride(\''+o.id+'\')">Remove</button></td></tr>'; }).join(''):'<tr class="empty-row"><td colspan="6">No overrides yet</td></tr>'}
  </tbody> </table> </div> </div>`;
 }
 
@@ -1821,20 +1821,20 @@ async function rejectClaim(venueId, venueName){
       <button onclick="closeVenueModal()" style="background:none;border:none;color:#888;font-size:22px;cursor:pointer;">×</button>
     </div>
     <div style="display:flex;flex-direction:column;gap:14px;">
-      <div class="field"><label>Venue Name</label><input id="ev-name" class="form-input"/></div>
-      <div class="field"><label>Type</label>
+      <div class="field"><label for="ev-name">Venue Name</label><input id="ev-name" class="form-input"/></div>
+      <div class="field"><label for="ev-type">Type</label>
         <select id="ev-type" class="form-input">
           <option>Bar</option><option>Rooftop</option><option>Event Space</option><option>Restaurant</option><option>Club</option><option>Lounge</option><option>Outdoor</option><option>Hotel</option><option>Other</option>
         </select>
       </div>
-      <div class="field"><label>Neighborhood</label><input id="ev-neighborhood" class="form-input"/></div>
-      <div class="field"><label>Address</label><input id="ev-address" class="form-input"/></div>
-      <div class="field"><label>Capacity</label><input id="ev-capacity" type="number" class="form-input"/></div>
-      <div class="field"><label>Description</label><textarea id="ev-description" class="form-input" rows="3"></textarea></div>
-      <div class="field"><label>Website</label><input id="ev-website" class="form-input"/></div>
-      <div class="field"><label>Instagram</label><input id="ev-instagram" class="form-input"/></div>
+      <div class="field"><label for="ev-neighborhood">Neighborhood</label><input id="ev-neighborhood" class="form-input"/></div>
+      <div class="field"><label for="ev-address">Address</label><input id="ev-address" class="form-input"/></div>
+      <div class="field"><label for="ev-capacity">Capacity</label><input id="ev-capacity" type="number" class="form-input"/></div>
+      <div class="field"><label for="ev-description">Description</label><textarea id="ev-description" class="form-input" rows="3"></textarea></div>
+      <div class="field"><label for="ev-website">Website</label><input id="ev-website" class="form-input"/></div>
+      <div class="field"><label for="ev-instagram">Instagram</label><input id="ev-instagram" class="form-input"/></div>
       <div class="field">
-        <label>Cover Photo</label>
+        <label for="ev-photo-input">Cover Photo</label>
         <button type="button" onclick="document.getElementById('ev-photo-input').click()" style="background:#f97316;color:#fff;border:none;border-radius:8px;padding:10px 16px;cursor:pointer;font-weight:600;font-size:13px;width:100%;margin-bottom:8px;">📷 Upload Photo</button>
         <input type="file" id="ev-photo-input" accept="image/*" style="display:none" onchange="handleAdminVenuePhoto(event)"/>
         <input id="ev-cover" class="form-input" placeholder="Or paste image URL..."/>
@@ -1854,32 +1854,32 @@ async function rejectClaim(venueId, venueName){
       <button onclick="closeEventModal()" style="background:none;border:none;color:#888;font-size:22px;cursor:pointer;">×</button>
     </div>
     <div style="display:flex;flex-direction:column;gap:14px;">
-      <div class="field"><label>Event Title *</label><input id="ee-title" class="form-input"/></div>
-      <div class="field"><label>Venue</label>
+      <div class="field"><label for="ee-title">Event Title *</label><input id="ee-title" class="form-input"/></div>
+      <div class="field"><label for="ee-venue">Venue</label>
         <select id="ee-venue" class="form-input"></select>
       </div>
-      <div class="field"><label>Category</label>
+      <div class="field"><label for="ee-category">Category</label>
         <select id="ee-category" class="form-input">
           <option>Nightlife</option><option>Comedy</option><option>Music</option><option>Food & Drink</option><option>Arts</option><option>Sports</option><option>Networking</option><option>Other</option>
         </select>
       </div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
-        <div class="field"><label>Start Date & Time</label><input id="ee-start" type="datetime-local" class="form-input"/></div>
-        <div class="field"><label>End Time</label><input id="ee-end" type="datetime-local" class="form-input"/></div>
+        <div class="field"><label for="ee-start">Start Date & Time</label><input id="ee-start" type="datetime-local" class="form-input"/></div>
+        <div class="field"><label for="ee-end">End Time</label><input id="ee-end" type="datetime-local" class="form-input"/></div>
       </div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
-        <div class="field"><label>Min Price ($)</label><input id="ee-price-min" type="number" class="form-input" placeholder="0 = Free"/></div>
-        <div class="field"><label>Max Price ($)</label><input id="ee-price-max" type="number" class="form-input"/></div>
+        <div class="field"><label for="ee-price-min">Min Price ($)</label><input id="ee-price-min" type="number" class="form-input" placeholder="0 = Free"/></div>
+        <div class="field"><label for="ee-price-max">Max Price ($)</label><input id="ee-price-max" type="number" class="form-input"/></div>
       </div>
-      <div class="field"><label>Description</label><textarea id="ee-description" class="form-input" rows="3"></textarea></div>
+      <div class="field"><label for="ee-description">Description</label><textarea id="ee-description" class="form-input" rows="3"></textarea></div>
       <div class="field">
-        <label>Cover Photo</label>
+        <label for="ee-photo-input">Cover Photo</label>
         <button type="button" onclick="document.getElementById('ee-photo-input').click()" style="background:#f97316;color:#fff;border:none;border-radius:8px;padding:10px 16px;cursor:pointer;font-weight:600;font-size:13px;width:100%;margin-bottom:8px;">📷 Upload Photo</button>
         <input type="file" id="ee-photo-input" accept="image/*" style="display:none" onchange="handleAdminEventPhoto(event)"/>
         <input id="ee-cover" class="form-input" placeholder="Or paste image URL..."/>
         <img id="ee-cover-preview" src="" alt="" style="display:none;width:100%;height:140px;object-fit:cover;border-radius:8px;margin-top:8px;border:1px solid #25252f;"/>
       </div>
-      <div class="field"><label>Status</label>
+      <div class="field"><label for="ee-status">Status</label>
         <select id="ee-status" class="form-input"><option value="published">Published</option><option value="draft">Draft</option></select>
       </div>
       <div id="ee-msg" style="font-size:13px;min-height:16px;"></div>
