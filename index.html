@@ -1259,8 +1259,11 @@ function renderHome(){
  const upcoming=allEvents.filter(e=>!isThisWeek(e.start_time)).slice(0,4);
  const allUpcoming=[...thisWeek,...upcoming].slice(0,4);
 
- // Venue cards for scroll — real photos first
- const venueScroll=allVenues.filter(v=>getVenueImg(v)).slice(0,6);
+ // Venue cards for scroll — featured first, then photo-having venues
+ const venueScroll=allVenues
+   .filter(v=>getVenueImg(v))
+   .sort((a,b)=>(b.is_featured?1:0)-(a.is_featured?1:0))
+   .slice(0,6);
 
  // Founding venues
  const foundingNames=['groundxgrind','1313','ground x grind'];
@@ -1466,11 +1469,12 @@ function renderHome(){
    </div>
    <p class="rh-section-sub" style="margin-top:10px">Bars, rooftops, event spaces, and more — all on CBUSEVENTS.</p>
    <div class="rh-venues-scroll">
-     ${(venueScroll.length?venueScroll:allVenues.slice(0,6)).map(v=>{
+     ${(venueScroll.length?venueScroll:allVenues.sort((a,b)=>(b.is_featured?1:0)-(a.is_featured?1:0)).slice(0,6)).map(v=>{
        const img=getVenueImg(v);
        return`<div class="rh-venue-card" onclick="showPage('venue',allVenues.find(x=>x.id==='${v.id}'))">
          <div class="rh-venue-img" style="${!img?'background:var(--card)':''}">
            ${img?`<img src="${img}" alt="${v.name}" onerror="this.style.display='none'">`:''}
+           ${v.is_featured?'<div class="rh-badge-featured">Featured</div>':''}
            <span class="rh-venue-tag">${v.venue_type||'Venue'}</span>
          </div>
          <div class="rh-venue-info">
@@ -1563,8 +1567,10 @@ function goSlide(idx){
 function buildHeroCards(){
  const el=document.getElementById('heroCards');
  if(!el)return;
- // Featured = is_featured flag OR non-free tier
- const featuredVenues=allVenues.filter(v=>v.is_featured||v.tier==='premium'||v.tier==='standard');
+ // Featured = is_featured flag OR non-free tier, featured flag takes priority
+ const featuredVenues=allVenues
+   .filter(v=>v.is_featured||v.tier==='premium'||v.tier==='standard')
+   .sort((a,b)=>(b.is_featured?1:0)-(a.is_featured?1:0));
  const showVenues=featuredVenues.length>=2?featuredVenues.slice(0,2):allVenues.slice(0,2);
  const nextEvent=allEvents.find(e=>e.is_boosted)||allEvents[0];
  const items=[
