@@ -800,21 +800,21 @@ function renderDashboard(){
 
  document.getElementById('pageContent').innerHTML=`
  <div class="stat-grid">
-   <div class="stat-card" style="--accent-color:var(--orange)">
+   <div class="stat-card" style="cursor:pointer;--accent-color:var(--orange)" onclick="nav('venues')">
      <div class="stat-card-eyebrow">Venues</div>
      <div class="stat-card-num">${allVenues.length}</div>
      <div class="stat-card-label">Total Listed</div>
-     <div class="stat-card-sub"><span class="dot" style="color:var(--green)"></span><span style="color:var(--green)">${approved} live</span>&nbsp;&nbsp;<span style="color:var(--gold)">${pending} pending</span></div>
+     <div class="stat-card-sub"><span style="color:var(--green)">${approved} live</span>&nbsp;&nbsp;<span style="color:var(--gold)">${pending} pending</span></div>
      <div class="stat-accent-bar" style="background:var(--orange)"></div>
    </div>
-   <div class="stat-card" style="--accent-color:var(--green)">
+   <div class="stat-card" style="cursor:pointer;--accent-color:var(--green)" onclick="nav('revenue')">
      <div class="stat-card-eyebrow">Revenue</div>
      <div class="stat-card-num" style="color:var(--green)">$${revenue}</div>
      <div class="stat-card-label">Monthly Est.</div>
      <div class="stat-card-sub"><span style="color:var(--muted)">${standard} standard · ${premium} premium</span></div>
      <div class="stat-accent-bar" style="background:var(--green)"></div>
    </div>
-   <div class="stat-card" style="--accent-color:${newInq?'var(--orange)':'var(--muted)'}">
+   <div class="stat-card" style="cursor:pointer;--accent-color:${newInq?'var(--orange)':'var(--muted)'}" onclick="nav('inquiries')">
      <div class="stat-card-eyebrow">Inquiries</div>
      <div class="stat-card-num" style="color:${newInq?'var(--orange)':'var(--text)'}">${newInq}</div>
      <div class="stat-card-label">Awaiting Reply</div>
@@ -828,7 +828,7 @@ function renderDashboard(){
      <div class="stat-card-sub"><span style="color:var(--muted)">${allDesignRequests.length} total</span></div>
      <div class="stat-accent-bar" style="background:var(--gold)"></div>
    </div>
-   <div class="stat-card" style="--accent-color:var(--blue)">
+   <div class="stat-card" style="cursor:pointer;--accent-color:var(--blue)" onclick="nav('events')">
      <div class="stat-card-eyebrow">Events</div>
      <div class="stat-card-num">${thisWeekEvents}</div>
      <div class="stat-card-label">This Week</div>
@@ -849,21 +849,58 @@ function renderDashboard(){
      <div class="stat-card-sub"><span style="color:var(--muted)">Active accounts</span></div>
      <div class="stat-accent-bar" style="background:var(--gold)"></div>
    </div>
-   <div class="stat-card" style="--accent-color:var(--green)">
+   <div class="stat-card" style="cursor:pointer;--accent-color:var(--green)" onclick="nav('users')">
      <div class="stat-card-eyebrow">Attendees</div>
      <div class="stat-card-num" style="color:var(--green)">${attendeeCount}</div>
      <div class="stat-card-label">Registered</div>
      <div class="stat-card-sub"><span style="color:var(--muted)">Active accounts</span></div>
      <div class="stat-accent-bar" style="background:var(--green)"></div>
    </div>
- </div> <!-- Pending venues --> ${pending?`
- <div class="table-card"> <div class="table-header"> <div class="table-title"> Pending Approval (${pending})</div> <button class="btn btn-ghost btn-sm" onclick="nav('venues')">View All →</button> </div> <table> <thead><tr><th>Venue</th><th>Type</th><th>Submitted</th><th>Actions</th></tr></thead> <tbody> ${allVenues.filter(v=>v.status==='pending').map(v=>`
- <tr> <td><strong>${v.name}</strong><div style="font-size:11px;color:var(--muted)">${v.neighborhood||v.city||''}</div></td> <td>${v.venue_type||'—'}</td> <td style="color:var(--muted)">${new Date(v.created_at).toLocaleDateString()}</td> <td><div style="display:flex;gap:6px"> <button class="btn btn-success btn-sm" onclick="approveVenue('${v.id}')"> Approve</button> <button class="btn btn-danger btn-sm" onclick="rejectVenue('${v.id}')"> Reject</button> </div></td> </tr>`).join('')}
- </tbody> </table> </div>`:'<div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:20px 24px;margin-bottom:24px;display:flex;align-items:center;gap:10px;color:var(--green);font-size:14px;font-weight:500"> No pending venues — all caught up!</div>'}
+ </div>
 
- <!-- Recent inquiries --> <div class="table-card"> <div class="table-header"> <div class="table-title"> Recent Inquiries</div> <button class="btn btn-ghost btn-sm" onclick="nav('inquiries')">View All →</button> </div> <table> <thead><tr><th>From</th><th>Venue</th><th>Date</th><th>Status</th></tr></thead> <tbody> ${allInquiries.slice(0,5).map(i=>`
- <tr> <td><strong>${i.name}</strong><div style="font-size:11px;color:var(--muted)">${i.email}</div></td> <td style="color:var(--sub)">${i.venues?.name||'—'}</td> <td style="color:var(--muted)">${new Date(i.created_at).toLocaleDateString()}</td> <td><span class="badge ${i.status==='new'?'badge-orange':'badge-muted'}">${i.status}</span></td> </tr>`).join('')||'<tr class="empty-row"><td colspan="4">No inquiries yet</td></tr>'}
- </tbody> </table> </div> `;
+ ${pending?`
+ <div class="table-card" style="margin-bottom:20px">
+   <div class="table-header">
+     <div><div class="table-title">Pending Approval</div><div class="table-title-sub">${pending} venue${pending>1?'s':''} waiting</div></div>
+     <button class="btn btn-ghost btn-sm" onclick="nav('venues')">View All →</button>
+   </div>
+   <div style="padding:8px 16px 16px;display:flex;flex-direction:column;gap:8px;">
+     ${allVenues.filter(v=>v.status==='pending').map(v=>`
+     <div style="background:var(--surface);border:1px solid rgba(251,191,36,0.2);border-radius:14px;padding:14px 18px;display:flex;align-items:center;gap:14px;">
+       <div style="width:36px;height:36px;border-radius:9px;background:rgba(251,191,36,0.1);border:1px solid rgba(251,191,36,0.2);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;color:var(--gold);flex-shrink:0;">${v.name.charAt(0).toUpperCase()}</div>
+       <div style="flex:1;min-width:0;">
+         <div style="font-weight:700;font-size:14px;letter-spacing:-0.02em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${v.name}</div>
+         <div style="font-size:11px;color:var(--muted);margin-top:2px;">${v.venue_type||'Venue'}${v.neighborhood?' · '+v.neighborhood:''} · ${new Date(v.created_at).toLocaleDateString()}</div>
+       </div>
+       <div style="display:flex;gap:6px;flex-shrink:0;">
+         <button class="btn btn-success btn-sm" onclick="approveVenue('${v.id}')">Approve</button>
+         <button class="btn btn-danger btn-sm" onclick="rejectVenue('${v.id}')">Reject</button>
+       </div>
+     </div>`).join('')}
+   </div>
+ </div>`:`
+ <div style="background:var(--card);border:1px solid rgba(52,211,153,0.15);border-radius:14px;padding:16px 22px;margin-bottom:20px;display:flex;align-items:center;gap:10px;">
+   <span style="color:var(--green);font-size:18px;">✓</span>
+   <span style="color:var(--green);font-size:14px;font-weight:600;">No pending venues — all caught up!</span>
+ </div>`}
+
+ <div class="table-card">
+   <div class="table-header">
+     <div><div class="table-title">Recent Inquiries</div><div class="table-title-sub">${allInquiries.filter(i=>i.status==='new').length} unread</div></div>
+     <button class="btn btn-ghost btn-sm" onclick="nav('inquiries')">View All →</button>
+   </div>
+   <div style="padding:8px 16px 16px;display:flex;flex-direction:column;gap:8px;">
+     ${allInquiries.slice(0,5).map(i=>`
+     <div style="background:var(--surface);border:1px solid ${i.status==='new'?'rgba(255,107,53,0.2)':'var(--border)'};border-radius:14px;padding:14px 18px;display:flex;align-items:center;gap:14px;cursor:pointer;" onclick="nav('inquiries')" onmouseover="this.style.borderColor='rgba(255,255,255,0.1)'" onmouseout="this.style.borderColor='${i.status==='new'?'rgba(255,107,53,0.2)':'var(--border)'}'">
+       <div style="width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,0.06);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;color:var(--sub);flex-shrink:0;">${i.name.charAt(0).toUpperCase()}</div>
+       <div style="flex:1;min-width:0;">
+         <div style="font-weight:700;font-size:13px;letter-spacing:-0.01em;">${i.name}</div>
+         <div style="font-size:11px;color:var(--muted);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${i.venues?.name||'General'} · ${new Date(i.created_at).toLocaleDateString()}</div>
+       </div>
+       <span class="badge ${i.status==='new'?'badge-orange':'badge-muted'}">${i.status}</span>
+     </div>`).join('')||`<div style="text-align:center;padding:40px;color:var(--muted);font-size:13px;">No inquiries yet</div>`}
+   </div>
+ </div>
 }
 
 // ── VENUES ────────────────────────────────────────────────────
@@ -872,20 +909,58 @@ function renderVenues(){
  const filtered=filters[venueFilter]||allVenues;
 
  document.getElementById('pageContent').innerHTML=`
- <div class="table-card"> <div class="table-header"> <div class="table-title">All Venues (${allVenues.length})</div> <button class="btn btn-primary btn-sm" onclick="openAddVenueRedirect()" style="padding:8px 16px;font-size:13px;">+ Add Venue</button> <div class="table-actions"> <button class="btn btn-primary btn-sm" onclick="openAddVenueModal()">+ Add Venue</button> </div> </div> <div class="filter-row"> ${['all','pending','approved','premium','standard'].map(f=>`
- <button class="filter-chip${venueFilter===f?' active':''}" onclick="venueFilter='${f}';renderVenues()">${f.charAt(0).toUpperCase()+f.slice(1)} ${f==='all'?'('+allVenues.length+')':f==='pending'?'('+filters.pending.length+')':f==='approved'?'('+filters.approved.length+')':f==='premium'?'('+filters.premium.length+')':'('+filters.standard.length+')'}</button> `).join('')}
- <input class="search-input" placeholder="Search venues..." oninput="searchVenues(this.value)" style="margin-left:auto"> </div> <div class="venue-card-mobile" id="venueCardBody">${renderVenueCards(filtered)}</div>
- <table> <thead><tr><th>Venue</th><th>Type</th><th>Neighborhood</th><th>Status</th><th>Plan</th><th>Featured</th><th>Actions</th></tr></thead> <tbody id="venueTableBody"> ${renderVenueRows(filtered)}
- </tbody> </table> </div> `;
+ <div class="table-card">
+   <div class="table-header">
+     <div>
+       <div class="table-title">Venues</div>
+       <div class="table-title-sub">${allVenues.length} total · ${allVenues.filter(v=>v.status==='approved').length} live</div>
+     </div>
+     <div style="display:flex;gap:8px;align-items:center;">
+       <input class="search-input" placeholder="Search venues..." oninput="searchVenues(this.value)" style="width:200px;">
+       <button class="btn btn-primary btn-sm" onclick="openAddVenueModal()">+ Add</button>
+     </div>
+   </div>
+   <div class="filter-row">
+     ${['all','pending','approved','premium','standard'].map(f=>`
+     <button class="filter-chip${venueFilter===f?' active':''}" onclick="venueFilter='${f}';renderVenues()">${f.charAt(0).toUpperCase()+f.slice(1)} (${(filters[f]||[]).length})</button>`).join('')}
+   </div>
+   <div id="venueListBody" style="padding:8px 16px 16px;display:flex;flex-direction:column;gap:8px;">
+     ${renderVenueCards2(filtered)}
+   </div>
+ </div>`;
 }
 
-function renderVenueRows(venues){
- if(!venues.length)return'<tr class="empty-row"><td colspan="6">No venues found</td></tr>';
- return venues.map(v=>`
- <tr> <td> <strong style="font-size:13px">${v.name}</strong> ${v.website?`<div style="font-size:11px"><a href="${v.website}" target="_blank" style="color:var(--orange)">${v.website.replace('https://','')}</a></div>`:''}
- </td> <td style="color:var(--sub)">${v.venue_type||'—'}</td> <td style="color:var(--sub)">${v.neighborhood||'—'}</td> <td><span class="badge ${v.status==='approved'?'badge-green':v.status==='pending'?'badge-orange':'badge-red'}">${v.status}</span></td> <td><span class="badge ${v.tier==='premium'?'badge-gold':v.tier==='standard'?'badge-blue':'badge-muted'}">${v.tier||'free'}</span></td> <td>${v.is_featured?'<span class="badge badge-gold">⭐ Yes</span>':'<span class="badge badge-muted">—</span>'}</td> <td> <div style="display:flex;gap:5px;flex-wrap:wrap"> ${v.status==='pending'?`<button class="btn btn-success btn-sm" onclick="approveVenue('${v.id}')">Approve</button>`:''}
- ${v.status!=='rejected'?`<button class="btn btn-ghost btn-sm" onclick="openTierModal('${v.id}')">Tier</button>`:''}
- <button class="btn btn-ghost btn-sm" onclick="toggleVenueFeature('${v.id}',${!v.is_featured})">${v.is_featured?'Unfeature':'⭐ Feature'}</button> <button class="btn btn-ghost btn-sm" onclick="openEditVenue('${v.id}')">✏️ Edit</button> <button class="btn btn-danger btn-sm" onclick="deleteVenue('${v.id}','${v.name.replace(/'/g,"\\'")}')">Delete</button> </div> </td> </tr>`).join('');
+function renderVenueCards2(venues){
+ if(!venues||!venues.length)return`<div style="text-align:center;padding:52px;color:var(--muted);font-size:13px;">No venues found</div>`;
+ return venues.map(v=>{
+   const statusClass=v.status==='approved'?'badge-green':v.status==='pending'?'badge-orange':'badge-red';
+   const tierClass=v.tier==='premium'?'badge-gold':v.tier==='standard'?'badge-blue':'badge-muted';
+   const borderColor=v.status==='pending'?'rgba(251,191,36,0.2)':v.status==='approved'?'rgba(52,211,153,0.12)':'var(--border)';
+   return`
+   <div style="background:var(--surface);border:1px solid ${borderColor};border-radius:14px;padding:15px 18px;display:flex;align-items:center;gap:14px;transition:border-color 0.18s;" onmouseover="this.style.borderColor='rgba(255,255,255,0.1)'" onmouseout="this.style.borderColor='${borderColor}'">
+     <div style="width:40px;height:40px;border-radius:10px;background:rgba(255,255,255,0.05);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:800;color:var(--sub);flex-shrink:0;">${v.name.charAt(0).toUpperCase()}</div>
+     <div style="flex:1;min-width:0;">
+       <div style="font-weight:700;font-size:14px;letter-spacing:-0.02em;display:flex;align-items:center;gap:8px;">
+         ${v.name}
+         ${v.is_featured?'<span style="color:var(--gold);font-size:11px;">⭐</span>':''}
+       </div>
+       <div style="font-size:11px;color:var(--muted);margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
+         ${v.venue_type||'Venue'}${v.neighborhood?' · '+v.neighborhood:''}${v.website?` · <a href="${v.website}" target="_blank" style="color:var(--orange);text-decoration:none;">${v.website.replace('https://','').replace('www.','').split('/')[0]}</a>`:''}
+       </div>
+     </div>
+     <div style="display:flex;gap:6px;align-items:center;flex-shrink:0;">
+       <span class="badge ${statusClass}">${v.status}</span>
+       <span class="badge ${tierClass}">${v.tier||'free'}</span>
+     </div>
+     <div style="display:flex;gap:5px;flex-shrink:0;">
+       ${v.status==='pending'?`<button class="btn btn-success btn-sm" onclick="approveVenue('${v.id}')">Approve</button>`:''}
+       <button class="btn btn-ghost btn-sm" onclick="openTierModal('${v.id}')">Tier</button>
+       <button class="btn btn-ghost btn-sm" onclick="toggleVenueFeature('${v.id}',${!v.is_featured})">${v.is_featured?'Unfeature':'⭐ Feature'}</button>
+       <button class="btn btn-ghost btn-sm" onclick="openEditVenue('${v.id}')">Edit</button>
+       <button class="btn btn-danger btn-sm" onclick="deleteVenue('${v.id}','${v.name.replace(/'/g,"\\'")}')">Delete</button>
+     </div>
+   </div>`;
+ }).join('');
 }
 
 function renderVenueCards(venues){
@@ -909,10 +984,8 @@ function renderVenueCards(venues){
 
 function searchVenues(q){
  const f=allVenues.filter(v=>v.name.toLowerCase().includes(q.toLowerCase())||(v.venue_type||'').toLowerCase().includes(q.toLowerCase())||(v.neighborhood||'').toLowerCase().includes(q.toLowerCase()));
- const el=document.getElementById('venueTableBody');
- if(el)el.innerHTML=renderVenueRows(f);
- const cards=document.getElementById('venueCardBody');
- if(cards)cards.innerHTML=renderVenueCards(f);
+ const el=document.getElementById('venueListBody');
+ if(el)el.innerHTML=renderVenueCards2(f);
 }
 
 // ── EVENTS ────────────────────────────────────────────────────
@@ -921,22 +994,67 @@ function renderEvents(){
  const filtered=filters[eventFilter]||allEvents;
 
  document.getElementById('pageContent').innerHTML=`
- <div class="table-card"> <div class="table-header"> <div class="table-title">All Events (${allEvents.length})</div> <button class="btn btn-primary btn-sm" onclick="openAddEvent()" style="padding:8px 16px;font-size:13px;">+ Add Event</button> </div> <div class="filter-row"> ${['all','published','draft'].map(f=>`
- <button class="filter-chip${eventFilter===f?' active':''}" onclick="eventFilter='${f}';renderEvents()">${f.charAt(0).toUpperCase()+f.slice(1)} (${(filters[f]||[]).length})</button> `).join('')}
- <input class="search-input" placeholder="Search events..." oninput="searchEvents(this.value)" style="margin-left:auto"> </div> <table> <thead><tr><th>Event</th><th>Venue</th><th>Date</th><th>Category</th><th>Status</th><th>Boost</th><th>Actions</th></tr></thead> <tbody id="eventTableBody"> ${renderEventRows(filtered)}
- </tbody> </table> </div> `;
+ <div class="table-card">
+   <div class="table-header">
+     <div>
+       <div class="table-title">Events</div>
+       <div class="table-title-sub">${allEvents.length} total · ${allEvents.filter(e=>e.status==='published').length} published</div>
+     </div>
+     <div style="display:flex;gap:8px;align-items:center;">
+       <input class="search-input" placeholder="Search events..." oninput="searchEvents(this.value)" style="width:200px;">
+       <button class="btn btn-primary btn-sm" onclick="openAddEvent()">+ Add</button>
+     </div>
+   </div>
+   <div class="filter-row">
+     ${['all','published','draft'].map(f=>`
+     <button class="filter-chip${eventFilter===f?' active':''}" onclick="eventFilter='${f}';renderEvents()">${f.charAt(0).toUpperCase()+f.slice(1)} (${(filters[f]||[]).length})</button>`).join('')}
+   </div>
+   <div id="eventListBody" style="padding:8px 16px 16px;display:flex;flex-direction:column;gap:8px;">
+     ${renderEventCards(filtered)}
+   </div>
+ </div>`;
 }
 
-function renderEventRows(events){
- if(!events.length)return'<tr class="empty-row"><td colspan="6">No events found</td></tr>';
- return events.map(e=>`
- <tr> <td><strong>${e.title}</strong>${e.is_free?'<span style="color:var(--green);font-size:11px;margin-left:6px">FREE</span>':e.price_min?`<span style="font-size:11px;color:var(--sub);margin-left:6px">$${e.price_min}</span>`:''}</td> <td style="color:var(--sub)">${e.venues?.name||'—'}</td> <td style="color:var(--muted)">${new Date(e.start_time).toLocaleDateString()} ${new Date(e.start_time).toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'})}</td> <td style="color:var(--sub)">${e.category||'—'}</td> <td><span class="badge ${e.status==='published'?'badge-green':'badge-muted'}">${e.status}</span></td> <td>${e.is_boosted?`<span class="badge badge-gold"> ${e.boost_type||'boosted'}</span>`:`<span class="badge badge-muted">—</span>`}</td> <td><div style="display:flex;gap:5px;flex-wrap:wrap"> <button class="btn btn-ghost btn-sm" onclick="toggleEventBoost('${e.id}',${!e.is_boosted})">${e.is_boosted?'↓ Unboost':' Boost'}</button> <button class="btn btn-ghost btn-sm" onclick="openEditEvent('${e.id}')">✏️ Edit</button> <button class="btn btn-danger btn-sm" onclick="deleteEvent('${e.id}','${e.title.replace(/'/g,"\\'")}')">Delete</button> </div></td> </tr>`).join('');
+function renderEventCards(events){
+ if(!events.length)return`<div style="text-align:center;padding:52px;color:var(--muted);font-size:13px;">No events found</div>`;
+ return events.map(e=>{
+   const d=e.start_time?new Date(e.start_time):null;
+   const dateStr=d?d.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}):'No date';
+   const timeStr=d?d.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'}):'';
+   const isPast=d&&d<new Date();
+   const borderColor=e.status==='published'&&!isPast?'rgba(52,211,153,0.12)':e.status==='draft'?'rgba(255,255,255,0.04)':'var(--border)';
+   return`
+   <div style="background:var(--surface);border:1px solid ${borderColor};border-radius:14px;padding:15px 18px;display:flex;align-items:center;gap:14px;transition:border-color 0.18s;" onmouseover="this.style.borderColor='rgba(255,255,255,0.1)'" onmouseout="this.style.borderColor='${borderColor}'">
+     <div style="width:44px;height:44px;border-radius:10px;background:rgba(129,140,248,0.1);border:1px solid rgba(129,140,248,0.2);display:flex;flex-direction:column;align-items:center;justify-content:center;flex-shrink:0;line-height:1;">
+       <div style="font-size:9px;font-weight:700;color:var(--blue);text-transform:uppercase;letter-spacing:0.05em;">${d?d.toLocaleString('en-US',{month:'short'}):'-'}</div>
+       <div style="font-size:17px;font-weight:800;color:var(--blue);font-family:var(--mono);">${d?d.getDate():'-'}</div>
+     </div>
+     <div style="flex:1;min-width:0;">
+       <div style="font-weight:700;font-size:14px;letter-spacing:-0.02em;display:flex;align-items:center;gap:8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
+         ${e.title}
+         ${e.is_free?'<span style="color:var(--green);font-size:10px;font-weight:700;background:rgba(52,211,153,0.1);border:1px solid rgba(52,211,153,0.2);border-radius:20px;padding:1px 7px;">FREE</span>':e.price_min?`<span style="color:var(--sub);font-size:11px;">$${e.price_min}</span>`:''}
+         ${e.is_boosted?`<span style="color:var(--gold);font-size:10px;">⚡ Boosted</span>`:''}
+       </div>
+       <div style="font-size:11px;color:var(--muted);margin-top:3px;">
+         ${e.venues?.name||'No venue'} · ${timeStr||dateStr}${e.category?' · '+e.category:''}
+       </div>
+     </div>
+     <div style="display:flex;gap:6px;align-items:center;flex-shrink:0;">
+       <span class="badge ${e.status==='published'?'badge-green':'badge-muted'}">${e.status}</span>
+     </div>
+     <div style="display:flex;gap:5px;flex-shrink:0;">
+       <button class="btn btn-ghost btn-sm" onclick="toggleEventBoost('${e.id}',${!e.is_boosted})">${e.is_boosted?'Unboost':'⚡ Boost'}</button>
+       <button class="btn btn-ghost btn-sm" onclick="openEditEvent('${e.id}')">Edit</button>
+       <button class="btn btn-danger btn-sm" onclick="deleteEvent('${e.id}','${e.title.replace(/'/g,"\\'")}')">Delete</button>
+     </div>
+   </div>`;
+ }).join('');
 }
 
 function searchEvents(q){
  const f=allEvents.filter(e=>e.title.toLowerCase().includes(q.toLowerCase())||(e.venues?.name||'').toLowerCase().includes(q.toLowerCase()));
- const el=document.getElementById('eventTableBody');
- if(el)el.innerHTML=renderEventRows(f);
+ const el=document.getElementById('eventListBody');
+ if(el)el.innerHTML=renderEventCards(f);
 }
 
 // ── INQUIRIES ─────────────────────────────────────────────────
@@ -945,13 +1063,39 @@ function renderInquiries(){
  const filtered=filters[inquiryFilter]||allInquiries;
 
  document.getElementById('pageContent').innerHTML=`
- <div class="table-card"> <div class="table-header"> <div class="table-title">All Inquiries (${allInquiries.length})</div> <div style="font-size:13px;color:var(--sub)">${allInquiries.filter(i=>i.status==='new').length} unread</div> </div> <div class="filter-row"> ${['all','new','read'].map(f=>`
- <button class="filter-chip${inquiryFilter===f?' active':''}" onclick="inquiryFilter='${f}';renderInquiries()">${f.charAt(0).toUpperCase()+f.slice(1)} (${(filters[f]||[]).length})</button> `).join('')}
- </div> <table> <thead><tr><th>From</th><th>Venue</th><th>Event Date</th><th>Guests</th><th>Message</th><th>Status</th><th>Actions</th></tr></thead> <tbody> ${filtered.length?filtered.map(i=>`
- <tr> <td> <strong>${i.name}</strong> <div style="font-size:11px;color:var(--orange)"><a href="mailto:${i.email}" style="color:var(--orange)">${i.email}</a></div> ${i.phone?`<div style="font-size:11px;color:var(--muted)">${i.phone}</div>`:''}
- </td> <td style="color:var(--sub)">${i.venues?.name||'—'}</td> <td style="color:var(--muted)">${i.event_date||'—'}</td> <td style="color:var(--sub)">${i.guest_count||'—'}</td> <td style="max-width:200px"><div style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--sub);font-size:12px">${i.message||'—'}</div></td> <td><span class="badge ${i.status==='new'?'badge-orange':'badge-muted'}">${i.status}</span></td> <td> <div style="display:flex;gap:5px"> ${i.status==='new'?`<button class="btn btn-ghost btn-sm" onclick="markRead('${i.id}')">Mark Read</button>`:''}
- <button class="btn btn-ghost btn-sm" onclick="viewInquiry('${i.id}')">View</button> </div> </td> </tr>`).join(''):'<tr class="empty-row"><td colspan="7">No inquiries found</td></tr>'}
- </tbody> </table> </div> `;
+ <div class="table-card">
+   <div class="table-header">
+     <div>
+       <div class="table-title">Inquiries</div>
+       <div class="table-title-sub">${allInquiries.filter(i=>i.status==='new').length} unread · ${allInquiries.length} total</div>
+     </div>
+   </div>
+   <div class="filter-row">
+     ${['all','new','read'].map(f=>`
+     <button class="filter-chip${inquiryFilter===f?' active':''}" onclick="inquiryFilter='${f}';renderInquiries()">${f.charAt(0).toUpperCase()+f.slice(1)} (${(filters[f]||[]).length})</button>`).join('')}
+   </div>
+   <div style="padding:8px 16px 16px;display:flex;flex-direction:column;gap:8px;">
+     ${filtered.length?filtered.map(i=>`
+     <div style="background:var(--surface);border:1px solid ${i.status==='new'?'rgba(255,107,53,0.25)':'var(--border)'};border-radius:14px;padding:15px 18px;display:flex;align-items:center;gap:14px;transition:border-color 0.18s;" onmouseover="this.style.borderColor='rgba(255,255,255,0.1)'" onmouseout="this.style.borderColor='${i.status==='new'?'rgba(255,107,53,0.25)':'var(--border)'}'">
+       <div style="width:40px;height:40px;border-radius:50%;background:${i.status==='new'?'rgba(255,107,53,0.1)':'rgba(255,255,255,0.05)'};border:1px solid ${i.status==='new'?'rgba(255,107,53,0.2)':'var(--border)'};display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;color:${i.status==='new'?'var(--orange)':'var(--sub)'};flex-shrink:0;">${(i.name||'?').charAt(0).toUpperCase()}</div>
+       <div style="flex:1;min-width:0;">
+         <div style="font-weight:700;font-size:14px;letter-spacing:-0.02em;">${i.name}</div>
+         <div style="font-size:11px;color:var(--muted);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
+           <a href="mailto:${i.email}" style="color:var(--orange);text-decoration:none;">${i.email}</a>
+           ${i.venues?.name?' · '+i.venues.name:''}
+           ${i.event_date?' · '+i.event_date:''}
+           ${i.guest_count?' · '+i.guest_count+' guests':''}
+         </div>
+         ${i.message?`<div style="font-size:12px;color:var(--sub);margin-top:5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:500px;font-style:italic;">"${i.message}"</div>`:''}
+       </div>
+       <div style="font-size:11px;color:var(--muted);flex-shrink:0;white-space:nowrap;">${new Date(i.created_at).toLocaleDateString()}</div>
+       <div style="display:flex;gap:5px;flex-shrink:0;">
+         ${i.status==='new'?`<button class="btn btn-ghost btn-sm" onclick="markRead('${i.id}')">Mark Read</button>`:''}
+         <button class="btn btn-ghost btn-sm" onclick="viewInquiry('${i.id}')">View</button>
+       </div>
+     </div>`).join(''):`<div style="text-align:center;padding:52px;color:var(--muted);font-size:13px;">No inquiries found</div>`}
+   </div>
+ </div>`;
 }
 
 // ── REVENUE ───────────────────────────────────────────────────
