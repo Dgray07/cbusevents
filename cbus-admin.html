@@ -661,7 +661,7 @@ function renderVenueCards(venues){
    <div class="v-card-actions">
      ${v.status==='pending'?`<button class="btn btn-success btn-sm" onclick="approveVenue('${v.id}')">Approve</button>`:''}
      ${v.status!=='rejected'?`<button class="btn btn-ghost btn-sm" onclick="openTierModal('${v.id}')">Tier</button>`:''}
-     <button class="btn btn-ghost btn-sm" onclick="toggleVenueFeature('${v.id}',${!v.is_featured})">${v.is_featured?'Unfeature':'Feature'}</button>
+     <button class="btn btn-ghost btn-sm" onclick="toggleVenueFeature('${v.id}',${v.is_featured?'false':'true'})">${v.is_featured?'Unfeature':'Feature'}</button>
      <button class="btn btn-danger btn-sm" onclick="deleteVenue('${v.id}','${v.name.replace(/'/g,"\'")}')">Delete</button>
    </div>
  </div>`).join('');
@@ -1166,10 +1166,13 @@ async function toggleEventBoost(id,val){
 }
 
 async function toggleVenueFeature(id,val){
- const{error}=await sb.from('venues').update({is_featured:val}).eq('id',id);
+ const isFeatured=val===true||val==='true';
+ const{error}=await sb.from('venues').update({is_featured:isFeatured}).eq('id',id);
  if(error){toast('Error: '+error.message,'error');return;}
- await loadData();renderShell();
- toast(val?'⭐ Venue featured!':'Feature removed');
+ await loadData();
+ if(currentPage==='venues')renderVenues();
+ else renderShell();
+ toast(isFeatured?'⭐ Venue featured!':'Feature removed');
 }
 
 // ── VENDORS ───────────────────────────────────────────────────
