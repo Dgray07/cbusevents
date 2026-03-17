@@ -844,6 +844,7 @@ function closeModal(){document.getElementById('modalContainer').innerHTML='';}
 init();
 </script>
 
+<script>
   // Show admin footer link only for admin users
   (function() {
     var link = document.getElementById('adminFooterLink');
@@ -853,5 +854,11 @@ init();
       try {
         var parsed = JSON.parse(stored);
         var email = parsed && parsed.user && parsed.user.email;
-        var adminEmails = ['<a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="aacecfcbc4decf939aeacdc7cbc3c684c9c5c7">[email&#160;protected]</a>'];
-        if (em
+        var adminEmails = ['deante90@gmail.com'];
+        if (email && adminEmails.indexOf(email) > -1) link.style.display = 'inline';
+      } catch(e) {}
+    }
+  })();
+</script>
+</body>
+</html>
