@@ -1396,26 +1396,28 @@ function renderVendors(){
  document.getElementById('pageContent').innerHTML=`
  <div class="table-card">
    <div class="table-header">
-     <div class="table-title">All Vendors (${allVendors.length})</div>
-     <input class="search-input" placeholder="Search vendors..." oninput="searchVendors(this.value)">
+     <div>
+       <div class="table-title">All Vendors</div>
+       <div class="table-title-sub">${allVendors.length} total &nbsp;·&nbsp; ${allVendors.filter(v=>v.subscription_status==='active'||v.tier==='premium'||v.tier==='standard').length} paid</div>
+     </div>
+     <input class="search-input" placeholder="Search vendors..." oninput="searchVendors(this.value)" style="width:220px;">
    </div>
-   <table>
-     <thead><tr><th>Business</th><th>Category</th><th>Tier</th><th>Sub Status</th><th>Promoted</th><th>Actions</th></tr></thead>
-     <tbody id="vendorTableBody">${renderVendorRows(allVendors)}</tbody>
-   </table>
+   <div id="vendorListBody" style="padding:8px 16px 16px;display:flex;flex-direction:column;gap:8px;">
+     ${renderVendorCards(allVendors)}
+   </div>
  </div>
 
- <!-- Vendor Edit Modal -->
- <div id="vendorEditModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:1000;display:none;align-items:center;justify-content:center">
-   <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:28px;width:100%;max-width:500px;max-height:90vh;overflow-y:auto">
-     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
-       <div style="font-family:Inter,sans-serif;font-size:16px;font-weight:700">Edit Vendor</div>
-       <button onclick="closeVendorEdit()" style="background:none;border:none;color:var(--muted);font-size:20px;cursor:pointer">×</button>
+ <!-- Vendor Edit Modal (separate from table card) -->
+ <div id="vendorEditModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.75);backdrop-filter:blur(8px);z-index:1000;align-items:center;justify-content:center;padding:20px;">
+   <div style="background:var(--card);border:1px solid var(--border);border-radius:20px;padding:28px;width:100%;max-width:500px;max-height:90vh;overflow-y:auto;box-shadow:0 24px 80px rgba(0,0,0,0.6);animation:fadeIn 0.2s ease;">
+     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:22px;">
+       <div style="font-size:16px;font-weight:700;letter-spacing:-0.02em;">Edit Vendor</div>
+       <button onclick="closeVendorEdit()" style="background:rgba(255,255,255,0.06);border:1px solid var(--border);border-radius:8px;color:var(--sub);font-size:16px;cursor:pointer;width:32px;height:32px;display:flex;align-items:center;justify-content:center;line-height:1;">×</button>
      </div>
-     <div class="field"><label>Business Name</label><input id="ve-name" class="input"/></div>
-     <div class="field"><label>Email</label><input id="ve-email" class="input"/></div>
+     <div class="field"><label>Business Name</label><input id="ve-name" class="form-input"/></div>
+     <div class="field"><label>Email</label><input id="ve-email" class="form-input"/></div>
      <div class="field"><label>Category</label>
-       <select id="ve-category" style="width:100%;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:10px 12px;color:var(--text);font-size:14px">
+       <select id="ve-category" class="form-input">
          <option>Photography</option><option>Videography</option><option>DJ / Music</option>
          <option>Live Music / Band</option><option>Catering</option><option>Florals & Decor</option>
          <option>Photo Booth</option><option>Bakery & Desserts</option><option>Event Coordination</option>
@@ -1423,46 +1425,65 @@ function renderVendors(){
          <option>Rentals (Linens, Furniture)</option><option>Design</option><option>Other</option>
        </select>
      </div>
-     <div class="field"><label>Description</label><textarea id="ve-desc" style="width:100%;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:10px 12px;color:var(--text);font-size:14px;min-height:80px;resize:vertical;font-family:inherit"></textarea></div>
-     <div class="field"><label>Phone</label><input id="ve-phone" class="input"/></div>
-     <div class="field"><label>Website</label><input id="ve-website" class="input"/></div>
-     <div class="field"><label>Instagram</label><input id="ve-instagram" class="input" placeholder="@handle"/></div>
+     <div class="field"><label>Description</label><textarea id="ve-desc" class="form-input" style="min-height:80px;resize:vertical;"></textarea></div>
+     <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+       <div class="field"><label>Phone</label><input id="ve-phone" class="form-input"/></div>
+       <div class="field"><label>Instagram</label><input id="ve-instagram" class="form-input" placeholder="@handle"/></div>
+     </div>
+     <div class="field"><label>Website</label><input id="ve-website" class="form-input"/></div>
      <div class="field"><label>Subscription Tier</label>
-       <select id="ve-tier" style="width:100%;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:10px 12px;color:var(--text);font-size:14px">
+       <select id="ve-tier" class="form-input">
          <option value="">FREE</option><option value="STANDARD">STANDARD</option><option value="PREMIUM">PREMIUM</option><option value="FOUNDING">FOUNDING</option>
        </select>
      </div>
-     <div style="display:flex;gap:10px;margin-top:20px">
-       <button onclick="closeVendorEdit()" class="btn btn-ghost" style="flex:1">Cancel</button>
-       <button onclick="saveVendorEdit()" class="btn btn-primary" style="flex:2">Save Changes →</button>
+     <div style="display:flex;gap:10px;margin-top:22px;">
+       <button onclick="closeVendorEdit()" class="btn btn-ghost" style="flex:1;">Cancel</button>
+       <button onclick="saveVendorEdit()" class="btn btn-primary" style="flex:2;">Save Changes →</button>
      </div>
    </div>
  </div>`;
 }
 
-function renderVendorRows(vendors){
- if(!vendors.length)return'<tr class="empty-row"><td colspan="7">No vendors found</td></tr>';
- return vendors.map(v=>`
- <tr>
-   <td><strong>${v.business_name||v.name||'—'}</strong><div style="font-size:11px;color:var(--muted)">${v.email||''}</div></td>
-   <td style="color:var(--sub)">${v.category||'—'}</td>
-   <td><span class="badge ${v.subscription_tier==='PREMIUM'||v.tier==='premium'?'badge-gold':v.subscription_tier==='STANDARD'||v.tier==='standard'?'badge-blue':'badge-muted'}">${v.subscription_tier||v.tier||'FREE'}</span></td>
-   <td><span class="badge ${v.subscription_status==='active'?'badge-green':'badge-muted'}">${v.subscription_status||'—'}</span></td>
-   <td>${v.admin_promoted?'<span class="badge badge-gold">⭐ Yes</span>':'<span class="badge badge-muted">—</span>'}</td>
-   <td>
-     <div style="display:flex;gap:5px;flex-wrap:wrap">
-       <button class="btn ${v.admin_promoted?'btn-ghost':'btn-success'} btn-sm" onclick="toggleVendorPromo('${v.id}',${!v.admin_promoted})">${v.admin_promoted?'Remove Promo':'⭐ Promote'}</button>
-       <button class="btn btn-ghost btn-sm" onclick="openEditVendor('${v.id}')">✏️ Edit</button>
+function renderVendorCards(vendors){
+ if(!vendors.length)return`<div style="text-align:center;padding:52px;color:var(--muted);font-size:13px;">No vendors found</div>`;
+ return vendors.map(v=>{
+   const tierClass=v.subscription_tier==='PREMIUM'||v.tier==='premium'?'badge-gold':v.subscription_tier==='STANDARD'||v.tier==='standard'?'badge-blue':'badge-muted';
+   const tierLabel=v.subscription_tier||v.tier||'FREE';
+   const subClass=v.subscription_status==='active'?'badge-green':'badge-muted';
+   const name=v.business_name||v.name||'Unnamed Vendor';
+   const cat=v.category||null;
+   return`
+   <div style="background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:16px 20px;display:flex;align-items:center;gap:16px;transition:border-color 0.18s;" onmouseover="this.style.borderColor='rgba(255,255,255,0.08)'" onmouseout="this.style.borderColor='var(--border)'">
+     <!-- Avatar -->
+     <div style="width:40px;height:40px;border-radius:10px;background:linear-gradient(135deg,rgba(255,107,53,0.2),rgba(255,107,53,0.06));border:1px solid rgba(255,107,53,0.2);display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:800;color:var(--orange);flex-shrink:0;letter-spacing:-0.02em;">${name.charAt(0).toUpperCase()}</div>
+     <!-- Business info -->
+     <div style="flex:1;min-width:0;">
+       <div style="font-weight:700;font-size:14px;letter-spacing:-0.02em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${name}${v.admin_promoted?'<span style="color:var(--gold);margin-left:6px;font-size:12px;">⭐</span>':''}</div>
+       <div style="font-size:11px;color:var(--muted);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${v.email||'No email'}</div>
+     </div>
+     <!-- Category pill -->
+     <div style="flex-shrink:0;min-width:0;max-width:140px;">
+       ${cat?`<span style="display:inline-block;background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:20px;padding:3px 11px;font-size:11px;font-weight:500;color:var(--sub);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:140px;">${cat}</span>`:`<span style="color:var(--muted);font-size:12px;">—</span>`}
+     </div>
+     <!-- Tier + Sub badges -->
+     <div style="display:flex;gap:6px;flex-shrink:0;align-items:center;">
+       <span class="badge ${tierClass}">${tierLabel}</span>
+       <span class="badge ${subClass}" style="display:${v.subscription_status?'inline-flex':'none'}">${v.subscription_status||''}</span>
+     </div>
+     <!-- Actions -->
+     <div style="display:flex;gap:6px;flex-shrink:0;">
+       <button class="btn ${v.admin_promoted?'btn-ghost':'btn-success'} btn-sm" onclick="toggleVendorPromo('${v.id}',${!v.admin_promoted})" title="${v.admin_promoted?'Remove Promo':'Promote'}">${v.admin_promoted?'Unpromo':'⭐ Promo'}</button>
+       <button class="btn btn-ghost btn-sm" onclick="openEditVendor('${v.id}')">Edit</button>
        <button class="btn btn-danger btn-sm" onclick="deleteVendor('${v.id}','${(v.business_name||v.name||'this vendor').replace(/'/g,"\\'")}')">Delete</button>
      </div>
-   </td>
- </tr>`).join('');
+   </div>`;
+ }).join('');
 }
 
 function searchVendors(q){
  const f=allVendors.filter(v=>(v.business_name||v.name||'').toLowerCase().includes(q.toLowerCase())||(v.category||'').toLowerCase().includes(q.toLowerCase()));
- const el=document.getElementById('vendorTableBody');
- if(el)el.innerHTML=renderVendorRows(f);
+ const el=document.getElementById('vendorListBody');
+ if(el)el.innerHTML=renderVendorCards(f);
 }
 
 async function toggleVendorPromo(id,val){
