@@ -2212,7 +2212,14 @@ function openVendorModal(id){
    </div>`:''}
    <div style="display:flex;gap:10px">
      <button onclick="closeVendorModal()" style="flex:1;background:#1e1e2e;color:#ccc;border:1px solid #25252f;border-radius:10px;padding:12px;font-size:14px;cursor:pointer;font-family:Inter,sans-serif;">Close</button>
-     ${v.email?`<a href="mailto:${v.email}" style="flex:2;background:var(--orange);color:#fff;border:none;border-radius:10px;padding:12px;font-size:14px;font-weight:700;cursor:pointer;text-align:center;text-decoration:none;display:block">Contact Vendor →</a>`:''}
+     ${v.email
+       ? `<a href="mailto:${v.email}" style="flex:2;background:var(--orange);color:#fff;border:none;border-radius:10px;padding:12px;font-size:14px;font-weight:700;cursor:pointer;text-align:center;text-decoration:none;display:block">Contact Vendor →</a>`
+       : v.website
+       ? `<a href="${v.website}" target="_blank" style="flex:2;background:var(--orange);color:#fff;border:none;border-radius:10px;padding:12px;font-size:14px;font-weight:700;cursor:pointer;text-align:center;text-decoration:none;display:block">Visit Website →</a>`
+       : v.instagram
+       ? `<a href="https://instagram.com/${v.instagram.replace('@','')}" target="_blank" style="flex:2;background:var(--orange);color:#fff;border:none;border-radius:10px;padding:12px;font-size:14px;font-weight:700;cursor:pointer;text-align:center;text-decoration:none;display:block">View on Instagram →</a>`
+       : `<a href="mailto:info@cbusevents.com?subject=Vendor Inquiry — ${encodeURIComponent(name)}" style="flex:2;background:var(--orange);color:#fff;border:none;border-radius:10px;padding:12px;font-size:14px;font-weight:700;cursor:pointer;text-align:center;text-decoration:none;display:block">Request Intro →</a>`
+     }
    </div>
  </div>`;
  document.getElementById('vendorModal').style.display='block';
