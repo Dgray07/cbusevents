@@ -1350,7 +1350,7 @@ function closeVendorEdit(){
 }
 
 async function saveVendorEdit(){
- if(!editingVendorId)return;
+ if(!editingVendorId){toast('Error: no vendor selected','error');return;}
  const updates={
    business_name:document.getElementById('ve-name').value.trim()||null,
    email:document.getElementById('ve-email').value.trim()||null,
@@ -1362,8 +1362,15 @@ async function saveVendorEdit(){
    subscription_tier:document.getElementById('ve-tier').value||null,
    updated_at:new Date().toISOString(),
  };
- const{error}=await sb.from('vendors').update(updates).eq('id',editingVendorId);
+ console.log('Saving vendor:', editingVendorId, updates);
+ const{data,error}=await sb.from('vendors').update(updates).eq('id',editingVendorId).select();
+ console.log('Vendor save result:', {data,error});
  if(error){toast('Error: '+error.message,'error');return;}
+ if(!data||data.length===0){
+   toast('Save blocked — check Supabase RLS policy on vendors table','error');
+   console.error('RLS blocked vendor update. editingVendorId:',editingVendorId);
+   return;
+ }
  closeVendorEdit();
  await loadData();renderPage();
  toast('Vendor updated');
@@ -1593,8 +1600,52 @@ const OUTREACH_DISTRICTS={
 const OUTREACH_STATUSES=['Not Contacted','Visited — No Answer','Left Info','Spoke to Staff','Decision Maker Reached','Interested','Signed Up','Not Interested'];
 const STATUS_COLORS={'Not Contacted':'badge-muted','Visited — No Answer':'badge-gold','Left Info':'badge-blue','Spoke to Staff':'badge-blue','Decision Maker Reached':'badge-orange','Interested':'badge-orange','Signed Up':'badge-green','Not Interested':'badge-red'};
 
-function getOutreachData(){try{return JSON.parse(localStorage.getItem('cbusevents_outreach')||'{}');}catch(e){return{};}}
-function saveOutreachData(d){localStorage.setItem('cbusevents_outreach',JSON.stringify(d));}
+let _outreachCache={};
+async function getOutreachData(){
+ if(Object.keys(_outreachCache).length>0)return _outreachCache;
+ try{
+   const{data}=await sb.from('outreach_tracker').select('venue_id,status,notes,updated_at');
+   const result={};
+   (data||[]).forEach(r=>result[r.venue_id]={status:r.status,notes:r.notes||'',updatedAt:r.updated_at});
+   _outreachCache=result;
+   try{
+     const local=JSON.parse(localStorage.getItem('cbusevents_outreach')||'{}');
+     const localKeys=Object.keys(local).filter(k=>!result[k]);
+     if(localKeys.length>0){
+       await sb.from('outreach_tracker').upsert(
+         localKeys.map(k=>({venue_id:k,status:local[k].status||'Not Contacted',notes:local[k].notes||'',updated_at:local[k].updatedAt||new Date().toISOString(),updated_by:'admin'})),
+         {onConflict:'venue_id'}
+       );
+       localKeys.forEach(k=>result[k]=local[k]);
+       _outreachCache=result;
+     }
+   }catch(e){}
+   return result;
+ }catch(e){
+   try{return JSON.parse(localStorage.getItem('cbusevents_outreach')||'{}');}catch(e2){return{};}
+ }
+}
+async function saveOutreachData(venueId,field,value){
+ if(!_outreachCache[venueId])_outreachCache[venueId]={};
+ _outreachCache[venueId][field]=value;
+ _outreachCache[venueId].updatedAt=new Date().toISOString();
+ try{
+   await sb.from('outreach_tracker').upsert({
+     venue_id:venueId,
+     status:_outreachCache[venueId].status||'Not Contacted',
+     notes:_outreachCache[venueId].notes||'',
+     updated_at:new Date().toISOString(),
+     updated_by:currentUser?currentUser.email:'admin',
+   },{onConflict:'venue_id'});
+ }catch(e){
+   try{
+     const d=JSON.parse(localStorage.getItem('cbusevents_outreach')||'{}');
+     if(!d[venueId])d[venueId]={};
+     d[venueId][field]=value;
+     localStorage.setItem('cbusevents_outreach',JSON.stringify(d));
+   }catch(e2){}
+ }
+}
 
 let _orDistrict='east-columbus',_orQ='',_orS='';
 
@@ -1696,21 +1747,17 @@ function renderOutreachCards(){
  }).join('');
 }
 
-function updateOutreachStatus(id,status){
- const data=getOutreachData();
- if(!data[id])data[id]={};
- data[id].status=status;
- data[id].updatedAt=new Date().toISOString();
- saveOutreachData(data);
+async function updateOutreachStatus(id,status){
+ await saveOutreachData(id,'status',status);
  const borderColor={'badge-green':'#22c55e','badge-orange':'#FF6B35','badge-blue':'#60a5fa','badge-gold':'#f59e0b','badge-red':'#ef4444','badge-muted':'#25252f'}[STATUS_COLORS[status]||'badge-muted']||'#25252f';
  const card=document.getElementById('ocard-'+id);
  if(card)card.style.borderLeftColor=borderColor;
- const d2=getOutreachData();
- const allVenues=Object.values(OUTREACH_DISTRICTS).flatMap(d=>d.venues);
- const total=allVenues.length;
- const signed=allVenues.filter(v=>(d2[v.id]?.status||'Not Contacted')==='Signed Up').length;
- const interested=allVenues.filter(v=>(d2[v.id]?.status||'Not Contacted')==='Interested').length;
- const contacted=allVenues.filter(v=>(d2[v.id]?.status||'Not Contacted')!=='Not Contacted').length;
+ const d2=await getOutreachData();
+ const allVenuesList=Object.values(OUTREACH_DISTRICTS).flatMap(d=>d.venues);
+ const total=allVenuesList.length;
+ const signed=allVenuesList.filter(v=>(d2[v.id]&&d2[v.id].status||'Not Contacted')==='Signed Up').length;
+ const interested=allVenuesList.filter(v=>(d2[v.id]&&d2[v.id].status||'Not Contacted')==='Interested').length;
+ const contacted=allVenuesList.filter(v=>(d2[v.id]&&d2[v.id].status||'Not Contacted')!=='Not Contacted').length;
  const nums=document.querySelectorAll('.stat-card-num');
  if(nums[0])nums[0].textContent=contacted;
  if(nums[1])nums[1].textContent=interested;
@@ -1720,27 +1767,11 @@ function updateOutreachStatus(id,status){
  if(bar)bar.style.width=Math.round((contacted/total)*100)+'%';
  toast(status==='Signed Up'?'Venue signed up!':status==='Interested'?'Marked interested':'Updated');
 }
-
-function updateOutreachNotes(id,notes){
- const data=getOutreachData();
- if(!data[id])data[id]={};
- data[id].notes=notes;
- data[id].updatedAt=new Date().toISOString();
- saveOutreachData(data);
+async function updateOutreachNotes(id,notes){
+ await saveOutreachData(id,'notes',notes);
  const ind=document.getElementById('note-saved-'+id);
- if(ind){ind.style.opacity='1';setTimeout(()=>{ind.style.opacity='0';},1800);}
+ if(ind){ind.style.opacity='1';setTimeout(()=>ind.style.opacity='0',1500);}
 }
-
-const _noteTimers={};
-function debounceSaveNote(id,val){
- clearTimeout(_noteTimers[id]);
- _noteTimers[id]=setTimeout(()=>updateOutreachNotes(id,val),600);
-}
-function saveNoteNow(id,val){
- clearTimeout(_noteTimers[id]);
- updateOutreachNotes(id,val);
-}
-
 // ── START ─────────────────────────────────────────────────────
 init();
 
