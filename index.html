@@ -257,22 +257,8 @@ nav {
 .tag { background:var(--surface); color:var(--sub); border-radius:20px; padding:3px 9px; font-size:11px; }
 
 /* ── EVENT CARDS ── */
-.event-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(265px,1fr)); gap:14px; }
-.event-card {
- background:var(--card); border:1px solid var(--border); border-radius:12px;
- overflow:hidden; cursor:pointer; transition:all 0.2s; display:flex;
-}
-.event-card:hover { border-color:var(--orange); transform:translateY(-2px); }
-.event-accent { width:4px; flex-shrink:0; background:var(--orange); }
-.event-accent.green { background:var(--green); }
-.event-body { padding:14px 16px; flex:1; }
-.event-cat { font-size:11px; color:var(--orange); font-weight:600; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:5px; display:flex; align-items:center; gap:6px; }
-.week-badge { background:#22c55e22; color:var(--green); border:1px solid #22c55e44; border-radius:20px; padding:2px 8px; font-size:10px; font-weight:700; }
-.event-title { font-weight:600; font-size:14px; margin-bottom:5px; line-height:1.4; }
-.event-venue { font-size:12px; color:var(--sub); margin-bottom:10px; }
-.event-pills { display:flex; gap:6px; flex-wrap:wrap; }
-.event-pill { background:var(--surface); border-radius:6px; padding:4px 8px; font-size:12px; color:var(--text); font-weight:500; }
-.event-pill.free { color:var(--green); }
+.event-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:24px; }
+/* event card styles now inline */
 
 /* ── VENUE DETAIL PAGE ── */
 .venue-detail-header {
@@ -1143,8 +1129,8 @@ async function init(){
 }
 
 // ── HELPERS ───────────────────────────────────────────────────
-function fmt(dt){ if(!dt)return''; const s=dt.replace(' ','T').replace(/(\.\d+)?(Z|[+-]\d{2}:?\d{2})?$/,''); return new Date(s).toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'}); }
-function fmtTime(dt){ if(!dt)return''; const s=dt.replace(' ','T').replace(/(\.\d+)?(Z|[+-]\d{2}:?\d{2})?$/,''); return new Date(s).toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'}); }
+function fmt(dt){ if(!dt)return''; return new Date(dt).toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric',timeZone:'America/New_York'}); }
+function fmtTime(dt){ if(!dt)return''; return new Date(dt).toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit',timeZone:'America/New_York'}); }
 function isThisWeek(dt){ const d=new Date(dt),n=new Date(); return d>=n&&d<=new Date(n.getTime()+7*24*60*60*1000); }
 function isPromoted(e){ return e.promoted_until && new Date(e.promoted_until)>new Date(); }
 function slug(name){ return name.toLowerCase().replace(/[^a-z0-9]+/g,'-'); }
@@ -1432,34 +1418,29 @@ function renderHome(){
        <div style="font-size:15px;font-weight:600;margin-bottom:6px">No upcoming events yet</div>
        <div style="font-size:13px;color:var(--muted)">Check back soon</div>
      </div>` : `
-   <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px" id="homeEventsGrid">
+   <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:20px" id="homeEventsGrid">
      ${allUpcoming.map(e=>{
        const venueName = e.venue_name_override||e.venues?.name||'Columbus Venue';
        const img = e.cover_image_url;
        const tw = isThisWeek(e.start_time);
        return `
          <div onclick="openEventModal('${e.id}')"
-           style="background:var(--card);border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden;cursor:pointer;transition:all 0.2s;position:relative"
-           onmouseover="this.style.borderColor='var(--orange)';this.style.transform='translateY(-2px)'"
-           onmouseout="this.style.borderColor='var(--border)';this.style.transform='translateY(0)'">
+           style="cursor:pointer;transition:transform 0.2s"
+           onmouseover="this.style.transform='translateY(-3px)'"
+           onmouseout="this.style.transform='translateY(0)'">
            <!-- Image -->
-           <div style="height:160px;position:relative;overflow:hidden;background:var(--surface)">
-             ${img ? `<img src="${img}" alt="${e.title}" style="width:100%;height:100%;object-fit:cover;transition:transform 0.4s" onerror="this.style.display='none'">` : `<div style="width:100%;height:100%;background:linear-gradient(135deg,rgba(255,107,53,0.08),rgba(129,140,248,0.06))"></div>`}
-             <div style="position:absolute;inset:0;background:linear-gradient(to bottom,transparent 40%,rgba(8,8,16,0.7) 100%)"></div>
-             ${tw ? `<div style="position:absolute;top:9px;left:9px;background:var(--green);color:#000;font-family:var(--mono);font-size:8px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;padding:3px 9px;border-radius:9999px">This Week</div>` : ''}
-             ${e.is_boosted ? `<div style="position:absolute;top:9px;left:9px;background:var(--orange);color:#fff;font-family:var(--mono);font-size:8px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;padding:3px 9px;border-radius:9999px">Featured</div>` : ''}
-             ${e.is_third_party ? `<div style="position:absolute;top:9px;right:9px;background:rgba(8,8,16,0.8);color:var(--sub);font-family:var(--mono);font-size:8px;letter-spacing:0.08em;padding:2px 8px;border-radius:9999px;border:1px solid var(--border)">Ticketmaster</div>` : ''}
+           <div style="width:100%;aspect-ratio:1/1;border-radius:16px;overflow:hidden;background:var(--surface);margin-bottom:14px;position:relative">
+             ${img
+               ? `<img src="${img}" alt="${e.title}" style="width:100%;height:100%;object-fit:cover">`
+               : `<div style="width:100%;height:100%;background:linear-gradient(135deg,rgba(255,107,53,0.15),rgba(129,140,248,0.1))"></div>`
+             }
+             ${tw ? `<div style="position:absolute;top:10px;left:10px;background:var(--green);color:#000;font-family:var(--mono);font-size:8px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;padding:3px 9px;border-radius:9999px">This Week</div>` : ''}
+             ${e.is_third_party ? `<div style="position:absolute;top:10px;right:10px;background:rgba(8,8,16,0.7);color:var(--sub);font-family:var(--mono);font-size:8px;letter-spacing:0.08em;padding:2px 8px;border-radius:9999px;border:1px solid var(--border)">Ticketmaster</div>` : ''}
            </div>
-           <!-- Body -->
-           <div style="padding:14px 16px">
-             <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.14em;text-transform:uppercase;color:var(--orange);margin-bottom:4px">${e.category||'Event'}</div>
-             <div style="font-family:var(--font);font-weight:700;font-size:14px;letter-spacing:-0.02em;color:var(--text);margin-bottom:5px;line-height:1.3;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical">${e.title}</div>
-             <div style="font-size:11px;color:var(--muted);margin-bottom:10px">${venueName}</div>
-             <div style="display:flex;justify-content:space-between;align-items:center">
-               <span style="font-family:var(--mono);font-size:9px;letter-spacing:0.08em;text-transform:uppercase;color:var(--sub);background:var(--surface);border:1px solid var(--border);padding:3px 9px;border-radius:var(--r-sm)">${fmt(e.start_time)}</span>
-               <span style="font-size:12px;font-weight:700;color:${e.is_free?'var(--green)':'var(--text)'}">${(e.is_free&&!e.is_third_party)?'Free':e.price_min?'From $'+e.price_min:e.is_third_party?'See Tickets':''}</span>
-             </div>
-           </div>
+           <!-- Info -->
+           <div style="font-family:var(--font);font-weight:700;font-size:15px;letter-spacing:-0.02em;color:var(--text);margin-bottom:5px;line-height:1.2;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical">${e.title}</div>
+           <div style="font-size:12px;color:var(--muted)">${fmt(e.start_time)}${fmtTime(e.start_time) ? ' at ' + fmtTime(e.start_time) : ''}</div>
+           <div style="font-size:12px;color:var(--sub)">${venueName}</div>
          </div>`;
      }).join('')}
    </div>`}
@@ -2128,12 +2109,19 @@ function vendorCard(v){
 
 function eventCard(e){
  const tw=isThisWeek(e.start_time);
- const promo=isPromoted(e);
- return`<div class="event-card" onclick="openEventModal('${e.id}')" style="${promo?'border-color:#f59e0b60;background:linear-gradient(135deg,var(--card),#1a1200)':''}"> <div class="event-accent${tw?' green':''}" style="${promo?'background:#f59e0b':''}"></div> <div class="event-body"> <div class="event-cat"> ${promo?'<span style="background:#f59e0b20;color:#f59e0b;border:1px solid #f59e0b40;border-radius:20px;padding:2px 8px;font-size:10px;font-weight:700;margin-right:4px"> FEATURED</span>':''}
- ${e.category||'Event'}${tw?'<span class="week-badge">THIS WEEK</span>':''}
- </div> <div class="event-title">${e.title}</div> <div class="event-venue"> ${e.venue_name_override||e.venues?.name||'Columbus Venue'}</div> <div class="event-pills"> <span class="event-pill"> ${fmt(e.start_time)}</span> <span class="event-pill"> ${fmtTime(e.start_time)}</span> ${(e.is_free&&!e.is_third_party)?'<span class="event-pill free">Free</span>':e.price_min?`<span class="event-pill">From $${e.price_min}</span>`:''}
- </div> <button onclick="toggleSaveEvent('${e.id}',this,event)" style="margin-top:6px;background:${savedEventIds.has(e.id)?'#FF6B3520':'transparent'};color:${savedEventIds.has(e.id)?'var(--orange)':'var(--sub)'};border:1px solid var(--border);border-radius:6px;padding:4px 10px;font-size:11px;cursor:pointer;font-family:var(--font);">${savedEventIds.has(e.id)?'♥ Saved':'♡ Save'}</button>
- </div> </div>`;
+ const venueName=e.venue_name_override||e.venues?.name||'Columbus Venue';
+ const img=e.cover_image_url;
+ return`<div onclick="openEventModal('${e.id}')" style="cursor:pointer;transition:transform 0.2s" onmouseover="this.style.transform='translateY(-3px)'" onmouseout="this.style.transform='translateY(0)'">
+   <div style="width:100%;aspect-ratio:1/1;border-radius:16px;overflow:hidden;background:var(--surface);margin-bottom:14px;position:relative">
+     ${img?`<img src="${img}" alt="${e.title}" style="width:100%;height:100%;object-fit:cover" onerror="this.style.display='none'">`:`<div style="width:100%;height:100%;background:linear-gradient(135deg,rgba(255,107,53,0.12),rgba(129,140,248,0.08))"></div>`}
+     ${tw?`<div style="position:absolute;top:10px;left:10px;background:var(--green);color:#000;font-family:var(--mono);font-size:8px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;padding:3px 9px;border-radius:9999px">This Week</div>`:''}
+     ${e.is_boosted?`<div style="position:absolute;top:10px;left:10px;background:var(--orange);color:#fff;font-family:var(--mono);font-size:8px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;padding:3px 9px;border-radius:9999px">Featured</div>`:''}
+     ${e.is_third_party?`<div style="position:absolute;top:10px;right:10px;background:rgba(8,8,16,0.7);color:var(--sub);font-family:var(--mono);font-size:8px;letter-spacing:0.08em;padding:2px 8px;border-radius:9999px;border:1px solid var(--border)">Ticketmaster</div>`:''}
+   </div>
+   <div style="font-family:var(--font);font-weight:700;font-size:15px;letter-spacing:-0.02em;color:var(--text);margin-bottom:5px;line-height:1.2;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical">${e.title}</div>
+   <div style="font-size:12px;color:var(--muted)">${fmt(e.start_time)}${fmtTime(e.start_time)?' at '+fmtTime(e.start_time):''}</div>
+   <div style="font-size:12px;color:var(--sub)">${venueName}</div>
+ </div>`;
 }
 
 // ── EVENT MODAL ───────────────────────────────────────────────
