@@ -8,12 +8,6 @@
 <meta name="robots" content="noindex,nofollow"/>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700;800;900&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
-<meta property="og:image" content="https://cbusevents.com/assets/cbus-shield.png">
-<link rel="apple-touch-icon" sizes="180x180" href="/assets/cbus-shield.png">
-<link rel="icon" type="image/png" href="/assets/cbus-shield.png">
-<meta name="theme-color" content="#080810">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="CBUSEVENTS">
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
 :root{
@@ -32,12 +26,10 @@ a{text-decoration:none;color:inherit;}
 button{cursor:pointer;font-family:var(--font);border:none;}
 @keyframes spin{to{transform:rotate(360deg);}}
 @keyframes fadeUp{from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:translateY(0);}}
-@keyframes fadeIn{from{opacity:0;}to{opacity:1;}}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.35}}
 
 /* ── AUTH GATE ── */
 .auth-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;}
-.auth-card{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:40px;width:100%;max-width:420px;animation:fadeUp 0.4s ease;box-shadow:0 32px 80px rgba(0,0,0,0.5);}
+.auth-card{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:40px;width:100%;max-width:420px;animation:fadeUp 0.4s ease;}
 .auth-logo{font-family:var(--font);font-size:22px;font-weight:800;margin-bottom:4px;text-align:center;}
 .auth-logo span{color:var(--orange);}
 .auth-sub{color:var(--sub);font-size:13px;text-align:center;margin-bottom:28px;}
@@ -77,23 +69,23 @@ nav{
 
 /* ── SIDEBAR ── */
 .sidebar{
- background:var(--surface);border-right:1px solid var(--border);
- padding:10px 8px;display:flex;flex-direction:column;gap:1px;
- position:sticky;top:60px;height:calc(100vh - 60px);overflow-y:auto;
- width:230px;
+  background:var(--surface);border-right:1px solid var(--border);
+  padding:0;display:flex;flex-direction:column;
+  position:sticky;top:60px;height:calc(100vh - 60px);overflow-y:auto;
+  width:230px;
 }
-.sidebar-section{padding:16px 14px 6px;font-family:var(--mono);font-size:9px;color:var(--muted);font-weight:700;letter-spacing:0.15em;text-transform:uppercase;}
+.sidebar-section{padding:16px 14px 5px;font-family:var(--mono);font-size:9px;color:var(--muted);font-weight:700;letter-spacing:0.15em;text-transform:uppercase;}
 .nav-item{
- display:flex;align-items:center;gap:8px;
- padding:8px 14px 8px 18px;margin:1px 0;
- border-radius:var(--r-md);border-left:2px solid transparent;
- cursor:pointer;font-size:13px;font-weight:500;color:var(--sub);transition:all 0.18s;
+  display:flex;align-items:center;gap:8px;
+  padding:8px 14px 8px 18px;margin:1px 8px;
+  border-radius:var(--r-md);border-left:2px solid transparent;
+  cursor:pointer;font-size:13px;font-weight:500;color:var(--sub);transition:all 0.18s;
 }
 .nav-item:hover{background:rgba(255,255,255,0.04);color:var(--text);border-left-color:var(--muted);}
 .nav-item.active{background:linear-gradient(135deg,rgba(255,107,53,0.1),rgba(255,107,53,0.04));color:var(--text);border-left-color:var(--orange);font-weight:600;}
 
 /* ── CONTENT ── */
-.content{padding:32px 36px;animation:fadeUp 0.35s ease;}
+.content{padding:32px;animation:fadeUp 0.3s ease;}
 .page{display:none;}
 .page.active{display:block;}
 .page-title{font-family:var(--font);font-size:22px;font-weight:800;margin-bottom:6px;}
@@ -116,7 +108,7 @@ nav{
 
 /* ── FEED EVENTS ── */
 .feed-item{
- background:var(--card);border:1px solid var(--border);border-radius:var(--r-lg);
+ background:var(--card);border:1px solid var(--border);border-radius:12px;
  display:grid;grid-template-columns:90px 1fr;overflow:hidden;
  margin-bottom:12px;cursor:pointer;transition:all 0.2s;
 }
@@ -194,15 +186,15 @@ h1,h2,h3,h4,h5,h6{font-family:var(--font);letter-spacing:-0.02em;}
 <div id="authGate"> <div class="auth-wrap"> <div class="auth-card"> <div class="auth-logo">CBUS<span>EVENTS</span></div> <p class="auth-sub">Your Columbus event dashboard</p> <div class="auth-tabs"> <button class="auth-tab active" id="tabSignin" onclick="switchTab('signin')">Sign In</button> <button class="auth-tab" id="tabSignup" onclick="switchTab('signup')">Create Account</button> </div> <div id="nameField" class="field" style="display:none"> <label>Display Name</label> <input id="authName" placeholder="Your name (optional)"/> </div> <div class="field"> <label>Email</label> <input type="email" id="authEmail" placeholder="you@email.com" onkeydown="if(event.key==='Enter')doAuth()"/> </div> <div class="field"> <label>Password</label> <input type="password" id="authPass" placeholder="••••••••" onkeydown="if(event.key==='Enter')doAuth()"/> </div> <div class="auth-err" id="authErr"></div> <button class="btn-primary" id="authBtn" onclick="doAuth()">Sign In</button> <div class="auth-switch"> <span id="authSwitchText">New to CBUSEVENTS?</span> <button id="authSwitchBtn" onclick="switchTab(currentTab==='signin'?'signup':'signin')">Create a free account</button> </div> <div style="text-align:center;margin-top:16px"> <a href="https://cbusevents.com" style="color:var(--muted);font-size:12px">← Back to CBUSEVENTS</a> </div> </div> </div>
 </div> <!-- ── PORTAL ── -->
 <div id="portal" style="display:none"> <nav> <div class="nav-logo" onclick="window.location.href='https://cbusevents.com'"> CBUS<span>EVENTS</span> </div> <div class="nav-right"> <span class="nav-email" id="navEmail"></span> <button class="nav-home-btn" onclick="window.location.href='https://cbusevents.com'"> Home</button> <button class="nav-signout" onclick="doSignOut()">Sign Out</button> </div> </nav> <div class="portal-layout"> <!-- Sidebar --> <aside class="sidebar">
-  <div style="padding:20px 22px 16px;border-bottom:1px solid var(--border-sub);position:relative">
+  <div style="padding:20px 22px 14px;border-bottom:1px solid var(--border-sub)">
     <div style="font-family:var(--font);font-weight:900;font-size:17px;letter-spacing:-0.05em;text-transform:uppercase">CBUS<span style="color:var(--orange)">EVENTS</span></div>
     <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.16em;text-transform:uppercase;color:var(--muted);margin-top:3px">My Account</div>
   </div>
-  <div style="padding:14px 22px 12px;border-bottom:1px solid var(--border-sub)">
+  <div style="padding:12px 22px 12px;border-bottom:1px solid var(--border-sub)">
     <div id="sidebarEmail" style="font-size:12px;color:var(--sub);overflow:hidden;text-overflow:ellipsis;white-space:nowrap"></div>
     <div style="font-family:var(--mono);font-size:8px;letter-spacing:0.14em;text-transform:uppercase;color:var(--green);margin-top:3px">Always Free</div>
   </div>
-  <div style="padding:12px 8px 6px">
+  <div style="flex:1;padding:10px 0">
     <div class="sidebar-section">My Account</div>
     <div class="nav-item active" id="nav-feed" onclick="showPage('feed')">My Feed</div>
     <div class="nav-item" id="nav-tickets" onclick="showPage('tickets')">My Tickets</div>
@@ -214,12 +206,19 @@ h1,h2,h3,h4,h5,h6{font-family:var(--font);letter-spacing:-0.02em;}
     <div class="nav-item" onclick="window.location.href='https://cbusevents.com'">Browse Events</div>
     <div class="nav-item" id="nav-planners" onclick="showPage('planners')">Plan Your Event</div>
   </div>
-  <div style="margin-top:auto;padding:18px;border-top:1px solid var(--border-sub)">
+  <div style="padding:16px;border-top:1px solid var(--border-sub)">
     <div style="background:var(--green-dim);border:1px solid var(--green-border);border-radius:var(--r-sm);padding:10px 12px;font-size:11px;color:var(--sub);line-height:1.55">
       <strong style="color:var(--green)">All features free.</strong> You only pay a platform fee when purchasing tickets.
     </div>
   </div>
-</aside> <!-- Pages --> <main class="content"> <!-- FEED --> <div class="page active" id="page-feed"> <div class="page-title">Your Columbus Feed</div> <div class="page-sub">Personalized events based on venues you follow</div> <div id="feedContent"><div class="spinner"></div></div> </div> <!-- TICKETS --> <div class="page" id="page-tickets"> <div class="page-title">My Tickets</div> <div class="page-sub">Your purchased event tickets</div> <div id="ticketsContent"><div class="spinner"></div></div> </div> <!-- SAVED VENUES --> <div class="page" id="page-venues"> <div class="page-title">Saved Venues</div> <div class="page-sub">Venues you've saved for later</div> <div id="savedVenuesContent"><div class="spinner"></div></div> </div> <!-- SAVED EVENTS --> <div class="page" id="page-events"> <div class="page-title">Saved Events</div> <div class="page-sub">Events you want to attend</div> <div id="savedEventsContent"><div class="spinner"></div></div> </div> <!-- FOLLOWING --> <div class="page" id="page-follows"> <div class="page-title">Venues You Follow</div> <div class="page-sub">Stay updated on events from these venues</div> <div id="followsContent"><div class="spinner"></div></div> </div> <!-- PROFILE --> <div class="page" id="page-profile"> <div class="page-title">Profile Settings</div> <div class="page-sub">Manage your account preferences</div> <div id="profileContent"></div> </div> </main> </div> <footer> <span class="footer-copy">© 2026 CBUSEVENTS · Columbus, Ohio</span> <div style="display:flex;align-items:center;gap:20px"> <span class="footer-copy">Made for Columbus </span> <a href="https://cbusevents.com/cbus-admin.html" class="footer-admin" id="adminFooterLink" style="display:none">Admin</a> </div> </footer> </div> <script src="https://unpkg.com/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+</aside> <!-- Pages --> <main class="content"> <!-- FEED --> <div class="page active" id="page-feed"> <div class="page-title">Your Columbus Feed</div> <div class="page-sub">Personalized events based on venues you follow</div> <div id="feedContent"><div class="spinner"></div></div> </div> <!-- TICKETS --> <div class="page" id="page-tickets"> <div class="page-title">My Tickets</div> <div class="page-sub">Your purchased event tickets</div> <div id="ticketsContent"><div class="spinner"></div></div> </div> <!-- SAVED VENUES --> <div class="page" id="page-venues"> <div class="page-title">Saved Venues</div> <div class="page-sub">Venues you've saved for later</div> <div id="savedVenuesContent"><div class="spinner"></div></div> </div> <!-- SAVED EVENTS --> <div class="page" id="page-events"> <div class="page-title">Saved Events</div> <div class="page-sub">Events you want to attend</div> <div id="savedEventsContent"><div class="spinner"></div></div> </div> <!-- FOLLOWING --> <div class="page" id="page-follows"> <div class="page-title">Venues You Follow</div> <div class="page-sub">Stay updated on events from these venues</div> <div id="followsContent"><div class="spinner"></div></div> </div> <!-- PROFILE --> <div class="page" id="page-profile"> <div class="page-title">Profile Settings</div> <div class="page-sub">Manage your account preferences</div> <div id="profileContent"></div> </div>
+ <!-- PLAN YOUR EVENT -->
+ <div class="page" id="page-planners">
+   <div class="page-title">Plan Your Own Event</div>
+   <div class="page-sub">Connect with Columbus event planners who can make your idea a reality</div>
+   <div id="plannersContent"><div class="spinner"></div></div>
+ </div>
+ </main> </div> <footer> <span class="footer-copy">© 2026 CBUSEVENTS · Columbus, Ohio</span> <div style="display:flex;align-items:center;gap:20px"> <span class="footer-copy">Made for Columbus </span> <a href="https://cbusevents.com/cbus-admin.html" class="footer-admin" id="adminFooterLink" style="display:none">Admin</a> </div> </footer> </div> <script src="https://unpkg.com/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <script>
 const SB_URL="https://toblgvatvsjljbqogzsv.supabase.co";
 const SB_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRvYmxndmF0dnNqbGpicW9nenN2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMDgwNTAsImV4cCI6MjA4NzY4NDA1MH0._WJEQPizNDiQfDXQB_DHPaQhixPGpMdmYQSmyWmm_FQ";
@@ -292,6 +291,7 @@ function enterPortal(){
  document.getElementById('authGate').style.display='none';
  document.getElementById('portal').style.display='';
  document.getElementById('navEmail').textContent=' '+currentUser.email;
+ var se=document.getElementById('sidebarEmail');if(se)se.textContent=currentUser.email;
  document.getElementById('sidebarEmail').textContent=currentUser.email;
  loadPage('feed');
 }
@@ -319,6 +319,7 @@ function loadPage(p){
  else if(p==='follows')loadFollows();
  else if(p==='profile')loadProfile();
  else if(p==='planners')loadPlanners();
+ else if(p==='planners')loadPlanners();
 }
 
 // ── FEED ────────────────────────────────────────────────────────
@@ -345,22 +346,17 @@ async function loadFeed(){
  return bF-aF;
  });
 
- el.innerHTML=`<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:20px">
- ${sorted.map(e=>`
-   <div onclick="window.location.href='https://cbusevents.com'"
-     style="cursor:pointer;transition:transform 0.2s"
-     onmouseover="this.style.transform='translateY(-3px)'"
-     onmouseout="this.style.transform='translateY(0)'">
-     <div style="width:100%;aspect-ratio:1/1;border-radius:16px;overflow:hidden;background:var(--surface);margin-bottom:14px;position:relative">
-       ${e.cover_image_url?`<img src="${e.cover_image_url}" alt="${e.title}" loading="lazy" style="width:100%;height:100%;object-fit:cover">`:'<div style="width:100%;height:100%;background:linear-gradient(135deg,rgba(255,107,53,0.1),rgba(129,140,248,0.07))"></div>'}
-       ${e.is_boosted?'<div style="position:absolute;top:10px;left:10px;background:var(--orange);color:#fff;font-family:var(--mono);font-size:8px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;padding:3px 9px;border-radius:9999px">Featured</div>':''}
-       ${followedIds.includes(e.venues?.id)?'<div style="position:absolute;top:10px;right:10px;background:var(--green-dim);color:var(--green);font-family:var(--mono);font-size:8px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;padding:3px 9px;border-radius:9999px;border:1px solid var(--green-border)">Following</div>':''}
-     </div>
-     <div style="font-family:var(--font);font-weight:700;font-size:15px;letter-spacing:-0.02em;color:var(--text);margin-bottom:5px;line-height:1.2;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical">${e.title}</div>
-     <div style="font-size:12px;color:var(--muted)">${fmt(e.start_time)}</div>
-     <div style="font-size:12px;color:var(--sub)">${e.venues?.name||'Columbus Venue'}</div>
-   </div>`).join('')}
- </div>`;
+ el.innerHTML='<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:20px">'+sorted.map(e=>{
+  const img=e.cover_image_url?`<img src="${e.cover_image_url}" alt="" loading="lazy" style="width:100%;height:100%;object-fit:cover">`:'<div style="width:100%;height:100%;background:linear-gradient(135deg,rgba(255,107,53,0.1),rgba(129,140,248,0.07))"></div>';
+  const featured=e.is_boosted?'<div style="position:absolute;top:10px;left:10px;background:var(--orange);color:#fff;font-family:var(--mono);font-size:8px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;padding:3px 9px;border-radius:9999px">Featured</div>':'';
+  const following=followedIds.includes(e.venues?.id)?'<div style="position:absolute;top:10px;right:10px;background:var(--green-dim);color:var(--green);font-family:var(--mono);font-size:8px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;padding:3px 9px;border-radius:9999px;border:1px solid var(--green-border)">Following</div>':'';
+  return `<div onclick="window.location.href='https://cbusevents.com'" style="cursor:pointer;transition:transform 0.2s" onmouseover="this.style.transform='translateY(-3px)'" onmouseout="this.style.transform='translateY(0)'">
+    <div style="width:100%;aspect-ratio:1/1;border-radius:16px;overflow:hidden;background:var(--surface);margin-bottom:12px;position:relative">${img}${featured}${following}</div>
+    <div style="font-weight:700;font-size:14px;letter-spacing:-0.02em;color:var(--text);margin-bottom:4px;line-height:1.2;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical">${e.title}</div>
+    <div style="font-size:11px;color:var(--muted)">${fmt(e.start_time)}</div>
+    <div style="font-size:11px;color:var(--sub)">${e.venues?.name||'Columbus Venue'}</div>
+  </div>`;
+}).join('')+'</div>';
 }
 
 // ── TICKETS ────────────────────────────────────────────────────
@@ -425,18 +421,9 @@ async function loadSavedEvents(){
  return;
  }
 
- el.innerHTML=`<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:20px">
- ${events.map(e=>`
-   <div style="cursor:pointer;transition:transform 0.2s" onmouseover="this.style.transform='translateY(-3px)'" onmouseout="this.style.transform='translateY(0)'" onclick="window.location.href='https://cbusevents.com'">
-     <div style="width:100%;aspect-ratio:1/1;border-radius:16px;overflow:hidden;background:var(--surface);margin-bottom:14px;position:relative">
-       ${e.cover_image_url?`<img src="${e.cover_image_url}" alt="${e.title}" loading="lazy" style="width:100%;height:100%;object-fit:cover">`:'<div style="width:100%;height:100%;background:linear-gradient(135deg,rgba(255,107,53,0.1),rgba(129,140,248,0.07))"></div>'}
-     </div>
-     <div style="font-weight:700;font-size:15px;letter-spacing:-0.02em;color:var(--text);margin-bottom:4px;line-height:1.2">${e.title}</div>
-     <div style="font-size:12px;color:var(--muted)">${fmt(e.start_time)}</div>
-     <div style="font-size:12px;color:var(--sub);margin-bottom:10px">${e.venues?.name||''}</div>
-     <button onclick="event.stopPropagation();unsaveEvent('${e.id}',this)" style="width:100%;background:none;border:1px solid var(--border);color:var(--muted);border-radius:var(--r-md);padding:6px;font-size:12px;cursor:pointer;transition:all 0.15s" onmouseover="this.style.borderColor='var(--red)';this.style.color='var(--red)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--muted)'">Remove</button>
-   </div>`).join('')}
- </div>`;
+ el.innerHTML=`<div class="card-grid">${events.map(e=>`
+ <div class="card" onclick="window.location.href='https://cbusevents.com'"> <div class="card-img">${e.cover_image_url?`<img src="${e.cover_image_url}" alt="${e.title}" loading="lazy">`:''}</div> <div class="card-body"> <div class="card-name">${e.title}</div> <div class="card-meta"> ${e.venues?.name||''}</div> <div class="card-meta" style="color:var(--orange);margin-top:3px"> ${fmt(e.start_time)}</div> ${e.is_boosted?'<span class="badge-boosted"> Featured</span>':''}
+ <button class="unsave-btn" onclick="event.stopPropagation();unsaveEvent('${e.id}',this)">Remove from saved</button> </div> </div>`).join('')}</div>`;
 }
 
 // ── FOLLOWS ────────────────────────────────────────────────────
@@ -504,18 +491,64 @@ function fmt(iso){
  return new Date(iso).toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric',hour:'numeric',minute:'2-digit',timeZone:'America/New_York'});
 }
 
+// ── PLAN YOUR EVENT ─────────────────────────────────────────
+async function loadPlanners(){
+ const el=document.getElementById('plannersContent');
+ if(!el)return;
+ const{data:planners,error}=await sb.from('planners')
+   .select('id,business_name,contact_name,bio,categories,rate_display,availability,website,instagram')
+   .eq('is_discoverable',true)
+   .order('created_at',{ascending:false});
+ if(error||!planners||planners.length===0){
+   el.innerHTML='<div class="empty"><div class="empty-icon">&#x1F4CB;</div><h3>Columbus Planners Coming Soon</h3><p>Planners are joining now. <a href="mailto:info@cbusevents.com">Contact us</a> and we will connect you directly.</p></div>';
+   return;
+ }
+ let html='<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:16px">';
+ planners.forEach(function(p){
+   const name=p.business_name||p.contact_name||'Columbus Planner';
+   const avail=p.availability==='available';
+   const availColor=avail?'var(--green)':'var(--gold)';
+   const availBg=avail?'var(--green-dim)':'rgba(251,191,36,0.1)';
+   const availBorder=avail?'var(--green-border)':'rgba(251,191,36,0.2)';
+   const availLabel=avail?'Available':'Limited';
+   const cats=(p.categories||[]).slice(0,3).map(function(c){return '<span style="font-family:var(--mono);font-size:9px;color:var(--sub);background:rgba(255,255,255,0.04);border:1px solid var(--border);padding:2px 8px;border-radius:9999px">'+c+'</span>';}).join('');
+   const bio=p.bio?'<div style="font-size:12px;color:var(--sub);line-height:1.55;margin-bottom:10px;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical">'+p.bio+'</div>':'';
+   const rate=p.rate_display?'<span style="font-family:var(--mono);font-size:11px;color:var(--text)">'+p.rate_display+'</span>':'<span style="font-size:11px;color:var(--muted)">Contact for Pricing</span>';
+   const contactHref=p.website||(p.instagram?'https://instagram.com/'+p.instagram:'');
+   const contact=contactHref?'<a href="'+contactHref+'" target="_blank" style="font-family:var(--mono);font-size:9px;letter-spacing:0.1em;text-transform:uppercase;color:var(--orange);text-decoration:none">Contact →</a>':'';
+   html+='<div style="background:var(--card);border:1px solid var(--border);border-radius:var(--r-lg);padding:20px;transition:all 0.2s">';
+   html+='<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px">';
+   html+='<div style="font-weight:700;font-size:14px;color:var(--text)">'+name+'</div>';
+   html+='<span style="font-family:var(--mono);font-size:8px;letter-spacing:0.1em;text-transform:uppercase;color:'+availColor+';background:'+availBg+';border:1px solid '+availBorder+';padding:3px 8px;border-radius:9999px;margin-left:8px;flex-shrink:0">'+availLabel+'</span>';
+   html+='</div>';
+   html+='<div style="font-family:var(--mono);font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:var(--orange);margin-bottom:8px">Event Planner</div>';
+   html+=bio;
+   html+='<div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:12px">'+cats+'</div>';
+   html+='<div style="display:flex;justify-content:space-between;align-items:center;padding-top:10px;border-top:1px solid var(--border-sub)">'+rate+contact+'</div>';
+   html+='</div>';
+ });
+ html+='</div>';
+ el.innerHTML=html;
+}
+
 // ── INIT ───────────────────────────────────────────────────────
 init();
 </script>
 
-  // Show admin footer link only for admin users
-  (function() {
-    var link = document.getElementById('adminFooterLink');
-    if (!link) return;
-    var stored = localStorage.getItem('sb-toblgvatvsjljbqogzsv-auth-token');
-    if (stored) {
-      try {
-        var parsed = JSON.parse(stored);
-        var email = parsed && parsed.user && parsed.user.email;
-        var adminEmails = ['<a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="c7a3a2a6a9b3a2fef787a0aaa6aeabe9a4a8aa">[email&#160;protected]</a>'];
-        if (em
+<script>
+(function(){
+  var link=document.getElementById('adminFooterLink');
+  if(!link)return;
+  try{
+    var stored=localStorage.getItem('sb-toblgvatvsjljbqogzsv-auth-token');
+    if(!stored)return;
+    var parsed=JSON.parse(stored);
+    var email=parsed&&parsed.user&&parsed.user.email;
+    if(email&&['deante90@gmail.com','info@cbusevents.com'].indexOf(email)>-1){
+      link.style.display='inline';
+    }
+  }catch(e){}
+})();
+</script>
+</body>
+</html>
