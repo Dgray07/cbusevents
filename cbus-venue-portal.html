@@ -4,6 +4,12 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>CBUSEVENTS — Venue Portal</title>
+<meta property="og:image" content="https://cbusevents.com/assets/cbus-shield.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/assets/cbus-shield.png">
+<link rel="icon" type="image/png" href="/assets/cbus-shield.png">
+<meta name="theme-color" content="#080810">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="CBUSEVENTS">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -206,7 +212,27 @@ function fatal(msg) {
  onload="status('Supabase — loading app...')"
  onerror="fatal('Could not load Supabase.')"></script> <script src="https://unpkg.com/@babel/standalone@7/babel.min.js"
  onload="status('All scripts loaded! Starting app...')"
- onerror="fatal('Could not load Babel.')"></script> <script type="text/babel" data-presets="react">
+ onerror="fatal('Could not load Babel.')"></script> <script>
+
+// ── GEOCODING ────────────────────────────────────────────────
+const MAPBOX_TOKEN='pk.eyJ1IjoiY2J1c2V2ZW50cyIsImEiOiJjbW1oNWJhaDYwYnVrMnJxN3hxdGJlZmhkIn0.RtF51b0qghUlJAjHgNRdFQ';
+async function geocodeAddress(address){
+  if(!address||address.trim().length<5)return null;
+  try{
+    const query=address.toLowerCase().includes('columbus')?address:address+', Columbus, OH';
+    const encoded=encodeURIComponent(query);
+    const url=`https://api.mapbox.com/geocoding/v5/mapbox.places/${encoded}.json?access_token=${MAPBOX_TOKEN}&country=US&proximity=-82.9988,39.9612&types=address,poi&limit=1`;
+    const res=await fetch(url);
+    if(!res.ok)return null;
+    const data=await res.json();
+    if(!data.features||data.features.length===0)return null;
+    const[lng,lat]=data.features[0].center;
+    return{lat,lng};
+  }catch(err){console.warn('Geocode failed:',err);return null;}
+}
+
+</script>
+<script type="text/babel" data-presets="react">
 const { useState, useEffect, createContext, useContext } = React;
 
 const SB_URL = "https://toblgvatvsjljbqogzsv.supabase.co";
@@ -243,17 +269,18 @@ function AuthProvider({ children }) {
 
 // Primitives
 const Btn = ({ children, onClick, variant="primary", size="md", disabled, style={} }) => {
- const sz = { sm:{padding:"7px 14px",fontSize:12}, md:{padding:"10px 20px",fontSize:14}, lg:{padding:"13px 28px",fontSize:15} };
+ const sz = { sm:{padding:"5px 12px",fontSize:11}, md:{padding:"9px 18px",fontSize:13}, lg:{padding:"13px 28px",fontSize:15} };
  const vr = {
- primary: {background:"#FF6B35",color:"#fff"},
- secondary: {background:"#1a1a24",color:"#e8e8f0",border:"1px solid #25252f"},
- ghost: {background:"transparent",color:"#8888a0",border:"1px solid #25252f"},
- danger: {background:"#2a0a0a",color:"#ef4444",border:"1px solid #4a1010"},
+   primary: {background:"#FF6B35",color:"#fff",border:"none"},
+   secondary: {background:"rgba(255,255,255,0.04)",color:"var(--text)",border:"1px solid var(--border)"},
+   ghost: {background:"rgba(255,255,255,0.04)",color:"var(--sub)",border:"1px solid var(--border)"},
+   danger: {background:"rgba(248,113,113,0.08)",color:"#f87171",border:"1px solid rgba(248,113,113,0.2)"},
  };
- return <button onClick={disabled?undefined:onClick} style={{border:"none",borderRadius:8,fontFamily:"'Inter',sans-serif",fontWeight:600,cursor:disabled?"not-allowed":"pointer",opacity:disabled?0.5:1,...sz[size],...vr[variant],...style}}>{children}</button>;
+ return <button onClick={disabled?undefined:onClick} style={{borderRadius:10,fontFamily:"'DM Sans',sans-serif",fontWeight:700,cursor:disabled?"not-allowed":"pointer",opacity:disabled?0.5:1,transition:"all 0.18s",...sz[size],...vr[variant],...style}}>{children}</button>;
 };
-const Card = ({children,style={}}) => <div style={{background:"#1a1a24",border:"1px solid #25252f",borderRadius:12,padding:24,...style}}>{children}</div>;
-const Badge = ({children,color="#55556a"}) => <span style={{background:color+"22",color,border:`1px solid ${color}44`,borderRadius:20,padding:"3px 10px",fontSize:11,fontWeight:600}}>{children}</span>;
+
+const Card = ({children,style={}}) => <div style={{background:"var(--card)",border:"1px solid var(--border)",borderRadius:14,padding:24,...style}}>{children}</div>;
+const Badge = ({children,color="var(--muted)"}) => <span style={{background:color+"22",color,border:`1px solid ${color}44`,borderRadius:20,padding:"3px 10px",fontSize:11,fontWeight:600}}>{children}</span>;
 const Field = ({label,children}) => <div style={{marginBottom:18}}><label>{label}</label>{children}</div>;
 const Grid2 = ({children,gap=16}) => <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap}}>{children}</div>;
 const Spin = () => <div style={{display:"flex",justifyContent:"center",padding:60}}><div style={{width:32,height:32,border:"3px solid #25252f",borderTopColor:"#FF6B35",borderRadius:"50%",animation:"spin 0.8s linear infinite"}}/></div>;
@@ -273,28 +300,47 @@ function AuthPage() {
  setBusy(false);
  };
  return (
- <div style={{minHeight:"100vh",background:"#0b0b0f",display:"flex",alignItems:"center",justifyContent:"center",padding:24}}> <div style={{width:"100%",maxWidth:400}}> <div style={{textAlign:"center",marginBottom:36}}> <div style={{fontFamily:"'Inter',sans-serif",fontWeight:800,fontSize:32,marginBottom:8}}>CBUS<span style={{color:"#FF6B35"}}>EVENTS</span></div> <div style={{color:"#8888a0",fontSize:14}}>Venue Owner Portal</div> </div> <Card> <h2 style={{fontFamily:"'Inter',sans-serif",fontSize:20,fontWeight:700,marginBottom:24}}> {mode==="signin"?"Sign in":mode==="signup"?"Create account":"Reset password"}
- </h2> {msg && <div style={{background:"#0a2a14",color:"#22c55e",border:"1px solid #1a4a24",borderRadius:8,padding:"12px",marginBottom:16,fontSize:14}}> {msg}</div>}
- {err && <div style={{background:"#2a0a0a",color:"#ef4444",border:"1px solid #4a1010",borderRadius:8,padding:"12px",marginBottom:16,fontSize:14}}> {err}</div>}
+ <div style={{minHeight:"100vh",background:"var(--bg)",display:"flex",alignItems:"center",justifyContent:"center",padding:24}}> <div style={{width:"100%",maxWidth:400}}> <div style={{textAlign:"center",marginBottom:36}}> <div style={{fontFamily:"'DM Sans',sans-serif",fontWeight:800,fontSize:32,marginBottom:8}}>CBUS<span style={{color:"#FF6B35"}}>EVENTS</span></div> <div style={{color:"var(--sub)",fontSize:14}}>Venue Owner Portal</div> </div> <Card> <h2 style={{fontFamily:"'DM Sans',sans-serif",fontSize:20,fontWeight:700,marginBottom:24}}> {mode==="signin"?"Sign in":mode==="signup"?"Create account":"Reset password"}
+ </h2> {msg && <div style={{background:"rgba(52,211,153,0.08)",color:"var(--green)",border:"1px solid #1a4a24",borderRadius:10,padding:"12px",marginBottom:16,fontSize:14}}> {msg}</div>}
+ {err && <div style={{background:"rgba(248,113,113,0.08)",color:"#ef4444",border:"1px solid #4a1010",borderRadius:10,padding:"12px",marginBottom:16,fontSize:14}}> {err}</div>}
  {mode==="signup" && <Field label="Full Name"><input value={name} onChange={e=>setName(e.target.value)} placeholder="Your name"/></Field>}
  <Field label="Email"><input type="email" value={email} onChange={e=>setEmail(e.target.value)} placeholder="you@yourvenue.com" onKeyDown={e=>e.key==="Enter"&&go()}/></Field> {mode!=="reset" && <Field label="Password"><input type="password" value={pw} onChange={e=>setPw(e.target.value)} placeholder="••••••••" onKeyDown={e=>e.key==="Enter"&&go()}/></Field>}
  <Btn onClick={go} disabled={busy} size="lg" style={{width:"100%",marginTop:8}}> {busy?"Please wait...":mode==="signin"?"Sign In":mode==="signup"?"Create Account":"Send Reset Email"}
- </Btn> <div style={{marginTop:20,display:"flex",flexDirection:"column",gap:10,alignItems:"center"}}> {mode==="signin" && <> <button onClick={()=>setMode("signup")} style={{background:"none",border:"none",color:"#FF6B35",cursor:"pointer",fontSize:14,fontFamily:"'Inter',sans-serif"}}>No account? Sign up free</button> <button onClick={()=>setMode("reset")} style={{background:"none",border:"none",color:"#8888a0",cursor:"pointer",fontSize:13,fontFamily:"'Inter',sans-serif"}}>Forgot password?</button> </>}
- {mode!=="signin" && <button onClick={()=>setMode("signin")} style={{background:"none",border:"none",color:"#FF6B35",cursor:"pointer",fontSize:14,fontFamily:"'Inter',sans-serif"}}>← Back to sign in</button>}
+ </Btn> <div style={{marginTop:20,display:"flex",flexDirection:"column",gap:10,alignItems:"center"}}> {mode==="signin" && <> <button onClick={()=>setMode("signup")} style={{background:"none",border:"none",color:"#FF6B35",cursor:"pointer",fontSize:14,fontFamily:"'DM Sans',sans-serif"}}>No account? Sign up free</button> <button onClick={()=>setMode("reset")} style={{background:"none",border:"none",color:"var(--sub)",cursor:"pointer",fontSize:13,fontFamily:"'DM Sans',sans-serif"}}>Forgot password?</button> </>}
+ {mode!=="signin" && <button onClick={()=>setMode("signin")} style={{background:"none",border:"none",color:"#FF6B35",cursor:"pointer",fontSize:14,fontFamily:"'DM Sans',sans-serif"}}>← Back to sign in</button>}
  </div> </Card> </div> </div> );
 }
 
 // Sidebar
 const NAV = [{key:"dashboard",icon:"⊞",label:"Dashboard"},{key:"venue",icon:"",label:"My Venue"},{key:"events",icon:"",label:"Events"},{key:"inquiries",icon:"",label:"Inquiries"},{key:"plan",icon:"⭐",label:"Plan & Billing"}];
-const HOME_BTN_STYLE = {display:"flex",alignItems:"center",gap:10,width:"100%",background:"transparent",color:"#8888a0",border:"1px solid transparent",borderRadius:8,padding:"10px 12px",cursor:"pointer",fontSize:13,fontFamily:"'Inter',sans-serif",fontWeight:400,marginBottom:2,textAlign:"left",transition:"color 0.15s"};
+const HOME_BTN_STYLE = {display:"flex",alignItems:"center",gap:10,width:"100%",background:"transparent",color:"var(--sub)",border:"1px solid transparent",borderRadius:10,padding:"10px 12px",cursor:"pointer",fontSize:13,fontFamily:"'DM Sans',sans-serif",fontWeight:400,marginBottom:2,textAlign:"left",transition:"color 0.15s"};
 
 function Sidebar({active,setActive,profile}) {
  return (
- <div style={{width:210,background:"#13131a",borderRight:"1px solid #25252f",display:"flex",flexDirection:"column",height:"100vh",position:"sticky",top:0,flexShrink:0}}> <div style={{padding:"22px 18px",borderBottom:"1px solid #25252f"}}> <div style={{fontFamily:"'Inter',sans-serif",fontWeight:800,fontSize:18}}>CBUS<span style={{color:"#FF6B35"}}>EVENTS</span></div> <div style={{color:"#8888a0",fontSize:11,marginTop:4}}>Venue Portal</div> </div> <nav style={{flex:1,padding:"10px 8px"}}> <button style={{display:"flex",alignItems:"center",gap:10,width:"100%",background:"transparent",color:"#8888a0",border:"1px solid transparent",borderRadius:8,padding:"10px 12px",cursor:"pointer",fontSize:13,fontFamily:"'Inter',sans-serif",fontWeight:400,marginBottom:6,textAlign:"left"}} onClick={()=>window.open('https://cbusevents.com','_self')}> <span></span>Home
- </button> <div style={{height:1,background:"#25252f",marginBottom:6}}/> {NAV.map(n=>(
- <button key={n.key} onClick={()=>setActive(n.key)} style={{display:"flex",alignItems:"center",gap:10,width:"100%",background:active===n.key?"#1a1a24":"transparent",color:active===n.key?"#e8e8f0":"#8888a0",border:`1px solid ${active===n.key?"#25252f":"transparent"}`,borderRadius:8,padding:"10px 12px",cursor:"pointer",fontSize:13,fontFamily:"'Inter',sans-serif",fontWeight:active===n.key?600:400,marginBottom:2,textAlign:"left"}}> <span>{n.icon}</span>{n.label}
- </button> ))}
- </nav> <div style={{padding:14,borderTop:"1px solid #25252f"}}> <div style={{fontSize:12,color:"#8888a0",marginBottom:10,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{profile?.full_name||profile?.email||"Account"}</div> <Btn variant="ghost" size="sm" onClick={()=>sb.auth.signOut()} style={{width:"100%"}}>Sign Out</Btn> </div> </div> );
+ <div style={{width:230,background:"var(--surface)",borderRight:"1px solid var(--border)",display:"flex",flexDirection:"column",height:"100vh",position:"sticky",top:0,flexShrink:0,overflowY:"auto"}}>
+   <div style={{padding:"28px 22px 22px",borderBottom:"1px solid var(--border-sub)",position:"relative"}}>
+     <div style={{fontFamily:"'DM Sans',sans-serif",fontWeight:900,fontSize:17,letterSpacing:"-0.05em",textTransform:"uppercase"}}>CBUS<span style={{color:"#FF6B35"}}>EVENTS</span></div>
+     <div style={{fontFamily:"'DM Mono',monospace",fontSize:9,letterSpacing:"0.16em",textTransform:"uppercase",color:"var(--muted)",marginTop:3}}>Venue Portal</div>
+   </div>
+   <div style={{padding:"16px 22px",borderBottom:"1px solid var(--border-sub)"}}>
+     <div style={{fontFamily:"'DM Sans',sans-serif",fontWeight:700,fontSize:13,color:"var(--text)",marginBottom:3,letterSpacing:"-0.02em"}}>{profile?.full_name||"Your Venue"}</div>
+     <div style={{fontFamily:"'DM Mono',monospace",fontSize:8,letterSpacing:"0.14em",textTransform:"uppercase",color:"var(--green)"}}>Live on Platform</div>
+   </div>
+   <nav style={{flex:1,padding:"16px 8px 8px"}}>
+     <div style={{padding:"0 14px 8px",fontFamily:"'DM Mono',monospace",fontSize:9,color:"var(--muted)",fontWeight:700,letterSpacing:"0.15em",textTransform:"uppercase"}}>Main</div>
+     <button onClick={()=>window.open("https://cbusevents.com","_self")} style={{display:"flex",alignItems:"center",gap:10,width:"100%",background:"transparent",color:"var(--sub)",border:"1px solid transparent",borderLeft:"2px solid transparent",borderRadius:10,padding:"8px 14px 8px 18px",cursor:"pointer",fontSize:13,fontFamily:"'DM Sans',sans-serif",fontWeight:500,marginBottom:1,textAlign:"left",transition:"all 0.18s"}}>
+       View Site →
+     </button>
+     {NAV.map(n=>(
+       <button key={n.key} onClick={()=>setActive(n.key)} style={{display:"flex",alignItems:"center",gap:10,width:"100%",background:active===n.key?"linear-gradient(135deg,rgba(255,107,53,0.1),rgba(255,107,53,0.04))":"transparent",color:active===n.key?"var(--text)":"var(--sub)",border:"1px solid transparent",borderLeft:`2px solid ${active===n.key?"#FF6B35":"transparent"}`,borderRadius:10,padding:"8px 14px 8px 18px",cursor:"pointer",fontSize:13,fontFamily:"'DM Sans',sans-serif",fontWeight:active===n.key?600:500,marginBottom:1,textAlign:"left",transition:"all 0.18s"}}>{n.label}
+       </button>
+     ))}
+   </nav>
+   <div style={{padding:18,borderTop:"1px solid var(--border-sub)"}}>
+     <div style={{background:"linear-gradient(135deg,rgba(255,107,53,0.15),rgba(255,107,53,0.06))",border:"1px solid rgba(255,107,53,0.25)",borderRadius:8,padding:"6px 10px",fontSize:10,fontWeight:700,textAlign:"center",letterSpacing:"0.08em",textTransform:"uppercase",color:"#FF6B35",marginBottom:10}}>Founding Member · $40/mo</div>
+     <button onClick={()=>sb.auth.signOut()} style={{width:"100%",background:"rgba(255,255,255,0.04)",color:"var(--sub)",border:"1px solid var(--border)",borderRadius:10,padding:"8px",fontSize:12,fontWeight:700,cursor:"pointer",fontFamily:"'DM Sans',sans-serif"}}>Sign Out</button>
+   </div>
+ </div> );
 }
 
 // Dashboard
@@ -302,18 +348,18 @@ function Dashboard({venue,events}) {
  const now=new Date(),week=new Date(now.getTime()+7*24*60*60*1000);
  const thisWeek=events.filter(e=>{const d=new Date(e.start_time);return d>=now&&d<=week;});
  return (
- <div> <h1 style={{fontFamily:"'Inter',sans-serif",fontSize:24,fontWeight:800,marginBottom:6}}>{venue?.name ? `Welcome back, ${venue.name}!` : "Welcome to CBUSEVENTS!"}</h1> <p style={{color:"#8888a0",marginBottom:28,fontSize:14}}>{venue?.name ? "Here's your venue overview." : "Let's get your venue listed and in front of Columbus planners."}</p> <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(160px,1fr))",gap:14,marginBottom:28}}> {[
- {label:"Published",value:events.filter(e=>e.status==="published").length,icon:"",color:"#FF6B35"},
- {label:"This Week",value:thisWeek.length,icon:"",color:"#22c55e"},
- {label:"Status",value:venue?.status||"—",icon:"",color:venue?.status==="approved"?"#22c55e":"#f59e0b"},
- {label:"Plan",value:venue?.tier?venue.tier[0].toUpperCase()+venue.tier.slice(1):"Free",icon:"⭐",color:"#f59e0b"},
+ <div> <h1 style={{fontFamily:"'DM Sans',sans-serif",fontSize:24,fontWeight:800,marginBottom:6}}>{venue?.name ? `Welcome back, ${venue.name}!` : "Welcome to CBUSEVENTS!"}</h1> <p style={{color:"var(--sub)",marginBottom:28,fontSize:14}}>{venue?.name ? "Here's your venue overview." : "Let's get your venue listed and in front of Columbus planners."}</p> <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(160px,1fr))",gap:14,marginBottom:28}}> {[
+ {label:"Published",value:events.filter(e=>e.status==="published").length,color:"#FF6B35"},
+ {label:"This Week",value:thisWeek.length,color:"var(--green)"},
+ {label:"Status",value:venue?.status||"—",color:venue?.status==="approved"?"var(--green)":"#f59e0b"},
+ {label:"Plan",value:venue?.tier?venue.tier[0].toUpperCase()+venue.tier.slice(1):"Free",color:"#f59e0b"},
  ].map(s=>(
- <Card key={s.label} style={{padding:18}}> <div style={{fontSize:22,marginBottom:8}}>{s.icon}</div> <div style={{fontFamily:"'Inter',sans-serif",fontSize:20,fontWeight:800,color:s.color,marginBottom:3}}>{s.value}</div> <div style={{color:"#8888a0",fontSize:12}}>{s.label}</div> </Card> ))}
+ <Card key={s.label} style={{padding:18}}> <div style={{fontFamily:"'DM Mono',monospace",fontSize:28,fontWeight:500,color:s.color,marginBottom:6,letterSpacing:"-0.02em",lineHeight:1}}>{s.value}</div> <div style={{color:"var(--sub)",fontSize:12}}>{s.label}</div> </Card> ))}
  </div> {!venue && (
- <Card style={{borderColor:"#FF6B35",borderStyle:"dashed",textAlign:"center",padding:"36px 24px"}}> <div style={{fontSize:36,marginBottom:12}}></div> <h3 style={{fontFamily:"'Inter',sans-serif",fontSize:18,fontWeight:700,marginBottom:8}}>Set up your venue listing</h3> <p style={{color:"#8888a0",fontSize:14}}>Click "My Venue" in the sidebar to get started.</p> </Card> )}
+ <Card style={{borderColor:"#FF6B35",borderStyle:"dashed",textAlign:"center",padding:"36px 24px"}}> <div style={{fontSize:36,marginBottom:12}}></div> <h3 style={{fontFamily:"'DM Sans',sans-serif",fontSize:18,fontWeight:700,marginBottom:8}}>Set up your venue listing</h3> <p style={{color:"var(--sub)",fontSize:14}}>Click "My Venue" in the sidebar to get started.</p> </Card> )}
  {thisWeek.length>0 && (
- <Card style={{marginTop:20}}> <h3 style={{fontFamily:"'Inter',sans-serif",fontSize:15,fontWeight:700,marginBottom:16}}>Events This Week</h3> {thisWeek.map(e=>(
- <div key={e.id} style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"9px 0",borderBottom:"1px solid #25252f"}}> <div> <div style={{fontSize:14,fontWeight:500}}>{e.title}</div> <div style={{fontSize:12,color:"#8888a0",marginTop:2}}>{new Date(e.start_time).toLocaleDateString("en-US",{weekday:"short",month:"short",day:"numeric"})}</div> </div> <Badge color={e.status==="published"?"#22c55e":"#55556a"}>{e.status}</Badge> </div> ))}
+ <Card style={{marginTop:20}}> <h3 style={{fontFamily:"'DM Sans',sans-serif",fontSize:15,fontWeight:700,marginBottom:16}}>Events This Week</h3> {thisWeek.map(e=>(
+ <div key={e.id} style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"9px 0",borderBottom:"1px solid var(--border)"}}> <div> <div style={{fontSize:14,fontWeight:500}}>{e.title}</div> <div style={{fontSize:12,color:"var(--sub)",marginTop:2}}>{new Date(e.start_time).toLocaleDateString("en-US",{weekday:"short",month:"short",day:"numeric"})}</div> </div> <Badge color={e.status==="published"?"var(--green)":"var(--muted)"}>{e.status}</Badge> </div> ))}
  </Card> )}
  </div> );
 }
@@ -351,13 +397,13 @@ function SharePanel({event, venue, onClose}) {
  };
 
  return (
- <div style={{position:"fixed",inset:0,background:"rgba(0,0,0,0.85)",zIndex:300,display:"flex",alignItems:"center",justifyContent:"center",padding:20}} onClick={e=>{if(e.target===e.currentTarget)onClose();}}> <div style={{background:"#1a1a24",border:"1px solid #25252f",borderRadius:20,padding:32,width:"100%",maxWidth:480}}> <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:20}}> <div style={{fontFamily:"'Inter',sans-serif",fontSize:18,fontWeight:800}}>Share This Event</div> <button onClick={onClose} style={{background:"none",border:"none",color:"#8888a0",fontSize:20,cursor:"pointer"}}></button> </div> <div style={{background:"#13131a",border:"1px solid #25252f",borderRadius:10,padding:"12px 14px",marginBottom:20}}> <div style={{fontWeight:600,fontSize:14}}>{event.title}</div> <div style={{color:"#8888a0",fontSize:12,marginTop:3}}>{venue?.name} · {event.start_time?new Date(event.start_time).toLocaleDateString("en-US",{weekday:"short",month:"short",day:"numeric"}):""}</div> </div> <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10,marginBottom:20}}> {platforms.map(p=>(
+ <div style={{position:"fixed",inset:0,background:"rgba(0,0,0,0.85)",zIndex:300,display:"flex",alignItems:"center",justifyContent:"center",padding:20}} onClick={e=>{if(e.target===e.currentTarget)onClose();}}> <div style={{background:"var(--card)",border:"1px solid var(--border)",borderRadius:20,padding:32,width:"100%",maxWidth:480}}> <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:20}}> <div style={{fontFamily:"'DM Sans',sans-serif",fontSize:18,fontWeight:800}}>Share This Event</div> <button onClick={onClose} style={{background:"none",border:"none",color:"var(--sub)",fontSize:20,cursor:"pointer"}}></button> </div> <div style={{background:"var(--surface)",border:"1px solid var(--border)",borderRadius:10,padding:"12px 14px",marginBottom:20}}> <div style={{fontWeight:600,fontSize:14}}>{event.title}</div> <div style={{color:"var(--sub)",fontSize:12,marginTop:3}}>{venue?.name} · {event.start_time?new Date(event.start_time).toLocaleDateString("en-US",{weekday:"short",month:"short",day:"numeric"}):""}</div> </div> <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10,marginBottom:20}}> {platforms.map(p=>(
  <a key={p.name} href={p.url} target="_blank" rel="noopener noreferrer"
- style={{display:"flex",alignItems:"center",gap:10,background:"#13131a",border:"1px solid #25252f",borderRadius:10,padding:"12px 14px",textDecoration:"none",color:"#e8e8f0",fontWeight:600,fontSize:13,transition:"all 0.15s",cursor:"pointer"}}
+ style={{display:"flex",alignItems:"center",gap:10,background:"var(--surface)",border:"1px solid var(--border)",borderRadius:10,padding:"12px 14px",textDecoration:"none",color:"var(--text)",fontWeight:600,fontSize:13,transition:"all 0.15s",cursor:"pointer"}}
  onMouseOver={e=>{e.currentTarget.style.borderColor=p.color;e.currentTarget.style.color=p.color;}}
- onMouseOut={e=>{e.currentTarget.style.borderColor="#25252f";e.currentTarget.style.color="#e8e8f0";}}> <span style={{fontSize:20}}>{p.icon}</span>{p.name}
+ onMouseOut={e=>{e.currentTarget.style.borderColor="var(--border)";e.currentTarget.style.color="var(--text)";}}> <span style={{fontSize:20}}>{p.icon}</span>{p.name}
  </a> ))}
- </div> <div style={{marginBottom:12}}> <div style={{fontSize:12,color:"#8888a0",marginBottom:6,fontWeight:500}}>Event Link</div> <div style={{display:"flex",gap:8}}> <input readOnly value={eventUrl} style={{flex:1,background:"#0b0b0f",border:"1px solid #25252f",borderRadius:8,padding:"9px 12px",color:"#8888a0",fontSize:13,fontFamily:"monospace"}}/> <button onClick={copyLink} style={{background:"#FF6B35",color:"#fff",border:"none",borderRadius:8,padding:"9px 16px",fontSize:13,fontWeight:700,cursor:"pointer",whiteSpace:"nowrap"}}>Copy</button> </div> </div> <div style={{fontSize:12,color:"#55556a",lineHeight:1.6}}> For Instagram & TikTok — copy the link above and paste it in your bio or story. Instagram and TikTok don't support direct URL sharing from external sites.
+ </div> <div style={{marginBottom:12}}> <div style={{fontSize:12,color:"var(--sub)",marginBottom:6,fontWeight:500}}>Event Link</div> <div style={{display:"flex",gap:8}}> <input readOnly value={eventUrl} style={{flex:1,background:"var(--bg)",border:"1px solid var(--border)",borderRadius:10,padding:"9px 12px",color:"var(--sub)",fontSize:13,fontFamily:"monospace"}}/> <button onClick={copyLink} style={{background:"#FF6B35",color:"#fff",border:"none",borderRadius:10,padding:"9px 16px",fontSize:13,fontWeight:700,cursor:"pointer",whiteSpace:"nowrap"}}>Copy</button> </div> </div> <div style={{fontSize:12,color:"var(--muted)",lineHeight:1.6}}> For Instagram & TikTok — copy the link above and paste it in your bio or story. Instagram and TikTok don't support direct URL sharing from external sites.
  </div> </div> </div> );
 }
 
@@ -415,20 +461,20 @@ function VenueForm({venue,onSave}) {
  setTimeout(()=>setToast({msg:""}),5000);
  };
  return (
- <div> <h2 style={{fontFamily:"'Inter',sans-serif",fontSize:22,fontWeight:800,marginBottom:20}}>My Venue</h2> <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:20}}> <Card style={{gridColumn:"1/-1"}}> <div style={{fontFamily:"'Inter',sans-serif",fontWeight:700,fontSize:11,marginBottom:18,color:"#8888a0",textTransform:"uppercase",letterSpacing:1.5}}>Basic Info</div> <Grid2><Field label="Venue Name *"><input value={f.name} onChange={set("name")} placeholder="The Bluestone"/></Field><Field label="Venue Type"><input value={f.venue_type} onChange={set("venue_type")} placeholder="Historic Ballroom"/></Field></Grid2> <Field label="Description"><textarea value={f.description} onChange={set("description")} placeholder="What makes your space special?"/></Field> <Grid2><Field label="Capacity"><input type="number" value={f.capacity} onChange={set("capacity")} placeholder="200"/></Field><Field label="Indoor/Outdoor"><select value={f.indoor_outdoor} onChange={set("indoor_outdoor")}><option value="indoor">Indoor</option><option value="outdoor">Outdoor</option><option value="both">Both</option></select></Field></Grid2> </Card> <Card> <div style={{fontFamily:"'Inter',sans-serif",fontWeight:700,fontSize:11,marginBottom:18,color:"#8888a0",textTransform:"uppercase",letterSpacing:1.5}}>Location & Contact</div> <Field label="Address"><input value={f.address} onChange={set("address")} placeholder="583 E Broad St"/></Field> <Field label="Neighborhood"><input value={f.neighborhood} onChange={set("neighborhood")} placeholder="Downtown"/></Field> <Field label="Website"><input value={f.website} onChange={set("website")} placeholder="https://yourvenue.com"/></Field> <Field label="Phone"><input value={f.phone} onChange={set("phone")} placeholder="(614) 555-0000"/></Field> <Field label="Booking Email"><input type="email" value={f.email} onChange={set("email")} placeholder="bookings@venue.com"/></Field> </Card> <Card> <div style={{fontFamily:"'Inter',sans-serif",fontWeight:700,fontSize:11,marginBottom:18,color:"#8888a0",textTransform:"uppercase",letterSpacing:1.5}}>Tags & Media</div> <Field label="Tags (comma-separated)"><input value={f.tags} onChange={set("tags")} placeholder="Weddings, Concerts, Corporate"/></Field> <Field label="Amenities (comma-separated)"><input value={f.amenities} onChange={set("amenities")} placeholder="PA System, Bar, Catering"/></Field> <Field label="Cover Photo">
+ <div> <h2 style={{fontFamily:"'DM Sans',sans-serif",fontSize:22,fontWeight:800,marginBottom:20}}>My Venue</h2> <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:20}}> <Card style={{gridColumn:"1/-1"}}> <div style={{fontFamily:"'DM Sans',sans-serif",fontWeight:700,fontSize:11,marginBottom:18,color:"var(--sub)",textTransform:"uppercase",letterSpacing:1.5}}>Basic Info</div> <Grid2><Field label="Venue Name *"><input value={f.name} onChange={set("name")} placeholder="The Bluestone"/></Field><Field label="Venue Type"><input value={f.venue_type} onChange={set("venue_type")} placeholder="Historic Ballroom"/></Field></Grid2> <Field label="Description"><textarea value={f.description} onChange={set("description")} placeholder="What makes your space special?"/></Field> <Grid2><Field label="Capacity"><input type="number" value={f.capacity} onChange={set("capacity")} placeholder="200"/></Field><Field label="Indoor/Outdoor"><select value={f.indoor_outdoor} onChange={set("indoor_outdoor")}><option value="indoor">Indoor</option><option value="outdoor">Outdoor</option><option value="both">Both</option></select></Field></Grid2> </Card> <Card> <div style={{fontFamily:"'DM Sans',sans-serif",fontWeight:700,fontSize:11,marginBottom:18,color:"var(--sub)",textTransform:"uppercase",letterSpacing:1.5}}>Location & Contact</div> <Field label="Address"><input value={f.address} onChange={set("address")} placeholder="583 E Broad St"/></Field> <Field label="Neighborhood"><input value={f.neighborhood} onChange={set("neighborhood")} placeholder="Downtown"/></Field> <Field label="Website"><input value={f.website} onChange={set("website")} placeholder="https://yourvenue.com"/></Field> <Field label="Phone"><input value={f.phone} onChange={set("phone")} placeholder="(614) 555-0000"/></Field> <Field label="Booking Email"><input type="email" value={f.email} onChange={set("email")} placeholder="bookings@venue.com"/></Field> </Card> <Card> <div style={{fontFamily:"'DM Sans',sans-serif",fontWeight:700,fontSize:11,marginBottom:18,color:"var(--sub)",textTransform:"uppercase",letterSpacing:1.5}}>Tags & Media</div> <Field label="Tags (comma-separated)"><input value={f.tags} onChange={set("tags")} placeholder="Weddings, Concerts, Corporate"/></Field> <Field label="Amenities (comma-separated)"><input value={f.amenities} onChange={set("amenities")} placeholder="PA System, Bar, Catering"/></Field> <Field label="Cover Photo">
   <div style={{display:"flex",flexDirection:"column",gap:10}}>
-    <button type="button" onClick={()=>document.getElementById("coverPhotoInput").click()} style={{background:"#f97316",color:"#fff",border:"none",borderRadius:8,padding:"10px 16px",cursor:"pointer",fontWeight:600,fontSize:14,display:"flex",alignItems:"center",gap:8}}>
+    <button type="button" onClick={()=>document.getElementById("coverPhotoInput").click()} style={{background:"#f97316",color:"#fff",border:"none",borderRadius:10,padding:"10px 16px",cursor:"pointer",fontWeight:600,fontSize:14,display:"flex",alignItems:"center",gap:8}}>
       <span>📷</span> Upload Photo from Gallery
     </button>
     <input type="file" id="coverPhotoInput" accept="image/*" style={{display:"none"}} onChange={handleCoverPhoto}/>
-    <input value={f.cover_image_url} onChange={set("cover_image_url")} placeholder="Or paste image URL..." style={{background:"#13131a",border:"1px solid #25252f",borderRadius:8,padding:"8px 12px",color:"#fff",fontSize:13}}/>
+    <input value={f.cover_image_url} onChange={set("cover_image_url")} placeholder="Or paste image URL..." style={{background:"var(--surface)",border:"1px solid var(--border)",borderRadius:10,padding:"8px 12px",color:"#fff",fontSize:13}}/>
   </div>
-  {f.cover_image_url&&<img src={f.cover_image_url} alt="" style={{width:"100%",height:120,objectFit:"cover",borderRadius:8,marginTop:10,border:"1px solid #25252f"}} onError={e=>e.target.style.display="none"}/>}
+  {f.cover_image_url&&<img src={f.cover_image_url} alt="" style={{width:"100%",height:120,objectFit:"cover",borderRadius:10,marginTop:10,border:"1px solid var(--border)"}} onError={e=>e.target.style.display="none"}/>}
 </Field>}
  </Card> </div> <Card style={{gridColumn:"1/-1"}}>
- <div style={{fontFamily:"'Inter',sans-serif",fontWeight:700,fontSize:11,marginBottom:12,color:"#8888a0",textTransform:"uppercase",letterSpacing:1.5}}>Space Photos</div>
- <div style={{color:"#8888a0",fontSize:13,marginBottom:14}}>Upload up to 6 photos of your event space. These appear on your venue page.</div>
- <button type="button" onClick={()=>document.getElementById('spacePhotoInput').click()} style={{background:"#f97316",color:"#fff",border:"none",borderRadius:8,padding:"10px 18px",cursor:"pointer",fontWeight:600,fontSize:13,marginBottom:12}}>📷 Upload Space Photos</button>
+ <div style={{fontFamily:"'DM Sans',sans-serif",fontWeight:700,fontSize:11,marginBottom:12,color:"var(--sub)",textTransform:"uppercase",letterSpacing:1.5}}>Space Photos</div>
+ <div style={{color:"var(--sub)",fontSize:13,marginBottom:14}}>Upload up to 6 photos of your event space. These appear on your venue page.</div>
+ <button type="button" onClick={()=>document.getElementById('spacePhotoInput').click()} style={{background:"#f97316",color:"#fff",border:"none",borderRadius:10,padding:"10px 18px",cursor:"pointer",fontWeight:600,fontSize:13,marginBottom:12}}>📷 Upload Space Photos</button>
  <input type="file" id="spacePhotoInput" accept="image/*" multiple style={{display:"none"}} onChange={async(e)=>{
    const files=Array.from(e.target.files).slice(0,6-(f.photos||[]).length);
    const compressed=await Promise.all(files.map(file=>new Promise((res)=>{
@@ -453,15 +499,15 @@ function VenueForm({venue,onSave}) {
  {(f.photos||[]).length>0&&<div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:8,marginTop:4}}>
    {(f.photos||[]).map((photo,i)=>(
      <div key={i} style={{position:"relative"}}>
-       <img src={photo} alt="" style={{width:"100%",height:100,objectFit:"cover",borderRadius:8,border:"1px solid #25252f"}}/>
+       <img src={photo} alt="" style={{width:"100%",height:100,objectFit:"cover",borderRadius:10,border:"1px solid var(--border)"}}/>
        <button onClick={()=>setF(p=>({...p,photos:p.photos.filter((_,j)=>j!==i)}))} style={{position:"absolute",top:4,right:4,background:"rgba(0,0,0,0.75)",color:"#fff",border:"none",borderRadius:4,width:22,height:22,fontSize:13,cursor:"pointer"}}>×</button>
      </div>
    ))}
  </div>}
 </Card>
-<Card style={{gridColumn:"1/-1"}}> <div style={{fontFamily:"'Inter',sans-serif",fontWeight:700,fontSize:11,marginBottom:18,color:"#8888a0",textTransform:"uppercase",letterSpacing:1.5}}> Social Media</div> <div style={{color:"#8888a0",fontSize:13,marginBottom:16}}>Link your accounts so fans can follow you — and share events directly to your profiles.</div> <Grid2> <Field label="Instagram"><input value={f.instagram} onChange={set("instagram")} placeholder="@yourvenue"/></Field> <Field label="TikTok"><input value={f.tiktok} onChange={set("tiktok")} placeholder="@yourvenue"/></Field> <Field label="Facebook Page URL"><input value={f.facebook} onChange={set("facebook")} placeholder="https://facebook.com/yourvenue"/></Field> <Field label="X / Twitter"><input value={f.twitter} onChange={set("twitter")} placeholder="@yourvenue"/></Field> </Grid2> </Card> <div style={{marginTop:22,display:"flex",gap:12,alignItems:"center"}}> <Btn onClick={save} disabled={busy} size="lg">{busy?"Saving...":venue?"Save Changes":"Submit Venue"}</Btn> {venue?.status==="pending"&&<Badge color="#f59e0b">Pending Review</Badge>}
- {venue?.status==="approved"&&<Badge color="#22c55e">Live </Badge>}
- </div> {toast.msg&&<div style={{position:"fixed",bottom:24,right:24,background:toast.type==="success"?"#0a2a14":"#2a0a0a",color:toast.type==="success"?"#22c55e":"#ef4444",border:`1px solid ${toast.type==="success"?"#1a4a24":"#4a1010"}`,borderRadius:10,padding:"12px 20px",fontSize:14,fontWeight:500,zIndex:999,boxShadow:"0 8px 32px rgba(0,0,0,0.5)"}}> {toast.type==="success"?" ":" "}{toast.msg}
+<Card style={{gridColumn:"1/-1"}}> <div style={{fontFamily:"'DM Sans',sans-serif",fontWeight:700,fontSize:11,marginBottom:18,color:"var(--sub)",textTransform:"uppercase",letterSpacing:1.5}}> Social Media</div> <div style={{color:"var(--sub)",fontSize:13,marginBottom:16}}>Link your accounts so fans can follow you — and share events directly to your profiles.</div> <Grid2> <Field label="Instagram"><input value={f.instagram} onChange={set("instagram")} placeholder="@yourvenue"/></Field> <Field label="TikTok"><input value={f.tiktok} onChange={set("tiktok")} placeholder="@yourvenue"/></Field> <Field label="Facebook Page URL"><input value={f.facebook} onChange={set("facebook")} placeholder="https://facebook.com/yourvenue"/></Field> <Field label="X / Twitter"><input value={f.twitter} onChange={set("twitter")} placeholder="@yourvenue"/></Field> </Grid2> </Card> <div style={{marginTop:22,display:"flex",gap:12,alignItems:"center"}}> <Btn onClick={save} disabled={busy} size="lg">{busy?"Saving...":venue?"Save Changes":"Submit Venue"}</Btn> {venue?.status==="pending"&&<Badge color="#f59e0b">Pending Review</Badge>}
+ {venue?.status==="approved"&&<Badge color="var(--green)">Live </Badge>}
+ </div> {toast.msg&&<div style={{position:"fixed",bottom:24,right:24,background:toast.type==="success"?"rgba(52,211,153,0.08)":"rgba(248,113,113,0.08)",color:toast.type==="success"?"var(--green)":"#ef4444",border:`1px solid ${toast.type==="success"?"rgba(52,211,153,0.2)":"rgba(248,113,113,0.25)"}`,borderRadius:10,padding:"12px 20px",fontSize:14,fontWeight:500,zIndex:999,boxShadow:"0 8px 32px rgba(0,0,0,0.5)"}}> {toast.type==="success"?" ":" "}{toast.msg}
  </div>}
  </div> );
 }
@@ -478,20 +524,20 @@ function TicketTierBuilder({tiers,setTiers,isFree}){
   return(
     <div style={{marginBottom:18}}>
       <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:10}}>
-        <label style={{marginBottom:0,fontSize:13,color:"#8888a0",fontWeight:500}}>Ticket Tiers</label>
-        <button type="button" onClick={add} style={{background:"#FF6B3520",color:"#FF6B35",border:"1px solid #FF6B3540",borderRadius:6,padding:"4px 12px",fontSize:12,fontWeight:700,cursor:"pointer",fontFamily:"'Inter',sans-serif"}}>+ Add Tier</button>
+        <label style={{marginBottom:0,fontSize:13,color:"var(--sub)",fontWeight:500}}>Ticket Tiers</label>
+        <button type="button" onClick={add} style={{background:"#FF6B3520",color:"#FF6B35",border:"1px solid #FF6B3540",borderRadius:6,padding:"4px 12px",fontSize:12,fontWeight:700,cursor:"pointer",fontFamily:"'DM Sans',sans-serif"}}>+ Add Tier</button>
       </div>
-      {tiers.length===0&&<div style={{background:"#13131a",border:"1px dashed #25252f",borderRadius:8,padding:"14px",textAlign:"center",color:"#55556a",fontSize:13}}>No ticket tiers yet — add GA, VIP, etc.</div>}
+      {tiers.length===0&&<div style={{background:"var(--surface)",border:"1px dashed #25252f",borderRadius:10,padding:"14px",textAlign:"center",color:"var(--muted)",fontSize:13}}>No ticket tiers yet — add GA, VIP, etc.</div>}
       {tiers.map((tier,i)=>(
-        <div key={i} style={{background:"#13131a",border:"1px solid #25252f",borderRadius:10,padding:"14px",marginBottom:10}}>
+        <div key={i} style={{background:"var(--surface)",border:"1px solid var(--border)",borderRadius:10,padding:"14px",marginBottom:10}}>
           <div style={{display:"grid",gridTemplateColumns:"1fr 100px 100px",gap:10,marginBottom:8}}>
-            <div><label style={{fontSize:11,color:"#8888a0",display:"block",marginBottom:4}}>Tier Name</label><input value={tier.name} onChange={e=>update(i,"name",e.target.value)} placeholder="General Admission" style={{background:"#0b0b0f",border:"1px solid #25252f",borderRadius:6,padding:"7px 10px",color:"#e8e8f0",fontSize:13,width:"100%",fontFamily:"'Inter',sans-serif"}}/></div>
-            <div><label style={{fontSize:11,color:"#8888a0",display:"block",marginBottom:4}}>Price ($)</label><input type="number" min="0" value={tier.price} onChange={e=>update(i,"price",e.target.value)} placeholder="25" style={{background:"#0b0b0f",border:"1px solid #25252f",borderRadius:6,padding:"7px 10px",color:"#e8e8f0",fontSize:13,width:"100%",fontFamily:"'Inter',sans-serif"}}/></div>
-            <div><label style={{fontSize:11,color:"#8888a0",display:"block",marginBottom:4}}>Qty</label><input type="number" min="1" value={tier.quantity} onChange={e=>update(i,"quantity",e.target.value)} placeholder="100" style={{background:"#0b0b0f",border:"1px solid #25252f",borderRadius:6,padding:"7px 10px",color:"#e8e8f0",fontSize:13,width:"100%",fontFamily:"'Inter',sans-serif"}}/></div>
+            <div><label style={{fontSize:11,color:"var(--sub)",display:"block",marginBottom:4}}>Tier Name</label><input value={tier.name} onChange={e=>update(i,"name",e.target.value)} placeholder="General Admission" style={{background:"var(--bg)",border:"1px solid var(--border)",borderRadius:6,padding:"7px 10px",color:"var(--text)",fontSize:13,width:"100%",fontFamily:"'DM Sans',sans-serif"}}/></div>
+            <div><label style={{fontSize:11,color:"var(--sub)",display:"block",marginBottom:4}}>Price ($)</label><input type="number" min="0" value={tier.price} onChange={e=>update(i,"price",e.target.value)} placeholder="25" style={{background:"var(--bg)",border:"1px solid var(--border)",borderRadius:6,padding:"7px 10px",color:"var(--text)",fontSize:13,width:"100%",fontFamily:"'DM Sans',sans-serif"}}/></div>
+            <div><label style={{fontSize:11,color:"var(--sub)",display:"block",marginBottom:4}}>Qty</label><input type="number" min="1" value={tier.quantity} onChange={e=>update(i,"quantity",e.target.value)} placeholder="100" style={{background:"var(--bg)",border:"1px solid var(--border)",borderRadius:6,padding:"7px 10px",color:"var(--text)",fontSize:13,width:"100%",fontFamily:"'DM Sans',sans-serif"}}/></div>
           </div>
           <div style={{display:"flex",gap:10,alignItems:"flex-end"}}>
-            <div style={{flex:1}}><label style={{fontSize:11,color:"#8888a0",display:"block",marginBottom:4}}>Perks (optional)</label><input value={tier.description} onChange={e=>update(i,"description",e.target.value)} placeholder="Front row access, 1 drink included..." style={{background:"#0b0b0f",border:"1px solid #25252f",borderRadius:6,padding:"7px 10px",color:"#e8e8f0",fontSize:13,width:"100%",fontFamily:"'Inter',sans-serif"}}/></div>
-            <button type="button" onClick={()=>remove(i)} style={{background:"#2a0a0a",color:"#ef4444",border:"1px solid #4a1010",borderRadius:6,padding:"7px 10px",fontSize:12,cursor:"pointer",fontFamily:"'Inter',sans-serif",flexShrink:0}}>Remove</button>
+            <div style={{flex:1}}><label style={{fontSize:11,color:"var(--sub)",display:"block",marginBottom:4}}>Perks (optional)</label><input value={tier.description} onChange={e=>update(i,"description",e.target.value)} placeholder="Front row access, 1 drink included..." style={{background:"var(--bg)",border:"1px solid var(--border)",borderRadius:6,padding:"7px 10px",color:"var(--text)",fontSize:13,width:"100%",fontFamily:"'DM Sans',sans-serif"}}/></div>
+            <button type="button" onClick={()=>remove(i)} style={{background:"rgba(248,113,113,0.08)",color:"#ef4444",border:"1px solid #4a1010",borderRadius:6,padding:"7px 10px",fontSize:12,cursor:"pointer",fontFamily:"'DM Sans',sans-serif",flexShrink:0}}>Remove</button>
           </div>
         </div>
       ))}
@@ -554,7 +600,7 @@ function EventModal({event,venueId,venueTier,currentEventCount,onClose,onSave}) 
  setBusy(false);onSave();onClose();
  };
  return (
- <div style={{position:"fixed",inset:0,background:"rgba(0,0,0,0.8)",zIndex:100,display:"flex",alignItems:"center",justifyContent:"center",padding:20}} onClick={onClose}> <div style={{background:"#1a1a24",border:"1px solid #25252f",borderRadius:16,padding:28,width:"100%",maxWidth:580,maxHeight:"92vh",overflowY:"auto"}} onClick={e=>e.stopPropagation()}> <h3 style={{fontFamily:"'Inter',sans-serif",fontWeight:800,fontSize:18,marginBottom:20}}>{event?"Edit Event":"New Event"}</h3> {err&&<div style={{background:"#2a0a0a",color:"#ef4444",border:"1px solid #4a1010",borderRadius:8,padding:"10px",marginBottom:14,fontSize:14}}>{err}</div>}
+ <div style={{position:"fixed",inset:0,background:"rgba(0,0,0,0.8)",zIndex:100,display:"flex",alignItems:"center",justifyContent:"center",padding:20}} onClick={onClose}> <div style={{background:"var(--card)",border:"1px solid var(--border)",borderRadius:16,padding:28,width:"100%",maxWidth:580,maxHeight:"92vh",overflowY:"auto"}} onClick={e=>e.stopPropagation()}> <h3 style={{fontFamily:"'DM Sans',sans-serif",fontWeight:800,fontSize:18,marginBottom:20}}>{event?"Edit Event":"New Event"}</h3> {err&&<div style={{background:"rgba(248,113,113,0.08)",color:"#ef4444",border:"1px solid #4a1010",borderRadius:10,padding:"10px",marginBottom:14,fontSize:14}}>{err}</div>}
  <Field label="Title *"><input value={f.title} onChange={set("title")} placeholder="Comedy Night Live"/></Field>
  <Field label="Description"><textarea value={f.description} onChange={set("description")} placeholder="What should attendees expect?"/></Field>
  <Grid2>
@@ -571,7 +617,7 @@ function EventModal({event,venueId,venueTier,currentEventCount,onClose,onSave}) 
  </div>
  <TicketTierBuilder tiers={tiers} setTiers={setTiers} isFree={f.is_free}/>
  <Field label="Cover Image URL"><input value={f.cover_image_url} onChange={set("cover_image_url")} placeholder="https://..."/></Field>
- {f.cover_image_url&&<img src={f.cover_image_url} alt="" style={{width:"100%",height:100,objectFit:"cover",borderRadius:8,marginBottom:14,border:"1px solid #25252f"}} onError={e=>e.target.style.display="none"}/>}
+ {f.cover_image_url&&<img src={f.cover_image_url} alt="" style={{width:"100%",height:100,objectFit:"cover",borderRadius:10,marginBottom:14,border:"1px solid var(--border)"}} onError={e=>e.target.style.display="none"}/>}
  <div style={{display:"flex",gap:10,marginTop:8}}>
    <Btn onClick={save} disabled={busy}>{busy?"Saving...":event?"Save Changes":"Create Event"}</Btn>
    <Btn variant="ghost" onClick={onClose}>Cancel</Btn>
@@ -589,7 +635,7 @@ function EventsManager({venue,events,onRefresh}) {
  const limit=tier==="premium"?null:tier==="standard"?20:4;
  const atLimit=limit!==null&&events.length>=limit;
  return(
- <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:16,flexWrap:"wrap",gap:12}}> <div> <h2 style={{fontFamily:"'Inter',sans-serif",fontSize:22,fontWeight:800}}>Events</h2> <p style={{color:"#8888a0",fontSize:14,marginTop:4}}> {events.length}{limit!==null?` / ${limit}`:""} events
+ <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:16,flexWrap:"wrap",gap:12}}> <div> <h2 style={{fontFamily:"'DM Sans',sans-serif",fontSize:22,fontWeight:800}}>Events</h2> <p style={{color:"var(--sub)",fontSize:14,marginTop:4}}> {events.length}{limit!==null?` / ${limit}`:""} events
  {tier==="premium"&&<span style={{color:"#f59e0b",marginLeft:6,fontSize:12}}> Unlimited</span>}
  </p> </div> <div style={{display:"flex",gap:8,alignItems:"center"}}> {atLimit&&<span style={{fontSize:12,color:"#FF6B35",background:"#FF6B3515",border:"1px solid #FF6B3530",borderRadius:6,padding:"4px 10px"}}>Limit reached</span>}
  <Btn onClick={()=>setModal("new")} disabled={!venue||atLimit}>+ New Event</Btn> </div> </div> );
@@ -600,13 +646,13 @@ function EventsManager({venue,events,onRefresh}) {
  const atLimit=limit!==null&&events.length>=limit;
  if(!atLimit)return null;
  return(
- <div style={{background:"linear-gradient(135deg,#1a0800,#200d00)",border:"1px solid #FF6B3540",borderRadius:12,padding:18,marginBottom:20,display:"flex",justifyContent:"space-between",alignItems:"center",gap:12,flexWrap:"wrap"}}> <div> <div style={{fontWeight:700,marginBottom:4}}> You've hit your {tier==="free"?"Free (4 events)":"Standard (20 events)"} limit</div> <div style={{color:"#8888a0",fontSize:13}}>{tier==="free"?"Upgrade to Standard for 20 events, or Premium for unlimited.":"Upgrade to Premium for unlimited events + hero placement + flyer design."}</div> </div> <Btn onClick={()=>window.location.href=tier==="free"?PAYMENT_LINK_STANDARD:PAYMENT_LINK_PREMIUM} variant="primary" size="sm">Upgrade Now →</Btn> </div> );
+ <div style={{background:"linear-gradient(135deg,#1a0800,#200d00)",border:"1px solid #FF6B3540",borderRadius:14,padding:18,marginBottom:20,display:"flex",justifyContent:"space-between",alignItems:"center",gap:12,flexWrap:"wrap"}}> <div> <div style={{fontWeight:700,marginBottom:4}}> You've hit your {tier==="free"?"Free (4 events)":"Standard (20 events)"} limit</div> <div style={{color:"var(--sub)",fontSize:13}}>{tier==="free"?"Upgrade to Standard for 20 events, or Premium for unlimited.":"Upgrade to Premium for unlimited events + hero placement + flyer design."}</div> </div> <Btn onClick={()=>window.location.href=tier==="free"?PAYMENT_LINK_STANDARD:PAYMENT_LINK_PREMIUM} variant="primary" size="sm">Upgrade Now →</Btn> </div> );
  })()}
- {!venue&&<Card style={{textAlign:"center",padding:40}}><p style={{color:"#8888a0"}}>Set up your venue first.</p></Card>}
- {venue&&events.length===0&&<Card style={{textAlign:"center",padding:48,borderStyle:"dashed"}}><div style={{fontSize:40,marginBottom:12}}></div><h3 style={{fontFamily:"'Inter',sans-serif",fontWeight:700,marginBottom:8}}>No events yet</h3><p style={{color:"#8888a0",fontSize:14,marginBottom:16}}>Add events to get discovered by Columbus event-goers.</p><Btn onClick={()=>setModal("new")}>+ Add First Event</Btn></Card>}
+ {!venue&&<Card style={{textAlign:"center",padding:40}}><p style={{color:"var(--sub)"}}>Set up your venue first.</p></Card>}
+ {venue&&events.length===0&&<Card style={{textAlign:"center",padding:48,borderStyle:"dashed"}}><div style={{fontSize:40,marginBottom:12}}></div><h3 style={{fontFamily:"'DM Sans',sans-serif",fontWeight:700,marginBottom:8}}>No events yet</h3><p style={{color:"var(--sub)",fontSize:14,marginBottom:16}}>Add events to get discovered by Columbus event-goers.</p><Btn onClick={()=>setModal("new")}>+ Add First Event</Btn></Card>}
  <div style={{display:"flex",flexDirection:"column",gap:10}}> {events.map(e=>(
- <Card key={e.id} style={{display:"flex",alignItems:"center",gap:14,padding:14}}> {e.cover_image_url?<img src={e.cover_image_url} alt="" style={{width:56,height:56,borderRadius:8,objectFit:"cover",flexShrink:0}} onError={ev=>ev.target.style.display="none"}/>:<div style={{width:56,height:56,borderRadius:8,background:"#13131a",display:"flex",alignItems:"center",justifyContent:"center",fontSize:22,flexShrink:0}}></div>}
- <div style={{flex:1,minWidth:0}}> <div style={{fontWeight:600,fontSize:14,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{e.title}</div> <div style={{color:"#8888a0",fontSize:12,marginTop:2}}>{e.start_time?new Date(e.start_time).toLocaleDateString("en-US",{weekday:"short",month:"short",day:"numeric",year:"numeric"}):"No date"} · {e.category}</div> </div> <div style={{display:"flex",gap:8,alignItems:"center",flexShrink:0}}> <Badge color={e.status==="published"?"#22c55e":e.status==="cancelled"?"#ef4444":"#55556a"}>{e.status}</Badge> <Btn size="sm" variant="secondary" onClick={()=>setModal(e)}>Edit</Btn> {e.status==="published"&&<Btn size="sm" onClick={()=>setShareEvent(e)} style={{background:"#FF6B3520",color:"#FF6B35",border:"1px solid #FF6B3540"}}>Share</Btn>}
+ <Card key={e.id} style={{display:"flex",alignItems:"center",gap:14,padding:14}}> {e.cover_image_url?<img src={e.cover_image_url} alt="" style={{width:56,height:56,borderRadius:10,objectFit:"cover",flexShrink:0}} onError={ev=>ev.target.style.display="none"}/>:<div style={{width:56,height:56,borderRadius:10,background:"var(--surface)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:22,flexShrink:0}}></div>}
+ <div style={{flex:1,minWidth:0}}> <div style={{fontWeight:600,fontSize:14,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{e.title}</div> <div style={{color:"var(--sub)",fontSize:12,marginTop:2}}>{e.start_time?new Date(e.start_time).toLocaleDateString("en-US",{weekday:"short",month:"short",day:"numeric",year:"numeric"}):"No date"} · {e.category}</div> </div> <div style={{display:"flex",gap:8,alignItems:"center",flexShrink:0}}> <Badge color={e.status==="published"?"var(--green)":e.status==="cancelled"?"#ef4444":"var(--muted)"}>{e.status}</Badge> <Btn size="sm" variant="secondary" onClick={()=>setModal(e)}>Edit</Btn> {e.status==="published"&&<Btn size="sm" onClick={()=>setShareEvent(e)} style={{background:"#FF6B3520",color:"#FF6B35",border:"1px solid #FF6B3540"}}>Share</Btn>}
  <Btn size="sm" variant="danger" onClick={()=>del(e.id)}>Del</Btn> </div> </Card> ))}
  </div> {modal&&<EventModal event={modal==="new"?null:modal} venueId={venue?.id} venueTier={venue?.tier||"free"} currentEventCount={events.length} onClose={()=>setModal(null)} onSave={onRefresh}/>}
  {shareEvent&&<SharePanel event={shareEvent} venue={venue} onClose={()=>setShareEvent(null)}/>}
@@ -621,9 +667,9 @@ function Inquiries({venue}) {
  const markRead=async id=>{await sb.from("inquiries").update({status:"read"}).eq("id",id);setItems(items.map(i=>i.id===id?{...i,status:"read"}:i));};
  if(busy)return<Spin/>;
  return (
- <div> <h2 style={{fontFamily:"'Inter',sans-serif",fontSize:22,fontWeight:800,marginBottom:6}}>Inquiries</h2> <p style={{color:"#8888a0",fontSize:14,marginBottom:24}}>{items.filter(i=>i.status==="new").length} unread</p> {items.length===0&&<Card style={{textAlign:"center",padding:48}}><div style={{fontSize:40,marginBottom:12}}></div><h3 style={{fontFamily:"'Inter',sans-serif",fontWeight:700,marginBottom:8}}>No inquiries yet</h3><p style={{color:"#8888a0",fontSize:14}}>Booking requests will show up here.</p></Card>}
+ <div> <h2 style={{fontFamily:"'DM Sans',sans-serif",fontSize:22,fontWeight:800,marginBottom:6}}>Inquiries</h2> <p style={{color:"var(--sub)",fontSize:14,marginBottom:24}}>{items.filter(i=>i.status==="new").length} unread</p> {items.length===0&&<Card style={{textAlign:"center",padding:48}}><div style={{fontSize:40,marginBottom:12}}></div><h3 style={{fontFamily:"'DM Sans',sans-serif",fontWeight:700,marginBottom:8}}>No inquiries yet</h3><p style={{color:"var(--sub)",fontSize:14}}>Booking requests will show up here.</p></Card>}
  <div style={{display:"flex",flexDirection:"column",gap:12}}> {items.map(i=>(
- <Card key={i.id} style={{borderColor:i.status==="new"?"#FF6B35":"#25252f",padding:18}}> <div style={{display:"flex",justifyContent:"space-between",marginBottom:8}}> <div><strong>{i.name}</strong><span style={{color:"#8888a0",fontSize:13,marginLeft:10}}>{i.email}</span></div> <div style={{display:"flex",gap:8,alignItems:"center"}}><Badge color={i.status==="new"?"#FF6B35":"#55556a"}>{i.status}</Badge>{i.status==="new"&&<Btn size="sm" variant="secondary" onClick={()=>markRead(i.id)}>Mark Read</Btn>}</div> </div> {i.event_date&&<div style={{fontSize:13,color:"#8888a0",marginBottom:8}}> {i.event_date} · {i.guest_count} guests</div>}
+ <Card key={i.id} style={{borderColor:i.status==="new"?"#FF6B35":"var(--border)",padding:18}}> <div style={{display:"flex",justifyContent:"space-between",marginBottom:8}}> <div><strong>{i.name}</strong><span style={{color:"var(--sub)",fontSize:13,marginLeft:10}}>{i.email}</span></div> <div style={{display:"flex",gap:8,alignItems:"center"}}><Badge color={i.status==="new"?"#FF6B35":"var(--muted)"}>{i.status}</Badge>{i.status==="new"&&<Btn size="sm" variant="secondary" onClick={()=>markRead(i.id)}>Mark Read</Btn>}</div> </div> {i.event_date&&<div style={{fontSize:13,color:"var(--sub)",marginBottom:8}}> {i.event_date} · {i.guest_count} guests</div>}
  <p style={{fontSize:14,lineHeight:1.7}}>{i.message}</p> </Card> ))}
  </div> </div> );
 }
@@ -663,21 +709,21 @@ function MarketingServices({venue}) {
  };
 
  return(
- <div style={{background:"linear-gradient(135deg,#130800,#1a0f00)",border:`2px solid ${isPremium?"#FF6B3550":"#25252f"}`,borderRadius:14,padding:24,marginTop:24}}> <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:16}}> <div> <div style={{fontFamily:"'Inter',sans-serif",fontWeight:800,fontSize:16,marginBottom:4}}> Marketing Services</div> <div style={{color:"#8888a0",fontSize:13}}>Custom designs for your venue & events</div> </div> {isPremium&&<span style={{background:"#FF6B3520",color:"#FF6B35",border:"1px solid #FF6B3540",borderRadius:20,padding:"3px 10px",fontSize:11,fontWeight:700}}> Premium</span>}
+ <div style={{background:"linear-gradient(135deg,#130800,#1a0f00)",border:`2px solid ${isPremium?"#FF6B3550":"var(--border)"}`,borderRadius:14,padding:24,marginTop:24}}> <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:16}}> <div> <div style={{fontFamily:"'DM Sans',sans-serif",fontWeight:800,fontSize:16,marginBottom:4}}> Marketing Services</div> <div style={{color:"var(--sub)",fontSize:13}}>Custom designs for your venue & events</div> </div> {isPremium&&<span style={{background:"#FF6B3520",color:"#FF6B35",border:"1px solid #FF6B3540",borderRadius:20,padding:"3px 10px",fontSize:11,fontWeight:700}}> Premium</span>}
  </div> {!isPremium?(
- <div style={{textAlign:"center",padding:"24px 0"}}> <div style={{fontSize:32,marginBottom:10}}></div> <div style={{fontWeight:600,marginBottom:8}}>Premium exclusive</div> <div style={{color:"#8888a0",fontSize:13,marginBottom:16,lineHeight:1.6}}>Upgrade to Premium to request custom flyer design and branded merch — printed and shipped by CBUSEVENTS.</div> <Btn onClick={()=>window.location.href=PAYMENT_LINK_PREMIUM}>Upgrade to Premium →</Btn> </div> ):(
- <div> {sent&&<div style={{background:"#0a2a14",color:"#22c55e",border:"1px solid #1a4a24",borderRadius:8,padding:"10px 14px",fontSize:14,marginBottom:14}}> Request sent! We'll reach out within 24 hours.</div>}
- {err&&<div style={{background:"#2a0a0a",color:"#ef4444",border:"1px solid #4a1010",borderRadius:8,padding:"10px 14px",fontSize:14,marginBottom:14}}> {err}</div>}
+ <div style={{textAlign:"center",padding:"24px 0"}}> <div style={{fontSize:32,marginBottom:10}}></div> <div style={{fontWeight:600,marginBottom:8}}>Premium exclusive</div> <div style={{color:"var(--sub)",fontSize:13,marginBottom:16,lineHeight:1.6}}>Upgrade to Premium to request custom flyer design and branded merch — printed and shipped by CBUSEVENTS.</div> <Btn onClick={()=>window.location.href=PAYMENT_LINK_PREMIUM}>Upgrade to Premium →</Btn> </div> ):(
+ <div> {sent&&<div style={{background:"rgba(52,211,153,0.08)",color:"var(--green)",border:"1px solid #1a4a24",borderRadius:10,padding:"10px 14px",fontSize:14,marginBottom:14}}> Request sent! We'll reach out within 24 hours.</div>}
+ {err&&<div style={{background:"rgba(248,113,113,0.08)",color:"#ef4444",border:"1px solid #4a1010",borderRadius:10,padding:"10px 14px",fontSize:14,marginBottom:14}}> {err}</div>}
  <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12,marginBottom:16}}> <div
  onClick={()=>setType(type==="flyer"?null:"flyer")}
- style={{background:type==="flyer"?"#FF6B3515":"#13131a",border:`1.5px solid ${type==="flyer"?"#FF6B35":"#25252f"}`,borderRadius:12,padding:18,cursor:"pointer",transition:"all 0.15s"}}> <div style={{fontSize:28,marginBottom:8}}></div> <div style={{fontWeight:700,marginBottom:4}}>Flyer Design</div> <div style={{color:"#8888a0",fontSize:12,lineHeight:1.5}}>Custom event flyers for social media & print</div> <div style={{color:"#22c55e",fontSize:11,fontWeight:600,marginTop:8}}>Included with Premium</div> </div> <div
+ style={{background:type==="flyer"?"#FF6B3515":"var(--surface)",border:`1.5px solid ${type==="flyer"?"#FF6B35":"var(--border)"}`,borderRadius:14,padding:18,cursor:"pointer",transition:"all 0.15s"}}> <div style={{fontSize:28,marginBottom:8}}></div> <div style={{fontWeight:700,marginBottom:4}}>Flyer Design</div> <div style={{color:"var(--sub)",fontSize:12,lineHeight:1.5}}>Custom event flyers for social media & print</div> <div style={{color:"var(--green)",fontSize:11,fontWeight:600,marginTop:8}}>Included with Premium</div> </div> <div
  onClick={()=>setType(type==="merch"?null:"merch")}
- style={{background:type==="merch"?"#FF6B3515":"#13131a",border:`1.5px solid ${type==="merch"?"#FF6B35":"#25252f"}`,borderRadius:12,padding:18,cursor:"pointer",transition:"all 0.15s"}}> <div style={{fontSize:28,marginBottom:8}}></div> <div style={{fontWeight:700,marginBottom:4}}>Merch Design</div> <div style={{color:"#8888a0",fontSize:12,lineHeight:1.5}}>Custom branded shirts, hats & more on demand</div> <div style={{color:"#f59e0b",fontSize:11,fontWeight:600,marginTop:8}}>Heat press printed</div> </div> </div> {type&&(
- <div> <label style={{display:"block",fontSize:13,color:"#8888a0",marginBottom:6}}>Tell us what you need for your {type==="flyer"?"flyer":"merch"} *</label> <textarea
+ style={{background:type==="merch"?"#FF6B3515":"var(--surface)",border:`1.5px solid ${type==="merch"?"#FF6B35":"var(--border)"}`,borderRadius:14,padding:18,cursor:"pointer",transition:"all 0.15s"}}> <div style={{fontSize:28,marginBottom:8}}></div> <div style={{fontWeight:700,marginBottom:4}}>Merch Design</div> <div style={{color:"var(--sub)",fontSize:12,lineHeight:1.5}}>Custom branded shirts, hats & more on demand</div> <div style={{color:"#f59e0b",fontSize:11,fontWeight:600,marginTop:8}}>Heat press printed</div> </div> </div> {type&&(
+ <div> <label style={{display:"block",fontSize:13,color:"var(--sub)",marginBottom:6}}>Tell us what you need for your {type==="flyer"?"flyer":"merch"} *</label> <textarea
  value={details}
  onChange={e=>setDetails(e.target.value)}
  placeholder={type==="flyer"?"e.g. Comedy Night flyer, Feb 28, 9pm, dark theme with our logo...":"e.g. 20 black tees with our venue logo on front, size M-XL..."}
- style={{width:"100%",background:"#0b0b0f",border:"1px solid #25252f",borderRadius:8,padding:"10px 14px",color:"#e8e8f0",fontFamily:"'Inter',sans-serif",fontSize:14,minHeight:80,resize:"vertical",outline:"none",marginBottom:12}}
+ style={{width:"100%",background:"var(--bg)",border:"1px solid var(--border)",borderRadius:10,padding:"10px 14px",color:"var(--text)",fontFamily:"'DM Sans',sans-serif",fontSize:14,minHeight:80,resize:"vertical",outline:"none",marginBottom:12}}
  /> <Btn onClick={submit} disabled={busy}>{busy?"Sending...":"Send Request →"}</Btn> </div> )}
  </div> )}
  </div> );
@@ -728,22 +774,22 @@ function PlanBilling({venue}) {
  const upgraded=new URLSearchParams(window.location.search).get("upgrade")==="success";
 
  return (
- <div> <h2 style={{fontFamily:"'Inter',sans-serif",fontSize:22,fontWeight:800,marginBottom:6}}>Plan & Billing</h2> <p style={{color:"#8888a0",fontSize:14,marginBottom:upgraded?16:32}}>Current plan: <strong style={{color:"#f59e0b"}}>{cur[0].toUpperCase()+cur.slice(1)}</strong></p> {upgraded&&<div style={{background:"#0a2a14",border:"1px solid #1a4a24",borderRadius:10,padding:"14px 18px",marginBottom:28,display:"flex",alignItems:"center",gap:10,color:"#22c55e",fontSize:14,fontWeight:600}}> Upgrade successful! Your plan will be activated within a minute.
+ <div> <h2 style={{fontFamily:"'DM Sans',sans-serif",fontSize:22,fontWeight:800,marginBottom:6}}>Plan & Billing</h2> <p style={{color:"var(--sub)",fontSize:14,marginBottom:upgraded?16:32}}>Current plan: <strong style={{color:"#f59e0b"}}>{cur[0].toUpperCase()+cur.slice(1)}</strong></p> {upgraded&&<div style={{background:"rgba(52,211,153,0.08)",border:"1px solid #1a4a24",borderRadius:10,padding:"14px 18px",marginBottom:28,display:"flex",alignItems:"center",gap:10,color:"var(--green)",fontSize:14,fontWeight:600}}> Upgrade successful! Your plan will be activated within a minute.
  </div>}
 
- {err&&<div style={{background:"#2a0a0a",border:"1px solid #4a1a1a",borderRadius:10,padding:"12px 16px",marginBottom:20,color:"#ef4444",fontSize:13}}> {err}</div>}
+ {err&&<div style={{background:"rgba(248,113,113,0.08)",border:"1px solid #4a1a1a",borderRadius:10,padding:"12px 16px",marginBottom:20,color:"#ef4444",fontSize:13}}> {err}</div>}
 
  <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(220px,1fr))",gap:20}}> {plans.map(p=>{const active=p.id===cur;const isLoading=loading===p.id;return(
- <div key={p.id} style={{background:active?"#1a1a24":"#13131a",border:`1.5px solid ${active?"#FF6B35":"#25252f"}`,borderRadius:14,padding:24,position:"relative",marginTop:16}}> {active&&<div style={{position:"absolute",top:-12,left:"50%",transform:"translateX(-50%)",background:"#FF6B35",color:"#fff",borderRadius:20,padding:"2px 14px",fontSize:11,fontWeight:700,whiteSpace:"nowrap"}}>CURRENT</div>}
+ <div key={p.id} style={{background:active?"var(--card)":"var(--surface)",border:`1.5px solid ${active?"#FF6B35":"var(--border)"}`,borderRadius:14,padding:24,position:"relative",marginTop:16}}> {active&&<div style={{position:"absolute",top:-12,left:"50%",transform:"translateX(-50%)",background:"#FF6B35",color:"#fff",borderRadius:20,padding:"2px 14px",fontSize:11,fontWeight:700,whiteSpace:"nowrap"}}>CURRENT</div>}
  {p.id==="premium"&&!active&&<div style={{position:"absolute",top:-12,left:"50%",transform:"translateX(-50%)",background:"#f59e0b",color:"#000",borderRadius:20,padding:"2px 14px",fontSize:11,fontWeight:700,whiteSpace:"nowrap"}}>MOST POPULAR</div>}
- <h3 style={{fontFamily:"'Inter',sans-serif",fontWeight:800,fontSize:20,marginBottom:4}}>{p.name}</h3> <div style={{marginBottom:18}}> <span style={{fontFamily:"'Inter',sans-serif",fontSize:32,fontWeight:800,color:p.price===0?"#e8e8f0":"#FF6B35"}}>{p.price===0?"Free":`$${p.price}`}</span> {p.price>0&&<span style={{color:"#8888a0",fontSize:13}}>/mo</span>}
- </div> <div style={{display:"flex",flexDirection:"column",gap:8,marginBottom:22}}> {p.perks.map(k=><div key={k} style={{display:"flex",gap:8,fontSize:13,color:"#8888a0"}}><span style={{color:"#22c55e"}}></span>{k}</div>)}
+ <h3 style={{fontFamily:"'DM Sans',sans-serif",fontWeight:800,fontSize:20,marginBottom:4}}>{p.name}</h3> <div style={{marginBottom:18}}> <span style={{fontFamily:"'DM Sans',sans-serif",fontSize:32,fontWeight:800,color:p.price===0?"var(--text)":"#FF6B35"}}>{p.price===0?"Free":`$${p.price}`}</span> {p.price>0&&<span style={{color:"var(--sub)",fontSize:13}}>/mo</span>}
+ </div> <div style={{display:"flex",flexDirection:"column",gap:8,marginBottom:22}}> {p.perks.map(k=><div key={k} style={{display:"flex",gap:8,fontSize:13,color:"var(--sub)"}}><span style={{color:"var(--green)"}}></span>{k}</div>)}
  </div> {active
  ?<Btn variant="ghost" style={{width:"100%"}} disabled>Current Plan</Btn> :p.price===0
  ?<Btn variant="ghost" style={{width:"100%",opacity:0.5}} disabled>Downgrade</Btn> :<Btn style={{width:"100%",opacity:isLoading?0.7:1}} variant={p.id==="premium"?"primary":"secondary"} onClick={()=>checkout(p)} disabled={!!loading}> {isLoading?"Redirecting to Stripe...":"Upgrade Now →"}
  </Btn> }
  </div> );})}
- </div> <div style={{marginTop:32,padding:20,background:"#13131a",border:"1px solid #25252f",borderRadius:12}}> <h4 style={{fontWeight:700,fontSize:14,marginBottom:8}}>Billing & Cancellation</h4> <p style={{color:"#8888a0",fontSize:13,lineHeight:1.7}}>Subscriptions are billed monthly and can be cancelled anytime. After upgrading, your tier is activated automatically within 1–2 minutes via Stripe webhook. To manage or cancel your subscription, contact <a href="mailto:info@cbusevents.com" style={{color:"#FF6B35"}}>info@cbusevents.com</a>.</p> </div> <MarketingServices venue={venue}/> </div> );
+ </div> <div style={{marginTop:32,padding:20,background:"var(--surface)",border:"1px solid var(--border)",borderRadius:14}}> <h4 style={{fontWeight:700,fontSize:14,marginBottom:8}}>Billing & Cancellation</h4> <p style={{color:"var(--sub)",fontSize:13,lineHeight:1.7}}>Subscriptions are billed monthly and can be cancelled anytime. After upgrading, your tier is activated automatically within 1–2 minutes via Stripe webhook. To manage or cancel your subscription, contact <a href="mailto:info@cbusevents.com" style={{color:"#FF6B35"}}>info@cbusevents.com</a>.</p> </div> <MarketingServices venue={venue}/> </div> );
 }
 
 // Portal Shell
@@ -770,7 +816,7 @@ function Portal() {
  };
  useEffect(()=>{load();},[]);
  return (
- <div style={{display:"flex",minHeight:"100vh"}}> <Sidebar active={page} setActive={setPage} profile={profile}/> <main style={{flex:1,padding:36,overflowY:"auto",background:"#0b0b0f"}}> {busy?<Spin/>:<> {page==="dashboard"&&<Dashboard venue={venue} events={events}/>}
+ <div style={{display:"flex",minHeight:"100vh"}}> <Sidebar active={page} setActive={setPage} profile={profile}/> <main style={{flex:1,padding:36,overflowY:"auto",background:"var(--bg)",minHeight:"100vh"}}> {busy?<Spin/>:<> {page==="dashboard"&&<Dashboard venue={venue} events={events}/>}
  {page==="venue" &&<VenueForm venue={venue} onSave={load}/>}
  {page==="events" &&<EventsManager venue={venue} events={events} onRefresh={load}/>}
  {page==="inquiries"&&<Inquiries venue={venue}/>}
