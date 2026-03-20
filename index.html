@@ -839,6 +839,11 @@ footer { background:var(--surface); border-top:1px solid var(--border); padding:
   color:var(--orange); text-decoration:none; letter-spacing:0.5px; white-space:nowrap;
 }
 .rh-view-all:hover { text-decoration:underline; }
+
+/* Hide hero floating cards on mobile */
+@media(max-width:900px){
+  .hero-cards-desktop { display:none !important; }
+}
 </style>
 <style>
 *{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;}
@@ -1355,7 +1360,7 @@ function renderHome(){
        Columbus<br><span style="color:var(--orange)">Events</span><br><span style="color:rgba(255,255,255,0.25)">Start Here.</span>
      </h1>
      <p style="color:var(--sub);font-size:17px;line-height:1.65;margin-bottom:32px;max-width:460px;font-weight:500">
-       The platform connecting <strong style="color:var(--text);font-weight:700">venues, vendors and planners to customers</strong> across Columbus. One ecosystem for every event.
+       The platform connecting <strong style="color:var(--text);font-weight:700">venues, vendors, planners</strong> to <strong style="color:var(--text);font-weight:700">customers</strong> across Columbus. One ecosystem for every event.
      </p>
      <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:28px">
        <a href="https://cbusevents.com/signup.html" style="display:inline-flex;align-items:center;gap:8px;background:var(--orange);color:#fff;border:none;font-family:var(--font);font-weight:700;font-size:15px;padding:14px 32px;border-radius:var(--r-md);cursor:pointer;transition:all 0.2s;text-decoration:none">Join Free Today</a>
@@ -1367,8 +1372,8 @@ function renderHome(){
      </div>
    </div>
 
-   <!-- Hero floating cards -->
-   <div id="heroCards" style="position:absolute;right:48px;top:50%;transform:translateY(-50%);z-index:3;display:flex;flex-direction:column;gap:10px;width:280px"></div>
+   <!-- Hero floating cards - desktop only -->
+   <div id="heroCards" class="hero-cards-desktop" style="position:absolute;right:48px;top:50%;transform:translateY(-50%);z-index:3;display:flex;flex-direction:column;gap:10px;width:280px"></div>
  </section>
 
  <!-- ══════════════════════════════════════════
@@ -1451,7 +1456,7 @@ function renderHome(){
              <div style="font-size:11px;color:var(--muted);margin-bottom:10px">${venueName}</div>
              <div style="display:flex;justify-content:space-between;align-items:center">
                <span style="font-family:var(--mono);font-size:9px;letter-spacing:0.08em;text-transform:uppercase;color:var(--sub);background:var(--surface);border:1px solid var(--border);padding:3px 9px;border-radius:var(--r-sm)">${fmt(e.start_time)}</span>
-               <span style="font-size:12px;font-weight:700;color:${e.is_free?'var(--green)':'var(--text)'}">${e.is_free?'Free':e.price_min?'From $'+e.price_min:''}</span>
+               <span style="font-size:12px;font-weight:700;color:${e.is_free?'var(--green)':'var(--text)'}">${(e.is_free&&!e.is_third_party)?'Free':e.price_min?'From $'+e.price_min:e.is_third_party?'See Tickets':''}</span>
              </div>
            </div>
          </div>`;
@@ -2148,7 +2153,19 @@ async function openEventModal(id){
 
  // Build ticket tiers HTML safely (no nested template literal quoting issues)
  const tiersHtml=()=>{
-   if(e.is_free)return'<div style="background:#0a2a14;border:1px solid #1a4a24;border-radius:10px;padding:14px 16px;margin-bottom:16px;display:flex;align-items:center;gap:10px"><span style="font-size:20px">&#127903;</span><div><div style="font-weight:700;color:#22c55e">Free Event</div><div style="font-size:12px;color:#888;margin-top:2px">No ticket required</div></div></div>';
+   // Third-party Ticketmaster event — always link out
+   if(e.is_third_party){
+     const src=e.ticket_source||'Ticketmaster';
+     if(e.ticket_url){
+       return '<div style="margin-bottom:16px">'
+         +'<div style="font-family:var(--mono);font-size:9px;letter-spacing:0.14em;text-transform:uppercase;color:var(--muted);margin-bottom:10px">Tickets via '+src+'</div>'
+         +'<a href="'+e.ticket_url+'" target="_blank" rel="noopener" style="display:block;background:var(--orange);color:#fff;font-family:var(--font);font-weight:700;font-size:15px;padding:14px;border-radius:var(--r-md);text-align:center;text-decoration:none;margin-bottom:8px">Get Tickets on '+src+' →</a>'
+         +'<div style="font-size:11px;color:var(--muted);text-align:center">You will be redirected to '+src+' to complete your purchase.</div>'
+         +'</div>';
+     }
+     return '<div style="color:var(--muted);font-size:13px;margin-bottom:16px">Visit '+src+' for ticket information.</div>';
+   }
+   if(e.is_free&&!e.is_third_party)return'<div style="background:rgba(52,211,153,0.08);border:1px solid rgba(52,211,153,0.2);border-radius:var(--r-md);padding:14px 16px;margin-bottom:16px;display:flex;align-items:center;gap:10px"><div><div style="font-weight:700;color:var(--green)">Free Event</div><div style="font-size:12px;color:var(--sub);margin-top:2px">No ticket required</div></div></div>';
    if(tiers.length===0){
      if(e.ticket_url)return'<a href="'+e.ticket_url+'" target="_blank" style="display:block;margin-bottom:16px"><button class="btn-primary" style="width:100%">Get Tickets &rarr;</button></a>';
      return'';
@@ -2190,10 +2207,10 @@ async function openEventModal(id){
      <span style="background:var(--surface);border-radius:8px;padding:6px 12px;font-size:13px">&#128197; ${fmt(e.start_time)}</span>
      <span style="background:var(--surface);border-radius:8px;padding:6px 12px;font-size:13px">&#128336; ${fmtTime(e.start_time)}</span>
      ${e.end_time?`<span style="background:var(--surface);border-radius:8px;padding:6px 12px;font-size:13px">Until ${fmtTime(e.end_time)}</span>`:''}
-     ${e.is_free?`<span style="background:#0a2a14;border:1px solid #1a4a24;border-radius:8px;padding:6px 12px;font-size:13px;color:var(--green)">Free</span>`:e.price_min!=null?`<span style="background:var(--surface);border-radius:8px;padding:6px 12px;font-size:13px">From $${e.price_min}${e.price_max&&e.price_max!==e.price_min?` \u2013 $${e.price_max}`:''}</span>`:''}
+     ${(e.is_free&&!e.is_third_party)?`<span style="background:rgba(52,211,153,0.1);border:1px solid rgba(52,211,153,0.2);border-radius:var(--r-sm);padding:5px 12px;font-size:12px;font-weight:700;color:var(--green)">Free</span>`:e.price_min!=null?`<span style="background:var(--surface);border-radius:8px;padding:6px 12px;font-size:13px">From $${e.price_min}${e.price_max&&e.price_max!==e.price_min?` \u2013 $${e.price_max}`:''}</span>`:''}
    </div>
    ${venue?`<div style="display:flex;align-items:center;gap:10px;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-bottom:16px;cursor:pointer" onclick="closeEventModal();showPage('venue',allVenues.find(x=>x.id==='${venue.id}'))"><div style="font-size:24px">${venueEmoji(venue.venue_type)}</div><div><div style="font-weight:600;font-size:14px">${venue.name}</div><div style="font-size:12px;color:var(--sub)">${venue.neighborhood||venue.city} \u2014 click to view venue</div></div></div>`:''}
-   ${e.description?`<p style="color:var(--sub);font-size:14px;line-height:1.7;margin-bottom:20px">${e.description}</p>`:''}
+   ${(e.description&&!e.description.toLowerCase().includes('ticket delivery')&&!e.description.toLowerCase().includes('delayed'))?`<p style="color:var(--sub);font-size:14px;line-height:1.7;margin-bottom:20px">${e.description}</p>`:''}
    ${tiersHtml()}
    <div id="ticketMsg" style="display:none;background:var(--card);border-radius:10px;padding:14px;margin-bottom:16px;font-size:13px;text-align:center;color:#8888a0"></div>
    <div style="display:flex;gap:10px;flex-wrap:wrap">
