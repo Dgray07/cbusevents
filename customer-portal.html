@@ -219,6 +219,7 @@ h1,h2,h3,h4,h5,h6{font-family:var(--font);letter-spacing:-0.02em;}
    <div id="plannersContent"><div class="spinner"></div></div>
  </div>
  </main> </div> <footer> <span class="footer-copy">© 2026 CBUSEVENTS · Columbus, Ohio</span> <div style="display:flex;align-items:center;gap:20px"> <span class="footer-copy">Made for Columbus </span> <a href="https://cbusevents.com/cbus-admin.html" class="footer-admin" id="adminFooterLink" style="display:none">Admin</a> </div> </footer> </div> <script src="https://unpkg.com/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="https://unpkg.com/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <script>
 const SB_URL="https://toblgvatvsjljbqogzsv.supabase.co";
 const SB_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRvYmxndmF0dnNqbGpicW9nenN2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMDgwNTAsImV4cCI6MjA4NzY4NDA1MH0._WJEQPizNDiQfDXQB_DHPaQhixPGpMdmYQSmyWmm_FQ";
@@ -318,7 +319,6 @@ function loadPage(p){
  else if(p==='events')loadSavedEvents();
  else if(p==='follows')loadFollows();
  else if(p==='profile')loadProfile();
- else if(p==='planners')loadPlanners();
  else if(p==='planners')loadPlanners();
 }
 
