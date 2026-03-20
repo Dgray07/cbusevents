@@ -1748,7 +1748,6 @@ unction renderVenues(){
 
 let _listMap=null;
 function setVenueView(view){
- // Map always visible above grid - no toggle needed
  const map=document.getElementById('venueMapContainer');
  if(map&&map.style.display==='none'){
    map.style.display='block';
@@ -1792,6 +1791,135 @@ async function initVenueListMap(){
      try{
        const q=encodeURIComponent(`${v.address}, Columbus, OH`);
        const r=await fetch(`https://api.mapbox.com/geocoding/v5/mapbox.places/${q}.json?access_token=pk.eyJ1IjoiY2J1c2V2ZW50cyIsImEiOiJjbW1oNWJhaDYwYnVrMnJxN3hxdGJlZmhkIn0.RtF51b0qghUlJAjHgNRdFQ&limit=1`);
+       const d=await r.json();
+       if(d.features&&d.features[0]) coords=d.features[0].center;
+     }catch(e){}
+   }
+   if(!coords) continue;
+
+   // Create custom marker
+   const el=document.createElement('div');
+   el.style.cssText='width:32px;height:32px;border-radius:50%;background:#FF6B35;border:3px solid #fff;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:13px;box-shadow:0 2px 8px rgba(0,0,0,0.4);transition:transform 0.15s;';
+   el.innerHTML='<svg width="12" height="12" fill="white" viewBox="0 0 16 16"><path d="M8 16s6-5.686 6-10A6 6 0 0 0 2 6c0 4.314 6 10 6 10zm0-7a3 3 0 1 1 0-6 3 3 0 0 1 0 6z"/></svg>';
+   el.onmouseover=()=>el.style.transform='scale(1.2)';
+   el.onmouseout=()=>el.style.transform='scale(1)';
+   el.onclick=()=>showMapPopup(v);
+
+   new mapboxgl.Marker({element:el}).setLngLat(coords).addTo(_listMap);
+ }
+}
+
+function showMapPopup(venue){
+ window._mapPopupVenue=venue;
+ const popup=document.getElementById('mapPopup');
+ const img=getVenueImg(venue);
+ document.getElementById('mapPopupImg').innerHTML=img?`<img src="${img}" style="width:100%;height:100%;object-fit:cover;" onerror="this.style.display='none'">`:'';
+ document.getElementById('mapPopupType').textContent=venue.venue_type||'Venue';
+ document.getElementById('mapPopupName').textContent=venue.name;
+ document.getElementById('mapPopupHood').textContent=venue.neighborhood?`${venue.neighborhood}, Columbus`:'Columbus, OH';
+ popup.style.display='block';
+}
+
+function renderVenues(){
+ const hoods=['All',...new Set(allVenues.map(v=>v.neighborhood).filter(Boolean))];
+ document.getElementById('app').innerHTML=`
+ <div class="search-section"> <div class="search-inner">
+   <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:12px">
+     <div><h1 style="font-family:Inter,sans-serif;font-size:28px;font-weight:800;margin-bottom:4px">Columbus Venues</h1>
+     <p style="color:var(--sub);font-size:14px">${allVenues.length} spaces for events, parties, and experiences</p></div>
+     <div style="display:flex;gap:8px;align-items:center">
+       <button id="btnGrid" onclick="setVenueView('grid')" style="display:flex;align-items:center;gap:6px;padding:8px 14px;border-radius:8px;border:1px solid var(--orange);background:var(--orange);color:#fff;font-size:13px;font-weight:600;cursor:pointer;font-family:Inter,sans-serif;">
+         <svg width="14" height="14" fill="currentColor" viewBox="0 0 16 16"><path d="M1 2.5A1.5 1.5 0 0 1 2.5 1h3A1.5 1.5 0 0 1 7 2.5v3A1.5 1.5 0 0 1 5.5 7h-3A1.5 1.5 0 0 1 1 5.5v-3zm8 0A1.5 1.5 0 0 1 10.5 1h3A1.5 1.5 0 0 1 15 2.5v3A1.5 1.5 0 0 1 13.5 7h-3A1.5 1.5 0 0 1 9 5.5v-3zm-8 8A1.5 1.5 0 0 1 2.5 9h3A1.5 1.5 0 0 1 7 10.5v3A1.5 1.5 0 0 1 5.5 15h-3A1.5 1.5 0 0 1 1 13.5v-3zm8 0A1.5 1.5 0 0 1 10.5 9h3A1.5 1.5 0 0 1 15 10.5v3A1.5 1.5 0 0 1 13.5 15h-3A1.5 1.5 0 0 1 9 13.5v-3z"/></svg>
+         Grid
+       </button>
+       <button id="btnMap" onclick="setVenueView('map')" style="display:flex;align-items:center;gap:6px;padding:8px 14px;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--sub);font-size:13px;font-weight:600;cursor:pointer;font-family:Inter,sans-serif;">
+         <svg width="14" height="14" fill="currentColor" viewBox="0 0 16 16"><path d="M8 16s6-5.686 6-10A6 6 0 0 0 2 6c0 4.314 6 10 6 10zm0-7a3 3 0 1 1 0-6 3 3 0 0 1 0 6z"/></svg>
+         Map
+       </button>
+     </div>
+   </div>
+   <div class="search-bar"> <div class="search-wrap"> <span class="search-icon"></span>
+     <input class="search-input" id="vSearch" placeholder="Search by name, type, neighborhood..." oninput="filterVenues()">
+   </div>
+   <select class="search-select" id="vHood" onchange="filterVenues()"> ${hoods.map(n=>`<option>${n}</option>`).join('')}</select>
+   <select class="search-select" id="vType" onchange="filterVenues()"> <option>All Types</option> <option>Bars &amp; Nightlife</option> <option>Comedy Clubs</option> <option>Rooftop</option> <option>Dive Bars</option> <option>Live Music Venues</option> </select>
+   </div>
+ </div> </div>
+ <section class="section">
+   <div id="venueGrid" class="venue-grid">${allVenues.map(v=>venueCard(v)).join('')}</div>
+   <div id="venueMapContainer" style="display:block;border-radius:var(--r-lg);overflow:hidden;border:1px solid var(--border);height:480px;position:relative;">
+     <div id="venueListMap" style="width:100%;height:100%;"></div>
+     <div id="mapPopup" style="display:none;position:absolute;bottom:24px;left:50%;transform:translateX(-50%);background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px 16px;min-width:240px;max-width:300px;box-shadow:0 8px 32px rgba(0,0,0,0.5);z-index:10;cursor:pointer;">
+       <div id="mapPopupImg" style="width:100%;height:120px;border-radius:8px;overflow:hidden;margin-bottom:10px;background:var(--surface);"></div>
+       <div id="mapPopupType" style="font-size:11px;color:var(--orange);font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:3px;"></div>
+       <div id="mapPopupName" style="font-family:Inter,sans-serif;font-weight:800;font-size:16px;margin-bottom:3px;"></div>
+       <div id="mapPopupHood" style="font-size:13px;color:var(--sub);margin-bottom:10px;"></div>
+       <button onclick="window._mapPopupVenue&&showPage('venue',window._mapPopupVenue)" style="width:100%;padding:9px;background:var(--orange);color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:Inter,sans-serif;">View Venue →</button>
+     </div>
+   </div>
+ </section> ${footer()}
+ `;
+ window._venueView='grid';
+}
+
+let _listMap=null;
+function setVenueView(view){
+ window._venueView=view;
+ const grid=document.getElementById('venueGrid');
+ const mapCont=document.getElementById('venueMapContainer');
+ const btnGrid=document.getElementById('btnGrid');
+ const btnMap=document.getElementById('btnMap');
+ if(!grid||!mapCont) return;
+ if(view==='map'){
+   grid.style.display='none';
+   mapCont.style.display='block';
+   btnMap.style.background='var(--orange)'; btnMap.style.color='#fff'; btnMap.style.borderColor='var(--orange)';
+   btnGrid.style.background='var(--surface)'; btnGrid.style.color='var(--sub)'; btnGrid.style.borderColor='var(--border)';
+   initVenueListMap();
+ } else {
+   grid.style.display='';
+   mapCont.style.display='none';
+   btnGrid.style.background='var(--orange)'; btnGrid.style.color='#fff'; btnGrid.style.borderColor='var(--orange)';
+   btnMap.style.background='var(--surface)'; btnMap.style.color='var(--sub)'; btnMap.style.borderColor='var(--border)';
+ }
+}
+
+async function initVenueListMap(){
+ if(_listMap){ _listMap.resize(); return; }
+ mapboxgl.accessToken='pk.eyJ1IjoiY2J1c2V2ZW50cyIsImEiOiJjbW1oNW0xN3gwZXo1MnBweDAzMXpsMml1In0.RSggtD49Vp56iykTU5JrpQ';
+ _listMap=new mapboxgl.Map({
+   container:'venueListMap',
+   style:'mapbox://styles/mapbox/dark-v11',
+   center:[-82.9988,39.9612], // Columbus, OH
+   zoom:12
+ });
+ _listMap.addControl(new mapboxgl.NavigationControl(),'top-right');
+
+ // Geocode venues that have addresses or neighborhoods
+ const venues=allVenues.filter(v=>v.neighborhood||v.address);
+ const columbusNeighborhoodCoords={
+   'Short North':[-83.0007,39.9812],'Downtown':[-82.9988,39.9612],'German Village':[-82.9994,39.9468],
+   'Clintonville':[-83.0157,39.9998],'Easton':[-82.9152,40.0494],'Brewery District':[-83.0033,39.9519],
+   'Italian Village':[-83.0000,39.9700],'Victorian Village':[-83.0100,39.9750],'Arena District':[-83.0100,39.9680],
+   'Grandview':[-83.0413,39.9847],'Bexley':[-82.9327,39.9653],'Westerville':[-82.9291,40.1262],
+   'Dublin':[-83.1141,40.0992],'Polaris':[-82.9988,40.1551],'Gahanna':[-82.8693,40.0178],
+   'Upper Arlington':[-83.0624,40.0007],'Worthington':[-83.0185,40.0931],'Hilliard':[-83.1585,40.0337],
+ };
+
+ for(const v of venues){
+   let coords=null;
+   // Try stored lat/lng first
+   if(v.latitude&&v.longitude){ coords=[parseFloat(v.longitude),parseFloat(v.latitude)]; }
+   // Try neighborhood lookup
+   else if(v.neighborhood){
+     const match=Object.keys(columbusNeighborhoodCoords).find(k=>v.neighborhood.toLowerCase().includes(k.toLowerCase())||k.toLowerCase().includes(v.neighborhood.toLowerCase()));
+     if(match){ const c=columbusNeighborhoodCoords[match]; coords=[c[0]+(Math.random()-0.5)*0.006, c[1]+(Math.random()-0.5)*0.004]; }
+   }
+   // Geocode via Mapbox if address available
+   if(!coords&&v.address){
+     try{
+       const q=encodeURIComponent(`${v.address}, Columbus, OH`);
+       const r=await fetch(`https://api.mapbox.com/geocoding/v5/mapbox.places/${q}.json?access_token=pk.eyJ1IjoiY2J1c2V2ZW50cyIsImEiOiJjbW1oNW0xN3gwZXo1MnBweDAzMXpsMml1In0.RSggtD49Vp56iykTU5JrpQ&limit=1`);
        const d=await r.json();
        if(d.features&&d.features[0]) coords=d.features[0].center;
      }catch(e){}
