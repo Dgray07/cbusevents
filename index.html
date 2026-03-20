@@ -1303,293 +1303,292 @@ function initHeroParticles(){
 
 // ── HOME ──────────────────────────────────────────────────────
 function renderHome(){
- const thisWeek=allEvents.filter(e=>isThisWeek(e.start_time)).slice(0,4);
- const upcoming=allEvents.filter(e=>!isThisWeek(e.start_time)).slice(0,4);
- const allUpcoming=[...thisWeek,...upcoming].slice(0,4);
+ const thisWeek = allEvents.filter(e=>isThisWeek(e.start_time)).slice(0,8);
+ const upcoming = allEvents.filter(e=>!isThisWeek(e.start_time)).slice(0,8);
+ const allUpcoming = [...thisWeek,...upcoming].slice(0,8);
 
- // Venue cards for scroll — featured first, then photo-having venues
- const venueScroll=allVenues
+ // Venue scroll — featured first
+ const venueScroll = allVenues
    .filter(v=>getVenueImg(v))
    .sort((a,b)=>(b.is_featured?1:0)-(a.is_featured?1:0))
    .slice(0,6);
 
- // Founding venues
- const foundingNames=['groundxgrind','1313','ground x grind'];
- const foundingVenues=allVenues.filter(v=>foundingNames.some(f=>v.name.toLowerCase().includes(f))).slice(0,3);
+ const HERO_SLIDES = [
+   { bg:'https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=1600&q=80', label:'Columbus Events' },
+   { bg:'https://images.unsplash.com/photo-1501281668745-f7f57925c3b4?w=1600&q=80', label:'Live Music' },
+   { bg:'https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?w=1600&q=80', label:'Nightlife' },
+   { bg:'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=1600&q=80', label:'Private Events' },
+ ];
 
- const tickerItems=['Venue Listings Open','Columbus\'s #1 Event Platform','Free to List Your Venue','Founding Spots Available','Vendors Welcome','Planners Searching Now'];
- const tickerHTML=(items)=>items.map(t=>`<span class="rh-ticker-item"><span class="rh-ticker-dot"></span>${t}</span>`).join('');
+ const CATEGORIES = [
+   { name:'Nightlife',  key:'Nightlife',  count: allEvents.filter(e=>e.category==='Nightlife').length  },
+   { name:'Concerts',   key:'Concert',    count: allEvents.filter(e=>e.category==='Concert').length    },
+   { name:'Arts',       key:'Arts',       count: allEvents.filter(e=>e.category==='Arts').length       },
+   { name:'Sports',     key:'Sports',     count: allEvents.filter(e=>e.category==='Sports').length     },
+   { name:'Comedy',     key:'Comedy',     count: allEvents.filter(e=>e.category==='Comedy').length     },
+   { name:'Corporate',  key:'Corporate',  count: allEvents.filter(e=>e.category==='Corporate').length  },
+ ];
 
- document.getElementById('app').innerHTML=`
+ document.getElementById('app').innerHTML = `
 
- <!-- ═══ HERO ═══ -->
- <section class="rh-hero">
-   <canvas id="heroParticleCanvas"></canvas>
-   <div class="rh-hero-content">
-     <div class="hero-city-tag"><div class="hero-city-dot"></div> Columbus, Ohio</div>
-     <h1 class="rh-headline" id="rhHeadline">Columbus<br><span class="rh-accent">Events</span><br><span class="rh-outline">Start Here.</span></h1>
-     <p class="rh-sub" id="rhSub">The platform connecting <strong>venues, vendors, planners, and attendees</strong> across Columbus. One ecosystem. Every event.</p>
-     <div class="rh-ctas" id="rhCtas">
-       <a href="https://cbusevents.com/signup.html" class="rh-btn-primary">Join Free Today</a>
-       <button class="rh-btn-secondary" onclick="showPage('events')">Browse Events →</button>
+ <!-- ══════════════════════════════════════════
+      HERO SLIDER
+ ══════════════════════════════════════════ -->
+ <section style="position:relative;min-height:600px;display:flex;align-items:center;overflow:hidden">
+   <div id="heroSlides" style="position:absolute;inset:0">
+     ${HERO_SLIDES.map((s,i)=>`
+       <div class="hero-slide${i===0?' active':''}"
+         style="position:absolute;inset:0;opacity:${i===0?'1':'0'};transition:opacity 1.2s ease;
+         background:url('${s.bg}') center/cover no-repeat;animation:heroPan 20s ease-in-out infinite">
+       </div>`).join('')}
+   </div>
+   <div style="position:absolute;inset:0;background:linear-gradient(to right,rgba(8,8,16,0.97) 35%,rgba(8,8,16,0.5) 70%,rgba(8,8,16,0.15) 100%)"></div>
+   <div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(8,8,16,0.95) 0%,transparent 40%)"></div>
+
+   <!-- Hero content -->
+   <div style="position:relative;z-index:2;padding:72px 48px;max-width:640px;animation:fadeUp 0.7s ease">
+     <div style="display:inline-flex;align-items:center;gap:8px;background:rgba(255,107,53,0.12);border:1px solid rgba(255,107,53,0.3);border-radius:9999px;padding:5px 16px;font-family:var(--mono);font-size:10px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:var(--orange);margin-bottom:24px">
+       <span style="width:5px;height:5px;border-radius:50%;background:var(--orange);animation:pulse 2s infinite;flex-shrink:0"></span>
+       Columbus, Ohio
      </div>
-     <div class="trust-badges-row" style="margin-bottom:28px">
-       <span class="trust-badge green"><span>🛡️</span> No credit card</span>
-       <span class="trust-badge"><span>⏱️</span> Under 10 min to list</span>
-       <span class="trust-badge"><span>🔒</span> Free forever</span>
+     <h1 style="font-family:var(--font);font-weight:900;font-size:clamp(44px,7vw,80px);line-height:0.95;letter-spacing:-0.04em;text-transform:uppercase;color:var(--text);margin-bottom:20px">
+       Columbus<br><span style="color:var(--orange)">Events</span><br><span style="color:rgba(255,255,255,0.25)">Start Here.</span>
+     </h1>
+     <p style="color:var(--sub);font-size:17px;line-height:1.65;margin-bottom:32px;max-width:460px;font-weight:500">
+       The platform connecting <strong style="color:var(--text);font-weight:700">venues, vendors, planners, and customers</strong> across Columbus. One ecosystem. Every event.
+     </p>
+     <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:28px">
+       <a href="https://cbusevents.com/signup.html" style="display:inline-flex;align-items:center;gap:8px;background:var(--orange);color:#fff;border:none;font-family:var(--font);font-weight:700;font-size:15px;padding:14px 32px;border-radius:var(--r-md);cursor:pointer;transition:all 0.2s;text-decoration:none">Join Free Today</a>
+       <button onclick="showPage('events')" style="display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,0.06);color:var(--text);border:1px solid var(--border);font-family:var(--font);font-weight:600;font-size:15px;padding:14px 24px;border-radius:var(--r-md);cursor:pointer;transition:all 0.2s">Browse Events</button>
      </div>
-     <div class="rh-proof">
-       <div class="rh-proof-num">📍 <strong>Columbus-Only</strong> Platform</div>
-       <div class="proof-sep"></div>
-       <div class="rh-proof-num">🎟️ <strong>Free</strong> to Start</div>
-       <div class="proof-sep"></div>
-       <div class="rh-proof-num">⚡ <strong>Live</strong> Ticketing Built In</div>
+     <!-- Slide dots -->
+     <div id="heroDots" style="display:flex;gap:6px">
+       ${HERO_SLIDES.map((_,i)=>`<div class="hero-dot${i===0?' active':''}" onclick="goSlide(${i})" style="width:${i===0?'36px':'24px'};height:3px;border-radius:2px;background:${i===0?'var(--orange)':'rgba(255,255,255,0.2)'};cursor:pointer;transition:all 0.3s"></div>`).join('')}
      </div>
    </div>
+
+   <!-- Hero floating cards -->
+   <div id="heroCards" style="position:absolute;right:48px;top:50%;transform:translateY(-50%);z-index:3;display:flex;flex-direction:column;gap:10px;width:280px"></div>
  </section>
 
- <!-- ═══ TRUST BAR ═══ -->
- <div class="rh-trust-bar">
-   <div class="rh-trust-item"><div class="rh-trust-check">✓</div> No contracts</div>
-   <div class="rh-trust-item"><div class="rh-trust-check">✓</div> Free to list</div>
-   <div class="rh-trust-item"><div class="rh-trust-check">✓</div> Live ticketing</div>
-   <div class="rh-trust-item"><div class="rh-trust-check">✓</div> Direct connections</div>
-   <div class="rh-trust-item"><div class="rh-trust-check">✓</div> Columbus-built</div>
+ <!-- ══════════════════════════════════════════
+      STAT BAR
+ ══════════════════════════════════════════ -->
+ <div style="display:flex;border-top:1px solid var(--border);border-bottom:1px solid var(--border);background:rgba(8,8,16,0.9)">
+   ${[
+     {num: allEvents.length + '+',  label:'Live Events'},
+     {num: allVenues.length + '+',  label:'Columbus Venues'},
+     {num:'Free',                   label:'Always for Customers'},
+     {num:'EST. 2026',              label:'Columbus Built'},
+   ].map(s=>`
+     <div style="flex:1;padding:16px 20px;border-right:1px solid var(--border);text-align:center;last-child:{border:none}">
+       <div style="font-family:var(--mono);font-size:18px;font-weight:500;color:var(--orange);letter-spacing:-0.02em">${s.num}</div>
+       <div style="font-family:var(--mono);font-size:9px;color:var(--muted);letter-spacing:0.12em;text-transform:uppercase;margin-top:3px">${s.label}</div>
+     </div>`).join('')}
  </div>
 
- <!-- ═══ LIVE EVENTS ═══ -->
- <div style="background:var(--bg);">
-   <div class="rh-events-section">
-     <div class="rh-events-header">
-       <div class="rh-events-label">Happening in <span>Columbus</span></div>
-       <button class="rh-view-all" onclick="showPage('events')">View All Events →</button>
-     </div>
-     <div class="rh-events-grid" id="homeEventsGrid">${renderHomeEventCards(allUpcoming)}</div>
-   </div>
- </div>
-
- <!-- ═══ WHY LIST HERE ═══ -->
- <section class="rh-section">
-   <p class="rh-section-label">Why list on CBUSEVENTS</p>
-   <h2 class="rh-section-title">Built to fill<br>your calendar</h2>
-   <p class="rh-section-sub">Every feature was designed with one goal: getting your venue more bookings from Columbus's most active event community.</p>
-   <div class="rh-benefits">
-     <div class="rh-benefit">
-       <div class="rh-benefit-icon">📍</div>
-       <div>
-         <div class="rh-benefit-title">Direct Booking Inquiries</div>
-         <div class="rh-benefit-desc">Planners send inquiries straight to your inbox. No middlemen, no commission on leads.</div>
-         <span class="rh-tag">FREE FEATURE</span>
-       </div>
-     </div>
-     <div class="rh-benefit">
-       <div class="rh-benefit-icon">🎯</div>
-       <div>
-         <div class="rh-benefit-title">Columbus-Only Audience</div>
-         <div class="rh-benefit-desc">Every person on this platform is local. No wasted impressions from outside your market.</div>
-       </div>
-     </div>
-     <div class="rh-benefit">
-       <div class="rh-benefit-icon">📅</div>
-       <div>
-         <div class="rh-benefit-title">Publish Events & Sell Tickets</div>
-         <div class="rh-benefit-desc">List your own events, keep your venue top-of-mind between private bookings.</div>
-         <span class="rh-tag">FREE FEATURE</span>
-       </div>
-     </div>
-     <div class="rh-benefit">
-       <div class="rh-benefit-icon">🚀</div>
-       <div>
-         <div class="rh-benefit-title">Hero Placement When You Boost</div>
-         <div class="rh-benefit-desc">Get your venue in the rotating hero slider — first thing every visitor sees. Columbus-scale visibility.</div>
-       </div>
-     </div>
-   </div>
- </section>
-
- <!-- ═══ HOW IT WORKS ═══ -->
- <section class="rh-section dark">
-   <p class="rh-section-label">How it works</p>
-   <h2 class="rh-section-title">Listed in<br>under 10 min</h2>
-   <p class="rh-section-sub">No sales calls. No approval wait. Fill in your details and you're live.</p>
-   <div class="rh-steps">
-     <div class="rh-step">
-       <div class="rh-step-num">01</div>
-       <div>
-         <div class="rh-step-title">Create Your Free Account</div>
-         <div class="rh-step-desc">Sign up in 60 seconds. No credit card. Your dashboard is ready immediately.</div>
-         <span class="rh-step-badge">FREE FOREVER</span>
-       </div>
-     </div>
-     <div class="rh-step">
-       <div class="rh-step-num">02</div>
-       <div>
-         <div class="rh-step-title">Build Your Venue Profile</div>
-         <div class="rh-step-desc">Add photos, capacity, amenities, pricing, and contact info. More detail = more inquiries.</div>
-       </div>
-     </div>
-     <div class="rh-step">
-       <div class="rh-step-num">03</div>
-       <div>
-         <div class="rh-step-title">Go Live & Get Discovered</div>
-         <div class="rh-step-desc">Your venue is instantly visible to every planner, organizer, and attendee searching Columbus.</div>
-       </div>
-     </div>
-     <div class="rh-step">
-       <div class="rh-step-num">04</div>
-       <div>
-         <div class="rh-step-title">Receive Inquiries & Bookings</div>
-         <div class="rh-step-desc">Planners reach out directly. You own the relationship — we just made the intro.</div>
-         <span class="rh-step-badge">YOU KEEP 100%</span>
-       </div>
-     </div>
-   </div>
- </section>
-
- <!-- ═══ EVENT PROMO CTA ═══ -->
- <section class="rh-section">
-   <div class="rh-founding-card">
-     <span class="rh-founding-badge">Free to List</span>
-     <h2 class="rh-founding-title">Your Events.<br><span>Columbus</span><br>Is Watching.</h2>
-     <p class="rh-founding-desc">Stop burying your events in Instagram captions. CBUSEVENTS puts them in front of Columbus planners, attendees, and venues — all in one place, built for this city.</p>
-     <div class="rh-perks">
-       <div class="rh-perk"><div class="rh-perk-check">✓</div>List events free — no platform fees to start</div>
-       <div class="rh-perk"><div class="rh-perk-check">✓</div>Built-in ticketing with QR check-in included</div>
-       <div class="rh-perk"><div class="rh-perk-check">✓</div>Reach planners actively booking Columbus venues</div>
-       <div class="rh-perk"><div class="rh-perk-check">✓</div>Your venue, your events — one dashboard</div>
-     </div>
-     <a href="https://cbusevents.com/auth.html?role=venue_owner" class="rh-btn-primary" style="width:100%;justify-content:center;font-size:15px;padding:16px;">Add Your First Event Free →</a>
-     <div class="founding-trust-row">
-       <span class="trust-badge green"><span>🛡️</span> No credit card</span>
-       <span class="trust-badge"><span>⚡</span> Live in minutes</span>
-       <span class="trust-badge"><span>📍</span> Columbus-only audience</span>
-     </div>
-   </div>
- </section>
-
- <!-- ═══ FOUR COMMUNITIES ═══ -->
- <section class="rh-section dark">
-   <p class="rh-section-label">Built for everyone</p>
-   <h2 class="rh-section-title">One platform.<br>Four communities.</h2>
-   <p class="rh-section-sub">Whether you're running a venue, building a business, planning events, or finding what's next in Columbus.</p>
-   <div class="rh-communities">
-     <a href="https://cbusevents.com/signup.html?role=venue" class="rh-community venues">
-       <div class="rh-community-header"><div class="rh-community-label">Venue Owners</div><span class="rh-community-free">FREE</span></div>
-       <div class="rh-community-desc">Get discovered, receive booking inquiries, publish events, and sell tickets — all from one dashboard built for Columbus venues.</div>
-       <div class="community-trust">
-         <span class="trust-badge green"><span>🛡️</span> No card needed</span>
-         <span class="trust-badge"><span>⏱️</span> Live in minutes</span>
-       </div>
-       <div class="rh-community-link">List your venue →</div>
-     </a>
-     <a href="https://cbusevents.com/signup.html?role=vendor" class="rh-community vendors">
-       <div class="rh-community-header"><div class="rh-community-label">Vendors</div><span class="rh-community-free">FREE</span></div>
-       <div class="rh-community-desc">Showcase your services, build your Columbus portfolio, and get booked by planners and venues actively looking for your skills.</div>
-       <div class="community-trust">
-         <span class="trust-badge green"><span>🛡️</span> No card needed</span>
-         <span class="trust-badge"><span>🤝</span> Planners actively searching</span>
-       </div>
-       <div class="rh-community-link">List your services →</div>
-     </a>
-     <a href="https://cbusevents.com/signup.html?role=planner" class="rh-community planners">
-       <div class="rh-community-header"><div class="rh-community-label">Event Planners</div><span class="rh-community-free">FREE</span></div>
-       <div class="rh-community-desc">Browse venues, send booking inquiries, hire vendors, and manage your events — the whole Columbus ecosystem in one place.</div>
-       <div class="rh-community-link">Join as a planner →</div>
-     </a>
-     <a href="https://cbusevents.com/signup.html?role=attendee" class="rh-community attendees">
-       <div class="rh-community-header"><div class="rh-community-label">Attendees</div><span class="rh-community-free">FREE</span></div>
-       <div class="rh-community-desc">Discover what's happening in Columbus, follow your favorite venues, buy tickets, and never miss another event worth going to.</div>
-       <div class="rh-community-link">Find events →</div>
-     </a>
-   </div>
- </section>
-
- <!-- ═══ FEATURED VENUES ═══ -->
- <section class="rh-section">
-   <div class="rh-section-header-row">
+ <!-- ══════════════════════════════════════════
+      CATEGORY CARDS
+ ══════════════════════════════════════════ -->
+ <section style="padding:48px 48px 0">
+   <div style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:20px">
      <div>
-       <p class="rh-section-label">Now Listed</p>
-       <h2 class="rh-section-title" style="margin-bottom:0">Columbus Venues</h2>
+       <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.2em;text-transform:uppercase;color:var(--orange);margin-bottom:6px">Browse by Category</div>
+       <h2 style="font-family:var(--font);font-size:22px;font-weight:800;letter-spacing:-0.03em;color:var(--text)">What are you looking for?</h2>
      </div>
-     <a class="rh-view-all" onclick="showPage('venues')" style="cursor:pointer;padding-bottom:4px;">View all →</a>
+     <button onclick="showPage('events')" style="font-family:var(--mono);font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:var(--orange);background:none;border:none;cursor:pointer">View All</button>
    </div>
-   <p class="rh-section-sub" style="margin-top:10px">Bars, rooftops, event spaces, and more — all on CBUSEVENTS.</p>
+   <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px">
+     ${CATEGORIES.map(cat=>`
+       <div onclick="showPage('events')" style="background:var(--card);border:1px solid var(--border);border-radius:var(--r-lg);padding:20px 18px;cursor:pointer;transition:all 0.2s;position:relative;overflow:hidden"
+         onmouseover="this.style.borderColor='rgba(255,107,53,0.4)';this.style.transform='translateY(-2px)'"
+         onmouseout="this.style.borderColor='var(--border)';this.style.transform='translateY(0)'">
+         <div style="font-family:var(--font);font-weight:700;font-size:14px;color:var(--text);margin-bottom:4px;letter-spacing:-0.02em">${cat.name}</div>
+         <div style="font-family:var(--mono);font-size:10px;color:var(--orange);letter-spacing:0.1em">${cat.count} event${cat.count!==1?'s':''}</div>
+       </div>`).join('')}
+   </div>
+ </section>
+
+ <!-- ══════════════════════════════════════════
+      LIVE EVENTS GRID
+ ══════════════════════════════════════════ -->
+ <section style="padding:48px">
+   <div style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:24px">
+     <div>
+       <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.2em;text-transform:uppercase;color:var(--orange);margin-bottom:6px">Happening in Columbus</div>
+       <h2 style="font-family:var(--font);font-size:22px;font-weight:800;letter-spacing:-0.03em;color:var(--text)">Upcoming Events</h2>
+     </div>
+     <button onclick="showPage('events')" style="font-family:var(--mono);font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:var(--orange);background:none;border:none;cursor:pointer">View All Events</button>
+   </div>
+
+   ${allUpcoming.length === 0 ? `
+     <div style="text-align:center;padding:48px 20px;color:var(--sub)">
+       <div style="font-size:15px;font-weight:600;margin-bottom:6px">No upcoming events yet</div>
+       <div style="font-size:13px;color:var(--muted)">Check back soon</div>
+     </div>` : `
+   <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px" id="homeEventsGrid">
+     ${allUpcoming.map(e=>{
+       const venueName = e.venue_name_override||e.venues?.name||'Columbus Venue';
+       const img = e.cover_image_url;
+       const tw = isThisWeek(e.start_time);
+       return `
+         <div onclick="openEventModal('${e.id}')"
+           style="background:var(--card);border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden;cursor:pointer;transition:all 0.2s;position:relative"
+           onmouseover="this.style.borderColor='var(--orange)';this.style.transform='translateY(-2px)'"
+           onmouseout="this.style.borderColor='var(--border)';this.style.transform='translateY(0)'">
+           <!-- Image -->
+           <div style="height:160px;position:relative;overflow:hidden;background:var(--surface)">
+             ${img ? `<img src="${img}" alt="${e.title}" style="width:100%;height:100%;object-fit:cover;transition:transform 0.4s" onerror="this.style.display='none'">` : `<div style="width:100%;height:100%;background:linear-gradient(135deg,rgba(255,107,53,0.08),rgba(129,140,248,0.06))"></div>`}
+             <div style="position:absolute;inset:0;background:linear-gradient(to bottom,transparent 40%,rgba(8,8,16,0.7) 100%)"></div>
+             ${tw ? `<div style="position:absolute;top:9px;left:9px;background:var(--green);color:#000;font-family:var(--mono);font-size:8px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;padding:3px 9px;border-radius:9999px">This Week</div>` : ''}
+             ${e.is_boosted ? `<div style="position:absolute;top:9px;left:9px;background:var(--orange);color:#fff;font-family:var(--mono);font-size:8px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;padding:3px 9px;border-radius:9999px">Featured</div>` : ''}
+             ${e.is_third_party ? `<div style="position:absolute;top:9px;right:9px;background:rgba(8,8,16,0.8);color:var(--sub);font-family:var(--mono);font-size:8px;letter-spacing:0.08em;padding:2px 8px;border-radius:9999px;border:1px solid var(--border)">Ticketmaster</div>` : ''}
+           </div>
+           <!-- Body -->
+           <div style="padding:14px 16px">
+             <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.14em;text-transform:uppercase;color:var(--orange);margin-bottom:4px">${e.category||'Event'}</div>
+             <div style="font-family:var(--font);font-weight:700;font-size:14px;letter-spacing:-0.02em;color:var(--text);margin-bottom:5px;line-height:1.3;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical">${e.title}</div>
+             <div style="font-size:11px;color:var(--muted);margin-bottom:10px">${venueName}</div>
+             <div style="display:flex;justify-content:space-between;align-items:center">
+               <span style="font-family:var(--mono);font-size:9px;letter-spacing:0.08em;text-transform:uppercase;color:var(--sub);background:var(--surface);border:1px solid var(--border);padding:3px 9px;border-radius:var(--r-sm)">${fmt(e.start_time)}</span>
+               <span style="font-size:12px;font-weight:700;color:${e.is_free?'var(--green)':'var(--text)'}">${e.is_free?'Free':e.price_min?'From $'+e.price_min:''}</span>
+             </div>
+           </div>
+         </div>`;
+     }).join('')}
+   </div>`}
+ </section>
+
+ <!-- ══════════════════════════════════════════
+      CTA BAND - SUPPLY SIDE
+ ══════════════════════════════════════════ -->
+ <section style="margin:0 48px 48px;background:linear-gradient(135deg,#0f0800,#1a0f00,#080810);border:1px solid rgba(255,107,53,0.2);border-radius:var(--r-lg);padding:48px;display:flex;justify-content:space-between;align-items:center;gap:32px;flex-wrap:wrap">
+   <div>
+     <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.2em;text-transform:uppercase;color:var(--orange);margin-bottom:10px">For Venues, Vendors and Planners</div>
+     <h2 style="font-family:var(--font);font-size:clamp(22px,4vw,36px);font-weight:800;letter-spacing:-0.04em;color:var(--text);line-height:1.1;margin-bottom:10px">Columbus Customers Are<br>Looking For You.</h2>
+     <p style="color:var(--sub);font-size:14px;line-height:1.65;max-width:480px">List your venue, services, or event planning business free. Get in front of every Columbus customer, planner, and organizer searching the platform right now.</p>
+   </div>
+   <div style="display:flex;flex-direction:column;gap:10px;flex-shrink:0">
+     <a href="https://cbusevents.com/signup.html?role=venue" style="display:block;background:var(--orange);color:#fff;font-family:var(--font);font-weight:700;font-size:14px;padding:12px 28px;border-radius:var(--r-md);text-decoration:none;text-align:center">List Your Venue Free</a>
+     <a href="https://cbusevents.com/signup.html?role=vendor" style="display:block;background:rgba(255,255,255,0.06);color:var(--text);border:1px solid var(--border);font-family:var(--font);font-weight:600;font-size:14px;padding:12px 28px;border-radius:var(--r-md);text-decoration:none;text-align:center">List Your Services</a>
+     <a href="https://cbusevents.com/signup.html?role=planner" style="display:block;background:rgba(255,255,255,0.06);color:var(--text);border:1px solid var(--border);font-family:var(--font);font-weight:600;font-size:14px;padding:12px 28px;border-radius:var(--r-md);text-decoration:none;text-align:center">Join as a Planner</a>
+   </div>
+ </section>
+
+ <!-- ══════════════════════════════════════════
+      FEATURED VENUES SCROLL
+ ══════════════════════════════════════════ -->
+ <section style="padding:0 48px 52px">
+   <div style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:20px">
+     <div>
+       <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.2em;text-transform:uppercase;color:var(--orange);margin-bottom:6px">Columbus Venues</div>
+       <h2 style="font-family:var(--font);font-size:22px;font-weight:800;letter-spacing:-0.03em;color:var(--text)">Find Your Space</h2>
+     </div>
+     <button onclick="showPage('venues')" style="font-family:var(--mono);font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:var(--orange);background:none;border:none;cursor:pointer">Browse All</button>
+   </div>
    <div class="rh-venues-scroll">
-     ${(venueScroll.length?venueScroll:allVenues.sort((a,b)=>(b.is_featured?1:0)-(a.is_featured?1:0)).slice(0,6)).map(v=>{
-       const img=getVenueImg(v);
-       return`<div class="rh-venue-card" onclick="showPage('venue',allVenues.find(x=>x.id==='${v.id}'))">
-         <div class="rh-venue-img" style="${!img?'background:var(--card)':''}">
-           ${img?`<img src="${img}" alt="${v.name}" onerror="this.style.display='none'">`:''}
+     ${(venueScroll.length?venueScroll:allVenues.slice(0,6)).map(v=>{
+       const img = getVenueImg(v);
+       return `<div class="rh-venue-card" onclick="showPage('venue',allVenues.find(x=>x.id==='${v.id}'))">
+         <div class="rh-venue-img">${img?`<img src="${img}" alt="${v.name}" onerror="this.style.display='none'">`:''}
            ${v.is_featured?'<div class="rh-badge-featured">Featured</div>':''}
            <span class="rh-venue-tag">${v.venue_type||'Venue'}</span>
          </div>
          <div class="rh-venue-info">
            <div class="rh-venue-name">${v.name}</div>
-           <div class="rh-venue-meta">${v.neighborhood||'Columbus'}${v.capacity?` · Cap. ${v.capacity}`:''}</div>
-           ${foundingNames.some(f=>v.name.toLowerCase().includes(f))?'<span class="rh-venue-badge">DAY ONE</span>':''}
+           <div class="rh-venue-meta">${v.neighborhood||'Columbus'}${v.capacity?` · ${v.capacity} cap`:''}</div>
          </div>
        </div>`;
      }).join('')}
-     <div class="rh-venue-card" onclick="window.location.href='https://cbusevents.com/signup.html?role=venue'" style="border-style:dashed;border-color:rgba(255,107,53,0.3);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:24px 16px;background:rgba(255,107,53,0.03)">
-       <div style="font-size:28px;margin-bottom:10px">+</div>
-       <div style="font-family:var(--font);font-weight:700;font-size:14px;margin-bottom:6px">Your Venue</div>
-       <div style="font-size:11px;color:rgba(255,255,255,0.4);margin-bottom:12px">Join free</div>
-       <span class="rh-venue-badge">List Yours</span>
+     <div class="rh-venue-card" onclick="window.location.href='https://cbusevents.com/signup.html?role=venue'" style="border:1px dashed rgba(255,107,53,0.3);background:rgba(255,107,53,0.03);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:24px 16px">
+       <div style="font-family:var(--font);font-weight:700;font-size:14px;color:var(--text);margin-bottom:5px">Your Venue</div>
+       <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:var(--orange)">List Free</div>
      </div>
    </div>
-   <button class="rh-btn-secondary" onclick="showPage('venues')" style="width:100%;justify-content:center;margin-top:20px;">Browse All Columbus Venues →</button>
  </section>
 
- <!-- ═══ SOCIAL PROOF ═══ -->
- <section class="rh-section">
-   <p class="rh-section-label">Early Believers</p>
-   <h2 class="rh-section-title">Columbus is<br>already here</h2>
-   <p class="rh-section-sub">Real venues and vendors who saw the vision early and got in first.</p>
-   <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:4px;">
-     <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--r-lg);padding:22px 20px;">
-       <div style="font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--orange);margin-bottom:10px;">Venue</div>
-       <div style="font-family:var(--font);font-size:15px;font-weight:700;margin-bottom:4px;">1313 E. Broad Street</div>
-       <div style="font-size:12px;color:var(--sub);">Downtown · Founding Venue</div>
-     </div>
-     <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--r-lg);padding:22px 20px;">
-       <div style="font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--orange);margin-bottom:10px;">Media & Strategy</div>
-       <div style="font-family:var(--font);font-size:15px;font-weight:700;margin-bottom:4px;">Colaeb</div>
-       <div style="font-size:12px;color:var(--sub);">Brand & Media · Day One Partner</div>
-     </div>
-     <div style="background:var(--card);border:1px solid rgba(255,107,53,0.2);border-radius:14px;padding:22px 20px;">
-       <div style="font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--orange);margin-bottom:10px;">Your Category</div>
-       <div style="font-family:var(--font);font-size:15px;font-weight:700;margin-bottom:4px;">Founding spot open</div>
-       <div style="font-size:12px;color:var(--sub);">Be the first in your space</div>
-     </div>
-     <div style="background:var(--card);border:1px solid rgba(255,255,255,0.06);border-radius:14px;padding:22px 20px;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:6px;">
-       <div style="font-family:var(--font);font-size:28px;font-weight:800;color:var(--orange);">22</div>
-       <div style="font-size:12px;color:var(--sub);text-align:center;">Founding spots claimed.<br>28 remaining.</div>
-     </div>
+ <!-- ══════════════════════════════════════════
+      FOUR COMMUNITIES
+ ══════════════════════════════════════════ -->
+ <section style="padding:52px 48px;background:var(--surface);border-top:1px solid var(--border);border-bottom:1px solid var(--border)">
+   <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.2em;text-transform:uppercase;color:var(--orange);margin-bottom:10px">Built for everyone</div>
+   <h2 style="font-family:var(--font);font-size:clamp(24px,4vw,36px);font-weight:800;letter-spacing:-0.04em;color:var(--text);margin-bottom:8px">One platform. Four communities.</h2>
+   <p style="color:var(--sub);font-size:14px;line-height:1.65;max-width:560px;margin-bottom:32px">Whether you are running a venue, building a business, planning events, or finding what is next in Columbus.</p>
+   <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px">
+     ${[
+       {role:'venue',    label:'Venue Owners',   desc:'Get discovered, receive booking inquiries, publish events, and sell tickets.',    link:'List your venue'},
+       {role:'vendor',   label:'Vendors',         desc:'Showcase your services and get booked by planners and venues searching Columbus.', link:'List your services'},
+       {role:'planner',  label:'Event Planners',  desc:'Browse venues, send inquiries, hire vendors, and manage your events.',            link:'Join as a planner'},
+       {role:'attendee', label:'Customers',        desc:'Discover Columbus events, buy tickets, and never miss a night worth going to.',   link:'Find events'},
+     ].map(c=>`
+       <a href="https://cbusevents.com/signup.html?role=${c.role}" style="background:var(--card);border:1px solid var(--border);border-radius:var(--r-lg);padding:22px 20px;text-decoration:none;display:block;transition:all 0.2s"
+         onmouseover="this.style.borderColor='rgba(255,107,53,0.3)';this.style.transform='translateY(-1px)'"
+         onmouseout="this.style.borderColor='var(--border)';this.style.transform='translateY(0)'">
+         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+           <div style="font-family:var(--font);font-weight:700;font-size:14px;color:var(--text)">${c.label}</div>
+           <span style="font-family:var(--mono);font-size:8px;letter-spacing:0.12em;text-transform:uppercase;background:var(--green-dim);color:var(--green);border:1px solid var(--green-border);padding:2px 8px;border-radius:9999px">FREE</span>
+         </div>
+         <div style="font-size:12px;color:var(--sub);line-height:1.55;margin-bottom:12px">${c.desc}</div>
+         <div style="font-family:var(--mono);font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--orange)">${c.link} →</div>
+       </a>`).join('')}
    </div>
-   <div class="rh-proof-grid">
-     <div class="rh-stat"><div class="rh-stat-num">49.6M</div><div class="rh-stat-label">Trips to Columbus annually</div></div>
-     <div class="rh-stat"><div class="rh-stat-num">$6.6B</div><div class="rh-stat-label">Visitor spending per year</div></div>
-     <div class="rh-stat"><div class="rh-stat-num">933K</div><div class="rh-stat-label">Residents — Ohio's largest city</div></div>
-     <div class="rh-stat"><div class="rh-stat-num">#2</div><div class="rh-stat-label">Fastest-growing U.S. city</div></div>
-   </div>
-   <p style="font-size:11px;color:rgba(255,255,255,0.2);margin-top:14px;line-height:1.5">Sources: Experience Columbus 2023 · Bank of America 2024 · U.S. Census Bureau</p>
  </section>
 
- <!-- ═══ FINAL CTA ═══ -->
- <section class="rh-final">
-   <p class="rh-section-label" style="text-align:center">Don't wait</p>
-   <h2 class="rh-final-title">Your next<br>booking starts<br><span>here.</span></h2>
-   <p class="rh-final-sub">Columbus is growing. The venues and vendors that get in now build the authority every newcomer sees first. It's free to start.</p>
-   <div class="rh-final-btns">
-     <a href="https://cbusevents.com/signup.html" class="rh-btn-primary">Join Free Today →</a>
-     <a href="https://cbusevents.com/signup.html?role=vendor" class="rh-btn-secondary">List Your Services →</a>
-     <a href="https://cbusevents.com/signup.html?role=planner" class="rh-btn-secondary">Join as a Planner →</a>
+ <!-- ══════════════════════════════════════════
+      COLUMBUS STATS
+ ══════════════════════════════════════════ -->
+ <section style="padding:52px 48px">
+   <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.2em;text-transform:uppercase;color:var(--orange);margin-bottom:10px;text-align:center">Columbus by the numbers</div>
+   <h2 style="font-family:var(--font);font-size:clamp(22px,3vw,32px);font-weight:800;letter-spacing:-0.04em;color:var(--text);margin-bottom:32px;text-align:center">The market is here</h2>
+   <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:14px;margin-bottom:20px">
+     ${[
+       {num:'49.6M', label:'Trips to Columbus annually'},
+       {num:'$6.6B', label:'Visitor spending per year'},
+       {num:'933K',  label:'Residents — Ohio\'s largest city'},
+       {num:'#2',    label:'Fastest-growing U.S. city'},
+     ].map(s=>`
+       <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--r-lg);padding:22px 20px;text-align:center">
+         <div style="font-family:var(--mono);font-size:30px;font-weight:500;color:var(--orange);letter-spacing:-0.02em;margin-bottom:6px">${s.num}</div>
+         <div style="font-size:11px;color:var(--muted);line-height:1.4">${s.label}</div>
+       </div>`).join('')}
+   </div>
+   <p style="font-size:10px;color:rgba(255,255,255,0.15);text-align:center">Sources: Experience Columbus 2023 · Bank of America 2024 · U.S. Census Bureau</p>
+ </section>
+
+ <!-- ══════════════════════════════════════════
+      FINAL CTA
+ ══════════════════════════════════════════ -->
+ <section style="padding:52px 48px;text-align:center;background:var(--surface);border-top:1px solid var(--border)">
+   <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.2em;text-transform:uppercase;color:var(--orange);margin-bottom:10px">Don't wait</div>
+   <h2 style="font-family:var(--font);font-size:clamp(28px,5vw,52px);font-weight:900;letter-spacing:-0.04em;color:var(--text);line-height:1;margin-bottom:14px">Your next booking<br>starts <span style="color:var(--orange)">here.</span></h2>
+   <p style="color:var(--sub);font-size:14px;line-height:1.65;max-width:480px;margin:0 auto 32px">Columbus is growing. The venues and vendors that get in now build the authority every newcomer sees first. It is free to start.</p>
+   <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
+     <a href="https://cbusevents.com/signup.html" style="display:inline-flex;background:var(--orange);color:#fff;font-family:var(--font);font-weight:700;font-size:15px;padding:14px 36px;border-radius:var(--r-md);text-decoration:none">Join Free Today</a>
+     <button onclick="showPage('events')" style="display:inline-flex;background:rgba(255,255,255,0.06);color:var(--text);border:1px solid var(--border);font-family:var(--font);font-weight:600;font-size:15px;padding:14px 28px;border-radius:var(--r-md);cursor:pointer">Browse Events</button>
    </div>
  </section>
 
  ${footer()}
  `;
- requestAnimationFrame(initHeroParticles);
+
+ // Init hero slider
+ let heroIdx = 0;
+ let heroTimer = setInterval(()=>goSlide((heroIdx+1)%HERO_SLIDES.length), 5200);
+ function goSlide(idx){
+   heroIdx = idx;
+   document.querySelectorAll('.hero-slide').forEach((el,i)=>{
+     el.style.opacity = i===idx?'1':'0';
+   });
+   const dots = document.getElementById('heroDots');
+   if(dots) dots.querySelectorAll('.hero-dot').forEach((d,i)=>{
+     d.style.width    = i===idx?'36px':'24px';
+     d.style.background = i===idx?'var(--orange)':'rgba(255,255,255,0.2)';
+   });
+ }
+ window.goSlide = goSlide;
+ window.heroTimer = heroTimer;
+
+ buildHeroCards();
 }
 
 function initHero(){
@@ -1604,11 +1603,7 @@ function initHero(){
  heroTimer=setInterval(()=>goSlide((heroIdx+1)%HERO_SLIDES.length),5000);
 }
 
-function goSlide(idx){
- heroIdx=idx;
- document.querySelectorAll('.hero-slide').forEach((el,i)=>el.classList.toggle('active',i===idx));
- document.querySelectorAll('.hero-dot').forEach((el,i)=>el.classList.toggle('active',i===idx));
-}
+// goSlide defined in renderHome
 
 function buildHeroCards(){
  const el=document.getElementById('heroCards');
