@@ -1,553 +1,1196 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>My Account — CBUSEVENTS</title>
-<meta name="description" content="Your CBUSEVENTS dashboard — saved venues, upcoming tickets, and personalized Columbus event recommendations."/>
-<meta name="robots" content="noindex,nofollow"/>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My CBUSEVENTS — Customer Portal</title>
+
+<!-- Brand Meta Tags -->
+<meta property="og:title" content="CBUSEVENTS — Columbus Event Ecosystem">
+<meta property="og:description" content="Columbus venues, planners, vendors, and customers — all connected.">
+<meta property="og:image" content="https://cbusevents.com/assets/cbus-shield.png">
+<meta property="og:image:width" content="1024">
+<meta property="og:image:height" content="1024">
+<meta property="og:url" content="https://cbusevents.com">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="CBUSEVENTS">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://cbusevents.com/assets/cbus-shield.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/assets/cbus-shield.png">
+<link rel="icon" type="image/png" sizes="192x192" href="/assets/cbus-shield.png">
+<link rel="icon" type="image/png" href="/assets/cbus-shield.png">
+<meta name="theme-color" content="#080810">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="CBUSEVENTS">
+
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700;800;900&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
-*{box-sizing:border-box;margin:0;padding:0;}
-:root{
-  --bg:#080810;--surface:#0f0f1a;--card:#141420;--card-hover:#18182a;
-  --border:#1e1e2e;--border-sub:#191928;
-  --text:#f0f0fa;--sub:#7070a0;--muted:#40405a;
-  --orange:#FF6B35;--orange-dim:rgba(255,107,53,0.1);--orange-border:rgba(255,107,53,0.25);
-  --green:#34d399;--green-dim:rgba(52,211,153,0.1);--green-border:rgba(52,211,153,0.2);
-  --red:#f87171;--blue:#818cf8;--gold:#fbbf24;
-  --font:'DM Sans',sans-serif;--mono:'DM Mono',monospace;
-  --r-sm:8px;--r-md:10px;--r-lg:14px;--r-full:9999px;
-}
-html{scroll-behavior:smooth;}
-body{background:var(--bg);color:var(--text);font-family:var(--font);min-height:100vh;}
-a{text-decoration:none;color:inherit;}
-button{cursor:pointer;font-family:var(--font);border:none;}
-@keyframes spin{to{transform:rotate(360deg);}}
-@keyframes fadeUp{from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:translateY(0);}}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; -webkit-font-smoothing: antialiased; }
 
-/* ── AUTH GATE ── */
-.auth-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;}
-.auth-card{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:40px;width:100%;max-width:420px;animation:fadeUp 0.4s ease;}
-.auth-logo{font-family:var(--font);font-size:22px;font-weight:800;margin-bottom:4px;text-align:center;}
-.auth-logo span{color:var(--orange);}
-.auth-sub{color:var(--sub);font-size:13px;text-align:center;margin-bottom:28px;}
-.auth-tabs{display:grid;grid-template-columns:1fr 1fr;gap:0;background:var(--surface);border-radius:10px;padding:4px;margin-bottom:24px;}
-.auth-tab{background:none;border:none;color:var(--sub);padding:8px;border-radius:7px;font-size:14px;font-weight:500;transition:all 0.15s;}
-.auth-tab.active{background:var(--card);color:var(--text);font-weight:600;}
-.field{margin-bottom:14px;}
-.field label{display:block;font-size:12px;color:var(--sub);font-weight:500;margin-bottom:5px;}
-.field input{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:10px 14px;color:var(--text);font-family:var(--font);font-size:14px;outline:none;}
-.field input:focus{border-color:var(--orange);}
-.btn-primary{background:var(--orange);color:#fff;border:none;border-radius:8px;padding:12px;font-size:14px;font-weight:700;width:100%;transition:opacity 0.15s;}
-.btn-primary:hover{opacity:0.85;}
-.auth-err{color:var(--red);font-size:13px;margin-bottom:10px;min-height:18px;}
-.auth-switch{text-align:center;margin-top:16px;font-size:13px;color:var(--sub);}
-.auth-switch button{background:none;border:none;color:var(--orange);font-size:13px;font-weight:600;}
-
-/* ── NAV ── */
-nav{
- position:sticky;top:0;z-index:100;
- background:rgba(8,8,16,0.88);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
- border-bottom:1px solid var(--border);
- display:flex;align-items:center;justify-content:space-between;
- padding:0 40px;height:60px;
-}
-.nav-logo{font-family:var(--font);font-weight:800;font-size:18px;cursor:pointer;}
-.nav-logo span{color:var(--orange);}
-.nav-right{display:flex;align-items:center;gap:12px;}
-.nav-email{font-size:13px;color:var(--sub);}
-.nav-home-btn{background:var(--card);border:1px solid var(--border);color:var(--text);border-radius:8px;padding:7px 16px;font-size:13px;font-weight:500;transition:all 0.15s;}
-.nav-home-btn:hover{border-color:var(--muted);}
-.nav-signout{background:none;border:1px solid var(--border);color:var(--sub);border-radius:8px;padding:7px 14px;font-size:13px;transition:all 0.15s;}
-.nav-signout:hover{color:var(--text);border-color:var(--muted);}
-
-/* ── LAYOUT ── */
-.portal-layout{display:grid;grid-template-columns:230px 1fr;gap:0;min-height:calc(100vh - 60px);}
-@media(max-width:900px){.portal-layout{grid-template-columns:1fr;}.sidebar{display:flex;flex-wrap:wrap;gap:4px;padding:12px;border-right:none;border-bottom:1px solid var(--border);position:static;height:auto;}}
-
-/* ── SIDEBAR ── */
-.sidebar{
-  background:var(--surface);border-right:1px solid var(--border);
-  padding:0;display:flex;flex-direction:column;
-  position:sticky;top:60px;height:calc(100vh - 60px);overflow-y:auto;
-  width:230px;
-}
-.sidebar-section{padding:16px 14px 5px;font-family:var(--mono);font-size:9px;color:var(--muted);font-weight:700;letter-spacing:0.15em;text-transform:uppercase;}
-.nav-item{
-  display:flex;align-items:center;gap:8px;
-  padding:8px 14px 8px 18px;margin:1px 8px;
-  border-radius:var(--r-md);border-left:2px solid transparent;
-  cursor:pointer;font-size:13px;font-weight:500;color:var(--sub);transition:all 0.18s;
-}
-.nav-item:hover{background:rgba(255,255,255,0.04);color:var(--text);border-left-color:var(--muted);}
-.nav-item.active{background:linear-gradient(135deg,rgba(255,107,53,0.1),rgba(255,107,53,0.04));color:var(--text);border-left-color:var(--orange);font-weight:600;}
-
-/* ── CONTENT ── */
-.content{padding:32px;animation:fadeUp 0.3s ease;}
-.page{display:none;}
-.page.active{display:block;}
-.page-title{font-family:var(--font);font-size:22px;font-weight:800;margin-bottom:6px;}
-.page-sub{color:var(--sub);font-size:14px;margin-bottom:28px;}
-
-/* ── CARDS ── */
-.card-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px;}
-.card{background:var(--card);border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden;cursor:pointer;transition:all 0.2s;}
-.card:hover{border-color:rgba(255,107,53,0.4);transform:translateY(-2px);box-shadow:0 8px 30px rgba(0,0,0,0.4);}
-.card-img{width:100%;height:150px;object-fit:cover;background:var(--surface);display:flex;align-items:center;justify-content:center;font-size:40px;}
-.card-img img{width:100%;height:100%;object-fit:cover;}
-.card-body{padding:14px;}
-.card-type{font-size:11px;color:var(--orange);font-weight:600;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;}
-.card-name{font-family:var(--font);font-weight:700;font-size:15px;margin-bottom:5px;}
-.card-meta{color:var(--sub);font-size:12px;}
-.badge-premium{display:inline-block;background:#f59e0b20;color:var(--gold);border:1px solid #f59e0b40;border-radius:20px;padding:2px 8px;font-size:10px;font-weight:700;margin-top:6px;}
-.badge-boosted{display:inline-block;background:#FF6B3520;color:var(--orange);border:1px solid #FF6B3540;border-radius:20px;padding:2px 8px;font-size:10px;font-weight:700;margin-top:6px;}
-.unsave-btn{display:block;width:100%;background:none;border:1px solid var(--border);color:var(--muted);border-radius:6px;padding:6px;font-size:12px;margin-top:10px;transition:all 0.15s;}
-.unsave-btn:hover{border-color:var(--red);color:var(--red);}
-
-/* ── FEED EVENTS ── */
-.feed-item{
- background:var(--card);border:1px solid var(--border);border-radius:12px;
- display:grid;grid-template-columns:90px 1fr;overflow:hidden;
- margin-bottom:12px;cursor:pointer;transition:all 0.2s;
-}
-.feed-item:hover{border-color:rgba(255,107,53,0.4);transform:translateY(-1px);}
-.feed-item-img{height:90px;background:var(--surface);display:flex;align-items:center;justify-content:center;font-size:28px;overflow:hidden;}
-.feed-item-img img{width:100%;height:100%;object-fit:cover;}
-.feed-item-body{padding:12px 14px;}
-.feed-item-title{font-weight:600;font-size:14px;margin-bottom:3px;}
-.feed-item-venue{color:var(--sub);font-size:12px;}
-.feed-item-date{color:var(--orange);font-size:12px;margin-top:2px;}
-
-/* ── TICKETS ── */
-.ticket-card{
- background:var(--card);border:1px solid var(--border);border-radius:12px;
- padding:18px 20px;display:grid;grid-template-columns:1fr auto;gap:16px;
- align-items:center;margin-bottom:12px;
-}
-.ticket-card.upcoming{border-left:2px solid var(--orange);background:linear-gradient(135deg,var(--card),rgba(255,107,53,0.03));}
-.ticket-card.past{opacity:0.55;}
-.ticket-event{font-weight:600;font-size:14px;margin-bottom:3px;}
-.ticket-venue{color:var(--sub);font-size:13px;}
-.ticket-date{color:var(--orange);font-size:13px;margin-top:3px;}
-.ticket-code-box{background:var(--surface);border:1px dashed var(--border);border-radius:8px;padding:10px 14px;text-align:center;}
-.ticket-code-label{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;}
-.ticket-code-val{font-family:var(--font);font-size:18px;font-weight:800;color:var(--orange);letter-spacing:3px;}
-
-/* ── PROFILE ── */
-.profile-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:24px;max-width:480px;}
-
-/* ── EMPTY / LOADING ── */
-.empty{text-align:center;padding:60px 20px;color:var(--sub);}
-.empty-icon{font-size:44px;margin-bottom:12px;}
-.empty h3{font-family:var(--font);font-size:17px;font-weight:700;margin-bottom:8px;color:var(--text);}
-.empty a{color:var(--orange);font-weight:600;}
-.spinner{width:28px;height:28px;border:3px solid var(--border);border-top-color:var(--orange);border-radius:50%;animation:spin 0.8s linear infinite;margin:48px auto;display:block;}
-
-/* ── FOOTER ── */
-footer{background:var(--surface);border-top:1px solid var(--border);padding:20px 40px;display:flex;justify-content:space-between;align-items:center;}
-.footer-copy{color:var(--muted);font-size:12px;}
-.footer-admin{color:var(--muted);font-size:11px;font-weight:600;opacity:0.4;transition:opacity 0.2s;}
-.footer-admin:hover{opacity:1;}
-
-/* ── MOBILE PORTAL ── */
-@media(max-width:680px){
-  html,body{overflow-x:hidden;}
-  .portal-nav{padding:0 16px !important;height:54px !important;}
-  .portal-sidebar{display:none !important;}
-  .portal-main{margin-left:0 !important;padding:16px !important;}
-  .portal-content{padding:16px !important;}
-  .stats-grid{grid-template-columns:1fr 1fr !important;gap:10px !important;}
-  .modal-inner,.modal-box{width:calc(100vw - 32px) !important;max-width:100% !important;margin:16px !important;}
-  table{display:block;overflow-x:auto;-webkit-overflow-scrolling:touch;}
-  .form-row{grid-template-columns:1fr !important;}
-  .grid-2,.grid-3{grid-template-columns:1fr !important;}
-  .card-grid{grid-template-columns:1fr !important;}
-  .btn-row{flex-direction:column !important;}
-  input,select,textarea{font-size:16px !important;}
-  .page-header{padding:16px !important;}
-  .section-pad{padding:16px !important;}
-}
-@media(max-width:900px){
-  .portal-sidebar{width:200px !important;}
+:root {
+  --bg:         #080810;
+  --surface:    #0f0f1a;
+  --card:       #141420;
+  --card-hover: #18182a;
+  --border:     #1e1e2e;
+  --border-sub: #191928;
+  --text:       #f0f0fa;
+  --sub:        #7070a0;
+  --muted:      #40405a;
+  --orange:     #FF6B35;
+  --orange-dim: rgba(255,107,53,0.1);
+  --orange-border: rgba(255,107,53,0.25);
+  --green:      #34d399;
+  --green-dim:  rgba(52,211,153,0.1);
+  --green-border: rgba(52,211,153,0.2);
+  --red:        #f87171;
+  --blue:       #818cf8;
+  --blue-dim:   rgba(129,140,248,0.1);
+  --blue-border:rgba(129,140,248,0.2);
+  --gold:       #fbbf24;
+  --font:       'DM Sans', sans-serif;
+  --mono:       'DM Mono', monospace;
+  --r-sm:  8px;
+  --r-md:  10px;
+  --r-lg:  14px;
+  --r-xl:  16px;
+  --r-full: 9999px;
+  --sidebar-w: 230px;
 }
 
+html { scroll-behavior: smooth; }
+body { background: var(--bg); color: var(--text); font-family: var(--font); display: flex; min-height: 100vh; }
+
+@keyframes fadeIn  { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
+@keyframes spin { to { transform:rotate(360deg); } }
+@keyframes pulse   { 0%,100%{opacity:1} 50%{opacity:0.35} }
+@keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
+
+/* ════════════════════════
+   TIER DEMO TOGGLE
+════════════════════════ */
+.tier-toggle {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 999;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--r-full);
+  padding: 4px;
+  box-shadow: 0 8px 40px rgba(0,0,0,0.6);
+}
+.tier-btn {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 8px 18px;
+  border-radius: var(--r-full);
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s;
+  background: transparent;
+  color: var(--muted);
+}
+.tier-btn.active { background: var(--orange); color: #fff; font-weight: 700; }
+.tier-label { font-family: var(--mono); font-size: 9px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); padding: 0 10px; }
+
+/* ════════════════════════
+   SIDEBAR
+════════════════════════ */
+.sidebar {
+  width: var(--sidebar-w);
+  flex-shrink: 0;
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow-y: auto;
+  z-index: 10;
+}
+.sidebar::-webkit-scrollbar { width: 0; }
+
+.sidebar-logo {
+  padding: 28px 22px 22px;
+  border-bottom: 1px solid var(--border-sub);
+  position: relative;
+}
+.sidebar-logo::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 22px; right: 22px;
+  height: 1px;
+  background: linear-gradient(90deg, var(--orange), transparent);
+  opacity: 0.4;
+}
+.sidebar-logo-text { font-family: var(--font); font-size: 17px; font-weight: 900; letter-spacing: -0.05em; text-transform: uppercase; }
+.sidebar-logo-text span { color: var(--orange); }
+.sidebar-logo-sub { font-family: var(--mono); font-size: 9px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--muted); margin-top: 3px; }
+
+.sidebar-customer {
+  padding: 18px 22px;
+  border-bottom: 1px solid var(--border-sub);
+}
+.customer-initials {
+  width: 42px; height: 42px;
+  background: linear-gradient(135deg, #080818, #181840);
+  border-radius: var(--r-md);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 15px; font-weight: 800;
+  color: var(--blue);
+  margin-bottom: 10px;
+  border: 1px solid var(--blue-border);
+  font-family: var(--mono);
+  letter-spacing: -0.02em;
+}
+.customer-name { font-weight: 700; font-size: 13px; color: var(--text); margin-bottom: 2px; letter-spacing: -0.02em; }
+.customer-tier {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 3px 10px;
+  border-radius: var(--r-full);
+  margin-top: 2px;
+}
+.tier-free     { background: rgba(255,255,255,0.04); color: var(--muted); border: 1px solid var(--border); }
+.tier-standard { background: var(--orange-dim); color: var(--orange); border: 1px solid var(--orange-border); }
+.tier-premium  { background: rgba(251,191,36,0.1); color: var(--gold); border: 1px solid rgba(251,191,36,0.2); }
+
+.sidebar-section { padding: 20px 22px 6px; font-size: 9px; color: var(--muted); font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; }
+
+.nav-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 8px 14px 8px 18px;
+  margin: 1px 8px;
+  border-radius: var(--r-md);
+  cursor: pointer;
+  font-size: 13px; font-weight: 500;
+  color: var(--sub);
+  transition: all 0.18s;
+  border-left: 2px solid transparent;
+  text-decoration: none;
+}
+.nav-item:hover { background: rgba(255,255,255,0.04); color: var(--text); border-left-color: var(--muted); }
+.nav-item.active { background: linear-gradient(135deg, rgba(255,107,53,0.1), rgba(255,107,53,0.04)); color: var(--text); border-left-color: var(--orange); font-weight: 600; }
+.nav-item.active svg { opacity: 1; color: var(--orange); }
+.nav-item svg { width: 15px; height: 15px; flex-shrink: 0; opacity: 0.65; }
+.nav-badge { background: var(--orange); color: #fff; border-radius: var(--r-full); padding: 1px 8px; font-size: 9px; font-weight: 800; margin-left: auto; }
+
+/* Locked nav item */
+.nav-item.locked { opacity: 0.45; cursor: default; }
+.nav-item.locked:hover { background: transparent; color: var(--sub); border-left-color: transparent; }
+.lock-icon { margin-left: auto; }
+.lock-icon svg { width: 11px; height: 11px; color: var(--muted); opacity: 0.7; }
+
+.sidebar-bottom { margin-top: auto; padding: 18px; border-top: 1px solid var(--border-sub); }
+
+/* Upgrade prompt in sidebar */
+.upgrade-prompt {
+  background: var(--orange-dim);
+  border: 1px solid var(--orange-border);
+  border-radius: var(--r-md);
+  padding: 12px 14px;
+  margin-bottom: 10px;
+}
+.upgrade-prompt-title { font-size: 12px; font-weight: 700; color: var(--orange); margin-bottom: 4px; letter-spacing: -0.01em; }
+.upgrade-prompt-text { font-size: 11px; color: var(--sub); line-height: 1.5; margin-bottom: 10px; }
+.btn-upgrade {
+  width: 100%;
+  background: var(--orange);
+  color: #fff;
+  font-family: var(--font);
+  font-weight: 700;
+  font-size: 11px;
+  letter-spacing: 0.02em;
+  padding: 8px;
+  border: none;
+  border-radius: var(--r-sm);
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+.btn-upgrade:hover { opacity: 0.9; }
+
+/* ════════════════════════
+   MAIN
+════════════════════════ */
+.main { flex: 1; overflow-x: hidden; }
+
+.topbar {
+  position: sticky; top: 0; z-index: 50;
+  background: rgba(8,8,16,0.88);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 36px; height: 60px;
+}
+.topbar-title { font-size: 16px; font-weight: 700; letter-spacing: -0.03em; }
+.topbar-right { display: flex; align-items: center; gap: 10px; }
+
+.btn { border: none; border-radius: var(--r-md); padding: 7px 15px; font-size: 12px; font-weight: 700; cursor: pointer; transition: all 0.18s; font-family: var(--font); letter-spacing: 0.02em; }
+.btn-primary { background: var(--orange); color: #fff; }
+.btn-primary:hover { opacity: 0.9; box-shadow: 0 4px 20px rgba(255,107,53,0.3); }
+.btn-ghost { background: rgba(255,255,255,0.04); color: var(--sub); border: 1px solid var(--border); }
+.btn-ghost:hover { color: var(--text); border-color: var(--muted); background: rgba(255,255,255,0.07); }
+.btn-sm { padding: 4px 11px; font-size: 11px; }
+
+.badge { display: inline-flex; align-items: center; border-radius: var(--r-full); padding: 3px 10px; font-size: 10px; font-weight: 700; letter-spacing: 0.04em; }
+.badge-green  { background: rgba(52,211,153,0.1);  color: var(--green); border: 1px solid rgba(52,211,153,0.2); }
+.badge-orange { background: rgba(255,107,53,0.12); color: var(--orange); border: 1px solid rgba(255,107,53,0.2); }
+.badge-blue   { background: rgba(129,140,248,0.1); color: var(--blue);   border: 1px solid rgba(129,140,248,0.2); }
+.badge-muted  { background: rgba(255,255,255,0.04); color: var(--muted); border: 1px solid var(--border); }
+.badge-gold   { background: rgba(251,191,36,0.1);  color: var(--gold);   border: 1px solid rgba(251,191,36,0.2); }
+
+.content { padding: 32px 36px; animation: fadeIn 0.35s ease; }
+
+/* ════════════════════════
+   WELCOME STRIP
+════════════════════════ */
+.welcome-strip {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  padding: 24px 28px;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  position: relative;
+  overflow: hidden;
+}
+.welcome-strip::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--orange), transparent);
+  opacity: 0.5;
+}
+.welcome-text {}
+.welcome-greeting { font-family: var(--mono); font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--muted); margin-bottom: 5px; }
+.welcome-name { font-size: 20px; font-weight: 700; letter-spacing: -0.03em; color: var(--text); margin-bottom: 3px; }
+.welcome-sub { font-size: 13px; color: var(--sub); }
+.welcome-stats { display: flex; gap: 32px; }
+.welcome-stat { text-align: center; }
+.welcome-stat-num { font-family: var(--mono); font-size: 24px; font-weight: 500; letter-spacing: -0.02em; color: var(--orange); line-height: 1; margin-bottom: 3px; }
+.welcome-stat-label { font-family: var(--mono); font-size: 9px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); }
+
+/* ════════════════════════
+   TABLE CARD
+════════════════════════ */
+.table-card { background: var(--card); border: 1px solid var(--border); border-radius: var(--r-lg); overflow: hidden; margin-bottom: 20px; }
+.table-header { display: flex; align-items: center; justify-content: space-between; padding: 20px 24px; border-bottom: 1px solid var(--border-sub); }
+.table-title { font-size: 15px; font-weight: 700; letter-spacing: -0.02em; }
+.table-title-sub { font-size: 12px; color: var(--sub); margin-top: 2px; }
+.table-actions { display: flex; gap: 8px; }
+
+/* ════════════════════════
+   EVENT CARDS (saved/upcoming)
+════════════════════════ */
+.events-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 12px;
+  padding: 16px;
+}
+
+.event-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  overflow: hidden;
+  cursor: pointer;
+  transition: background 0.18s, border-color 0.18s, transform 0.18s;
+  position: relative;
+}
+.event-card:hover { background: var(--card-hover); border-color: rgba(255,255,255,0.08); transform: translateY(-2px); }
+.event-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, transparent, var(--orange), transparent); opacity: 0; transition: opacity 0.2s; }
+.event-card:hover::before { opacity: 1; }
+
+.event-card-img { height: 130px; position: relative; overflow: hidden; }
+.event-card-img-bg { position: absolute; inset: 0; background-size: cover; background-position: center; transition: transform 0.4s; }
+.event-card:hover .event-card-img-bg { transform: scale(1.04); }
+.event-card-img-overlay { position: absolute; inset: 0; background: linear-gradient(to bottom, transparent 40%, rgba(8,8,16,0.65) 100%); }
+
+.ec1 { background: linear-gradient(135deg,#180808,#551000,#cc2200); }
+.ec2 { background: linear-gradient(135deg,#080818,#101050,#2020aa); }
+.ec3 { background: linear-gradient(135deg,#101008,#302808,#887700); }
+.ec4 { background: linear-gradient(135deg,#081008,#203020,#226633); }
+
+.event-card-badge { position: absolute; top: 9px; left: 9px; background: var(--orange); color: #fff; font-family: var(--mono); font-size: 8px; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; padding: 2px 8px; border-radius: var(--r-full); }
+
+.event-card-body { padding: 14px 16px 16px; }
+.event-card-venue { font-family: var(--mono); font-size: 9px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--orange); margin-bottom: 3px; }
+.event-card-name { font-size: 14px; font-weight: 700; letter-spacing: -0.02em; color: var(--text); line-height: 1.2; margin-bottom: 8px; }
+.event-card-meta { display: flex; justify-content: space-between; align-items: center; }
+.event-card-date { font-family: var(--mono); font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); }
+.event-card-price { font-size: 12px; font-weight: 700; color: var(--text); }
+
+/* ════════════════════════
+   TICKET ROW
+════════════════════════ */
+.ticket-row {
+  display: flex; align-items: center; gap: 16px;
+  padding: 16px 24px;
+  border-bottom: 1px solid var(--border-sub);
+  transition: background 0.15s; cursor: pointer;
+}
+.ticket-row:last-child { border-bottom: none; }
+.ticket-row:hover { background: rgba(255,255,255,0.025); }
+
+.ticket-date-block {
+  width: 44px; height: 44px;
+  background: var(--blue-dim);
+  border: 1px solid var(--blue-border);
+  border-radius: var(--r-md);
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  line-height: 1;
+}
+.ticket-date-month { font-family: var(--mono); font-size: 9px; font-weight: 700; color: var(--blue); text-transform: uppercase; letter-spacing: 0.05em; }
+.ticket-date-day   { font-family: var(--mono); font-size: 18px; font-weight: 500; color: var(--blue); }
+
+.ticket-info { flex: 1; min-width: 0; }
+.ticket-name { font-weight: 700; font-size: 13px; color: var(--text); margin-bottom: 2px; letter-spacing: -0.01em; }
+.ticket-detail { font-size: 11px; color: var(--muted); }
+
+.ticket-right { text-align: right; flex-shrink: 0; }
+.ticket-type { font-family: var(--mono); font-size: 10px; letter-spacing: 0.1em; color: var(--sub); margin-bottom: 4px; }
+.ticket-price { font-family: var(--mono); font-size: 13px; font-weight: 500; color: var(--text); }
+
+/* ════════════════════════
+   FILTER ROW
+════════════════════════ */
+.filter-row { display: flex; gap: 6px; padding: 14px 22px; border-bottom: 1px solid var(--border-sub); flex-wrap: wrap; align-items: center; }
+.filter-chip { background: rgba(255,255,255,0.04); border: 1px solid var(--border); border-radius: var(--r-full); padding: 5px 14px; font-size: 11px; font-weight: 600; color: var(--sub); cursor: pointer; transition: all 0.15s; }
+.filter-chip:hover, .filter-chip.active { background: var(--orange-dim); border-color: var(--orange-border); color: var(--orange); }
+.search-input { background: rgba(255,255,255,0.04); border: 1px solid var(--border); border-radius: var(--r-md); padding: 7px 13px; color: var(--text); font-family: var(--font); font-size: 13px; outline: none; margin-left: auto; }
+.search-input:focus { border-color: var(--orange-border); }
+.search-input::placeholder { color: var(--muted); }
+
+/* ════════════════════════
+   PLANNER DISCOVER SECTION
+   The hidden wow layer
+════════════════════════ */
+.planner-section {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  overflow: hidden;
+  margin-bottom: 20px;
+  position: relative;
+}
+
+.planner-section-header {
+  padding: 20px 24px;
+  border-bottom: 1px solid var(--border-sub);
+  display: flex; align-items: flex-start; justify-content: space-between; gap: 16px;
+}
+
+.planner-discover-label {
+  font-family: var(--mono);
+  font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase;
+  color: var(--orange); margin-bottom: 5px;
+  display: flex; align-items: center; gap: 6px;
+}
+.planner-discover-label::before { content: ''; display: block; width: 5px; height: 5px; background: var(--orange); border-radius: 50%; animation: pulse 2s infinite; }
+
+.planner-section-title { font-size: 15px; font-weight: 700; letter-spacing: -0.02em; color: var(--text); margin-bottom: 3px; }
+.planner-section-sub { font-size: 12px; color: var(--sub); max-width: 480px; line-height: 1.5; }
+
+.planner-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 12px;
+  padding: 16px;
+}
+
+.planner-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  padding: 18px 20px;
+  cursor: pointer;
+  transition: background 0.18s, border-color 0.18s, transform 0.18s;
+}
+.planner-card:hover { background: var(--card-hover); border-color: rgba(255,255,255,0.08); transform: translateY(-2px); }
+
+.planner-card-top { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+
+.planner-card-avatar {
+  width: 40px; height: 40px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--mono); font-size: 14px; font-weight: 700;
+  flex-shrink: 0;
+  letter-spacing: -0.02em;
+}
+.pa1 { background: var(--orange-dim); color: var(--orange); border: 1px solid var(--orange-border); }
+.pa2 { background: var(--blue-dim);   color: var(--blue);   border: 1px solid var(--blue-border); }
+.pa3 { background: var(--green-dim);  color: var(--green);  border: 1px solid var(--green-border); }
+.pa4 { background: rgba(251,191,36,0.1); color: var(--gold); border: 1px solid rgba(251,191,36,0.2); }
+
+.planner-card-name { font-weight: 700; font-size: 13px; color: var(--text); margin-bottom: 1px; letter-spacing: -0.01em; }
+.planner-card-type { font-family: var(--mono); font-size: 9px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--orange); }
+
+.planner-card-tags { display: flex; gap: 5px; flex-wrap: wrap; margin-bottom: 10px; }
+.planner-tag { font-family: var(--mono); font-size: 9px; letter-spacing: 0.08em; color: var(--sub); background: rgba(255,255,255,0.04); border: 1px solid var(--border); padding: 2px 8px; border-radius: var(--r-full); }
+
+.planner-card-footer { display: flex; align-items: center; justify-content: space-between; padding-top: 10px; border-top: 1px solid var(--border-sub); }
+.planner-card-rate { font-family: var(--mono); font-size: 11px; font-weight: 500; color: var(--text); }
+.planner-card-avail { font-family: var(--mono); font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--green); }
+.planner-card-avail.limited { color: var(--gold); }
+
+/* ════════════════════════
+   FREEMIUM BLUR TREATMENT
+   Applied to growth tools
+════════════════════════ */
+.locked-feature {
+  position: relative;
+  border-radius: var(--r-lg);
+  overflow: hidden;
+}
+
+.locked-feature .locked-content {
+  filter: blur(4px);
+  pointer-events: none;
+  user-select: none;
+  opacity: 0.6;
+}
+
+.locked-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: rgba(8,8,16,0.55);
+  backdrop-filter: blur(2px);
+  z-index: 10;
+  text-align: center;
+  padding: 24px;
+}
+
+.locked-overlay-title {
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--text);
+  margin-bottom: 6px;
+}
+
+.locked-overlay-sub {
+  font-size: 12px;
+  color: var(--sub);
+  line-height: 1.55;
+  max-width: 280px;
+  margin-bottom: 16px;
+}
+
+.btn-unlock {
+  background: var(--orange);
+  color: #fff;
+  font-family: var(--font);
+  font-weight: 700;
+  font-size: 12px;
+  letter-spacing: 0.02em;
+  padding: 9px 22px;
+  border: none;
+  border-radius: var(--r-md);
+  cursor: pointer;
+  transition: opacity 0.2s, transform 0.15s;
+  box-shadow: 0 4px 20px rgba(255,107,53,0.3);
+}
+.btn-unlock:hover { opacity: 0.9; transform: translateY(-1px); }
+
+.locked-tier-badge {
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  padding: 3px 10px;
+  border-radius: var(--r-full);
+  margin-bottom: 10px;
+  display: inline-block;
+}
+.locked-tier-badge.standard { background: var(--orange-dim); color: var(--orange); border: 1px solid var(--orange-border); }
+.locked-tier-badge.premium  { background: rgba(251,191,36,0.1); color: var(--gold); border: 1px solid rgba(251,191,36,0.2); }
+
+/* ════════════════════════
+   GROWTH TOOLS (blurred for free tier)
+════════════════════════ */
+
+/* Recommendation engine */
+.rec-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  padding: 16px 18px;
+  display: flex; align-items: flex-start; gap: 14px;
+  margin-bottom: 10px;
+}
+.rec-card-body { flex: 1; }
+.rec-card-label { font-family: var(--mono); font-size: 9px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--orange); margin-bottom: 4px; }
+.rec-card-title { font-weight: 700; font-size: 13px; color: var(--text); margin-bottom: 2px; letter-spacing: -0.01em; }
+.rec-card-detail { font-size: 11px; color: var(--muted); }
+.rec-card-match { font-family: var(--mono); font-size: 10px; letter-spacing: 0.1em; color: var(--green); }
+
+/* Priority notifications */
+.notif-row {
+  display: flex; align-items: flex-start; gap: 12px;
+  padding: 14px 24px;
+  border-bottom: 1px solid var(--border-sub);
+}
+.notif-row:last-child { border-bottom: none; }
+.notif-dot-wrap { padding-top: 4px; flex-shrink: 0; }
+.notif-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+.notif-dot.orange { background: var(--orange); }
+.notif-dot.green  { background: var(--green); }
+.notif-dot.blue   { background: var(--blue); }
+.notif-dot.muted  { background: var(--muted); }
+.notif-text { font-size: 13px; color: var(--text); line-height: 1.45; flex: 1; }
+.notif-text span { color: var(--orange); font-weight: 600; }
+.notif-time { font-family: var(--mono); font-size: 9px; letter-spacing: 0.08em; color: var(--muted); flex-shrink: 0; padding-top: 2px; }
+
+/* Two col */
+.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; }
+
+/* ════════════════════════
+   RESPONSIVE
+════════════════════════ */
+@media (max-width: 1100px) { .two-col { grid-template-columns: 1fr; } }
+@media (max-width: 860px) {
+  :root { --sidebar-w: 0px; }
+  .sidebar { display: none; }
+  .content { padding: 20px; }
+  .topbar { padding: 0 20px; }
+  .welcome-stats { display: none; }
+}
 </style>
-<style>
-*{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;}
-body{font-family:var(--font);}
-h1,h2,h3,h4,h5,h6{font-family:var(--font);letter-spacing:-0.02em;}
-.nav-logo,.auth-logo,.login-logo,.sidebar-logo-text{font-family:var(--font)!important;font-weight:800!important;letter-spacing:-0.04em!important;text-transform:uppercase;}
-.nav-logo span,.auth-logo span,.login-logo span,.sidebar-logo-text span{color:#FF6B35;}
-</style>
+<script src="https://unpkg.com/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 </head>
-<body> <!-- ── AUTH GATE ── -->
-<div id="authGate"> <div class="auth-wrap"> <div class="auth-card"> <div class="auth-logo">CBUS<span>EVENTS</span></div> <p class="auth-sub">Your Columbus event dashboard</p> <div class="auth-tabs"> <button class="auth-tab active" id="tabSignin" onclick="switchTab('signin')">Sign In</button> <button class="auth-tab" id="tabSignup" onclick="switchTab('signup')">Create Account</button> </div> <div id="nameField" class="field" style="display:none"> <label>Display Name</label> <input id="authName" placeholder="Your name (optional)"/> </div> <div class="field"> <label>Email</label> <input type="email" id="authEmail" placeholder="you@email.com" onkeydown="if(event.key==='Enter')doAuth()"/> </div> <div class="field"> <label>Password</label> <input type="password" id="authPass" placeholder="••••••••" onkeydown="if(event.key==='Enter')doAuth()"/> </div> <div class="auth-err" id="authErr"></div> <button class="btn-primary" id="authBtn" onclick="doAuth()">Sign In</button> <div class="auth-switch"> <span id="authSwitchText">New to CBUSEVENTS?</span> <button id="authSwitchBtn" onclick="switchTab(currentTab==='signin'?'signup':'signin')">Create a free account</button> </div> <div style="text-align:center;margin-top:16px"> <a href="https://cbusevents.com" style="color:var(--muted);font-size:12px">← Back to CBUSEVENTS</a> </div> </div> </div>
-</div> <!-- ── PORTAL ── -->
-<div id="portal" style="display:none"> <nav> <div class="nav-logo" onclick="window.location.href='https://cbusevents.com'"> CBUS<span>EVENTS</span> </div> <div class="nav-right"> <span class="nav-email" id="navEmail"></span> <button class="nav-home-btn" onclick="window.location.href='https://cbusevents.com'"> Home</button> <button class="nav-signout" onclick="doSignOut()">Sign Out</button> </div> </nav> <div class="portal-layout"> <!-- Sidebar --> <aside class="sidebar">
-  <div style="padding:20px 22px 14px;border-bottom:1px solid var(--border-sub)">
-    <div style="font-family:var(--font);font-weight:900;font-size:17px;letter-spacing:-0.05em;text-transform:uppercase">CBUS<span style="color:var(--orange)">EVENTS</span></div>
-    <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.16em;text-transform:uppercase;color:var(--muted);margin-top:3px">My Account</div>
-  </div>
-  <div style="padding:12px 22px 12px;border-bottom:1px solid var(--border-sub)">
-    <div id="sidebarEmail" style="font-size:12px;color:var(--sub);overflow:hidden;text-overflow:ellipsis;white-space:nowrap"></div>
-    <div style="font-family:var(--mono);font-size:8px;letter-spacing:0.14em;text-transform:uppercase;color:var(--green);margin-top:3px">Always Free</div>
-  </div>
-  <div style="flex:1;padding:10px 0">
-    <div class="sidebar-section">My Account</div>
-    <div class="nav-item active" id="nav-feed" onclick="showPage('feed')">My Feed</div>
-    <div class="nav-item" id="nav-tickets" onclick="showPage('tickets')">My Tickets</div>
-    <div class="nav-item" id="nav-venues" onclick="showPage('venues')">Saved Venues</div>
-    <div class="nav-item" id="nav-events" onclick="showPage('events')">Saved Events</div>
-    <div class="nav-item" id="nav-follows" onclick="showPage('follows')">Following</div>
-    <div class="nav-item" id="nav-profile" onclick="showPage('profile')">Profile</div>
-    <div class="sidebar-section">Discover</div>
-    <div class="nav-item" onclick="window.location.href='https://cbusevents.com'">Browse Events</div>
-    <div class="nav-item" id="nav-planners" onclick="showPage('planners')">Plan Your Event</div>
-  </div>
-  <div style="padding:16px;border-top:1px solid var(--border-sub)">
-    <div style="background:var(--green-dim);border:1px solid var(--green-border);border-radius:var(--r-sm);padding:10px 12px;font-size:11px;color:var(--sub);line-height:1.55">
-      <strong style="color:var(--green)">All features free.</strong> You only pay a platform fee when purchasing tickets.
+<body>
+
+<!-- AUTH GATE -->
+<div id="authGate" style="display:none;position:fixed;inset:0;background:var(--bg);z-index:9999;display:flex;align-items:center;justify-content:center;padding:24px">
+  <div style="background:var(--card);border:1px solid var(--border);border-radius:20px;padding:40px;width:100%;max-width:420px;box-shadow:0 32px 80px rgba(0,0,0,0.5)">
+    <div style="text-align:center;margin-bottom:32px">
+      <div style="font-family:var(--font);font-weight:900;font-size:22px;letter-spacing:-0.05em;text-transform:uppercase;margin-bottom:6px">CBUS<span style="color:var(--orange)">EVENTS</span></div>
+      <div style="color:var(--sub);font-size:13px">Your Columbus event dashboard</div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:0;background:var(--surface);border-radius:10px;padding:4px;margin-bottom:24px">
+      <button id="tabSignin" onclick="switchTab('signin')" style="background:var(--card);color:var(--text);border:none;padding:8px;border-radius:7px;font-size:14px;font-weight:600;cursor:pointer;font-family:var(--font)">Sign In</button>
+      <button id="tabSignup" onclick="switchTab('signup')" style="background:none;color:var(--sub);border:none;padding:8px;border-radius:7px;font-size:14px;font-weight:500;cursor:pointer;font-family:var(--font)">Create Account</button>
+    </div>
+    <div id="nameField" style="display:none;margin-bottom:14px">
+      <label style="display:block;font-size:12px;color:var(--sub);font-weight:500;margin-bottom:5px">Display Name</label>
+      <input id="authName" placeholder="Your name (optional)" style="width:100%;background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:9px;padding:10px 14px;color:var(--text);font-family:var(--font);font-size:14px;outline:none"/>
+    </div>
+    <div style="margin-bottom:14px">
+      <label style="display:block;font-size:12px;color:var(--sub);font-weight:500;margin-bottom:5px">Email</label>
+      <input type="email" id="authEmail" placeholder="you@email.com" onkeydown="if(event.key==='Enter')doAuth()" style="width:100%;background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:9px;padding:10px 14px;color:var(--text);font-family:var(--font);font-size:14px;outline:none"/>
+    </div>
+    <div style="margin-bottom:14px">
+      <label style="display:block;font-size:12px;color:var(--sub);font-weight:500;margin-bottom:5px">Password</label>
+      <input type="password" id="authPass" placeholder="••••••••" onkeydown="if(event.key==='Enter')doAuth()" style="width:100%;background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:9px;padding:10px 14px;color:var(--text);font-family:var(--font);font-size:14px;outline:none"/>
+    </div>
+    <div id="authErr" style="color:var(--red);font-size:13px;margin-bottom:10px;min-height:18px"></div>
+    <button id="authBtn" onclick="doAuth()" style="width:100%;background:var(--orange);color:#fff;border:none;border-radius:9px;padding:12px;font-size:14px;font-weight:700;cursor:pointer;font-family:var(--font)">Sign In</button>
+    <div style="text-align:center;margin-top:16px;font-size:13px;color:var(--sub)">
+      <span id="authSwitchText">New to CBUSEVENTS?</span>
+      <button id="authSwitchBtn" onclick="switchTab(currentTab==='signin'?'signup':'signin')" style="background:none;border:none;color:var(--orange);font-size:13px;font-weight:600;cursor:pointer;font-family:var(--font);margin-left:4px">Create a free account</button>
+    </div>
+    <div style="text-align:center;margin-top:12px">
+      <a href="https://cbusevents.com" style="color:var(--muted);font-size:12px">← Back to CBUSEVENTS</a>
     </div>
   </div>
-</aside> <!-- Pages --> <main class="content"> <!-- FEED --> <div class="page active" id="page-feed"> <div class="page-title">Your Columbus Feed</div> <div class="page-sub">Personalized events based on venues you follow</div> <div id="feedContent"><div class="spinner"></div></div> </div> <!-- TICKETS --> <div class="page" id="page-tickets"> <div class="page-title">My Tickets</div> <div class="page-sub">Your purchased event tickets</div> <div id="ticketsContent"><div class="spinner"></div></div> </div> <!-- SAVED VENUES --> <div class="page" id="page-venues"> <div class="page-title">Saved Venues</div> <div class="page-sub">Venues you've saved for later</div> <div id="savedVenuesContent"><div class="spinner"></div></div> </div> <!-- SAVED EVENTS --> <div class="page" id="page-events"> <div class="page-title">Saved Events</div> <div class="page-sub">Events you want to attend</div> <div id="savedEventsContent"><div class="spinner"></div></div> </div> <!-- FOLLOWING --> <div class="page" id="page-follows"> <div class="page-title">Venues You Follow</div> <div class="page-sub">Stay updated on events from these venues</div> <div id="followsContent"><div class="spinner"></div></div> </div> <!-- PROFILE --> <div class="page" id="page-profile"> <div class="page-title">Profile Settings</div> <div class="page-sub">Manage your account preferences</div> <div id="profileContent"></div> </div>
- <!-- PLAN YOUR EVENT -->
- <div class="page" id="page-planners">
-   <div class="page-title">Plan Your Own Event</div>
-   <div class="page-sub">Connect with Columbus event planners who can make your idea a reality</div>
-   <div id="plannersContent"><div class="spinner"></div></div>
- </div>
- </main> </div> <footer> <span class="footer-copy">© 2026 CBUSEVENTS · Columbus, Ohio</span> <div style="display:flex;align-items:center;gap:20px"> <span class="footer-copy">Made for Columbus </span> <a href="https://cbusevents.com/cbus-admin.html" class="footer-admin" id="adminFooterLink" style="display:none">Admin</a> </div> </footer> </div> <script src="https://unpkg.com/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
-<script src="https://unpkg.com/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+</div>
+
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <div class="sidebar-logo-text">CBUS<span>EVENTS</span></div>
+    <div class="sidebar-logo-sub">My Account</div>
+  </div>
+
+  <div class="sidebar-customer">
+    <div class="customer-initials" id="sidebarInitials">CB</div>
+    <div class="customer-name" id="sidebarName">Account</div>
+    <div class="customer-tier tier-free" id="sidebarTier">Free</div>
+  </div>
+
+  <div class="sidebar-section">Discover</div>
+  <a class="nav-item active" href="#">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+    Dashboard
+  </a>
+  <a class="nav-item" href="#">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    Browse Events
+  </a>
+  <a class="nav-item" href="#">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+    Saved Events
+    <span class="nav-badge">4</span>
+  </a>
+  <a class="nav-item" href="#">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v2z"/></svg>
+    My Tickets
+  </a>
+
+  <div class="sidebar-section">Plan</div>
+  <a class="nav-item" href="#">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+    Hire a Planner
+  </a>
+
+  <!-- Locked nav items for free tier -->
+  <a class="nav-item locked" id="navRecommendations" href="#">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+    Recommendations
+    <span class="lock-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></span>
+  </a>
+  <a class="nav-item locked" id="navNotifications" href="#">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+    Priority Alerts
+    <span class="lock-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></span>
+  </a>
+
+  <div class="sidebar-bottom">
+    <div class="upgrade-prompt" id="sidebarUpgrade">
+      <div class="upgrade-prompt-title" id="upgradeTitle">Unlock More</div>
+      <div class="upgrade-prompt-text" id="upgradeText">Get personalized recommendations and priority event alerts.</div>
+      <button class="btn-upgrade" id="upgradeBtn">Upgrade Now</button>
+    </div>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<div class="main">
+
+  <div class="topbar">
+    <div class="topbar-title" id="topbarTitle">My Dashboard</div>
+    <div class="topbar-right">
+      <button class="btn btn-ghost btn-sm" onclick="window.open('https://cbusevents.com','_blank')">Browse Events &nearr;</button>
+      <button class="btn btn-ghost btn-sm" id="signOutBtn" onclick="doSignOut()" style="display:none">Sign Out</button>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- WELCOME STRIP -->
+    <div class="welcome-strip">
+      <div class="welcome-text">
+        <div class="welcome-greeting">Welcome back</div>
+        <div class="welcome-name" id="welcomeName">Welcome back</div>
+        <div class="welcome-sub" id="welcomeSub">You have 2 upcoming events this month.</div>
+      </div>
+      <div class="welcome-stats">
+        <div class="welcome-stat">
+          <div class="welcome-stat-num">4</div>
+          <div class="welcome-stat-label">Saved Events</div>
+        </div>
+        <div class="welcome-stat">
+          <div class="welcome-stat-num">6</div>
+          <div class="welcome-stat-label">Tickets Purchased</div>
+        </div>
+        <div class="welcome-stat">
+          <div class="welcome-stat-num">2</div>
+          <div class="welcome-stat-label">Upcoming</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- UPCOMING EVENTS - live from Supabase -->
+    <div class="table-card">
+      <div class="table-header">
+        <div>
+          <div class="table-title">Happening in Columbus</div>
+          <div class="table-title-sub" id="feedSubtitle">Loading events...</div>
+        </div>
+        <button class="btn btn-ghost btn-sm" onclick="window.open('https://cbusevents.com','_blank')">Browse More</button>
+      </div>
+      <div class="events-grid" id="liveEventsGrid">
+        <div style="padding:40px;text-align:center;color:var(--muted);grid-column:1/-1">
+          <div style="width:24px;height:24px;border:2px solid var(--border);border-top-color:var(--orange);border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 12px"></div>
+          Loading Columbus events...
+        </div>
+      </div>
+    </div>
+
+    <!-- TICKET HISTORY - live from Supabase -->
+    <div class="table-card">
+      <div class="table-header">
+        <div class="table-title">My Tickets</div>
+        <button class="btn btn-ghost btn-sm">View All</button>
+      </div>
+
+      <div class="ticket-row">
+        <div class="ticket-date-block"><div class="ticket-date-month">Apr</div><div class="ticket-date-day">26</div></div>
+        <div class="ticket-info">
+          <div class="ticket-name">Friday Night R&B Vol. 4</div>
+          <div class="ticket-detail">Kemba Live &middot; General Admission</div>
+        </div>
+        <div class="ticket-right">
+          <div class="ticket-type">GA &middot; 1 ticket</div>
+          <div class="ticket-price">$27.00</div>
+        </div>
+      </div>
+
+      <div class="ticket-row">
+        <div class="ticket-date-block"><div class="ticket-date-month">May</div><div class="ticket-date-day">08</div></div>
+        <div class="ticket-info">
+          <div class="ticket-name">Columbus Tech Mixer</div>
+          <div class="ticket-detail">The Exchange &middot; General Admission</div>
+        </div>
+        <div class="ticket-right">
+          <div class="ticket-type">GA &middot; 1 ticket</div>
+          <div class="ticket-price">$17.00</div>
+        </div>
+      </div>
+
+      <div class="ticket-row">
+        <div class="ticket-date-block" style="background:rgba(255,255,255,0.04);border-color:var(--border);"><div class="ticket-date-month" style="color:var(--muted)">Mar</div><div class="ticket-date-day" style="color:var(--muted)">15</div></div>
+        <div class="ticket-info">
+          <div class="ticket-name" style="color:var(--sub)">Winter Networking Night</div>
+          <div class="ticket-detail">The Exchange &middot; VIP</div>
+        </div>
+        <div class="ticket-right">
+          <div class="ticket-type">VIP &middot; 2 tickets</div>
+          <div class="ticket-price" style="color:var(--sub)">$92.00</div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- HIRE A PLANNER — Discovery layer -->
+    <div class="planner-section">
+      <div class="planner-section-header">
+        <div>
+          <div class="planner-discover-label">New on CBUSEVENTS</div>
+          <div class="planner-section-title">Plan Your Own Event</div>
+          <div class="planner-section-sub">Connect with Columbus event planners who can make your idea a reality. Private parties, corporate events, weddings, brand activations and more.</div>
+        </div>
+        <div style="display:flex;gap:8px;flex-shrink:0;">
+          <div class="filter-chip active">All</div>
+          <div class="filter-chip">Weddings</div>
+          <div class="filter-chip">Corporate</div>
+          <div class="filter-chip">Private</div>
+        </div>
+      </div>
+
+      <div class="planner-grid">
+
+        <div class="planner-card">
+          <div class="planner-card-top">
+            <div class="planner-card-avatar pa1">MJ</div>
+            <div>
+              <div class="planner-card-name">Marcus Johnson Events</div>
+              <div class="planner-card-type">Full Service Planner</div>
+            </div>
+          </div>
+          <div class="planner-card-tags">
+            <span class="planner-tag">Corporate</span>
+            <span class="planner-tag">Private Parties</span>
+            <span class="planner-tag">Concerts</span>
+          </div>
+          <div class="planner-card-footer">
+            <span class="planner-card-rate">From $1,200</span>
+            <span class="planner-card-avail">Available</span>
+          </div>
+        </div>
+
+        <div class="planner-card">
+          <div class="planner-card-top">
+            <div class="planner-card-avatar pa2">SE</div>
+            <div>
+              <div class="planner-card-name">Simone Ellis Co.</div>
+              <div class="planner-card-type">Wedding + Events</div>
+            </div>
+          </div>
+          <div class="planner-card-tags">
+            <span class="planner-tag">Weddings</span>
+            <span class="planner-tag">Brand Activations</span>
+          </div>
+          <div class="planner-card-footer">
+            <span class="planner-card-rate">From $2,400</span>
+            <span class="planner-card-avail">Available</span>
+          </div>
+        </div>
+
+        <div class="planner-card">
+          <div class="planner-card-top">
+            <div class="planner-card-avatar pa3">RP</div>
+            <div>
+              <div class="planner-card-name">Renee Productions</div>
+              <div class="planner-card-type">Event Production</div>
+            </div>
+          </div>
+          <div class="planner-card-tags">
+            <span class="planner-tag">Concerts</span>
+            <span class="planner-tag">Corporate</span>
+            <span class="planner-tag">Activations</span>
+          </div>
+          <div class="planner-card-footer">
+            <span class="planner-card-rate">From $3,500</span>
+            <span class="planner-card-avail limited">Limited</span>
+          </div>
+        </div>
+
+        <div class="planner-card">
+          <div class="planner-card-top">
+            <div class="planner-card-avatar pa4">AT</div>
+            <div>
+              <div class="planner-card-name">Andre Thomas Events</div>
+              <div class="planner-card-type">Private + Social</div>
+            </div>
+          </div>
+          <div class="planner-card-tags">
+            <span class="planner-tag">Private Parties</span>
+            <span class="planner-tag">Weddings</span>
+          </div>
+          <div class="planner-card-footer">
+            <span class="planner-card-rate">Contact for Pricing</span>
+            <span class="planner-card-avail">Available</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- GROWTH TOOLS (gated) -->
+    <div class="two-col">
+
+      <!-- Personalized Recommendations — Standard+ -->
+      <div class="locked-feature" id="featureRec">
+        <div class="locked-content">
+          <div class="table-card" style="margin-bottom:0;">
+            <div class="table-header">
+              <div>
+                <div class="table-title">Recommended For You</div>
+                <div class="table-title-sub">Based on your event history</div>
+              </div>
+            </div>
+            <div style="padding:14px 16px;display:flex;flex-direction:column;gap:10px;">
+              <div class="rec-card">
+                <div class="rec-card-body">
+                  <div class="rec-card-label">Strong Match</div>
+                  <div class="rec-card-title">Short North Poetry Slam</div>
+                  <div class="rec-card-detail">Land Grant Brewing &middot; May 14</div>
+                </div>
+                <div class="rec-card-match">94% match</div>
+              </div>
+              <div class="rec-card">
+                <div class="rec-card-body">
+                  <div class="rec-card-label">Based on R&B</div>
+                  <div class="rec-card-title">Rooftop Summer Series</div>
+                  <div class="rec-card-detail">The Exchange &middot; Jun 14</div>
+                </div>
+                <div class="rec-card-match">88% match</div>
+              </div>
+              <div class="rec-card">
+                <div class="rec-card-body">
+                  <div class="rec-card-label">Trending Near You</div>
+                  <div class="rec-card-title">Columbus Arts Festival</div>
+                  <div class="rec-card-detail">Goodale Park &middot; Jun 6</div>
+                </div>
+                <div class="rec-card-match">81% match</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="locked-overlay" id="recOverlay">
+          <span class="locked-tier-badge standard">Standard</span>
+          <div class="locked-overlay-title">Events picked for you</div>
+          <div class="locked-overlay-sub">Your listing is visible. Upgrade to get personalized event recommendations based on your taste and history.</div>
+          <button class="btn-unlock" onclick="setTier('standard')">Unlock Recommendations</button>
+        </div>
+      </div>
+
+      <!-- Priority Alerts — Standard+ -->
+      <div class="locked-feature" id="featureAlerts">
+        <div class="locked-content">
+          <div class="table-card" style="margin-bottom:0;">
+            <div class="table-header">
+              <div class="table-title">Priority Alerts</div>
+            </div>
+            <div class="notif-row">
+              <div class="notif-dot-wrap"><div class="notif-dot orange"></div></div>
+              <div class="notif-text"><span>Friday Night R&B</span> is 80% sold out. Only 24 GA tickets left.</div>
+              <div class="notif-time">Now</div>
+            </div>
+            <div class="notif-row">
+              <div class="notif-dot-wrap"><div class="notif-dot green"></div></div>
+              <div class="notif-text">New event added in <span>Short North</span> matching your interests.</div>
+              <div class="notif-time">2h ago</div>
+            </div>
+            <div class="notif-row">
+              <div class="notif-dot-wrap"><div class="notif-dot blue"></div></div>
+              <div class="notif-text"><span>Sonic Temple</span> early bird tickets end in 48 hours.</div>
+              <div class="notif-time">1d ago</div>
+            </div>
+            <div class="notif-row">
+              <div class="notif-dot-wrap"><div class="notif-dot muted"></div></div>
+              <div class="notif-text">Your saved event <span>Columbus Arts Festival</span> just announced its lineup.</div>
+              <div class="notif-time">2d ago</div>
+            </div>
+          </div>
+        </div>
+        <div class="locked-overlay" id="alertsOverlay">
+          <span class="locked-tier-badge standard">Standard</span>
+          <div class="locked-overlay-title">Never miss a moment</div>
+          <div class="locked-overlay-sub">Get alerts when saved events sell out, drop new lineups, or offer early bird pricing.</div>
+          <button class="btn-unlock" onclick="setTier('standard')">Unlock Priority Alerts</button>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+</div>
+
+<!-- TIER TOGGLE -->
+<div class="tier-toggle">
+  <span class="tier-label">Preview as</span>
+  <button class="tier-btn active" id="btnFree"     onclick="setTier('free')">Free</button>
+  <button class="tier-btn"        id="btnStandard" onclick="setTier('standard')">Standard</button>
+  <button class="tier-btn"        id="btnPremium"  onclick="setTier('premium')">Premium</button>
+</div>
+
 <script>
 const SB_URL="https://toblgvatvsjljbqogzsv.supabase.co";
 const SB_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRvYmxndmF0dnNqbGpicW9nenN2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMDgwNTAsImV4cCI6MjA4NzY4NDA1MH0._WJEQPizNDiQfDXQB_DHPaQhixPGpMdmYQSmyWmm_FQ";
 const sb=supabase.createClient(SB_URL,SB_KEY);
-
 let currentUser=null;
 let currentTab='signin';
-let loadedPages=new Set();
 
-// ── AUTH ────────────────────────────────────────────────────────
-async function init(){
- const params=new URLSearchParams(window.location.search);
- const{data:{session}}=await sb.auth.getSession();
- if(session?.user){currentUser=session.user;enterPortal();}
- else if(params.get("tab")==="signup"){setTimeout(()=>switchTab("signup"),100);}
- sb.auth.onAuthStateChange((_,session)=>{
- currentUser=session?.user??null;
- if(currentUser)enterPortal(); else exitPortal();
- });
+// ── TIER TOGGLE (demo) ──────────────────────────────────────
+function setTier(tier) {
+  document.querySelectorAll('.tier-btn').forEach(b=>b.classList.remove('active'));
+  const btn=document.getElementById('btn'+tier.charAt(0).toUpperCase()+tier.slice(1));
+  if(btn)btn.classList.add('active');
+  const recFeature=document.getElementById('featureRec');
+  const alertsFeature=document.getElementById('featureAlerts');
+  const recOverlay=document.getElementById('recOverlay');
+  const alertsOverlay=document.getElementById('alertsOverlay');
+  const sidebarTier=document.getElementById('sidebarTier');
+  const upgradeBlock=document.getElementById('sidebarUpgrade');
+  const navRec=document.getElementById('navRecommendations');
+  const navAlerts=document.getElementById('navNotifications');
+  const upgradeTitle=document.getElementById('upgradeTitle');
+  const upgradeText=document.getElementById('upgradeText');
+  const welcomeSub=document.getElementById('welcomeSub');
+  if(tier==='free'){
+    if(recFeature)recFeature.querySelector('.locked-content').style.filter='blur(4px)';
+    if(alertsFeature)alertsFeature.querySelector('.locked-content').style.filter='blur(4px)';
+    if(recOverlay)recOverlay.style.display='flex';
+    if(alertsOverlay)alertsOverlay.style.display='flex';
+    if(sidebarTier){sidebarTier.className='customer-tier tier-free';sidebarTier.textContent='Free';}
+    if(upgradeBlock)upgradeBlock.style.display='block';
+    if(navRec)navRec.classList.add('locked');
+    if(navAlerts)navAlerts.classList.add('locked');
+  } else if(tier==='standard'){
+    if(recFeature)recFeature.querySelector('.locked-content').style.filter='none';
+    if(alertsFeature)alertsFeature.querySelector('.locked-content').style.filter='none';
+    if(recOverlay)recOverlay.style.display='none';
+    if(alertsOverlay)alertsOverlay.style.display='none';
+    if(sidebarTier){sidebarTier.className='customer-tier tier-standard';sidebarTier.textContent='Standard';}
+    if(upgradeBlock)upgradeBlock.style.display='block';
+    if(upgradeTitle)upgradeTitle.textContent='Go Premium';
+    if(upgradeText)upgradeText.textContent='Get priority placement, advanced insights, and exclusive early access.';
+    if(navRec)navRec.classList.remove('locked');
+    if(navAlerts)navAlerts.classList.remove('locked');
+  } else if(tier==='premium'){
+    if(recFeature)recFeature.querySelector('.locked-content').style.filter='none';
+    if(alertsFeature)alertsFeature.querySelector('.locked-content').style.filter='none';
+    if(recOverlay)recOverlay.style.display='none';
+    if(alertsOverlay)alertsOverlay.style.display='none';
+    if(sidebarTier){sidebarTier.className='customer-tier tier-premium';sidebarTier.textContent='Premium';}
+    if(upgradeBlock)upgradeBlock.style.display='none';
+    if(navRec)navRec.classList.remove('locked');
+    if(navAlerts)navAlerts.classList.remove('locked');
+  }
 }
 
+// ── AUTH ────────────────────────────────────────────────────
 function switchTab(tab){
- currentTab=tab;
- document.getElementById('tabSignin').classList.toggle('active',tab==='signin');
- document.getElementById('tabSignup').classList.toggle('active',tab==='signup');
- document.getElementById('nameField').style.display=tab==='signup'?'block':'none';
- document.getElementById('authBtn').textContent=tab==='signin'?'Sign In':'Create Account';
- document.getElementById('authSwitchText').textContent=tab==='signin'?'New to CBUSEVENTS?':'Already have an account?';
- document.getElementById('authSwitchBtn').textContent=tab==='signin'?'Create a free account':'Sign in instead';
- document.getElementById('authErr').textContent='';
+  currentTab=tab;
+  document.getElementById('tabSignin').style.background=tab==='signin'?'var(--card)':'none';
+  document.getElementById('tabSignin').style.color=tab==='signin'?'var(--text)':'var(--sub)';
+  document.getElementById('tabSignup').style.background=tab==='signup'?'var(--card)':'none';
+  document.getElementById('tabSignup').style.color=tab==='signup'?'var(--text)':'var(--sub)';
+  document.getElementById('nameField').style.display=tab==='signup'?'block':'none';
+  document.getElementById('authBtn').textContent=tab==='signin'?'Sign In':'Create Account';
+  document.getElementById('authSwitchText').textContent=tab==='signin'?'New to CBUSEVENTS?':'Already have an account?';
+  document.getElementById('authSwitchBtn').textContent=tab==='signin'?'Create a free account':'Sign in instead';
+  document.getElementById('authErr').textContent='';
 }
 
 async function doAuth(){
- const email=document.getElementById('authEmail').value.trim();
- const pass=document.getElementById('authPass').value;
- const name=document.getElementById('authName').value.trim();
- const errEl=document.getElementById('authErr');
- const btn=document.getElementById('authBtn');
- if(!email||!pass){errEl.textContent='Email and password required.';return;}
- btn.disabled=true;btn.textContent='Please wait…';errEl.textContent='';
-
- let error;
- if(currentTab==='signin'){
- ({error}=await sb.auth.signInWithPassword({email,password:pass}));
- } else {
- const{data,error:e}=await sb.auth.signUp({email,password:pass});
- error=e;
- if(!error){
-   if(!data.session){
-     errEl.style.color='#22c55e';
-     errEl.textContent=`Check your email — we sent a confirmation link to ${email}.`;
-     btn.disabled=false;btn.textContent='Create Account';
-     return;
-   }
-   if(name&&data.user){
-     await sb.from('customer_profiles').upsert({user_id:data.user.id,display_name:name},{onConflict:'user_id'});
-   }
- }
- }
- if(error){errEl.textContent=error.message;btn.disabled=false;btn.textContent=currentTab==='signin'?'Sign In':'Create Account';}
+  const email=document.getElementById('authEmail').value.trim();
+  const pass=document.getElementById('authPass').value;
+  const name=document.getElementById('authName').value.trim();
+  const errEl=document.getElementById('authErr');
+  const btn=document.getElementById('authBtn');
+  if(!email||!pass){errEl.textContent='Email and password required.';return;}
+  btn.disabled=true;btn.textContent='Please wait...';errEl.textContent='';
+  let error;
+  if(currentTab==='signin'){
+    ({error}=await sb.auth.signInWithPassword({email,password:pass}));
+  } else {
+    const{data,error:e}=await sb.auth.signUp({email,password:pass});
+    error=e;
+    if(!error&&!data.session){
+      errEl.style.color='var(--green)';
+      errEl.textContent='Check your email for a confirmation link.';
+      btn.disabled=false;btn.textContent='Create Account';
+      return;
+    }
+    if(!error&&name&&data.user){
+      await sb.from('customer_profiles').upsert({user_id:data.user.id,display_name:name},{onConflict:'user_id'});
+    }
+  }
+  if(error){errEl.textContent=error.message;btn.disabled=false;btn.textContent=currentTab==='signin'?'Sign In':'Create Account';}
 }
 
 async function doSignOut(){
- await sb.auth.signOut();
- loadedPages=new Set();
- exitPortal();
+  await sb.auth.signOut();
+  showAuthGate();
 }
 
-function enterPortal(){
- document.getElementById('authGate').style.display='none';
- document.getElementById('portal').style.display='';
- document.getElementById('navEmail').textContent=' '+currentUser.email;
- var se=document.getElementById('sidebarEmail');if(se)se.textContent=currentUser.email;
- document.getElementById('sidebarEmail').textContent=currentUser.email;
- loadPage('feed');
-}
-function exitPortal(){
- document.getElementById('authGate').style.display='';
- document.getElementById('portal').style.display='none';
+// ── PORTAL ─────────────────────────────────────────────────
+function showAuthGate(){
+  document.getElementById('authGate').style.display='flex';
+  document.getElementById('signOutBtn').style.display='none';
 }
 
-// ── PAGE NAV ────────────────────────────────────────────────────
-function showPage(p){
- document.querySelectorAll('.page').forEach(el=>el.classList.remove('active'));
- document.querySelectorAll('.nav-item[id^="nav-"]').forEach(el=>el.classList.remove('active'));
- document.getElementById('page-'+p)?.classList.add('active');
- document.getElementById('nav-'+p)?.classList.add('active');
- loadPage(p);
+function hideAuthGate(user){
+  document.getElementById('authGate').style.display='none';
+  document.getElementById('signOutBtn').style.display='block';
+  const initials=user.email?user.email.substring(0,2).toUpperCase():'CB';
+  const el=document.getElementById('sidebarInitials');
+  if(el)el.textContent=initials;
+  const nameEl=document.getElementById('sidebarName');
+  if(nameEl)nameEl.textContent=user.email;
+  const wName=document.getElementById('welcomeName');
+  if(wName)wName.textContent=user.email.split('@')[0];
+  loadLiveData(user);
 }
 
-function loadPage(p){
- if(loadedPages.has(p))return;
- loadedPages.add(p);
- if(p==='feed')loadFeed();
- else if(p==='tickets')loadTickets();
- else if(p==='venues')loadSavedVenues();
- else if(p==='events')loadSavedEvents();
- else if(p==='follows')loadFollows();
- else if(p==='profile')loadProfile();
- else if(p==='planners')loadPlanners();
+// ── LIVE DATA ───────────────────────────────────────────────
+async function loadLiveData(user){
+  loadLiveEvents(user);
+  loadLiveTickets(user);
 }
 
-// ── FEED ────────────────────────────────────────────────────────
-async function loadFeed(){
- const el=document.getElementById('feedContent');
- const{data:follows}=await sb.from('customer_venue_follows').select('venue_id').eq('user_id',currentUser.id) ?? {data:[]};
- const followedIds=(follows||[]).map(f=>f.venue_id);
-
- const{data:events}=await sb.from('events')
- .select('id,title,description,start_time,cover_image_url,is_boosted,venues(id,name,slug)')
- .gte('start_time',new Date().toISOString())
- .order('start_time',{ascending:true})
- .limit(40);
-
- if(!events?.length){
- el.innerHTML=`<div class="empty"><h3>No upcoming events yet</h3><p><a href="https://cbusevents.com">Browse CBUSEVENTS →</a></p></div>`;
- return;
- }
-
- // Boost followed venues to top
- const sorted=[...events].sort((a,b)=>{
- const aF=followedIds.includes(a.venues?.id)?1:0;
- const bF=followedIds.includes(b.venues?.id)?1:0;
- return bF-aF;
- });
-
- el.innerHTML='<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:20px">'+sorted.map(e=>{
-  const img=e.cover_image_url?`<img src="${e.cover_image_url}" alt="" loading="lazy" style="width:100%;height:100%;object-fit:cover">`:'<div style="width:100%;height:100%;background:linear-gradient(135deg,rgba(255,107,53,0.1),rgba(129,140,248,0.07))"></div>';
-  const featured=e.is_boosted?'<div style="position:absolute;top:10px;left:10px;background:var(--orange);color:#fff;font-family:var(--mono);font-size:8px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;padding:3px 9px;border-radius:9999px">Featured</div>':'';
-  const following=followedIds.includes(e.venues?.id)?'<div style="position:absolute;top:10px;right:10px;background:var(--green-dim);color:var(--green);font-family:var(--mono);font-size:8px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;padding:3px 9px;border-radius:9999px;border:1px solid var(--green-border)">Following</div>':'';
-  return `<div onclick="window.location.href='https://cbusevents.com'" style="cursor:pointer;transition:transform 0.2s" onmouseover="this.style.transform='translateY(-3px)'" onmouseout="this.style.transform='translateY(0)'">
-    <div style="width:100%;aspect-ratio:1/1;border-radius:16px;overflow:hidden;background:var(--surface);margin-bottom:12px;position:relative">${img}${featured}${following}</div>
-    <div style="font-weight:700;font-size:14px;letter-spacing:-0.02em;color:var(--text);margin-bottom:4px;line-height:1.2;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical">${e.title}</div>
-    <div style="font-size:11px;color:var(--muted)">${fmt(e.start_time)}</div>
-    <div style="font-size:11px;color:var(--sub)">${e.venues?.name||'Columbus Venue'}</div>
-  </div>`;
-}).join('')+'</div>';
+async function loadLiveEvents(user){
+  const grid=document.getElementById('liveEventsGrid');
+  const subtitle=document.getElementById('feedSubtitle');
+  if(!grid)return;
+  const{data:follows}=await sb.from('customer_venue_follows').select('venue_id').eq('user_id',user.id);
+  const followedIds=(follows||[]).map(f=>f.venue_id);
+  const{data:events}=await sb.from('events')
+    .select('id,title,start_time,cover_image_url,is_boosted,is_third_party,venue_name_override,venues(id,name,neighborhood)')
+    .gte('start_time',new Date().toISOString())
+    .eq('status','published')
+    .order('start_time',{ascending:true})
+    .limit(8);
+  if(!events||events.length===0){
+    grid.innerHTML='<div style="padding:40px;text-align:center;color:var(--sub);grid-column:1/-1">No upcoming events yet. <a href="https://cbusevents.com" style="color:var(--orange)">Browse Columbus events →</a></div>';
+    if(subtitle)subtitle.textContent='No upcoming events';
+    return;
+  }
+  // Sort followed venues first
+  const sorted=[...events].sort((a,b)=>{
+    return (followedIds.includes(b.venues?.id)?1:0)-(followedIds.includes(a.venues?.id)?1:0);
+  });
+  if(subtitle)subtitle.textContent=sorted.length+' upcoming events';
+  const colors=['ec1','ec2','ec3','ec4'];
+  grid.innerHTML=sorted.map((e,i)=>{
+    const venueName=e.venue_name_override||e.venues?.name||'Columbus Venue';
+    const d=new Date(e.start_time);
+    const dateStr=d.toLocaleDateString('en-US',{month:'short',day:'numeric',timeZone:'America/New_York'});
+    const timeStr=d.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit',timeZone:'America/New_York'});
+    const isFollowed=followedIds.includes(e.venues?.id);
+    return '<div class="event-card" onclick="window.open('https://cbusevents.com','_blank')">'
+      +'<div class="event-card-img">'
+      +(e.cover_image_url
+        ?'<div class="event-card-img-bg" style="background-image:url(''+e.cover_image_url+'')"></div>'
+        :'<div class="event-card-img-bg '+colors[i%4]+'"></div>')
+      +'<div class="event-card-img-overlay"></div>'
+      +(isFollowed?'<div class="event-card-badge" style="background:var(--green);color:#000">Following</div>'
+        :e.is_boosted?'<div class="event-card-badge">Featured</div>':'')
+      +'</div>'
+      +'<div class="event-card-body">'
+      +'<div class="event-card-venue">'+venueName+'</div>'
+      +'<div class="event-card-name">'+e.title+'</div>'
+      +'<div class="event-card-meta"><span class="event-card-date">'+dateStr+' · '+timeStr+'</span></div>'
+      +'</div></div>';
+  }).join('');
 }
 
-// ── TICKETS ────────────────────────────────────────────────────
-async function loadTickets(){
- const el=document.getElementById('ticketsContent');
- const{data:tickets,error}=await sb.from('tickets')
- .select('*,events(id,title,start_time,venues(name))')
- .eq('user_id',currentUser.id)
- .eq('status','active')
- .order('purchased_at',{ascending:false});
- if(error){el.innerHTML=`<div class="empty"><h3>Error</h3><p>${error.message}</p></div>`;return;}
-
- if(!tickets?.length){
- el.innerHTML=`<div class="empty"><h3>No tickets yet</h3><p><a href="https://cbusevents.com">Browse upcoming events →</a></p></div>`;
- return;
- }
-
- const now=new Date();
- const upcoming=tickets.filter(t=>new Date(t.events?.start_time||0)>=now);
- const past=tickets.filter(t=>new Date(t.events?.start_time||0)<now);
-
- const renderTickets=(list,isPast)=>list.map(t=>`
- <div class="ticket-card ${isPast?'past':'upcoming'}"> <div> <div class="ticket-event">${t.events?.title||'Event'}</div> <div class="ticket-venue"> ${t.events?.venues?.name||'Columbus Venue'}</div> <div class="ticket-date"> ${fmt(t.events?.start_time)}</div> <div style="margin-top:6px;display:flex;gap:8px;flex-wrap:wrap"> <span style="background:var(--surface);border-radius:6px;padding:3px 8px;font-size:12px">Qty: ${t.quantity||1}</span> <span style="background:var(--surface);border-radius:6px;padding:3px 8px;font-size:12px">$${((t.amount_paid||0)/100).toFixed(2)}</span> </div> </div> <div class="ticket-code-box"> <div class="ticket-code-label">Ticket</div> <div class="ticket-code-val">${t.ticket_code||'—'}</div> </div> </div>`).join('');
-
- el.innerHTML=`
- ${upcoming.length?`<h3 style="font-family:var(--font);font-size:14px;font-weight:700;margin-bottom:12px;color:var(--green)"> Upcoming (${upcoming.length})</h3>${renderTickets(upcoming,false)}`:''}
- ${past.length?`<h3 style="font-family:var(--font);font-size:14px;font-weight:700;margin:20px 0 12px;color:var(--muted)">Past Events</h3>${renderTickets(past,true)}`:''}`;
+async function loadLiveTickets(user){
+  const container=document.getElementById('ticketsContainer');
+  if(!container)return;
+  const{data:tickets,error}=await sb.from('tickets')
+    .select('*,events(id,title,start_time,venues(name))')
+    .eq('email',user.email)
+    .eq('status','active')
+    .order('created_at',{ascending:false})
+    .limit(10);
+  if(error||!tickets||tickets.length===0){
+    container.innerHTML='<div style="padding:24px;text-align:center;color:var(--sub);font-size:13px">No tickets yet. <a href="https://cbusevents.com" style="color:var(--orange)">Browse events →</a></div>';
+    return;
+  }
+  container.innerHTML=tickets.map(t=>{
+    const ev=t.events;
+    const d=ev?.start_time?new Date(ev.start_time):null;
+    const month=d?d.toLocaleDateString('en-US',{month:'short',timeZone:'America/New_York'}):'';
+    const day=d?d.toLocaleDateString('en-US',{day:'numeric',timeZone:'America/New_York'}):'';
+    const price=t.amount_paid?'$'+(t.amount_paid/100).toFixed(2):'Free';
+    return '<div class="ticket-row">'
+      +'<div class="ticket-date-block"><div class="ticket-date-month">'+month+'</div><div class="ticket-date-day">'+day+'</div></div>'
+      +'<div class="ticket-info">'
+      +'<div class="ticket-name">'+(ev?.title||'Event')+'</div>'
+      +'<div class="ticket-detail">'+(ev?.venues?.name||'Columbus Venue')+(t.tier_name?' · '+t.tier_name:'')+'</div>'
+      +'</div>'
+      +'<div class="ticket-right">'
+      +(t.ticket_code?'<div class="ticket-type" style="font-family:var(--mono);font-size:12px;color:var(--orange);letter-spacing:2px">'+t.ticket_code+'</div>':'')
+      +'<div class="ticket-price">'+price+'</div>'
+      +'</div></div>';
+  }).join('');
 }
 
-// ── SAVED VENUES ───────────────────────────────────────────────
-async function loadSavedVenues(){
- const el=document.getElementById('savedVenuesContent');
- const{data,error}=await sb.from('customer_saved_venues')
- .select('venue_id,venues(id,name,venue_type,cover_image_url,tier,neighborhood)')
- .eq('user_id',currentUser.id)
- .order('saved_at',{ascending:false});
- if(error){el.innerHTML=`<div class="empty"><h3>Error</h3><p>${error.message}</p></div>`;return;}
-
- const venues=(data||[]).map(d=>d.venues).filter(Boolean);
- if(!venues.length){
- el.innerHTML=`<div class="empty"><h3>No saved venues</h3><p><a href="https://cbusevents.com">Browse Columbus venues →</a></p></div>`;
- return;
- }
-
- el.innerHTML=`<div class="card-grid">${venues.map(v=>`
- <div class="card"> <div class="card-img">${v.cover_image_url?`<img src="${v.cover_image_url}" alt="${v.name}" loading="lazy">`:''}</div> <div class="card-body"> <div class="card-type">${v.venue_type||'Venue'}</div> <div class="card-name">${v.name}</div> <div class="card-meta"> ${v.neighborhood||'Columbus'}</div> ${v.tier==='premium'?'<span class="badge-premium">⭐ Premium</span>':''}
- <button class="unsave-btn" onclick="unsaveVenue('${v.id}',this)">Remove from saved</button> </div> </div>`).join('')}</div>`;
-}
-
-// ── SAVED EVENTS ───────────────────────────────────────────────
-async function loadSavedEvents(){
- const el=document.getElementById('savedEventsContent');
- const{data,error}=await sb.from('customer_saved_events')
- .select('event_id,events(id,title,start_time,cover_image_url,is_boosted,venues(name))')
- .eq('user_id',currentUser.id)
- .order('saved_at',{ascending:false});
- if(error){el.innerHTML=`<div class="empty"><h3>Error</h3><p>${error.message}</p></div>`;return;}
-
- const events=(data||[]).map(d=>d.events).filter(Boolean);
- if(!events.length){
- el.innerHTML=`<div class="empty"><h3>No saved events</h3><p><a href="https://cbusevents.com">Browse upcoming events →</a></p></div>`;
- return;
- }
-
- el.innerHTML=`<div class="card-grid">${events.map(e=>`
- <div class="card" onclick="window.location.href='https://cbusevents.com'"> <div class="card-img">${e.cover_image_url?`<img src="${e.cover_image_url}" alt="${e.title}" loading="lazy">`:''}</div> <div class="card-body"> <div class="card-name">${e.title}</div> <div class="card-meta"> ${e.venues?.name||''}</div> <div class="card-meta" style="color:var(--orange);margin-top:3px"> ${fmt(e.start_time)}</div> ${e.is_boosted?'<span class="badge-boosted"> Featured</span>':''}
- <button class="unsave-btn" onclick="event.stopPropagation();unsaveEvent('${e.id}',this)">Remove from saved</button> </div> </div>`).join('')}</div>`;
-}
-
-// ── FOLLOWS ────────────────────────────────────────────────────
-async function loadFollows(){
- const el=document.getElementById('followsContent');
- const{data,error}=await sb.from('customer_venue_follows')
- .select('venue_id,venues(id,name,cover_image_url,tier)')
- .eq('user_id',currentUser.id)
- .order('followed_at',{ascending:false});
- if(error){el.innerHTML=`<div class="empty"><h3>Error</h3><p>${error.message}</p></div>`;return;}
-
- const venues=(data||[]).map(d=>d.venues).filter(Boolean);
- if(!venues.length){
- el.innerHTML=`<div class="empty"><h3>Not following any venues yet</h3><p>Follow venues to see their events first in your feed.</p></div>`;
- return;
- }
-
- el.innerHTML=`<div class="card-grid">${venues.map(v=>`
- <div class="card" onclick="window.location.href='https://cbusevents.com'"> <div class="card-img">${v.cover_image_url?`<img src="${v.cover_image_url}" alt="${v.name}" loading="lazy">`:''}</div> <div class="card-body"> <div class="card-name">${v.name}</div> ${v.tier==='premium'?'<span class="badge-premium">⭐ Premium</span>':''}
- <button class="unsave-btn" onclick="event.stopPropagation();unfollowVenue('${v.id}',this)">Unfollow</button> </div> </div>`).join('')}</div>`;
-}
-
-// ── PROFILE ────────────────────────────────────────────────────
-async function loadProfile(){
- const el=document.getElementById('profileContent');
- const{data:profile}=await sb.from('customer_profiles')
- .select('*').eq('user_id',currentUser.id).single() ?? {data:{}};
-
- el.innerHTML=`
- <div class="profile-card"> <div class="field"><label>Display Name</label><input id="profName" value="${profile?.display_name||''}" placeholder="Your name"/></div> <div class="field"><label>Email (read-only)</label><input value="${currentUser.email}" disabled style="opacity:0.5"/></div> <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px"> <label style="font-size:12px;color:var(--sub);font-weight:500">Email Notifications</label> <input type="checkbox" id="profNotif" ${profile?.notification_email!==false?'checked':''} style="width:16px;height:16px;accent-color:var(--orange)"/> </div> <button class="btn-primary" style="padding:10px" onclick="saveProfile()">Save Changes</button> <div id="profMsg" style="color:var(--green);font-size:13px;margin-top:10px;min-height:18px"></div> <div style="margin-top:20px;padding-top:16px;border-top:1px solid var(--border);color:var(--muted);font-size:12px"> Member since ${new Date(currentUser.created_at).toLocaleDateString('en-US',{month:'long',year:'numeric'})}
- </div> </div>`;
-}
-
-async function saveProfile(){
- await sb.from('customer_profiles').upsert({
- user_id:currentUser.id,
- display_name:document.getElementById('profName').value.trim(),
- notification_email:document.getElementById('profNotif').checked,
- updated_at:new Date().toISOString()
- },{onConflict:'user_id'});
- const msg=document.getElementById('profMsg');
- if(msg){msg.textContent=' Saved!';setTimeout(()=>msg.textContent='',3000);}
-}
-
-// ── ACTIONS ────────────────────────────────────────────────────
-async function unsaveVenue(venueId,btn){
- btn.textContent='Removing…';
- await sb.from('customer_saved_venues').delete().eq('user_id',currentUser.id).eq('venue_id',venueId);
- btn.closest('.card').remove();
-}
-async function unsaveEvent(eventId,btn){
- btn.textContent='Removing…';
- await sb.from('customer_saved_events').delete().eq('user_id',currentUser.id).eq('event_id',eventId);
- btn.closest('.card').remove();
-}
-async function unfollowVenue(venueId,btn){
- btn.textContent='Unfollowing…';
- await sb.from('customer_venue_follows').delete().eq('user_id',currentUser.id).eq('venue_id',venueId);
- btn.closest('.card').remove();
-}
-
-// ── HELPERS ────────────────────────────────────────────────────
-function fmt(iso){
- if(!iso)return'TBD';
- return new Date(iso).toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric',hour:'numeric',minute:'2-digit',timeZone:'America/New_York'});
-}
-
-// ── PLAN YOUR EVENT ─────────────────────────────────────────
-async function loadPlanners(){
- const el=document.getElementById('plannersContent');
- if(!el)return;
- const{data:planners,error}=await sb.from('planners')
-   .select('id,business_name,contact_name,bio,categories,rate_display,availability,website,instagram')
-   .eq('is_discoverable',true)
-   .order('created_at',{ascending:false});
- if(error||!planners||planners.length===0){
-   el.innerHTML='<div class="empty"><div class="empty-icon">&#x1F4CB;</div><h3>Columbus Planners Coming Soon</h3><p>Planners are joining now. <a href="mailto:info@cbusevents.com">Contact us</a> and we will connect you directly.</p></div>';
-   return;
- }
- let html='<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:16px">';
- planners.forEach(function(p){
-   const name=p.business_name||p.contact_name||'Columbus Planner';
-   const avail=p.availability==='available';
-   const availColor=avail?'var(--green)':'var(--gold)';
-   const availBg=avail?'var(--green-dim)':'rgba(251,191,36,0.1)';
-   const availBorder=avail?'var(--green-border)':'rgba(251,191,36,0.2)';
-   const availLabel=avail?'Available':'Limited';
-   const cats=(p.categories||[]).slice(0,3).map(function(c){return '<span style="font-family:var(--mono);font-size:9px;color:var(--sub);background:rgba(255,255,255,0.04);border:1px solid var(--border);padding:2px 8px;border-radius:9999px">'+c+'</span>';}).join('');
-   const bio=p.bio?'<div style="font-size:12px;color:var(--sub);line-height:1.55;margin-bottom:10px;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical">'+p.bio+'</div>':'';
-   const rate=p.rate_display?'<span style="font-family:var(--mono);font-size:11px;color:var(--text)">'+p.rate_display+'</span>':'<span style="font-size:11px;color:var(--muted)">Contact for Pricing</span>';
-   const contactHref=p.website||(p.instagram?'https://instagram.com/'+p.instagram:'');
-   const contact=contactHref?'<a href="'+contactHref+'" target="_blank" style="font-family:var(--mono);font-size:9px;letter-spacing:0.1em;text-transform:uppercase;color:var(--orange);text-decoration:none">Contact →</a>':'';
-   html+='<div style="background:var(--card);border:1px solid var(--border);border-radius:var(--r-lg);padding:20px;transition:all 0.2s">';
-   html+='<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px">';
-   html+='<div style="font-weight:700;font-size:14px;color:var(--text)">'+name+'</div>';
-   html+='<span style="font-family:var(--mono);font-size:8px;letter-spacing:0.1em;text-transform:uppercase;color:'+availColor+';background:'+availBg+';border:1px solid '+availBorder+';padding:3px 8px;border-radius:9999px;margin-left:8px;flex-shrink:0">'+availLabel+'</span>';
-   html+='</div>';
-   html+='<div style="font-family:var(--mono);font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:var(--orange);margin-bottom:8px">Event Planner</div>';
-   html+=bio;
-   html+='<div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:12px">'+cats+'</div>';
-   html+='<div style="display:flex;justify-content:space-between;align-items:center;padding-top:10px;border-top:1px solid var(--border-sub)">'+rate+contact+'</div>';
-   html+='</div>';
- });
- html+='</div>';
- el.innerHTML=html;
-}
-
-// ── INIT ───────────────────────────────────────────────────────
-init();
-</script>
-
-<script>
-(function(){
-  var link=document.getElementById('adminFooterLink');
-  if(!link)return;
-  try{
-    var stored=localStorage.getItem('sb-toblgvatvsjljbqogzsv-auth-token');
-    if(!stored)return;
-    var parsed=JSON.parse(stored);
-    var email=parsed&&parsed.user&&parsed.user.email;
-    if(email&&['deante90@gmail.com','info@cbusevents.com'].indexOf(email)>-1){
-      link.style.display='inline';
-    }
-  }catch(e){}
+// ── INIT ────────────────────────────────────────────────────
+(async function init(){
+  const params=new URLSearchParams(window.location.search);
+  const{data:{session}}=await sb.auth.getSession();
+  if(session?.user){
+    currentUser=session.user;
+    hideAuthGate(session.user);
+  } else {
+    showAuthGate();
+    if(params.get('tab')==='signup')setTimeout(()=>switchTab('signup'),100);
+  }
+  sb.auth.onAuthStateChange((_,session)=>{
+    if(session?.user){currentUser=session.user;hideAuthGate(session.user);}
+    else showAuthGate();
+  });
 })();
 </script>
 </body>
