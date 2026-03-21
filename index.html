@@ -1266,7 +1266,7 @@ function renderFeaturedEvent(){
   var viewBtn=document.createElement('button');
   viewBtn.textContent='View Details';
   viewBtn.style.cssText='background:transparent;color:var(--text);border:1px solid var(--border);border-radius:10px;padding:12px 24px;font-size:14px;cursor:pointer;font-family:var(--font)';
-  viewBtn.onclick=function(){openEventModal(fe.id);};
+  viewBtn.onclick=function(){window.location.href='event.html?id='+fe.id;};
   slot.innerHTML='<section class="section" style="padding-top:36px;padding-bottom:0"><div style="background:linear-gradient(135deg,#0f0a00,#1a1200,#0b0b0f);border:1px solid #f59e0b50;border-radius:18px;overflow:hidden">'+img+'<div style="padding:24px 28px;display:flex;justify-content:space-between;align-items:center;gap:24px;flex-wrap:wrap"><div><div style="display:inline-flex;background:#f59e0b;color:#000;border-radius:20px;padding:3px 12px;font-size:11px;font-weight:700;text-transform:uppercase;margin-bottom:10px">Featured Event</div><div style="font-size:11px;color:#f59e0b;font-weight:700;text-transform:uppercase;margin-bottom:6px">'+(fe.category||'Event')+'</div><div style="font-family:var(--font);font-size:22px;font-weight:800;margin-bottom:12px">'+fe.title+'</div><div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px"><span style="background:var(--card);border-radius:8px;padding:6px 12px;font-size:13px">'+fmt(fe.start_time)+'</span><span style="background:var(--card);border-radius:8px;padding:6px 12px;font-size:13px">'+fmtTime(fe.start_time)+(fe.end_time?' - '+fmtTime(fe.end_time):'')+'</span>'+price+'</div>'+venueLine+desc+'</div><div id="featuredBtns" style="flex-shrink:0;display:flex;flex-direction:column;gap:10px">'+ticket+'<div style="font-size:11px;color:#55556a;text-align:center">Powered by CBUSEVENTS</div></div></div></div></section>';
   var btns=document.getElementById('featuredBtns');
   if(btns) btns.insertBefore(viewBtn, btns.children[btns.children.length-1]);
@@ -1295,7 +1295,7 @@ function renderHomeEventCards(events){
       </div>`).join('');
   }
   return items.map((e,i)=>`
-    <div class="rh-event-card" onclick="openEventModal('${e.id}')">
+    <div class="rh-event-card" onclick=\"window.location.href='event.html?id=${e.id}'\">
       <div class="rh-event-card-img">
         ${e.cover_image_url?`<img src="${e.cover_image_url}" alt="${e.title}" onerror="this.parentNode.innerHTML='<span>${HOME_EVENT_ICONS[i]}</span>'">`:`<span>${HOME_EVENT_ICONS[i%HOME_EVENT_ICONS.length]}</span>`}
         ${e.is_boosted?'<div class="rh-badge-featured">Featured</div>':''}
@@ -1525,7 +1525,7 @@ function renderHome(){
        const img = e.cover_image_url;
        const tw = isThisWeek(e.start_time);
        return `
-         <div onclick="openEventModal('${e.id}')"
+         <div onclick=\"window.location.href='event.html?id=${e.id}'\"
            style="cursor:pointer;transition:transform 0.2s"
            onmouseover="this.style.transform='translateY(-3px)'"
            onmouseout="this.style.transform='translateY(0)'">
@@ -1830,7 +1830,7 @@ function showHomeMapPopup(e){
   meta.textContent  = fmt(e.start_time) + (fmtTime(e.start_time) ? ' at ' + fmtTime(e.start_time) : '');
   venue.textContent = e.venue_name_override || e.venues?.name || 'Columbus Venue';
   popup.style.display = 'block';
-  popup.onclick = ()=>openEventModal(e.id);
+  popup.onclick = ()=>window.location.href='event.html?id='+e.id;
   // Auto-hide after 6 seconds
   clearTimeout(popup._hideTimer);
   popup._hideTimer = setTimeout(()=>popup.style.display='none', 6000);
@@ -1875,7 +1875,7 @@ function filterHomeMap(category, clickedEl){
     const venueName = e.venue_name_override||e.venues?.name||'Columbus Venue';
     const img = e.cover_image_url;
     const tw = isThisWeek(e.start_time);
-    return `<div onclick="openEventModal('${e.id}')"
+    return `<div onclick=\"window.location.href='event.html?id=${e.id}'\"
       style="cursor:pointer;transition:transform 0.2s;scroll-snap-align:start;flex:0 0 72vw;max-width:280px"
       onmouseover="this.style.transform='translateY(-3px)'"
       onmouseout="this.style.transform='translateY(0)'">
@@ -1909,7 +1909,7 @@ function buildHeroCards(){
    ...(nextEvent?[{
      icon:'', label:'Featured Event', title:nextEvent.title,
      meta:`${fmt(nextEvent.start_time)} · ${fmtTime(nextEvent.start_time)}`,
-     onclick:`openEventModal('${nextEvent.id}')`
+     onclick:`window.location.href='event.html?id=${nextEvent.id}'`
    }]:[])
  ];
  el.innerHTML=items.map(item=>`
@@ -2410,7 +2410,7 @@ function eventCard(e){
  const tw=isThisWeek(e.start_time);
  const venueName=e.venue_name_override||e.venues?.name||'Columbus Venue';
  const img=e.cover_image_url;
- return`<div onclick="openEventModal('${e.id}')" style="cursor:pointer;transition:transform 0.2s" onmouseover="this.style.transform='translateY(-3px)'" onmouseout="this.style.transform='translateY(0)'">
+ return`<div onclick=\"window.location.href='event.html?id=${e.id}'\" style="cursor:pointer;transition:transform 0.2s" onmouseover="this.style.transform='translateY(-3px)'" onmouseout="this.style.transform='translateY(0)'">
    <div style="width:100%;aspect-ratio:1/1;border-radius:16px;overflow:hidden;background:var(--surface);margin-bottom:14px;position:relative">
      ${img?`<img src="${img}" alt="${e.title}" style="width:100%;height:100%;object-fit:cover" onerror="this.style.display='none'">`:`<div style="width:100%;height:100%;background:linear-gradient(135deg,rgba(255,107,53,0.12),rgba(129,140,248,0.08))"></div>`}
      ${tw?`<div style="position:absolute;top:10px;left:10px;background:var(--green);color:#000;font-family:var(--mono);font-size:8px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;padding:3px 9px;border-radius:9999px">This Week</div>`:''}
@@ -2425,6 +2425,9 @@ function eventCard(e){
 
 // ── EVENT MODAL ───────────────────────────────────────────────
 async function openEventModal(id){
+ // Redirect to standalone event page
+ window.location.href='event.html?id='+id;
+ return;
  const e=allEvents.find(x=>x.id===id);
  if(!e)return;
  const venue=allVenues.find(v=>v.id===e.venue_id);
