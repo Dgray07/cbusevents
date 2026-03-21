@@ -69,40 +69,6 @@ body { background: var(--bg); color: var(--text); font-family: var(--font); disp
 @keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
 
 /* ════════════════════════
-   TIER DEMO TOGGLE
-════════════════════════ */
-.tier-toggle {
-  position: fixed;
-  bottom: 24px;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 999;
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: var(--r-full);
-  padding: 4px;
-  box-shadow: 0 8px 40px rgba(0,0,0,0.6);
-}
-.tier-btn {
-  font-family: var(--mono);
-  font-size: 10px;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  padding: 8px 18px;
-  border-radius: var(--r-full);
-  border: none;
-  cursor: pointer;
-  transition: all 0.2s;
-  background: transparent;
-  color: var(--muted);
-}
-.tier-btn.active { background: var(--orange); color: #fff; font-weight: 700; }
-.tier-label { font-family: var(--mono); font-size: 9px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); padding: 0 10px; }
-
-/* ════════════════════════
    SIDEBAR
 ════════════════════════ */
 .sidebar {
@@ -601,17 +567,17 @@ body { background: var(--bg); color: var(--text); font-family: var(--font); disp
     </div>
     <div style="margin-bottom:14px">
       <label style="display:block;font-size:12px;color:var(--sub);font-weight:500;margin-bottom:5px">Email</label>
-      <input type="email" id="authEmail" placeholder="you@email.com" id="authPassInput" style="width:100%;background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:9px;padding:10px 14px;color:var(--text);font-family:var(--font);font-size:14px;outline:none"/>
+      <input type="email" id="authEmail" placeholder="you@email.com" class="auth-enter-submit" style="width:100%;background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:9px;padding:10px 14px;color:var(--text);font-family:var(--font);font-size:14px;outline:none"/>
     </div>
     <div style="margin-bottom:14px">
       <label style="display:block;font-size:12px;color:var(--sub);font-weight:500;margin-bottom:5px">Password</label>
-      <input type="password" id="authPass" placeholder="••••••••" id="authPassInput" style="width:100%;background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:9px;padding:10px 14px;color:var(--text);font-family:var(--font);font-size:14px;outline:none"/>
+      <input type="password" id="authPass" placeholder="••••••••" class="auth-enter-submit" style="width:100%;background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:9px;padding:10px 14px;color:var(--text);font-family:var(--font);font-size:14px;outline:none"/>
     </div>
     <div id="authErr" style="color:var(--red);font-size:13px;margin-bottom:10px;min-height:18px"></div>
     <button id="authBtn" style="width:100%;background:var(--orange);color:#fff;border:none;border-radius:9px;padding:12px;font-size:14px;font-weight:700;cursor:pointer;font-family:var(--font)">Sign In</button>
     <div style="text-align:center;margin-top:16px;font-size:13px;color:var(--sub)">
       <span id="authSwitchText">New to CBUSEVENTS?</span>
-      <button id="authSwitchBtn" id="authSwitchBtnEl" style="background:none;border:none;color:var(--orange);font-size:13px;font-weight:600;cursor:pointer;font-family:var(--font);margin-left:4px">Create a free account</button>
+      <button id="authSwitchBtn" style="background:none;border:none;color:var(--orange);font-size:13px;font-weight:600;cursor:pointer;font-family:var(--font);margin-left:4px">Create a free account</button>
     </div>
     <div style="text-align:center;margin-top:12px">
       <a href="https://cbusevents.com" style="color:var(--muted);font-size:12px">← Back to CBUSEVENTS</a>
@@ -701,15 +667,15 @@ body { background: var(--bg); color: var(--text); font-family: var(--font); disp
       </div>
       <div class="welcome-stats">
         <div class="welcome-stat">
-          <div class="welcome-stat-num">4</div>
+          <div class="welcome-stat-num" id="statSaved">—</div>
           <div class="welcome-stat-label">Saved Events</div>
         </div>
         <div class="welcome-stat">
-          <div class="welcome-stat-num">6</div>
+          <div class="welcome-stat-num" id="statTickets">—</div>
           <div class="welcome-stat-label">Tickets Purchased</div>
         </div>
         <div class="welcome-stat">
-          <div class="welcome-stat-num">2</div>
+          <div class="welcome-stat-num" id="statUpcoming">—</div>
           <div class="welcome-stat-label">Upcoming</div>
         </div>
       </div>
@@ -736,45 +702,14 @@ body { background: var(--bg); color: var(--text); font-family: var(--font); disp
     <div class="table-card">
       <div class="table-header">
         <div class="table-title">My Tickets</div>
-        <button class="btn btn-ghost btn-sm">View All</button>
+        <button class="btn btn-ghost btn-sm" onclick="window.open('https://cbusevents.com','_blank')">Browse Events</button>
       </div>
-
-      <div class="ticket-row">
-        <div class="ticket-date-block"><div class="ticket-date-month">Apr</div><div class="ticket-date-day">26</div></div>
-        <div class="ticket-info">
-          <div class="ticket-name">Friday Night R&B Vol. 4</div>
-          <div class="ticket-detail">Kemba Live &middot; General Admission</div>
-        </div>
-        <div class="ticket-right">
-          <div class="ticket-type">GA &middot; 1 ticket</div>
-          <div class="ticket-price">$27.00</div>
+      <div id="ticketsContainer">
+        <div style="padding:40px;text-align:center;color:var(--muted);">
+          <div style="width:24px;height:24px;border:2px solid var(--border);border-top-color:var(--orange);border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 12px"></div>
+          Loading tickets...
         </div>
       </div>
-
-      <div class="ticket-row">
-        <div class="ticket-date-block"><div class="ticket-date-month">May</div><div class="ticket-date-day">08</div></div>
-        <div class="ticket-info">
-          <div class="ticket-name">Columbus Tech Mixer</div>
-          <div class="ticket-detail">The Exchange &middot; General Admission</div>
-        </div>
-        <div class="ticket-right">
-          <div class="ticket-type">GA &middot; 1 ticket</div>
-          <div class="ticket-price">$17.00</div>
-        </div>
-      </div>
-
-      <div class="ticket-row">
-        <div class="ticket-date-block" style="background:rgba(255,255,255,0.04);border-color:var(--border);"><div class="ticket-date-month" style="color:var(--muted)">Mar</div><div class="ticket-date-day" style="color:var(--muted)">15</div></div>
-        <div class="ticket-info">
-          <div class="ticket-name" style="color:var(--sub)">Winter Networking Night</div>
-          <div class="ticket-detail">The Exchange &middot; VIP</div>
-        </div>
-        <div class="ticket-right">
-          <div class="ticket-type">VIP &middot; 2 tickets</div>
-          <div class="ticket-price" style="color:var(--sub)">$92.00</div>
-        </div>
-      </div>
-
     </div>
 
     <!-- HIRE A PLANNER — Discovery layer -->
@@ -917,7 +852,7 @@ body { background: var(--bg); color: var(--text); font-family: var(--font); disp
           <span class="locked-tier-badge standard">Standard</span>
           <div class="locked-overlay-title">Events picked for you</div>
           <div class="locked-overlay-sub">Your listing is visible. Upgrade to get personalized event recommendations based on your taste and history.</div>
-          <button class="btn-unlock" onclick="setTier('standard')">Unlock Recommendations</button>
+          <button class="btn-unlock" onclick="goUpgrade('standard')">Unlock Recommendations</button>
         </div>
       </div>
 
@@ -954,7 +889,7 @@ body { background: var(--bg); color: var(--text); font-family: var(--font); disp
           <span class="locked-tier-badge standard">Standard</span>
           <div class="locked-overlay-title">Never miss a moment</div>
           <div class="locked-overlay-sub">Get alerts when saved events sell out, drop new lineups, or offer early bird pricing.</div>
-          <button class="btn-unlock" onclick="setTier('standard')">Unlock Priority Alerts</button>
+          <button class="btn-unlock" onclick="goUpgrade('standard')">Unlock Priority Alerts</button>
         </div>
       </div>
 
@@ -963,13 +898,6 @@ body { background: var(--bg); color: var(--text); font-family: var(--font); disp
   </div>
 </div>
 
-<!-- TIER TOGGLE -->
-<div class="tier-toggle">
-  <span class="tier-label">Preview as</span>
-  <button class="tier-btn active" id="btnFree"     onclick="setTier('free')">Free</button>
-  <button class="tier-btn"        id="btnStandard" onclick="setTier('standard')">Standard</button>
-  <button class="tier-btn"        id="btnPremium"  onclick="setTier('premium')">Premium</button>
-</div>
 
 <script src="https://unpkg.com/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <script>
@@ -979,51 +907,63 @@ const sb=supabase.createClient(SB_URL,SB_KEY);
 let currentUser=null;
 window.currentTab='signin'; let currentTab=window.currentTab;
 
-// ── TIER TOGGLE (demo) ──────────────────────────────────────
-window.setTier = function setTier(tier) {
-  document.querySelectorAll('.tier-btn').forEach(b=>b.classList.remove('active'));
-  const btn=document.getElementById('btn'+tier.charAt(0).toUpperCase()+tier.slice(1));
-  if(btn)btn.classList.add('active');
-  const recFeature=document.getElementById('featureRec');
+// ── STRIPE UPGRADE LINKS ────────────────────────────────────
+const STRIPE_STANDARD='https://buy.stripe.com/aFa3cv3vWasGdFBdA4c3m02'; // TODO: replace with customer Standard link
+const STRIPE_PREMIUM ='https://buy.stripe.com/aFa3cv3vWasGdFBdA4c3m02';  // TODO: replace with customer Premium link
+
+window.goUpgrade = function goUpgrade(tier){
+  const url=tier==='premium'?STRIPE_PREMIUM:STRIPE_STANDARD;
+  const email=currentUser?.email||'';
+  window.location.href=url+(email?'&prefilled_email='+encodeURIComponent(email):'');
+}
+
+// ── TIER UI — applies locked/unlocked state based on real tier
+function applyTierUI(tier){
+  const t=(tier||'free').toLowerCase();
+  const isPaid=t==='standard'||t==='premium';
+  const isPremium=t==='premium';
+
+  const recFeature   =document.getElementById('featureRec');
   const alertsFeature=document.getElementById('featureAlerts');
-  const recOverlay=document.getElementById('recOverlay');
+  const recOverlay   =document.getElementById('recOverlay');
   const alertsOverlay=document.getElementById('alertsOverlay');
-  const sidebarTier=document.getElementById('sidebarTier');
-  const upgradeBlock=document.getElementById('sidebarUpgrade');
-  const navRec=document.getElementById('navRecommendations');
-  const navAlerts=document.getElementById('navNotifications');
-  const upgradeTitle=document.getElementById('upgradeTitle');
-  const upgradeText=document.getElementById('upgradeText');
-  const welcomeSub=document.getElementById('welcomeSub');
-  if(tier==='free'){
-    if(recFeature)recFeature.querySelector('.locked-content').style.filter='blur(4px)';
+  const sidebarTier  =document.getElementById('sidebarTier');
+  const upgradeBlock =document.getElementById('sidebarUpgrade');
+  const upgradeBtn   =document.getElementById('upgradeBtn');
+  const navRec       =document.getElementById('navRecommendations');
+  const navAlerts    =document.getElementById('navNotifications');
+  const upgradeTitle =document.getElementById('upgradeTitle');
+  const upgradeText  =document.getElementById('upgradeText');
+
+  if(isPaid){
+    if(recFeature)   recFeature.querySelector('.locked-content').style.filter='none';
+    if(alertsFeature)alertsFeature.querySelector('.locked-content').style.filter='none';
+    if(recOverlay)   recOverlay.style.display='none';
+    if(alertsOverlay)alertsOverlay.style.display='none';
+    if(navRec)       navRec.classList.remove('locked');
+    if(navAlerts)    navAlerts.classList.remove('locked');
+    if(isPremium){
+      if(sidebarTier){sidebarTier.className='customer-tier tier-premium';sidebarTier.textContent='Premium';}
+      if(upgradeBlock)upgradeBlock.style.display='none';
+    } else {
+      if(sidebarTier){sidebarTier.className='customer-tier tier-standard';sidebarTier.textContent='Standard';}
+      if(upgradeBlock)upgradeBlock.style.display='block';
+      if(upgradeTitle)upgradeTitle.textContent='Go Premium';
+      if(upgradeText) upgradeText.textContent='Get priority placement, advanced insights, and exclusive early access.';
+      if(upgradeBtn)  upgradeBtn.onclick=()=>goUpgrade('premium');
+    }
+  } else {
+    if(recFeature)   recFeature.querySelector('.locked-content').style.filter='blur(4px)';
     if(alertsFeature)alertsFeature.querySelector('.locked-content').style.filter='blur(4px)';
-    if(recOverlay)recOverlay.style.display='flex';
+    if(recOverlay)   recOverlay.style.display='flex';
     if(alertsOverlay)alertsOverlay.style.display='flex';
     if(sidebarTier){sidebarTier.className='customer-tier tier-free';sidebarTier.textContent='Free';}
     if(upgradeBlock)upgradeBlock.style.display='block';
-    if(navRec)navRec.classList.add('locked');
-    if(navAlerts)navAlerts.classList.add('locked');
-  } else if(tier==='standard'){
-    if(recFeature)recFeature.querySelector('.locked-content').style.filter='none';
-    if(alertsFeature)alertsFeature.querySelector('.locked-content').style.filter='none';
-    if(recOverlay)recOverlay.style.display='none';
-    if(alertsOverlay)alertsOverlay.style.display='none';
-    if(sidebarTier){sidebarTier.className='customer-tier tier-standard';sidebarTier.textContent='Standard';}
-    if(upgradeBlock)upgradeBlock.style.display='block';
-    if(upgradeTitle)upgradeTitle.textContent='Go Premium';
-    if(upgradeText)upgradeText.textContent='Get priority placement, advanced insights, and exclusive early access.';
-    if(navRec)navRec.classList.remove('locked');
-    if(navAlerts)navAlerts.classList.remove('locked');
-  } else if(tier==='premium'){
-    if(recFeature)recFeature.querySelector('.locked-content').style.filter='none';
-    if(alertsFeature)alertsFeature.querySelector('.locked-content').style.filter='none';
-    if(recOverlay)recOverlay.style.display='none';
-    if(alertsOverlay)alertsOverlay.style.display='none';
-    if(sidebarTier){sidebarTier.className='customer-tier tier-premium';sidebarTier.textContent='Premium';}
-    if(upgradeBlock)upgradeBlock.style.display='none';
-    if(navRec)navRec.classList.remove('locked');
-    if(navAlerts)navAlerts.classList.remove('locked');
+    if(upgradeTitle)upgradeTitle.textContent='Unlock More';
+    if(upgradeText) upgradeText.textContent='Get personalized recommendations and priority event alerts.';
+    if(upgradeBtn)  upgradeBtn.onclick=()=>goUpgrade('standard');
+    if(navRec)      navRec.classList.add('locked');
+    if(navAlerts)   navAlerts.classList.add('locked');
   }
 }
 
@@ -1043,7 +983,7 @@ window.switchTab = function switchTab(tab){
 
 window.doAuth = async function doAuth(){
   const email=document.getElementById('authEmail').value.trim();
-  const pass=(document.getElementById('authPass')||document.getElementById('authPassInput')||{value:''}).value;
+  const pass=(document.getElementById('authPass')||{value:''}).value;
   const name=document.getElementById('authName').value.trim();
   const errEl=document.getElementById('authErr');
   const btn=document.getElementById('authBtn');
@@ -1051,7 +991,16 @@ window.doAuth = async function doAuth(){
   btn.disabled=true;btn.textContent='Please wait...';errEl.textContent='';
   let error;
   if(currentTab==='signin'){
-    ({error}=await sb.auth.signInWithPassword({email,password:pass}));
+    const{error:e,data}=await sb.auth.signInWithPassword({email,password:pass});
+    error=e;
+    if(!error&&data?.user){
+      // Redirect if this user belongs to a different portal
+      const{data:rd}=await sb.from('user_roles').select('role').eq('user_id',data.user.id).maybeSingle();
+      const role=rd?.role;
+      if(role==='vendor'){window.location.href='https://cbusevents.com/cbus-vendor-portal.html';return;}
+      if(role==='venue_owner'){window.location.href='https://cbusevents.com/cbus-venue-portal.html';return;}
+      if(role==='planner'){window.location.href='https://cbusevents.com/cbus-planner-portal.html';return;}
+    }
   } else {
     const{data,error:e}=await sb.auth.signUp({email,password:pass});
     error=e;
@@ -1061,8 +1010,12 @@ window.doAuth = async function doAuth(){
       btn.disabled=false;btn.textContent='Create Account';
       return;
     }
-    if(!error&&name&&data.user){
-      await sb.from('customer_profiles').upsert({user_id:data.user.id,display_name:name},{onConflict:'user_id'});
+    if(!error&&data.user){
+      // Write role row so cross-portal redirects work correctly
+      await sb.from('user_roles').insert({user_id:data.user.id,role:'customer'}).select().maybeSingle().catch(()=>{});
+      if(name){
+        await sb.from('customer_profiles').upsert({user_id:data.user.id,display_name:name},{onConflict:'user_id'});
+      }
     }
   }
   if(error){
@@ -1099,6 +1052,10 @@ function hideAuthGate(user){
   if(nameEl)nameEl.textContent=user.email;
   const wName=document.getElementById('welcomeName');
   if(wName)wName.textContent=user.email.split('@')[0];
+  // Load tier then apply UI, then load data
+  sb.from('customer_profiles').select('subscription_tier').eq('user_id',user.id).maybeSingle().then(({data})=>{
+    applyTierUI(data?.subscription_tier||'free');
+  });
   loadLiveData(user);
 }
 
@@ -1106,6 +1063,26 @@ function hideAuthGate(user){
 async function loadLiveData(user){
   loadLiveEvents(user);
   loadLiveTickets(user);
+  loadWelcomeStats(user);
+}
+
+async function loadWelcomeStats(user){
+  const now=new Date().toISOString();
+  const[savedRes,ticketsRes,upcomingRes]=await Promise.all([
+    sb.from('customer_saved_events').select('id',{count:'exact',head:true}).eq('user_id',user.id),
+    sb.from('tickets').select('id',{count:'exact',head:true}).eq('email',user.email).eq('status','active'),
+    sb.from('tickets').select('id',{count:'exact',head:true}).eq('email',user.email).eq('status','active').gte('events.start_time',now),
+  ]);
+  const setStat=(id,val)=>{const el=document.getElementById(id);if(el)el.textContent=val??'0';};
+  setStat('statSaved',savedRes.count??0);
+  setStat('statTickets',ticketsRes.count??0);
+  // upcoming: fall back to total active tickets count if the join count isn't available
+  setStat('statUpcoming',upcomingRes.count??0);
+  const sub=document.getElementById('welcomeSub');
+  if(sub){
+    const upcoming=upcomingRes.count??0;
+    sub.textContent=upcoming>0?`You have ${upcoming} upcoming event${upcoming===1?'':'s'}.`:'No upcoming events right now.';
+  }
 }
 
 async function loadLiveEvents(user){
@@ -1137,20 +1114,19 @@ async function loadLiveEvents(user){
     const dateStr=d.toLocaleDateString('en-US',{month:'short',day:'numeric',timeZone:'America/New_York'});
     const timeStr=d.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit',timeZone:'America/New_York'});
     const isFollowed=followedIds.includes(e.venues?.id);
-    return '<div class="event-card" onclick="window.open('https://cbusevents.com','_blank')">'
-      +'<div class="event-card-img">'
-      +(e.cover_image_url
-        ?'<div class="event-card-img-bg" style="background-image:url(''+e.cover_image_url+'')"></div>'
-        :'<div class="event-card-img-bg '+colors[i%4]+'"></div>')
-      +'<div class="event-card-img-overlay"></div>'
-      +(isFollowed?'<div class="event-card-badge" style="background:var(--green);color:#000">Following</div>'
-        :e.is_boosted?'<div class="event-card-badge">Featured</div>':'')
-      +'</div>'
-      +'<div class="event-card-body">'
-      +'<div class="event-card-venue">'+venueName+'</div>'
-      +'<div class="event-card-name">'+e.title+'</div>'
-      +'<div class="event-card-meta"><span class="event-card-date">'+dateStr+' · '+timeStr+'</span></div>'
-      +'</div></div>';
+    const imgBg=e.cover_image_url
+      ?`<div class="event-card-img-bg" style="background-image:url('${e.cover_image_url.replace(/'/g,"\\'")}')"></div>`
+      :`<div class="event-card-img-bg ${colors[i%4]}"></div>`;
+    const badge=isFollowed
+      ?'<div class="event-card-badge" style="background:var(--green);color:#000">Following</div>'
+      :e.is_boosted?'<div class="event-card-badge">Featured</div>':'';
+    return `<div class="event-card" onclick="window.open('https://cbusevents.com','_blank')">
+      <div class="event-card-img">${imgBg}<div class="event-card-img-overlay"></div>${badge}</div>
+      <div class="event-card-body">
+        <div class="event-card-venue">${venueName}</div>
+        <div class="event-card-name">${e.title}</div>
+        <div class="event-card-meta"><span class="event-card-date">${dateStr} · ${timeStr}</span></div>
+      </div></div>`;
   }).join('');
 }
 
@@ -1187,6 +1163,8 @@ async function loadLiveTickets(user){
 }
 
 // ── INIT ────────────────────────────────────────────────────
+let _initDone=false;
+
 (async function init(){
   const params=new URLSearchParams(window.location.search);
   const{data:{session}}=await sb.auth.getSession();
@@ -1197,39 +1175,27 @@ async function loadLiveTickets(user){
     showAuthGate();
     if(params.get('tab')==='signup')setTimeout(()=>switchTab('signup'),100);
   }
-  sb.auth.onAuthStateChange((_,session)=>{
-    if(session?.user){currentUser=session.user;hideAuthGate(session.user);}
-    else showAuthGate();
+  _initDone=true;
+  sb.auth.onAuthStateChange((event,session)=>{
+    // Only react to explicit sign-in/sign-out — ignore TOKEN_REFRESHED and other noise
+    if(event==='SIGNED_IN' && session?.user && !currentUser && _initDone){
+      currentUser=session.user;
+      hideAuthGate(session.user);
+    } else if(event==='SIGNED_OUT'){
+      currentUser=null;
+      showAuthGate();
+    }
   });
 })();
 
-// ── WIRE UP AUTH BUTTONS via event listeners (avoids inline onclick timing issues) ──
-document.addEventListener('DOMContentLoaded', function() {
-  var authBtn = document.getElementById('authBtn');
+// ── WIRE AUTH BUTTONS — single binding after DOM ready ──────
+document.addEventListener('DOMContentLoaded', function(){
+  var authBtn=document.getElementById('authBtn');
   if(authBtn) authBtn.addEventListener('click', function(){ if(window.doAuth) window.doAuth(); });
 
-  var authPassInput = document.getElementById('authPassInput')||document.getElementById('authPass');
-  if(authPassInput) authPassInput.addEventListener('keydown', function(e){ if(e.key==='Enter' && window.doAuth) window.doAuth(); });
-
-  var authEmailInput = document.getElementById('authEmail');
-  if(authEmailInput) authEmailInput.addEventListener('keydown', function(e){ if(e.key==='Enter' && window.doAuth) window.doAuth(); });
-
-  var switchBtn = document.getElementById('authSwitchBtnEl');
+  var switchBtn=document.getElementById('authSwitchBtn');
   if(switchBtn) switchBtn.addEventListener('click', function(){
     if(window.switchTab) window.switchTab(window.currentTab==='signin'?'signup':'signin');
-  });
-});
-</script>
-
-<script>
-// Wire auth gate buttons after DOM + scripts are fully loaded
-window.addEventListener('load', function() {
-  var authBtn = document.getElementById('authBtn');
-  if(authBtn) authBtn.addEventListener('click', function(){ if(window.doAuth) window.doAuth(); });
-
-  var switchBtn = document.getElementById('authSwitchBtnWrap');
-  if(switchBtn) switchBtn.addEventListener('click', function(){
-    if(window.switchTab && window.currentTab) window.switchTab(window.currentTab==='signin'?'signup':'signin');
   });
 
   document.querySelectorAll('.auth-enter-submit').forEach(function(el){
@@ -1243,7 +1209,7 @@ window.addEventListener('load', function() {
 function doAuth(){ if(window.doAuth) window.doAuth(); }
 function switchTab(t){ if(window.switchTab) window.switchTab(t); }
 function doSignOut(){ if(window.doSignOut) window.doSignOut(); }
-function setTier(t){ if(window.setTier) window.setTier(t); }
+function goUpgrade(t){ if(window.goUpgrade) window.goUpgrade(t); }
 </script>
 </body>
 </html>
