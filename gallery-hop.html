@@ -1,0 +1,740 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gallery Hop — CBUSEVENTS</title>
+<meta name="description" content="Columbus Gallery Hop — every first Friday in the Short North Arts District. Find participating venues, plan your route, and discover what's happening tonight.">
+<meta property="og:title" content="Gallery Hop Columbus — CBUSEVENTS">
+<meta property="og:description" content="Every first Friday. Short North Arts District. Browse all participating venues, get directions, and plan your night.">
+<meta property="og:image" content="https://cbusevents.com/assets/cbus-shield.png">
+<meta name="theme-color" content="#080810">
+<link rel="apple-touch-icon" href="/assets/cbus-shield.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700;800;900&family=DM+Mono:wght@400;500&family=Playfair+Display:ital,wght@0,700;0,900;1,700&display=swap" rel="stylesheet">
+<link href="https://api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.css" rel="stylesheet">
+<script src="https://api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.js"></script>
+<script src="https://unpkg.com/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; -webkit-font-smoothing: antialiased; }
+:root {
+  --bg:      #080810;
+  --surface: #0f0f1a;
+  --card:    #141420;
+  --border:  #1e1e2e;
+  --border-sub: #191928;
+  --text:    #f0f0fa;
+  --sub:     #7070a0;
+  --muted:   #40405a;
+  --orange:  #FF6B35;
+  --orange-dim: rgba(255,107,53,0.1);
+  --orange-border: rgba(255,107,53,0.25);
+  --green:   #34d399;
+  --green-dim: rgba(52,211,153,0.1);
+  --green-border: rgba(52,211,153,0.2);
+  --blue:    #818cf8;
+  --gold:    #fbbf24;
+  --font:    'DM Sans', sans-serif;
+  --mono:    'DM Mono', monospace;
+  --serif:   'Playfair Display', serif;
+  --r-sm: 8px; --r-md: 10px; --r-lg: 14px; --r-full: 9999px;
+}
+html { scroll-behavior: smooth; }
+body { background: var(--bg); color: var(--text); font-family: var(--font); min-height: 100vh; }
+a { text-decoration: none; color: inherit; }
+button { font-family: var(--font); cursor: pointer; border: none; }
+
+@keyframes fadeUp  { from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)} }
+@keyframes pulse   { 0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.4;transform:scale(0.8)} }
+@keyframes float   { 0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)} }
+@keyframes spin    { to{transform:rotate(360deg)} }
+@keyframes glow    { 0%,100%{box-shadow:0 0 20px rgba(255,107,53,0.25)}50%{box-shadow:0 0 40px rgba(255,107,53,0.5)} }
+@keyframes slideUp { from{opacity:0;transform:translateY(40px)}to{opacity:1;transform:translateY(0)} }
+
+/* ── NAV ── */
+nav {
+  position: sticky; top: 0; z-index: 100;
+  background: rgba(8,8,16,0.92); backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 48px; height: 62px;
+}
+.nav-logo { font-weight: 900; font-size: 17px; letter-spacing: -0.05em; text-transform: uppercase; cursor: pointer; }
+.nav-logo span { color: var(--orange); }
+.nav-back {
+  display: flex; align-items: center; gap: 7px;
+  font-family: var(--mono); font-size: 10px; letter-spacing: 0.12em;
+  text-transform: uppercase; color: var(--sub); transition: color 0.2s;
+}
+.nav-back:hover { color: var(--orange); }
+.nav-cta {
+  background: var(--orange); color: #fff;
+  font-weight: 700; font-size: 13px;
+  padding: 8px 20px; border-radius: var(--r-md);
+}
+.nav-cta:hover { opacity: 0.9; }
+
+/* ── HERO ── */
+.hero {
+  position: relative; min-height: 540px;
+  display: flex; align-items: flex-end; overflow: hidden;
+}
+.hero-bg {
+  position: absolute; inset: 0;
+  background: url('https://images.unsplash.com/photo-1594736797933-d0501ba2fe65?w=1600&q=80') center/cover no-repeat;
+}
+.hero-bg::after {
+  content: ''; position: absolute; inset: 0;
+  background: linear-gradient(to top, rgba(8,8,16,1) 0%, rgba(8,8,16,0.75) 45%, rgba(8,8,16,0.2) 100%);
+}
+.hero-content {
+  position: relative; z-index: 2;
+  padding: 0 48px 52px; width: 100%;
+  animation: fadeUp 0.8s ease;
+}
+.hero-eyebrow {
+  display: inline-flex; align-items: center; gap: 8px;
+  font-family: var(--mono); font-size: 10px; font-weight: 700;
+  letter-spacing: 0.2em; text-transform: uppercase;
+  color: var(--orange); margin-bottom: 14px;
+}
+.hero-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--orange); animation: pulse 2s infinite; }
+.hero-title {
+  font-family: var(--serif);
+  font-size: clamp(52px, 8vw, 96px);
+  font-weight: 900; line-height: 0.92;
+  color: var(--text); margin-bottom: 5px;
+}
+.hero-title em { color: var(--orange); font-style: italic; }
+.hero-sub {
+  font-family: var(--mono); font-size: 10px; letter-spacing: 0.2em;
+  text-transform: uppercase; color: var(--sub); margin-bottom: 22px;
+}
+.hero-meta { display: flex; align-items: center; gap: 20px; flex-wrap: wrap; }
+.next-hop {
+  display: inline-flex; align-items: center; gap: 9px;
+  background: linear-gradient(135deg, rgba(255,107,53,0.18), rgba(255,107,53,0.06));
+  border: 1px solid rgba(255,107,53,0.4);
+  border-radius: var(--r-full); padding: 9px 20px;
+  font-family: var(--mono); font-size: 10px; font-weight: 700;
+  letter-spacing: 0.14em; text-transform: uppercase; color: var(--orange);
+  animation: glow 3s ease infinite;
+}
+.hero-stat {
+  font-family: var(--mono); font-size: 10px; letter-spacing: 0.1em;
+  text-transform: uppercase; color: var(--muted);
+  display: flex; align-items: center; gap: 6px;
+}
+.hero-stat strong { color: var(--text); }
+
+/* ── FILTER BAR ── */
+.filter-bar {
+  background: var(--surface); border-bottom: 1px solid var(--border);
+  padding: 0 48px; display: flex; align-items: center;
+  gap: 6px; height: 54px; overflow-x: auto; scrollbar-width: none;
+  position: sticky; top: 62px; z-index: 90;
+}
+.filter-bar::-webkit-scrollbar { display: none; }
+.filter-chip {
+  flex-shrink: 0; background: transparent;
+  border: 1px solid var(--border); border-radius: var(--r-full);
+  padding: 5px 16px; font-family: var(--mono); font-size: 10px;
+  font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--sub); cursor: pointer; transition: all 0.18s; white-space: nowrap;
+}
+.filter-chip:hover { border-color: var(--orange); color: var(--text); }
+.filter-chip.active { background: var(--orange); border-color: var(--orange); color: #fff; }
+.filter-sep { width: 1px; height: 18px; background: var(--border); flex-shrink: 0; margin: 0 4px; }
+
+/* ── PAGE ── */
+.page { max-width: 1200px; margin: 0 auto; padding: 48px; }
+
+/* ── SECTION LABELS ── */
+.s-label { font-family: var(--mono); font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--orange); margin-bottom: 5px; }
+.s-title { font-family: var(--font); font-size: 22px; font-weight: 800; letter-spacing: -0.03em; color: var(--text); margin-bottom: 4px; }
+.s-sub   { font-size: 13px; color: var(--sub); line-height: 1.6; margin-bottom: 28px; }
+
+/* ── MONTH BANNER ── */
+.month-banner {
+  background: linear-gradient(135deg, #0f0800, #1a0f00, #0c0c18);
+  border: 1px solid rgba(255,107,53,0.28);
+  border-radius: var(--r-lg); padding: 28px 32px;
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 24px; margin-bottom: 40px; flex-wrap: wrap;
+  animation: glow 4s ease infinite;
+}
+.month-date {
+  width: 64px; height: 64px; flex-shrink: 0;
+  background: var(--orange); border-radius: 12px;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center; line-height: 1;
+}
+.month-date-mo { font-family: var(--mono); font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(255,255,255,0.75); }
+.month-date-d  { font-family: var(--mono); font-size: 28px; font-weight: 500; color: #fff; }
+.month-title { font-family: var(--serif); font-size: 24px; font-weight: 700; color: var(--text); margin-bottom: 3px; }
+.month-sub   { font-size: 13px; color: var(--sub); }
+.month-stats { display: flex; gap: 28px; }
+.m-stat { text-align: center; }
+.m-stat-num   { font-family: var(--mono); font-size: 22px; font-weight: 500; color: var(--orange); line-height: 1; margin-bottom: 3px; }
+.m-stat-label { font-family: var(--mono); font-size: 8px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); }
+
+/* ── MAP ── */
+.map-wrap {
+  border-radius: var(--r-lg); overflow: hidden;
+  border: 1px solid var(--border); margin-bottom: 48px;
+  position: relative;
+}
+#hopMap { width: 100%; height: 400px; }
+.map-near-btn {
+  position: absolute; top: 12px; right: 12px;
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: var(--r-md); padding: 8px 14px;
+  font-family: var(--mono); font-size: 9px; letter-spacing: 0.1em;
+  text-transform: uppercase; color: var(--text); z-index: 10;
+  display: flex; align-items: center; gap: 6px;
+}
+.map-near-btn:hover { border-color: var(--orange); color: var(--orange); }
+.map-popup {
+  display: none; position: absolute; bottom: 20px; left: 50%;
+  transform: translateX(-50%); background: var(--card);
+  border: 1px solid var(--border); border-radius: var(--r-lg);
+  min-width: 260px; max-width: 320px;
+  box-shadow: 0 8px 40px rgba(0,0,0,0.6); z-index: 10;
+  overflow: hidden; cursor: pointer; animation: slideUp 0.25s ease;
+}
+.map-popup-img { height: 110px; background: var(--surface); overflow: hidden; position: relative; }
+.map-popup-img img { width: 100%; height: 100%; object-fit: cover; }
+.map-popup-body { padding: 12px 14px; }
+.map-popup-name { font-weight: 700; font-size: 13px; color: var(--text); margin-bottom: 3px; letter-spacing: -0.01em; }
+.map-popup-meta { font-family: var(--mono); font-size: 9px; letter-spacing: 0.08em; color: var(--muted); margin-bottom: 6px; }
+.map-popup-desc { font-size: 11px; color: var(--sub); line-height: 1.5; }
+.map-popup-close { position: absolute; top: 8px; right: 8px; background: rgba(0,0,0,0.5); border: none; border-radius: 6px; width: 24px; height: 24px; color: #fff; font-size: 14px; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+
+/* ── VENUE GRID ── */
+.venue-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px,1fr)); gap: 16px; margin-bottom: 52px; }
+.venue-card {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: var(--r-lg); overflow: hidden; cursor: pointer;
+  transition: all 0.2s; position: relative;
+}
+.venue-card:hover { border-color: rgba(255,107,53,0.35); transform: translateY(-2px); box-shadow: 0 12px 40px rgba(0,0,0,0.4); }
+.venue-card.featured { border-color: rgba(255,107,53,0.35); }
+.venue-card.featured::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  background: linear-gradient(90deg, transparent, var(--orange), transparent);
+}
+.vc-img { height: 175px; position: relative; overflow: hidden; background: var(--surface); }
+.vc-img img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.4s; }
+.venue-card:hover .vc-img img { transform: scale(1.04); }
+.vc-img-overlay { position: absolute; inset: 0; background: linear-gradient(to top, rgba(8,8,16,0.6) 0%, transparent 60%); }
+.vc-status {
+  position: absolute; top: 10px; left: 10px;
+  font-family: var(--mono); font-size: 8px; font-weight: 700;
+  letter-spacing: 0.12em; text-transform: uppercase;
+  padding: 3px 10px; border-radius: var(--r-full);
+}
+.status-open   { background: rgba(52,211,153,0.9); color: #000; }
+.status-soon   { background: rgba(251,191,36,0.9); color: #000; }
+.vc-type {
+  position: absolute; bottom: 9px; left: 10px;
+  background: rgba(8,8,16,0.8); border: 1px solid var(--border);
+  font-family: var(--mono); font-size: 8px; letter-spacing: 0.08em;
+  text-transform: uppercase; color: var(--sub);
+  padding: 2px 9px; border-radius: var(--r-full);
+}
+.vc-featured {
+  position: absolute; top: 10px; right: 10px;
+  background: var(--orange); color: #fff;
+  font-family: var(--mono); font-size: 8px; font-weight: 700;
+  letter-spacing: 0.1em; text-transform: uppercase;
+  padding: 3px 10px; border-radius: var(--r-full);
+}
+.vc-body { padding: 15px 17px 17px; }
+.vc-name    { font-weight: 700; font-size: 15px; letter-spacing: -0.02em; color: var(--text); margin-bottom: 2px; }
+.vc-address { font-size: 11px; color: var(--muted); margin-bottom: 8px; }
+.vc-desc    { font-size: 12px; color: var(--sub); line-height: 1.55; margin-bottom: 11px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.vc-footer  { display: flex; align-items: center; justify-content: space-between; padding-top: 10px; border-top: 1px solid var(--border-sub); }
+.vc-hours   { font-family: var(--mono); font-size: 9px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--sub); }
+.vc-hours strong { color: var(--green); }
+.vc-actions { display: flex; gap: 6px; }
+
+/* ── BUTTONS ── */
+.btn { font-weight: 700; border-radius: var(--r-md); transition: all 0.18s; }
+.btn-sm  { font-size: 11px; padding: 6px 13px; }
+.btn-md  { font-size: 13px; padding: 10px 22px; }
+.btn-lg  { font-size: 14px; padding: 13px 28px; }
+.btn-orange { background: var(--orange); color: #fff; }
+.btn-orange:hover { opacity: 0.9; box-shadow: 0 4px 20px rgba(255,107,53,0.3); }
+.btn-ghost  { background: rgba(255,255,255,0.05); color: var(--sub); border: 1px solid var(--border); }
+.btn-ghost:hover  { color: var(--text); border-color: var(--muted); }
+.btn-blue   { background: rgba(129,140,248,0.12); color: var(--blue); border: 1px solid rgba(129,140,248,0.25); }
+.btn-blue:hover { background: rgba(129,140,248,0.2); }
+
+/* ── HOW IT WORKS ── */
+.how-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 14px; margin-bottom: 52px; }
+.how-card { background: var(--card); border: 1px solid var(--border); border-radius: var(--r-lg); padding: 24px 20px; }
+.how-num   { font-family: var(--mono); font-size: 30px; font-weight: 500; color: rgba(255,107,53,0.2); line-height: 1; margin-bottom: 10px; }
+.how-title { font-weight: 700; font-size: 14px; letter-spacing: -0.01em; color: var(--text); margin-bottom: 6px; }
+.how-desc  { font-size: 12px; color: var(--sub); line-height: 1.6; }
+
+/* ── JOIN BANNER ── */
+.join-banner {
+  background: linear-gradient(135deg, #080818, #10102a);
+  border: 1px solid rgba(129,140,248,0.2);
+  border-radius: var(--r-lg); padding: 36px 40px;
+  display: flex; align-items: center; gap: 32px;
+  margin-bottom: 52px; flex-wrap: wrap;
+}
+.join-icon { font-size: 52px; flex-shrink: 0; animation: float 4s ease infinite; }
+.join-title { font-family: var(--serif); font-size: 24px; font-weight: 700; color: var(--text); margin-bottom: 6px; }
+.join-sub   { font-size: 13px; color: var(--sub); line-height: 1.65; max-width: 520px; margin-bottom: 16px; }
+.join-ctas  { display: flex; gap: 10px; flex-wrap: wrap; }
+
+/* ── PAST HOPS ── */
+.past-grid { display: grid; grid-template-columns: repeat(auto-fill,minmax(200px,1fr)); gap: 10px; margin-bottom: 52px; }
+.past-card {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 12px; padding: 14px 16px;
+  display: flex; align-items: center; gap: 12px;
+  cursor: pointer; transition: all 0.18s;
+}
+.past-card:hover { border-color: rgba(255,107,53,0.2); }
+.past-date {
+  width: 42px; height: 42px; flex-shrink: 0;
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 9px; display: flex; flex-direction: column;
+  align-items: center; justify-content: center; line-height: 1;
+}
+.past-mo  { font-family: var(--mono); font-size: 8px; color: var(--muted); text-transform: uppercase; }
+.past-day { font-family: var(--mono); font-size: 17px; color: var(--sub); font-weight: 500; }
+.past-title { font-weight: 600; font-size: 12px; color: var(--text); margin-bottom: 2px; }
+.past-count { font-family: var(--mono); font-size: 9px; letter-spacing: 0.06em; color: var(--muted); }
+
+/* ── SPINNER ── */
+.spinner { width: 28px; height: 28px; border: 2px solid var(--border); border-top-color: var(--orange); border-radius: 50%; animation: spin 0.8s linear infinite; margin: 48px auto; display: block; }
+.empty { text-align: center; padding: 60px 20px; color: var(--sub); }
+.empty h3 { font-weight: 700; font-size: 16px; color: var(--text); margin-bottom: 8px; }
+
+/* ── FOOTER ── */
+footer {
+  background: var(--surface); border-top: 1px solid var(--border);
+  padding: 24px 48px; display: flex; justify-content: space-between;
+  align-items: center; flex-wrap: wrap; gap: 12px;
+}
+.f-logo { font-weight: 900; font-size: 15px; letter-spacing: -0.04em; text-transform: uppercase; }
+.f-logo span { color: var(--orange); }
+.f-copy { font-family: var(--mono); font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); }
+
+/* ── RESPONSIVE ── */
+@media(max-width:768px){
+  nav, footer { padding: 0 20px; }
+  footer { padding: 20px; }
+  .hero-content { padding: 0 20px 36px; }
+  .filter-bar { padding: 0 16px; }
+  .page { padding: 28px 20px; }
+  .how-grid { grid-template-columns: 1fr; }
+  .month-banner { flex-direction: column; align-items: flex-start; }
+  .month-stats { gap: 20px; }
+  .venue-grid { grid-template-columns: 1fr; }
+  .join-banner { padding: 24px 20px; }
+  #hopMap { height: 320px; }
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo" onclick="window.location.href='https://cbusevents.com'">CBUS<span>EVENTS</span></div>
+  <a href="https://cbusevents.com" class="nav-back">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+    Back to CBUSEVENTS
+  </a>
+  <button class="nav-cta btn" onclick="window.location.href='https://cbusevents.com/signup.html?role=venue'">List Your Venue</button>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-content">
+    <div class="hero-eyebrow">
+      <div class="hero-dot"></div>
+      Short North Arts District · Every First Friday
+    </div>
+    <h1 class="hero-title">Gallery<br><em>Hop</em></h1>
+    <div class="hero-sub">Columbus · Short North · Est. 1984</div>
+    <div class="hero-meta">
+      <div class="next-hop" id="nextHopBadge">
+        <div class="hero-dot"></div>
+        <span id="nextHopDate">Loading...</span>
+      </div>
+      <div class="hero-stat"><strong id="heroVenueCount">—</strong>&nbsp;venues participating</div>
+      <div class="hero-stat"><strong>Free</strong>&nbsp;to attend</div>
+    </div>
+  </div>
+</section>
+
+<!-- FILTER BAR -->
+<div class="filter-bar">
+  <div class="filter-chip active" onclick="filterVenues('All',this)">All Stops</div>
+  <div class="filter-chip" onclick="filterVenues('Gallery',this)">Galleries</div>
+  <div class="filter-chip" onclick="filterVenues('Bar',this)">Bars & Restaurants</div>
+  <div class="filter-chip" onclick="filterVenues('Boutique',this)">Boutiques</div>
+  <div class="filter-chip" onclick="filterVenues('Studio',this)">Studios</div>
+  <div class="filter-chip" onclick="filterVenues('Performance',this)">Performance</div>
+  <div class="filter-sep"></div>
+  <div class="filter-chip" onclick="filterVenues('Featured',this)">Featured Stops</div>
+</div>
+
+<!-- PAGE CONTENT -->
+<div class="page">
+
+  <!-- MONTH BANNER -->
+  <div class="month-banner">
+    <div style="display:flex;align-items:center;gap:20px">
+      <div class="month-date">
+        <div class="month-date-mo" id="bannerMonth">APR</div>
+        <div class="month-date-d"  id="bannerDay">4</div>
+      </div>
+      <div>
+        <div class="month-title" id="bannerTitle">April Gallery Hop</div>
+        <div class="month-sub">First Friday of every month · 6:00 PM – 10:00 PM · Free &amp; open to the public</div>
+      </div>
+    </div>
+    <div class="month-stats">
+      <div class="m-stat"><div class="m-stat-num" id="statStops">—</div><div class="m-stat-label">Stops</div></div>
+      <div class="m-stat"><div class="m-stat-num">4h</div><div class="m-stat-label">Duration</div></div>
+      <div class="m-stat"><div class="m-stat-num">Free</div><div class="m-stat-label">Admission</div></div>
+    </div>
+  </div>
+
+  <!-- MAP -->
+  <div class="s-label">Interactive Map</div>
+  <div class="s-title" style="margin-bottom:16px">All <span id="mapTitle">Stops</span> on the Hop</div>
+  <div class="map-wrap">
+    <div id="hopMap"></div>
+    <button class="map-near-btn btn" onclick="centerOnUser()">
+      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg>
+      Near Me
+    </button>
+    <div class="map-popup" id="mapPopup">
+      <button class="map-popup-close" onclick="document.getElementById('mapPopup').style.display='none'">×</button>
+      <div class="map-popup-img" id="mapPopupImg"></div>
+      <div class="map-popup-body">
+        <div class="map-popup-name" id="mapPopupName"></div>
+        <div class="map-popup-meta" id="mapPopupMeta"></div>
+        <div class="map-popup-desc" id="mapPopupDesc"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- VENUE GRID -->
+  <div class="s-label">Participating Venues</div>
+  <div class="s-title" id="gridTitle">This Month's Stops</div>
+  <div class="s-sub">Tap any stop for hours, what's featured, and directions.</div>
+  <div id="venueGrid" class="venue-grid">
+    <div style="grid-column:1/-1;text-align:center;padding:48px 0">
+      <div class="spinner"></div>
+    </div>
+  </div>
+
+  <!-- HOW IT WORKS -->
+  <div class="s-label">In the Field</div>
+  <div class="s-title" style="margin-bottom:20px">How Gallery Hop Works</div>
+  <div class="how-grid">
+    <div class="how-card">
+      <div class="how-num">01</div>
+      <div class="how-title">Find Your Stops</div>
+      <div class="how-desc">Browse all participating venues on the map or filter by type. See what each stop is featuring tonight before you go.</div>
+    </div>
+    <div class="how-card">
+      <div class="how-num">02</div>
+      <div class="how-title">Navigate in Real Time</div>
+      <div class="how-desc">Tap "Near Me" to find your closest stop. Get directions to any venue directly from the map. Free and open all night.</div>
+    </div>
+    <div class="how-card">
+      <div class="how-num">03</div>
+      <div class="how-title">Book the Space</div>
+      <div class="how-desc">Love a venue? Send a booking inquiry directly from their page on CBUSEVENTS. The full ecosystem is one tap away.</div>
+    </div>
+  </div>
+
+  <!-- JOIN BANNER -->
+  <div class="join-banner">
+    <div class="join-icon">🎨</div>
+    <div>
+      <div class="join-title">Is Your Venue Participating?</div>
+      <div class="join-sub">Get your Gallery Hop stop in front of thousands of Columbus residents planning their First Friday. List on CBUSEVENTS free and opt into the Gallery Hop guide. Takes five minutes.</div>
+      <div class="join-ctas">
+        <button class="btn btn-md btn-orange" onclick="window.location.href='https://cbusevents.com/signup.html?role=venue'">List Your Venue Free</button>
+        <button class="btn btn-md btn-ghost" onclick="window.location.href='https://cbusevents.com/cbus-venue-portal.html'">Already Listed? Sign In</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- PAST HOPS -->
+  <div class="s-label">Archive</div>
+  <div class="s-title" style="margin-bottom:18px">Past Gallery Hops</div>
+  <div class="past-grid" id="pastGrid">
+    <!-- Seeded with known 2026 dates -->
+    <div class="past-card"><div class="past-date"><div class="past-mo">Mar</div><div class="past-day">7</div></div><div><div class="past-title">March Gallery Hop</div><div class="past-count">First Friday · Short North</div></div></div>
+    <div class="past-card"><div class="past-date"><div class="past-mo">Feb</div><div class="past-day">6</div></div><div><div class="past-title">February Gallery Hop</div><div class="past-count">First Friday · Short North</div></div></div>
+    <div class="past-card"><div class="past-date"><div class="past-mo">Jan</div><div class="past-day">2</div></div><div><div class="past-title">January Gallery Hop</div><div class="past-count">First Friday · Short North</div></div></div>
+    <div class="past-card"><div class="past-date"><div class="past-mo">Dec</div><div class="past-day">5</div></div><div><div class="past-title">December Gallery Hop</div><div class="past-count">First Friday · Short North</div></div></div>
+    <div class="past-card"><div class="past-date"><div class="past-mo">Nov</div><div class="past-day">7</div></div><div><div class="past-title">November Gallery Hop</div><div class="past-count">First Friday · Short North</div></div></div>
+    <div class="past-card"><div class="past-date"><div class="past-mo">Oct</div><div class="past-day">3</div></div><div><div class="past-title">October Gallery Hop</div><div class="past-count">First Friday · Short North</div></div></div>
+  </div>
+
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="f-logo">CBUS<span>EVENTS</span></div>
+  <div class="f-copy">Gallery Hop · Short North Arts District · Every First Friday</div>
+  <div class="f-copy">© 2026 CBUSEVENTS · Columbus, Ohio</div>
+</footer>
+
+<script>
+const SB_URL = "https://toblgvatvsjljbqogzsv.supabase.co";
+const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRvYmxndmF0dnNqbGpicW9nenN2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMDgwNTAsImV4cCI6MjA4NzY4NDA1MH0._WJEQPizNDiQfDXQB_DHPaQhixPGpMdmYQSmyWmm_FQ";
+const sb = supabase.createClient(SB_URL, SB_KEY);
+const MAPBOX_TOKEN = 'pk.eyJ1IjoiY2J1c2V2ZW50cyIsImEiOiJjbW1oNWJhaDYwYnVrMnJxN3hxdGJlZmhkIn0.RtF51b0qghUlJAjHgNRdFQ';
+const COLUMBUS = [-82.9988, 39.9612];
+
+let allParticipants = [];
+let _map = null;
+let _markers = [];
+let _activeFilter = 'All';
+
+// ── NEXT HOP DATE ────────────────────────────────────────────
+function getNextFirstFriday() {
+  const now = new Date();
+  let d = new Date(now.getFullYear(), now.getMonth(), 1);
+  while(d.getDay() !== 5) d.setDate(d.getDate() + 1);
+  if(d <= now) {
+    d = new Date(now.getFullYear(), now.getMonth() + 1, 1);
+    while(d.getDay() !== 5) d.setDate(d.getDate() + 1);
+  }
+  return d;
+}
+
+function formatHopDate(d) {
+  return d.toLocaleDateString('en-US', { weekday:'short', month:'long', day:'numeric', timeZone:'America/New_York' });
+}
+
+function setNextHopUI() {
+  const d = getNextFirstFriday();
+  const mo = d.toLocaleDateString('en-US', { month:'short', timeZone:'America/New_York' }).toUpperCase();
+  const day = d.getDate();
+  const monthName = d.toLocaleDateString('en-US', { month:'long', timeZone:'America/New_York' });
+
+  document.getElementById('nextHopDate').textContent = 'Next Hop: ' + formatHopDate(d) + ' · 6:00 PM';
+  document.getElementById('bannerMonth').textContent = mo;
+  document.getElementById('bannerDay').textContent   = day;
+  document.getElementById('bannerTitle').textContent = monthName + ' Gallery Hop';
+}
+
+// ── LOAD DATA ────────────────────────────────────────────────
+async function loadParticipants() {
+  const hopDate = getNextFirstFriday().toISOString().split('T')[0];
+
+  // Try the view first; fall back to direct join if view doesn't exist yet
+  const { data, error } = await sb
+    .from('gallery_hop_participants')
+    .select('*, venues(id,name,venue_type,address,neighborhood,cover_image_url,lat,lng,website,instagram)')
+    .eq('hop_date', hopDate)
+    .eq('is_active', true)
+    .order('is_featured', { ascending: false })
+    .order('sort_order', { ascending: true });
+
+  if(error || !data || data.length === 0) {
+    // Fallback: show Short North venues from main venues table
+    const { data: fallback } = await sb
+      .from('venues')
+      .select('id,name,venue_type,address,neighborhood,cover_image_url,lat,lng,website')
+      .eq('status', 'approved')
+      .ilike('neighborhood', '%short north%')
+      .limit(12);
+
+    if(fallback && fallback.length > 0) {
+      allParticipants = fallback.map(v => ({
+        venues: v,
+        is_featured: v.is_featured || false,
+        tonight_desc: '',
+        hop_hours: '6:00 – 10:00 PM',
+        admission: 'Free',
+        special_offer: null
+      }));
+    } else {
+      document.getElementById('venueGrid').innerHTML =
+        '<div class="empty"><h3>Gallery Hop listings coming soon</h3><p>Venues are signing up now. Check back closer to the first Friday.</p></div>';
+      return;
+    }
+  } else {
+    allParticipants = data;
+  }
+
+  document.getElementById('heroVenueCount').textContent = allParticipants.length;
+  document.getElementById('statStops').textContent = allParticipants.length;
+
+  renderGrid(allParticipants);
+  initMap();
+}
+
+// ── RENDER GRID ──────────────────────────────────────────────
+function renderGrid(participants) {
+  const grid = document.getElementById('venueGrid');
+  if(!participants.length) {
+    grid.innerHTML = '<div class="empty"><h3>No stops match this filter</h3><p>Try a different category.</p></div>';
+    return;
+  }
+
+  const now = new Date();
+  const hopStart = new Date(); hopStart.setHours(18,0,0,0);
+  const hopEnd   = new Date(); hopEnd.setHours(22,0,0,0);
+  const isHopNight = now >= hopStart && now <= hopEnd;
+
+  grid.innerHTML = participants.map(p => {
+    const v = p.venues || {};
+    const img = v.cover_image_url;
+    const statusLabel = isHopNight ? 'Open Tonight' : 'Opens at 6 PM';
+    const statusClass = isHopNight ? 'status-open' : 'status-soon';
+    const desc = p.tonight_desc || p.special_offer || ('Join us for Gallery Hop at ' + v.name + ' in ' + (v.neighborhood||'Short North') + '.');
+    const mapsUrl = 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent((v.address||v.name) + ' Columbus OH');
+
+    return `<div class="venue-card${p.is_featured?' featured':''}" onclick="window.open('${mapsUrl}','_blank')">
+      <div class="vc-img">
+        ${img ? `<img src="${img}" alt="${v.name}" onerror="this.style.display='none'">` : `<div style="width:100%;height:100%;background:linear-gradient(135deg,rgba(255,107,53,0.1),rgba(129,140,248,0.07))"></div>`}
+        <div class="vc-img-overlay"></div>
+        <div class="vc-status ${statusClass}">${statusLabel}</div>
+        ${v.venue_type ? `<div class="vc-type">${v.venue_type}</div>` : ''}
+        ${p.is_featured ? '<div class="vc-featured">Featured Stop</div>' : ''}
+      </div>
+      <div class="vc-body">
+        <div class="vc-name">${v.name||'Columbus Venue'}</div>
+        <div class="vc-address">${v.address||v.neighborhood||'Short North'}</div>
+        <div class="vc-desc">${desc}</div>
+        <div class="vc-footer">
+          <div class="vc-hours"><strong>${p.hop_hours||'6:00 – 10:00 PM'}</strong> · ${p.admission||'Free'}</div>
+          <div class="vc-actions">
+            <button class="btn btn-sm btn-ghost" onclick="event.stopPropagation();window.open('${mapsUrl}','_blank')">Directions</button>
+            ${v.website ? `<button class="btn btn-sm btn-orange" onclick="event.stopPropagation();window.open('${v.website}','_blank')">Details</button>` : `<button class="btn btn-sm btn-orange" onclick="event.stopPropagation()">Details</button>`}
+          </div>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ── FILTER ───────────────────────────────────────────────────
+function filterVenues(type, el) {
+  _activeFilter = type;
+  document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+
+  const filtered = type === 'All' ? allParticipants
+    : type === 'Featured' ? allParticipants.filter(p => p.is_featured)
+    : allParticipants.filter(p => (p.venues?.venue_type||'').toLowerCase().includes(type.toLowerCase()));
+
+  renderGrid(filtered);
+  renderMapMarkers(filtered);
+
+  const title = type === 'All' ? "This Month's Stops" : type + ' Stops';
+  document.getElementById('gridTitle').textContent = title;
+  document.getElementById('mapTitle').textContent  = type === 'All' ? 'All' : type;
+}
+
+// ── MAP ──────────────────────────────────────────────────────
+function initMap() {
+  if(_map) return;
+  mapboxgl.accessToken = MAPBOX_TOKEN;
+  _map = new mapboxgl.Map({
+    container: 'hopMap',
+    style: 'mapbox://styles/mapbox/dark-v11',
+    center: COLUMBUS,
+    zoom: 13,
+    attributionControl: false
+  });
+  _map.addControl(new mapboxgl.NavigationControl({ showCompass: false }), 'bottom-right');
+  _map.on('load', () => {
+    renderMapMarkers(allParticipants);
+    centerOnUser();
+  });
+}
+
+function renderMapMarkers(participants) {
+  if(!_map) return;
+  _markers.forEach(m => m.remove());
+  _markers = [];
+
+  const bounds = new mapboxgl.LngLatBounds();
+  let hasCoords = false;
+
+  participants.forEach(p => {
+    const v = p.venues || {};
+    const lat = parseFloat(v.lat || 0);
+    const lng = parseFloat(v.lng || 0);
+    if(!lat || !lng) return;
+
+    hasCoords = true;
+    bounds.extend([lng, lat]);
+
+    const el = document.createElement('div');
+    el.style.cssText = 'width:34px;height:34px;border-radius:50%;background:#FF6B35;border:3px solid #fff;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:13px;box-shadow:0 2px 14px rgba(255,107,53,0.5);transition:transform 0.15s';
+    el.innerHTML = p.is_featured ? '⭐' : '🎨';
+    el.onmouseover = () => el.style.transform = 'scale(1.2)';
+    el.onmouseout  = () => el.style.transform = 'scale(1)';
+    el.onclick = () => showMapPopup(p);
+
+    const marker = new mapboxgl.Marker({ element: el }).setLngLat([lng, lat]).addTo(_map);
+    _markers.push(marker);
+  });
+
+  if(hasCoords && _markers.length > 0) {
+    if(_markers.length === 1) {
+      _map.flyTo({ center: _markers[0].getLngLat(), zoom: 15, duration: 800 });
+    } else {
+      _map.fitBounds(bounds, { padding: { top:60, bottom:80, left:60, right:60 }, duration: 800, maxZoom: 15 });
+    }
+  }
+}
+
+function showMapPopup(p) {
+  const v = p.venues || {};
+  const popup = document.getElementById('mapPopup');
+  const imgEl = document.getElementById('mapPopupImg');
+  document.getElementById('mapPopupName').textContent = v.name || 'Gallery Hop Stop';
+  document.getElementById('mapPopupMeta').textContent = (p.hop_hours || '6:00 – 10:00 PM') + ' · ' + (p.admission || 'Free');
+  document.getElementById('mapPopupDesc').textContent = p.tonight_desc || p.special_offer || (v.address || v.neighborhood || 'Short North');
+  imgEl.innerHTML = v.cover_image_url
+    ? `<img src="${v.cover_image_url}" alt="${v.name}" onerror="this.style.display='none'">`
+    : `<div style="width:100%;height:100%;background:linear-gradient(135deg,rgba(255,107,53,0.12),rgba(129,140,248,0.08))"></div>`;
+  popup.style.display = 'block';
+  clearTimeout(popup._t);
+  popup._t = setTimeout(() => popup.style.display = 'none', 7000);
+}
+
+function centerOnUser() {
+  if(!_map) return;
+  navigator.geolocation?.getCurrentPosition(
+    pos => _map.flyTo({ center: [pos.coords.longitude, pos.coords.latitude], zoom: 14, duration: 1000 }),
+    ()  => _map.flyTo({ center: COLUMBUS, zoom: 13, duration: 600 })
+  );
+}
+
+// ── INIT ─────────────────────────────────────────────────────
+setNextHopUI();
+loadParticipants();
+
+// Filter chip clicks
+document.querySelectorAll('.filter-chip').forEach(chip => {
+  if(!chip.getAttribute('onclick')) {
+    chip.addEventListener('click', function() {
+      document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+      this.classList.add('active');
+    });
+  }
+});
+</script>
+</body>
+</html>
