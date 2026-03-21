@@ -48,7 +48,7 @@
 <meta name="twitter:image" content="https://cbusevents.com/assets/cbus-shield.png"> <!-- Structured Data for Google -->
 <script type="application/ld+json">
 </script> <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700;800;900&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"> <style>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700;800;900&family=DM+Mono:wght@400;500&family=Playfair+Display:ital,wght@0,700;1,700&display=swap" rel="stylesheet"> <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
 :root {
   --bg:         #080810;
@@ -85,6 +85,7 @@ a { text-decoration:none; color:inherit; }
 button { cursor:pointer; font-family:var(--font); border:none; }
 @keyframes spin { to { transform:rotate(360deg); } }
 @keyframes fadeUp { from { opacity:0; transform:translateY(24px); } to { opacity:1; transform:translateY(0); } }
+@keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-5px)} }
 @keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
 @keyframes heroPan { 0%,100% { transform:scale(1.05) translateX(0); } 50% { transform:scale(1.08) translateX(-2%); } }
 
@@ -992,7 +993,27 @@ h1,h2,h3,h4,h5,h6{font-family:var(--font);letter-spacing:-0.02em;}
 </style>
 </head>
 <body> <!-- NAV -->
-<nav id="topNav"> <div class="nav-logo" onclick="showPage('home')"> CBUS<span>EVENTS</span> </div> <div class="nav-links"> <button class="nav-link" id="nav-home" onclick="showPage('home')">Home</button> <button class="nav-link" id="nav-venues" onclick="showPage('venues')">Venues</button> <button class="nav-link" id="nav-vendors" onclick="showPage('vendors')">Vendors</button> <button class="nav-link" id="nav-events" onclick="showPage('events')">Events</button> <a class="nav-link" href="https://cbusevents.com/blog.html" style="text-decoration:none">Blog</a> </div> <div style="display:flex;align-items:center;gap:10px"> <div style="position:relative" id="joinDropdown"> <button class="nav-link" onclick="toggleJoinMenu()" style="display:flex;align-items:center;gap:4px">Join ▾</button> <div id="joinMenu" style="display:none;position:absolute;top:calc(100% + 8px);right:0;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:8px;min-width:190px;box-shadow:0 16px 40px rgba(0,0,0,0.5);z-index:200;"> <a href="https://cbusevents.com/signup.html?role=venue" style="display:flex;align-items:center;gap:8px;padding:9px 14px;border-radius:8px;font-size:13px;font-weight:500;color:#8888a0;text-decoration:none;transition:all 0.15s;" onmouseover="this.style.background='#13131a';this.style.color='#e8e8f0'" onmouseout="this.style.background='';this.style.color='#8888a0'"> List Your Venue</a> <a href="https://cbusevents.com/signup.html?role=vendor" style="display:flex;align-items:center;gap:8px;padding:9px 14px;border-radius:8px;font-size:13px;font-weight:500;color:#8888a0;text-decoration:none;transition:all 0.15s;" onmouseover="this.style.background='#13131a';this.style.color='#e8e8f0'" onmouseout="this.style.background='';this.style.color='#8888a0'"> List Your Services</a> <a href="https://cbusevents.com/signup.html?role=planner" style="display:flex;align-items:center;gap:8px;padding:9px 14px;border-radius:8px;font-size:13px;font-weight:500;color:#8888a0;text-decoration:none;transition:all 0.15s;" onmouseover="this.style.background='#13131a';this.style.color='#e8e8f0'" onmouseout="this.style.background='';this.style.color='#8888a0'"> Event Planners</a> <div style="height:1px;background:#25252f;margin:4px 8px;"></div> <a href="https://cbusevents.com/signup.html?role=attendee" style="display:flex;align-items:center;gap:8px;padding:9px 14px;border-radius:8px;font-size:13px;font-weight:500;color:#8888a0;text-decoration:none;transition:all 0.15s;" onmouseover="this.style.background='#13131a';this.style.color='#e8e8f0'" onmouseout="this.style.background='';this.style.color='#8888a0'"> Find Events</a> <div style="height:1px;background:#25252f;margin:4px 8px;"></div> <a href="https://cbusevents.com/blog.html" style="display:flex;align-items:center;gap:8px;padding:9px 14px;border-radius:8px;font-size:13px;font-weight:600;color:#FF6B35;text-decoration:none;transition:all 0.15s;" onmouseover="this.style.background='#13131a'" onmouseout="this.style.background=''"> Columbus Blog</a> </div> </div> <a href="https://cbusevents.com/auth.html" class="nav-cta" style="text-decoration:none">Sign In</a> </div>
+<nav id="topNav"> <div class="nav-logo" onclick="showPage('home')"> CBUS<span>EVENTS</span> </div> <div class="nav-links"> <button class="nav-link" id="nav-home" onclick="showPage('home')">Home</button> <button class="nav-link" id="nav-venues" onclick="showPage('venues')">Venues</button> <button class="nav-link" id="nav-vendors" onclick="showPage('vendors')">Vendors</button> <button class="nav-link" id="nav-events" onclick="showPage('events')">Events</button> <div style="position:relative" id="columbusDropdown">
+  <button class="nav-link" onclick="toggleColumbusMenu()" style="display:flex;align-items:center;gap:4px">Columbus ▾</button>
+  <div id="columbusMenu" style="display:none;position:absolute;top:calc(100% + 8px);left:0;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:8px;min-width:210px;box-shadow:0 16px 40px rgba(0,0,0,0.5);z-index:200;">
+    <a href="https://cbusevents.com/gallery-hop.html" style="display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:8px;font-size:13px;font-weight:600;color:var(--text);text-decoration:none;transition:background 0.15s" onmouseover="this.style.background='rgba(255,255,255,0.05)'" onmouseout="this.style.background='transparent'">
+      <div style="width:6px;height:6px;border-radius:50%;background:var(--orange);flex-shrink:0"></div>
+      <div>
+        <div style="font-weight:600;font-size:13px">Gallery Hop</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:1px">Every first Friday · Short North</div>
+      </div>
+    </a>
+    <div style="height:1px;background:var(--border);margin:4px 8px"></div>
+    <a href="https://cbusevents.com/blog.html" style="display:flex;align-items:center;gap:10px;padding:9px 14px;border-radius:8px;font-size:13px;font-weight:500;color:var(--sub);text-decoration:none;transition:background 0.15s" onmouseover="this.style.background='rgba(255,255,255,0.05)'" onmouseout="this.style.background='transparent'">
+      
+      <div>Columbus Blog</div>
+    </a>
+    <a href="https://cbusevents.com/gallery-hop.html" style="display:flex;align-items:center;gap:10px;padding:9px 14px;border-radius:8px;font-size:13px;font-weight:500;color:var(--sub);text-decoration:none;transition:background 0.15s" onmouseover="this.style.background='rgba(255,255,255,0.05)'" onmouseout="this.style.background='transparent'">
+      
+      <div>Communities <span style="font-size:10px;background:var(--orange-dim);color:var(--orange);border:1px solid var(--orange-border);border-radius:9999px;padding:1px 7px;margin-left:4px">Soon</span></div>
+    </a>
+  </div>
+</div> </div> <div style="display:flex;align-items:center;gap:10px"> <div style="position:relative" id="joinDropdown"> <button class="nav-link" onclick="toggleJoinMenu()" style="display:flex;align-items:center;gap:4px">Join ▾</button> <div id="joinMenu" style="display:none;position:absolute;top:calc(100% + 8px);right:0;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:8px;min-width:190px;box-shadow:0 16px 40px rgba(0,0,0,0.5);z-index:200;"> <a href="https://cbusevents.com/signup.html?role=venue" style="display:flex;align-items:center;gap:8px;padding:9px 14px;border-radius:8px;font-size:13px;font-weight:500;color:#8888a0;text-decoration:none;transition:all 0.15s;" onmouseover="this.style.background='#13131a';this.style.color='#e8e8f0'" onmouseout="this.style.background='';this.style.color='#8888a0'"> List Your Venue</a> <a href="https://cbusevents.com/signup.html?role=vendor" style="display:flex;align-items:center;gap:8px;padding:9px 14px;border-radius:8px;font-size:13px;font-weight:500;color:#8888a0;text-decoration:none;transition:all 0.15s;" onmouseover="this.style.background='#13131a';this.style.color='#e8e8f0'" onmouseout="this.style.background='';this.style.color='#8888a0'"> List Your Services</a> <a href="https://cbusevents.com/signup.html?role=planner" style="display:flex;align-items:center;gap:8px;padding:9px 14px;border-radius:8px;font-size:13px;font-weight:500;color:#8888a0;text-decoration:none;transition:all 0.15s;" onmouseover="this.style.background='#13131a';this.style.color='#e8e8f0'" onmouseout="this.style.background='';this.style.color='#8888a0'"> Event Planners</a> <div style="height:1px;background:#25252f;margin:4px 8px;"></div> <a href="https://cbusevents.com/signup.html?role=attendee" style="display:flex;align-items:center;gap:8px;padding:9px 14px;border-radius:8px;font-size:13px;font-weight:500;color:#8888a0;text-decoration:none;transition:all 0.15s;" onmouseover="this.style.background='#13131a';this.style.color='#e8e8f0'" onmouseout="this.style.background='';this.style.color='#8888a0'"> Find Events</a> <div style="height:1px;background:#25252f;margin:4px 8px;"></div> <a href="https://cbusevents.com/blog.html" style="display:flex;align-items:center;gap:8px;padding:9px 14px;border-radius:8px;font-size:13px;font-weight:600;color:#FF6B35;text-decoration:none;transition:all 0.15s;" onmouseover="this.style.background='#13131a'" onmouseout="this.style.background=''"> Columbus Blog</a> </div> </div> <a href="https://cbusevents.com/auth.html" class="nav-cta" style="text-decoration:none">Sign In</a> </div>
 <button class="nav-hamburger" id="navHamburger" aria-label="Menu"><span></span><span></span><span></span></button>
 </nav>
 <div id="navMobileMenu" class="nav-mobile-menu">
@@ -1224,7 +1245,7 @@ function renderFeaturedEvent(){
 }
 
 // ── HOME EVENT CARDS ─────────────────────────────────────────
-const HOME_EVENT_ICONS=['🎵','🎉','🎭','🎤','🥂','🎸','🏆','🎊'];
+const HOME_EVENT_ICONS=['','','','','','','',''];
 const HOME_EVENT_PLACEHOLDERS=[
   {title:'Columbus Night Market',category:'Nightlife',venueName:'Short North',dateStr:'Sat Mar 22',is_free:true},
   {title:'Live Jazz Evening',category:'Music',venueName:'German Village',dateStr:'Fri Mar 21',is_free:false},
@@ -1240,8 +1261,8 @@ function renderHomeEventCards(events){
         <div class="rh-event-card-body">
           <div class="rh-event-card-cat">${e.category}</div>
           <div class="rh-event-card-title">${e.title}</div>
-          <div class="rh-event-card-venue">📍 ${e.venueName}</div>
-          <div class="rh-event-card-date">📅 ${e.dateStr}</div>
+          <div class="rh-event-card-venue"> ${e.venueName}</div>
+          <div class="rh-event-card-date"> ${e.dateStr}</div>
         </div>
       </div>`).join('');
   }
@@ -1255,8 +1276,8 @@ function renderHomeEventCards(events){
       <div class="rh-event-card-body">
         <div class="rh-event-card-cat">${e.category||'Event'}</div>
         <div class="rh-event-card-title">${e.title}</div>
-        <div class="rh-event-card-venue">📍 ${e.venue_name_override||e.venues?.name||'Columbus Venue'}</div>
-        <div class="rh-event-card-date">📅 ${fmt(e.start_time)}</div>
+        <div class="rh-event-card-venue"> ${e.venue_name_override||e.venues?.name||'Columbus Venue'}</div>
+        <div class="rh-event-card-date"> ${fmt(e.start_time)}</div>
       </div>
     </div>`).join('');
 }
@@ -1515,6 +1536,34 @@ function renderHome(){
  </section>
 
  <!-- ══════════════════════════════════════════
+      GALLERY HOP BANNER
+ ══════════════════════════════════════════ -->
+ <section style="padding:0 48px 48px">
+   <a href="https://cbusevents.com/gallery-hop.html" style="display:flex;align-items:center;justify-content:space-between;gap:24px;background:linear-gradient(135deg,#0a0a1a,#140a00,#0a0a18);border:1px solid rgba(255,107,53,0.2);border-radius:var(--r-lg);padding:28px 32px;text-decoration:none;transition:all 0.2s;flex-wrap:wrap" onmouseover="this.style.borderColor='rgba(255,107,53,0.45)';this.style.transform='translateY(-1px)'" onmouseout="this.style.borderColor='rgba(255,107,53,0.2)';this.style.transform='translateY(0)'">
+     <div style="display:flex;align-items:center;gap:20px">
+       <div style="width:52px;height:52px;flex-shrink:0;background:rgba(255,107,53,0.1);border:1px solid rgba(255,107,53,0.25);border-radius:var(--r-md);display:flex;align-items:center;justify-content:center">
+         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#FF6B35" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
+       </div>
+       <div>
+         <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.2em;text-transform:uppercase;color:var(--orange);margin-bottom:5px;display:flex;align-items:center;gap:7px">
+           <span style="width:5px;height:5px;border-radius:50%;background:var(--orange);animation:pulse 2s infinite;display:inline-block"></span>
+           Short North Arts District · Every First Friday
+         </div>
+         <div style="font-family:'Playfair Display',serif;font-size:clamp(20px,3vw,28px);font-weight:700;color:var(--text);margin-bottom:4px">Gallery <em style="color:var(--orange);font-style:italic">Hop</em> Guide</div>
+         <div style="font-size:13px;color:var(--sub);line-height:1.5">Browse all participating venues, get directions, and plan your First Friday night out.</div>
+       </div>
+     </div>
+     <div style="display:flex;align-items:center;gap:12px;flex-shrink:0">
+       <div style="text-align:right">
+         <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.14em;text-transform:uppercase;color:var(--muted);margin-bottom:3px">Next Hop</div>
+         <div id="navGalleryHopDate" style="font-family:var(--mono);font-size:13px;font-weight:500;color:var(--text)">Loading...</div>
+       </div>
+       <div style="background:var(--orange);color:#fff;font-family:var(--font);font-weight:700;font-size:13px;padding:10px 20px;border-radius:var(--r-md);white-space:nowrap">View Guide →</div>
+     </div>
+   </a>
+ </section>
+
+ <!-- ══════════════════════════════════════════
       FEATURED VENUES SCROLL
  ══════════════════════════════════════════ -->
  <section style="padding:0 48px 52px">
@@ -1716,7 +1765,7 @@ function renderHomeMapMarkers(category){
     const el = document.createElement('div');
     el.style.cssText = 'width:36px;height:36px;border-radius:50%;background:var(--orange);border:3px solid #fff;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 12px rgba(255,107,53,0.5);transition:transform 0.15s;font-size:14px;';
     // Category emoji on pin
-    const catEmoji = {Concert:'🎵',Sports:'🏆',Arts:'🎨',Comedy:'😂',Nightlife:'🍸',Corporate:'💼',Theater:'🎭',Wedding:'💍',Networking:'🤝'}[e.category]||'📍';
+    const catEmoji = {Concert:'',Sports:'',Arts:'',Comedy:'',Nightlife:'',Corporate:'',Theater:'',Wedding:'',Networking:''}[e.category]||'';
     el.innerHTML = catEmoji;
     el.onmouseover = ()=>el.style.transform='scale(1.2)';
     el.onmouseout  = ()=>el.style.transform='scale(1)';
@@ -1830,7 +1879,7 @@ function buildHeroCards(){
      onclick:`showPage('venue',allVenues.find(x=>x.id==='${v.id}'))`
    })),
    ...(nextEvent?[{
-     icon:'🎉', label:'Featured Event', title:nextEvent.title,
+     icon:'', label:'Featured Event', title:nextEvent.title,
      meta:`${fmt(nextEvent.start_time)} · ${fmtTime(nextEvent.start_time)}`,
      onclick:`openEventModal('${nextEvent.id}')`
    }]:[])
@@ -2191,7 +2240,7 @@ async function initVenueMap(venue){
       const d=await r.json();
       if(d.features&&d.features[0]){
         coords=d.features[0].center;
-        if(addrEl) addrEl.innerHTML='📍 '+d.features[0].place_name;
+        if(addrEl) addrEl.innerHTML=' '+d.features[0].place_name;
       }
     }catch(e){}
   }
@@ -2199,7 +2248,7 @@ async function initVenueMap(venue){
   if(!coords){
     // Fallback: show Columbus center with neighborhood label
     coords=[-82.9988,39.9612];
-    if(addrEl) addrEl.innerHTML=`📍 ${venue.neighborhood||'Columbus'}, Columbus OH`;
+    if(addrEl) addrEl.innerHTML=` ${venue.neighborhood||'Columbus'}, Columbus OH`;
   }
 
   wrap.style.display='block';
@@ -2307,13 +2356,13 @@ function vendorCard(v){
  const promoted=v.admin_promoted||v.tier==='premium'||v.tier==='PREMIUM';
  // Pick a category-based bg color and icon for the placeholder
  const catLower=catLabel.toLowerCase();
- let placeholderIcon='🎪',placeholderBg='linear-gradient(135deg,#001520,#0b0b0f)';
- if(catLower.includes('photo'))       {placeholderIcon='📸';placeholderBg='linear-gradient(135deg,#1a0820,#0b0b0f)';}
- else if(catLower.includes('dj')||catLower.includes('music')) {placeholderIcon='🎵';placeholderBg='linear-gradient(135deg,#001a10,#0b0b0f)';}
- else if(catLower.includes('cater')||catLower.includes('food')) {placeholderIcon='🍽️';placeholderBg='linear-gradient(135deg,#1a1000,#0b0b0f)';}
- else if(catLower.includes('floral')||catLower.includes('flower')) {placeholderIcon='🌸';placeholderBg='linear-gradient(135deg,#0a1a00,#0b0b0f)';}
- else if(catLower.includes('video'))  {placeholderIcon='🎥';placeholderBg='linear-gradient(135deg,#001a1a,#0b0b0f)';}
- else if(catLower.includes('design')) {placeholderIcon='✨';placeholderBg='linear-gradient(135deg,#10001a,#0b0b0f)';}
+ let placeholderIcon='',placeholderBg='linear-gradient(135deg,#001520,#0b0b0f)';
+ if(catLower.includes('photo'))       {placeholderIcon='';placeholderBg='linear-gradient(135deg,#1a0820,#0b0b0f)';}
+ else if(catLower.includes('dj')||catLower.includes('music')) {placeholderIcon='';placeholderBg='linear-gradient(135deg,#001a10,#0b0b0f)';}
+ else if(catLower.includes('cater')||catLower.includes('food')) {placeholderIcon='️';placeholderBg='linear-gradient(135deg,#1a1000,#0b0b0f)';}
+ else if(catLower.includes('floral')||catLower.includes('flower')) {placeholderIcon='';placeholderBg='linear-gradient(135deg,#0a1a00,#0b0b0f)';}
+ else if(catLower.includes('video'))  {placeholderIcon='';placeholderBg='linear-gradient(135deg,#001a1a,#0b0b0f)';}
+ else if(catLower.includes('design')) {placeholderIcon='';placeholderBg='linear-gradient(135deg,#10001a,#0b0b0f)';}
  return`<div class="venue-card" onclick="openVendorModal('${v.id}')" style="cursor:pointer">
    <div class="venue-card-img">
      ${img?`<img src="${img}" alt="${name}" style="width:100%;height:100%;object-fit:cover" onerror="this.parentNode.innerHTML='<div style=\\'width:100%;height:170px;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:40px;${placeholderBg}\\'>${placeholderIcon}</div>'">`
@@ -2471,13 +2520,13 @@ function openVendorModal(id){
  const cat=typeof v.category==='object'?v.category?.join(', '):(v.category||v.services||'Event Services');
  const promoted=v.admin_promoted||v.tier==='premium'||v.tier==='PREMIUM';
  const catLower=cat.toLowerCase();
- let placeholderIcon='🎪',placeholderBg='#0d0d1a';
- if(catLower.includes('photo'))       {placeholderIcon='📸';placeholderBg='#1a0820';}
- else if(catLower.includes('dj')||catLower.includes('music')) {placeholderIcon='🎵';placeholderBg='#001a10';}
- else if(catLower.includes('cater')||catLower.includes('food')) {placeholderIcon='🍽️';placeholderBg='#1a1000';}
- else if(catLower.includes('floral')||catLower.includes('flower')) {placeholderIcon='🌸';placeholderBg='#0a1a00';}
- else if(catLower.includes('video'))  {placeholderIcon='🎥';placeholderBg='#001a1a';}
- else if(catLower.includes('design')) {placeholderIcon='✨';placeholderBg='#10001a';}
+ let placeholderIcon='',placeholderBg='#0d0d1a';
+ if(catLower.includes('photo'))       {placeholderIcon='';placeholderBg='#1a0820';}
+ else if(catLower.includes('dj')||catLower.includes('music')) {placeholderIcon='';placeholderBg='#001a10';}
+ else if(catLower.includes('cater')||catLower.includes('food')) {placeholderIcon='️';placeholderBg='#1a1000';}
+ else if(catLower.includes('floral')||catLower.includes('flower')) {placeholderIcon='';placeholderBg='#0a1a00';}
+ else if(catLower.includes('video'))  {placeholderIcon='';placeholderBg='#001a1a';}
+ else if(catLower.includes('design')) {placeholderIcon='';placeholderBg='#10001a';}
  document.getElementById('vendorModalContent').innerHTML=`
  ${img?`<img src="${img}" alt="${name}" style="width:100%;height:200px;object-fit:cover" onerror="this.style.display='none'"/>`:
  `<div style="width:100%;height:120px;background:${placeholderBg};display:flex;align-items:center;justify-content:center;font-size:52px">${placeholderIcon}</div>`}
@@ -2586,7 +2635,7 @@ function showPricing(){
        <div style="font-family:var(--font);font-size:26px;font-weight:800;letter-spacing:-0.03em;margin-bottom:2px">${p.price}<span style="font-size:14px;font-weight:400;color:#8888a0">${p.price==='$0'?'':'/mo'}</span></div>
        <div style="color:#8888a0;font-size:12px;margin-bottom:18px">${p.sub}</div>
        <div style="flex:1;display:flex;flex-direction:column;gap:8px;margin-bottom:20px">
-        ${p.features.map(f=>`<div style="display:flex;align-items:center;gap:7px;font-size:13px"><span style="color:${p.color};font-size:14px">✓</span>${f}</div>`).join('')}
+        ${p.features.map(f=>`<div style="display:flex;align-items:center;gap:7px;font-size:13px"><span style="color:${p.color};font-size:14px"></span>${f}</div>`).join('')}
        </div>
        <button onclick="window.open('https://cbusevents.com/${p.link}','_blank');document.getElementById('pricingModal').remove();document.body.style.overflow=''" style="width:100%;${p.btnStyle};border:none;border-radius:9px;padding:12px;font-size:14px;font-weight:700;cursor:pointer;font-family:var(--font)">${p.btn}</button>
       </div>`).join('')}
@@ -2614,6 +2663,10 @@ function showPricing(){
 }
 
 // ── JOIN DROPDOWN ─────────────────────────────────────────────
+function toggleColumbusMenu(){
+ const m=document.getElementById('columbusMenu');
+ if(m)m.style.display=m.style.display==='none'?'block':'none';
+}
 function toggleJoinMenu(){
  const m=document.getElementById('joinMenu');
  if(m)m.style.display=m.style.display==='none'?'block':'none';
@@ -2669,11 +2722,28 @@ document.addEventListener('click',function(e){
  const d=document.getElementById('joinDropdown');
  const m=document.getElementById('joinMenu');
  if(d&&m&&!d.contains(e.target))m.style.display='none';
+ const cd=document.getElementById('columbusDropdown');
+ const cm=document.getElementById('columbusMenu');
+ if(cd&&cm&&!cd.contains(e.target))cm.style.display='none';
 });
 
 // ── START ─────────────────────────────────────────────────────
 setNavActive('home');
 init();
+
+// Gallery Hop next date
+(function(){
+  function nextFirstFriday(){
+    var now=new Date(),d=new Date(now.getFullYear(),now.getMonth(),1);
+    while(d.getDay()!==5)d.setDate(d.getDate()+1);
+    if(d<=now){d=new Date(now.getFullYear(),now.getMonth()+1,1);while(d.getDay()!==5)d.setDate(d.getDate()+1);}
+    return d;
+  }
+  var d=nextFirstFriday();
+  var label=d.toLocaleDateString('en-US',{month:'short',day:'numeric',timeZone:'America/New_York'});
+  var el=document.getElementById('navGalleryHopDate');
+  if(el)el.textContent='Fri, '+label+' · 6 PM';
+})();
 
 // Load current user session and their saved items
 (async()=>{
@@ -2756,13 +2826,13 @@ async function toggleSaveEvent(eventId, btn, e){
 <div id="sticky-cta-bar" aria-label="Join CBUSEVENTS free">
   <div id="sticky-cta-row">
     <button class="sticky-nav-btn" onclick="showPage('events')">
-      <span class="sticky-nav-btn-icon">🎟️</span>Events
+      <span class="sticky-nav-btn-icon">️</span>Events
     </button>
     <a id="sticky-cta-btn" href="https://cbusevents.com/signup.html">
       Join Free Today
     </a>
     <button class="sticky-nav-btn" onclick="showPage('venues')">
-      <span class="sticky-nav-btn-icon">📍</span>Venues
+      <span class="sticky-nav-btn-icon"></span>Venues
     </button>
   </div>
   <div id="sticky-cta-sub">No credit card &nbsp;·&nbsp; Free to start</div>
