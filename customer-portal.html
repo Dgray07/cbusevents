@@ -601,14 +601,14 @@ body { background: var(--bg); color: var(--text); font-family: var(--font); disp
     </div>
     <div style="margin-bottom:14px">
       <label style="display:block;font-size:12px;color:var(--sub);font-weight:500;margin-bottom:5px">Email</label>
-      <input type="email" id="authEmail" placeholder="you@email.com" id="authPass" style="width:100%;background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:9px;padding:10px 14px;color:var(--text);font-family:var(--font);font-size:14px;outline:none"/>
+      <input type="email" id="authEmail" placeholder="you@email.com" id="authPassInput" style="width:100%;background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:9px;padding:10px 14px;color:var(--text);font-family:var(--font);font-size:14px;outline:none"/>
     </div>
     <div style="margin-bottom:14px">
       <label style="display:block;font-size:12px;color:var(--sub);font-weight:500;margin-bottom:5px">Password</label>
       <input type="password" id="authPass" placeholder="••••••••" id="authPassInput" style="width:100%;background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:9px;padding:10px 14px;color:var(--text);font-family:var(--font);font-size:14px;outline:none"/>
     </div>
     <div id="authErr" style="color:var(--red);font-size:13px;margin-bottom:10px;min-height:18px"></div>
-    <button id="authBtn" onclick="doAuth()" style="width:100%;background:var(--orange);color:#fff;border:none;border-radius:9px;padding:12px;font-size:14px;font-weight:700;cursor:pointer;font-family:var(--font)">Sign In</button>
+    <button id="authBtn" style="width:100%;background:var(--orange);color:#fff;border:none;border-radius:9px;padding:12px;font-size:14px;font-weight:700;cursor:pointer;font-family:var(--font)">Sign In</button>
     <div style="text-align:center;margin-top:16px;font-size:13px;color:var(--sub)">
       <span id="authSwitchText">New to CBUSEVENTS?</span>
       <button id="authSwitchBtn" id="authSwitchBtnEl" style="background:none;border:none;color:var(--orange);font-size:13px;font-weight:600;cursor:pointer;font-family:var(--font);margin-left:4px">Create a free account</button>
@@ -1043,7 +1043,7 @@ window.switchTab = function switchTab(tab){
 
 window.doAuth = async function doAuth(){
   const email=document.getElementById('authEmail').value.trim();
-  const pass=document.getElementById('authPass').value;
+  const pass=(document.getElementById('authPass')||document.getElementById('authPassInput')||{value:''}).value;
   const name=document.getElementById('authName').value.trim();
   const errEl=document.getElementById('authErr');
   const btn=document.getElementById('authBtn');
@@ -1236,6 +1236,14 @@ window.addEventListener('load', function() {
     el.addEventListener('keydown', function(e){ if(e.key==='Enter' && window.doAuth) window.doAuth(); });
   });
 });
+</script>
+
+<script>
+// Global aliases so inline onclick handlers can find these functions
+function doAuth(){ if(window.doAuth) window.doAuth(); }
+function switchTab(t){ if(window.switchTab) window.switchTab(t); }
+function doSignOut(){ if(window.doSignOut) window.doSignOut(); }
+function setTier(t){ if(window.setTier) window.setTier(t); }
 </script>
 </body>
 </html>
