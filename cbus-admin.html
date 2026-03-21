@@ -1230,7 +1230,7 @@ async function deletePlanner(userId){
  // Delete user_roles
  await sb.from('user_roles').delete().eq('user_id',userId);
  // Attempt auth user delete
- await sb.rpc('admin_delete_user',{target_user_id:userId}).catch(()=>{});
+ try{ await sb.rpc('admin_delete_user',{target_user_id:userId}); }catch(e){}
  toast('Planner deleted');
  await renderPlanners();
 }
@@ -1393,7 +1393,7 @@ async function deleteVendor(id,name){
  if(userId){
    await sb.from('user_roles').delete().eq('user_id',userId);
    // Attempt to delete auth user via admin RPC (requires admin_delete_user function in Supabase)
-   await sb.rpc('admin_delete_user',{target_user_id:userId}).catch(()=>{});
+   try{ await sb.rpc('admin_delete_user',{target_user_id:userId}); }catch(e){}
  }
  await loadData();renderPage();
  toast('Vendor deleted');
@@ -1409,7 +1409,9 @@ async function deleteUser(userId,email){
  await sb.from('customer_profiles').delete().eq('user_id',userId).catch(()=>{});
  await sb.from('user_roles').delete().eq('user_id',userId).catch(()=>{});
  // Attempt auth user delete via RPC
- const{error}=await sb.rpc('admin_delete_user',{target_user_id:userId}).catch(e=>({error:e}));
+ let deleteError=null;
+ try{ const r=await sb.rpc('admin_delete_user',{target_user_id:userId});deleteError=r.error||null; }catch(e){deleteError=e;}
+ const error=deleteError;
  if(error){
    toast('Profile deleted. Auth account requires manual deletion in Supabase dashboard.','info');
  } else {
