@@ -581,7 +581,6 @@ body { background: var(--bg); color: var(--text); font-family: var(--font); disp
   .welcome-stats { display: none; }
 }
 </style>
-<script src="https://unpkg.com/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 </head>
 <body>
 
@@ -602,17 +601,17 @@ body { background: var(--bg); color: var(--text); font-family: var(--font); disp
     </div>
     <div style="margin-bottom:14px">
       <label style="display:block;font-size:12px;color:var(--sub);font-weight:500;margin-bottom:5px">Email</label>
-      <input type="email" id="authEmail" placeholder="you@email.com" onkeydown="if(event.key==='Enter')doAuth()" style="width:100%;background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:9px;padding:10px 14px;color:var(--text);font-family:var(--font);font-size:14px;outline:none"/>
+      <input type="email" id="authEmail" placeholder="you@email.com" onkeydown="if(event.key==='Enter'&&window.doAuth)window.doAuth()" style="width:100%;background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:9px;padding:10px 14px;color:var(--text);font-family:var(--font);font-size:14px;outline:none"/>
     </div>
     <div style="margin-bottom:14px">
       <label style="display:block;font-size:12px;color:var(--sub);font-weight:500;margin-bottom:5px">Password</label>
-      <input type="password" id="authPass" placeholder="••••••••" onkeydown="if(event.key==='Enter')doAuth()" style="width:100%;background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:9px;padding:10px 14px;color:var(--text);font-family:var(--font);font-size:14px;outline:none"/>
+      <input type="password" id="authPass" placeholder="••••••••" onkeydown="if(event.key==='Enter'&&window.doAuth)window.doAuth()" style="width:100%;background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:9px;padding:10px 14px;color:var(--text);font-family:var(--font);font-size:14px;outline:none"/>
     </div>
     <div id="authErr" style="color:var(--red);font-size:13px;margin-bottom:10px;min-height:18px"></div>
-    <button id="authBtn" onclick="doAuth()" style="width:100%;background:var(--orange);color:#fff;border:none;border-radius:9px;padding:12px;font-size:14px;font-weight:700;cursor:pointer;font-family:var(--font)">Sign In</button>
+    <button id="authBtn" onclick="if(window.doAuth)window.doAuth();else console.error('doAuth not ready')" style="width:100%;background:var(--orange);color:#fff;border:none;border-radius:9px;padding:12px;font-size:14px;font-weight:700;cursor:pointer;font-family:var(--font)">Sign In</button>
     <div style="text-align:center;margin-top:16px;font-size:13px;color:var(--sub)">
       <span id="authSwitchText">New to CBUSEVENTS?</span>
-      <button id="authSwitchBtn" onclick="switchTab(currentTab==='signin'?'signup':'signin')" style="background:none;border:none;color:var(--orange);font-size:13px;font-weight:600;cursor:pointer;font-family:var(--font);margin-left:4px">Create a free account</button>
+      <button id="authSwitchBtn" onclick="if(window.switchTab)window.switchTab(currentTab==='signin'?'signup':'signin')" style="background:none;border:none;color:var(--orange);font-size:13px;font-weight:600;cursor:pointer;font-family:var(--font);margin-left:4px">Create a free account</button>
     </div>
     <div style="text-align:center;margin-top:12px">
       <a href="https://cbusevents.com" style="color:var(--muted);font-size:12px">← Back to CBUSEVENTS</a>
@@ -972,6 +971,7 @@ body { background: var(--bg); color: var(--text); font-family: var(--font); disp
   <button class="tier-btn"        id="btnPremium"  onclick="setTier('premium')">Premium</button>
 </div>
 
+<script src="https://unpkg.com/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <script>
 const SB_URL="https://toblgvatvsjljbqogzsv.supabase.co";
 const SB_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRvYmxndmF0dnNqbGpicW9nenN2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMDgwNTAsImV4cCI6MjA4NzY4NDA1MH0._WJEQPizNDiQfDXQB_DHPaQhixPGpMdmYQSmyWmm_FQ";
@@ -980,7 +980,7 @@ let currentUser=null;
 let currentTab='signin';
 
 // ── TIER TOGGLE (demo) ──────────────────────────────────────
-function setTier(tier) {
+window.setTier = function setTier(tier) {
   document.querySelectorAll('.tier-btn').forEach(b=>b.classList.remove('active'));
   const btn=document.getElementById('btn'+tier.charAt(0).toUpperCase()+tier.slice(1));
   if(btn)btn.classList.add('active');
@@ -1028,7 +1028,7 @@ function setTier(tier) {
 }
 
 // ── AUTH ────────────────────────────────────────────────────
-function switchTab(tab){
+window.switchTab = function switchTab(tab){
   currentTab=tab;
   document.getElementById('tabSignin').style.background=tab==='signin'?'var(--card)':'none';
   document.getElementById('tabSignin').style.color=tab==='signin'?'var(--text)':'var(--sub)';
@@ -1041,7 +1041,7 @@ function switchTab(tab){
   document.getElementById('authErr').textContent='';
 }
 
-async function doAuth(){
+window.doAuth = async function doAuth(){
   const email=document.getElementById('authEmail').value.trim();
   const pass=document.getElementById('authPass').value;
   const name=document.getElementById('authName').value.trim();
@@ -1068,7 +1068,7 @@ async function doAuth(){
   if(error){errEl.textContent=error.message;btn.disabled=false;btn.textContent=currentTab==='signin'?'Sign In':'Create Account';}
 }
 
-async function doSignOut(){
+window.doSignOut = async function doSignOut(){
   await sb.auth.signOut();
   showAuthGate();
 }
