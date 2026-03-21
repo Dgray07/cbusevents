@@ -1043,7 +1043,7 @@ window.switchTab = function switchTab(tab){
 
 window.doAuth = async function doAuth(){
   const email=document.getElementById('authEmail').value.trim();
-  const pass=document.getElementById('authPass').value;
+  const pass=(document.getElementById('authPass')||document.getElementById('authPassInput')||{value:''}).value;
   const name=document.getElementById('authName').value.trim();
   const errEl=document.getElementById('authErr');
   const btn=document.getElementById('authBtn');
@@ -1065,7 +1065,17 @@ window.doAuth = async function doAuth(){
       await sb.from('customer_profiles').upsert({user_id:data.user.id,display_name:name},{onConflict:'user_id'});
     }
   }
-  if(error){errEl.textContent=error.message;btn.disabled=false;btn.textContent=currentTab==='signin'?'Sign In':'Create Account';}
+  if(error){
+    errEl.textContent=error.message;
+    btn.disabled=false;
+    btn.textContent=currentTab==='signin'?'Sign In':'Create Account';
+  } else {
+    // Explicitly hide auth gate on success
+    const gate=document.getElementById('authGate');
+    if(gate)gate.style.display='none';
+    btn.disabled=false;
+    btn.textContent=currentTab==='signin'?'Sign In':'Create Account';
+  }
 }
 
 window.doSignOut = async function doSignOut(){
@@ -1198,7 +1208,7 @@ document.addEventListener('DOMContentLoaded', function() {
   var authBtn = document.getElementById('authBtn');
   if(authBtn) authBtn.addEventListener('click', function(){ if(window.doAuth) window.doAuth(); });
 
-  var authPassInput = document.getElementById('authPassInput');
+  var authPassInput = document.getElementById('authPassInput')||document.getElementById('authPass');
   if(authPassInput) authPassInput.addEventListener('keydown', function(e){ if(e.key==='Enter' && window.doAuth) window.doAuth(); });
 
   var authEmailInput = document.getElementById('authEmail');
