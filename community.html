@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title id="pageTitle">Community — CBUSEVENTS</title>
+<meta name="description" id="pageDesc" content="Columbus community events on CBUSEVENTS">
+<meta property="og:image" content="https://cbusevents.com/assets/cbus-shield.png">
+<meta name="theme-color" content="#080810">
+<link rel="apple-touch-icon" href="/assets/cbus-shield.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700;800;900&family=DM+Mono:wght@400;500&family=Playfair+Display:ital,wght@0,700;0,900;1,700&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; -webkit-font-smoothing: antialiased; }
+:root {
+  --bg:      #080810;
+  --surface: #0f0f1a;
+  --card:    #141420;
+  --border:  #1e1e2e;
+  --border-sub: #191928;
+  --text:    #f0f0fa;
+  --sub:     #7070a0;
+  --muted:   #40405a;
+  --accent:  #FF6B35;
+  --accent-dim: rgba(255,107,53,0.1);
+  --accent-border: rgba(255,107,53,0.25);
+  --font:    'DM Sans', sans-serif;
+  --mono:    'DM Mono', monospace;
+  --serif:   'Playfair Display', serif;
+  --r-sm: 8px; --r-md: 10px; --r-lg: 14px; --r-full: 9999px;
+}
+html { scroll-behavior: smooth; }
+body { background: var(--bg); color: var(--text); font-family: var(--font); min-height: 100vh; }
+a { text-decoration: none; color: inherit; }
+button { font-family: var(--font); cursor: pointer; border: none; }
+@keyframes fadeUp { from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)} }
+@keyframes pulse  { 0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.4;transform:scale(0.8)} }
+@keyframes spin   { to{transform:rotate(360deg)} }
+
+/* ── NAV ── */
+nav {
+  position: sticky; top: 0; z-index: 100;
+  background: rgba(8,8,16,0.92); backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 48px; height: 62px;
+}
+.nav-logo { font-weight: 900; font-size: 17px; letter-spacing: -0.05em; text-transform: uppercase; cursor: pointer; }
+.nav-logo span { color: var(--accent); }
+.nav-back { display: flex; align-items: center; gap: 7px; font-family: var(--mono); font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--sub); transition: color 0.2s; }
+.nav-back:hover { color: var(--accent); }
+.nav-cta { background: var(--accent); color: #fff; font-weight: 700; font-size: 13px; padding: 8px 20px; border-radius: var(--r-md); }
+
+/* ── HERO ── */
+.hero {
+  position: relative; min-height: 480px;
+  display: flex; align-items: flex-end; overflow: hidden;
+}
+.hero-bg { position: absolute; inset: 0; background-size: cover; background-position: center; }
+.hero-bg::after {
+  content: ''; position: absolute; inset: 0;
+  background: linear-gradient(to top, rgba(8,8,16,1) 0%, rgba(8,8,16,0.75) 45%, rgba(8,8,16,0.15) 100%);
+}
+.hero-content { position: relative; z-index: 2; padding: 0 48px 52px; width: 100%; animation: fadeUp 0.8s ease; }
+.hero-eyebrow { display: inline-flex; align-items: center; gap: 8px; font-family: var(--mono); font-size: 10px; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase; color: var(--accent); margin-bottom: 14px; }
+.hero-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); animation: pulse 2s infinite; flex-shrink: 0; }
+.hero-title { font-family: var(--serif); font-size: clamp(44px,7vw,84px); font-weight: 900; line-height: 0.95; color: var(--text); margin-bottom: 16px; }
+.hero-desc { font-size: 16px; color: var(--sub); line-height: 1.7; max-width: 560px; margin-bottom: 24px; font-weight: 500; }
+.hero-desc strong { color: var(--text); font-weight: 700; }
+.hero-stats { display: flex; align-items: center; gap: 28px; flex-wrap: wrap; }
+.hero-stat { font-family: var(--mono); font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); }
+.hero-stat strong { color: var(--text); font-weight: 500; display: block; font-size: 20px; letter-spacing: -0.02em; margin-bottom: 2px; }
+
+/* ── FILTER BAR ── */
+.filter-bar { background: var(--surface); border-bottom: 1px solid var(--border); padding: 0 48px; display: flex; align-items: center; gap: 6px; height: 54px; overflow-x: auto; scrollbar-width: none; position: sticky; top: 62px; z-index: 90; }
+.filter-bar::-webkit-scrollbar { display: none; }
+.filter-chip { flex-shrink: 0; background: transparent; border: 1px solid var(--border); border-radius: var(--r-full); padding: 5px 16px; font-family: var(--mono); font-size: 10px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--sub); cursor: pointer; transition: all 0.18s; white-space: nowrap; }
+.filter-chip:hover { border-color: var(--accent); color: var(--text); }
+.filter-chip.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+/* ── PAGE ── */
+.page { max-width: 1200px; margin: 0 auto; padding: 48px; }
+.s-label { font-family: var(--mono); font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--accent); margin-bottom: 5px; }
+.s-title { font-family: var(--font); font-size: 22px; font-weight: 800; letter-spacing: -0.03em; color: var(--text); margin-bottom: 4px; }
+.s-sub   { font-size: 13px; color: var(--sub); line-height: 1.6; margin-bottom: 28px; }
+
+/* ── EVENT CARDS ── */
+.events-grid { display: flex; gap: 16px; overflow-x: auto; padding-bottom: 12px; scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; scrollbar-width: none; margin-bottom: 52px; }
+.events-grid::-webkit-scrollbar { display: none; }
+.event-card { scroll-snap-align: start; flex: 0 0 240px; cursor: pointer; transition: transform 0.2s; }
+.event-card:hover { transform: translateY(-3px); }
+.event-card-img { width: 100%; aspect-ratio: 1/1; border-radius: 16px; overflow: hidden; background: var(--surface); margin-bottom: 12px; position: relative; }
+.event-card-img img { width: 100%; height: 100%; object-fit: cover; }
+.event-card-img-placeholder { width: 100%; height: 100%; background: linear-gradient(135deg, var(--accent-dim), rgba(129,140,248,0.07)); }
+.event-card-badge { position: absolute; top: 10px; left: 10px; font-family: var(--mono); font-size: 8px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; padding: 3px 9px; border-radius: var(--r-full); }
+.badge-green  { background: rgba(52,211,153,0.9); color: #000; }
+.badge-accent { background: var(--accent); color: #fff; }
+.event-card-title  { font-weight: 700; font-size: 14px; letter-spacing: -0.02em; color: var(--text); margin-bottom: 4px; line-height: 1.2; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+.event-card-date   { font-size: 11px; color: var(--muted); }
+.event-card-venue  { font-size: 11px; color: var(--sub); }
+
+/* ── VENUE CARDS ── */
+.venues-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px,1fr)); gap: 14px; margin-bottom: 52px; }
+.venue-card { background: var(--card); border: 1px solid var(--border); border-radius: var(--r-lg); overflow: hidden; cursor: pointer; transition: all 0.2s; }
+.venue-card:hover { border-color: var(--accent-border); transform: translateY(-2px); box-shadow: 0 10px 36px rgba(0,0,0,0.4); }
+.venue-card-img { height: 160px; position: relative; overflow: hidden; background: var(--surface); }
+.venue-card-img img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.4s; }
+.venue-card:hover .venue-card-img img { transform: scale(1.04); }
+.venue-card-img-overlay { position: absolute; inset: 0; background: linear-gradient(to top, rgba(8,8,16,0.55) 0%, transparent 60%); }
+.venue-card-type { position: absolute; bottom: 9px; left: 10px; background: rgba(8,8,16,0.8); border: 1px solid var(--border); font-family: var(--mono); font-size: 8px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--sub); padding: 2px 9px; border-radius: var(--r-full); }
+.venue-card-body { padding: 14px 16px; }
+.venue-card-name { font-weight: 700; font-size: 15px; letter-spacing: -0.02em; color: var(--text); margin-bottom: 2px; }
+.venue-card-hood { font-size: 11px; color: var(--muted); margin-bottom: 8px; }
+.venue-card-action { font-family: var(--mono); font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); }
+
+/* ── VENDOR / PLANNER CARDS ── */
+.people-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px,1fr)); gap: 12px; margin-bottom: 52px; }
+.people-card { background: var(--card); border: 1px solid var(--border); border-radius: var(--r-lg); padding: 20px; transition: all 0.2s; cursor: pointer; }
+.people-card:hover { border-color: var(--accent-border); transform: translateY(-1px); }
+.people-card-avatar { width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-family: var(--mono); font-size: 15px; font-weight: 700; margin-bottom: 12px; border: 1px solid var(--accent-border); background: var(--accent-dim); color: var(--accent); }
+.people-card-name { font-weight: 700; font-size: 14px; letter-spacing: -0.01em; color: var(--text); margin-bottom: 2px; }
+.people-card-type { font-family: var(--mono); font-size: 9px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent); margin-bottom: 8px; }
+.people-card-desc { font-size: 12px; color: var(--sub); line-height: 1.55; margin-bottom: 12px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.people-card-footer { display: flex; justify-content: space-between; align-items: center; padding-top: 10px; border-top: 1px solid var(--border-sub); }
+.people-card-rate  { font-family: var(--mono); font-size: 10px; font-weight: 500; color: var(--text); }
+.people-card-avail { font-family: var(--mono); font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; color: #34d399; }
+
+/* ── JOIN BAND ── */
+.join-band { background: linear-gradient(135deg, var(--surface), var(--card)); border: 1px solid var(--accent-border); border-radius: var(--r-lg); padding: 36px 40px; display: flex; align-items: center; justify-content: space-between; gap: 32px; margin-bottom: 52px; flex-wrap: wrap; }
+.join-band-title { font-family: var(--serif); font-size: 24px; font-weight: 700; color: var(--text); margin-bottom: 6px; }
+.join-band-sub   { font-size: 13px; color: var(--sub); line-height: 1.65; max-width: 480px; }
+.join-band-ctas  { display: flex; gap: 10px; flex-shrink: 0; flex-wrap: wrap; }
+.btn { font-weight: 700; border-radius: var(--r-md); transition: all 0.18s; }
+.btn-md { font-size: 13px; padding: 10px 22px; }
+.btn-accent { background: var(--accent); color: #fff; }
+.btn-accent:hover { opacity: 0.9; }
+.btn-ghost  { background: rgba(255,255,255,0.05); color: var(--sub); border: 1px solid var(--border); }
+.btn-ghost:hover { color: var(--text); border-color: var(--muted); }
+
+/* ── OTHER COMMUNITIES ── */
+.communities-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px,1fr)); gap: 10px; margin-bottom: 52px; }
+.community-chip { background: var(--card); border: 1px solid var(--border); border-radius: var(--r-lg); padding: 16px 18px; cursor: pointer; transition: all 0.18s; text-decoration: none; display: block; }
+.community-chip:hover { transform: translateY(-2px); border-color: rgba(255,255,255,0.1); }
+.community-chip-name { font-weight: 700; font-size: 13px; letter-spacing: -0.01em; color: var(--text); margin-bottom: 3px; }
+.community-chip-count { font-family: var(--mono); font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; }
+
+/* ── EMPTY / SPINNER ── */
+.spinner { width: 26px; height: 26px; border: 2px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.8s linear infinite; margin: 48px auto; display: block; }
+.empty { text-align: center; padding: 52px 20px; color: var(--sub); }
+.empty-title { font-weight: 700; font-size: 15px; color: var(--text); margin-bottom: 6px; }
+.empty-sub { font-size: 13px; line-height: 1.6; }
+
+/* ── FOOTER ── */
+footer { background: var(--surface); border-top: 1px solid var(--border); padding: 24px 48px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; }
+.f-logo { font-weight: 900; font-size: 15px; letter-spacing: -0.04em; text-transform: uppercase; }
+.f-logo span { color: var(--accent); }
+.f-copy { font-family: var(--mono); font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); }
+
+/* ── RESPONSIVE ── */
+@media(max-width:768px){
+  nav, footer { padding: 0 20px; }
+  footer { padding: 20px; }
+  .hero-content { padding: 0 20px 36px; }
+  .filter-bar { padding: 0 16px; }
+  .page { padding: 28px 20px; }
+  .venues-grid { grid-template-columns: 1fr; }
+  .join-band { flex-direction: column; padding: 24px 20px; }
+  .event-card { flex: 0 0 72vw; max-width: 260px; }
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo" onclick="window.location.href='https://cbusevents.com'">CBUS<span>EVENTS</span></div>
+  <a href="https://cbusevents.com" class="nav-back">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+    Back to CBUSEVENTS
+  </a>
+  <button class="nav-cta btn" onclick="window.location.href='https://cbusevents.com/signup.html'">Join Free</button>
+</nav>
+
+<!-- HERO - populated by JS -->
+<section class="hero" id="communityHero">
+  <div class="hero-bg" id="heroBg"></div>
+  <div class="hero-content">
+    <div class="hero-eyebrow"><div class="hero-dot"></div><span id="heroEyebrow">Columbus Community</span></div>
+    <h1 class="hero-title" id="heroTitle">Loading...</h1>
+    <p class="hero-desc" id="heroDesc"></p>
+    <div class="hero-stats" id="heroStats"></div>
+  </div>
+</section>
+
+<!-- FILTER BAR -->
+<div class="filter-bar">
+  <div class="filter-chip active" onclick="setTab('events',this)">Events</div>
+  <div class="filter-chip" onclick="setTab('venues',this)">Venues</div>
+  <div class="filter-chip" onclick="setTab('people',this)">Planners & Vendors</div>
+</div>
+
+<!-- PAGE -->
+<div class="page">
+
+  <!-- EVENTS TAB -->
+  <div id="tabEvents">
+    <div class="s-label">Upcoming</div>
+    <div class="s-title" id="eventsTitle">Events</div>
+    <div class="s-sub">Events tagged to this community. Tap any event to get tickets or learn more.</div>
+    <div id="eventsGrid" class="events-grid"><div class="spinner"></div></div>
+  </div>
+
+  <!-- VENUES TAB -->
+  <div id="tabVenues" style="display:none">
+    <div class="s-label">Spaces</div>
+    <div class="s-title" id="venuesTitle">Venues</div>
+    <div class="s-sub">Venues that serve and celebrate this community.</div>
+    <div id="venuesGrid" class="venues-grid"><div class="spinner"></div></div>
+  </div>
+
+  <!-- PEOPLE TAB -->
+  <div id="tabPeople" style="display:none">
+    <div class="s-label">Professionals</div>
+    <div class="s-title" id="peopleTitle">Planners & Vendors</div>
+    <div class="s-sub">Planners and vendors who serve this community.</div>
+    <div id="peopleGrid" class="people-grid"><div class="spinner"></div></div>
+  </div>
+
+  <!-- JOIN BAND -->
+  <div class="join-band" id="joinBand">
+    <div>
+      <div class="join-band-title" id="joinTitle">Serve this community?</div>
+      <div class="join-band-sub" id="joinSub">List your venue, services, or events on CBUSEVENTS and get discovered by this community. Free to start.</div>
+    </div>
+    <div class="join-band-ctas">
+      <button class="btn btn-md btn-accent" onclick="window.location.href='https://cbusevents.com/signup.html?role=venue'">List Your Venue</button>
+      <button class="btn btn-md btn-ghost"  onclick="window.location.href='https://cbusevents.com/signup.html?role=vendor'">List Your Services</button>
+    </div>
+  </div>
+
+  <!-- OTHER COMMUNITIES -->
+  <div class="s-label">Explore Columbus</div>
+  <div class="s-title" style="margin-bottom:18px">More Communities</div>
+  <div class="communities-grid" id="communitiesGrid"></div>
+
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="f-logo">CBUS<span>EVENTS</span></div>
+  <div class="f-copy" id="footerCommunity">Columbus Community</div>
+  <div class="f-copy">© 2026 CBUSEVENTS · Columbus, Ohio</div>
+</footer>
+
+<script>
+const SB_URL = "https://toblgvatvsjljbqogzsv.supabase.co";
+const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRvYmxndmF0dnNqbGpicW9nenN2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMDgwNTAsImV4cCI6MjA4NzY4NDA1MH0._WJEQPizNDiQfDXQB_DHPaQhixPGpMdmYQSmyWmm_FQ";
+const sb = supabase.createClient(SB_URL, SB_KEY);
+
+// ── COMMUNITY DEFINITIONS ────────────────────────────────────
+const COMMUNITIES = {
+  'black-columbus': {
+    name: 'Black Columbus',
+    eyebrow: 'Columbus Community',
+    desc: 'The culture moves through Columbus. From Bronzeville to King-Lincoln to the Short North, Black Columbus has always been the heartbeat of this city\'s nightlife, arts, and community.',
+    accent: '#fbbf24',
+    accentDim: 'rgba(251,191,36,0.1)',
+    accentBorder: 'rgba(251,191,36,0.25)',
+    bg: 'https://images.unsplash.com/photo-1533174072545-7a4b6ad7a6c3?w=1600&q=80',
+    joinTitle: 'Part of Black Columbus?',
+    joinSub: 'List your venue, services, or events and get in front of the community. Free to start.',
+  },
+  'latino-columbus': {
+    name: 'Latino Columbus',
+    eyebrow: 'Columbus Community',
+    desc: 'Columbus\'s Latino community is one of the fastest growing in Ohio. From Mifflin to Hilltop, find the events, venues, and vendors that celebrate the culture.',
+    accent: '#f87171',
+    accentDim: 'rgba(248,113,113,0.1)',
+    accentBorder: 'rgba(248,113,113,0.25)',
+    bg: 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=1600&q=80',
+    joinTitle: 'Serve the Latino community?',
+    joinSub: 'List your venue, services, or events and get discovered. Free to start.',
+  },
+  'somali-east-african': {
+    name: 'Somali & East African',
+    eyebrow: 'Columbus Community',
+    desc: 'Columbus has one of the largest Somali communities in the United States. Find events, spaces, and vendors that speak to your experience.',
+    accent: '#34d399',
+    accentDim: 'rgba(52,211,153,0.1)',
+    accentBorder: 'rgba(52,211,153,0.2)',
+    bg: 'https://images.unsplash.com/photo-1523580494863-6f3031224c94?w=1600&q=80',
+    joinTitle: 'Serve the East African community?',
+    joinSub: 'List your venue, services, or events on CBUSEVENTS. Free to start.',
+  },
+  'west-african': {
+    name: 'West African',
+    eyebrow: 'Columbus Community',
+    desc: 'From cultural celebrations to community gatherings, West African Columbus is vibrant and growing. Discover events and venues that feel like home.',
+    accent: '#fb923c',
+    accentDim: 'rgba(251,146,60,0.1)',
+    accentBorder: 'rgba(251,146,60,0.25)',
+    bg: 'https://images.unsplash.com/photo-1567532939604-b6b5b0db2604?w=1600&q=80',
+    joinTitle: 'Serve the West African community?',
+    joinSub: 'List your venue, services, or events and connect with the community. Free to start.',
+  },
+  'south-asian': {
+    name: 'South Asian',
+    eyebrow: 'Columbus Community',
+    desc: 'Columbus\'s South Asian community spans multiple generations and cultures. Find events that celebrate everything from Diwali to Garba to everyday community.',
+    accent: '#a78bfa',
+    accentDim: 'rgba(167,139,250,0.1)',
+    accentBorder: 'rgba(167,139,250,0.25)',
+    bg: 'https://images.unsplash.com/photo-1514222134-b57cbb8ce073?w=1600&q=80',
+    joinTitle: 'Serve the South Asian community?',
+    joinSub: 'List your venue, services, or events on CBUSEVENTS. Free to start.',
+  },
+  'lgbtq-columbus': {
+    name: 'LGBTQ+ Columbus',
+    eyebrow: 'Columbus Community',
+    desc: 'Columbus has one of the most active LGBTQ+ communities in the Midwest. From Pride to the Short North scene to year-round events, find everything happening in Columbus.',
+    accent: '#818cf8',
+    accentDim: 'rgba(129,140,248,0.1)',
+    accentBorder: 'rgba(129,140,248,0.25)',
+    bg: 'https://images.unsplash.com/photo-1567532939604-b6b5b0db2604?w=1600&q=80',
+    joinTitle: 'Serve the LGBTQ+ community?',
+    joinSub: 'List your venue, services, or events and get discovered. Free to start.',
+  },
+  'osu-campus': {
+    name: 'OSU & Campus',
+    eyebrow: 'Columbus Community',
+    desc: 'Game days, concerts, networking, nightlife. If it happens near campus, it\'s here.',
+    accent: '#ef4444',
+    accentDim: 'rgba(239,68,68,0.1)',
+    accentBorder: 'rgba(239,68,68,0.25)',
+    bg: 'https://images.unsplash.com/photo-1541339907198-e08756dedf3f?w=1600&q=80',
+    joinTitle: 'Near campus?',
+    joinSub: 'List your venue, services, or events and reach the OSU community. Free to start.',
+  },
+  'tech-startup': {
+    name: 'Tech & Startup',
+    eyebrow: 'Columbus Community',
+    desc: 'Columbus\'s tech scene is growing fast. Find the mixers, conferences, and networking events that connect you to the people building this city\'s future.',
+    accent: '#60a5fa',
+    accentDim: 'rgba(96,165,250,0.1)',
+    accentBorder: 'rgba(96,165,250,0.25)',
+    bg: 'https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=1600&q=80',
+    joinTitle: 'Part of Columbus tech?',
+    joinSub: 'List your events, services, or venue and connect with the tech community. Free to start.',
+  },
+  'arts-creative': {
+    name: 'Arts & Creative',
+    eyebrow: 'Columbus Community',
+    desc: 'Gallery openings in the Short North. Live painting at Easton. Underground film screenings in Franklinton. Pop-up studios, open mics, and installations you will not find anywhere else. Columbus creates differently.',
+    accent: '#f472b6',
+    accentDim: 'rgba(244,114,182,0.1)',
+    accentBorder: 'rgba(244,114,182,0.25)',
+    bg: 'https://images.unsplash.com/photo-1460661419201-fd4cecdf8a8b?w=1600&q=80',
+    joinTitle: 'Part of the creative scene?',
+    joinSub: 'List your gallery, studio, or services and get discovered by Columbus\'s creative community. Free to start.',
+  },
+  'young-professionals': {
+    name: 'Young Professionals',
+    eyebrow: 'Columbus Community',
+    desc: 'New to Columbus or leveling up? Find the networking events, social mixers, and professional gatherings that build real connections.',
+    accent: '#2dd4bf',
+    accentDim: 'rgba(45,212,191,0.1)',
+    accentBorder: 'rgba(45,212,191,0.25)',
+    bg: 'https://images.unsplash.com/photo-1511578314322-379afb476865?w=1600&q=80',
+    joinTitle: 'Host professional events?',
+    joinSub: 'List your venue, services, or events and reach Columbus\'s professional community. Free to start.',
+  },
+  'short-north-scene': {
+    name: 'Short North Scene',
+    eyebrow: 'Columbus Community',
+    desc: 'The heartbeat of Columbus nightlife. Bars, galleries, restaurants, and events all within walking distance of each other.',
+    accent: '#FF6B35',
+    accentDim: 'rgba(255,107,53,0.1)',
+    accentBorder: 'rgba(255,107,53,0.25)',
+    bg: 'https://images.unsplash.com/photo-1566737236500-c8ac43014a67?w=1600&q=80',
+    joinTitle: 'In the Short North?',
+    joinSub: 'List your venue, services, or events and get in front of the Short North audience. Free to start.',
+  },
+  'faith-communities': {
+    name: 'Faith Communities',
+    eyebrow: 'Columbus Community',
+    desc: 'Community gatherings, worship events, and faith-based activities across Columbus denominations and traditions.',
+    accent: '#fef08a',
+    accentDim: 'rgba(254,240,138,0.08)',
+    accentBorder: 'rgba(254,240,138,0.2)',
+    bg: 'https://images.unsplash.com/photo-1438032005730-c779502df39b?w=1600&q=80',
+    joinTitle: 'Host faith community events?',
+    joinSub: 'List your events, venue, or services and connect with faith communities across Columbus. Free to start.',
+  },
+};
+
+// ── ROUTING ──────────────────────────────────────────────────
+const slug = new URLSearchParams(window.location.search).get('c') || 'black-columbus';
+const community = COMMUNITIES[slug] || COMMUNITIES['black-columbus'];
+
+// ── APPLY THEME ──────────────────────────────────────────────
+function applyTheme() {
+  const r = document.documentElement.style;
+  r.setProperty('--accent',        community.accent);
+  r.setProperty('--accent-dim',    community.accentDim);
+  r.setProperty('--accent-border', community.accentBorder);
+
+  document.getElementById('heroBg').style.backgroundImage = "url('" + community.bg + "')";
+  document.getElementById('heroEyebrow').textContent = community.eyebrow;
+  document.getElementById('heroTitle').textContent   = community.name;
+  document.getElementById('heroDesc').innerHTML      = community.desc;
+  document.getElementById('joinTitle').textContent   = community.joinTitle;
+  document.getElementById('joinSub').textContent     = community.joinSub;
+  document.getElementById('footerCommunity').textContent = community.name + ' · Columbus, Ohio';
+  document.getElementById('eventsTitle').textContent  = community.name + ' Events';
+  document.getElementById('venuesTitle').textContent  = community.name + ' Venues';
+  document.getElementById('peopleTitle').textContent  = community.name + ' Planners & Vendors';
+  document.title = community.name + ' — CBUSEVENTS';
+
+  // Other communities grid
+  const grid = document.getElementById('communitiesGrid');
+  grid.innerHTML = Object.entries(COMMUNITIES)
+    .filter(([k]) => k !== slug)
+    .map(([k, c]) => `<a href="?c=${k}" class="community-chip" style="border-color:${c.accentBorder}">
+      <div class="community-chip-name">${c.name}</div>
+      <div class="community-chip-count" style="color:${c.accent}">Columbus</div>
+    </a>`).join('');
+}
+
+// ── TABS ─────────────────────────────────────────────────────
+function setTab(tab, el) {
+  ['events','venues','people'].forEach(t => {
+    document.getElementById('tab' + t.charAt(0).toUpperCase() + t.slice(1)).style.display = t === tab ? 'block' : 'none';
+  });
+  document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+
+  if(tab === 'venues' && !window._venuesLoaded)  loadVenues();
+  if(tab === 'people' && !window._peopleLoaded)  loadPeople();
+}
+
+// ── FORMAT HELPERS ───────────────────────────────────────────
+function fmt(iso) {
+  if(!iso) return '';
+  return new Date(iso).toLocaleDateString('en-US', { weekday:'short', month:'short', day:'numeric', timeZone:'America/New_York' });
+}
+function fmtTime(iso) {
+  if(!iso) return '';
+  return new Date(iso).toLocaleTimeString('en-US', { hour:'numeric', minute:'2-digit', timeZone:'America/New_York' });
+}
+function isThisWeek(iso) {
+  const d = new Date(iso), n = new Date();
+  return d >= n && d <= new Date(n.getTime() + 7*24*60*60*1000);
+}
+
+// ── LOAD EVENTS ──────────────────────────────────────────────
+async function loadEvents() {
+  const grid = document.getElementById('eventsGrid');
+  const { data, error } = await sb.from('events')
+    .select('id,title,start_time,cover_image_url,is_third_party,is_boosted,venue_name_override,venues(name,neighborhood)')
+    .contains('community_tags', [slug])
+    .eq('status', 'published')
+    .gte('start_time', new Date().toISOString())
+    .order('start_time', { ascending: true })
+    .limit(12);
+
+  const events = data && data.length ? data : [];
+
+  // Update hero stats
+  document.getElementById('heroStats').innerHTML = `
+    <div class="hero-stat"><strong>${events.length}+</strong>Upcoming Events</div>
+    <div class="hero-stat"><strong>Free</strong>Always for Customers</div>`;
+
+  if(!events.length) {
+    grid.innerHTML = '<div class="empty"><div class="empty-title">No events yet</div><div class="empty-sub">Events tagged to this community will appear here. Check back soon or browse all Columbus events.</div></div>';
+    return;
+  }
+
+  grid.innerHTML = events.map(e => {
+    const vname = e.venue_name_override || e.venues?.name || 'Columbus Venue';
+    const tw = isThisWeek(e.start_time);
+    return `<div class="event-card" onclick="window.location.href='https://cbusevents.com'">
+      <div class="event-card-img">
+        ${e.cover_image_url
+          ? `<img src="${e.cover_image_url}" alt="${e.title}" loading="lazy">`
+          : '<div class="event-card-img-placeholder"></div>'}
+        ${tw ? '<div class="event-card-badge badge-green">This Week</div>' : ''}
+        ${e.is_boosted ? '<div class="event-card-badge badge-accent">Featured</div>' : ''}
+      </div>
+      <div class="event-card-title">${e.title}</div>
+      <div class="event-card-date">${fmt(e.start_time)}${fmtTime(e.start_time) ? ' at ' + fmtTime(e.start_time) : ''}</div>
+      <div class="event-card-venue">${vname}</div>
+    </div>`;
+  }).join('');
+}
+
+// ── LOAD VENUES ──────────────────────────────────────────────
+async function loadVenues() {
+  window._venuesLoaded = true;
+  const grid = document.getElementById('venuesGrid');
+  const { data } = await sb.from('venues')
+    .select('id,name,venue_type,neighborhood,cover_image_url')
+    .contains('community_tags', [slug])
+    .eq('status', 'approved')
+    .limit(12);
+
+  if(!data || !data.length) {
+    grid.innerHTML = '<div class="empty"><div class="empty-title">No venues tagged yet</div><div class="empty-sub">Venues that serve this community will appear here once they opt in through their portal.</div></div>';
+    return;
+  }
+
+  grid.innerHTML = data.map(v => `
+    <div class="venue-card" onclick="window.location.href='https://cbusevents.com'">
+      <div class="venue-card-img">
+        ${v.cover_image_url ? `<img src="${v.cover_image_url}" alt="${v.name}" loading="lazy">` : '<div style="width:100%;height:100%;background:var(--surface)"></div>'}
+        <div class="venue-card-img-overlay"></div>
+        ${v.venue_type ? `<div class="venue-card-type">${v.venue_type}</div>` : ''}
+      </div>
+      <div class="venue-card-body">
+        <div class="venue-card-name">${v.name}</div>
+        <div class="venue-card-hood">${v.neighborhood || 'Columbus'}</div>
+        <div class="venue-card-action">View Venue →</div>
+      </div>
+    </div>`).join('');
+}
+
+// ── LOAD PEOPLE ──────────────────────────────────────────────
+async function loadPeople() {
+  window._peopleLoaded = true;
+  const grid = document.getElementById('peopleGrid');
+
+  const [{ data: planners }, { data: vendors }] = await Promise.all([
+    sb.from('planners').select('id,business_name,contact_name,bio,categories,rate_display,availability').contains('community_tags', [slug]).eq('is_discoverable', true).limit(6),
+    sb.from('vendors').select('id,business_name,name,description,category,neighborhood').contains('community_tags', [slug]).limit(6),
+  ]);
+
+  const people = [
+    ...(planners || []).map(p => ({ ...p, _type: 'planner' })),
+    ...(vendors  || []).map(v => ({ ...v, _type: 'vendor'  })),
+  ];
+
+  if(!people.length) {
+    grid.innerHTML = '<div class="empty"><div class="empty-title">No planners or vendors yet</div><div class="empty-sub">Planners and vendors who serve this community will appear here once they opt in.</div></div>';
+    return;
+  }
+
+  grid.innerHTML = people.map(p => {
+    const name = p.business_name || p.contact_name || p.name || 'Columbus Professional';
+    const initials = name.split(' ').slice(0,2).map(w => w[0]).join('').toUpperCase();
+    const type = p._type === 'planner' ? 'Event Planner' : (p.category || 'Vendor');
+    const desc = p.bio || p.description || '';
+    const avail = p.availability === 'available';
+    return `<div class="people-card">
+      <div class="people-card-avatar">${initials}</div>
+      <div class="people-card-name">${name}</div>
+      <div class="people-card-type">${type}</div>
+      ${desc ? `<div class="people-card-desc">${desc}</div>` : ''}
+      <div class="people-card-footer">
+        <div class="people-card-rate">${p.rate_display || (p.neighborhood || 'Columbus')}</div>
+        ${p._type === 'planner' ? `<div class="people-card-avail" style="color:${avail ? '#34d399' : '#fbbf24'}">${avail ? 'Available' : 'Limited'}</div>` : ''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ── INIT ─────────────────────────────────────────────────────
+applyTheme();
+loadEvents();
+</script>
+</body>
+</html>
