@@ -410,7 +410,7 @@ function SharePanel({event, venue, onClose}) {
 // Venue Form
 function VenueForm({venue,onSave}) {
  const {user}=useAuth();
- const [f,setF]=useState({name:venue?.name||"",description:venue?.description||"",address:venue?.address||"",neighborhood:venue?.neighborhood||"",website:venue?.website||"",phone:venue?.phone||"",email:venue?.email||"",venue_type:venue?.venue_type||"",capacity:venue?.capacity||"",indoor_outdoor:venue?.indoor_outdoor||"indoor",tags:venue?.tags?.join(", ")||"",amenities:venue?.amenities?.join(", ")||"",cover_image_url:venue?.cover_image_url||"",instagram:venue?.instagram||"",facebook:venue?.facebook||"",tiktok:venue?.tiktok||"",twitter:venue?.twitter||"",photos:venue?.photos||[]});
+ const [f,setF]=useState({name:venue?.name||"",description:venue?.description||"",address:venue?.address||"",neighborhood:venue?.neighborhood||"",website:venue?.website||"",phone:venue?.phone||"",email:venue?.email||"",venue_type:venue?.venue_type||"",capacity:venue?.capacity||"",indoor_outdoor:venue?.indoor_outdoor||"indoor",tags:venue?.tags?.join(", ")||"",amenities:venue?.amenities?.join(", ")||"",cover_image_url:venue?.cover_image_url||"",instagram:venue?.instagram||"",facebook:venue?.facebook||"",tiktok:venue?.tiktok||"",twitter:venue?.twitter||"",photos:venue?.photos||[],community_tags:venue?.community_tags||[],is_gallery_hop:venue?.is_gallery_hop||false});
  const [busy,setBusy]=useState(false);
  const [toast,setToast]=useState({msg:"",type:"success"});
  const set=k=>e=>setF(p=>({...p,[k]:e.target.value}));
@@ -461,7 +461,45 @@ function VenueForm({venue,onSave}) {
  setTimeout(()=>setToast({msg:""}),5000);
  };
  return (
- <div> <h2 style={{fontFamily:"'DM Sans',sans-serif",fontSize:22,fontWeight:800,marginBottom:20}}>My Venue</h2> <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:20}}> <Card style={{gridColumn:"1/-1"}}> <div style={{fontFamily:"'DM Sans',sans-serif",fontWeight:700,fontSize:11,marginBottom:18,color:"var(--sub)",textTransform:"uppercase",letterSpacing:1.5}}>Basic Info</div> <Grid2><Field label="Venue Name *"><input value={f.name} onChange={set("name")} placeholder="The Bluestone"/></Field><Field label="Venue Type"><input value={f.venue_type} onChange={set("venue_type")} placeholder="Historic Ballroom"/></Field></Grid2> <Field label="Description"><textarea value={f.description} onChange={set("description")} placeholder="What makes your space special?"/></Field> <Grid2><Field label="Capacity"><input type="number" value={f.capacity} onChange={set("capacity")} placeholder="200"/></Field><Field label="Indoor/Outdoor"><select value={f.indoor_outdoor} onChange={set("indoor_outdoor")}><option value="indoor">Indoor</option><option value="outdoor">Outdoor</option><option value="both">Both</option></select></Field></Grid2> </Card> <Card> <div style={{fontFamily:"'DM Sans',sans-serif",fontWeight:700,fontSize:11,marginBottom:18,color:"var(--sub)",textTransform:"uppercase",letterSpacing:1.5}}>Location & Contact</div> <Field label="Address"><input value={f.address} onChange={set("address")} placeholder="583 E Broad St"/></Field> <Field label="Neighborhood"><input value={f.neighborhood} onChange={set("neighborhood")} placeholder="Downtown"/></Field> <Field label="Website"><input value={f.website} onChange={set("website")} placeholder="https://yourvenue.com"/></Field> <Field label="Phone"><input value={f.phone} onChange={set("phone")} placeholder="(614) 555-0000"/></Field> <Field label="Booking Email"><input type="email" value={f.email} onChange={set("email")} placeholder="bookings@venue.com"/></Field> </Card> <Card> <div style={{fontFamily:"'DM Sans',sans-serif",fontWeight:700,fontSize:11,marginBottom:18,color:"var(--sub)",textTransform:"uppercase",letterSpacing:1.5}}>Tags & Media</div> <Field label="Tags (comma-separated)"><input value={f.tags} onChange={set("tags")} placeholder="Weddings, Concerts, Corporate"/></Field> <Field label="Amenities (comma-separated)"><input value={f.amenities} onChange={set("amenities")} placeholder="PA System, Bar, Catering"/></Field> <Field label="Cover Photo">
+ <div> <h2 style={{fontFamily:"'DM Sans',sans-serif",fontSize:22,fontWeight:800,marginBottom:20}}>My Venue</h2> <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:20}}> <Card style={{gridColumn:"1/-1"}}>
+  <div style={{fontFamily:"'DM Sans',sans-serif",fontWeight:700,fontSize:11,marginBottom:6,color:"var(--sub)",textTransform:"uppercase",letterSpacing:1.5}}>Columbus Communities</div>
+  <div style={{color:"var(--sub)",fontSize:13,marginBottom:16}}>Select the communities your venue serves. This powers the community discovery pages and helps the right audience find you.</div>
+  <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(200px,1fr))",gap:8}}>
+    {[
+      {key:"black-columbus",      label:"Black Columbus"},
+      {key:"latino-columbus",     label:"Latino Columbus"},
+      {key:"somali-east-african", label:"Somali & East African"},
+      {key:"west-african",        label:"West African"},
+      {key:"south-asian",         label:"South Asian"},
+      {key:"lgbtq-columbus",      label:"LGBTQ+ Columbus"},
+      {key:"osu-campus",          label:"OSU & Campus"},
+      {key:"tech-startup",        label:"Tech & Startup"},
+      {key:"arts-creative",       label:"Arts & Creative"},
+      {key:"young-professionals", label:"Young Professionals"},
+      {key:"short-north-scene",   label:"Short North Scene"},
+      {key:"faith-communities",   label:"Faith Communities"},
+    ].map(c=>(
+      <label key={c.key} style={{display:"flex",alignItems:"center",gap:8,background:(f.community_tags||[]).includes(c.key)?"var(--orange-dim)":"rgba(255,255,255,0.03)",border:"1px solid"+(((f.community_tags||[]).includes(c.key))?"var(--orange-border)":"var(--border)"),borderRadius:"var(--r-md)",padding:"9px 12px",cursor:"pointer",transition:"all 0.15s",fontSize:13,color:(f.community_tags||[]).includes(c.key)?"var(--orange)":"var(--sub)",fontWeight:(f.community_tags||[]).includes(c.key)?600:400}}>
+        <input type="checkbox" checked={(f.community_tags||[]).includes(c.key)}
+          onChange={e=>{
+            const tags=f.community_tags||[];
+            setF(p=>({...p,community_tags:e.target.checked?[...tags,c.key]:tags.filter(t=>t!==c.key)}));
+          }}
+          style={{accentColor:"var(--orange)",width:14,height:14,flexShrink:0}}
+        />
+        {c.label}
+      </label>
+    ))}
+  </div>
+  <div style={{marginTop:16,display:"flex",alignItems:"center",gap:8,background:f.is_gallery_hop?"var(--orange-dim)":"rgba(255,255,255,0.03)",border:"1px solid"+(f.is_gallery_hop?"var(--orange-border)":"var(--border)"),borderRadius:"var(--r-md)",padding:"10px 14px",cursor:"pointer",maxWidth:320}} onClick={()=>setF(p=>({...p,is_gallery_hop:!p.is_gallery_hop}))}>
+    <input type="checkbox" checked={!!f.is_gallery_hop} onChange={e=>setF(p=>({...p,is_gallery_hop:e.target.checked}))} style={{accentColor:"var(--orange)",width:14,height:14,flexShrink:0}}/>
+    <div>
+      <div style={{fontSize:13,fontWeight:600,color:f.is_gallery_hop?"var(--orange)":"var(--text)"}}>Participate in Gallery Hop</div>
+      <div style={{fontSize:11,color:"var(--muted)",marginTop:1}}>List your venue on the Gallery Hop guide every first Friday</div>
+    </div>
+  </div>
+</Card>
+<Card style={{gridColumn:"1/-1"}}> <div style={{fontFamily:"'DM Sans',sans-serif",fontWeight:700,fontSize:11,marginBottom:18,color:"var(--sub)",textTransform:"uppercase",letterSpacing:1.5}}>Basic Info</div> <Grid2><Field label="Venue Name *"><input value={f.name} onChange={set("name")} placeholder="The Bluestone"/></Field><Field label="Venue Type"><input value={f.venue_type} onChange={set("venue_type")} placeholder="Historic Ballroom"/></Field></Grid2> <Field label="Description"><textarea value={f.description} onChange={set("description")} placeholder="What makes your space special?"/></Field> <Grid2><Field label="Capacity"><input type="number" value={f.capacity} onChange={set("capacity")} placeholder="200"/></Field><Field label="Indoor/Outdoor"><select value={f.indoor_outdoor} onChange={set("indoor_outdoor")}><option value="indoor">Indoor</option><option value="outdoor">Outdoor</option><option value="both">Both</option></select></Field></Grid2> </Card> <Card> <div style={{fontFamily:"'DM Sans',sans-serif",fontWeight:700,fontSize:11,marginBottom:18,color:"var(--sub)",textTransform:"uppercase",letterSpacing:1.5}}>Location & Contact</div> <Field label="Address"><input value={f.address} onChange={set("address")} placeholder="583 E Broad St"/></Field> <Field label="Neighborhood"><input value={f.neighborhood} onChange={set("neighborhood")} placeholder="Downtown"/></Field> <Field label="Website"><input value={f.website} onChange={set("website")} placeholder="https://yourvenue.com"/></Field> <Field label="Phone"><input value={f.phone} onChange={set("phone")} placeholder="(614) 555-0000"/></Field> <Field label="Booking Email"><input type="email" value={f.email} onChange={set("email")} placeholder="bookings@venue.com"/></Field> </Card> <Card> <div style={{fontFamily:"'DM Sans',sans-serif",fontWeight:700,fontSize:11,marginBottom:18,color:"var(--sub)",textTransform:"uppercase",letterSpacing:1.5}}>Tags & Media</div> <Field label="Tags (comma-separated)"><input value={f.tags} onChange={set("tags")} placeholder="Weddings, Concerts, Corporate"/></Field> <Field label="Amenities (comma-separated)"><input value={f.amenities} onChange={set("amenities")} placeholder="PA System, Bar, Catering"/></Field> <Field label="Cover Photo">
   <div style={{display:"flex",flexDirection:"column",gap:10}}>
     <button type="button" onClick={()=>document.getElementById("coverPhotoInput").click()} style={{background:"#f97316",color:"#fff",border:"none",borderRadius:10,padding:"10px 16px",cursor:"pointer",fontWeight:600,fontSize:14,display:"flex",alignItems:"center",gap:8}}>
       <span>📷</span> Upload Photo from Gallery
