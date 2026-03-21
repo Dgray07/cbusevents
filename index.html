@@ -1520,28 +1520,32 @@ function renderHome(){
  <section style="padding:0 48px 52px">
    <div style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:20px">
      <div>
-       <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.2em;text-transform:uppercase;color:var(--orange);margin-bottom:6px">Columbus Venues</div>
-       <h2 style="font-family:var(--font);font-size:22px;font-weight:800;letter-spacing:-0.03em;color:var(--text)">Find Your Space</h2>
+       <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.2em;text-transform:uppercase;color:var(--orange);margin-bottom:6px">Available for Booking</div>
+       <h2 style="font-family:var(--font);font-size:22px;font-weight:800;letter-spacing:-0.03em;color:var(--text)">Book Your Space</h2>
      </div>
      <button onclick="showPage('venues')" style="font-family:var(--mono);font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:var(--orange);background:none;border:none;cursor:pointer">Browse All</button>
    </div>
    <div class="rh-venues-scroll">
      ${(venueScroll.length?venueScroll:allVenues.slice(0,6)).map(v=>{
        const img = getVenueImg(v);
+       const venueEvents = allEvents.filter(e=>e.venue_id===v.id&&isThisWeek(e.start_time)).length;
        return `<div class="rh-venue-card" onclick="showPage('venue',allVenues.find(x=>x.id==='${v.id}'))">
          <div class="rh-venue-img">${img?`<img src="${img}" alt="${v.name}" onerror="this.style.display='none'">`:''}
            ${v.is_featured?'<div class="rh-badge-featured">Featured</div>':''}
            <span class="rh-venue-tag">${v.venue_type||'Venue'}</span>
+           <div style="position:absolute;top:10px;left:10px;background:rgba(52,211,153,0.9);color:#000;font-family:var(--mono);font-size:8px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;padding:3px 9px;border-radius:9999px">Available</div>
          </div>
          <div class="rh-venue-info">
            <div class="rh-venue-name">${v.name}</div>
-           <div class="rh-venue-meta">${v.neighborhood||'Columbus'}${v.capacity?` · ${v.capacity} cap`:''}</div>
+           <div class="rh-venue-meta">${v.neighborhood||'Columbus'}${v.capacity?` · Up to ${v.capacity}`:''}</div>
+           <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.08em;color:var(--orange);margin-top:4px">${venueEvents>0?venueEvents+' event'+(venueEvents>1?'s':'')+' this week · ':''}Send Inquiry →</div>
          </div>
        </div>`;
      }).join('')}
      <div class="rh-venue-card" onclick="window.location.href='https://cbusevents.com/signup.html?role=venue'" style="border:1px dashed rgba(255,107,53,0.3);background:rgba(255,107,53,0.03);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:24px 16px">
-       <div style="font-family:var(--font);font-weight:700;font-size:14px;color:var(--text);margin-bottom:5px">Your Venue</div>
-       <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:var(--orange)">List Free</div>
+       <div style="font-family:var(--font);font-weight:700;font-size:14px;color:var(--text);margin-bottom:5px">Your Venue Here</div>
+       <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:var(--orange);margin-bottom:8px">Founding spots open</div>
+       <div style="font-family:var(--mono);font-size:8px;letter-spacing:0.08em;color:var(--muted)">List free · Be discoverable</div>
      </div>
    </div>
  </section>
