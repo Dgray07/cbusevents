@@ -1224,19 +1224,11 @@ async function renderPlanners(){
 }
 
 async function deletePlanner(userId){
- if(!confirm('Delete this planner account?\n\nThis will remove their profile and account. Cannot be undone.'))return;
+ if(!confirm('Delete this planner?\n\nThis removes their planner profile. Cannot be undone.'))return;
 
- // Delete from planners table
- const{error:e1}=await sb.from('planners').delete().eq('user_id',userId);
- if(e1)console.warn('planners delete:',e1.message);
-
- // Delete user_roles - this is the critical one
- const{error:e2}=await sb.from('user_roles').delete().eq('user_id',userId);
- if(e2){toast('Error: '+e2.message,'error');console.error('user_roles:',e2);return;}
-
- // Try auth delete - non-blocking
- const{error:e3}=await sb.rpc('admin_delete_user',{target_user_id:userId});
- if(e3)console.warn('auth delete RPC (non-fatal):',e3.message);
+ await sb.from('planners').delete().eq('user_id',userId);
+ const{error}=await sb.from('user_roles').delete().eq('user_id',userId);
+ if(error){toast('Error: '+error.message,'error');return;}
 
  toast('Planner deleted');
  await renderPlanners();
@@ -1389,28 +1381,18 @@ async function saveVendorEdit(){
 }
 
 async function deleteVendor(id,name){
- if(!confirm(`Delete "${name}"?\n\nThis will remove their vendor profile and account. Cannot be undone.`))return;
+ if(!confirm(`Delete "${name}"?\n\nThis will remove their vendor listing. Cannot be undone.`))return;
  const vendor=allVendors.find(v=>v.id===id);
  const userId=vendor?.user_id;
 
- // Delete vendor profile
  const{error:e1}=await sb.from('vendors').delete().eq('id',id);
- if(e1){toast('Error deleting vendor: '+e1.message,'error');console.error('vendor delete:',e1);return;}
+ if(e1){toast('Error: '+e1.message,'error');return;}
 
- // Delete user_roles
  if(userId){
-   const{error:e2}=await sb.from('user_roles').delete().eq('user_id',userId);
-   if(e2)console.warn('user_roles delete:',e2.message);
+   await sb.from('user_roles').delete().eq('user_id',userId);
  }
 
- // Try auth delete via RPC - non-blocking
- if(userId){
-   const{error:e3}=await sb.rpc('admin_delete_user',{target_user_id:userId});
-   if(e3)console.warn('auth delete RPC (non-fatal):',e3.message);
- }
-
- await loadData();
- renderPage();
+ await loadData();renderPage();
  toast('Vendor deleted');
 }
 
