@@ -571,6 +571,11 @@ async function doLogin(){
  const{error,data}=await sb.auth.signInWithPassword({email,password:pass});
  if(error){const el=document.getElementById('aErr');if(el){el.textContent=error.message;el.style.display='block';}return;}
  currentUser=data.user;
+ // Redirect if wrong portal
+ const{data:rd}=await sb.from('user_roles').select('role').eq('user_id',currentUser.id).maybeSingle();
+ const role=rd?.role;
+ if(role==='vendor'){window.location.href='https://cbusevents.com/cbus-vendor-portal.html';return;}
+ if(role==='venue_owner'){window.location.href='https://cbusevents.com/cbus-venue-portal.html';return;}
  await loadData();await handleBoostReturn();setLoggedInNav();
  const upgradeParam=new URLSearchParams(window.location.search).get('upgrade');
  if(upgradeParam&&['pro','agency'].includes(upgradeParam)) nav('billing');

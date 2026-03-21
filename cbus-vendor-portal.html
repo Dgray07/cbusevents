@@ -334,7 +334,6 @@ let currentUser=null,vendorProfile=null,currentTab='signin';
 let selectedServices=new Set(),portfolioPhotos=[];
 
 
-// ── SOCIAL SHARE ──────────────────────────────────────────────
 function openVendorShareModal(eventId, eventTitle, venueName, eventDate){
  const eventUrl=`https://cbusevents.com/?event=${eventId}`;
  const text=encodeURIComponent(` ${eventTitle} at ${venueName} in Columbus! Get tickets → ${eventUrl}`);
@@ -344,7 +343,9 @@ function openVendorShareModal(eventId, eventTitle, venueName, eventDate){
  {name:"TikTok",icon:"",color:"#ff0050",url:`https://www.tiktok.com/`},
  {name:"Instagram",icon:"",color:"#e1306c",url:`https://www.instagram.com/`},
  ];
- document.getElementById('modalContainer').innerHTML=`
+ const mc=document.getElementById('modalContainer');
+ mc.style.display='flex';
+ mc.innerHTML=`
  <div class="modal-overlay" onclick="if(event.target===this)closeModal()"> <div class="modal"> <div class="modal-header"> <div class="modal-title"> Share This Event</div> <button onclick="closeModal()" style="background:none;border:none;color:var(--sub);font-size:18px;cursor:pointer"></button> </div> <div class="modal-body"> <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-bottom:18px"> <div style="font-weight:600;font-size:14px">${eventTitle}</div> <div style="color:var(--sub);font-size:12px;margin-top:3px"> ${venueName} · ${eventDate}</div> </div> <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:18px"> ${platforms.map(p=>`
  <a href="${p.url}" target="_blank" rel="noopener noreferrer"
  style="display:flex;align-items:center;gap:10px;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 14px;text-decoration:none;color:var(--text);font-weight:600;font-size:13px"
@@ -355,14 +356,21 @@ function openVendorShareModal(eventId, eventTitle, venueName, eventDate){
 }
 
 // ── AUTH ──────────────────────────────────────────────────────
+let _initDone=false; // guard against onAuthStateChange double-fire on page load
+
 async function init(){
  const params=new URLSearchParams(window.location.search);
  const{data:{session}}=await sb.auth.getSession();
  if(session?.user){currentUser=session.user;await enterPortal();}
  else if(params.get("tab")==="signup"){setTimeout(()=>switchTab("signup"),100);}
- sb.auth.onAuthStateChange(async(_,session)=>{
- currentUser=session?.user??null;
- if(currentUser)await enterPortal(); else exitPortal();
+ _initDone=true;
+ sb.auth.onAuthStateChange(async(event,session)=>{
+   // Only handle SIGNED_IN for events AFTER init — TOKEN_REFRESHED must not re-run enterPortal
+   if(event==='SIGNED_IN' && session?.user && !currentUser && _initDone){
+     currentUser=session.user;await enterPortal();
+   } else if(event==='SIGNED_OUT'){
+     currentUser=null;exitPortal();
+   }
  });
 }
 
@@ -469,9 +477,10 @@ function exitPortal(){
 
 function updatePlanBadge(){
  const badge=document.getElementById('planBadge');
+ if(!badge)return;
  const tier=(vendorProfile?.subscription_tier||'FREE').toUpperCase();
- badge.textContent=tier==='PREMIUM'?'⭐ Premium':tier==='STANDARD'?' Standard':'Free';
- badge.className='nav-plan '+(tier==='PREMIUM'?'plan-premium':tier==='STANDARD'?'plan-standard':'plan-free');
+ badge.textContent=tier==='PREMIUM'?'⭐ Premium':tier==='STANDARD'?' Standard':'Free Tier';
+ badge.className='sidebar-plan-badge '+(tier==='PREMIUM'?'tier-premium':tier==='STANDARD'?'tier-standard':'tier-free');
 }
 
 // ── PAGE NAV ──────────────────────────────────────────────────
@@ -666,7 +675,7 @@ async function saveProfile(){
 
 // ── SERVICES ──────────────────────────────────────────────────
 function renderServicesGrid(){
- document.getElementById('servicesGrid').innerHTML=SERVICES.map(s=>`<div class="service-chip ${selectedServices.has(s.key)?'active':''}" onclick="toggleService('${s.key}')"><div><div class="service-chip-name">${s.name}</div><div class="service-chip-desc">${s.desc}</div></div></div>`).join('');
+ document.getElementById('servicesGrid').innerHTML=SERVICES.map(s=>`<div id="svc-${s.key}" class="service-chip ${selectedServices.has(s.key)?'active':''}" onclick="toggleService('${s.key}')"><div><div class="service-chip-name">${s.name}</div><div class="service-chip-desc">${s.desc}</div></div></div>`).join('');
 }
 
 function toggleService(key){
@@ -897,12 +906,14 @@ async function loadBrowseEvents(){
 }
 
 function openProposalModal(eventId,eventTitle,venueName){
- document.getElementById('modalContainer').innerHTML=`
+ const mc=document.getElementById('modalContainer');
+ mc.style.display='flex';
+ mc.innerHTML=`
  <div class="modal-overlay" onclick="if(event.target===this)closeModal()"> <div class="modal"> <div class="modal-header"> <div class="modal-title"> Send a Proposal</div> <button onclick="closeModal()" style="background:none;border:none;color:var(--sub);font-size:18px;cursor:pointer"></button> </div> <div class="modal-body"> <div style="background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:12px 14px;margin-bottom:16px"> <div style="font-weight:600;font-size:13px">${eventTitle}</div> <div style="font-size:12px;color:var(--sub);margin-top:2px"> ${venueName}</div> </div> <div class="field"><label>Your Pitch *</label><textarea id="proposalMsg" placeholder="Introduce your business and how you can help with this event. Be specific about what you offer and your rates..." style="min-height:120px"></textarea></div> <div class="field"><label>Your Rate / Starting Price (optional)</label><input id="proposalRate" placeholder="e.g. Starting at $500 · Packages from $250"/></div> </div> <div class="modal-footer"> <button class="btn btn-orange" onclick="sendProposal('${eventId}')">Send Proposal →</button> <button class="btn btn-ghost" onclick="closeModal()">Cancel</button> </div> </div> </div>`;
 }
 
 async function sendProposal(eventId){
- const message=(document.getElementById('pageContent'))?.value.trim();
+ const message=document.getElementById('proposalMsg')?.value.trim();
  const rate=document.getElementById('proposalRate')?.value.trim();
  if(!message){toast('Please write a pitch message','error');return;}
 
@@ -946,7 +957,11 @@ function toast(msg,type='success'){
  setTimeout(()=>el.style.display='none',3000);
 }
 
-function closeModal(){document.getElementById('modalContainer').innerHTML='';}
+function closeModal(){
+ const mc=document.getElementById('modalContainer');
+ mc.innerHTML='';
+ mc.style.display='none';
+}
 
 // ── INIT ──────────────────────────────────────────────────────
 init();

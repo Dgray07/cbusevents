@@ -260,10 +260,14 @@ function AuthProvider({ children }) {
  if (session?.user) fetchProfile(session.user.id);
  else setLoading(false);
  });
- const { data: { subscription } } = sb.auth.onAuthStateChange((_e, session) => {
- setUser(session?.user ?? null);
- if (session?.user) fetchProfile(session.user.id);
- else { setProfile(null); setLoading(false); }
+ const { data: { subscription } } = sb.auth.onAuthStateChange((event, session) => {
+   // Only react to explicit sign-in / sign-out events — ignore TOKEN_REFRESHED etc.
+   if (event === 'SIGNED_IN') {
+     setUser(session?.user ?? null);
+     if (session?.user) fetchProfile(session.user.id);
+   } else if (event === 'SIGNED_OUT') {
+     setUser(null); setProfile(null); setLoading(false);
+   }
  });
  return () => subscription.unsubscribe();
  }, []);
@@ -302,8 +306,8 @@ function AuthPage() {
  setBusy(true); setErr(""); setMsg("");
  try {
  if (mode==="signin") { const {error}=await sb.auth.signInWithPassword({email,password:pw}); if(error) setErr(error.message); }
- else if (mode==="signup") { const {data:suData,error}=await sb.auth.signUp({email,password:pw,options:{emailRedirectTo:'https://cbusevents.com/auth.html',data:{full_name:name}}}); if(error) setErr(error.message); else { if(suData?.user){await sb.from('user_roles').insert({user_id:suData.user.id,role:'venue_owner'}).select().maybeSingle().catch(()=>{});} setMsg("Check your email to confirm, then sign in!"); } }
- else { const {error}=await sb.auth.resetPasswordForEmail(email,{redirectTo:'https://cbusevents.com/auth.html'}); if(error) setErr(error.message); else setMsg("Reset email sent! Check your inbox."); }
+ else if (mode==="signup") { const {data:suData,error}=await sb.auth.signUp({email,password:pw,options:{emailRedirectTo:'https://cbusevents.com/cbus-venue-portal.html',data:{full_name:name}}}); if(error) setErr(error.message); else { if(suData?.user){await sb.from('user_roles').insert({user_id:suData.user.id,role:'venue_owner'}).select().maybeSingle().catch(()=>{});} setMsg("Check your email to confirm, then sign in!"); } }
+ else { const {error}=await sb.auth.resetPasswordForEmail(email,{redirectTo:'https://cbusevents.com/cbus-venue-portal.html'}); if(error) setErr(error.message); else setMsg("Reset email sent! Check your inbox."); }
  } catch(e) { setErr("Network error. Check your connection."); }
  setBusy(false);
  };
@@ -778,6 +782,7 @@ function MarketingServices({venue}) {
 // Plan & Billing
 function PlanBilling({venue}) {
  const cur=venue?.tier||"free";
+ const {user}=useAuth();
  const [loading,setLoading]=React.useState(null);
  const [err,setErr]=React.useState(null);
 
@@ -847,6 +852,16 @@ function Portal() {
  const [venue,setVenue]=useState(null);
  const [events,setEvents]=useState([]);
  const [busy,setBusy]=useState(true);
+
+ // Role guard — redirect if this user belongs to a different portal
+ useEffect(()=>{
+   if(!user)return;
+   sb.from('user_roles').select('role').eq('user_id',user.id).maybeSingle().then(({data})=>{
+     const role=data?.role;
+     if(role==='vendor'){window.location.href='https://cbusevents.com/cbus-vendor-portal.html';}
+     else if(role==='planner'){window.location.href='https://cbusevents.com/cbus-planner-portal.html';}
+   });
+ },[user?.id]);
  const load=async(retry=0)=>{
  setBusy(true);
  const {data:v}=await sb.from("venues").select("*").eq("owner_id",user.id).maybeSingle();
