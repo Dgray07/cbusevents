@@ -1391,9 +1391,19 @@ function renderHome(){
      <button onclick="showPage('events')" style="font-family:var(--mono);font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:var(--orange);background:none;border:none;cursor:pointer">View All</button>
    </div>
    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px">
+     <div id="catAll" onclick="filterHomeMap('All',this)"
+       style="position:relative;border-radius:var(--r-lg);overflow:hidden;cursor:pointer;transition:transform 0.2s;aspect-ratio:4/3;min-height:100px;outline:3px solid var(--orange);outline-offset:2px"
+       onmouseover="this.style.transform='scale(1.02)'"
+       onmouseout="this.style.transform='scale(1)'">
+       <div style="position:absolute;inset:0;background:linear-gradient(135deg,#1a0800,#0f0f1a)"></div>
+       <div style="position:absolute;inset:0;padding:14px 16px;display:flex;flex-direction:column;justify-content:flex-end">
+         <div style="font-family:var(--font);font-weight:800;font-size:15px;color:#fff;margin-bottom:3px;letter-spacing:-0.02em">All Events</div>
+         <div style="font-family:var(--mono);font-size:9px;color:var(--orange);letter-spacing:0.14em;text-transform:uppercase">${allEvents.length} total</div>
+       </div>
+     </div>
      ${CATEGORIES.map(cat=>`
-       <div onclick="showPage('events')"
-         style="position:relative;border-radius:var(--r-lg);overflow:hidden;cursor:pointer;transition:transform 0.2s;aspect-ratio:4/3;min-height:100px"
+       <div id="cat${cat.key}" onclick="filterHomeMap('${cat.key}',this)"
+         style="position:relative;border-radius:var(--r-lg);overflow:hidden;cursor:pointer;transition:all 0.2s;aspect-ratio:4/3;min-height:100px"
          onmouseover="this.style.transform='scale(1.02)'"
          onmouseout="this.style.transform='scale(1)'">
          <img src="${cat.img}" alt="${cat.name}"
@@ -1409,13 +1419,47 @@ function renderHome(){
  </section>
 
  <!-- ══════════════════════════════════════════
+      EVENTS MAP - filters with category cards
+ ══════════════════════════════════════════ -->
+ <section style="padding:0 48px;margin-top:32px">
+   <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+     <div>
+       <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.2em;text-transform:uppercase;color:var(--orange);margin-bottom:5px">
+         <span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--orange);animation:pulse 2s infinite;margin-right:6px;vertical-align:middle"></span>
+         Live Near You
+       </div>
+       <h2 id="mapSectionTitle" style="font-family:var(--font);font-size:22px;font-weight:800;letter-spacing:-0.03em;color:var(--text)">All Columbus Events</h2>
+     </div>
+     <div style="font-family:var(--mono);font-size:10px;color:var(--sub);letter-spacing:0.08em" id="mapEventCount"></div>
+   </div>
+   <div style="position:relative;border-radius:var(--r-lg);overflow:hidden;border:1px solid var(--border)">
+     <div id="homeMap" style="width:100%;height:420px"></div>
+     <!-- Map popup -->
+     <div id="homeMapPopup" style="display:none;position:absolute;bottom:20px;left:50%;transform:translateX(-50%);background:var(--card);border:1px solid var(--border);border-radius:var(--r-lg);padding:0;min-width:260px;max-width:320px;box-shadow:0 8px 40px rgba(0,0,0,0.6);z-index:10;overflow:hidden;cursor:pointer">
+       <div id="homeMapPopupImg" style="height:120px;background:var(--surface);overflow:hidden;position:relative"></div>
+       <div style="padding:14px 16px">
+         <div id="homeMapPopupCat" style="font-family:var(--mono);font-size:9px;letter-spacing:0.14em;text-transform:uppercase;color:var(--orange);margin-bottom:4px"></div>
+         <div id="homeMapPopupTitle" style="font-family:var(--font);font-weight:700;font-size:14px;color:var(--text);margin-bottom:4px;line-height:1.2"></div>
+         <div id="homeMapPopupMeta" style="font-size:11px;color:var(--muted)"></div>
+         <div id="homeMapPopupVenue" style="font-size:11px;color:var(--sub);margin-top:2px"></div>
+       </div>
+     </div>
+     <!-- Location button -->
+     <button onclick="centerHomeMapOnUser()" style="position:absolute;top:12px;right:12px;background:var(--card);border:1px solid var(--border);border-radius:var(--r-md);padding:8px 12px;font-family:var(--mono);font-size:9px;letter-spacing:0.1em;text-transform:uppercase;color:var(--text);cursor:pointer;z-index:10;display:flex;align-items:center;gap:6px">
+       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg>
+       Near Me
+     </button>
+   </div>
+ </section>
+
+ <!-- ══════════════════════════════════════════
       LIVE EVENTS GRID
  ══════════════════════════════════════════ -->
- <section style="padding:48px">
+ <section style="padding:32px 48px 48px">
    <div style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:24px">
      <div>
        <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.2em;text-transform:uppercase;color:var(--orange);margin-bottom:6px">Happening in Columbus</div>
-       <h2 style="font-family:var(--font);font-size:22px;font-weight:800;letter-spacing:-0.03em;color:var(--text)">Upcoming Events</h2>
+       <h2 id="eventsGridTitle" style="font-family:var(--font);font-size:22px;font-weight:800;letter-spacing:-0.03em;color:var(--text)">Upcoming Events</h2>
      </div>
      <button onclick="showPage('events')" style="font-family:var(--mono);font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:var(--orange);background:none;border:none;cursor:pointer">View All Events</button>
    </div>
@@ -1584,6 +1628,7 @@ function renderHome(){
  window.heroTimer = heroTimer;
 
  buildHeroCards();
+ setTimeout(()=>initHomeMap(), 300);
 }
 
 function initHero(){
@@ -1599,6 +1644,171 @@ function initHero(){
 }
 
 // goSlide defined in renderHome
+
+
+// ── HOME MAP ─────────────────────────────────────────────────
+let _homeMap = null;
+let _homeMapMarkers = [];
+let _activeHomeCategory = 'All';
+const COLUMBUS_CENTER = [-82.9988, 39.9612];
+const MAPBOX_TOKEN = 'pk.eyJ1IjoiY2J1c2V2ZW50cyIsImEiOiJjbW1oNWJhaDYwYnVrMnJxN3hxdGJlZmhkIn0.RtF51b0qghUlJAjHgNRdFQ';
+
+function initHomeMap(){
+  const container = document.getElementById('homeMap');
+  if(!container || _homeMap) return;
+  mapboxgl.accessToken = MAPBOX_TOKEN;
+  _homeMap = new mapboxgl.Map({
+    container: 'homeMap',
+    style: 'mapbox://styles/mapbox/dark-v11',
+    center: COLUMBUS_CENTER,
+    zoom: 11,
+    attributionControl: false
+  });
+  _homeMap.addControl(new mapboxgl.NavigationControl({showCompass:false}), 'bottom-right');
+  _homeMap.on('load', ()=>{
+    renderHomeMapMarkers('All');
+    centerHomeMapOnUser();
+  });
+}
+
+function centerHomeMapOnUser(){
+  if(!_homeMap) return;
+  if(navigator.geolocation){
+    navigator.geolocation.getCurrentPosition(pos=>{
+      _homeMap.flyTo({center:[pos.coords.longitude,pos.coords.latitude],zoom:12,duration:1200});
+    }, ()=>{
+      _homeMap.flyTo({center:COLUMBUS_CENTER,zoom:11,duration:800});
+    });
+  }
+}
+
+function renderHomeMapMarkers(category){
+  if(!_homeMap) return;
+  // Clear existing markers
+  _homeMapMarkers.forEach(m=>m.remove());
+  _homeMapMarkers=[];
+
+  const filtered = category==='All'
+    ? allEvents.filter(e=>e.lat||e.lng||e.venues?.lat||e.venues?.lng)
+    : allEvents.filter(e=>(e.category===category||e.category===(category==='Concert'?'Concert':category))
+        && (e.lat||e.lng||e.venues?.lat||e.venues?.lng));
+
+  // Update count
+  const countEl = document.getElementById('mapEventCount');
+  if(countEl) countEl.textContent = filtered.length + ' event' + (filtered.length!==1?'s':'');
+
+  const bounds = new mapboxgl.LngLatBounds();
+  let hasCoords = false;
+
+  filtered.forEach(e=>{
+    const lat = parseFloat(e.lat||e.venues?.lat||0);
+    const lng = parseFloat(e.lng||e.venues?.lng||0);
+    if(!lat||!lng) return;
+
+    hasCoords = true;
+    bounds.extend([lng,lat]);
+
+    // Create pin
+    const el = document.createElement('div');
+    el.style.cssText = 'width:36px;height:36px;border-radius:50%;background:var(--orange);border:3px solid #fff;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 12px rgba(255,107,53,0.5);transition:transform 0.15s;font-size:14px;';
+    // Category emoji on pin
+    const catEmoji = {Concert:'🎵',Sports:'🏆',Arts:'🎨',Comedy:'😂',Nightlife:'🍸',Corporate:'💼',Theater:'🎭',Wedding:'💍',Networking:'🤝'}[e.category]||'📍';
+    el.innerHTML = catEmoji;
+    el.onmouseover = ()=>el.style.transform='scale(1.2)';
+    el.onmouseout  = ()=>el.style.transform='scale(1)';
+    el.onclick = ()=>showHomeMapPopup(e);
+
+    const marker = new mapboxgl.Marker({element:el}).setLngLat([lng,lat]).addTo(_homeMap);
+    _homeMapMarkers.push(marker);
+  });
+
+  // Fit bounds if we have coords
+  if(hasCoords && _homeMapMarkers.length > 0){
+    if(_homeMapMarkers.length === 1){
+      _homeMap.flyTo({center:_homeMapMarkers[0].getLngLat(),zoom:14,duration:800});
+    } else {
+      _homeMap.fitBounds(bounds,{padding:{top:60,bottom:80,left:60,right:60},duration:800,maxZoom:14});
+    }
+  }
+}
+
+function showHomeMapPopup(e){
+  const popup = document.getElementById('homeMapPopup');
+  const img   = document.getElementById('homeMapPopupImg');
+  const cat   = document.getElementById('homeMapPopupCat');
+  const title = document.getElementById('homeMapPopupTitle');
+  const meta  = document.getElementById('homeMapPopupMeta');
+  const venue = document.getElementById('homeMapPopupVenue');
+  if(!popup) return;
+
+  img.innerHTML = e.cover_image_url
+    ? `<img src="${e.cover_image_url}" style="width:100%;height:100%;object-fit:cover" onerror="this.style.display='none'">`
+    : `<div style="width:100%;height:100%;background:linear-gradient(135deg,rgba(255,107,53,0.15),rgba(129,140,248,0.1))"></div>`;
+  cat.textContent   = e.category || 'Event';
+  title.textContent = e.title;
+  meta.textContent  = fmt(e.start_time) + (fmtTime(e.start_time) ? ' at ' + fmtTime(e.start_time) : '');
+  venue.textContent = e.venue_name_override || e.venues?.name || 'Columbus Venue';
+  popup.style.display = 'block';
+  popup.onclick = ()=>openEventModal(e.id);
+  // Auto-hide after 6 seconds
+  clearTimeout(popup._hideTimer);
+  popup._hideTimer = setTimeout(()=>popup.style.display='none', 6000);
+}
+
+function filterHomeMap(category, clickedEl){
+  _activeHomeCategory = category;
+
+  // Update category card outlines
+  document.querySelectorAll('[id^="cat"]').forEach(el=>{
+    el.style.outline = 'none';
+    el.style.outlineOffset = '0';
+  });
+  if(clickedEl){
+    clickedEl.style.outline = '3px solid var(--orange)';
+    clickedEl.style.outlineOffset = '2px';
+  }
+
+  // Update map
+  renderHomeMapMarkers(category);
+
+  // Update section title
+  const mapTitle  = document.getElementById('mapSectionTitle');
+  const gridTitle = document.getElementById('eventsGridTitle');
+  const label = category === 'All' ? 'All Columbus Events' : category + ' Events';
+  if(mapTitle)  mapTitle.textContent  = label;
+  if(gridTitle) gridTitle.textContent = label;
+
+  // Update events grid
+  const grid = document.getElementById('homeEventsGrid');
+  if(!grid) return;
+  const filtered = category==='All'
+    ? [...allEvents].slice(0,8)
+    : allEvents.filter(e=>e.category===category).slice(0,8);
+
+  if(filtered.length===0){
+    grid.innerHTML = "<div style='padding:40px 20px;text-align:center;color:var(--sub);font-size:13px'>No " + category + " events right now.</div>";
+    return;
+  }
+
+  grid.innerHTML = filtered.map(e=>{
+    const venueName = e.venue_name_override||e.venues?.name||'Columbus Venue';
+    const img = e.cover_image_url;
+    const tw = isThisWeek(e.start_time);
+    return `<div onclick="openEventModal('${e.id}')"
+      style="cursor:pointer;transition:transform 0.2s;scroll-snap-align:start;flex:0 0 72vw;max-width:280px"
+      onmouseover="this.style.transform='translateY(-3px)'"
+      onmouseout="this.style.transform='translateY(0)'">
+      <div style="width:100%;aspect-ratio:1/1;border-radius:16px;overflow:hidden;background:var(--surface);margin-bottom:12px;position:relative">
+        ${img?`<img src="${img}" alt="${e.title}" style="width:100%;height:100%;object-fit:cover">`:`<div style="width:100%;height:100%;background:linear-gradient(135deg,rgba(255,107,53,0.15),rgba(129,140,248,0.1))"></div>`}
+        ${tw?`<div style="position:absolute;top:10px;left:10px;background:var(--green);color:#000;font-family:var(--mono);font-size:8px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;padding:3px 9px;border-radius:9999px">This Week</div>`:''}
+        ${e.is_third_party?`<div style="position:absolute;top:10px;right:10px;background:rgba(8,8,16,0.7);color:var(--sub);font-family:var(--mono);font-size:8px;letter-spacing:0.08em;padding:2px 8px;border-radius:9999px;border:1px solid var(--border)">Ticketmaster</div>`:''}
+      </div>
+      <div style="font-family:var(--font);font-weight:700;font-size:15px;letter-spacing:-0.02em;color:var(--text);margin-bottom:5px;line-height:1.2;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical">${e.title}</div>
+      <div style="font-size:12px;color:var(--muted)">${fmt(e.start_time)}${fmtTime(e.start_time)?' at '+fmtTime(e.start_time):''}</div>
+      <div style="font-size:12px;color:var(--sub)">${venueName}</div>
+    </div>`;
+  }).join('');
+}
 
 function buildHeroCards(){
  const el=document.getElementById('heroCards');
