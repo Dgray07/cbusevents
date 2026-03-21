@@ -1,403 +1,306 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>CBUSEVENTS — Vendor Portal</title>
-<meta name="robots" content="noindex,nofollow"/>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vendor Portal — CBUSEVENTS</title>
+<meta name="theme-color" content="#080810">
+<link rel="apple-touch-icon" href="/assets/cbus-shield.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700;9..40,800;9..40,900&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700;800;900&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <style>
-*{box-sizing:border-box;margin:0;padding:0;}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-font-smoothing:antialiased;}
 :root{
   --bg:#080810;--surface:#0f0f1a;--card:#141420;--card-hover:#18182a;
-  --border:#1e1e2e;--border-sub:#191928;
-  --text:#f0f0fa;--sub:#7070a0;--muted:#40405a;
-  --orange:#FF6B35;--green:#34d399;--red:#f87171;--blue:#818cf8;--gold:#fbbf24;
-  --font:'DM Sans',sans-serif;--mono:'DM Mono',monospace;
+  --border:#1e1e2e;--border-sub:#191928;--text:#f0f0fa;--sub:#7070a0;--muted:#40405a;
+  --orange:#FF6B35;--orange-dim:rgba(255,107,53,0.1);--orange-border:rgba(255,107,53,0.25);
+  --green:#34d399;--green-dim:rgba(52,211,153,0.1);--green-border:rgba(52,211,153,0.2);
+  --red:#f87171;--blue:#818cf8;--blue-dim:rgba(129,140,248,0.1);--blue-border:rgba(129,140,248,0.2);
+  --gold:#fbbf24;--font:'DM Sans',sans-serif;--mono:'DM Mono',monospace;
+  --r-sm:8px;--r-md:10px;--r-lg:14px;--r-xl:16px;--r-full:9999px;
+  --sidebar-w:230px;
 }
 html{scroll-behavior:smooth;}
-body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min-height:100vh;}
+body{background:var(--bg);color:var(--text);font-family:var(--font);display:flex;min-height:100vh;}
 a{text-decoration:none;color:inherit;}
-button{cursor:pointer;font-family:'DM Sans',sans-serif;border:none;}
-input,textarea,select{background:var(--bg);color:var(--text);border:1px solid var(--border);border-radius:8px;padding:10px 14px;font-family:'DM Sans',sans-serif;font-size:14px;width:100%;outline:none;}
-input:focus,textarea:focus,select:focus{border-color:var(--orange);}
+button{font-family:var(--font);cursor:pointer;border:none;}
+input,select,textarea{font-family:var(--font);background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:var(--r-md);padding:10px 14px;color:var(--text);font-size:14px;width:100%;outline:none;transition:border-color 0.18s;}
+input:focus,select:focus,textarea:focus{border-color:var(--orange-border);}
+input::placeholder,textarea::placeholder{color:var(--muted);}
 textarea{resize:vertical;min-height:90px;}
-label{display:block;font-size:12px;color:var(--sub);font-weight:500;margin-bottom:5px;}
-@keyframes spin{to{transform:rotate(360deg);}}
-@keyframes fadeUp{from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:translateY(0);}}
-
-/* ── AUTH ── */
-.auth-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;}
-.auth-card{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:40px;width:100%;max-width:440px;animation:fadeUp 0.4s ease;}
-.auth-logo{font-family:'DM Sans',sans-serif;font-size:22px;font-weight:800;text-align:center;margin-bottom:4px;}
-.auth-logo span{color:var(--orange);}
-.auth-sub{color:var(--sub);font-size:13px;text-align:center;margin-bottom:28px;}
-.auth-tabs{display:grid;grid-template-columns:1fr 1fr;background:var(--surface);border-radius:10px;padding:4px;margin-bottom:24px;}
-.auth-tab{background:none;border:none;color:var(--sub);padding:8px;border-radius:7px;font-size:14px;font-weight:500;transition:all 0.15s;}
-.auth-tab.active{background:var(--card);color:var(--text);font-weight:600;}
-.field{margin-bottom:14px;}
-.btn-primary{background:var(--orange);color:#fff;border:none;border-radius:8px;padding:12px;font-size:14px;font-weight:700;width:100%;transition:opacity 0.15s;}
-.btn-primary:hover{opacity:0.85;}
-.auth-err{color:var(--red);font-size:13px;margin-bottom:10px;min-height:18px;}
-
-/* ── NAV ── */
-nav{position:sticky;top:0;z-index:100;background:rgba(11,11,15,0.95);-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 40px;height:60px;}
-.nav-logo{font-family:'DM Sans',sans-serif;font-weight:800;font-size:18px;cursor:pointer;}
-.nav-logo span{color:var(--orange);}
-.nav-logo-sub{font-size:10px;color:var(--muted);font-weight:400;margin-left:6px;letter-spacing:1px;text-transform:uppercase;}
-.nav-right{display:flex;align-items:center;gap:10px;}
-.nav-home{background:var(--card);border:1px solid var(--border);color:var(--text);border-radius:8px;padding:7px 14px;font-size:13px;font-weight:500;transition:all 0.15s;}
-.nav-home:hover{border-color:var(--muted);}
-.nav-plan{border-radius:20px;padding:4px 12px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;}
-.plan-free{background:var(--surface);color:var(--muted);border:1px solid var(--border);}
-.plan-standard{background:#60a5fa20;color:var(--blue);border:1px solid #60a5fa40;}
-.plan-premium{background:#f59e0b20;color:var(--gold);border:1px solid #f59e0b40;}
-.nav-signout{background:none;border:1px solid var(--border);color:var(--sub);border-radius:8px;padding:7px 14px;font-size:13px;transition:all 0.15s;}
-.nav-signout:hover{color:var(--text);}
-
-/* ── LAYOUT ── */
-.portal-layout{display:grid;grid-template-columns:210px 1fr;min-height:calc(100vh - 60px);}
-@media(max-width:900px){
-  .portal-layout{display:flex;flex-direction:column;}
-  .sidebar{flex-direction:row!important;overflow-x:auto!important;height:auto!important;min-height:0!important;position:relative!important;top:auto!important;width:100%!important;padding:0!important;border-right:none!important;border-bottom:1px solid var(--border)!important;}
-  .sidebar-section{display:none!important;}
-  .nav-item{flex-shrink:0!important;white-space:nowrap!important;border-radius:0!important;border-bottom:3px solid transparent!important;padding:13px 16px!important;font-size:13px!important;}
-  .nav-item.active{background:transparent!important;color:var(--orange)!important;border-bottom-color:var(--orange)!important;}
-  .content{padding:20px 16px!important;flex:1!important;}
-  nav{padding:0 16px!important;}
-  .nav-logo-sub,.nav-home{display:none!important;}
-  .stat-grid{grid-template-columns:1fr 1fr!important;}
-  .plan-grid{grid-template-columns:1fr!important;}
-  .services-grid{grid-template-columns:1fr 1fr!important;}
-}
-
+select option{background:var(--card);}
+label{display:block;font-family:var(--mono);font-size:10px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);margin-bottom:6px;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
 
 /* ── SIDEBAR ── */
-.sidebar{background:var(--surface);border-right:1px solid var(--border);padding:16px 10px;display:flex;flex-direction:column;gap:2px;position:sticky;top:60px;height:calc(100vh - 60px);overflow-y:auto;}
-.sidebar-section{padding:10px 10px 4px;font-size:10px;color:var(--muted);font-weight:700;letter-spacing:1.5px;text-transform:uppercase;}
-.nav-item{display:flex;align-items:center;gap:8px;padding:9px 12px;border-radius:8px;cursor:pointer;font-size:13px;font-weight:500;color:var(--sub);transition:all 0.15s;}
-.nav-item:hover{background:var(--card);color:var(--text);}
-.nav-item.active{background:var(--card);color:var(--text);}
-.nav-item .badge{background:var(--orange);color:#fff;border-radius:20px;padding:1px 7px;font-size:10px;font-weight:700;margin-left:auto;}
+.sidebar{width:var(--sidebar-w);flex-shrink:0;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;position:sticky;top:0;height:100vh;overflow-y:auto;z-index:10;}
+.sidebar::-webkit-scrollbar{width:0;}
+.sidebar-logo{padding:28px 22px 22px;border-bottom:1px solid var(--border-sub);position:relative;}
+.sidebar-logo::after{content:'';position:absolute;bottom:0;left:22px;right:22px;height:1px;background:linear-gradient(90deg,var(--orange),transparent);opacity:0.4;}
+.sidebar-logo-text{font-weight:900;font-size:17px;letter-spacing:-0.05em;text-transform:uppercase;}
+.sidebar-logo-text span{color:var(--orange);}
+.sidebar-logo-sub{font-family:var(--mono);font-size:9px;letter-spacing:0.16em;text-transform:uppercase;color:var(--muted);margin-top:3px;}
+.sidebar-vendor{padding:16px 22px;border-bottom:1px solid var(--border-sub);}
+.vendor-initials{width:40px;height:40px;background:linear-gradient(135deg,#080818,#181840);border-radius:var(--r-md);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;color:var(--blue);margin-bottom:8px;border:1px solid var(--blue-border);font-family:var(--mono);}
+.vendor-name{font-weight:700;font-size:13px;color:var(--text);margin-bottom:2px;letter-spacing:-0.02em;}
+.vendor-tier{display:inline-flex;align-items:center;gap:5px;font-family:var(--mono);font-size:9px;letter-spacing:0.12em;text-transform:uppercase;padding:3px 10px;border-radius:var(--r-full);margin-top:2px;}
+.tier-free{background:rgba(255,255,255,0.04);color:var(--muted);border:1px solid var(--border);}
+.tier-standard{background:var(--orange-dim);color:var(--orange);border:1px solid var(--orange-border);}
+.tier-premium{background:rgba(251,191,36,0.1);color:var(--gold);border:1px solid rgba(251,191,36,0.2);}
+.sidebar-section{padding:18px 22px 6px;font-size:9px;color:var(--muted);font-weight:700;letter-spacing:0.15em;text-transform:uppercase;}
+.nav-item{display:flex;align-items:center;gap:10px;padding:8px 14px 8px 18px;margin:1px 8px;border-radius:var(--r-md);cursor:pointer;font-size:13px;font-weight:500;color:var(--sub);transition:all 0.18s;border-left:2px solid transparent;background:none;width:calc(100% - 16px);text-align:left;}
+.nav-item:hover{background:rgba(255,255,255,0.04);color:var(--text);border-left-color:var(--muted);}
+.nav-item.active{background:linear-gradient(135deg,rgba(255,107,53,0.1),rgba(255,107,53,0.04));color:var(--text);border-left-color:var(--orange);font-weight:600;}
+.nav-item svg{width:15px;height:15px;flex-shrink:0;opacity:0.65;}
+.nav-item.active svg{opacity:1;}
+.sidebar-bottom{margin-top:auto;padding:18px;border-top:1px solid var(--border-sub);}
+.sidebar-plan-badge{background:linear-gradient(135deg,rgba(255,107,53,0.15),rgba(255,107,53,0.06));border:1px solid rgba(255,107,53,0.25);border-radius:8px;padding:6px 10px;font-size:10px;font-weight:700;text-align:center;letter-spacing:0.08em;text-transform:uppercase;color:var(--orange);margin-bottom:10px;}
+.btn-signout{width:100%;background:rgba(255,255,255,0.04);color:var(--sub);border:1px solid var(--border);border-radius:var(--r-md);padding:8px;font-size:12px;font-weight:600;transition:all 0.18s;}
+.btn-signout:hover{color:var(--text);border-color:var(--muted);}
 
-/* ── CONTENT ── */
-.content{padding:32px;animation:fadeUp 0.3s ease;}
-.page{display:none;}
-.page.active{display:block;}
-.page-title{font-family:'DM Sans',sans-serif;font-size:22px;font-weight:800;margin-bottom:6px;}
-.page-sub{color:var(--sub);font-size:14px;margin-bottom:28px;}
-
-/* ── CARDS ── */
-.card{background:var(--card);border:1px solid var(--border);border-radius:14px;overflow:hidden;}
-.card-header{display:flex;align-items:center;justify-content:space-between;padding:18px 22px;border-bottom:1px solid var(--border);}
-.card-title{font-family:'DM Sans',sans-serif;font-size:16px;font-weight:700;}
-.card-body{padding:22px;}
-
-/* ── STAT GRID ── */
-.stat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:14px;margin-bottom:28px;}
-.stat-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:20px;}
-.stat-icon{font-size:22px;margin-bottom:8px;}
-.stat-num{font-family:'DM Sans',sans-serif;font-size:26px;font-weight:800;margin-bottom:3px;}
-.stat-label{font-size:12px;color:var(--sub);}
-
-/* ── SERVICES GRID ── */
-.services-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;}
-.service-card{background:var(--surface);border:1.5px solid var(--border);border-radius:12px;padding:16px 18px;cursor:pointer;transition:all 0.2s;position:relative;}
-.service-card:hover{border-color:var(--orange);}
-.service-card.selected{border-color:var(--orange);background:#FF6B3510;}
-.service-card.selected::after{content:'';position:absolute;top:10px;right:12px;background:var(--orange);color:#fff;border-radius:50%;width:20px;height:20px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;}
-.service-icon{font-size:28px;margin-bottom:8px;}
-.service-name{font-weight:600;font-size:14px;margin-bottom:3px;}
-.service-desc{font-size:12px;color:var(--sub);}
-
-/* ── PORTFOLIO ── */
-.portfolio-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;margin-bottom:20px;}
-.portfolio-item{position:relative;border-radius:10px;overflow:hidden;aspect-ratio:1;background:var(--surface);border:1px solid var(--border);}
-.portfolio-item img{width:100%;height:100%;object-fit:cover;}
-.portfolio-remove{position:absolute;top:6px;right:6px;background:rgba(0,0,0,0.7);border:none;color:#fff;border-radius:6px;width:26px;height:26px;font-size:13px;display:flex;align-items:center;justify-content:center;cursor:pointer;opacity:0;transition:opacity 0.15s;}
-.portfolio-item:hover .portfolio-remove{opacity:1;}
-.portfolio-add{border-radius:10px;aspect-ratio:1;background:var(--surface);border:2px dashed var(--border);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;cursor:pointer;transition:all 0.2s;color:var(--sub);font-size:13px;}
-.portfolio-add:hover{border-color:var(--orange);color:var(--orange);}
-
-/* ── PROPOSALS ── */
-.proposal-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:18px 20px;margin-bottom:12px;transition:all 0.2s;}
-.proposal-card:hover{border-color:var(--orange);}
-.proposal-title{font-weight:600;font-size:14px;margin-bottom:4px;}
-.proposal-meta{font-size:12px;color:var(--sub);margin-bottom:10px;}
-.proposal-status{display:inline-block;border-radius:20px;padding:3px 10px;font-size:11px;font-weight:700;}
-.status-pending{background:#f59e0b20;color:var(--gold);border:1px solid #f59e0b40;}
-.status-accepted{background:#22c55e20;color:var(--green);border:1px solid #22c55e40;}
-.status-declined{background:#ef444420;color:var(--red);border:1px solid #ef444430;}
-
-/* ── PLAN CARDS ── */
-.plan-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;}
-@media(max-width:700px){.plan-grid{grid-template-columns:1fr;}}
-.plan-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:24px;position:relative;display:flex;flex-direction:column;}
-.plan-card.current{border-color:var(--orange);background:linear-gradient(135deg,#1a0800,#1a1a24);}
-.plan-card.popular{border-color:#f59e0b80;}
-.plan-badge{position:absolute;top:-12px;left:50%;transform:translateX(-50%);background:var(--orange);color:#fff;border-radius:20px;padding:3px 14px;font-size:11px;font-weight:700;white-space:nowrap;}
-.plan-name{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;}
-.plan-price{font-family:'DM Sans',sans-serif;font-size:26px;font-weight:800;letter-spacing:-0.03em;margin-bottom:4px;}
-.plan-price span{font-size:14px;color:var(--sub);font-weight:400;}
-.plan-period{color:var(--sub);font-size:13px;margin-bottom:20px;}
-.plan-perks{flex:1;display:flex;flex-direction:column;gap:9px;margin-bottom:24px;}
-.plan-perk{display:flex;gap:8px;font-size:13px;color:var(--sub);}
-.plan-perk .check{color:var(--green);flex-shrink:0;}
-.plan-perk.premium-perk .check{color:var(--gold);}
-.plan-btn{width:100%;border:none;border-radius:9px;padding:11px;font-size:14px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;transition:opacity 0.15s;}
-.plan-btn:hover{opacity:0.85;}
-
-/* ── BROWSE EVENTS (for proposals) ── */
-.event-row{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px 16px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;gap:12px;}
-.event-row-info .event-title{font-weight:600;font-size:14px;margin-bottom:3px;}
-.event-row-info .event-meta{font-size:12px;color:var(--sub);}
-
-/* ── MODAL ── */
-.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:200;display:flex;align-items:center;justify-content:center;padding:20px;overflow-y:auto;}
-.modal{background:var(--card);border:1px solid var(--border);border-radius:18px;width:100%;max-width:560px;animation:fadeUp 0.25s ease;}
-.modal-header{display:flex;justify-content:space-between;align-items:center;padding:20px 24px;border-bottom:1px solid var(--border);}
-.modal-title{font-family:'DM Sans',sans-serif;font-size:17px;font-weight:700;}
-.modal-body{padding:24px;}
-.modal-footer{padding:16px 24px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:8px;}
+/* ── MAIN ── */
+.main{flex:1;overflow-x:hidden;display:flex;flex-direction:column;}
+.topbar{position:sticky;top:0;z-index:50;background:rgba(8,8,16,0.88);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 36px;height:60px;}
+.topbar-title{font-size:16px;font-weight:700;letter-spacing:-0.03em;}
+.topbar-right{display:flex;align-items:center;gap:10px;}
+.content{padding:32px 36px;animation:fadeUp 0.3s ease;flex:1;}
 
 /* ── BUTTONS ── */
-.btn{border:none;border-radius:7px;padding:8px 16px;font-size:13px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all 0.15s;}
-.btn-orange{background:var(--orange);color:#fff;}
-.btn-orange:hover{opacity:0.85;}
-.btn-ghost{background:var(--surface);color:var(--sub);border:1px solid var(--border);}
-.btn-ghost:hover{color:var(--text);}
-.btn-sm{padding:5px 12px;font-size:12px;}
+.btn{border-radius:var(--r-md);font-weight:700;transition:all 0.18s;font-family:var(--font);}
+.btn-primary{background:var(--orange);color:#fff;padding:10px 22px;font-size:13px;}
+.btn-primary:hover{opacity:0.9;box-shadow:0 4px 20px rgba(255,107,53,0.3);}
+.btn-ghost{background:rgba(255,255,255,0.04);color:var(--sub);border:1px solid var(--border);padding:8px 16px;font-size:12px;}
+.btn-ghost:hover{color:var(--text);border-color:var(--muted);}
+.btn-sm{padding:5px 12px;font-size:11px;}
+.btn-danger{background:rgba(248,113,113,0.1);color:var(--red);border:1px solid rgba(248,113,113,0.2);padding:5px 12px;font-size:11px;}
+.btn-danger:hover{background:rgba(248,113,113,0.2);}
 
-/* ── UPGRADE GATE ── */
-.upgrade-gate{background:linear-gradient(135deg,#1a0f00,#1a1a24);border:1px solid #FF6B3540;border-radius:16px;padding:40px;text-align:center;}
-.upgrade-gate-icon{font-size:44px;margin-bottom:14px;}
-.upgrade-gate h3{font-family:'DM Sans',sans-serif;font-size:20px;font-weight:800;margin-bottom:8px;}
-.upgrade-gate p{color:var(--sub);font-size:14px;line-height:1.65;max-width:420px;margin:0 auto 24px;}
+/* ── CARDS ── */
+.card{background:var(--card);border:1px solid var(--border);border-radius:var(--r-lg);}
+.card-header{display:flex;align-items:center;justify-content:space-between;padding:20px 24px;border-bottom:1px solid var(--border-sub);}
+.card-title{font-size:15px;font-weight:700;letter-spacing:-0.02em;}
+.card-sub{font-size:12px;color:var(--sub);margin-top:2px;}
 
-/* ── TOAST ── */
-.toast{position:fixed;bottom:24px;right:24px;z-index:999;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:12px 18px;font-size:13px;font-weight:500;animation:fadeUp 0.3s ease;box-shadow:0 8px 32px rgba(0,0,0,0.4);display:none;}
-.toast.success{border-color:#22c55e40;color:var(--green);}
-.toast.error{border-color:#ef444440;color:var(--red);}
+/* ── STAT CARDS ── */
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;margin-bottom:24px;}
+.stat-card{background:var(--card);border:1px solid var(--border);border-radius:var(--r-lg);padding:20px;}
+.stat-num{font-family:var(--mono);font-size:28px;font-weight:500;color:var(--orange);letter-spacing:-0.02em;line-height:1;margin-bottom:4px;}
+.stat-label{font-family:var(--mono);font-size:9px;letter-spacing:0.14em;text-transform:uppercase;color:var(--muted);}
 
-/* ── MISC ── */
-.empty{text-align:center;padding:60px 20px;color:var(--sub);}
-.empty-icon{font-size:44px;margin-bottom:12px;}
-.empty h3{font-family:'DM Sans',sans-serif;font-size:17px;font-weight:700;margin-bottom:8px;color:var(--text);}
-.spinner{width:28px;height:28px;border:3px solid var(--border);border-top-color:var(--orange);border-radius:50%;animation:spin 0.8s linear infinite;margin:48px auto;display:block;}
-.badge-green{background:#22c55e20;color:var(--green);border:1px solid #22c55e30;border-radius:20px;padding:3px 10px;font-size:11px;font-weight:700;display:inline-block;}
-.badge-orange{background:#FF6B3520;color:var(--orange);border:1px solid #FF6B3530;border-radius:20px;padding:3px 10px;font-size:11px;font-weight:700;display:inline-block;}
-.badge-blue{background:#60a5fa20;color:var(--blue);border:1px solid #60a5fa30;border-radius:20px;padding:3px 10px;font-size:11px;font-weight:700;display:inline-block;}
-.badge-gold{background:#f59e0b20;color:var(--gold);border:1px solid #f59e0b30;border-radius:20px;padding:3px 10px;font-size:11px;font-weight:700;display:inline-block;}
-footer{background:var(--surface);border-top:1px solid var(--border);padding:20px 40px;display:flex;justify-content:space-between;align-items:center;}
-.footer-copy{color:var(--muted);font-size:12px;}
-.footer-admin{color:var(--muted);font-size:11px;font-weight:600;opacity:0.4;transition:opacity 0.2s;}
-.footer-admin:hover{opacity:1;}
+/* ── FORM ── */
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;}
+.form-field{margin-bottom:16px;}
+.form-msg{font-size:12px;margin-top:8px;min-height:18px;}
 
-/* ── MOBILE PORTAL ── */
-@media(max-width:680px){
-  html,body{overflow-x:hidden;}
-  .portal-nav{padding:0 16px !important;height:54px !important;}
-  .portal-sidebar{display:none !important;}
-  .portal-main{margin-left:0 !important;padding:16px !important;}
-  .portal-content{padding:16px !important;}
-  .stats-grid{grid-template-columns:1fr 1fr !important;gap:10px !important;}
-  .modal-inner,.modal-box{width:calc(100vw - 32px) !important;max-width:100% !important;margin:16px !important;}
-  table{display:block;overflow-x:auto;-webkit-overflow-scrolling:touch;}
-  .form-row{grid-template-columns:1fr !important;}
-  .grid-2,.grid-3{grid-template-columns:1fr !important;}
-  .card-grid{grid-template-columns:1fr !important;}
-  .btn-row{flex-direction:column !important;}
-  input,select,textarea{font-size:16px !important;}
-  .page-header{padding:16px !important;}
-  .section-pad{padding:16px !important;}
+/* ── SERVICE CHIPS ── */
+.services-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:8px;margin-bottom:16px;}
+.service-chip{background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:var(--r-md);padding:12px 14px;cursor:pointer;transition:all 0.18s;display:flex;align-items:center;gap:10px;}
+.service-chip:hover{border-color:rgba(255,107,53,0.3);}
+.service-chip.active{background:var(--orange-dim);border-color:var(--orange-border);}
+.service-chip-name{font-size:13px;font-weight:600;color:var(--text);}
+.service-chip.active .service-chip-name{color:var(--orange);}
+.service-chip-desc{font-size:11px;color:var(--muted);margin-top:1px;}
+
+/* ── PROPOSAL ROW ── */
+.proposal-row{display:flex;align-items:flex-start;gap:14px;padding:16px 20px;border-bottom:1px solid var(--border-sub);transition:background 0.15s;}
+.proposal-row:last-child{border-bottom:none;}
+.proposal-row:hover{background:rgba(255,255,255,0.02);}
+.proposal-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:5px;}
+.proposal-body{flex:1;min-width:0;}
+.proposal-title{font-weight:600;font-size:13px;color:var(--text);margin-bottom:3px;}
+.proposal-meta{font-size:11px;color:var(--muted);}
+.proposal-status{font-family:var(--mono);font-size:9px;letter-spacing:0.1em;text-transform:uppercase;padding:3px 9px;border-radius:var(--r-full);flex-shrink:0;}
+
+/* ── PHOTO GRID ── */
+.photo-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:16px;}
+.photo-thumb{aspect-ratio:1;border-radius:var(--r-md);overflow:hidden;position:relative;background:var(--surface);border:1px solid var(--border);}
+.photo-thumb img{width:100%;height:100%;object-fit:cover;}
+.photo-thumb-remove{position:absolute;top:4px;right:4px;background:rgba(0,0,0,0.75);color:#fff;border:none;border-radius:6px;width:22px;height:22px;font-size:14px;display:flex;align-items:center;justify-content:center;cursor:pointer;opacity:0;transition:opacity 0.15s;}
+.photo-thumb:hover .photo-thumb-remove{opacity:1;}
+
+/* ── PLAN CARDS ── */
+.plan-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:16px;margin-bottom:24px;}
+.plan-card{background:var(--card);border:1px solid var(--border);border-radius:var(--r-lg);padding:24px;position:relative;}
+.plan-card.current{border-color:rgba(255,107,53,0.4);}
+.plan-card-badge{position:absolute;top:-10px;left:50%;transform:translateX(-50%);font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;padding:3px 12px;border-radius:var(--r-full);white-space:nowrap;}
+.plan-name{font-weight:800;font-size:18px;letter-spacing:-0.02em;margin-bottom:4px;}
+.plan-price{font-family:var(--mono);font-size:30px;font-weight:500;color:var(--orange);line-height:1;margin-bottom:16px;}
+.plan-price span{font-size:13px;color:var(--muted);}
+.plan-perks{display:flex;flex-direction:column;gap:7px;margin-bottom:20px;}
+.plan-perk{font-size:12px;color:var(--sub);display:flex;align-items:center;gap:7px;}
+.plan-perk::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--green);flex-shrink:0;}
+
+/* ── SPINNER / EMPTY ── */
+.spinner{width:24px;height:24px;border:2px solid var(--border);border-top-color:var(--orange);border-radius:50%;animation:spin 0.8s linear infinite;margin:40px auto;display:block;}
+.empty-state{text-align:center;padding:48px 20px;color:var(--sub);}
+.empty-title{font-weight:700;font-size:15px;color:var(--text);margin-bottom:6px;}
+
+/* ── AUTH GATE ── */
+#authGate{display:none;position:fixed;inset:0;background:var(--bg);z-index:9999;align-items:center;justify-content:center;padding:24px;}
+.auth-box{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:40px;width:100%;max-width:420px;box-shadow:0 32px 80px rgba(0,0,0,0.5);}
+.auth-logo{font-weight:900;font-size:22px;letter-spacing:-0.05em;text-transform:uppercase;text-align:center;margin-bottom:6px;}
+.auth-logo span{color:var(--orange);}
+.auth-sub{color:var(--sub);font-size:13px;text-align:center;margin-bottom:28px;}
+.auth-tabs{display:grid;grid-template-columns:1fr 1fr;gap:0;background:var(--surface);border-radius:10px;padding:4px;margin-bottom:20px;}
+.auth-tab{background:none;color:var(--sub);border:none;padding:8px;border-radius:7px;font-size:14px;font-weight:500;cursor:pointer;transition:all 0.15s;}
+.auth-tab.active{background:var(--card);color:var(--text);font-weight:600;}
+.auth-field{margin-bottom:14px;}
+.auth-err{color:var(--red);font-size:12px;min-height:18px;margin-bottom:8px;}
+.auth-btn{width:100%;background:var(--orange);color:#fff;border:none;border-radius:9px;padding:12px;font-size:14px;font-weight:700;cursor:pointer;font-family:var(--font);transition:opacity 0.18s;}
+.auth-btn:hover{opacity:0.9;}
+.auth-switch{text-align:center;margin-top:16px;font-size:13px;color:var(--sub);}
+.auth-switch-btn{background:none;border:none;color:var(--orange);font-size:13px;font-weight:600;cursor:pointer;margin-left:4px;}
+
+/* ── MOBILE BOTTOM NAV ── */
+.mobile-bottom-nav{display:none;position:fixed;bottom:0;left:0;right:0;background:var(--surface);border-top:1px solid var(--border);z-index:200;padding-bottom:env(safe-area-inset-bottom);}
+.mobile-bottom-nav-inner{display:flex;align-items:stretch;height:58px;padding:0 8px;}
+.mobile-nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;background:none;border:none;cursor:pointer;color:var(--sub);font-size:10px;font-weight:500;transition:color 0.15s;padding:4px 2px;}
+.mobile-nav-btn.active{color:var(--orange);}
+.mobile-nav-btn svg{width:20px;height:20px;flex-shrink:0;}
+
+/* ── RESPONSIVE ── */
+@media(max-width:860px){
+  :root{--sidebar-w:0px;}
+  .sidebar{display:none;}
+  .content{padding:20px;padding-bottom:80px;}
+  .topbar{padding:0 20px;}
+  .form-grid{grid-template-columns:1fr;}
+  .mobile-bottom-nav{display:block;}
 }
-@media(max-width:900px){
-  .portal-sidebar{width:200px !important;}
+@media(max-width:600px){
+  .stats-grid{grid-template-columns:1fr 1fr;}
+  .plan-grid{grid-template-columns:1fr;}
+  .photo-grid{grid-template-columns:repeat(3,1fr);}
 }
-
-</style>
-<style>
-*{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;}
-body{font-family:'DM Sans',sans-serif;}
-h1,h2,h3,h4,h5,h6{font-family:'DM Sans',sans-serif;letter-spacing:-0.02em;}
-.nav-logo,.auth-logo,.login-logo,.sidebar-logo-text{font-family:'DM Sans',sans-serif!important;font-weight:800!important;letter-spacing:-0.04em!important;text-transform:uppercase;}
-.nav-logo span,.auth-logo span,.login-logo span,.sidebar-logo-text span{color:#FF6B35;}
-
-/* ── CBUSEVENTS DESIGN SYSTEM UPGRADE ─────────────────────── */
-:root{
-  --bg:#080810 !important;
-  --surface:#0f0f1a !important;
-  --card:#141420 !important;
-  --card-hover:#18182a !important;
-  --border:#1e1e2e !important;
-  --border-sub:#191928 !important;
-  --text:#f0f0fa !important;
-  --sub:#7070a0 !important;
-  --muted:#40405a !important;
-  --orange:#FF6B35 !important;
-  --green:#34d399 !important;
-  --red:#f87171 !important;
-  --blue:#818cf8 !important;
-  --gold:#fbbf24 !important;
-  --font:'DM Sans',sans-serif !important;
-  --mono:'DM Mono',monospace !important;
-}
-*{ -webkit-font-smoothing:antialiased; }
-body{ font-family:'DM Sans',sans-serif !important; background:var(--bg) !important; color:var(--text) !important; }
-h1,h2,h3,h4,h5,h6{ font-family:'DM Sans',sans-serif !important; letter-spacing:-0.02em; }
-
-/* Stat cards — monospace numbers, hover lift, accent bar */
-.stat-card{
-  background:var(--card) !important; border:1px solid var(--border) !important;
-  border-radius:16px !important; padding:22px 24px 20px !important;
-  position:relative; overflow:hidden; transition:all 0.2s !important;
-}
-.stat-card::before{
-  content:''; position:absolute; top:0; left:0; right:0; height:2px;
-  background:linear-gradient(90deg,transparent,var(--orange),transparent);
-  opacity:0; transition:opacity 0.2s;
-}
-.stat-card:hover{ background:var(--card-hover) !important; transform:translateY(-1px) !important; border-color:rgba(255,255,255,0.08) !important; }
-.stat-card:hover::before{ opacity:1; }
-.stat-num,.stat-card-num,.stat-value{
-  font-family:'DM Mono',monospace !important;
-  font-size:32px !important; font-weight:500 !important;
-  line-height:1 !important; letter-spacing:-0.02em !important; margin-bottom:6px !important;
-}
-.stat-label,.stat-card-label{ font-size:13px !important; color:var(--sub) !important; font-weight:500 !important; }
-.stat-sub,.stat-card-sub,.stat-meta{ font-size:11px !important; color:var(--muted) !important; margin-top:8px !important; }
-
-/* Sidebar nav — orange left-border active indicator */
-.sidebar,.portal-sidebar{ background:var(--surface) !important; border-right:1px solid var(--border) !important; }
-.nav-item{
-  border-left:2px solid transparent !important;
-  border-radius:10px !important; transition:all 0.18s !important;
-  padding:8px 14px 8px 18px !important; margin:1px 8px !important;
-  font-size:13px !important; font-weight:500 !important; color:var(--sub) !important;
-}
-.nav-item:hover{ background:rgba(255,255,255,0.04) !important; color:var(--text) !important; border-left-color:var(--muted) !important; }
-.nav-item.active{
-  background:linear-gradient(135deg,rgba(255,107,53,0.1),rgba(255,107,53,0.04)) !important;
-  color:var(--text) !important; border-left-color:var(--orange) !important; font-weight:600 !important;
-}
-
-/* Topbar / nav */
-.portal-nav,.nav-bar,.topbar{
-  background:rgba(8,8,16,0.88) !important;
-  -webkit-backdrop-filter:blur(20px) !important; backdrop-filter:blur(20px) !important;
-  border-bottom:1px solid var(--border) !important;
-}
-
-/* Cards / panels */
-.card,.panel,.card-section{
-  background:var(--card) !important; border:1px solid var(--border) !important;
-  border-radius:16px !important;
-}
-.card-header,.panel-header{ border-bottom:1px solid var(--border-sub) !important; }
-.card-title,.panel-title{ font-size:15px !important; font-weight:700 !important; letter-spacing:-0.02em !important; }
-
-/* Buttons */
-.btn,.btn-primary,.btn-orange{
-  font-family:'DM Sans',sans-serif !important; font-weight:700 !important;
-  letter-spacing:0.02em !important; border-radius:9px !important; border:none !important;
-  transition:all 0.18s !important; cursor:pointer !important;
-}
-.btn-primary,.btn-orange{ background:var(--orange) !important; color:#fff !important; }
-.btn-primary:hover,.btn-orange:hover{ opacity:0.9 !important; box-shadow:0 4px 20px rgba(255,107,53,0.3) !important; }
-.btn-ghost{ background:rgba(255,255,255,0.04) !important; color:var(--sub) !important; border:1px solid var(--border) !important; }
-.btn-ghost:hover{ color:var(--text) !important; background:rgba(255,255,255,0.07) !important; }
-.btn-outline{ background:transparent !important; border:1.5px solid var(--border) !important; color:var(--text) !important; }
-.btn-outline:hover{ border-color:var(--muted) !important; }
-
-/* Badges */
-.badge{ border-radius:20px !important; padding:3px 10px !important; font-size:10px !important; font-weight:700 !important; letter-spacing:0.04em !important; }
-.badge-green{ background:rgba(52,211,153,0.1) !important; color:var(--green) !important; border:1px solid rgba(52,211,153,0.2) !important; }
-.badge-orange{ background:rgba(255,107,53,0.12) !important; color:var(--orange) !important; border:1px solid rgba(255,107,53,0.2) !important; }
-.badge-blue{ background:rgba(129,140,248,0.1) !important; color:var(--blue) !important; border:1px solid rgba(129,140,248,0.2) !important; }
-.badge-gold{ background:rgba(251,191,36,0.1) !important; color:var(--gold) !important; border:1px solid rgba(251,191,36,0.2) !important; }
-.badge-muted{ background:rgba(255,255,255,0.04) !important; color:var(--muted) !important; border:1px solid var(--border) !important; }
-
-/* Forms */
-input,textarea,select{
-  background:rgba(255,255,255,0.04) !important; border:1px solid var(--border) !important;
-  border-radius:9px !important; color:var(--text) !important;
-  font-family:'DM Sans',sans-serif !important;
-}
-input:focus,textarea:focus,select:focus{
-  border-color:rgba(255,107,53,0.5) !important;
-  background:rgba(255,255,255,0.06) !important;
-  box-shadow:0 0 0 3px rgba(255,107,53,0.08) !important;
-  outline:none !important;
-}
-
-/* Auth / Login */
-.auth-card,.login-card,.auth-wrap > div{
-  background:var(--card) !important; border:1px solid var(--border) !important;
-  border-radius:20px !important; box-shadow:0 32px 80px rgba(0,0,0,0.5) !important;
-}
-.auth-tabs{ border-bottom:1px solid var(--border-sub) !important; background:transparent !important; }
-.auth-tab{ font-family:'DM Sans',sans-serif !important; font-weight:600 !important; color:var(--muted) !important; border-bottom:2px solid transparent !important; }
-.auth-tab.active{ color:var(--orange) !important; border-bottom-color:var(--orange) !important; }
-.auth-logo,.login-logo,.nav-logo{
-  font-family:'DM Sans',sans-serif !important; font-weight:900 !important;
-  letter-spacing:-0.05em !important; text-transform:uppercase !important;
-}
-
-/* Tables */
-th{ font-size:10px !important; color:var(--muted) !important; font-weight:700 !important; text-transform:uppercase !important; letter-spacing:0.1em !important; border-bottom:1px solid var(--border-sub) !important; }
-td{ border-bottom:1px solid rgba(255,255,255,0.03) !important; font-size:13px !important; }
-tr:hover td{ background:rgba(255,255,255,0.02) !important; }
-
-/* Modals */
-.modal,.modal-box,.modal-inner{
-  background:var(--card) !important; border:1px solid var(--border) !important;
-  border-radius:20px !important; box-shadow:0 24px 80px rgba(0,0,0,0.6) !important;
-}
-.modal-overlay{ -webkit-backdrop-filter:blur(8px) !important; backdrop-filter:blur(8px) !important; }
-
-/* Toast */
-.toast{ background:var(--card) !important; border:1px solid var(--border) !important; border-radius:12px !important; font-family:'DM Sans',sans-serif !important; }
-.toast-success,.toast.success{ border-color:rgba(52,211,153,0.3) !important; color:var(--green) !important; }
-.toast-error,.toast.error{ border-color:rgba(248,113,113,0.3) !important; color:var(--red) !important; }
-
-/* Logo accent bar in sidebar */
-.sidebar-logo,.logo-wrap{ position:relative !important; }
-.sidebar-logo::after,.logo-wrap::after{
-  content:'' !important; position:absolute !important; bottom:0 !important; left:22px !important; right:22px !important;
-  height:1px !important; background:linear-gradient(90deg,var(--orange),transparent) !important; opacity:0.4 !important;
-}
-/* ── END DESIGN SYSTEM ─────────────────────────────────────── */
 </style>
 </head>
-<body> <!-- ── AUTH GATE ── -->
-<div id="authGate"> <div class="auth-wrap"> <div class="auth-card"> <div class="auth-logo">CBUS<span>EVENTS</span></div> <p class="auth-sub">Vendor Portal — reach venues & planners across Columbus</p> <div class="auth-tabs"> <button class="auth-tab active" id="tabSignin" onclick="switchTab('signin')">Sign In</button> <button class="auth-tab" id="tabSignup" onclick="switchTab('signup')">Create Account</button> </div> <div id="nameField" class="field" style="display:none"> <label>Business Name</label> <input id="authName" placeholder="e.g. Columbus Creative Co."/> </div> <div class="field"> <label>Email</label> <input type="email" id="authEmail" placeholder="you@business.com" onkeydown="if(event.key==='Enter')doAuth()"/> </div> <div class="field"> <label>Password</label> <input type="password" id="authPass" placeholder="••••••••" onkeydown="if(event.key==='Enter')doAuth()"/> </div> <div class="auth-err" id="authErr"></div> <button class="btn-primary" id="authBtn" onclick="doAuth()">Sign In</button> <div style="text-align:center;margin-top:14px;font-size:13px;color:var(--sub)"> <span id="authSwitchText">New vendor?</span> <button onclick="switchTab(currentTab==='signin'?'signup':'signin')" style="background:none;border:none;color:var(--orange);font-size:13px;font-weight:600;margin-left:4px" id="authSwitchBtn">Create a free account</button> </div> <div style="text-align:center;margin-top:12px"> <a href="https://cbusevents.com" style="color:var(--muted);font-size:12px">← Back to CBUSEVENTS</a> </div> </div> </div>
-</div> <!-- ── PORTAL ── -->
-<div id="portal" style="display:none"> <nav> <div class="nav-logo" onclick="window.location.href='https://cbusevents.com'"> CBUS<span>EVENTS</span> </div> <div class="nav-right"> <span class="nav-plan plan-free" id="navPlanBadge">Free</span> <button class="nav-home" onclick="window.location.href='https://cbusevents.com'"> Home</button> <button class="nav-signout" onclick="doSignOut()">Sign Out</button> </div> </nav> <div class="portal-layout"> <!-- Sidebar --> <aside class="sidebar"> <div class="sidebar-section">My Business</div> <div class="nav-item active" id="nav-dashboard" onclick="showPage('dashboard')">⊞ Dashboard</div> <div class="nav-item" id="nav-profile" onclick="showPage('profile')"> My Profile</div> <div class="nav-item" id="nav-services" onclick="showPage('services')"> Services & Products</div> <div class="nav-item" id="nav-portfolio" onclick="showPage('portfolio')"> Portfolio</div> <div class="sidebar-section">Growth</div> <div class="nav-item" id="nav-proposals" onclick="showPage('proposals')"> Proposals <span class="badge" id="proposalBadge" style="display:none">0</span></div> <div class="nav-item" id="nav-events" onclick="showPage('events')"> Browse Events</div> <div class="nav-item" id="nav-plan" onclick="showPage('plan')">⭐ Plan & Billing</div> </aside> <!-- Pages --> <main class="content"> <!-- DASHBOARD --> <div class="page active" id="page-dashboard"> <div class="page-title">Welcome back!</div> <div class="page-sub" id="dashSub">Here's your vendor overview.</div> <div class="stat-grid" id="dashStats"></div> <div id="dashContent"></div> </div> <!-- PROFILE --> <div class="page" id="page-profile"> <div class="page-title">My Vendor Profile</div> <div class="page-sub">This is how venues and planners see your business</div> <div class="card" style="max-width:640px"> <div class="card-body" style="display:flex;flex-direction:column;gap:14px"> <div class="field"><label>Cover Photo <span style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--muted)">— shown on your directory card</span></label><div style="display:flex;align-items:center;gap:14px"><div id="profCoverPreview" style="width:80px;height:80px;border-radius:10px;border:1.5px solid var(--border);background:var(--bg);display:flex;align-items:center;justify-content:center;font-size:28px;overflow:hidden;flex-shrink:0">🎪</div><div><button type="button" class="btn btn-secondary" onclick="document.getElementById('coverPhotoInput').click()" style="padding:8px 16px;font-size:13px">Upload Photo</button><div style="font-size:11px;color:var(--muted);margin-top:5px">JPG or PNG · Square works best</div></div></div><input type="file" id="coverPhotoInput" accept="image/*" style="display:none" onchange="handleCoverPhoto(event)"/></div><div class="field"><label>Business Name *</label><input id="profName" placeholder="e.g. Columbus Creative Co."/></div> <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px"> <div class="field"><label>Email</label><input id="profEmail" type="email" placeholder="contact@yourbiz.com"/></div> <div class="field"><label>Phone</label><input id="profPhone" placeholder="(614) 555-0000"/></div> </div> <div class="field"><label>Website</label><input id="profWebsite" placeholder="https://yourbiz.com"/></div> <div class="field"><label>Bio / About Your Business</label><textarea id="profBio" placeholder="Tell venues and planners what makes you special..."></textarea></div> <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px"> <div style="grid-column:1/-1;font-family:'DM Sans',sans-serif;font-size:12px;color:var(--sub);font-weight:700;text-transform:uppercase;letter-spacing:1px;padding-top:4px"> Social Media — share events to your followers</div> <div class="field"><label>Instagram</label><input id="profInsta" placeholder="@handle"/></div> <div class="field"><label>TikTok</label><input id="profTiktok" placeholder="@handle"/></div> <div class="field"><label>Facebook Page URL</label><input id="profFacebook" placeholder="https://facebook.com/yourpage"/></div> <div class="field"><label>X / Twitter</label><input id="profTwitter" placeholder="@handle"/></div> <div class="field"><label>Years in Business</label><input id="profYears" type="number" placeholder="5"/></div> </div> <div id="profMsg" style="color:var(--green);font-size:13px;min-height:18px"></div> <button class="btn btn-orange" onclick="saveProfile()" style="align-self:flex-start;padding:10px 24px">Save Profile →</button> </div> </div> </div> <!-- SERVICES --> <div class="page" id="page-services"> <div class="page-title">Services & Products</div> <div class="page-sub">Select everything your business offers — this determines how you appear in search</div> <div class="services-grid" id="servicesGrid"></div> <div style="margin-top:20px"> <div class="field" style="max-width:480px"> <label>Custom service or product not listed above?</label> <input id="customService" placeholder="e.g. Custom Neon Signs, Photo Booths..."/> </div> <button class="btn btn-orange" onclick="saveServices()" style="margin-top:4px">Save Services →</button> <div id="servicesMsg" style="color:var(--green);font-size:13px;margin-top:8px;min-height:18px"></div> </div> </div> <!-- PORTFOLIO --> <div class="page" id="page-portfolio"> <div class="page-title">Portfolio</div> <div class="page-sub">Showcase your work — photos help you get chosen. Free for all vendors.</div> <div class="portfolio-grid" id="portfolioGrid"></div> <input type="file" id="photoFileInput" accept="image/*" multiple style="display:none" onchange="handlePhotoUpload(event)"/>
- <div style="margin-top:4px;max-width:500px">
-  <button class="btn btn-orange" onclick="document.getElementById('photoFileInput').click()" style="width:100%;padding:14px;font-size:15px;margin-bottom:12px;display:flex;align-items:center;justify-content:center;gap:8px">
-   <span style="font-size:20px">📷</span> Upload Photos from Gallery
-  </button>
-  <div id="uploadProgress" style="display:none;margin-bottom:10px">
-   <div style="background:var(--surface);border-radius:8px;height:6px;overflow:hidden">
-    <div id="uploadBar" style="background:var(--orange);height:100%;width:0%;transition:width 0.3s"></div>
-   </div>
-   <div id="uploadStatus" style="color:var(--sub);font-size:12px;margin-top:6px"></div>
+<body>
+
+<!-- AUTH GATE -->
+<div id="authGate" style="display:flex">
+  <div class="auth-box">
+    <div class="auth-logo">CBUS<span>EVENTS</span></div>
+    <div class="auth-sub">Vendor Portal</div>
+    <div class="auth-tabs">
+      <button class="auth-tab active" id="tabSignin" onclick="switchTab('signin')">Sign In</button>
+      <button class="auth-tab" id="tabSignup" onclick="switchTab('signup')">Create Account</button>
+    </div>
+    <div class="auth-field" id="nameField" style="display:none">
+      <label>Business Name</label>
+      <input id="authName" placeholder="Your business name">
+    </div>
+    <div class="auth-field">
+      <label>Email</label>
+      <input type="email" id="authEmail" placeholder="you@email.com" onkeydown="if(event.key==='Enter')doAuth()">
+    </div>
+    <div class="auth-field">
+      <label>Password</label>
+      <input type="password" id="authPass" placeholder="••••••••" onkeydown="if(event.key==='Enter')doAuth()">
+    </div>
+    <div class="auth-err" id="authErr"></div>
+    <button class="auth-btn" id="authBtn" onclick="doAuth()">Sign In</button>
+    <div class="auth-switch">
+      <span id="authSwitchText">New vendor?</span>
+      <button class="auth-switch-btn" onclick="switchTab(currentTab==='signin'?'signup':'signin')" id="authSwitchBtn">Create a free account</button>
+    </div>
+    <div style="text-align:center;margin-top:12px">
+      <a href="https://cbusevents.com" style="color:var(--muted);font-size:12px">Back to CBUSEVENTS</a>
+    </div>
   </div>
-  <details style="margin-top:4px">
-   <summary style="color:var(--muted);font-size:12px;cursor:pointer;user-select:none">Or add by URL</summary>
-   <div style="display:flex;gap:8px;margin-top:8px">
-    <input id="photoUrl" placeholder="https://... (paste image URL)"/>
-    <button class="btn btn-orange" onclick="addPhotoByUrl()" style="white-space:nowrap;flex-shrink:0">Add</button>
-   </div>
-  </details>
-  <div id="portfolioMsg" style="color:var(--green);font-size:13px;margin-top:8px;min-height:18px"></div>
- </div> </div> <!-- PROPOSALS --> <div class="page" id="page-proposals"> <div class="page-title">My Proposals</div> <div class="page-sub">Track proposals you've sent to venues and event planners</div> <div id="proposalsContent"><div class="spinner"></div></div> </div> <!-- BROWSE EVENTS --> <div class="page" id="page-events"> <div class="page-title">Browse Events</div> <div class="page-sub">Find upcoming events and send proposals to the organizers</div> <div id="eventsContent"><div class="spinner"></div></div> </div> <!-- PLAN --> <div class="page" id="page-plan"> <div class="page-title">Plan & Billing</div> <div class="page-sub">Upgrade to get featured and send proposals directly to venues & planners</div> <div id="planContent"></div> </div> </main> </div> <footer> <span class="footer-copy">© 2026 CBUSEVENTS · Columbus, Ohio</span> <div style="display:flex;align-items:center;gap:20px"> <span class="footer-copy">Made for Columbus </span> <a href="https://cbusevents.com/cbus-admin.html" class="footer-admin" id="adminFooterLink" style="display:none">Admin</a> </div> </footer>
-</div> <div id="toast" class="toast"></div>
-<div id="modalContainer"></div> <script src="https://unpkg.com/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+</div>
+
+<!-- SIDEBAR -->
+<aside class="sidebar" id="portalSidebar">
+  <div class="sidebar-logo">
+    <div class="sidebar-logo-text">CBUS<span>EVENTS</span></div>
+    <div class="sidebar-logo-sub">Vendor Portal</div>
+  </div>
+  <div class="sidebar-vendor">
+    <div class="vendor-initials" id="sidebarInitials">VD</div>
+    <div class="vendor-name" id="sidebarName">Your Business</div>
+    <div class="vendor-tier tier-free" id="sidebarTier">Free</div>
+  </div>
+  <div class="sidebar-section">Main</div>
+  <button class="nav-item active" id="nav-dashboard" onclick="showPage('dashboard')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+    Dashboard
+  </button>
+  <button class="nav-item" id="nav-profile" onclick="showPage('profile')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+    My Profile
+  </button>
+  <button class="nav-item" id="nav-services" onclick="showPage('services')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+    Services
+  </button>
+  <button class="nav-item" id="nav-portfolio" onclick="showPage('portfolio')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+    Portfolio
+  </button>
+  <div class="sidebar-section">Growth</div>
+  <button class="nav-item" id="nav-proposals" onclick="showPage('proposals')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+    Inquiries
+    <span id="proposalBadge" style="display:none;margin-left:auto;background:var(--orange);color:#fff;border-radius:var(--r-full);padding:1px 8px;font-size:9px;font-weight:800">0</span>
+  </button>
+  <button class="nav-item" id="nav-events" onclick="showPage('events')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+    Browse Events
+  </button>
+  <div class="sidebar-bottom">
+    <div class="sidebar-plan-badge" id="planBadge">Free Tier</div>
+    <button class="btn-signout" onclick="doSignOut()">Sign Out</button>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<div class="main">
+  <div class="topbar">
+    <div class="topbar-title" id="topbarTitle">Dashboard</div>
+    <div class="topbar-right">
+      <button class="btn btn-ghost btn-sm" onclick="window.open('https://cbusevents.com','_blank')">View Site</button>
+      <button class="nav-item" id="nav-plan" onclick="showPage('plan')" style="margin:0;width:auto;padding:7px 14px;border-radius:var(--r-md)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        Plan
+      </button>
+    </div>
+  </div>
+  <div class="content" id="pageContent">
+    <div class="spinner"></div>
+  </div>
+</div>
+
+<!-- MOBILE BOTTOM NAV -->
+<div class="mobile-bottom-nav">
+  <div class="mobile-bottom-nav-inner">
+    <button class="mobile-nav-btn active" id="mnav-dashboard" onclick="showPage('dashboard')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+      <span>Home</span>
+    </button>
+    <button class="mobile-nav-btn" id="mnav-profile" onclick="showPage('profile')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      <span>Profile</span>
+    </button>
+    <button class="mobile-nav-btn" id="mnav-services" onclick="showPage('services')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+      <span>Services</span>
+    </button>
+    <button class="mobile-nav-btn" id="mnav-proposals" onclick="showPage('proposals')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+      <span>Inquiries</span>
+    </button>
+    <button class="mobile-nav-btn" id="mnav-plan" onclick="showPage('plan')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      <span>Plan</span>
+    </button>
+  </div>
+</div>
+
 <script>
+
 const SB_URL="https://toblgvatvsjljbqogzsv.supabase.co";
 const SB_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRvYmxndmF0dnNqbGpicW9nenN2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMDgwNTAsImV4cCI6MjA4NzY4NDA1MH0._WJEQPizNDiQfDXQB_DHPaQhixPGpMdmYQSmyWmm_FQ";
 const sb=supabase.createClient(SB_URL,SB_KEY);
@@ -551,7 +454,7 @@ async function enterPortal(){
  updatePlanBadge();
 
  document.getElementById('authGate').style.display='none';
- document.getElementById('portal').style.display='';
+ // portal show handled;
 
  // Load dashboard
  renderDashboard();
@@ -561,11 +464,11 @@ async function enterPortal(){
 
 function exitPortal(){
  document.getElementById('authGate').style.display='';
- document.getElementById('portal').style.display='none';
+ // portal hide handled;
 }
 
 function updatePlanBadge(){
- const badge=document.getElementById('navPlanBadge');
+ const badge=document.getElementById('planBadge');
  const tier=(vendorProfile?.subscription_tier||'FREE').toUpperCase();
  badge.textContent=tier==='PREMIUM'?'⭐ Premium':tier==='STANDARD'?' Standard':'Free';
  badge.className='nav-plan '+(tier==='PREMIUM'?'plan-premium':tier==='STANDARD'?'plan-standard':'plan-free');
@@ -590,47 +493,71 @@ function showPage(p){
 async function renderDashboard(){
  const rawName=vendorProfile?.business_name||'';
  const hasRealName=rawName&&!rawName.includes('@')&&rawName.trim().length>0;
- const displayName=hasRealName?rawName:(currentUser?.email||'');
- document.getElementById('page-dashboard').querySelector('.page-title').textContent = hasRealName ? `Welcome back, ${rawName}!` : 'Welcome to CBUSEVENTS!';
-  document.getElementById('dashSub').textContent = hasRealName ? "Here's your vendor overview." : "Let's get your services in front of Columbus planners.";
-
  const tier=(vendorProfile?.subscription_tier||'FREE').toUpperCase();
- const sentProposals=await sb.from('vendor_proposals').select('id,status').eq('vendor_id',vendorProfile?.id) ?? {data:[]};
+
+ const sentProposals=await sb.from('vendor_proposals').select('id,status').eq('vendor_id',vendorProfile?.id)??{data:[]};
  const proposals=sentProposals.data||[];
  const accepted=proposals.filter(p=>p.status==='accepted').length;
 
- document.getElementById('dashStats').innerHTML=`
- <div class="stat-card"> <div class="stat-num" style="color:var(--orange)">${selectedServices.size}</div> <div class="stat-label">Services Listed</div> </div> <div class="stat-card"> <div class="stat-num" style="color:var(--blue)">${portfolioPhotos.length}</div> <div class="stat-label">Portfolio Photos</div> </div> <div class="stat-card"> <div class="stat-num" style="color:${tier==='PREMIUM'?'var(--gold)':'var(--muted)'}">${tier==='PREMIUM'?proposals.length:'—'}</div> <div class="stat-label">Proposals Sent</div> </div> <div class="stat-card"> <div class="stat-num" style="color:var(--green)">${tier==='PREMIUM'?accepted:'—'}</div> <div class="stat-label">Proposals Accepted</div> </div>`;
-
- // Status cards
  const checks=[
- {done:hasRealName,label:'Add your business name & bio',action:"showPage('profile')",btn:'Complete Profile'},
- {done:selectedServices.size>0,label:'Add your services',action:"showPage('services')",btn:'Add Services'},
- {done:portfolioPhotos.length>0,label:'Upload portfolio photos',action:"showPage('portfolio')",btn:'Add Photos'},
- {done:tier!=='FREE',label:'Get featured in the directory',action:"showPage('plan')",btn:'Upgrade Plan'},
+  {done:hasRealName,label:'Add your business name and bio',action:"showPage('profile')",btn:'Complete Profile'},
+  {done:selectedServices.size>0,label:'Add your services',action:"showPage('services')",btn:'Add Services'},
+  {done:portfolioPhotos.length>0,label:'Upload portfolio photos',action:"showPage('portfolio')",btn:'Add Photos'},
  ];
- const incomplete=checks.filter(c=>!c.done);
+ const pct=Math.round((checks.filter(c=>c.done).length/checks.length)*100);
 
- // Show urgent banner if they haven't set a business name — they're invisible on the site
- const urgentBanner=!hasRealName?`
- <div style="background:linear-gradient(135deg,#1a0800,#0d0d0d);border:1.5px solid #FF6B35;border-radius:14px;padding:18px 20px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap">
-   <div>
-     <div style="font-weight:700;font-size:15px;color:#FF6B35;margin-bottom:4px"> Your profile is hidden from Columbus planners</div>
-     <div style="font-size:13px;color:var(--sub)">You need a business name before your listing goes live. Takes 30 seconds.</div>
+ document.getElementById('pageContent').innerHTML=`
+ <div style="margin-bottom:8px">
+   <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.18em;text-transform:uppercase;color:var(--muted);margin-bottom:4px">Welcome back</div>
+   <div style="font-size:22px;font-weight:800;letter-spacing:-0.03em;margin-bottom:2px">${hasRealName?rawName:'Your Vendor Account'}</div>
+   <div style="font-size:13px;color:var(--sub)">${hasRealName?"Here's your vendor overview.":'Get your services in front of Columbus planners.'}</div>
+ </div>
+
+ <div class="stats-grid" style="margin-top:24px">
+   <div class="stat-card"><div class="stat-num">${selectedServices.size}</div><div class="stat-label">Services Listed</div></div>
+   <div class="stat-card"><div class="stat-num" style="color:var(--blue)">${portfolioPhotos.length}</div><div class="stat-label">Portfolio Photos</div></div>
+   <div class="stat-card"><div class="stat-num" style="color:var(--green)">${tier==='FREE'?'—':accepted}</div><div class="stat-label">Accepted</div></div>
+   <div class="stat-card"><div class="stat-num" style="color:${tier==='PREMIUM'?'var(--gold)':'var(--muted)'}">${tier}</div><div class="stat-label">Current Plan</div></div>
+ </div>
+
+ ${pct<100?`
+ <div class="card" style="margin-bottom:20px">
+   <div class="card-header"><div><div class="card-title">Profile Setup</div><div class="card-sub">${pct}% complete</div></div></div>
+   <div style="height:3px;background:var(--border);border-radius:2px;margin:0 24px 0"><div style="height:100%;width:${pct}%;background:var(--orange);border-radius:2px;transition:width 0.4s"></div></div>
+   <div style="padding:16px 24px;display:flex;flex-direction:column;gap:10px">
+     ${checks.map(c=>`
+     <div style="display:flex;align-items:center;justify-content:space-between;gap:12px">
+       <div style="display:flex;align-items:center;gap:10px">
+         <div style="width:18px;height:18px;border-radius:50%;border:2px solid ${c.done?'var(--green)':'var(--border)'};background:${c.done?'var(--green-dim)':'transparent'};display:flex;align-items:center;justify-content:center;flex-shrink:0">
+           ${c.done?'<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>':''}
+         </div>
+         <span style="font-size:13px;color:${c.done?'var(--sub)':'var(--text)'}">${c.label}</span>
+       </div>
+       ${!c.done?`<button class="btn btn-ghost btn-sm" onclick="${c.action}">${c.btn}</button>`:''}
+     </div>`).join('')}
    </div>
-   <button class="btn btn-orange" onclick="showPage('profile')" style="flex-shrink:0;white-space:nowrap">Complete Profile →</button>
- </div>`:'';
+ </div>`:''}
 
- document.getElementById('dashContent').innerHTML=urgentBanner+(incomplete.length?`
- <div class="card"> <div class="card-header"><div class="card-title"> Complete your setup</div><div style="font-size:13px;color:var(--sub)">${checks.filter(c=>c.done).length}/${checks.length} done</div></div> <div class="card-body" style="display:flex;flex-direction:column;gap:10px"> ${checks.map(c=>`
- <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 14px;background:${c.done?'var(--surface)':'var(--bg)'};border:1px solid ${c.done?'#22c55e30':'var(--border)'};border-radius:10px;gap:12px"> <div style="display:flex;align-items:center;gap:10px"> <span style="font-size:16px">${c.done?'':'⬜'}</span> <span style="font-size:13px;font-weight:500;${c.done?'color:var(--muted);text-decoration:line-through':''}">${c.label}</span> </div> ${!c.done?`<button class="btn btn-orange btn-sm" onclick="${c.action}">${c.btn}</button>`:''}
- </div>`).join('')}
- </div> </div>`:`
- <div style="background:#0a1a0a;border:1px solid #22c55e30;border-radius:14px;padding:20px 24px;display:flex;align-items:center;gap:12px;color:var(--green);font-size:14px;font-weight:500"> Your profile is fully set up and live on CBUSEVENTS!
- </div>`);
+ <div class="card">
+   <div class="card-header">
+     <div><div class="card-title">Recent Inquiries</div></div>
+     <button class="btn btn-ghost btn-sm" onclick="showPage('proposals')">View All</button>
+   </div>
+   ${proposals.length===0?`<div class="empty-state"><div class="empty-title">No inquiries yet</div><p>Complete your profile to get discovered by Columbus planners.</p></div>`
+     :`<div>${proposals.slice(0,3).map(p=>`<div class="proposal-row">
+       <div class="proposal-dot" style="background:${p.status==='accepted'?'var(--green)':p.status==='rejected'?'var(--red)':'var(--muted)'}"></div>
+       <div class="proposal-body"><div class="proposal-title">Event Inquiry</div><div class="proposal-meta">${p.status}</div></div>
+     </div>`).join('')}</div>`}
+ </div>`;
 }
 
-// ── PROFILE ───────────────────────────────────────────────────
+
+function updateCoverPreview(url){
+ const el=document.getElementById('profCoverPreview');
+ if(!el)return;
+ if(url&&url.startsWith('http'))el.innerHTML=`<img src="${url}" style="width:100%;height:100%;object-fit:cover">`;
+ else el.textContent='';
+}
 function prefillProfile(){
  if(!vendorProfile)return;
  const f=vendorProfile;
@@ -639,6 +566,8 @@ function prefillProfile(){
    if(f.cover_image_url){coverPrev.innerHTML=`<img src="${f.cover_image_url}" style="width:100%;height:100%;object-fit:cover">`;}
    else{coverPrev.textContent='🎪';}
  }
+ const cu=document.getElementById('profCoverUrl');if(cu)cu.value=f.cover_image_url||'';
+ updateCoverPreview(f.cover_image_url||'');
  document.getElementById('profName').value=f.business_name||f.name||'';
  document.getElementById('profEmail').value=f.email||'';
  document.getElementById('profPhone').value=f.phone||'';
@@ -680,6 +609,7 @@ async function saveProfile(){
  msg.style.color='var(--sub)';
  msg.textContent='Saving...';
  try {
+   const profCoverUrl=document.getElementById('profCoverUrl')?.value?.trim()||'';
    const profName=document.getElementById('profName').value.trim();
    if(!profName){msg.style.color='var(--red,#ff4444)';msg.textContent='Business name is required';return;}
    
@@ -736,8 +666,7 @@ async function saveProfile(){
 
 // ── SERVICES ──────────────────────────────────────────────────
 function renderServicesGrid(){
- document.getElementById('servicesGrid').innerHTML=SERVICES.map(s=>`
- <div class="service-card ${selectedServices.has(s.key)?'selected':''}" id="svc-${s.key}" onclick="toggleService('${s.key}')"> <div class="service-icon">${s.icon}</div> <div class="service-name">${s.name}</div> <div class="service-desc">${s.desc}</div> </div>`).join('');
+ document.getElementById('servicesGrid').innerHTML=SERVICES.map(s=>`<div class="service-chip ${selectedServices.has(s.key)?'active':''}" onclick="toggleService('${s.key}')"><div><div class="service-chip-name">${s.name}</div><div class="service-chip-desc">${s.desc}</div></div></div>`).join('');
 }
 
 function toggleService(key){
@@ -758,7 +687,7 @@ async function saveServices(){
  const{error}=await sb.from('vendors').update({services,updated_at:new Date().toISOString()}).eq('user_id',currentUser.id);
  if(error){toast('Error: '+error.message,'error');return;}
  vendorProfile.services=services;
- const msg=document.getElementById('servicesMsg');
+ const msg=document.getElementById('servMsg');
  msg.textContent=' Services saved!';
  setTimeout(()=>msg.textContent='',3000);
  renderDashboard();
@@ -893,7 +822,7 @@ async function savePortfolio(){
  }
  vendorProfile.portfolio_photos=portfolioPhotos;
  renderPortfolioGrid();
- const msg=document.getElementById('portfolioMsg');
+ const msg=document.getElementById('portMsg');
  if(msg){msg.textContent='✓ Portfolio updated!';setTimeout(()=>msg.textContent='',2500);}
  renderDashboard();
 }
@@ -931,7 +860,7 @@ async function loadProposals(){
 
 // ── BROWSE EVENTS ─────────────────────────────────────────────
 async function loadBrowseEvents(){
- const el=document.getElementById('eventsContent');
+ const el=document.getElementById('pageContent');
  const tier=(vendorProfile?.subscription_tier||'FREE').toUpperCase();
 
  if(tier!=='PREMIUM'){
@@ -973,7 +902,7 @@ function openProposalModal(eventId,eventTitle,venueName){
 }
 
 async function sendProposal(eventId){
- const message=document.getElementById('proposalMsg')?.value.trim();
+ const message=(document.getElementById('pageContent'))?.value.trim();
  const rate=document.getElementById('proposalRate')?.value.trim();
  if(!message){toast('Please write a pitch message','error');return;}
 
@@ -998,7 +927,7 @@ function renderPlan(){
  const isStandard=tier==='STANDARD';
  const isPremium=tier==='PREMIUM';
 
- document.getElementById('planContent').innerHTML=`
+ document.getElementById('pageContent').innerHTML=`
  <div class="plan-grid"> <!-- FREE --> <div class="plan-card ${!isStandard&&!isPremium?'current':''}"> <div class="plan-name" style="color:var(--muted)">Free</div> <div class="plan-price">$0<span>/mo</span></div> <div class="plan-period">forever</div> <div class="plan-perks"> <div class="plan-perk"><span class="check"></span>Vendor profile & bio</div> <div class="plan-perk"><span class="check"></span>Select all your services</div> <div class="plan-perk"><span class="check"></span>Portfolio photos (unlimited)</div> <div class="plan-perk"><span class="check" style="color:var(--muted)"></span><span style="color:var(--muted)">Featured in directory</span></div> <div class="plan-perk"><span class="check" style="color:var(--muted)"></span><span style="color:var(--muted)">Send proposals</span></div> </div> <button class="plan-btn" style="background:var(--surface);color:var(--sub);border:1px solid var(--border)" disabled>${!isStandard&&!isPremium?'Current Plan':'Free Plan'}</button> </div> <!-- FOUNDING MEMBER --> <div class="plan-card ${isStandard||isPremium?'current':'popular'}" style="${isStandard||isPremium?'':'background:linear-gradient(135deg,#1a0800,#200d00);border-color:#FF6B3580;'}"> ${!isStandard&&!isPremium?'<div class="plan-badge">FOUNDING MEMBER</div>':''} <div class="plan-name" style="color:var(--orange)">Founding Member</div> <div class="plan-price" style="color:var(--orange)">$20<span>/mo</span></div> <div class="plan-period">Rate locked forever</div> <div class="plan-perks"> <div class="plan-perk"><span class="check"></span>Everything in Free</div> <div class="plan-perk"><span class="check"></span>Featured in vendor directory</div> <div class="plan-perk"><span class="check"></span>Priority search placement</div> <div class="plan-perk premium-perk"><span class="check"></span>Send proposals to venues</div> <div class="plan-perk premium-perk"><span class="check"></span>Send proposals to planners</div> <div class="plan-perk premium-perk"><span class="check"></span>Browse all upcoming events</div> </div> ${isStandard||isPremium
  ?'<button class="plan-btn" style="background:var(--surface);color:var(--sub);border:1px solid var(--border)" disabled>Current Plan</button>'
  :`<button class="plan-btn" style="background:#FF6B35;color:#fff" onclick="window.location.href='${STRIPE_LINKS.standard}&prefilled_email='+encodeURIComponent(currentUser?.email||'')">Claim Founding Rate →</button>`}
@@ -1023,21 +952,8 @@ function closeModal(){document.getElementById('modalContainer').innerHTML='';}
 init();
 </script>
 
-<script>
-  // Show admin footer link only for admin users
-  (function() {
-    var link = document.getElementById('adminFooterLink');
-    if (!link) return;
-    var stored = localStorage.getItem('sb-toblgvatvsjljbqogzsv-auth-token');
-    if (stored) {
-      try {
-        var parsed = JSON.parse(stored);
-        var email = parsed && parsed.user && parsed.user.email;
-        var adminEmails = ['deante90@gmail.com'];
-        if (email && adminEmails.indexOf(email) > -1) link.style.display = 'inline';
-      } catch(e) {}
-    }
-  })();
-</script>
+<div id="toast" style="display:none;position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:var(--card);border:1px solid var(--border);border-radius:var(--r-md);padding:10px 20px;font-size:13px;font-weight:600;z-index:1000;white-space:nowrap;box-shadow:0 8px 32px rgba(0,0,0,0.5)"></div>
+<!-- MODAL CONTAINER -->
+<div id="modalContainer" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.8);z-index:500;align-items:center;justify-content:center;padding:20px"></div>
 </body>
 </html>

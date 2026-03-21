@@ -482,7 +482,7 @@ function nav(page){
  renderPage();
 }
 
-function renderPage(){
+async function renderPage(){
  if(currentPage==='dashboard')renderDashboard();
  else if(currentPage==='venues')renderVenues();
  else if(currentPage==='events')renderEvents();
@@ -490,9 +490,9 @@ function renderPage(){
  else if(currentPage==='revenue')renderRevenue();
  else if(currentPage==='design')renderDesignRequests();
  else if(currentPage==='vendors')renderVendors();
- else if(currentPage==='planners')renderPlanners();
- else if(currentPage==='subscriptions')renderSubscriptions();
- else if(currentPage==='users')renderUsers();
+ else if(currentPage==='planners')await renderPlanners();
+ else if(currentPage==='subscriptions')await renderSubscriptions();
+ else if(currentPage==='users')await renderUsers();
  else if(currentPage==='overrides')renderOverrides();
  else if(currentPage==='claims')renderClaims();
  else if(currentPage==='blog')renderBlog();
@@ -1227,7 +1227,7 @@ async function deletePlanner(userId){
  if(!confirm('Delete this planner account?'))return;
  await sb.from('user_roles').delete().eq('user_id',userId).eq('role','planner');
  toast('Planner deleted');
- renderPlanners();
+ await renderPlanners();
 }
 
 function renderVendors(){
@@ -1454,7 +1454,25 @@ async function renderUsers(){
      <table><thead><tr><th>Name / Email</th><th>Role</th><th>User ID</th><th>Change Role</th><th>Actions</th></tr></thead>
      <tbody>${byRole[role].map(u=>userRow(u)).join('')}</tbody></table>
    </div>`:''
- ).join('')}`;
+ ).join('')}
+`;
+
+ // Append All Signups table via DOM (avoids nested template literal issue)
+ if(allSignups.length){
+   const wrap=document.createElement('div');
+   wrap.className='table-card';
+   wrap.style.marginBottom='20px';
+   wrap.innerHTML='<div class="table-header"><div><div class="table-title">All Signups ('+allSignups.length+')</div><div style="font-size:12px;color:var(--muted);margin-top:2px">Every account including customers</div></div></div>'
+     +'<table class="data-table"><thead><tr><th>Email</th><th>Name</th><th>Role</th><th>Joined</th></tr></thead><tbody>'
+     +allSignups.map(u=>'<tr>'
+       +'<td><strong>'+(u.email||'—')+'</strong></td>'
+       +'<td>'+(u.display_name||'—')+'</td>'
+       +'<td><span class="badge '+(u.has_role?'badge-orange':'badge-muted')+'">'+(u.has_role?(allRoles.find(r=>r.user_id===u.user_id)?.role||'customer'):'customer')+'</span></td>'
+       +'<td>'+(u.created_at?new Date(u.created_at).toLocaleDateString():'—')+'</td>'
+       +'</tr>').join('')
+     +'</tbody></table>';
+   document.getElementById('pageContent').appendChild(wrap);
+ }
 }
 
 async function doUserSearch(){}
