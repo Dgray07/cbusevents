@@ -833,7 +833,7 @@ window.currentTab='signin'; let currentTab=window.currentTab;
 const STRIPE_STANDARD='https://buy.stripe.com/aFa3cv3vWasGdFBdA4c3m02'; // TODO: replace with customer Standard link
 const STRIPE_PREMIUM ='https://buy.stripe.com/aFa3cv3vWasGdFBdA4c3m02';  // TODO: replace with customer Premium link
 
-window.goUpgrade = function goUpgrade(tier){
+function goUpgrade(tier){
   const url=tier==='premium'?STRIPE_PREMIUM:STRIPE_STANDARD;
   const email=currentUser?.email||'';
   window.location.href=url+(email?'&prefilled_email='+encodeURIComponent(email):'');
@@ -890,7 +890,7 @@ function applyTierUI(tier){
 }
 
 // ── AUTH ────────────────────────────────────────────────────
-window.switchTab = function switchTab(tab){
+function switchTab(tab){
   currentTab=tab; window.currentTab=tab;
   document.getElementById('tabSignin').style.background=tab==='signin'?'var(--card)':'none';
   document.getElementById('tabSignin').style.color=tab==='signin'?'var(--text)':'var(--sub)';
@@ -903,7 +903,7 @@ window.switchTab = function switchTab(tab){
   document.getElementById('authErr').textContent='';
 }
 
-window.doAuth = async function doAuth(){
+async function doAuth(){
   const email=document.getElementById('authEmail').value.trim();
   const pass=(document.getElementById('authPass')||{value:''}).value;
   const name=document.getElementById('authName').value.trim();
@@ -914,29 +914,21 @@ window.doAuth = async function doAuth(){
 
   if(currentTab==='signin'){
     const{error,data}=await sb.auth.signInWithPassword({email,password:pass});
-    if(error){
-      errEl.textContent=error.message;
-      btn.disabled=false;btn.textContent='Sign In';
-      return;
-    }
+    if(error){errEl.textContent=error.message;btn.disabled=false;btn.textContent='Sign In';return;}
     // Redirect if this user belongs to a different portal
     const{data:rd}=await sb.from('user_roles').select('role').eq('user_id',data.user.id).maybeSingle();
     const role=rd?.role;
     if(role==='vendor'){window.location.href='https://cbusevents.com/cbus-vendor-portal.html';return;}
     if(role==='venue_owner'){window.location.href='https://cbusevents.com/cbus-venue-portal.html';return;}
     if(role==='planner'){window.location.href='https://cbusevents.com/cbus-planner-portal.html';return;}
-    // Customer or no role — enter portal
+    // Customer — enter portal
     currentUser=data.user;
     btn.disabled=false;btn.textContent='Sign In';
     hideAuthGate(data.user);
 
   } else {
-    const{data,error}=await sb.auth.signUp({email,password:pass});
-    if(error){
-      errEl.textContent=error.message;
-      btn.disabled=false;btn.textContent='Create Account';
-      return;
-    }
+    const{error,data}=await sb.auth.signUp({email,password:pass});
+    if(error){errEl.textContent=error.message;btn.disabled=false;btn.textContent='Create Account';return;}
     if(!data.session){
       errEl.style.color='var(--green)';
       errEl.textContent='Check your email for a confirmation link.';
@@ -955,7 +947,7 @@ window.doAuth = async function doAuth(){
   }
 }
 
-window.doSignOut = async function doSignOut(){
+async function doSignOut(){
   await sb.auth.signOut();
   showAuthGate();
 }
@@ -1155,17 +1147,18 @@ let _initDone=false;
 // ── WIRE AUTH BUTTONS — DOM is already ready at this point ──
 (function wireAuthButtons(){
   var authBtn=document.getElementById('authBtn');
-  if(authBtn) authBtn.addEventListener('click', function(){ if(window.doAuth) window.doAuth(); });
+  if(authBtn) authBtn.addEventListener('click', doAuth);
 
   var switchBtn=document.getElementById('authSwitchBtn');
   if(switchBtn) switchBtn.addEventListener('click', function(){
-    if(window.switchTab) window.switchTab(window.currentTab==='signin'?'signup':'signin');
+    switchTab(window.currentTab==='signin'?'signup':'signin');
   });
 
   document.querySelectorAll('.auth-enter-submit').forEach(function(el){
-    el.addEventListener('keydown', function(e){ if(e.key==='Enter' && window.doAuth) window.doAuth(); });
+    el.addEventListener('keydown', function(e){ if(e.key==='Enter') doAuth(); });
   });
 })();
 </script>
+
 </body>
 </html>
