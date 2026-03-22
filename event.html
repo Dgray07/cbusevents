@@ -394,13 +394,12 @@ async function loadEvent() {
   }
 
   // ── RIDESHARE ──
-  if (venue && venue.lat && venue.lng) {
-    initRideshare(venue.lat, venue.lng, venue.address || venue.name);
-  } else if (event.venue_name_override) {
-    // No coords - still show links with venue name
-    document.getElementById('rideshareSection').style.display = 'block';
-    document.getElementById('rideshareDistance').textContent = event.venue_name_override;
-    renderRideshareLinks(null, null, null, null, event.venue_name_override);
+  // Always try rideshare - geocodes address if no lat/lng stored
+  const rLat = venue?.lat || null;
+  const rLng = venue?.lng || null;
+  const rAddr = venue?.address || event.venue_name_override || venue?.name || null;
+  if (rAddr || (rLat && rLng)) {
+    initRideshare(rLat, rLng, rAddr);
   }
 
   // ── DESCRIPTION ──
@@ -603,16 +602,37 @@ async function loadMoreEvents(event) {
 }
 
 // ── RIDESHARE ESTIMATOR ──────────────────────────────────────
-function initRideshare(venueLat, venueLng, venueAddress) {
+async function initRideshare(venueLat, venueLng, venueAddress) {
   const section = document.getElementById('rideshareSection');
   const optionsEl = document.getElementById('rideshareOptions');
   const distEl = document.getElementById('rideshareDistance');
-  if (!section || !venueLat || !venueLng) return;
+  if (!section) return;
 
   section.style.display = 'block';
 
+  // If no coords, geocode the address via Mapbox
+  if ((!venueLat || !venueLng) && venueAddress) {
+    distEl.textContent = 'Looking up venue location...';
+    try {
+      const q = encodeURIComponent(venueAddress + ', Columbus, OH');
+      const res = await fetch(`https://api.mapbox.com/geocoding/v5/mapbox.places/${q}.json?access_token=pk.eyJ1IjoiY2J1c2V2ZW50cyIsImEiOiJjbW1oNWJhaDYwYnVrMnJxN3hxdGJlZmhkIn0.RtF51b0qghUlJAjHgNRdFQ&limit=1`);
+      const geo = await res.json();
+      if (geo.features && geo.features[0]) {
+        venueLng = geo.features[0].center[0];
+        venueLat = geo.features[0].center[1];
+      }
+    } catch(e) {
+      console.warn('Geocode failed:', e);
+    }
+  }
+
+  if (!venueLat || !venueLng) {
+    renderRideshareLinks(null, null, null, null, venueAddress);
+    return;
+  }
+
   if (!navigator.geolocation) {
-    distEl.textContent = 'Geolocation not supported on this device.';
+    distEl.textContent = venueAddress || 'Venue';
     renderRideshareLinks(null, null, venueLat, venueLng, venueAddress);
     return;
   }
