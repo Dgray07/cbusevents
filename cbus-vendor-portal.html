@@ -940,33 +940,61 @@ async function savePortfolio(){
 
 // ── PROPOSALS ─────────────────────────────────────────────────
 async function loadProposals(){
- const el=document.getElementById('proposalsContent');
+ const pc=document.getElementById('pageContent');
  const tier=(vendorProfile?.subscription_tier||'FREE').toUpperCase();
 
  if(tier!=='PREMIUM'){
- el.innerHTML=`
- <div class="upgrade-gate"> <h3>Send Proposals with Premium</h3> <p>Premium vendors can browse upcoming events and send proposals directly to venues and planners. Stand out before the event is even booked.</p> <button class="btn btn-orange" onclick="showPage('plan')" style="padding:12px 28px;font-size:14px">Upgrade to Premium →</button> </div>`;
- return;
+   pc.innerHTML=`
+   <div style="max-width:600px">
+     <div style="font-size:22px;font-weight:800;letter-spacing:-0.03em;margin-bottom:20px">Inquiries</div>
+     <div class="card" style="text-align:center;padding:40px;border-style:dashed">
+       <div style="font-size:36px;margin-bottom:12px">📬</div>
+       <h3 style="font-size:17px;font-weight:700;margin-bottom:8px">Send Proposals with Premium</h3>
+       <p style="color:var(--sub);font-size:13px;line-height:1.6;margin-bottom:20px;max-width:380px;margin-left:auto;margin-right:auto">Premium vendors can browse upcoming events and send proposals directly to venues and planners.</p>
+       <button class="btn btn-primary" onclick="showPage('plan')" style="padding:12px 28px;font-size:14px">Upgrade to Premium →</button>
+     </div>
+   </div>`;
+   return;
  }
+
+ pc.innerHTML='<div style="font-size:22px;font-weight:800;letter-spacing:-0.03em;margin-bottom:20px">Inquiries</div><div class="spinner"></div>';
 
  const{data:proposals}=await sb.from('vendor_proposals')
- .select('*,events(title,start_time,venues(name))')
- .eq('vendor_id',vendorProfile.id)
- .order('created_at',{ascending:false})
- .catch(()=>({data:[]}));
+   .select('*,events(title,start_time,venues(name))')
+   .eq('vendor_id',vendorProfile.id)
+   .order('created_at',{ascending:false})
+   .catch(()=>({data:[]}));
+
+ const pending=(proposals||[]).filter(p=>p.status==='pending').length;
+ const badge=document.getElementById('proposalBadge');
+ if(badge){badge.textContent=pending;badge.style.display=pending?'':' none';}
 
  if(!proposals?.length){
- el.innerHTML=`<div class="empty"><h3>No proposals sent yet</h3><p style="margin-bottom:16px">Browse upcoming events and introduce your business.</p><button class="btn btn-orange" onclick="showPage('events')">Browse Events →</button></div>`;
- return;
+   pc.innerHTML=`
+   <div style="font-size:22px;font-weight:800;letter-spacing:-0.03em;margin-bottom:20px">Inquiries</div>
+   <div class="card" style="text-align:center;padding:48px">
+     <div style="font-size:36px;margin-bottom:12px">📭</div>
+     <h3 style="font-weight:700;margin-bottom:8px">No proposals sent yet</h3>
+     <p style="color:var(--sub);font-size:13px;margin-bottom:16px">Browse upcoming events and introduce your business.</p>
+     <button class="btn btn-primary" onclick="showPage('events')">Browse Events →</button>
+   </div>`;
+   return;
  }
 
- // Update badge
- const pending=proposals.filter(p=>p.status==='pending').length;
- const badge=document.getElementById('proposalBadge');
- if(badge){badge.textContent=pending;badge.style.display=pending?'':'none';}
-
- el.innerHTML=proposals.map(p=>`
- <div class="proposal-card"> <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px"> <div> <div class="proposal-title">${p.events?.title||'Event'}</div> <div class="proposal-meta"> ${p.events?.venues?.name||'Venue'} · ${fmt(p.events?.start_time)}</div> <div style="font-size:13px;color:var(--sub);margin-top:6px;line-height:1.6">${p.message||''}</div> </div> <span class="proposal-status status-${p.status||'pending'}">${p.status||'pending'}</span> </div> </div>`).join('');
+ pc.innerHTML=`
+ <div style="font-size:22px;font-weight:800;letter-spacing:-0.03em;margin-bottom:20px">Inquiries <span style="font-family:var(--mono);font-size:12px;color:var(--muted);font-weight:400">(${proposals.length})</span></div>
+ <div class="card" style="padding:0;overflow:hidden">
+   ${proposals.map(p=>`
+   <div class="proposal-row">
+     <div class="proposal-dot" style="background:${p.status==='accepted'?'var(--green)':p.status==='rejected'?'var(--red)':'var(--muted)'}"></div>
+     <div class="proposal-body" style="flex:1;min-width:0">
+       <div class="proposal-title">${p.events?.title||'Event'}</div>
+       <div class="proposal-meta">${p.events?.venues?.name||'Venue'} · ${fmt(p.events?.start_time)}</div>
+       ${p.message?`<div style="font-size:13px;color:var(--sub);margin-top:6px;line-height:1.6">${p.message}</div>`:''}
+     </div>
+     <span style="font-family:var(--mono);font-size:9px;letter-spacing:0.1em;text-transform:uppercase;padding:3px 9px;border-radius:9999px;flex-shrink:0;background:${p.status==='accepted'?'var(--green-dim)':p.status==='rejected'?'rgba(248,113,113,0.1)':'rgba(255,255,255,0.04)'};color:${p.status==='accepted'?'var(--green)':p.status==='rejected'?'var(--red)':'var(--muted)'};border:1px solid ${p.status==='accepted'?'var(--green-border)':p.status==='rejected'?'rgba(248,113,113,0.2)':'var(--border)'}">${p.status||'pending'}</span>
+   </div>`).join('')}
+ </div>`;
 }
 
 // ── BROWSE EVENTS ─────────────────────────────────────────────
