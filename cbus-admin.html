@@ -1189,13 +1189,13 @@ async function renderPlanners(){
  const list=roles||[];
  const userIds=list.map(r=>r.user_id);
 
- // Pull emails from the planners table (written at signup)
+ // Pull emails from the planners table using correct column names
  let emailMap={};
  if(userIds.length){
    const{data:plannerRows}=await sb.from('planners')
-     .select('user_id,email,created_at')
-     .in('user_id',userIds);
-   (plannerRows||[]).forEach(p=>emailMap[p.user_id]={email:p.email,created_at:p.created_at});
+     .select('owner_id,contact_email,created_at')
+     .in('owner_id',userIds);
+   (plannerRows||[]).forEach(p=>emailMap[p.owner_id]={email:p.contact_email,created_at:p.created_at});
  }
 
  document.getElementById('pageContent').innerHTML=`
