@@ -127,6 +127,20 @@ nav{
 .error-state{text-align:center;padding:80px 20px;color:var(--sub);}
 .error-title{font-size:18px;font-weight:700;color:var(--text);margin-bottom:8px;}
 
+/* ── RIDESHARE ── */
+.rideshare-card{background:var(--card);border:1px solid var(--border);border-radius:var(--r-lg);padding:20px 22px;margin-bottom:24px;}
+.rideshare-title{font-size:14px;font-weight:700;letter-spacing:-0.02em;margin-bottom:4px;}
+.rideshare-sub{font-size:12px;color:var(--sub);margin-bottom:16px;}
+.rideshare-options{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;}
+.rideshare-option{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-md);padding:12px 14px;cursor:pointer;transition:all 0.18s;text-decoration:none;display:block;}
+.rideshare-option:hover{border-color:var(--orange-border);}
+.rideshare-brand{font-family:var(--mono);font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);margin-bottom:4px;}
+.rideshare-estimate{font-size:18px;font-weight:800;color:var(--orange);letter-spacing:-0.02em;}
+.rideshare-estimate.loading{color:var(--muted);font-size:13px;font-weight:500;}
+.rideshare-time{font-size:11px;color:var(--sub);margin-top:2px;}
+.rideshare-disclaimer{font-size:10px;color:var(--muted);line-height:1.5;}
+.rideshare-detecting{font-size:13px;color:var(--sub);text-align:center;padding:16px 0;}
+
 /* ── MORE EVENTS ── */
 .more-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px;margin-top:16px;}
 .more-card{background:var(--card);border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden;cursor:pointer;transition:all 0.18s;}
@@ -202,6 +216,19 @@ footer{background:var(--surface);border-top:1px solid var(--border);padding:24px
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
         Share
       </button>
+    </div>
+
+    <!-- Rideshare -->
+    <div id="rideshareSection" style="display:none">
+      <div class="section-label">Get there</div>
+      <div class="rideshare-card">
+        <div class="rideshare-title">Rideshare Estimate</div>
+        <div class="rideshare-sub" id="rideshareDistance">Calculating from your location...</div>
+        <div id="rideshareOptions">
+          <div class="rideshare-detecting">Detecting your location...</div>
+        </div>
+        <div class="rideshare-disclaimer">Estimates based on distance. Actual fares vary by time, demand, and traffic. Prices shown in USD.</div>
+      </div>
     </div>
 
     <!-- More Events -->
@@ -364,6 +391,16 @@ async function loadEvent() {
       <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.14em;text-transform:uppercase;color:var(--orange);margin-bottom:4px">Venue</div>
       <div style="font-weight:700;font-size:15px">${event.venue_name_override}</div>
     </div>`;
+  }
+
+  // ── RIDESHARE ──
+  if (venue && venue.lat && venue.lng) {
+    initRideshare(venue.lat, venue.lng, venue.address || venue.name);
+  } else if (event.venue_name_override) {
+    // No coords - still show links with venue name
+    document.getElementById('rideshareSection').style.display = 'block';
+    document.getElementById('rideshareDistance').textContent = event.venue_name_override;
+    renderRideshareLinks(null, null, null, null, event.venue_name_override);
   }
 
   // ── DESCRIPTION ──
@@ -563,6 +600,115 @@ async function loadMoreEvents(event) {
       </div>
     </div>`;
   }).join('');
+}
+
+// ── RIDESHARE ESTIMATOR ──────────────────────────────────────
+function initRideshare(venueLat, venueLng, venueAddress) {
+  const section = document.getElementById('rideshareSection');
+  const optionsEl = document.getElementById('rideshareOptions');
+  const distEl = document.getElementById('rideshareDistance');
+  if (!section || !venueLat || !venueLng) return;
+
+  section.style.display = 'block';
+
+  if (!navigator.geolocation) {
+    distEl.textContent = 'Geolocation not supported on this device.';
+    renderRideshareLinks(null, null, venueLat, venueLng, venueAddress);
+    return;
+  }
+
+  navigator.geolocation.getCurrentPosition(
+    (pos) => {
+      const userLat = pos.coords.latitude;
+      const userLng = pos.coords.longitude;
+      const dist = haversineDistance(userLat, userLng, venueLat, venueLng);
+      const distMiles = dist.toFixed(1);
+
+      distEl.textContent = `${distMiles} miles from your location`;
+
+      // Estimate fares
+      // Base rates (approximate Columbus market rates 2026)
+      const uberX = estimateFare(dist, 1.20, 0.90, 2.50);
+      const uberComfort = estimateFare(dist, 1.65, 1.10, 4.00);
+      const lyftStd = estimateFare(dist, 1.15, 0.85, 2.25);
+      const lyftXL = estimateFare(dist, 1.80, 1.20, 3.50);
+
+      // ETA estimate (avg 5 min base + 1.5 min per mile)
+      const etaMin = Math.round(5 + dist * 1.5);
+
+      optionsEl.innerHTML = `
+        <div class="rideshare-options">
+          <a class="rideshare-option" href="${uberDeepLink(venueLat, venueLng, venueAddress)}" target="_blank" rel="noopener">
+            <div class="rideshare-brand">Uber X</div>
+            <div class="rideshare-estimate">${uberX}</div>
+            <div class="rideshare-time">~${etaMin} min away</div>
+          </a>
+          <a class="rideshare-option" href="${uberDeepLink(venueLat, venueLng, venueAddress)}" target="_blank" rel="noopener">
+            <div class="rideshare-brand">Uber Comfort</div>
+            <div class="rideshare-estimate">${uberComfort}</div>
+            <div class="rideshare-time">~${etaMin + 2} min away</div>
+          </a>
+          <a class="rideshare-option" href="${lyftDeepLink(venueLat, venueLng, venueAddress)}" target="_blank" rel="noopener">
+            <div class="rideshare-brand">Lyft</div>
+            <div class="rideshare-estimate">${lyftStd}</div>
+            <div class="rideshare-time">~${etaMin} min away</div>
+          </a>
+          <a class="rideshare-option" href="${lyftDeepLink(venueLat, venueLng, venueAddress)}" target="_blank" rel="noopener">
+            <div class="rideshare-brand">Lyft XL</div>
+            <div class="rideshare-estimate">${lyftXL}</div>
+            <div class="rideshare-time">~${etaMin + 3} min away</div>
+          </a>
+        </div>`;
+    },
+    () => {
+      // User denied or unavailable - show links without estimate
+      distEl.textContent = 'Enable location for fare estimates';
+      renderRideshareLinks(null, null, venueLat, venueLng, venueAddress);
+    },
+    { timeout: 8000 }
+  );
+}
+
+function haversineDistance(lat1, lng1, lat2, lng2) {
+  const R = 3958.8; // miles
+  const dLat = (lat2 - lat1) * Math.PI / 180;
+  const dLng = (lng2 - lng1) * Math.PI / 180;
+  const a = Math.sin(dLat/2)**2 + Math.cos(lat1*Math.PI/180) * Math.cos(lat2*Math.PI/180) * Math.sin(dLng/2)**2;
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+}
+
+function estimateFare(miles, perMile, perMin, base) {
+  const avgMph = 22; // Columbus urban avg
+  const mins = (miles / avgMph) * 60;
+  const low = base + (miles * perMile) + (mins * perMin);
+  const high = low * 1.35; // surge buffer
+  return '$' + low.toFixed(0) + ' – $' + high.toFixed(0);
+}
+
+function uberDeepLink(lat, lng, address) {
+  const dest = encodeURIComponent(address || (lat + ',' + lng));
+  return `https://m.uber.com/ul/?action=setPickup&pickup=my_location&dropoff[latitude]=${lat}&dropoff[longitude]=${lng}&dropoff[nickname]=${dest}`;
+}
+
+function lyftDeepLink(lat, lng, address) {
+  return `https://lyft.com/ride?id=lyft&destination[latitude]=${lat}&destination[longitude]=${lng}`;
+}
+
+function renderRideshareLinks(userLat, userLng, venueLat, venueLng, venueAddress) {
+  const optionsEl = document.getElementById('rideshareOptions');
+  optionsEl.innerHTML = `
+    <div class="rideshare-options">
+      <a class="rideshare-option" href="${uberDeepLink(venueLat, venueLng, venueAddress)}" target="_blank" rel="noopener">
+        <div class="rideshare-brand">Uber</div>
+        <div class="rideshare-estimate" style="font-size:14px;font-weight:700;color:var(--text)">Open Uber</div>
+        <div class="rideshare-time">Tap to get a ride</div>
+      </a>
+      <a class="rideshare-option" href="${lyftDeepLink(venueLat, venueLng, venueAddress)}" target="_blank" rel="noopener">
+        <div class="rideshare-brand">Lyft</div>
+        <div class="rideshare-estimate" style="font-size:14px;font-weight:700;color:var(--text)">Open Lyft</div>
+        <div class="rideshare-time">Tap to get a ride</div>
+      </a>
+    </div>`;
 }
 
 // ── SHARE ────────────────────────────────────────────────────
