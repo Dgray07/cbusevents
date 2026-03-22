@@ -720,90 +720,12 @@ body { background: var(--bg); color: var(--text); font-family: var(--font); disp
           <div class="planner-section-title">Plan Your Own Event</div>
           <div class="planner-section-sub">Connect with Columbus event planners who can make your idea a reality. Private parties, corporate events, weddings, brand activations and more.</div>
         </div>
-        <div style="display:flex;gap:8px;flex-shrink:0;">
-          <div class="filter-chip active">All</div>
-          <div class="filter-chip">Weddings</div>
-          <div class="filter-chip">Corporate</div>
-          <div class="filter-chip">Private</div>
-        </div>
       </div>
-
-      <div class="planner-grid">
-
-        <div class="planner-card">
-          <div class="planner-card-top">
-            <div class="planner-card-avatar pa1">MJ</div>
-            <div>
-              <div class="planner-card-name">Marcus Johnson Events</div>
-              <div class="planner-card-type">Full Service Planner</div>
-            </div>
-          </div>
-          <div class="planner-card-tags">
-            <span class="planner-tag">Corporate</span>
-            <span class="planner-tag">Private Parties</span>
-            <span class="planner-tag">Concerts</span>
-          </div>
-          <div class="planner-card-footer">
-            <span class="planner-card-rate">From $1,200</span>
-            <span class="planner-card-avail">Available</span>
-          </div>
+      <div class="planner-grid" id="plannerGrid">
+        <div style="padding:40px;text-align:center;color:var(--muted);grid-column:1/-1">
+          <div style="width:24px;height:24px;border:2px solid var(--border);border-top-color:var(--orange);border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 12px"></div>
+          Loading planners...
         </div>
-
-        <div class="planner-card">
-          <div class="planner-card-top">
-            <div class="planner-card-avatar pa2">SE</div>
-            <div>
-              <div class="planner-card-name">Simone Ellis Co.</div>
-              <div class="planner-card-type">Wedding + Events</div>
-            </div>
-          </div>
-          <div class="planner-card-tags">
-            <span class="planner-tag">Weddings</span>
-            <span class="planner-tag">Brand Activations</span>
-          </div>
-          <div class="planner-card-footer">
-            <span class="planner-card-rate">From $2,400</span>
-            <span class="planner-card-avail">Available</span>
-          </div>
-        </div>
-
-        <div class="planner-card">
-          <div class="planner-card-top">
-            <div class="planner-card-avatar pa3">RP</div>
-            <div>
-              <div class="planner-card-name">Renee Productions</div>
-              <div class="planner-card-type">Event Production</div>
-            </div>
-          </div>
-          <div class="planner-card-tags">
-            <span class="planner-tag">Concerts</span>
-            <span class="planner-tag">Corporate</span>
-            <span class="planner-tag">Activations</span>
-          </div>
-          <div class="planner-card-footer">
-            <span class="planner-card-rate">From $3,500</span>
-            <span class="planner-card-avail limited">Limited</span>
-          </div>
-        </div>
-
-        <div class="planner-card">
-          <div class="planner-card-top">
-            <div class="planner-card-avatar pa4">AT</div>
-            <div>
-              <div class="planner-card-name">Andre Thomas Events</div>
-              <div class="planner-card-type">Private + Social</div>
-            </div>
-          </div>
-          <div class="planner-card-tags">
-            <span class="planner-tag">Private Parties</span>
-            <span class="planner-tag">Weddings</span>
-          </div>
-          <div class="planner-card-footer">
-            <span class="planner-card-rate">Contact for Pricing</span>
-            <span class="planner-card-avail">Available</span>
-          </div>
-        </div>
-
       </div>
     </div>
 
@@ -1064,6 +986,46 @@ async function loadLiveData(user){
   loadLiveEvents(user);
   loadLiveTickets(user);
   loadWelcomeStats(user);
+  loadLivePlanners();
+}
+
+async function loadLivePlanners(){
+  const grid=document.getElementById('plannerGrid');
+  if(!grid)return;
+  const{data:planners}=await sb.from('planners')
+    .select('id,business_name,contact_name,bio,specialties,categories,rate_from,rate_display,availability,cover_image_url')
+    .eq('is_discoverable',true)
+    .eq('status','active')
+    .order('created_at',{ascending:false})
+    .limit(6);
+  if(!planners||planners.length===0){
+    grid.innerHTML='<div style="padding:40px;text-align:center;color:var(--sub);grid-column:1/-1">No planners listed yet — check back soon.</div>';
+    return;
+  }
+  const avatarColors=['pa1','pa2','pa3','pa4'];
+  grid.innerHTML=planners.map((p,i)=>{
+    const name=p.business_name||p.contact_name||'Columbus Planner';
+    const initials=name.split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase();
+    const tags=(p.categories||p.specialties||[]).slice(0,3);
+    const rate=p.rate_display||(p.rate_from?`From $${Number(p.rate_from).toLocaleString()}`:'Contact for Pricing');
+    const avail=p.availability||'available';
+    const availClass=avail.toLowerCase().includes('limited')?'limited':'';
+    const availLabel=avail.charAt(0).toUpperCase()+avail.slice(1);
+    return `<div class="planner-card">
+      <div class="planner-card-top">
+        <div class="planner-card-avatar ${avatarColors[i%4]}">${initials}</div>
+        <div>
+          <div class="planner-card-name">${name}</div>
+          ${p.bio?`<div class="planner-card-type" style="text-transform:none;letter-spacing:0;font-size:11px;color:var(--sub)">${p.bio.substring(0,60)}${p.bio.length>60?'...':''}</div>`:''}
+        </div>
+      </div>
+      ${tags.length?`<div class="planner-card-tags">${tags.map(t=>`<span class="planner-tag">${t}</span>`).join('')}</div>`:''}
+      <div class="planner-card-footer">
+        <span class="planner-card-rate">${rate}</span>
+        <span class="planner-card-avail ${availClass}">${availLabel}</span>
+      </div>
+    </div>`;
+  }).join('');
 }
 
 async function loadWelcomeStats(user){
