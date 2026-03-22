@@ -911,45 +911,47 @@ window.doAuth = async function doAuth(){
   const btn=document.getElementById('authBtn');
   if(!email||!pass){errEl.textContent='Email and password required.';return;}
   btn.disabled=true;btn.textContent='Please wait...';errEl.textContent='';
-  let error;
+
   if(currentTab==='signin'){
-    const{error:e,data}=await sb.auth.signInWithPassword({email,password:pass});
-    error=e;
-    if(!error&&data?.user){
-      // Redirect if this user belongs to a different portal
-      const{data:rd}=await sb.from('user_roles').select('role').eq('user_id',data.user.id).maybeSingle();
-      const role=rd?.role;
-      if(role==='vendor'){window.location.href='https://cbusevents.com/cbus-vendor-portal.html';return;}
-      if(role==='venue_owner'){window.location.href='https://cbusevents.com/cbus-venue-portal.html';return;}
-      if(role==='planner'){window.location.href='https://cbusevents.com/cbus-planner-portal.html';return;}
+    const{error,data}=await sb.auth.signInWithPassword({email,password:pass});
+    if(error){
+      errEl.textContent=error.message;
+      btn.disabled=false;btn.textContent='Sign In';
+      return;
     }
+    // Redirect if this user belongs to a different portal
+    const{data:rd}=await sb.from('user_roles').select('role').eq('user_id',data.user.id).maybeSingle();
+    const role=rd?.role;
+    if(role==='vendor'){window.location.href='https://cbusevents.com/cbus-vendor-portal.html';return;}
+    if(role==='venue_owner'){window.location.href='https://cbusevents.com/cbus-venue-portal.html';return;}
+    if(role==='planner'){window.location.href='https://cbusevents.com/cbus-planner-portal.html';return;}
+    // Customer or no role — enter portal
+    currentUser=data.user;
+    btn.disabled=false;btn.textContent='Sign In';
+    hideAuthGate(data.user);
+
   } else {
-    const{data,error:e}=await sb.auth.signUp({email,password:pass});
-    error=e;
-    if(!error&&!data.session){
+    const{data,error}=await sb.auth.signUp({email,password:pass});
+    if(error){
+      errEl.textContent=error.message;
+      btn.disabled=false;btn.textContent='Create Account';
+      return;
+    }
+    if(!data.session){
       errEl.style.color='var(--green)';
       errEl.textContent='Check your email for a confirmation link.';
       btn.disabled=false;btn.textContent='Create Account';
       return;
     }
-    if(!error&&data.user){
-      // Write role row so cross-portal redirects work correctly
+    if(data.user){
       await sb.from('user_roles').insert({user_id:data.user.id,role:'customer'}).select().maybeSingle().catch(()=>{});
       if(name){
-        await sb.from('customer_profiles').upsert({user_id:data.user.id,display_name:name},{onConflict:'user_id'});
+        await sb.from('customer_profiles').upsert({user_id:data.user.id,display_name:name},{onConflict:'user_id'}).catch(()=>{});
       }
+      currentUser=data.user;
+      btn.disabled=false;btn.textContent='Create Account';
+      hideAuthGate(data.user);
     }
-  }
-  if(error){
-    errEl.textContent=error.message;
-    btn.disabled=false;
-    btn.textContent=currentTab==='signin'?'Sign In':'Create Account';
-  } else {
-    // Explicitly hide auth gate on success
-    const gate=document.getElementById('authGate');
-    if(gate)gate.style.display='none';
-    btn.disabled=false;
-    btn.textContent=currentTab==='signin'?'Sign In':'Create Account';
   }
 }
 
@@ -1164,14 +1166,6 @@ let _initDone=false;
     el.addEventListener('keydown', function(e){ if(e.key==='Enter' && window.doAuth) window.doAuth(); });
   });
 })();
-</script>
-
-<script>
-// Global aliases so inline onclick handlers can find these functions
-function doAuth(){ if(window.doAuth) window.doAuth(); }
-function switchTab(t){ if(window.switchTab) window.switchTab(t); }
-function doSignOut(){ if(window.doSignOut) window.doSignOut(); }
-function goUpgrade(t){ if(window.goUpgrade) window.goUpgrade(t); }
 </script>
 </body>
 </html>
