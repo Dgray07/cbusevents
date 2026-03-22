@@ -1177,7 +1177,6 @@ async function toggleVenueFeature(id,val){
 
 // ── VENDORS ───────────────────────────────────────────────────
 async function renderPlanners(){
- // Use admin RPC to get planner emails directly from auth.users
  const{data:roles, error:rolesErr}=await sb.from('user_roles')
    .select('user_id, role')
    .eq('role','planner');
@@ -1190,13 +1189,13 @@ async function renderPlanners(){
  const list=roles||[];
  const userIds=list.map(r=>r.user_id);
 
- // Pull emails via admin_user_emails view
+ // Pull emails from the planners table (written at signup)
  let emailMap={};
  if(userIds.length){
-   const{data:users}=await sb.from('admin_user_emails')
-     .select('id,email,created_at')
-     .in('id',userIds);
-   (users||[]).forEach(u=>emailMap[u.id]={email:u.email,created_at:u.created_at});
+   const{data:plannerRows}=await sb.from('planners')
+     .select('user_id,email,created_at')
+     .in('user_id',userIds);
+   (plannerRows||[]).forEach(p=>emailMap[p.user_id]={email:p.email,created_at:p.created_at});
  }
 
  document.getElementById('pageContent').innerHTML=`
@@ -1213,7 +1212,7 @@ async function renderPlanners(){
      ${list.map(p=>{
        const u=emailMap[p.user_id]||{};
        return`<tr>
-         <td><strong>${u.email||p.user_id}</strong></td>
+         <td><strong>${u.email||'<span style="color:var(--muted);font-style:italic">'+p.user_id+'</span>'}</strong></td>
          <td>${u.created_at?new Date(u.created_at).toLocaleDateString():'—'}</td>
          <td><button class="btn btn-ghost btn-sm" onclick="deletePlanner('${p.user_id}')">Delete</button></td>
        </tr>`;

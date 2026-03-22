@@ -598,6 +598,8 @@ async function doSignup(){
  }
  currentUser=data.user;
  await sb.from('user_roles').insert({user_id:data.user.id,role:'planner'}).select().maybeSingle().catch(()=>{});
+ // Write email to planners table so admin portal can display it
+ await sb.from('planners').upsert({user_id:data.user.id,email,created_at:new Date().toISOString()},{onConflict:'user_id'}).catch(()=>{});
  await loadData();
  setLoggedInNav();
  nav('dashboard');
