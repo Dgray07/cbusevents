@@ -1627,6 +1627,44 @@ function renderHome(){
    </div>
  </section>
 
+
+ <!-- ══════════════════════════════════════════
+      COLUMBUS COMMUNITIES
+ ══════════════════════════════════════════ -->
+ <section style="padding:52px 48px;background:var(--bg);">
+   <div style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:20px">
+     <div>
+       <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.2em;text-transform:uppercase;color:var(--orange);margin-bottom:6px">Columbus Communities</div>
+       <h2 style="font-family:var(--font);font-size:22px;font-weight:800;letter-spacing:-0.03em;color:var(--text)">Find Your Scene</h2>
+     </div>
+     <a href="https://cbusevents.com/community.html" style="font-family:var(--mono);font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:var(--orange);background:none;border:none;cursor:pointer;text-decoration:none">All Communities</a>
+   </div>
+   <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px">
+     ${[
+       {slug:'black-columbus',      label:'Black Columbus',        accent:'#fbbf24'},
+       {slug:'latino-columbus',     label:'Latino Columbus',       accent:'#f87171'},
+       {slug:'lgbtq-columbus',      label:'LGBTQ+ Columbus',       accent:'#818cf8'},
+       {slug:'arts-creative',       label:'Arts & Creative',       accent:'#f472b6'},
+       {slug:'tech-startup',        label:'Tech & Startup',        accent:'#60a5fa'},
+       {slug:'osu-campus',          label:'OSU & Campus',          accent:'#ef4444'},
+       {slug:'young-professionals', label:'Young Professionals',   accent:'#2dd4bf'},
+       {slug:'short-north-scene',   label:'Short North',           accent:'#FF6B35'},
+       {slug:'south-asian',         label:'South Asian',           accent:'#a78bfa'},
+       {slug:'west-african',        label:'West African',          accent:'#fb923c'},
+       {slug:'somali-east-african', label:'Somali & East African', accent:'#34d399'},
+       {slug:'faith-communities',   label:'Faith Communities',     accent:'#fef08a'},
+     ].map(c=>`
+       <a href="https://cbusevents.com/community.html?c=${c.slug}"
+         style="background:var(--card);border:1px solid var(--border);border-radius:var(--r-lg);padding:16px;text-decoration:none;display:block;transition:all 0.18s;cursor:pointer"
+         onmouseover="this.style.borderColor='${c.accent}';this.style.transform='translateY(-2px)'"
+         onmouseout="this.style.borderColor='var(--border)';this.style.transform='translateY(0)'">
+         <div style="width:28px;height:3px;border-radius:2px;background:${c.accent};margin-bottom:10px"></div>
+         <div style="font-family:var(--font);font-weight:700;font-size:13px;color:var(--text);letter-spacing:-0.01em;line-height:1.3">${c.label}</div>
+         <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-top:5px">View events</div>
+       </a>`).join('')}
+   </div>
+ </section>
+
  <!-- ══════════════════════════════════════════
       FOUR COMMUNITIES
  ══════════════════════════════════════════ -->
