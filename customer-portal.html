@@ -551,7 +551,7 @@ body { background: var(--bg); color: var(--text); font-family: var(--font); disp
 <body>
 
 <!-- AUTH GATE -->
-<div id="authGate" style="display:none;position:fixed;inset:0;background:var(--bg);z-index:9999;display:flex;align-items:center;justify-content:center;padding:24px">
+<div id="authGate" style="display:flex;position:fixed;inset:0;background:var(--bg);z-index:9999;align-items:center;justify-content:center;padding:24px">
   <div style="background:var(--card);border:1px solid var(--border);border-radius:20px;padding:40px;width:100%;max-width:420px;box-shadow:0 32px 80px rgba(0,0,0,0.5)">
     <div style="text-align:center;margin-bottom:32px">
       <div style="font-family:var(--font);font-weight:900;font-size:22px;letter-spacing:-0.05em;text-transform:uppercase;margin-bottom:6px">CBUS<span style="color:var(--orange)">EVENTS</span></div>
@@ -574,7 +574,7 @@ body { background: var(--bg); color: var(--text); font-family: var(--font); disp
       <input type="password" id="authPass" placeholder="••••••••" class="auth-enter-submit" style="width:100%;background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:9px;padding:10px 14px;color:var(--text);font-family:var(--font);font-size:14px;outline:none"/>
     </div>
     <div id="authErr" style="color:var(--red);font-size:13px;margin-bottom:10px;min-height:18px"></div>
-    <button id="authBtn" style="width:100%;background:var(--orange);color:#fff;border:none;border-radius:9px;padding:12px;font-size:14px;font-weight:700;cursor:pointer;font-family:var(--font)">Sign In</button>
+    <button id="authBtn" onclick="doAuth()" style="width:100%;background:var(--orange);color:#fff;border:none;border-radius:9px;padding:12px;font-size:14px;font-weight:700;cursor:pointer;font-family:var(--font)">Sign In</button>
     <div style="text-align:center;margin-top:16px;font-size:13px;color:var(--sub)">
       <span id="authSwitchText">New to CBUSEVENTS?</span>
       <button id="authSwitchBtn" style="background:none;border:none;color:var(--orange);font-size:13px;font-weight:600;cursor:pointer;font-family:var(--font);margin-left:4px">Create a free account</button>
@@ -1188,8 +1188,8 @@ let _initDone=false;
   });
 })();
 
-// ── WIRE AUTH BUTTONS — single binding after DOM ready ──────
-document.addEventListener('DOMContentLoaded', function(){
+// ── WIRE AUTH BUTTONS — DOM is already ready at this point ──
+(function wireAuthButtons(){
   var authBtn=document.getElementById('authBtn');
   if(authBtn) authBtn.addEventListener('click', function(){ if(window.doAuth) window.doAuth(); });
 
@@ -1201,7 +1201,7 @@ document.addEventListener('DOMContentLoaded', function(){
   document.querySelectorAll('.auth-enter-submit').forEach(function(el){
     el.addEventListener('keydown', function(e){ if(e.key==='Enter' && window.doAuth) window.doAuth(); });
   });
-});
+})();
 </script>
 
 <script>
