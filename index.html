@@ -1518,8 +1518,8 @@ function renderHome(){
        <div style="font-size:15px;font-weight:600;margin-bottom:6px">No upcoming events yet</div>
        <div style="font-size:13px;color:var(--muted)">Check back soon</div>
      </div>` : `
-   <div id="homeEventsGrid" style="display:flex;gap:16px;overflow-x:auto;padding-bottom:12px;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;scrollbar-width:none;-ms-overflow-style:none">
-   <style>#homeEventsGrid::-webkit-scrollbar{display:none}#homeEventsGrid>div{scroll-snap-align:start;flex:0 0 72vw;max-width:280px}@media(min-width:768px){#homeEventsGrid{display:grid!important;grid-template-columns:repeat(auto-fill,minmax(220px,1fr))!important;overflow-x:visible!important;flex-wrap:unset!important}#homeEventsGrid>div{flex:unset!important;max-width:unset!important}}</style>
+   <div id="homeEventsGrid" style="display:flex;gap:14px;overflow-x:auto;padding-bottom:12px;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;scrollbar-width:none;-ms-overflow-style:none">
+   <style>#homeEventsGrid::-webkit-scrollbar{display:none}#homeEventsGrid>div{scroll-snap-align:start;flex:0 0 300px;min-width:300px}@media(max-width:600px){#homeEventsGrid>div{flex:0 0 78vw;min-width:78vw}}</style>
      ${allUpcoming.map(e=>{
        const venueName = e.venue_name_override||e.venues?.name||'Columbus Venue';
        const img = e.cover_image_url;
