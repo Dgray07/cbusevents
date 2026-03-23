@@ -1,26 +1,118 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 
-<url>
-<loc>https://cbusevents.com/</loc>
-<changefreq>daily</changefreq>
-<priority>1.0</priority>
-</url>
+  <!-- Core pages -->
+  <url>
+    <loc>https://cbusevents.com/</loc>
+    <changefreq>daily</changefreq>
+    <priority>1.0</priority>
+  </url>
 
-<url>
-<loc>https://cbusevents.com/cbus-admin.html</loc>
-<changefreq>weekly</changefreq>
-</url>
+  <url>
+    <loc>https://cbusevents.com/blog.html</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
 
-<url>
-<loc>https://cbusevents.com/cbus-planner-portal.html</loc>
-<changefreq>weekly</changefreq>
-</url>
+  <url>
+    <loc>https://cbusevents.com/gallery-hop.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
 
-<url>
-<loc>https://cbusevents.com/cbus-venue-portal.html</loc>
-<changefreq>weekly</changefreq>
-</url>
+  <!-- Signup pages -->
+  <url>
+    <loc>https://cbusevents.com/signup.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://cbusevents.com/signup.html?role=venue</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://cbusevents.com/signup.html?role=vendor</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://cbusevents.com/signup.html?role=planner</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://cbusevents.com/signup.html?role=attendee</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+
+  <!-- Community pages -->
+  <url>
+    <loc>https://cbusevents.com/community.html</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+
+  <url>
+    <loc>https://cbusevents.com/community.html?c=black-columbus</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+
+  <url>
+    <loc>https://cbusevents.com/community.html?c=latino-columbus</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+
+  <url>
+    <loc>https://cbusevents.com/community.html?c=lgbtq-columbus</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+
+  <url>
+    <loc>https://cbusevents.com/community.html?c=arts-creative</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+
+  <url>
+    <loc>https://cbusevents.com/community.html?c=osu-campus</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+
+  <!-- Portal pages (auth-gated, lower priority) -->
+  <url>
+    <loc>https://cbusevents.com/cbus-planner-portal.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
+  <url>
+    <loc>https://cbusevents.com/cbus-venue-portal.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
+  <url>
+    <loc>https://cbusevents.com/cbus-vendor-portal.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
+  <!-- NOTE: Individual event URLs (event.html?id=...) should be added below -->
+  <!-- as new events are published. Example: -->
+  <!-- <url> -->
+  <!--   <loc>https://cbusevents.com/event.html?id=YOUR_EVENT_ID</loc> -->
+  <!--   <changefreq>weekly</changefreq> -->
+  <!--   <priority>0.9</priority> -->
+  <!-- </url> -->
 
 </urlset>
