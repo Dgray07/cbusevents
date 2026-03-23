@@ -357,7 +357,7 @@ function Sidebar({active,setActive,profile}) {
      ))}
    </nav>
    <div style={{padding:18,borderTop:"1px solid var(--border-sub)"}}>
-     <div style={{background:"linear-gradient(135deg,rgba(255,107,53,0.15),rgba(255,107,53,0.06))",border:"1px solid rgba(255,107,53,0.25)",borderRadius:8,padding:"6px 10px",fontSize:10,fontWeight:700,textAlign:"center",letterSpacing:"0.08em",textTransform:"uppercase",color:"#FF6B35",marginBottom:10}}>Founding Member · $40/mo</div>
+     <div style={{background:"linear-gradient(135deg,rgba(255,107,53,0.15),rgba(255,107,53,0.06))",border:"1px solid rgba(255,107,53,0.25)",borderRadius:8,padding:"6px 10px",fontSize:10,fontWeight:700,textAlign:"center",letterSpacing:"0.08em",textTransform:"uppercase",color:"#FF6B35",marginBottom:10}}>Venue Standard · $39/mo</div>
      <button onClick={()=>sb.auth.signOut()} style={{width:"100%",background:"rgba(255,255,255,0.04)",color:"var(--sub)",border:"1px solid var(--border)",borderRadius:10,padding:"8px",fontSize:12,fontWeight:700,cursor:"pointer",fontFamily:"'DM Sans',sans-serif"}}>Sign Out</button>
    </div>
  </div> );
@@ -733,8 +733,8 @@ function Inquiries({venue}) {
 }
 
 // Stripe config
-const PAYMENT_LINK_STANDARD="https://buy.stripe.com/28E9AT0jK7gufNJ2Vqc3m00"; // Founding $40/mo
-const PAYMENT_LINK_PREMIUM="https://buy.stripe.com/28E9AT0jK7gufNJ2Vqc3m00";  // TODO: replace with Premium Stripe link when ready
+const PAYMENT_LINK_STANDARD="https://buy.stripe.com/9B64gz8Qg1Wa6d93Zuc3m03";
+const PAYMENT_LINK_PREMIUM="https://buy.stripe.com/cNi8wPc2sfN030X7bGc3m04";
 
 
 
@@ -795,9 +795,9 @@ function PlanBilling({venue}) {
  const [err,setErr]=React.useState(null);
 
  const plans=[
- {id:"free", name:"Free", price:0, priceId:null, perks:["1 venue listing","Up to 4 events/month","Basic search placement","Public venue page"]},
- {id:"standard",name:"Standard", price:40, priceId:"standard", perks:["Up to 20 events/month","Priority search placement","Inquiry inbox enabled","Email support","Analytics dashboard","Founding rate — locked forever"]},
- {id:"premium", name:"Premium", price:79, priceId:"premium", perks:["Unlimited events","Top of all search results","Homepage feature slot","Flyer & merch design included","Dedicated support","Founding rate — locked forever"]},
+ {id:"free", name:"Free", price:0, priceId:null, perks:["1 venue listing","Up to 4 events/month","Public venue page","Venue automatically submitted to Google","Promoted on CBUSEVENTS social media"]},
+ {id:"standard",name:"Standard", price:39, priceId:"standard", perks:["Up to 20 events/month","Priority search placement","Inquiry inbox enabled","Analytics dashboard","Email support"]},
+ {id:"premium", name:"Premium", price:99, priceId:"premium", perks:["Unlimited events","Top of all search results","Homepage feature slot","Multi-account and staff management","Geolocation promos","Ticket revenue share","Featured placement","Dedicated support"]},
  ];
 
  const checkout=(plan)=>{

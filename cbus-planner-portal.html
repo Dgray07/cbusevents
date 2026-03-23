@@ -756,30 +756,51 @@ function renderBilling(){
  document.getElementById('app').innerHTML=`
  <div class="page">
    <div class="section-title">Plan & Billing</div>
-   <div class="section-sub" style="margin-bottom:32px">Founding member pricing — locked in forever while spots last</div>
+   <div class="section-sub" style="margin-bottom:32px">Choose the plan that fits your business</div>
    ${planParam==='success'?`<div style="background:#0a2a14;border:1px solid #1a4a24;border-radius:10px;padding:14px 18px;margin-bottom:28px;color:#22c55e;font-size:14px;font-weight:600;">Upgrade successful! Your plan will be activated within a minute.</div>`:''}
    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:18px">
+     <!-- FREE -->
      <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:28px">
        <div style="font-family:'DM Sans',sans-serif;font-weight:800;font-size:18px;margin-bottom:8px">Free</div>
        <div style="font-family:'DM Sans',sans-serif;font-size:28px;font-weight:800;letter-spacing:-0.03em;line-height:1;margin-bottom:20px">$0<span style="font-size:14px;color:var(--sub)">/mo</span></div>
        <div style="display:flex;flex-direction:column;gap:9px;margin-bottom:24px;font-size:13px;color:var(--sub)">
-         <div>Browse all Columbus venues</div><div>Send venue inquiries</div><div>Create and publish events</div>
+         <div>Browse all Columbus venues</div>
+         <div>Send venue inquiries</div>
+         <div>Create and publish events</div>
+         <div>Events automatically submitted to Google</div>
+         <div>Promoted on CBUSEVENTS social media</div>
        </div>
        <div style="text-align:center;padding:10px;background:var(--surface);border:1px solid var(--border);border-radius:8px;font-size:13px;color:var(--muted)">Current Plan</div>
      </div>
-     <div style="background:var(--card);border:2px solid #FF6B35;border-radius:14px;padding:28px;position:relative">
-       <div style="position:absolute;top:-11px;left:50%;transform:translateX(-50%);background:#FF6B35;color:#fff;border-radius:20px;padding:2px 14px;font-size:11px;font-weight:700;white-space:nowrap">FOUNDING MEMBER</div>
-       <div style="font-family:'DM Sans',sans-serif;font-weight:800;font-size:18px;color:#FF6B35;margin-bottom:8px">Pro</div>
+     <!-- STANDARD -->
+     <div style="background:linear-gradient(135deg,#1a0800,#200d00);border:2px solid #FF6B35;border-radius:14px;padding:28px;position:relative">
+       <div style="position:absolute;top:-11px;left:50%;transform:translateX(-50%);background:#FF6B35;color:#fff;border-radius:20px;padding:2px 14px;font-size:11px;font-weight:700;white-space:nowrap">MOST POPULAR</div>
+       <div style="font-family:'DM Sans',sans-serif;font-weight:800;font-size:18px;color:#FF6B35;margin-bottom:8px">Standard</div>
        <div style="font-family:'DM Sans',sans-serif;font-size:28px;font-weight:800;letter-spacing:-0.03em;line-height:1;color:#FF6B35;margin-bottom:4px">$15<span style="font-size:14px;color:var(--sub)">/mo</span></div>
-       <div style="font-size:11px;color:var(--muted);margin-bottom:20px">Rate locked forever</div>
+       <div style="font-size:11px;color:var(--muted);margin-bottom:20px">billed monthly</div>
        <div style="display:flex;flex-direction:column;gap:9px;margin-bottom:24px;font-size:13px;color:var(--sub)">
+         <div style="color:var(--text)">Everything in Free</div>
          <div style="color:var(--text)">Full vendor directory access</div>
          <div style="color:var(--text)">Receive vendor proposals</div>
          <div style="color:var(--text)">Featured planner profile</div>
+         <div style="color:var(--text)">Marketing features</div>
          <div style="color:var(--text)">Sell tickets through CBUSEVENTS</div>
-         <div>Everything in Free</div>
        </div>
-       <button onclick="window.location.href='https://buy.stripe.com/3cI3cv3vWcAOgRN0Nic3m01'" style="width:100%;padding:11px;background:#FF6B35;color:#fff;border:none;border-radius:8px;font-weight:700;font-size:14px;cursor:pointer">Claim Founding Rate →</button>
+       <button onclick="window.location.href='https://buy.stripe.com/6oU8wP6I8fN0595dA4c3m07?prefilled_email='+encodeURIComponent(currentUser?.email||'')" style="width:100%;padding:11px;background:#FF6B35;color:#fff;border:none;border-radius:8px;font-weight:700;font-size:14px;cursor:pointer">Upgrade to Standard →</button>
+     </div>
+     <!-- PREMIUM -->
+     <div style="background:linear-gradient(135deg,#1a1000,#251500);border:2px solid #fbbf24;border-radius:14px;padding:28px;position:relative">
+       <div style="position:absolute;top:-11px;left:50%;transform:translateX(-50%);background:#fbbf24;color:#000;border-radius:20px;padding:2px 14px;font-size:11px;font-weight:700;white-space:nowrap">PREMIUM</div>
+       <div style="font-family:'DM Sans',sans-serif;font-weight:800;font-size:18px;color:#fbbf24;margin-bottom:8px">Premium</div>
+       <div style="font-family:'DM Sans',sans-serif;font-size:28px;font-weight:800;letter-spacing:-0.03em;line-height:1;color:#fbbf24;margin-bottom:4px">$45<span style="font-size:14px;color:var(--sub)">/mo</span></div>
+       <div style="font-size:11px;color:var(--muted);margin-bottom:20px">billed monthly</div>
+       <div style="display:flex;flex-direction:column;gap:9px;margin-bottom:24px;font-size:13px;color:var(--sub)">
+         <div style="color:var(--text)">Everything in Standard</div>
+         <div style="color:var(--text)">Unlimited events</div>
+         <div style="color:var(--text)">Top placement across all search results</div>
+         <div style="color:var(--text)">Dedicated support</div>
+       </div>
+       <button onclick="window.location.href='https://buy.stripe.com/9B6aEX9UkdES451gMgc3m08?prefilled_email='+encodeURIComponent(currentUser?.email||'')" style="width:100%;padding:11px;background:#fbbf24;color:#000;border:none;border-radius:8px;font-weight:800;font-size:14px;cursor:pointer">Upgrade to Premium →</button>
      </div>
    </div>
    <div style="margin-top:28px;padding:18px;background:var(--surface);border:1px solid var(--border);border-radius:12px">

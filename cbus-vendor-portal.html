@@ -315,8 +315,8 @@ const sb=supabase.createClient(SB_URL,SB_KEY);
 
 // Stripe payment links
 const STRIPE_LINKS={
- standard:'https://buy.stripe.com/aFa3cv3vWasGdFBdA4c3m02',
- premium:'https://buy.stripe.com/aFa3cv3vWasGdFBdA4c3m02',
+ standard:'https://buy.stripe.com/28EbJ17Mc8ky30XanSc3m05',
+ premium:'https://buy.stripe.com/eVq8wP2rSeIW7hdeE8c3m06',
 };
 
 const SERVICES=[
@@ -1077,10 +1077,61 @@ function renderPlan(){
  const isPremium=tier==='PREMIUM';
 
  document.getElementById('pageContent').innerHTML=`
- <div class="plan-grid"> <!-- FREE --> <div class="plan-card ${!isStandard&&!isPremium?'current':''}"> <div class="plan-name" style="color:var(--muted)">Free</div> <div class="plan-price">$0<span>/mo</span></div> <div class="plan-period">forever</div> <div class="plan-perks"> <div class="plan-perk"><span class="check"></span>Vendor profile & bio</div> <div class="plan-perk"><span class="check"></span>Select all your services</div> <div class="plan-perk"><span class="check"></span>Portfolio photos (unlimited)</div> <div class="plan-perk"><span class="check" style="color:var(--muted)"></span><span style="color:var(--muted)">Featured in directory</span></div> <div class="plan-perk"><span class="check" style="color:var(--muted)"></span><span style="color:var(--muted)">Send proposals</span></div> </div> <button class="plan-btn" style="background:var(--surface);color:var(--sub);border:1px solid var(--border)" disabled>${!isStandard&&!isPremium?'Current Plan':'Free Plan'}</button> </div> <!-- FOUNDING MEMBER --> <div class="plan-card ${isStandard||isPremium?'current':'popular'}" style="${isStandard||isPremium?'':'background:linear-gradient(135deg,#1a0800,#200d00);border-color:#FF6B3580;'}"> ${!isStandard&&!isPremium?'<div class="plan-badge">FOUNDING MEMBER</div>':''} <div class="plan-name" style="color:var(--orange)">Founding Member</div> <div class="plan-price" style="color:var(--orange)">$20<span>/mo</span></div> <div class="plan-period">Rate locked forever</div> <div class="plan-perks"> <div class="plan-perk"><span class="check"></span>Everything in Free</div> <div class="plan-perk"><span class="check"></span>Featured in vendor directory</div> <div class="plan-perk"><span class="check"></span>Priority search placement</div> <div class="plan-perk premium-perk"><span class="check"></span>Send proposals to venues</div> <div class="plan-perk premium-perk"><span class="check"></span>Send proposals to planners</div> <div class="plan-perk premium-perk"><span class="check"></span>Browse all upcoming events</div> </div> ${isStandard||isPremium
- ?'<button class="plan-btn" style="background:var(--surface);color:var(--sub);border:1px solid var(--border)" disabled>Current Plan</button>'
- :`<button class="plan-btn" style="background:#FF6B35;color:#fff" onclick="window.location.href='${STRIPE_LINKS.standard}&prefilled_email='+encodeURIComponent(currentUser?.email||'')">Claim Founding Rate →</button>`}
- </div> </div> <div style="margin-top:20px;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px 20px;font-size:13px;color:var(--sub);line-height:1.7"> After payment your plan upgrades automatically within a few minutes. Questions? Email <a href="mailto:info@cbusevents.com" style="color:var(--orange)">info@cbusevents.com</a> </div>`;
+ <div class="section-title" style="margin-bottom:6px">Plan & Billing</div>
+ <div class="section-sub" style="margin-bottom:28px">Choose the plan that fits your business</div>
+ <div class="plan-grid">
+   <!-- FREE -->
+   <div class="plan-card ${!isStandard&&!isPremium?'current':''}">
+     <div class="plan-name" style="color:var(--muted)">Free</div>
+     <div class="plan-price">$0<span>/mo</span></div>
+     <div class="plan-period">forever</div>
+     <div class="plan-perks">
+       <div class="plan-perk">Vendor profile and bio</div>
+       <div class="plan-perk">Select all your services</div>
+       <div class="plan-perk">Portfolio photos (unlimited)</div>
+       <div class="plan-perk">Profile automatically submitted to Google</div>
+       <div class="plan-perk">Promoted on CBUSEVENTS social media</div>
+     </div>
+     <button class="plan-btn" style="background:var(--surface);color:var(--sub);border:1px solid var(--border)" disabled>${!isStandard&&!isPremium?'Current Plan':'Free Plan'}</button>
+   </div>
+   <!-- STANDARD -->
+   <div class="plan-card ${isStandard?'current':''}" style="${!isStandard&&!isPremium?'background:linear-gradient(135deg,#1a0800,#200d00);border-color:#FF6B3580;':''}">
+     ${!isStandard&&!isPremium?'<div class="plan-badge">MOST POPULAR</div>':''}
+     <div class="plan-name" style="color:var(--orange)">Standard</div>
+     <div class="plan-price" style="color:var(--orange)">$15<span>/mo</span></div>
+     <div class="plan-period">billed monthly</div>
+     <div class="plan-perks">
+       <div class="plan-perk">Everything in Free</div>
+       <div class="plan-perk">Featured in vendor directory</div>
+       <div class="plan-perk">Priority search placement</div>
+       <div class="plan-perk">Suggested to planners and venues as a trusted vendor</div>
+       <div class="plan-perk">Send proposals to venues and planners</div>
+       <div class="plan-perk">Browse all upcoming events</div>
+     </div>
+     ${isStandard
+       ?'<button class="plan-btn" style="background:var(--surface);color:var(--sub);border:1px solid var(--border)" disabled>Current Plan</button>'
+       :`<button class="plan-btn" style="background:#FF6B35;color:#fff" onclick="window.location.href='${STRIPE_LINKS.standard}&prefilled_email='+encodeURIComponent(currentUser?.email||'')">Upgrade to Standard →</button>`}
+   </div>
+   <!-- PREMIUM -->
+   <div class="plan-card ${isPremium?'current':''}" style="${isPremium?'':'background:linear-gradient(135deg,#1a1000,#251500);border-color:#fbbf2480;'}">
+     ${isPremium?'':'<div class="plan-badge" style="background:#fbbf24;color:#000">PREMIUM</div>'}
+     <div class="plan-name" style="color:var(--gold)">Premium</div>
+     <div class="plan-price" style="color:var(--gold)">$45<span>/mo</span></div>
+     <div class="plan-period">billed monthly</div>
+     <div class="plan-perks">
+       <div class="plan-perk">Everything in Standard</div>
+       <div class="plan-perk">Sitewide promotional banner</div>
+       <div class="plan-perk">Top placement across all categories</div>
+       <div class="plan-perk">Dedicated support</div>
+     </div>
+     ${isPremium
+       ?'<button class="plan-btn" style="background:var(--surface);color:var(--sub);border:1px solid var(--border)" disabled>Current Plan</button>'
+       :`<button class="plan-btn" style="background:#fbbf24;color:#000;font-weight:800" onclick="window.location.href='${STRIPE_LINKS.premium}&prefilled_email='+encodeURIComponent(currentUser?.email||'')">Upgrade to Premium →</button>`}
+   </div>
+ </div>
+ <div style="margin-top:20px;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px 20px;font-size:13px;color:var(--sub);line-height:1.7">
+   After payment your plan upgrades automatically within a few minutes. Questions? Email <a href="mailto:info@cbusevents.com" style="color:var(--orange)">info@cbusevents.com</a>
+ </div>`;
 }
 
 // ── HELPERS ───────────────────────────────────────────────────
