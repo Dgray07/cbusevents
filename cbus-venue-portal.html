@@ -1,7 +1,14 @@
 <!DOCTYPE html>
-
 <html lang="en">
 <head>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-P70BRSL5E5"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-P70BRSL5E5');
+    </script>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>CBUSEVENTS — Venue Portal</title>
@@ -29,25 +36,33 @@ textarea { resize: vertical; min-height: 90px; }
 @keyframes spin { to { transform: rotate(360deg); } }
 
 /* ── MOBILE PORTAL ── */
+/* Mobile bottom nav */
+.mobile-bottom-nav{display:none;position:fixed;bottom:0;left:0;right:0;background:var(--surface);border-top:1px solid var(--border);z-index:200;padding:0 8px;padding-bottom:env(safe-area-inset-bottom);}
+.mobile-bottom-nav-inner{display:flex;align-items:stretch;height:58px;}
+.mobile-nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;background:none;border:none;cursor:pointer;color:var(--sub);font-family:'DM Sans',sans-serif;font-size:10px;font-weight:500;transition:color 0.15s;padding:4px 2px;}
+.mobile-nav-btn.active{color:var(--orange);}
+.mobile-nav-btn svg{width:20px;height:20px;flex-shrink:0;}
+
 @media(max-width:680px){
-html,body{overflow-x:hidden;}
-.portal-nav{padding:0 16px !important;height:54px !important;}
-.portal-sidebar{display:none !important;}
-.portal-main{margin-left:0 !important;padding:16px !important;}
-.portal-content{padding:16px !important;}
-.stats-grid{grid-template-columns:1fr 1fr !important;gap:10px !important;}
-.modal-inner,.modal-box{width:calc(100vw - 32px) !important;max-width:100% !important;margin:16px !important;}
-table{display:block;overflow-x:auto;-webkit-overflow-scrolling:touch;}
-.form-row{grid-template-columns:1fr !important;}
-.grid-2,.grid-3{grid-template-columns:1fr !important;}
-.card-grid{grid-template-columns:1fr !important;}
-.btn-row{flex-direction:column !important;}
-input,select,textarea{font-size:16px !important;}
-.page-header{padding:16px !important;}
-.section-pad{padding:16px !important;}
+  html,body{overflow-x:hidden;}
+  .portal-nav{padding:0 16px !important;height:54px !important;}
+  .portal-sidebar{display:none !important;}
+  .portal-main{margin-left:0 !important;padding:16px !important;padding-bottom:80px !important;}
+  .mobile-bottom-nav{display:block;}
+  .portal-content{padding:16px !important;}
+  .stats-grid{grid-template-columns:1fr 1fr !important;gap:10px !important;}
+  .modal-inner,.modal-box{width:calc(100vw - 32px) !important;max-width:100% !important;margin:16px !important;}
+  table{display:block;overflow-x:auto;-webkit-overflow-scrolling:touch;}
+  .form-row{grid-template-columns:1fr !important;}
+  .grid-2,.grid-3{grid-template-columns:1fr !important;}
+  .card-grid{grid-template-columns:1fr !important;}
+  .btn-row{flex-direction:column !important;}
+  input,select,textarea{font-size:16px !important;}
+  .page-header{padding:16px !important;}
+  .section-pad{padding:16px !important;}
 }
 @media(max-width:900px){
-.portal-sidebar{width:200px !important;}
+  .portal-sidebar{width:200px !important;}
 }
 
 </style>
@@ -60,139 +75,138 @@ h1,h2,h3,h4,h5,h6{font-family:'DM Sans',sans-serif;letter-spacing:-0.02em;}
 
 /* ── CBUSEVENTS DESIGN SYSTEM UPGRADE ─────────────────────── */
 :root{
-–bg:#080810;–surface:#0f0f1a;–card:#141420;–card-hover:#18182a;
-–border:#1e1e2e;–border-sub:#191928;
-–text:#f0f0fa;–sub:#7070a0;–muted:#40405a;
-–orange:#FF6B35;–green:#34d399;–red:#f87171;–blue:#818cf8;–gold:#fbbf24;
-–font:‘DM Sans’,sans-serif;–mono:‘DM Mono’,monospace;
+  --bg:#080810;--surface:#0f0f1a;--card:#141420;--card-hover:#18182a;
+  --border:#1e1e2e;--border-sub:#191928;
+  --text:#f0f0fa;--sub:#7070a0;--muted:#40405a;
+  --orange:#FF6B35;--green:#34d399;--red:#f87171;--blue:#818cf8;--gold:#fbbf24;
+  --font:'DM Sans',sans-serif;--mono:'DM Mono',monospace;
 }
 *{ -webkit-font-smoothing:antialiased; }
-body{ font-family:‘DM Sans’,sans-serif !important; background:var(–bg) !important; color:var(–text) !important; }
-h1,h2,h3,h4,h5,h6{ font-family:‘DM Sans’,sans-serif !important; letter-spacing:-0.02em; }
+body{ font-family:'DM Sans',sans-serif !important; background:var(--bg) !important; color:var(--text) !important; }
+h1,h2,h3,h4,h5,h6{ font-family:'DM Sans',sans-serif !important; letter-spacing:-0.02em; }
 
 /* Stat cards — monospace numbers, hover lift, accent bar */
 .stat-card{
-background:var(–card) !important; border:1px solid var(–border) !important;
-border-radius:16px !important; padding:22px 24px 20px !important;
-position:relative; overflow:hidden; transition:all 0.2s !important;
+  background:var(--card) !important; border:1px solid var(--border) !important;
+  border-radius:16px !important; padding:22px 24px 20px !important;
+  position:relative; overflow:hidden; transition:all 0.2s !important;
 }
 .stat-card::before{
-content:’’; position:absolute; top:0; left:0; right:0; height:2px;
-background:linear-gradient(90deg,transparent,var(–orange),transparent);
-opacity:0; transition:opacity 0.2s;
+  content:''; position:absolute; top:0; left:0; right:0; height:2px;
+  background:linear-gradient(90deg,transparent,var(--orange),transparent);
+  opacity:0; transition:opacity 0.2s;
 }
-.stat-card:hover{ background:var(–card-hover) !important; transform:translateY(-1px) !important; border-color:rgba(255,255,255,0.08) !important; }
+.stat-card:hover{ background:var(--card-hover) !important; transform:translateY(-1px) !important; border-color:rgba(255,255,255,0.08) !important; }
 .stat-card:hover::before{ opacity:1; }
 .stat-num,.stat-card-num,.stat-value{
-font-family:‘DM Mono’,monospace !important;
-font-size:32px !important; font-weight:500 !important;
-line-height:1 !important; letter-spacing:-0.02em !important; margin-bottom:6px !important;
+  font-family:'DM Mono',monospace !important;
+  font-size:32px !important; font-weight:500 !important;
+  line-height:1 !important; letter-spacing:-0.02em !important; margin-bottom:6px !important;
 }
-.stat-label,.stat-card-label{ font-size:13px !important; color:var(–sub) !important; font-weight:500 !important; }
-.stat-sub,.stat-card-sub,.stat-meta{ font-size:11px !important; color:var(–muted) !important; margin-top:8px !important; }
+.stat-label,.stat-card-label{ font-size:13px !important; color:var(--sub) !important; font-weight:500 !important; }
+.stat-sub,.stat-card-sub,.stat-meta{ font-size:11px !important; color:var(--muted) !important; margin-top:8px !important; }
 
 /* Sidebar nav — orange left-border active indicator */
-.sidebar,.portal-sidebar{ background:var(–surface) !important; border-right:1px solid var(–border) !important; }
+.sidebar,.portal-sidebar{ background:var(--surface) !important; border-right:1px solid var(--border) !important; }
 .nav-item{
-border-left:2px solid transparent !important;
-border-radius:10px !important; transition:all 0.18s !important;
-padding:8px 14px 8px 18px !important; margin:1px 8px !important;
-font-size:13px !important; font-weight:500 !important; color:var(–sub) !important;
+  border-left:2px solid transparent !important;
+  border-radius:10px !important; transition:all 0.18s !important;
+  padding:8px 14px 8px 18px !important; margin:1px 8px !important;
+  font-size:13px !important; font-weight:500 !important; color:var(--sub) !important;
 }
-.nav-item:hover{ background:rgba(255,255,255,0.04) !important; color:var(–text) !important; border-left-color:var(–muted) !important; }
+.nav-item:hover{ background:rgba(255,255,255,0.04) !important; color:var(--text) !important; border-left-color:var(--muted) !important; }
 .nav-item.active{
-background:linear-gradient(135deg,rgba(255,107,53,0.1),rgba(255,107,53,0.04)) !important;
-color:var(–text) !important; border-left-color:var(–orange) !important; font-weight:600 !important;
+  background:linear-gradient(135deg,rgba(255,107,53,0.1),rgba(255,107,53,0.04)) !important;
+  color:var(--text) !important; border-left-color:var(--orange) !important; font-weight:600 !important;
 }
 
 /* Topbar / nav */
 .portal-nav,.nav-bar,.topbar{
-background:rgba(8,8,16,0.88) !important;
--webkit-backdrop-filter:blur(20px) !important; backdrop-filter:blur(20px) !important;
-border-bottom:1px solid var(–border) !important;
+  background:rgba(8,8,16,0.88) !important;
+  -webkit-backdrop-filter:blur(20px) !important; backdrop-filter:blur(20px) !important;
+  border-bottom:1px solid var(--border) !important;
 }
 
 /* Cards / panels */
 .card,.panel,.card-section{
-background:var(–card) !important; border:1px solid var(–border) !important;
-border-radius:16px !important;
+  background:var(--card) !important; border:1px solid var(--border) !important;
+  border-radius:16px !important;
 }
-.card-header,.panel-header{ border-bottom:1px solid var(–border-sub) !important; }
+.card-header,.panel-header{ border-bottom:1px solid var(--border-sub) !important; }
 .card-title,.panel-title{ font-size:15px !important; font-weight:700 !important; letter-spacing:-0.02em !important; }
 
 /* Buttons */
 .btn,.btn-primary,.btn-orange{
-font-family:‘DM Sans’,sans-serif !important; font-weight:700 !important;
-letter-spacing:0.02em !important; border-radius:9px !important; border:none !important;
-transition:all 0.18s !important; cursor:pointer !important;
+  font-family:'DM Sans',sans-serif !important; font-weight:700 !important;
+  letter-spacing:0.02em !important; border-radius:9px !important; border:none !important;
+  transition:all 0.18s !important; cursor:pointer !important;
 }
-.btn-primary,.btn-orange{ background:var(–orange) !important; color:#fff !important; }
+.btn-primary,.btn-orange{ background:var(--orange) !important; color:#fff !important; }
 .btn-primary:hover,.btn-orange:hover{ opacity:0.9 !important; box-shadow:0 4px 20px rgba(255,107,53,0.3) !important; }
-.btn-ghost{ background:rgba(255,255,255,0.04) !important; color:var(–sub) !important; border:1px solid var(–border) !important; }
-.btn-ghost:hover{ color:var(–text) !important; background:rgba(255,255,255,0.07) !important; }
-.btn-outline{ background:transparent !important; border:1.5px solid var(–border) !important; color:var(–text) !important; }
-.btn-outline:hover{ border-color:var(–muted) !important; }
+.btn-ghost{ background:rgba(255,255,255,0.04) !important; color:var(--sub) !important; border:1px solid var(--border) !important; }
+.btn-ghost:hover{ color:var(--text) !important; background:rgba(255,255,255,0.07) !important; }
+.btn-outline{ background:transparent !important; border:1.5px solid var(--border) !important; color:var(--text) !important; }
+.btn-outline:hover{ border-color:var(--muted) !important; }
 
 /* Badges */
 .badge{ border-radius:20px !important; padding:3px 10px !important; font-size:10px !important; font-weight:700 !important; letter-spacing:0.04em !important; }
-.badge-green{ background:rgba(52,211,153,0.1) !important; color:var(–green) !important; border:1px solid rgba(52,211,153,0.2) !important; }
-.badge-orange{ background:rgba(255,107,53,0.12) !important; color:var(–orange) !important; border:1px solid rgba(255,107,53,0.2) !important; }
-.badge-blue{ background:rgba(129,140,248,0.1) !important; color:var(–blue) !important; border:1px solid rgba(129,140,248,0.2) !important; }
-.badge-gold{ background:rgba(251,191,36,0.1) !important; color:var(–gold) !important; border:1px solid rgba(251,191,36,0.2) !important; }
-.badge-muted{ background:rgba(255,255,255,0.04) !important; color:var(–muted) !important; border:1px solid var(–border) !important; }
+.badge-green{ background:rgba(52,211,153,0.1) !important; color:var(--green) !important; border:1px solid rgba(52,211,153,0.2) !important; }
+.badge-orange{ background:rgba(255,107,53,0.12) !important; color:var(--orange) !important; border:1px solid rgba(255,107,53,0.2) !important; }
+.badge-blue{ background:rgba(129,140,248,0.1) !important; color:var(--blue) !important; border:1px solid rgba(129,140,248,0.2) !important; }
+.badge-gold{ background:rgba(251,191,36,0.1) !important; color:var(--gold) !important; border:1px solid rgba(251,191,36,0.2) !important; }
+.badge-muted{ background:rgba(255,255,255,0.04) !important; color:var(--muted) !important; border:1px solid var(--border) !important; }
 
 /* Forms */
 input,textarea,select{
-background:rgba(255,255,255,0.04) !important; border:1px solid var(–border) !important;
-border-radius:9px !important; color:var(–text) !important;
-font-family:‘DM Sans’,sans-serif !important;
+  background:rgba(255,255,255,0.04) !important; border:1px solid var(--border) !important;
+  border-radius:9px !important; color:var(--text) !important;
+  font-family:'DM Sans',sans-serif !important;
 }
 input:focus,textarea:focus,select:focus{
-border-color:rgba(255,107,53,0.5) !important;
-background:rgba(255,255,255,0.06) !important;
-box-shadow:0 0 0 3px rgba(255,107,53,0.08) !important;
-outline:none !important;
+  border-color:rgba(255,107,53,0.5) !important;
+  background:rgba(255,255,255,0.06) !important;
+  box-shadow:0 0 0 3px rgba(255,107,53,0.08) !important;
+  outline:none !important;
 }
 
 /* Auth / Login */
 .auth-card,.login-card,.auth-wrap > div{
-background:var(–card) !important; border:1px solid var(–border) !important;
-border-radius:20px !important; box-shadow:0 32px 80px rgba(0,0,0,0.5) !important;
+  background:var(--card) !important; border:1px solid var(--border) !important;
+  border-radius:20px !important; box-shadow:0 32px 80px rgba(0,0,0,0.5) !important;
 }
-.auth-tabs{ border-bottom:1px solid var(–border-sub) !important; background:transparent !important; }
-.auth-tab{ font-family:‘DM Sans’,sans-serif !important; font-weight:600 !important; color:var(–muted) !important; border-bottom:2px solid transparent !important; }
-.auth-tab.active{ color:var(–orange) !important; border-bottom-color:var(–orange) !important; }
+.auth-tabs{ border-bottom:1px solid var(--border-sub) !important; background:transparent !important; }
+.auth-tab{ font-family:'DM Sans',sans-serif !important; font-weight:600 !important; color:var(--muted) !important; border-bottom:2px solid transparent !important; }
+.auth-tab.active{ color:var(--orange) !important; border-bottom-color:var(--orange) !important; }
 .auth-logo,.login-logo,.nav-logo{
-font-family:‘DM Sans’,sans-serif !important; font-weight:900 !important;
-letter-spacing:-0.05em !important; text-transform:uppercase !important;
+  font-family:'DM Sans',sans-serif !important; font-weight:900 !important;
+  letter-spacing:-0.05em !important; text-transform:uppercase !important;
 }
 
 /* Tables */
-th{ font-size:10px !important; color:var(–muted) !important; font-weight:700 !important; text-transform:uppercase !important; letter-spacing:0.1em !important; border-bottom:1px solid var(–border-sub) !important; }
+th{ font-size:10px !important; color:var(--muted) !important; font-weight:700 !important; text-transform:uppercase !important; letter-spacing:0.1em !important; border-bottom:1px solid var(--border-sub) !important; }
 td{ border-bottom:1px solid rgba(255,255,255,0.03) !important; font-size:13px !important; }
 tr:hover td{ background:rgba(255,255,255,0.02) !important; }
 
 /* Modals */
 .modal,.modal-box,.modal-inner{
-background:var(–card) !important; border:1px solid var(–border) !important;
-border-radius:20px !important; box-shadow:0 24px 80px rgba(0,0,0,0.6) !important;
+  background:var(--card) !important; border:1px solid var(--border) !important;
+  border-radius:20px !important; box-shadow:0 24px 80px rgba(0,0,0,0.6) !important;
 }
 .modal-overlay{ -webkit-backdrop-filter:blur(8px) !important; backdrop-filter:blur(8px) !important; }
 
 /* Toast */
-.toast{ background:var(–card) !important; border:1px solid var(–border) !important; border-radius:12px !important; font-family:‘DM Sans’,sans-serif !important; }
-.toast-success,.toast.success{ border-color:rgba(52,211,153,0.3) !important; color:var(–green) !important; }
-.toast-error,.toast.error{ border-color:rgba(248,113,113,0.3) !important; color:var(–red) !important; }
+.toast{ background:var(--card) !important; border:1px solid var(--border) !important; border-radius:12px !important; font-family:'DM Sans',sans-serif !important; }
+.toast-success,.toast.success{ border-color:rgba(52,211,153,0.3) !important; color:var(--green) !important; }
+.toast-error,.toast.error{ border-color:rgba(248,113,113,0.3) !important; color:var(--red) !important; }
 
 /* Logo accent bar in sidebar */
 .sidebar-logo,.logo-wrap{ position:relative !important; }
 .sidebar-logo::after,.logo-wrap::after{
-content:’’ !important; position:absolute !important; bottom:0 !important; left:22px !important; right:22px !important;
-height:1px !important; background:linear-gradient(90deg,var(–orange),transparent) !important; opacity:0.4 !important;
+  content:'' !important; position:absolute !important; bottom:0 !important; left:22px !important; right:22px !important;
+  height:1px !important; background:linear-gradient(90deg,var(--orange),transparent) !important; opacity:0.4 !important;
 }
 /* ── END DESIGN SYSTEM ─────────────────────────────────────── */
 </style>
-
 </head>
 <body>
 <div id="root"> <div style="min-height:100vh;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:16px;"> <div style="font-family:'DM Sans',sans-serif;font-size:28px;font-weight:800;">CBUS<span style="color:#FF6B35">EVENTS</span></div> <div style="width:32px;height:32px;border:3px solid #25252f;border-top-color:#FF6B35;border-radius:50%;animation:spin 0.8s linear infinite;"></div> <div id="status" style="color:#8888a0;font-size:13px;">Loading scripts...</div> </div>
@@ -217,92 +231,95 @@ function fatal(msg) {
  onerror="fatal('Could not load Babel.')"></script> <script>
 
 // ── GEOCODING ────────────────────────────────────────────────
-const MAPBOX_TOKEN=‘pk.eyJ1IjoiY2J1c2V2ZW50cyIsImEiOiJjbW1oNWJhaDYwYnVrMnJxN3hxdGJlZmhkIn0.RtF51b0qghUlJAjHgNRdFQ’;
+const MAPBOX_TOKEN='pk.eyJ1IjoiY2J1c2V2ZW50cyIsImEiOiJjbW1oNWJhaDYwYnVrMnJxN3hxdGJlZmhkIn0.RtF51b0qghUlJAjHgNRdFQ';
 async function geocodeAddress(address){
-if(!address||address.trim().length<5)return null;
-try{
-const query=address.toLowerCase().includes(‘columbus’)?address:address+’, Columbus, OH’;
-const encoded=encodeURIComponent(query);
-const url=`https://api.mapbox.com/geocoding/v5/mapbox.places/${encoded}.json?access_token=${MAPBOX_TOKEN}&country=US&proximity=-82.9988,39.9612&types=address,poi&limit=1`;
-const res=await fetch(url);
-if(!res.ok)return null;
-const data=await res.json();
-if(!data.features||data.features.length===0)return null;
-const[lng,lat]=data.features[0].center;
-return{lat,lng};
-}catch(err){console.warn(‘Geocode failed:’,err);return null;}
+  if(!address||address.trim().length<5)return null;
+  try{
+    const query=address.toLowerCase().includes('columbus')?address:address+', Columbus, OH';
+    const encoded=encodeURIComponent(query);
+    const url=`https://api.mapbox.com/geocoding/v5/mapbox.places/${encoded}.json?access_token=${MAPBOX_TOKEN}&country=US&proximity=-82.9988,39.9612&types=address,poi&limit=1`;
+    const res=await fetch(url);
+    if(!res.ok)return null;
+    const data=await res.json();
+    if(!data.features||data.features.length===0)return null;
+    const[lng,lat]=data.features[0].center;
+    return{lat,lng};
+  }catch(err){console.warn('Geocode failed:',err);return null;}
 }
 
 </script>
 <script type="text/babel" data-presets="react">
 const { useState, useEffect, createContext, useContext } = React;
 
-const SB_URL = “https://toblgvatvsjljbqogzsv.supabase.co”;
-const SB_KEY = “eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRvYmxndmF0dnNqbGpicW9nenN2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMDgwNTAsImV4cCI6MjA4NzY4NDA1MH0._WJEQPizNDiQfDXQB_DHPaQhixPGpMdmYQSmyWmm_FQ”;
+const SB_URL = "https://toblgvatvsjljbqogzsv.supabase.co";
+const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRvYmxndmF0dnNqbGpicW9nenN2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMDgwNTAsImV4cCI6MjA4NzY4NDA1MH0._WJEQPizNDiQfDXQB_DHPaQhixPGpMdmYQSmyWmm_FQ";
 const sb = supabase.createClient(SB_URL, SB_KEY);
 
 const AuthCtx = createContext(null);
 const useAuth = () => useContext(AuthCtx);
 
 function AuthProvider({ children }) {
-const [user, setUser] = useState(null);
-const [profile, setProfile] = useState(null);
-const [loading, setLoading] = useState(true);
-useEffect(() => {
-sb.auth.getSession().then(({ data: { session } }) => {
-setUser(session?.user ?? null);
-if (session?.user) fetchProfile(session.user.id);
-else setLoading(false);
-});
-const { data: { subscription } } = sb.auth.onAuthStateChange((_e, session) => {
-setUser(session?.user ?? null);
-if (session?.user) fetchProfile(session.user.id);
-else { setProfile(null); setLoading(false); }
-});
-return () => subscription.unsubscribe();
-}, []);
-async function fetchProfile(id) {
-sb.from(“profiles”).select(”*”).eq(“id”, id).single().then(({data}) => {
-setProfile(data); setLoading(false);
-}).catch(() => setLoading(false));
-}
-return <AuthCtx.Provider value={{ user, profile, loading }}>{children}</AuthCtx.Provider>;
+ const [user, setUser] = useState(null);
+ const [profile, setProfile] = useState(null);
+ const [loading, setLoading] = useState(true);
+ useEffect(() => {
+ sb.auth.getSession().then(({ data: { session } }) => {
+ setUser(session?.user ?? null);
+ if (session?.user) fetchProfile(session.user.id);
+ else setLoading(false);
+ });
+ const { data: { subscription } } = sb.auth.onAuthStateChange((event, session) => {
+   // Only react to explicit sign-in / sign-out events — ignore TOKEN_REFRESHED etc.
+   if (event === 'SIGNED_IN') {
+     setUser(session?.user ?? null);
+     if (session?.user) fetchProfile(session.user.id);
+   } else if (event === 'SIGNED_OUT') {
+     setUser(null); setProfile(null); setLoading(false);
+   }
+ });
+ return () => subscription.unsubscribe();
+ }, []);
+ async function fetchProfile(id) {
+ sb.from("profiles").select("*").eq("id", id).single().then(({data}) => {
+   setProfile(data); setLoading(false);
+ }).catch(() => setLoading(false));
+ }
+ return <AuthCtx.Provider value={{ user, profile, loading }}>{children}</AuthCtx.Provider>;
 }
 
 // Primitives
-const Btn = ({ children, onClick, variant=“primary”, size=“md”, disabled, style={} }) => {
-const sz = { sm:{padding:“5px 12px”,fontSize:11}, md:{padding:“9px 18px”,fontSize:13}, lg:{padding:“13px 28px”,fontSize:15} };
-const vr = {
-primary: {background:”#FF6B35”,color:”#fff”,border:“none”},
-secondary: {background:“rgba(255,255,255,0.04)”,color:“var(–text)”,border:“1px solid var(–border)”},
-ghost: {background:“rgba(255,255,255,0.04)”,color:“var(–sub)”,border:“1px solid var(–border)”},
-danger: {background:“rgba(248,113,113,0.08)”,color:”#f87171”,border:“1px solid rgba(248,113,113,0.2)”},
-};
-return <button onClick={disabled?undefined:onClick} style={{borderRadius:10,fontFamily:”‘DM Sans’,sans-serif”,fontWeight:700,cursor:disabled?“not-allowed”:“pointer”,opacity:disabled?0.5:1,transition:“all 0.18s”,…sz[size],…vr[variant],…style}}>{children}</button>;
+const Btn = ({ children, onClick, variant="primary", size="md", disabled, style={} }) => {
+ const sz = { sm:{padding:"5px 12px",fontSize:11}, md:{padding:"9px 18px",fontSize:13}, lg:{padding:"13px 28px",fontSize:15} };
+ const vr = {
+   primary: {background:"#FF6B35",color:"#fff",border:"none"},
+   secondary: {background:"rgba(255,255,255,0.04)",color:"var(--text)",border:"1px solid var(--border)"},
+   ghost: {background:"rgba(255,255,255,0.04)",color:"var(--sub)",border:"1px solid var(--border)"},
+   danger: {background:"rgba(248,113,113,0.08)",color:"#f87171",border:"1px solid rgba(248,113,113,0.2)"},
+ };
+ return <button onClick={disabled?undefined:onClick} style={{borderRadius:10,fontFamily:"'DM Sans',sans-serif",fontWeight:700,cursor:disabled?"not-allowed":"pointer",opacity:disabled?0.5:1,transition:"all 0.18s",...sz[size],...vr[variant],...style}}>{children}</button>;
 };
 
-const Card = ({children,style={}}) => <div style={{background:“var(–card)”,border:“1px solid var(–border)”,borderRadius:14,padding:24,…style}}>{children}</div>;
-const Badge = ({children,color=“var(–muted)”}) => <span style={{background:color+“22”,color,border:`1px solid ${color}44`,borderRadius:20,padding:“3px 10px”,fontSize:11,fontWeight:600}}>{children}</span>;
+const Card = ({children,style={}}) => <div style={{background:"var(--card)",border:"1px solid var(--border)",borderRadius:14,padding:24,...style}}>{children}</div>;
+const Badge = ({children,color="var(--muted)"}) => <span style={{background:color+"22",color,border:`1px solid ${color}44`,borderRadius:20,padding:"3px 10px",fontSize:11,fontWeight:600}}>{children}</span>;
 const Field = ({label,children}) => <div style={{marginBottom:18}}><label>{label}</label>{children}</div>;
-const Grid2 = ({children,gap=16}) => <div style={{display:“grid”,gridTemplateColumns:“1fr 1fr”,gap}}>{children}</div>;
-const Spin = () => <div style={{display:“flex”,justifyContent:“center”,padding:60}}><div style={{width:32,height:32,border:“3px solid #25252f”,borderTopColor:”#FF6B35”,borderRadius:“50%”,animation:“spin 0.8s linear infinite”}}/></div>;
+const Grid2 = ({children,gap=16}) => <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap}}>{children}</div>;
+const Spin = () => <div style={{display:"flex",justifyContent:"center",padding:60}}><div style={{width:32,height:32,border:"3px solid #25252f",borderTopColor:"#FF6B35",borderRadius:"50%",animation:"spin 0.8s linear infinite"}}/></div>;
 
 // Auth Page
 function AuthPage() {
-const [mode, setMode] = useState(“signin”);
-const [email, setEmail] = useState(””); const [pw, setPw] = useState(””); const [name, setName] = useState(””);
-const [busy, setBusy] = useState(false); const [msg, setMsg] = useState(””); const [err, setErr] = useState(””);
-const go = async () => {
-setBusy(true); setErr(””); setMsg(””);
-try {
-if (mode===“signin”) { const {error}=await sb.auth.signInWithPassword({email,password:pw}); if(error) setErr(error.message); }
-else if (mode===“signup”) { const {data:suData,error}=await sb.auth.signUp({email,password:pw,options:{emailRedirectTo:‘https://cbusevents.com/auth.html’,data:{full_name:name}}}); if(error) setErr(error.message); else { if(suData?.user){await sb.from(‘user_roles’).insert({user_id:suData.user.id,role:‘venue_owner’}).select().maybeSingle().catch(()=>{});} setMsg(“Check your email to confirm, then sign in!”); } }
-else { const {error}=await sb.auth.resetPasswordForEmail(email,{redirectTo:‘https://cbusevents.com/auth.html’}); if(error) setErr(error.message); else setMsg(“Reset email sent! Check your inbox.”); }
-} catch(e) { setErr(“Network error. Check your connection.”); }
-setBusy(false);
-};
-return (
-
+ const [mode, setMode] = useState("signin");
+ const [email, setEmail] = useState(""); const [pw, setPw] = useState(""); const [name, setName] = useState("");
+ const [busy, setBusy] = useState(false); const [msg, setMsg] = useState(""); const [err, setErr] = useState("");
+ const go = async () => {
+ setBusy(true); setErr(""); setMsg("");
+ try {
+ if (mode==="signin") { const {error}=await sb.auth.signInWithPassword({email,password:pw}); if(error) setErr(error.message); }
+ else if (mode==="signup") { const {data:suData,error}=await sb.auth.signUp({email,password:pw,options:{emailRedirectTo:'https://cbusevents.com/cbus-venue-portal.html',data:{full_name:name}}}); if(error) setErr(error.message); else { if(suData?.user){await sb.from('user_roles').insert({user_id:suData.user.id,role:'venue_owner'}).select().maybeSingle().catch(()=>{});} setMsg("Check your email to confirm, then sign in!"); } }
+ else { const {error}=await sb.auth.resetPasswordForEmail(email,{redirectTo:'https://cbusevents.com/cbus-venue-portal.html'}); if(error) setErr(error.message); else setMsg("Reset email sent! Check your inbox."); }
+ } catch(e) { setErr("Network error. Check your connection."); }
+ setBusy(false);
+ };
+ return (
  <div style={{minHeight:"100vh",background:"var(--bg)",display:"flex",alignItems:"center",justifyContent:"center",padding:24}}> <div style={{width:"100%",maxWidth:400}}> <div style={{textAlign:"center",marginBottom:36}}> <div style={{fontFamily:"'DM Sans',sans-serif",fontWeight:800,fontSize:32,marginBottom:8}}>CBUS<span style={{color:"#FF6B35"}}>EVENTS</span></div> <div style={{color:"var(--sub)",fontSize:14}}>Venue Owner Portal</div> </div> <Card> <h2 style={{fontFamily:"'DM Sans',sans-serif",fontSize:20,fontWeight:700,marginBottom:24}}> {mode==="signin"?"Sign in":mode==="signup"?"Create account":"Reset password"}
  </h2> {msg && <div style={{background:"rgba(52,211,153,0.08)",color:"var(--green)",border:"1px solid #1a4a24",borderRadius:10,padding:"12px",marginBottom:16,fontSize:14}}> {msg}</div>}
  {err && <div style={{background:"rgba(248,113,113,0.08)",color:"#ef4444",border:"1px solid #4a1010",borderRadius:10,padding:"12px",marginBottom:16,fontSize:14}}> {err}</div>}
@@ -315,12 +332,11 @@ return (
 }
 
 // Sidebar
-const NAV = [{key:“dashboard”,icon:“⊞”,label:“Dashboard”},{key:“venue”,icon:””,label:“My Venue”},{key:“events”,icon:””,label:“Events”},{key:“inquiries”,icon:””,label:“Inquiries”},{key:“plan”,icon:“⭐”,label:“Plan & Billing”}];
-const HOME_BTN_STYLE = {display:“flex”,alignItems:“center”,gap:10,width:“100%”,background:“transparent”,color:“var(–sub)”,border:“1px solid transparent”,borderRadius:10,padding:“10px 12px”,cursor:“pointer”,fontSize:13,fontFamily:”‘DM Sans’,sans-serif”,fontWeight:400,marginBottom:2,textAlign:“left”,transition:“color 0.15s”};
+const NAV = [{key:"dashboard",icon:"⊞",label:"Dashboard"},{key:"venue",icon:"",label:"My Venue"},{key:"events",icon:"",label:"Events"},{key:"inquiries",icon:"",label:"Inquiries"},{key:"plan",icon:"⭐",label:"Plan & Billing"}];
+const HOME_BTN_STYLE = {display:"flex",alignItems:"center",gap:10,width:"100%",background:"transparent",color:"var(--sub)",border:"1px solid transparent",borderRadius:10,padding:"10px 12px",cursor:"pointer",fontSize:13,fontFamily:"'DM Sans',sans-serif",fontWeight:400,marginBottom:2,textAlign:"left",transition:"color 0.15s"};
 
 function Sidebar({active,setActive,profile}) {
-return (
-
+ return (
  <div style={{width:230,background:"var(--surface)",borderRight:"1px solid var(--border)",display:"flex",flexDirection:"column",height:"100vh",position:"sticky",top:0,flexShrink:0,overflowY:"auto"}}>
    <div style={{padding:"28px 22px 22px",borderBottom:"1px solid var(--border-sub)",position:"relative"}}>
      <div style={{fontFamily:"'DM Sans',sans-serif",fontWeight:900,fontSize:17,letterSpacing:"-0.05em",textTransform:"uppercase"}}>CBUS<span style={{color:"#FF6B35"}}>EVENTS</span></div>
@@ -349,10 +365,9 @@ return (
 
 // Dashboard
 function Dashboard({venue,events}) {
-const now=new Date(),week=new Date(now.getTime()+7*24*60*60*1000);
-const thisWeek=events.filter(e=>{const d=new Date(e.start_time);return d>=now&&d<=week;});
-return (
-
+ const now=new Date(),week=new Date(now.getTime()+7*24*60*60*1000);
+ const thisWeek=events.filter(e=>{const d=new Date(e.start_time);return d>=now&&d<=week;});
+ return (
  <div> <h1 style={{fontFamily:"'DM Sans',sans-serif",fontSize:24,fontWeight:800,marginBottom:6}}>{venue?.name ? `Welcome back, ${venue.name}!` : "Welcome to CBUSEVENTS!"}</h1> <p style={{color:"var(--sub)",marginBottom:28,fontSize:14}}>{venue?.name ? "Here's your venue overview." : "Let's get your venue listed and in front of Columbus planners."}</p> <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(160px,1fr))",gap:14,marginBottom:28}}> {[
  {label:"Published",value:events.filter(e=>e.status==="published").length,color:"#FF6B35"},
  {label:"This Week",value:thisWeek.length,color:"var(--green)"},
@@ -369,39 +384,39 @@ return (
  </div> );
 }
 
+
 // ── SOCIAL SHARE ──────────────────────────────────────────────
 function SharePanel({event, venue, onClose}) {
-const eventUrl = `https://cbusevents.com/?event=${event.id}`;
-const title = encodeURIComponent(event.title || “”);
-const text = encodeURIComponent(` ${event.title} at ${venue?.name||"our venue"} in Columbus! Get tickets → ${eventUrl}`);
-const igHandle = venue?.instagram ? venue.instagram.replace(”@”,””) : “”;
-const fbUrl = venue?.facebook || “”;
+ const eventUrl = `https://cbusevents.com/?event=${event.id}`;
+ const title = encodeURIComponent(event.title || "");
+ const text = encodeURIComponent(` ${event.title} at ${venue?.name||"our venue"} in Columbus! Get tickets → ${eventUrl}`);
+ const igHandle = venue?.instagram ? venue.instagram.replace("@","") : "";
+ const fbUrl = venue?.facebook || "";
 
-const platforms = [
-{
-name:“Facebook”,icon:””,color:”#1877f2”,
-url: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(eventUrl)}&quote=${text}`
-},
-{
-name:“X / Twitter”,icon:””,color:”#1da1f2”,
-url: `https://twitter.com/intent/tweet?text=${text}`
-},
-{
-name:“TikTok”,icon:””,color:”#ff0050”,
-url: `https://www.tiktok.com/`
-},
-{
-name:“Instagram”,icon:””,color:”#e1306c”,
-url: `https://www.instagram.com/`
-},
-];
+ const platforms = [
+ {
+ name:"Facebook",icon:"",color:"#1877f2",
+ url: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(eventUrl)}&quote=${text}`
+ },
+ {
+ name:"X / Twitter",icon:"",color:"#1da1f2",
+ url: `https://twitter.com/intent/tweet?text=${text}`
+ },
+ {
+ name:"TikTok",icon:"",color:"#ff0050",
+ url: `https://www.tiktok.com/`
+ },
+ {
+ name:"Instagram",icon:"",color:"#e1306c",
+ url: `https://www.instagram.com/`
+ },
+ ];
 
-const copyLink = () => {
-navigator.clipboard.writeText(eventUrl);
-};
+ const copyLink = () => {
+ navigator.clipboard.writeText(eventUrl);
+ };
 
-return (
-
+ return (
  <div style={{position:"fixed",inset:0,background:"rgba(0,0,0,0.85)",zIndex:300,display:"flex",alignItems:"center",justifyContent:"center",padding:20}} onClick={e=>{if(e.target===e.currentTarget)onClose();}}> <div style={{background:"var(--card)",border:"1px solid var(--border)",borderRadius:20,padding:32,width:"100%",maxWidth:480}}> <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:20}}> <div style={{fontFamily:"'DM Sans',sans-serif",fontSize:18,fontWeight:800}}>Share This Event</div> <button onClick={onClose} style={{background:"none",border:"none",color:"var(--sub)",fontSize:20,cursor:"pointer"}}></button> </div> <div style={{background:"var(--surface)",border:"1px solid var(--border)",borderRadius:10,padding:"12px 14px",marginBottom:20}}> <div style={{fontWeight:600,fontSize:14}}>{event.title}</div> <div style={{color:"var(--sub)",fontSize:12,marginTop:3}}>{venue?.name} · {event.start_time?new Date(event.start_time).toLocaleDateString("en-US",{weekday:"short",month:"short",day:"numeric"}):""}</div> </div> <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10,marginBottom:20}}> {platforms.map(p=>(
  <a key={p.name} href={p.url} target="_blank" rel="noopener noreferrer"
  style={{display:"flex",alignItems:"center",gap:10,background:"var(--surface)",border:"1px solid var(--border)",borderRadius:10,padding:"12px 14px",textDecoration:"none",color:"var(--text)",fontWeight:600,fontSize:13,transition:"all 0.15s",cursor:"pointer"}}
@@ -414,59 +429,58 @@ return (
 
 // Venue Form
 function VenueForm({venue,onSave}) {
-const {user}=useAuth();
-const [f,setF]=useState({name:venue?.name||””,description:venue?.description||””,address:venue?.address||””,neighborhood:venue?.neighborhood||””,website:venue?.website||””,phone:venue?.phone||””,email:venue?.email||””,venue_type:venue?.venue_type||””,capacity:venue?.capacity||””,indoor_outdoor:venue?.indoor_outdoor||“indoor”,tags:venue?.tags?.join(”, “)||””,amenities:venue?.amenities?.join(”, “)||””,cover_image_url:venue?.cover_image_url||””,instagram:venue?.instagram||””,facebook:venue?.facebook||””,tiktok:venue?.tiktok||””,twitter:venue?.twitter||””,photos:venue?.photos||[],community_tags:venue?.community_tags||[],is_gallery_hop:venue?.is_gallery_hop||false});
-const [busy,setBusy]=useState(false);
-const [toast,setToast]=useState({msg:””,type:“success”});
-const set=k=>e=>setF(p=>({…p,[k]:e.target.value}));
+ const {user}=useAuth();
+ const [f,setF]=useState({name:venue?.name||"",description:venue?.description||"",address:venue?.address||"",neighborhood:venue?.neighborhood||"",website:venue?.website||"",phone:venue?.phone||"",email:venue?.email||"",venue_type:venue?.venue_type||"",capacity:venue?.capacity||"",indoor_outdoor:venue?.indoor_outdoor||"indoor",tags:venue?.tags?.join(", ")||"",amenities:venue?.amenities?.join(", ")||"",cover_image_url:venue?.cover_image_url||"",instagram:venue?.instagram||"",facebook:venue?.facebook||"",tiktok:venue?.tiktok||"",twitter:venue?.twitter||"",photos:venue?.photos||[],community_tags:venue?.community_tags||[],is_gallery_hop:venue?.is_gallery_hop||false});
+ const [busy,setBusy]=useState(false);
+ const [toast,setToast]=useState({msg:"",type:"success"});
+ const set=k=>e=>setF(p=>({...p,[k]:e.target.value}));
 
-const compressImage=(file,maxWidth=1200,quality=0.82)=>new Promise((resolve,reject)=>{
-const reader=new FileReader();
-reader.onload=e=>{
-const img=new Image();
-img.onload=()=>{
-try{
-const canvas=document.createElement(‘canvas’);
-let w=img.width,h=img.height;
-if(w>maxWidth){h=Math.round(h*(maxWidth/w));w=maxWidth;}
-canvas.width=w;canvas.height=h;
-canvas.getContext(‘2d’).drawImage(img,0,0,w,h);
-resolve(canvas.toDataURL(‘image/jpeg’,quality));
-}catch(e){reject(e);}
-};
-img.onerror=reject;
-img.src=e.target.result;
-};
-reader.onerror=reject;
-reader.readAsDataURL(file);
-});
+ const compressImage=(file,maxWidth=1200,quality=0.82)=>new Promise((resolve,reject)=>{
+   const reader=new FileReader();
+   reader.onload=e=>{
+     const img=new Image();
+     img.onload=()=>{
+       try{
+         const canvas=document.createElement('canvas');
+         let w=img.width,h=img.height;
+         if(w>maxWidth){h=Math.round(h*(maxWidth/w));w=maxWidth;}
+         canvas.width=w;canvas.height=h;
+         canvas.getContext('2d').drawImage(img,0,0,w,h);
+         resolve(canvas.toDataURL('image/jpeg',quality));
+       }catch(e){reject(e);}
+     };
+     img.onerror=reject;
+     img.src=e.target.result;
+   };
+   reader.onerror=reject;
+   reader.readAsDataURL(file);
+ });
 
-const handleCoverPhoto=async(e)=>{
-const file=e.target.files[0];
-if(!file)return;
-try{
-setToast({msg:‘Compressing photo…’,type:‘success’});
-const dataUrl=await compressImage(file);
-setF(p=>({…p,cover_image_url:dataUrl}));
-setToast({msg:‘Photo ready — click Save to apply’,type:‘success’});
-setTimeout(()=>setToast({msg:’’}),3000);
-}catch(err){
-setToast({msg:‘Photo failed: ‘+err.message,type:‘error’});
-}
-e.target.value=’’;
-};
-const save=async()=>{
-if(!f.name.trim()){setToast({msg:“Venue name is required.”,type:“error”});setTimeout(()=>setToast({msg:””}),3000);return;}
-setBusy(true);
-const payload={…f,capacity:f.capacity?parseInt(f.capacity):null,tags:f.tags.split(”,”).map(t=>t.trim()).filter(Boolean),amenities:f.amenities.split(”,”).map(t=>t.trim()).filter(Boolean),owner_id:user.id};
-const {error}=venue?.id?await sb.from(“venues”).update(payload).eq(“id”,venue.id):await sb.from(“venues”).insert(payload);
-setBusy(false);
-if(error){setToast({msg:“Error: “+error.message,type:“error”});}
-else{setToast({msg:“Venue saved! We’ll review it within 24 hours.”,type:“success”});onSave?.();}
-setTimeout(()=>setToast({msg:””}),5000);
-};
-return (
-
+ const handleCoverPhoto=async(e)=>{
+   const file=e.target.files[0];
+   if(!file)return;
+   try{
+     setToast({msg:'Compressing photo...',type:'success'});
+     const dataUrl=await compressImage(file);
+     setF(p=>({...p,cover_image_url:dataUrl}));
+     setToast({msg:'Photo ready — click Save to apply',type:'success'});
+     setTimeout(()=>setToast({msg:''}),3000);
+   }catch(err){
+     setToast({msg:'Photo failed: '+err.message,type:'error'});
+   }
+   e.target.value='';
+ };
+ const save=async()=>{
+ if(!f.name.trim()){setToast({msg:"Venue name is required.",type:"error"});setTimeout(()=>setToast({msg:""}),3000);return;}
+ setBusy(true);
+ const payload={...f,capacity:f.capacity?parseInt(f.capacity):null,tags:f.tags.split(",").map(t=>t.trim()).filter(Boolean),amenities:f.amenities.split(",").map(t=>t.trim()).filter(Boolean),owner_id:user.id};
+ const {error}=venue?.id?await sb.from("venues").update(payload).eq("id",venue.id):await sb.from("venues").insert(payload);
+ setBusy(false);
+ if(error){setToast({msg:"Error: "+error.message,type:"error"});}
+ else{setToast({msg:"Venue saved! We'll review it within 24 hours.",type:"success"});onSave?.();}
+ setTimeout(()=>setToast({msg:""}),5000);
+ };
+ return (
  <div> <h2 style={{fontFamily:"'DM Sans',sans-serif",fontSize:22,fontWeight:800,marginBottom:20}}>My Venue</h2> <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:20}}> <Card style={{gridColumn:"1/-1"}}>
   <div style={{fontFamily:"'DM Sans',sans-serif",fontWeight:700,fontSize:11,marginBottom:6,color:"var(--sub)",textTransform:"uppercase",letterSpacing:1.5}}>Columbus Communities</div>
   <div style={{color:"var(--sub)",fontSize:13,marginBottom:16}}>Select the communities your venue serves. This powers the community discovery pages and helps the right audience find you.</div>
@@ -557,94 +571,93 @@ return (
 }
 
 // Events
-const ECATS=[“Concert”,“Sports”,“Comedy”,“Theater”,“Networking”,“Wedding”,“Corporate”,“Food & Drink”,“Arts”,“Other”];
-const blankTier=()=>({id:null,name:“General Admission”,price:””,quantity:””,description:””});
+const ECATS=["Concert","Sports","Comedy","Theater","Networking","Wedding","Corporate","Food & Drink","Arts","Other"];
+const blankTier=()=>({id:null,name:"General Admission",price:"",quantity:"",description:""});
 
 function TicketTierBuilder({tiers,setTiers,isFree}){
-if(isFree)return null;
-const add=()=>setTiers(t=>[…t,blankTier()]);
-const remove=i=>setTiers(t=>t.filter((_,idx)=>idx!==i));
-const update=(i,k,v)=>setTiers(t=>t.map((tier,idx)=>idx===i?{…tier,[k]:v}:tier));
-return(
-<div style={{marginBottom:18}}>
-<div style={{display:“flex”,justifyContent:“space-between”,alignItems:“center”,marginBottom:10}}>
-<label style={{marginBottom:0,fontSize:13,color:“var(–sub)”,fontWeight:500}}>Ticket Tiers</label>
-<button type=“button” onClick={add} style={{background:”#FF6B3520”,color:”#FF6B35”,border:“1px solid #FF6B3540”,borderRadius:6,padding:“4px 12px”,fontSize:12,fontWeight:700,cursor:“pointer”,fontFamily:”‘DM Sans’,sans-serif”}}>+ Add Tier</button>
-</div>
-{tiers.length===0&&<div style={{background:“var(–surface)”,border:“1px dashed #25252f”,borderRadius:10,padding:“14px”,textAlign:“center”,color:“var(–muted)”,fontSize:13}}>No ticket tiers yet — add GA, VIP, etc.</div>}
-{tiers.map((tier,i)=>(
-<div key={i} style={{background:“var(–surface)”,border:“1px solid var(–border)”,borderRadius:10,padding:“14px”,marginBottom:10}}>
-<div style={{display:“grid”,gridTemplateColumns:“1fr 100px 100px”,gap:10,marginBottom:8}}>
-<div><label style={{fontSize:11,color:“var(–sub)”,display:“block”,marginBottom:4}}>Tier Name</label><input value={tier.name} onChange={e=>update(i,“name”,e.target.value)} placeholder=“General Admission” style={{background:“var(–bg)”,border:“1px solid var(–border)”,borderRadius:6,padding:“7px 10px”,color:“var(–text)”,fontSize:13,width:“100%”,fontFamily:”‘DM Sans’,sans-serif”}}/></div>
-<div><label style={{fontSize:11,color:“var(–sub)”,display:“block”,marginBottom:4}}>Price ($)</label><input type=“number” min=“0” value={tier.price} onChange={e=>update(i,“price”,e.target.value)} placeholder=“25” style={{background:“var(–bg)”,border:“1px solid var(–border)”,borderRadius:6,padding:“7px 10px”,color:“var(–text)”,fontSize:13,width:“100%”,fontFamily:”‘DM Sans’,sans-serif”}}/></div>
-<div><label style={{fontSize:11,color:“var(–sub)”,display:“block”,marginBottom:4}}>Qty</label><input type=“number” min=“1” value={tier.quantity} onChange={e=>update(i,“quantity”,e.target.value)} placeholder=“100” style={{background:“var(–bg)”,border:“1px solid var(–border)”,borderRadius:6,padding:“7px 10px”,color:“var(–text)”,fontSize:13,width:“100%”,fontFamily:”‘DM Sans’,sans-serif”}}/></div>
-</div>
-<div style={{display:“flex”,gap:10,alignItems:“flex-end”}}>
-<div style={{flex:1}}><label style={{fontSize:11,color:“var(–sub)”,display:“block”,marginBottom:4}}>Perks (optional)</label><input value={tier.description} onChange={e=>update(i,“description”,e.target.value)} placeholder=“Front row access, 1 drink included…” style={{background:“var(–bg)”,border:“1px solid var(–border)”,borderRadius:6,padding:“7px 10px”,color:“var(–text)”,fontSize:13,width:“100%”,fontFamily:”‘DM Sans’,sans-serif”}}/></div>
-<button type=“button” onClick={()=>remove(i)} style={{background:“rgba(248,113,113,0.08)”,color:”#ef4444”,border:“1px solid #4a1010”,borderRadius:6,padding:“7px 10px”,fontSize:12,cursor:“pointer”,fontFamily:”‘DM Sans’,sans-serif”,flexShrink:0}}>Remove</button>
-</div>
-</div>
-))}
-</div>
-);
+  if(isFree)return null;
+  const add=()=>setTiers(t=>[...t,blankTier()]);
+  const remove=i=>setTiers(t=>t.filter((_,idx)=>idx!==i));
+  const update=(i,k,v)=>setTiers(t=>t.map((tier,idx)=>idx===i?{...tier,[k]:v}:tier));
+  return(
+    <div style={{marginBottom:18}}>
+      <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:10}}>
+        <label style={{marginBottom:0,fontSize:13,color:"var(--sub)",fontWeight:500}}>Ticket Tiers</label>
+        <button type="button" onClick={add} style={{background:"#FF6B3520",color:"#FF6B35",border:"1px solid #FF6B3540",borderRadius:6,padding:"4px 12px",fontSize:12,fontWeight:700,cursor:"pointer",fontFamily:"'DM Sans',sans-serif"}}>+ Add Tier</button>
+      </div>
+      {tiers.length===0&&<div style={{background:"var(--surface)",border:"1px dashed #25252f",borderRadius:10,padding:"14px",textAlign:"center",color:"var(--muted)",fontSize:13}}>No ticket tiers yet — add GA, VIP, etc.</div>}
+      {tiers.map((tier,i)=>(
+        <div key={i} style={{background:"var(--surface)",border:"1px solid var(--border)",borderRadius:10,padding:"14px",marginBottom:10}}>
+          <div style={{display:"grid",gridTemplateColumns:"1fr 100px 100px",gap:10,marginBottom:8}}>
+            <div><label style={{fontSize:11,color:"var(--sub)",display:"block",marginBottom:4}}>Tier Name</label><input value={tier.name} onChange={e=>update(i,"name",e.target.value)} placeholder="General Admission" style={{background:"var(--bg)",border:"1px solid var(--border)",borderRadius:6,padding:"7px 10px",color:"var(--text)",fontSize:13,width:"100%",fontFamily:"'DM Sans',sans-serif"}}/></div>
+            <div><label style={{fontSize:11,color:"var(--sub)",display:"block",marginBottom:4}}>Price ($)</label><input type="number" min="0" value={tier.price} onChange={e=>update(i,"price",e.target.value)} placeholder="25" style={{background:"var(--bg)",border:"1px solid var(--border)",borderRadius:6,padding:"7px 10px",color:"var(--text)",fontSize:13,width:"100%",fontFamily:"'DM Sans',sans-serif"}}/></div>
+            <div><label style={{fontSize:11,color:"var(--sub)",display:"block",marginBottom:4}}>Qty</label><input type="number" min="1" value={tier.quantity} onChange={e=>update(i,"quantity",e.target.value)} placeholder="100" style={{background:"var(--bg)",border:"1px solid var(--border)",borderRadius:6,padding:"7px 10px",color:"var(--text)",fontSize:13,width:"100%",fontFamily:"'DM Sans',sans-serif"}}/></div>
+          </div>
+          <div style={{display:"flex",gap:10,alignItems:"flex-end"}}>
+            <div style={{flex:1}}><label style={{fontSize:11,color:"var(--sub)",display:"block",marginBottom:4}}>Perks (optional)</label><input value={tier.description} onChange={e=>update(i,"description",e.target.value)} placeholder="Front row access, 1 drink included..." style={{background:"var(--bg)",border:"1px solid var(--border)",borderRadius:6,padding:"7px 10px",color:"var(--text)",fontSize:13,width:"100%",fontFamily:"'DM Sans',sans-serif"}}/></div>
+            <button type="button" onClick={()=>remove(i)} style={{background:"rgba(248,113,113,0.08)",color:"#ef4444",border:"1px solid #4a1010",borderRadius:6,padding:"7px 10px",fontSize:12,cursor:"pointer",fontFamily:"'DM Sans',sans-serif",flexShrink:0}}>Remove</button>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
 }
 
 function EventModal({event,venueId,venueTier,currentEventCount,onClose,onSave}) {
-const {user}=useAuth();
-const blank={title:””,description:””,category:“Other”,start_time:””,end_time:””,is_free:false,price_min:””,price_max:””,cover_image_url:””,status:“draft”};
-const [f,setF]=useState(event?{…event,start_time:event.start_time?new Date(event.start_time).toISOString().slice(0,16):””,end_time:event.end_time?new Date(event.end_time).toISOString().slice(0,16):””}:blank);
-const [tiers,setTiers]=useState([]);
-const [busy,setBusy]=useState(false);
-const [err,setErr]=useState(””);
-const set=k=>e=>setF(p=>({…p,[k]:e.target.type===“checkbox”?e.target.checked:e.target.value}));
+ const {user}=useAuth();
+ const blank={title:"",description:"",category:"Other",start_time:"",end_time:"",is_free:false,price_min:"",price_max:"",cover_image_url:"",status:"draft"};
+ const [f,setF]=useState(event?{...event,start_time:event.start_time?new Date(event.start_time).toISOString().slice(0,16):"",end_time:event.end_time?new Date(event.end_time).toISOString().slice(0,16):""}:blank);
+ const [tiers,setTiers]=useState([]);
+ const [busy,setBusy]=useState(false);
+ const [err,setErr]=useState("");
+ const set=k=>e=>setF(p=>({...p,[k]:e.target.type==="checkbox"?e.target.checked:e.target.value}));
 
-// Load existing tiers when editing
-useEffect(()=>{
-if(event?.id){
-sb.from(“ticket_tiers”).select(”*”).eq(“event_id”,event.id).order(“price”,{ascending:true})
-.then(({data})=>setTiers((data||[]).map(t=>({…t,price:String(t.price||””),quantity:String(t.quantity||””)}))))
-}
-},[event?.id]);
+ // Load existing tiers when editing
+ useEffect(()=>{
+   if(event?.id){
+     sb.from("ticket_tiers").select("*").eq("event_id",event.id).order("price",{ascending:true})
+       .then(({data})=>setTiers((data||[]).map(t=>({...t,price:String(t.price||""),quantity:String(t.quantity||"")}))))
+   }
+ },[event?.id]);
 
-const save=async()=>{
-if(!f.title.trim()){setErr(“Title required.”);return;}
-if(!f.start_time){setErr(“Start time required.”);return;}
-if(!f.is_free&&tiers.some(t=>!t.name||t.price===””)){setErr(“Each ticket tier needs a name and price.”);return;}
-if(!event?.id){
-const tier=venueTier||“free”;
-const limit=tier===“premium”?null:tier===“standard”?20:4;
-if(limit!==null&&currentEventCount>=limit){setErr(`Your ${tier} plan is limited to ${limit} events. Upgrade to add more.`);return;}
-}
-setBusy(true);setErr(””);
-const priceValues=tiers.filter(t=>t.price!==””).map(t=>parseFloat(t.price));
-const payload={
-…f,
-venue_id:venueId,
-owner_id:user.id,
-price_min:f.is_free?0:(priceValues.length?Math.min(…priceValues):null),
-price_max:f.is_free?0:(priceValues.length?Math.max(…priceValues):null),
-start_time:f.start_time||null,
-end_time:f.end_time&&f.end_time.trim()!==’’?f.end_time:null,
-};
-// Remove ticket_url from payload (no longer used)
-delete payload.ticket_url;
-const {data:evData,error}=event?.id
-?await sb.from(“events”).update(payload).eq(“id”,event.id).select().single()
-:await sb.from(“events”).insert(payload).select().single();
-if(error){setBusy(false);setErr(error.message);return;}
-const eventId=evData.id;
-// Save ticket tiers
-if(!f.is_free&&tiers.length>0){
-// Delete old tiers then reinsert
-await sb.from(“ticket_tiers”).delete().eq(“event_id”,eventId);
-const tierRows=tiers.map(t=>({event_id:eventId,venue_id:venueId,name:t.name,price:parseFloat(t.price)||0,quantity:parseInt(t.quantity)||null,quantity_remaining:parseInt(t.quantity)||null,description:t.description||null}));
-const {error:tierErr}=await sb.from(“ticket_tiers”).insert(tierRows);
-if(tierErr){setBusy(false);setErr(“Event saved but tiers failed: “+tierErr.message);return;}
-}
-setBusy(false);onSave();onClose();
-};
-return (
-
+ const save=async()=>{
+ if(!f.title.trim()){setErr("Title required.");return;}
+ if(!f.start_time){setErr("Start time required.");return;}
+ if(!f.is_free&&tiers.some(t=>!t.name||t.price==="")){setErr("Each ticket tier needs a name and price.");return;}
+ if(!event?.id){
+   const tier=venueTier||"free";
+   const limit=tier==="premium"?null:tier==="standard"?20:4;
+   if(limit!==null&&currentEventCount>=limit){setErr(`Your ${tier} plan is limited to ${limit} events. Upgrade to add more.`);return;}
+ }
+ setBusy(true);setErr("");
+ const priceValues=tiers.filter(t=>t.price!=="").map(t=>parseFloat(t.price));
+ const payload={
+   ...f,
+   venue_id:venueId,
+   owner_id:user.id,
+   price_min:f.is_free?0:(priceValues.length?Math.min(...priceValues):null),
+   price_max:f.is_free?0:(priceValues.length?Math.max(...priceValues):null),
+   start_time:f.start_time||null,
+   end_time:f.end_time&&f.end_time.trim()!==''?f.end_time:null,
+ };
+ // Remove ticket_url from payload (no longer used)
+ delete payload.ticket_url;
+ const {data:evData,error}=event?.id
+   ?await sb.from("events").update(payload).eq("id",event.id).select().single()
+   :await sb.from("events").insert(payload).select().single();
+ if(error){setBusy(false);setErr(error.message);return;}
+ const eventId=evData.id;
+ // Save ticket tiers
+ if(!f.is_free&&tiers.length>0){
+   // Delete old tiers then reinsert
+   await sb.from("ticket_tiers").delete().eq("event_id",eventId);
+   const tierRows=tiers.map(t=>({event_id:eventId,venue_id:venueId,name:t.name,price:parseFloat(t.price)||0,quantity:parseInt(t.quantity)||null,quantity_remaining:parseInt(t.quantity)||null,description:t.description||null}));
+   const {error:tierErr}=await sb.from("ticket_tiers").insert(tierRows);
+   if(tierErr){setBusy(false);setErr("Event saved but tiers failed: "+tierErr.message);return;}
+ }
+ setBusy(false);onSave();onClose();
+ };
+ return (
  <div style={{position:"fixed",inset:0,background:"rgba(0,0,0,0.8)",zIndex:100,display:"flex",alignItems:"center",justifyContent:"center",padding:20}} onClick={onClose}> <div style={{background:"var(--card)",border:"1px solid var(--border)",borderRadius:16,padding:28,width:"100%",maxWidth:580,maxHeight:"92vh",overflowY:"auto"}} onClick={e=>e.stopPropagation()}> <h3 style={{fontFamily:"'DM Sans',sans-serif",fontWeight:800,fontSize:18,marginBottom:20}}>{event?"Edit Event":"New Event"}</h3> {err&&<div style={{background:"rgba(248,113,113,0.08)",color:"#ef4444",border:"1px solid #4a1010",borderRadius:10,padding:"10px",marginBottom:14,fontSize:14}}>{err}</div>}
  <Field label="Title *"><input value={f.title} onChange={set("title")} placeholder="Comedy Night Live"/></Field>
  <Field label="Description"><textarea value={f.description} onChange={set("description")} placeholder="What should attendees expect?"/></Field>
@@ -671,11 +684,10 @@ return (
 }
 
 function EventsManager({venue,events,onRefresh}) {
-const [modal,setModal]=useState(null);
-const [shareEvent,setShareEvent]=useState(null);
-const del=async id=>{if(!confirm(“Delete this event?”))return;await sb.from(“events”).delete().eq(“id”,id);onRefresh();};
-return (
-
+ const [modal,setModal]=useState(null);
+ const [shareEvent,setShareEvent]=useState(null);
+ const del=async id=>{if(!confirm("Delete this event?"))return;await sb.from("events").delete().eq("id",id);onRefresh();};
+ return (
  <div> {(()=>{
  const tier=venue?.tier||"free";
  const limit=tier==="premium"?null:tier==="standard"?20:4;
@@ -707,13 +719,12 @@ return (
 
 // Inquiries
 function Inquiries({venue}) {
-const [items,setItems]=useState([]);
-const [busy,setBusy]=useState(true);
-useEffect(()=>{if(!venue?.id){setBusy(false);return;}sb.from(“inquiries”).select(”*”).eq(“venue_id”,venue.id).order(“created_at”,{ascending:false}).then(({data})=>{setItems(data||[]);setBusy(false);});},[venue?.id]);
-const markRead=async id=>{await sb.from(“inquiries”).update({status:“read”}).eq(“id”,id);setItems(items.map(i=>i.id===id?{…i,status:“read”}:i));};
-if(busy)return<Spin/>;
-return (
-
+ const [items,setItems]=useState([]);
+ const [busy,setBusy]=useState(true);
+ useEffect(()=>{if(!venue?.id){setBusy(false);return;}sb.from("inquiries").select("*").eq("venue_id",venue.id).order("created_at",{ascending:false}).then(({data})=>{setItems(data||[]);setBusy(false);});},[venue?.id]);
+ const markRead=async id=>{await sb.from("inquiries").update({status:"read"}).eq("id",id);setItems(items.map(i=>i.id===id?{...i,status:"read"}:i));};
+ if(busy)return<Spin/>;
+ return (
  <div> <h2 style={{fontFamily:"'DM Sans',sans-serif",fontSize:22,fontWeight:800,marginBottom:6}}>Inquiries</h2> <p style={{color:"var(--sub)",fontSize:14,marginBottom:24}}>{items.filter(i=>i.status==="new").length} unread</p> {items.length===0&&<Card style={{textAlign:"center",padding:48}}><div style={{fontSize:40,marginBottom:12}}></div><h3 style={{fontFamily:"'DM Sans',sans-serif",fontWeight:700,marginBottom:8}}>No inquiries yet</h3><p style={{color:"var(--sub)",fontSize:14}}>Booking requests will show up here.</p></Card>}
  <div style={{display:"flex",flexDirection:"column",gap:12}}> {items.map(i=>(
  <Card key={i.id} style={{borderColor:i.status==="new"?"#FF6B35":"var(--border)",padding:18}}> <div style={{display:"flex",justifyContent:"space-between",marginBottom:8}}> <div><strong>{i.name}</strong><span style={{color:"var(--sub)",fontSize:13,marginLeft:10}}>{i.email}</span></div> <div style={{display:"flex",gap:8,alignItems:"center"}}><Badge color={i.status==="new"?"#FF6B35":"var(--muted)"}>{i.status}</Badge>{i.status==="new"&&<Btn size="sm" variant="secondary" onClick={()=>markRead(i.id)}>Mark Read</Btn>}</div> </div> {i.event_date&&<div style={{fontSize:13,color:"var(--sub)",marginBottom:8}}> {i.event_date} · {i.guest_count} guests</div>}
@@ -722,39 +733,40 @@ return (
 }
 
 // Stripe config
-const PAYMENT_LINK_STANDARD=“https://buy.stripe.com/28E9AT0jK7gufNJ2Vqc3m00”; // Founding $40/mo
-const PAYMENT_LINK_PREMIUM=“https://buy.stripe.com/28E9AT0jK7gufNJ2Vqc3m00”;  // TODO: replace with Premium Stripe link when ready
+const PAYMENT_LINK_STANDARD="https://buy.stripe.com/28E9AT0jK7gufNJ2Vqc3m00"; // Founding $40/mo
+const PAYMENT_LINK_PREMIUM="https://buy.stripe.com/28E9AT0jK7gufNJ2Vqc3m00";  // TODO: replace with Premium Stripe link when ready
+
+
 
 // Marketing Services (Premium)
 function MarketingServices({venue}) {
-const [type,setType]=React.useState(null);
-const [details,setDetails]=React.useState(””);
-const [busy,setBusy]=React.useState(false);
-const [sent,setSent]=React.useState(false);
-const [err,setErr]=React.useState(””);
-const tier=venue?.tier||“free”;
-const isPremium=tier===“premium”;
+ const [type,setType]=React.useState(null);
+ const [details,setDetails]=React.useState("");
+ const [busy,setBusy]=React.useState(false);
+ const [sent,setSent]=React.useState(false);
+ const [err,setErr]=React.useState("");
+ const tier=venue?.tier||"free";
+ const isPremium=tier==="premium";
 
-const submit=async()=>{
-if(!details.trim()){setErr(“Please describe what you need.”);return;}
-setBusy(true);setErr(””);
-const{data:{user}}=await sb.auth.getUser();
-const{error}=await sb.from(“design_requests”).insert({
-venue_id:venue.id,
-venue_name:venue.name,
-email:user?.email||””,
-type,
-details,
-status:“new”
-});
-setBusy(false);
-if(error){setErr(error.message);return;}
-setSent(true);setType(null);setDetails(””);
-setTimeout(()=>setSent(false),5000);
-};
+ const submit=async()=>{
+ if(!details.trim()){setErr("Please describe what you need.");return;}
+ setBusy(true);setErr("");
+ const{data:{user}}=await sb.auth.getUser();
+ const{error}=await sb.from("design_requests").insert({
+ venue_id:venue.id,
+ venue_name:venue.name,
+ email:user?.email||"",
+ type,
+ details,
+ status:"new"
+ });
+ setBusy(false);
+ if(error){setErr(error.message);return;}
+ setSent(true);setType(null);setDetails("");
+ setTimeout(()=>setSent(false),5000);
+ };
 
-return(
-
+ return(
  <div style={{background:"linear-gradient(135deg,#130800,#1a0f00)",border:`2px solid ${isPremium?"#FF6B3550":"var(--border)"}`,borderRadius:14,padding:24,marginTop:24}}> <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:16}}> <div> <div style={{fontFamily:"'DM Sans',sans-serif",fontWeight:800,fontSize:16,marginBottom:4}}> Marketing Services</div> <div style={{color:"var(--sub)",fontSize:13}}>Custom designs for your venue & events</div> </div> {isPremium&&<span style={{background:"#FF6B3520",color:"#FF6B35",border:"1px solid #FF6B3540",borderRadius:20,padding:"3px 10px",fontSize:11,fontWeight:700}}> Premium</span>}
  </div> {!isPremium?(
  <div style={{textAlign:"center",padding:"24px 0"}}> <div style={{fontSize:32,marginBottom:10}}></div> <div style={{fontWeight:600,marginBottom:8}}>Premium exclusive</div> <div style={{color:"var(--sub)",fontSize:13,marginBottom:16,lineHeight:1.6}}>Upgrade to Premium to request custom flyer design and branded merch — printed and shipped by CBUSEVENTS.</div> <Btn onClick={()=>window.location.href=PAYMENT_LINK_PREMIUM}>Upgrade to Premium →</Btn> </div> ):(
@@ -777,63 +789,54 @@ return(
 
 // Plan & Billing
 function PlanBilling({venue}) {
-const cur=venue?.tier||“free”;
-const [loading,setLoading]=React.useState(null);
-const [err,setErr]=React.useState(null);
+ const cur=venue?.tier||"free";
+ const {user}=useAuth();
+ const [loading,setLoading]=React.useState(null);
+ const [err,setErr]=React.useState(null);
 
-const plans=[
-{id:“free”, name:“Free”, price:0, priceId:null, perks:[“1 venue listing”,“Up to 4 events/month”,“Basic search placement”,“Public venue page”]},
-{id:“standard”,name:“Standard”, price:40, priceId:“standard”, perks:[“Up to 20 events/month”,“Priority search placement”,“Inquiry inbox enabled”,“Email support”,“Analytics dashboard”,“Founding rate — locked forever”]},
-{id:“premium”, name:“Premium”, price:79, priceId:“premium”, perks:[“Unlimited events”,“Top of all search results”,“Homepage feature slot”,“Flyer & merch design included”,“Dedicated support”,“Founding rate — locked forever”]},
-];
+ const plans=[
+ {id:"free", name:"Free", price:0, priceId:null, perks:["1 venue listing","Up to 4 events/month","Basic search placement","Public venue page"]},
+ {id:"standard",name:"Standard", price:40, priceId:"standard", perks:["Up to 20 events/month","Priority search placement","Inquiry inbox enabled","Email support","Analytics dashboard","Founding rate — locked forever"]},
+ {id:"premium", name:"Premium", price:79, priceId:"premium", perks:["Unlimited events","Top of all search results","Homepage feature slot","Flyer & merch design included","Dedicated support","Founding rate — locked forever"]},
+ ];
 
-const checkout=(plan)=>{
-if(!plan.priceId)return;
-const links={standard:PAYMENT_LINK_STANDARD,premium:PAYMENT_LINK_PREMIUM};
-const url=links[plan.id];
-if(!url)return;
-// Pass tier, user email and venue ID so return URL can update correct tier
-const params=new URLSearchParams({
-client_reference_id: venue?.id||“unknown”,
-prefilled_email: user?.email||””,
-});
-window.location.href=url+”?”+params.toString()+”#tier=”+plan.id;
-// NOTE: Update PAYMENT_LINK_STANDARD and PAYMENT_LINK_PREMIUM to separate Stripe links
-// when you create them in the Stripe dashboard
-};
+ const checkout=(plan)=>{
+ if(!plan.priceId)return;
+ const links={standard:PAYMENT_LINK_STANDARD,premium:PAYMENT_LINK_PREMIUM};
+ const url=links[plan.id];
+ const returnUrl=`https://cbusevents.com/cbus-venue-portal.html?upgrade=success&tier=${plan.id}`;
+ if(url) window.location.href=url+"?client_reference_id="+(venue?.id||"unknown")+"&prefilled_email="+(user?.email||"");
+ };
 
-// Handle return from Stripe — auto-update tier
-React.useEffect(()=>{
-const p=new URLSearchParams(window.location.search);
-if(p.get(“upgrade”)===“success”&&venue?.id){
-// Get tier from param or hash fallback
-const hashTier=window.location.hash.replace(’#tier=’,’’);
-const newTier=p.get(“tier”)||hashTier||“standard”;
-// Write tier to Supabase immediately
-sb.from(“venues”).update({
-tier:newTier,
-subscription_status:“active”,
-subscription_tier:newTier.toUpperCase(),
-}).eq(“id”,venue.id).then(({error})=>{
-if(!error){
-// Reload venue data to reflect new tier
-sb.from(“venues”).select(”*”).eq(“id”,venue.id).single().then(({data})=>{
-if(data) setVenue(data);
-});
-}
-});
-window.history.replaceState({},””,window.location.pathname);
-}
-},[venue?.id]);
+ // Handle return from Stripe — auto-update tier
+ React.useEffect(()=>{
+ const p=new URLSearchParams(window.location.search);
+ if(p.get("upgrade")==="success"&&venue?.id){
+   const newTier=p.get("tier")||"standard";
+   // Write tier to Supabase immediately
+   sb.from("venues").update({
+     tier:newTier,
+     subscription_status:"active",
+     subscription_tier:newTier.toUpperCase(),
+   }).eq("id",venue.id).then(({error})=>{
+     if(!error){
+       // Reload venue data to reflect new tier
+       sb.from("venues").select("*").eq("id",venue.id).single().then(({data})=>{
+         if(data) setVenue(data);
+       });
+     }
+   });
+   window.history.replaceState({},"",window.location.pathname);
+ }
+ },[venue?.id]);
 
-const upgraded=new URLSearchParams(window.location.search).get(“upgrade”)===“success”;
+ const upgraded=new URLSearchParams(window.location.search).get("upgrade")==="success";
 
-return (
-
+ return (
  <div> <h2 style={{fontFamily:"'DM Sans',sans-serif",fontSize:22,fontWeight:800,marginBottom:6}}>Plan & Billing</h2> <p style={{color:"var(--sub)",fontSize:14,marginBottom:upgraded?16:32}}>Current plan: <strong style={{color:"#f59e0b"}}>{cur[0].toUpperCase()+cur.slice(1)}</strong></p> {upgraded&&<div style={{background:"rgba(52,211,153,0.08)",border:"1px solid #1a4a24",borderRadius:10,padding:"14px 18px",marginBottom:28,display:"flex",alignItems:"center",gap:10,color:"var(--green)",fontSize:14,fontWeight:600}}> Upgrade successful! Your plan will be activated within a minute.
  </div>}
 
-{err&&<div style={{background:“rgba(248,113,113,0.08)”,border:“1px solid #4a1a1a”,borderRadius:10,padding:“12px 16px”,marginBottom:20,color:”#ef4444”,fontSize:13}}> {err}</div>}
+ {err&&<div style={{background:"rgba(248,113,113,0.08)",border:"1px solid #4a1a1a",borderRadius:10,padding:"12px 16px",marginBottom:20,color:"#ef4444",fontSize:13}}> {err}</div>}
 
  <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(220px,1fr))",gap:20}}> {plans.map(p=>{const active=p.id===cur;const isLoading=loading===p.id;return(
  <div key={p.id} style={{background:active?"var(--card)":"var(--surface)",border:`1.5px solid ${active?"#FF6B35":"var(--border)"}`,borderRadius:14,padding:24,position:"relative",marginTop:16}}> {active&&<div style={{position:"absolute",top:-12,left:"50%",transform:"translateX(-50%)",background:"#FF6B35",color:"#fff",borderRadius:20,padding:"2px 14px",fontSize:11,fontWeight:700,whiteSpace:"nowrap"}}>CURRENT</div>}
@@ -850,30 +853,55 @@ return (
 
 // Portal Shell
 function Portal() {
-const {user,profile}=useAuth();
-// If arriving from pricing page with ?upgrade=standard or ?upgrade=premium, go straight to plan tab
-const initPage = [‘standard’,‘premium’].includes(new URLSearchParams(window.location.search).get(‘upgrade’)) ? ‘plan’ : ‘dashboard’;
-const [page,setPage]=useState(initPage);
-const [venue,setVenue]=useState(null);
-const [events,setEvents]=useState([]);
-const [busy,setBusy]=useState(true);
-const load=async(retry=0)=>{
-setBusy(true);
-const {data:v}=await sb.from(“venues”).select(”*”).eq(“owner_id”,user.id).maybeSingle();
-if(!v && retry < 2){
-// Venue write may still be in-flight after email confirmation — retry after short delay
-setTimeout(()=>load(retry+1), 1200);
-return;
-}
-setVenue(v||null);
-if(v?.id){const {data:ev}=await sb.from(“events”).select(”*”).eq(“venue_id”,v.id).order(“start_time”,{ascending:true});setEvents(ev||[]);}
-else setEvents([]);
-setBusy(false);
-};
-useEffect(()=>{load();},[]);
-return (
+ const {user,profile}=useAuth();
+ // If arriving from pricing page with ?upgrade=standard or ?upgrade=premium, go straight to plan tab
+ const initPage = ['standard','premium'].includes(new URLSearchParams(window.location.search).get('upgrade')) ? 'plan' : 'dashboard';
+ const [page,setPage]=useState(initPage);
+ const [venue,setVenue]=useState(null);
+ const [events,setEvents]=useState([]);
+ const [busy,setBusy]=useState(true);
 
- <div style={{display:"flex",minHeight:"100vh"}}> <Sidebar active={page} setActive={setPage} profile={profile}/> <main style={{flex:1,padding:36,overflowY:"auto",background:"var(--bg)",minHeight:"100vh"}}> {busy?<Spin/>:<> {page==="dashboard"&&<Dashboard venue={venue} events={events}/>}
+ // Role guard — redirect if this user belongs to a different portal
+ useEffect(()=>{
+   if(!user)return;
+   sb.from('user_roles').select('role').eq('user_id',user.id).maybeSingle().then(({data})=>{
+     const role=data?.role;
+     if(role==='vendor'){window.location.href='https://cbusevents.com/cbus-vendor-portal.html';}
+     else if(role==='planner'){window.location.href='https://cbusevents.com/cbus-planner-portal.html';}
+   });
+ },[user?.id]);
+ const load=async(retry=0)=>{
+ setBusy(true);
+ const {data:v}=await sb.from("venues").select("*").eq("owner_id",user.id).maybeSingle();
+ if(!v && retry < 2){
+   // Venue write may still be in-flight after email confirmation — retry after short delay
+   setTimeout(()=>load(retry+1), 1200);
+   return;
+ }
+ setVenue(v||null);
+ if(v?.id){const {data:ev}=await sb.from("events").select("*").eq("venue_id",v.id).order("start_time",{ascending:true});setEvents(ev||[]);}
+ else setEvents([]);
+ setBusy(false);
+ };
+ useEffect(()=>{load();},[]);
+ return (
+ <div style={{display:"flex",minHeight:"100vh"}}>
+   <Sidebar active={page} setActive={setPage} profile={profile}/>
+   {/* Mobile bottom nav */}
+   <div className="mobile-bottom-nav">
+     <div className="mobile-bottom-nav-inner">
+       {NAV.map(n=>(
+         <button key={n.key} className={"mobile-nav-btn"+(page===n.key?" active":"")} onClick={()=>setPage(n.key)}>
+           {n.key==="dashboard" && <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>}
+           {n.key==="venue"     && <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>}
+           {n.key==="events"    && <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>}
+           {n.key==="inquiries" && <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>}
+           {n.key==="plan"      && <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>}
+           <span>{n.label}</span>
+         </button>
+       ))}
+     </div>
+   </div> <main style={{flex:1,padding:36,overflowY:"auto",background:"var(--bg)",minHeight:"100vh"}}> {busy?<Spin/>:<> {page==="dashboard"&&<Dashboard venue={venue} events={events}/>}
  {page==="venue" &&<VenueForm venue={venue} onSave={load}/>}
  {page==="events" &&<EventsManager venue={venue} events={events} onRefresh={load}/>}
  {page==="inquiries"&&<Inquiries venue={venue}/>}
@@ -883,22 +911,22 @@ return (
 }
 
 function App() {
-const {user,loading}=useAuth();
-useEffect(()=>{
-if(!loading){
-const el=document.getElementById(‘root’);
-// Remove loading screen content — React will take over
-}
-},[loading]);
-if(loading)return null;
-return user?<Portal/>:<AuthPage/>;
+ const {user,loading}=useAuth();
+ useEffect(()=>{
+ if(!loading){
+ const el=document.getElementById('root');
+ // Remove loading screen content — React will take over
+ }
+ },[loading]);
+ if(loading)return null;
+ return user?<Portal/>:<AuthPage/>;
 }
 
 function Root() {
-return <AuthProvider><App/></AuthProvider>;
+ return <AuthProvider><App/></AuthProvider>;
 }
 
-ReactDOM.createRoot(document.getElementById(“root”)).render(<Root/>);
+ReactDOM.createRoot(document.getElementById("root")).render(<Root/>);
 </script>
 
 <script>
@@ -917,6 +945,5 @@ ReactDOM.createRoot(document.getElementById(“root”)).render(<Root/>);
     }
   })();
 </script>
-
 </body>
 </html>
