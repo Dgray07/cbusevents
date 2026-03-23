@@ -1516,7 +1516,7 @@ function renderHome(){
  <!-- ══════════════════════════════════════════
       LIVE EVENTS GRID
  ══════════════════════════════════════════ -->
- <section style="padding:32px 48px 48px">
+ <section id="eventsSection" style="padding:32px 48px 48px">
    <div style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:24px">
      <div>
        <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.2em;text-transform:uppercase;color:var(--orange);margin-bottom:6px">Happening in Columbus</div>
@@ -1882,6 +1882,10 @@ function filterHomeMap(category, clickedEl){
     grid.innerHTML = "<div style='padding:40px 20px;text-align:center;color:var(--sub);font-size:13px'>No " + category + " events right now.</div>";
     return;
   }
+
+  // Scroll to events section smoothly
+  const evSection = document.getElementById('eventsSection') || document.getElementById('homeEventsGrid');
+  if(evSection) evSection.scrollIntoView({behavior:'smooth', block:'start'});
 
   grid.innerHTML = filtered.map(e=>{
     const venueName = e.venue_name_override||e.venues?.name||'Columbus Venue';
