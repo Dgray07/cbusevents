@@ -1,14 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <!-- Google tag (gtag.js) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-P70BRSL5E5"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-      gtag('config', 'G-P70BRSL5E5');
-    </script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title id="pageTitle">Community — CBUSEVENTS</title>
@@ -176,13 +168,27 @@ footer { background: var(--surface); border-top: 1px solid var(--border); paddin
   .join-band { flex-direction: column; padding: 24px 20px; }
   .event-card { flex: 0 0 72vw; max-width: 260px; }
 }
+
+/* ── ADA COMPLIANCE ── */
+/* Skip navigation */
+.skip-link{position:absolute;top:-100px;left:8px;background:var(--orange,#FF6B35);color:#fff;padding:8px 16px;border-radius:0 0 8px 8px;font-weight:700;font-size:14px;z-index:99999;text-decoration:none;transition:top 0.2s;}
+.skip-link:focus{top:0;}
+
+/* Focus styles - visible for keyboard navigation */
+*:focus-visible{outline:2px solid #FF6B35;outline-offset:3px;border-radius:4px;}
+button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px solid #FF6B35;outline-offset:3px;}
+
+/* Reduced motion */
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:0.01ms!important;animation-iteration-count:1!important;transition-duration:0.01ms!important;}
+}
 </style>
 </head>
 <body>
 
 <!-- NAV -->
 <nav>
-  <div class="nav-logo" onclick="window.location.href='https://cbusevents.com'">CBUS<span>EVENTS</span></div>
+  <div class="nav-logo" onclick="window.location.href='https://cbusevents.com'" role="button" tabindex="0">CBUS<span>EVENTS</span></div>
   <a href="https://cbusevents.com" class="nav-back">
     <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
     Back to CBUSEVENTS
@@ -203,9 +209,9 @@ footer { background: var(--surface); border-top: 1px solid var(--border); paddin
 
 <!-- FILTER BAR -->
 <div class="filter-bar">
-  <div class="filter-chip active" onclick="setTab('events',this)">Events</div>
-  <div class="filter-chip" onclick="setTab('venues',this)">Venues</div>
-  <div class="filter-chip" onclick="setTab('people',this)">Planners & Vendors</div>
+  <div class="filter-chip active" onclick="setTab('events',this)" role="button" tabindex="0">Events</div>
+  <div class="filter-chip" onclick="setTab('venues',this)" role="button" tabindex="0">Venues</div>
+  <div class="filter-chip" onclick="setTab('people',this)" role="button" tabindex="0">Planners & Vendors</div>
 </div>
 
 <!-- PAGE -->
@@ -487,7 +493,7 @@ async function loadEvents() {
   grid.innerHTML = events.map(e => {
     const vname = e.venue_name_override || e.venues?.name || 'Columbus Venue';
     const tw = isThisWeek(e.start_time);
-    return `<div class="event-card" onclick="window.location.href='https://cbusevents.com'">
+    return `<div class="event-card" onclick="window.location.href='https://cbusevents.com'" role="button" tabindex="0">
       <div class="event-card-img">
         ${e.cover_image_url
           ? `<img src="${e.cover_image_url}" alt="${e.title}" loading="lazy">`
@@ -518,7 +524,7 @@ async function loadVenues() {
   }
 
   grid.innerHTML = data.map(v => `
-    <div class="venue-card" onclick="window.location.href='https://cbusevents.com'">
+    <div class="venue-card" onclick="window.location.href='https://cbusevents.com'" role="button" tabindex="0">
       <div class="venue-card-img">
         ${v.cover_image_url ? `<img src="${v.cover_image_url}" alt="${v.name}" loading="lazy">` : '<div style="width:100%;height:100%;background:var(--surface)"></div>'}
         <div class="venue-card-img-overlay"></div>

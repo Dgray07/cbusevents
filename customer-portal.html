@@ -1,14 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <!-- Google tag (gtag.js) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-P70BRSL5E5"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-      gtag('config', 'G-P70BRSL5E5');
-    </script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>My CBUSEVENTS — Customer Portal</title>
@@ -77,6 +69,40 @@ body { background: var(--bg); color: var(--text); font-family: var(--font); disp
 @keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
 
 /* ════════════════════════
+   TIER DEMO TOGGLE
+════════════════════════ */
+.tier-toggle {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 999;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--r-full);
+  padding: 4px;
+  box-shadow: 0 8px 40px rgba(0,0,0,0.6);
+}
+.tier-btn {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 8px 18px;
+  border-radius: var(--r-full);
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s;
+  background: transparent;
+  color: var(--muted);
+}
+.tier-btn.active { background: var(--orange); color: #fff; font-weight: 700; }
+.tier-label { font-family: var(--mono); font-size: 9px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); padding: 0 10px; }
+
+/* ════════════════════════
    SIDEBAR
 ════════════════════════ */
 .sidebar {
@@ -128,10 +154,21 @@ body { background: var(--bg); color: var(--text); font-family: var(--font); disp
   letter-spacing: -0.02em;
 }
 .customer-name { font-weight: 700; font-size: 13px; color: var(--text); margin-bottom: 2px; letter-spacing: -0.02em; }
-
-
-
-
+.customer-tier {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 3px 10px;
+  border-radius: var(--r-full);
+  margin-top: 2px;
+}
+.tier-free     { background: rgba(255,255,255,0.04); color: var(--muted); border: 1px solid var(--border); }
+.tier-standard { background: var(--orange-dim); color: var(--orange); border: 1px solid var(--orange-border); }
+.tier-premium  { background: rgba(251,191,36,0.1); color: var(--gold); border: 1px solid rgba(251,191,36,0.2); }
 
 .sidebar-section { padding: 20px 22px 6px; font-size: 9px; color: var(--muted); font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; }
 
@@ -153,18 +190,39 @@ body { background: var(--bg); color: var(--text); font-family: var(--font); disp
 .nav-item svg { width: 15px; height: 15px; flex-shrink: 0; opacity: 0.65; }
 .nav-badge { background: var(--orange); color: #fff; border-radius: var(--r-full); padding: 1px 8px; font-size: 9px; font-weight: 800; margin-left: auto; }
 
-
-
-
+/* Locked nav item */
+.nav-item.locked { opacity: 0.45; cursor: default; }
+.nav-item.locked:hover { background: transparent; color: var(--sub); border-left-color: transparent; }
+.lock-icon { margin-left: auto; }
+.lock-icon svg { width: 11px; height: 11px; color: var(--muted); opacity: 0.7; }
 
 .sidebar-bottom { margin-top: auto; padding: 18px; border-top: 1px solid var(--border-sub); }
 
-
-
-
-
-
-
+/* Upgrade prompt in sidebar */
+.upgrade-prompt {
+  background: var(--orange-dim);
+  border: 1px solid var(--orange-border);
+  border-radius: var(--r-md);
+  padding: 12px 14px;
+  margin-bottom: 10px;
+}
+.upgrade-prompt-title { font-size: 12px; font-weight: 700; color: var(--orange); margin-bottom: 4px; letter-spacing: -0.01em; }
+.upgrade-prompt-text { font-size: 11px; color: var(--sub); line-height: 1.5; margin-bottom: 10px; }
+.btn-upgrade {
+  width: 100%;
+  background: var(--orange);
+  color: #fff;
+  font-family: var(--font);
+  font-weight: 700;
+  font-size: 11px;
+  letter-spacing: 0.02em;
+  padding: 8px;
+  border: none;
+  border-radius: var(--r-sm);
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+.btn-upgrade:hover { opacity: 0.9; }
 
 /* ════════════════════════
    MAIN
@@ -400,55 +458,121 @@ body { background: var(--bg); color: var(--text); font-family: var(--font); disp
    FREEMIUM BLUR TREATMENT
    Applied to growth tools
 ════════════════════════ */
+.locked-feature {
+  position: relative;
+  border-radius: var(--r-lg);
+  overflow: hidden;
+}
 
+.locked-feature .locked-content {
+  filter: blur(4px);
+  pointer-events: none;
+  user-select: none;
+  opacity: 0.6;
+}
 
+.locked-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: rgba(8,8,16,0.55);
+  backdrop-filter: blur(2px);
+  z-index: 10;
+  text-align: center;
+  padding: 24px;
+}
 
+.locked-overlay-title {
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--text);
+  margin-bottom: 6px;
+}
 
+.locked-overlay-sub {
+  font-size: 12px;
+  color: var(--sub);
+  line-height: 1.55;
+  max-width: 280px;
+  margin-bottom: 16px;
+}
 
+.btn-unlock {
+  background: var(--orange);
+  color: #fff;
+  font-family: var(--font);
+  font-weight: 700;
+  font-size: 12px;
+  letter-spacing: 0.02em;
+  padding: 9px 22px;
+  border: none;
+  border-radius: var(--r-md);
+  cursor: pointer;
+  transition: opacity 0.2s, transform 0.15s;
+  box-shadow: 0 4px 20px rgba(255,107,53,0.3);
+}
+.btn-unlock:hover { opacity: 0.9; transform: translateY(-1px); }
 
-
-
-
-
-
-
-
-
-
-
+.locked-tier-badge {
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  padding: 3px 10px;
+  border-radius: var(--r-full);
+  margin-bottom: 10px;
+  display: inline-block;
+}
+.locked-tier-badge.standard { background: var(--orange-dim); color: var(--orange); border: 1px solid var(--orange-border); }
+.locked-tier-badge.premium  { background: rgba(251,191,36,0.1); color: var(--gold); border: 1px solid rgba(251,191,36,0.2); }
 
 /* ════════════════════════
    GROWTH TOOLS (blurred for free tier)
 ════════════════════════ */
 
+/* Recommendation engine */
+.rec-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  padding: 16px 18px;
+  display: flex; align-items: flex-start; gap: 14px;
+  margin-bottom: 10px;
+}
+.rec-card-body { flex: 1; }
+.rec-card-label { font-family: var(--mono); font-size: 9px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--orange); margin-bottom: 4px; }
+.rec-card-title { font-weight: 700; font-size: 13px; color: var(--text); margin-bottom: 2px; letter-spacing: -0.01em; }
+.rec-card-detail { font-size: 11px; color: var(--muted); }
+.rec-card-match { font-family: var(--mono); font-size: 10px; letter-spacing: 0.1em; color: var(--green); }
 
+/* Priority notifications */
+.notif-row {
+  display: flex; align-items: flex-start; gap: 12px;
+  padding: 14px 24px;
+  border-bottom: 1px solid var(--border-sub);
+}
+.notif-row:last-child { border-bottom: none; }
+.notif-dot-wrap { padding-top: 4px; flex-shrink: 0; }
+.notif-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+.notif-dot.orange { background: var(--orange); }
+.notif-dot.green  { background: var(--green); }
+.notif-dot.blue   { background: var(--blue); }
+.notif-dot.muted  { background: var(--muted); }
+.notif-text { font-size: 13px; color: var(--text); line-height: 1.45; flex: 1; }
+.notif-text span { color: var(--orange); font-weight: 600; }
+.notif-time { font-family: var(--mono); font-size: 9px; letter-spacing: 0.08em; color: var(--muted); flex-shrink: 0; padding-top: 2px; }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+/* Two col */
+.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; }
 
 /* ════════════════════════
    RESPONSIVE
 ════════════════════════ */
-@media (max-width: 1100px) {  }
+@media (max-width: 1100px) { .two-col { grid-template-columns: 1fr; } }
 @media (max-width: 860px) {
   :root { --sidebar-w: 0px; }
   .sidebar { display: none; }
@@ -456,12 +580,26 @@ body { background: var(--bg); color: var(--text); font-family: var(--font); disp
   .topbar { padding: 0 20px; }
   .welcome-stats { display: none; }
 }
+
+/* ── ADA COMPLIANCE ── */
+/* Skip navigation */
+.skip-link{position:absolute;top:-100px;left:8px;background:var(--orange,#FF6B35);color:#fff;padding:8px 16px;border-radius:0 0 8px 8px;font-weight:700;font-size:14px;z-index:99999;text-decoration:none;transition:top 0.2s;}
+.skip-link:focus{top:0;}
+
+/* Focus styles - visible for keyboard navigation */
+*:focus-visible{outline:2px solid #FF6B35;outline-offset:3px;border-radius:4px;}
+button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px solid #FF6B35;outline-offset:3px;}
+
+/* Reduced motion */
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:0.01ms!important;animation-iteration-count:1!important;transition-duration:0.01ms!important;}
+}
 </style>
 </head>
 <body>
 
 <!-- AUTH GATE -->
-<div id="authGate" style="display:flex;position:fixed;inset:0;background:var(--bg);z-index:9999;align-items:center;justify-content:center;padding:24px">
+<div id="authGate" style="display:none;position:fixed;inset:0;background:var(--bg);z-index:9999;display:flex;align-items:center;justify-content:center;padding:24px">
   <div style="background:var(--card);border:1px solid var(--border);border-radius:20px;padding:40px;width:100%;max-width:420px;box-shadow:0 32px 80px rgba(0,0,0,0.5)">
     <div style="text-align:center;margin-bottom:32px">
       <div style="font-family:var(--font);font-weight:900;font-size:22px;letter-spacing:-0.05em;text-transform:uppercase;margin-bottom:6px">CBUS<span style="color:var(--orange)">EVENTS</span></div>
@@ -477,17 +615,17 @@ body { background: var(--bg); color: var(--text); font-family: var(--font); disp
     </div>
     <div style="margin-bottom:14px">
       <label style="display:block;font-size:12px;color:var(--sub);font-weight:500;margin-bottom:5px">Email</label>
-      <input type="email" id="authEmail" placeholder="you@email.com" class="auth-enter-submit" style="width:100%;background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:9px;padding:10px 14px;color:var(--text);font-family:var(--font);font-size:14px;outline:none"/>
+      <input type="email" id="authEmail" autocomplete="email" placeholder="you@email.com" id="authPassInput" style="width:100%;background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:9px;padding:10px 14px;color:var(--text);font-family:var(--font);font-size:14px;outline:none"/>
     </div>
     <div style="margin-bottom:14px">
       <label style="display:block;font-size:12px;color:var(--sub);font-weight:500;margin-bottom:5px">Password</label>
-      <input type="password" id="authPass" placeholder="••••••••" class="auth-enter-submit" style="width:100%;background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:9px;padding:10px 14px;color:var(--text);font-family:var(--font);font-size:14px;outline:none"/>
+      <input type="password" id="authPass" autocomplete="current-password" placeholder="••••••••" id="authPassInput" style="width:100%;background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:9px;padding:10px 14px;color:var(--text);font-family:var(--font);font-size:14px;outline:none"/>
     </div>
-    <div id="authErr" style="color:var(--red);font-size:13px;margin-bottom:10px;min-height:18px"></div>
-    <button id="authBtn" onclick="doAuth()" style="width:100%;background:var(--orange);color:#fff;border:none;border-radius:9px;padding:12px;font-size:14px;font-weight:700;cursor:pointer;font-family:var(--font)">Sign In</button>
+    <div id="authErr" role="alert" aria-live="polite" style="color:var(--red);font-size:13px;margin-bottom:10px;min-height:18px"></div>
+    <button id="authBtn" style="width:100%;background:var(--orange);color:#fff;border:none;border-radius:9px;padding:12px;font-size:14px;font-weight:700;cursor:pointer;font-family:var(--font)">Sign In</button>
     <div style="text-align:center;margin-top:16px;font-size:13px;color:var(--sub)">
       <span id="authSwitchText">New to CBUSEVENTS?</span>
-      <button id="authSwitchBtn" style="background:none;border:none;color:var(--orange);font-size:13px;font-weight:600;cursor:pointer;font-family:var(--font);margin-left:4px">Create a free account</button>
+      <button id="authSwitchBtn" id="authSwitchBtnEl" style="background:none;border:none;color:var(--orange);font-size:13px;font-weight:600;cursor:pointer;font-family:var(--font);margin-left:4px">Create a free account</button>
     </div>
     <div style="text-align:center;margin-top:12px">
       <a href="https://cbusevents.com" style="color:var(--muted);font-size:12px">← Back to CBUSEVENTS</a>
@@ -506,6 +644,7 @@ body { background: var(--bg); color: var(--text); font-family: var(--font); disp
   <div class="sidebar-customer">
     <div class="customer-initials" id="sidebarInitials">CB</div>
     <div class="customer-name" id="sidebarName">Account</div>
+    <div class="customer-tier tier-free" id="sidebarTier">Free</div>
   </div>
 
   <div class="sidebar-section">Discover</div>
@@ -526,6 +665,32 @@ body { background: var(--bg); color: var(--text); font-family: var(--font); disp
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v2z"/></svg>
     My Tickets
   </a>
+
+  <div class="sidebar-section">Plan</div>
+  <a class="nav-item" href="#">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+    Hire a Planner
+  </a>
+
+  <!-- Locked nav items for free tier -->
+  <a class="nav-item locked" id="navRecommendations" href="#">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+    Recommendations
+    <span class="lock-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></span>
+  </a>
+  <a class="nav-item locked" id="navNotifications" href="#">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+    Priority Alerts
+    <span class="lock-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></span>
+  </a>
+
+  <div class="sidebar-bottom">
+    <div class="upgrade-prompt" id="sidebarUpgrade">
+      <div class="upgrade-prompt-title" id="upgradeTitle">Unlock More</div>
+      <div class="upgrade-prompt-text" id="upgradeText">Get personalized recommendations and priority event alerts.</div>
+      <button class="btn-upgrade" id="upgradeBtn">Upgrade Now</button>
+    </div>
+  </div>
 </aside>
 
 <!-- MAIN -->
@@ -539,7 +704,7 @@ body { background: var(--bg); color: var(--text); font-family: var(--font); disp
     </div>
   </div>
 
-  <div class="content">
+  <div class="content" id="main-content">
 
     <!-- WELCOME STRIP -->
     <div class="welcome-strip">
@@ -550,15 +715,15 @@ body { background: var(--bg); color: var(--text); font-family: var(--font); disp
       </div>
       <div class="welcome-stats">
         <div class="welcome-stat">
-          <div class="welcome-stat-num" id="statSaved">—</div>
+          <div class="welcome-stat-num">4</div>
           <div class="welcome-stat-label">Saved Events</div>
         </div>
         <div class="welcome-stat">
-          <div class="welcome-stat-num" id="statTickets">—</div>
+          <div class="welcome-stat-num">6</div>
           <div class="welcome-stat-label">Tickets Purchased</div>
         </div>
         <div class="welcome-stat">
-          <div class="welcome-stat-num" id="statUpcoming">—</div>
+          <div class="welcome-stat-num">2</div>
           <div class="welcome-stat-label">Upcoming</div>
         </div>
       </div>
@@ -585,14 +750,45 @@ body { background: var(--bg); color: var(--text); font-family: var(--font); disp
     <div class="table-card">
       <div class="table-header">
         <div class="table-title">My Tickets</div>
-        <button class="btn btn-ghost btn-sm" onclick="window.open('https://cbusevents.com','_blank')">Browse Events</button>
+        <button class="btn btn-ghost btn-sm">View All</button>
       </div>
-      <div id="ticketsContainer">
-        <div style="padding:40px;text-align:center;color:var(--muted);">
-          <div style="width:24px;height:24px;border:2px solid var(--border);border-top-color:var(--orange);border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 12px"></div>
-          Loading tickets...
+
+      <div class="ticket-row">
+        <div class="ticket-date-block"><div class="ticket-date-month">Apr</div><div class="ticket-date-day">26</div></div>
+        <div class="ticket-info">
+          <div class="ticket-name">Friday Night R&B Vol. 4</div>
+          <div class="ticket-detail">Kemba Live &middot; General Admission</div>
+        </div>
+        <div class="ticket-right">
+          <div class="ticket-type">GA &middot; 1 ticket</div>
+          <div class="ticket-price">$27.00</div>
         </div>
       </div>
+
+      <div class="ticket-row">
+        <div class="ticket-date-block"><div class="ticket-date-month">May</div><div class="ticket-date-day">08</div></div>
+        <div class="ticket-info">
+          <div class="ticket-name">Columbus Tech Mixer</div>
+          <div class="ticket-detail">The Exchange &middot; General Admission</div>
+        </div>
+        <div class="ticket-right">
+          <div class="ticket-type">GA &middot; 1 ticket</div>
+          <div class="ticket-price">$17.00</div>
+        </div>
+      </div>
+
+      <div class="ticket-row">
+        <div class="ticket-date-block" style="background:rgba(255,255,255,0.04);border-color:var(--border);"><div class="ticket-date-month" style="color:var(--muted)">Mar</div><div class="ticket-date-day" style="color:var(--muted)">15</div></div>
+        <div class="ticket-info">
+          <div class="ticket-name" style="color:var(--sub)">Winter Networking Night</div>
+          <div class="ticket-detail">The Exchange &middot; VIP</div>
+        </div>
+        <div class="ticket-right">
+          <div class="ticket-type">VIP &middot; 2 tickets</div>
+          <div class="ticket-price" style="color:var(--sub)">$92.00</div>
+        </div>
+      </div>
+
     </div>
 
     <!-- HIRE A PLANNER — Discovery layer -->
@@ -603,21 +799,191 @@ body { background: var(--bg); color: var(--text); font-family: var(--font); disp
           <div class="planner-section-title">Plan Your Own Event</div>
           <div class="planner-section-sub">Connect with Columbus event planners who can make your idea a reality. Private parties, corporate events, weddings, brand activations and more.</div>
         </div>
-      </div>
-      <div class="planner-grid" id="plannerGrid">
-        <div style="padding:40px;text-align:center;color:var(--muted);grid-column:1/-1">
-          <div style="width:24px;height:24px;border:2px solid var(--border);border-top-color:var(--orange);border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 12px"></div>
-          Loading planners...
+        <div style="display:flex;gap:8px;flex-shrink:0;">
+          <div class="filter-chip active">All</div>
+          <div class="filter-chip">Weddings</div>
+          <div class="filter-chip">Corporate</div>
+          <div class="filter-chip">Private</div>
         </div>
       </div>
+
+      <div class="planner-grid">
+
+        <div class="planner-card">
+          <div class="planner-card-top">
+            <div class="planner-card-avatar pa1">MJ</div>
+            <div>
+              <div class="planner-card-name">Marcus Johnson Events</div>
+              <div class="planner-card-type">Full Service Planner</div>
+            </div>
+          </div>
+          <div class="planner-card-tags">
+            <span class="planner-tag">Corporate</span>
+            <span class="planner-tag">Private Parties</span>
+            <span class="planner-tag">Concerts</span>
+          </div>
+          <div class="planner-card-footer">
+            <span class="planner-card-rate">From $1,200</span>
+            <span class="planner-card-avail">Available</span>
+          </div>
+        </div>
+
+        <div class="planner-card">
+          <div class="planner-card-top">
+            <div class="planner-card-avatar pa2">SE</div>
+            <div>
+              <div class="planner-card-name">Simone Ellis Co.</div>
+              <div class="planner-card-type">Wedding + Events</div>
+            </div>
+          </div>
+          <div class="planner-card-tags">
+            <span class="planner-tag">Weddings</span>
+            <span class="planner-tag">Brand Activations</span>
+          </div>
+          <div class="planner-card-footer">
+            <span class="planner-card-rate">From $2,400</span>
+            <span class="planner-card-avail">Available</span>
+          </div>
+        </div>
+
+        <div class="planner-card">
+          <div class="planner-card-top">
+            <div class="planner-card-avatar pa3">RP</div>
+            <div>
+              <div class="planner-card-name">Renee Productions</div>
+              <div class="planner-card-type">Event Production</div>
+            </div>
+          </div>
+          <div class="planner-card-tags">
+            <span class="planner-tag">Concerts</span>
+            <span class="planner-tag">Corporate</span>
+            <span class="planner-tag">Activations</span>
+          </div>
+          <div class="planner-card-footer">
+            <span class="planner-card-rate">From $3,500</span>
+            <span class="planner-card-avail limited">Limited</span>
+          </div>
+        </div>
+
+        <div class="planner-card">
+          <div class="planner-card-top">
+            <div class="planner-card-avatar pa4">AT</div>
+            <div>
+              <div class="planner-card-name">Andre Thomas Events</div>
+              <div class="planner-card-type">Private + Social</div>
+            </div>
+          </div>
+          <div class="planner-card-tags">
+            <span class="planner-tag">Private Parties</span>
+            <span class="planner-tag">Weddings</span>
+          </div>
+          <div class="planner-card-footer">
+            <span class="planner-card-rate">Contact for Pricing</span>
+            <span class="planner-card-avail">Available</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- GROWTH TOOLS (gated) -->
+    <div class="two-col">
+
+      <!-- Personalized Recommendations — Standard+ -->
+      <div class="locked-feature" id="featureRec">
+        <div class="locked-content">
+          <div class="table-card" style="margin-bottom:0;">
+            <div class="table-header">
+              <div>
+                <div class="table-title">Recommended For You</div>
+                <div class="table-title-sub">Based on your event history</div>
+              </div>
+            </div>
+            <div style="padding:14px 16px;display:flex;flex-direction:column;gap:10px;">
+              <div class="rec-card">
+                <div class="rec-card-body">
+                  <div class="rec-card-label">Strong Match</div>
+                  <div class="rec-card-title">Short North Poetry Slam</div>
+                  <div class="rec-card-detail">Land Grant Brewing &middot; May 14</div>
+                </div>
+                <div class="rec-card-match">94% match</div>
+              </div>
+              <div class="rec-card">
+                <div class="rec-card-body">
+                  <div class="rec-card-label">Based on R&B</div>
+                  <div class="rec-card-title">Rooftop Summer Series</div>
+                  <div class="rec-card-detail">The Exchange &middot; Jun 14</div>
+                </div>
+                <div class="rec-card-match">88% match</div>
+              </div>
+              <div class="rec-card">
+                <div class="rec-card-body">
+                  <div class="rec-card-label">Trending Near You</div>
+                  <div class="rec-card-title">Columbus Arts Festival</div>
+                  <div class="rec-card-detail">Goodale Park &middot; Jun 6</div>
+                </div>
+                <div class="rec-card-match">81% match</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="locked-overlay" id="recOverlay">
+          <span class="locked-tier-badge standard">Standard</span>
+          <div class="locked-overlay-title">Events picked for you</div>
+          <div class="locked-overlay-sub">Your listing is visible. Upgrade to get personalized event recommendations based on your taste and history.</div>
+          <button class="btn-unlock" onclick="setTier('standard')">Unlock Recommendations</button>
+        </div>
+      </div>
+
+      <!-- Priority Alerts — Standard+ -->
+      <div class="locked-feature" id="featureAlerts">
+        <div class="locked-content">
+          <div class="table-card" style="margin-bottom:0;">
+            <div class="table-header">
+              <div class="table-title">Priority Alerts</div>
+            </div>
+            <div class="notif-row">
+              <div class="notif-dot-wrap"><div class="notif-dot orange"></div></div>
+              <div class="notif-text"><span>Friday Night R&B</span> is 80% sold out. Only 24 GA tickets left.</div>
+              <div class="notif-time">Now</div>
+            </div>
+            <div class="notif-row">
+              <div class="notif-dot-wrap"><div class="notif-dot green"></div></div>
+              <div class="notif-text">New event added in <span>Short North</span> matching your interests.</div>
+              <div class="notif-time">2h ago</div>
+            </div>
+            <div class="notif-row">
+              <div class="notif-dot-wrap"><div class="notif-dot blue"></div></div>
+              <div class="notif-text"><span>Sonic Temple</span> early bird tickets end in 48 hours.</div>
+              <div class="notif-time">1d ago</div>
+            </div>
+            <div class="notif-row">
+              <div class="notif-dot-wrap"><div class="notif-dot muted"></div></div>
+              <div class="notif-text">Your saved event <span>Columbus Arts Festival</span> just announced its lineup.</div>
+              <div class="notif-time">2d ago</div>
+            </div>
+          </div>
+        </div>
+        <div class="locked-overlay" id="alertsOverlay">
+          <span class="locked-tier-badge standard">Standard</span>
+          <div class="locked-overlay-title">Never miss a moment</div>
+          <div class="locked-overlay-sub">Get alerts when saved events sell out, drop new lineups, or offer early bird pricing.</div>
+          <button class="btn-unlock" onclick="setTier('standard')">Unlock Priority Alerts</button>
+        </div>
+      </div>
+
     </div>
 
   </div>
 </div>
 
-  </div>
+<!-- TIER TOGGLE -->
+<div class="tier-toggle">
+  <span class="tier-label">Preview as</span>
+  <button class="tier-btn active" id="btnFree"     onclick="setTier('free')">Free</button>
+  <button class="tier-btn"        id="btnStandard" onclick="setTier('standard')">Standard</button>
+  <button class="tier-btn"        id="btnPremium"  onclick="setTier('premium')">Premium</button>
 </div>
-
 
 <script src="https://unpkg.com/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <script>
@@ -627,9 +993,56 @@ const sb=supabase.createClient(SB_URL,SB_KEY);
 let currentUser=null;
 window.currentTab='signin'; let currentTab=window.currentTab;
 
+// ── TIER TOGGLE (demo) ──────────────────────────────────────
+window.setTier = function setTier(tier) {
+  document.querySelectorAll('.tier-btn').forEach(b=>b.classList.remove('active'));
+  const btn=document.getElementById('btn'+tier.charAt(0).toUpperCase()+tier.slice(1));
+  if(btn)btn.classList.add('active');
+  const recFeature=document.getElementById('featureRec');
+  const alertsFeature=document.getElementById('featureAlerts');
+  const recOverlay=document.getElementById('recOverlay');
+  const alertsOverlay=document.getElementById('alertsOverlay');
+  const sidebarTier=document.getElementById('sidebarTier');
+  const upgradeBlock=document.getElementById('sidebarUpgrade');
+  const navRec=document.getElementById('navRecommendations');
+  const navAlerts=document.getElementById('navNotifications');
+  const upgradeTitle=document.getElementById('upgradeTitle');
+  const upgradeText=document.getElementById('upgradeText');
+  const welcomeSub=document.getElementById('welcomeSub');
+  if(tier==='free'){
+    if(recFeature)recFeature.querySelector('.locked-content').style.filter='blur(4px)';
+    if(alertsFeature)alertsFeature.querySelector('.locked-content').style.filter='blur(4px)';
+    if(recOverlay)recOverlay.style.display='flex';
+    if(alertsOverlay)alertsOverlay.style.display='flex';
+    if(sidebarTier){sidebarTier.className='customer-tier tier-free';sidebarTier.textContent='Free';}
+    if(upgradeBlock)upgradeBlock.style.display='block';
+    if(navRec)navRec.classList.add('locked');
+    if(navAlerts)navAlerts.classList.add('locked');
+  } else if(tier==='standard'){
+    if(recFeature)recFeature.querySelector('.locked-content').style.filter='none';
+    if(alertsFeature)alertsFeature.querySelector('.locked-content').style.filter='none';
+    if(recOverlay)recOverlay.style.display='none';
+    if(alertsOverlay)alertsOverlay.style.display='none';
+    if(sidebarTier){sidebarTier.className='customer-tier tier-standard';sidebarTier.textContent='Standard';}
+    if(upgradeBlock)upgradeBlock.style.display='block';
+    if(upgradeTitle)upgradeTitle.textContent='Go Premium';
+    if(upgradeText)upgradeText.textContent='Get priority placement, advanced insights, and exclusive early access.';
+    if(navRec)navRec.classList.remove('locked');
+    if(navAlerts)navAlerts.classList.remove('locked');
+  } else if(tier==='premium'){
+    if(recFeature)recFeature.querySelector('.locked-content').style.filter='none';
+    if(alertsFeature)alertsFeature.querySelector('.locked-content').style.filter='none';
+    if(recOverlay)recOverlay.style.display='none';
+    if(alertsOverlay)alertsOverlay.style.display='none';
+    if(sidebarTier){sidebarTier.className='customer-tier tier-premium';sidebarTier.textContent='Premium';}
+    if(upgradeBlock)upgradeBlock.style.display='none';
+    if(navRec)navRec.classList.remove('locked');
+    if(navAlerts)navAlerts.classList.remove('locked');
+  }
+}
 
 // ── AUTH ────────────────────────────────────────────────────
-function switchTab(tab){
+window.switchTab = function switchTab(tab){
   currentTab=tab; window.currentTab=tab;
   document.getElementById('tabSignin').style.background=tab==='signin'?'var(--card)':'none';
   document.getElementById('tabSignin').style.color=tab==='signin'?'var(--text)':'var(--sub)';
@@ -642,9 +1055,9 @@ function switchTab(tab){
   document.getElementById('authErr').textContent='';
 }
 
-async function doAuth(){
+window.doAuth = async function doAuth(){
   const email=document.getElementById('authEmail').value.trim();
-  const pass=(document.getElementById('authPass')||{value:''}).value;
+  const pass=(document.getElementById('authPass')||document.getElementById('authPassInput')||{value:''}).value;
   const name=document.getElementById('authName').value.trim();
   const errEl=document.getElementById('authErr');
   const btn=document.getElementById('authBtn');
@@ -652,16 +1065,7 @@ async function doAuth(){
   btn.disabled=true;btn.textContent='Please wait...';errEl.textContent='';
   let error;
   if(currentTab==='signin'){
-    const{error:e,data}=await sb.auth.signInWithPassword({email,password:pass});
-    error=e;
-    if(!error&&data?.user){
-      // Redirect if this user belongs to a different portal
-      const{data:rd}=await sb.from('user_roles').select('role').eq('user_id',data.user.id).maybeSingle();
-      const role=rd?.role;
-      if(role==='vendor'){window.location.href='https://cbusevents.com/cbus-vendor-portal.html';return;}
-      if(role==='venue_owner'){window.location.href='https://cbusevents.com/cbus-venue-portal.html';return;}
-      if(role==='planner'){window.location.href='https://cbusevents.com/cbus-planner-portal.html';return;}
-    }
+    ({error}=await sb.auth.signInWithPassword({email,password:pass}));
   } else {
     const{data,error:e}=await sb.auth.signUp({email,password:pass});
     error=e;
@@ -671,12 +1075,8 @@ async function doAuth(){
       btn.disabled=false;btn.textContent='Create Account';
       return;
     }
-    if(!error&&data.user){
-      // Write role row so cross-portal redirects work correctly
-      await sb.from('user_roles').insert({user_id:data.user.id,role:'customer'}).select().maybeSingle().catch(()=>{});
-      if(name){
-        await sb.from('customer_profiles').upsert({user_id:data.user.id,display_name:name},{onConflict:'user_id'});
-      }
+    if(!error&&name&&data.user){
+      await sb.from('customer_profiles').upsert({user_id:data.user.id,display_name:name},{onConflict:'user_id'});
     }
   }
   if(error){
@@ -692,7 +1092,7 @@ async function doAuth(){
   }
 }
 
-async function doSignOut(){
+window.doSignOut = async function doSignOut(){
   await sb.auth.signOut();
   showAuthGate();
 }
@@ -720,66 +1120,6 @@ function hideAuthGate(user){
 async function loadLiveData(user){
   loadLiveEvents(user);
   loadLiveTickets(user);
-  loadWelcomeStats(user);
-  loadLivePlanners();
-}
-
-async function loadLivePlanners(){
-  const grid=document.getElementById('plannerGrid');
-  if(!grid)return;
-  const{data:planners}=await sb.from('planners')
-    .select('id,business_name,contact_name,bio,specialties,categories,rate_from,rate_display,availability,cover_image_url')
-    .eq('is_discoverable',true)
-    .eq('status','active')
-    .order('created_at',{ascending:false})
-    .limit(6);
-  if(!planners||planners.length===0){
-    grid.innerHTML='<div style="padding:40px;text-align:center;color:var(--sub);grid-column:1/-1">No planners listed yet — check back soon.</div>';
-    return;
-  }
-  const avatarColors=['pa1','pa2','pa3','pa4'];
-  grid.innerHTML=planners.map((p,i)=>{
-    const name=p.business_name||p.contact_name||'Columbus Planner';
-    const initials=name.split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase();
-    const tags=(p.categories||p.specialties||[]).slice(0,3);
-    const rate=p.rate_display||(p.rate_from?`From $${Number(p.rate_from).toLocaleString()}`:'Contact for Pricing');
-    const avail=p.availability||'available';
-    const availClass=avail.toLowerCase().includes('limited')?'limited':'';
-    const availLabel=avail.charAt(0).toUpperCase()+avail.slice(1);
-    return `<div class="planner-card">
-      <div class="planner-card-top">
-        <div class="planner-card-avatar ${avatarColors[i%4]}">${initials}</div>
-        <div>
-          <div class="planner-card-name">${name}</div>
-          ${p.bio?`<div class="planner-card-type" style="text-transform:none;letter-spacing:0;font-size:11px;color:var(--sub)">${p.bio.substring(0,60)}${p.bio.length>60?'...':''}</div>`:''}
-        </div>
-      </div>
-      ${tags.length?`<div class="planner-card-tags">${tags.map(t=>`<span class="planner-tag">${t}</span>`).join('')}</div>`:''}
-      <div class="planner-card-footer">
-        <span class="planner-card-rate">${rate}</span>
-        <span class="planner-card-avail ${availClass}">${availLabel}</span>
-      </div>
-    </div>`;
-  }).join('');
-}
-
-async function loadWelcomeStats(user){
-  const now=new Date().toISOString();
-  const[savedRes,ticketsRes,upcomingRes]=await Promise.all([
-    sb.from('customer_saved_events').select('id',{count:'exact',head:true}).eq('user_id',user.id),
-    sb.from('tickets').select('id',{count:'exact',head:true}).eq('email',user.email).eq('status','active'),
-    sb.from('tickets').select('id',{count:'exact',head:true}).eq('email',user.email).eq('status','active').gte('events.start_time',now),
-  ]);
-  const setStat=(id,val)=>{const el=document.getElementById(id);if(el)el.textContent=val??'0';};
-  setStat('statSaved',savedRes.count??0);
-  setStat('statTickets',ticketsRes.count??0);
-  // upcoming: fall back to total active tickets count if the join count isn't available
-  setStat('statUpcoming',upcomingRes.count??0);
-  const sub=document.getElementById('welcomeSub');
-  if(sub){
-    const upcoming=upcomingRes.count??0;
-    sub.textContent=upcoming>0?`You have ${upcoming} upcoming event${upcoming===1?'':'s'}.`:'No upcoming events right now.';
-  }
 }
 
 async function loadLiveEvents(user){
@@ -811,19 +1151,20 @@ async function loadLiveEvents(user){
     const dateStr=d.toLocaleDateString('en-US',{month:'short',day:'numeric',timeZone:'America/New_York'});
     const timeStr=d.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit',timeZone:'America/New_York'});
     const isFollowed=followedIds.includes(e.venues?.id);
-    const imgBg=e.cover_image_url
-      ?`<div class="event-card-img-bg" style="background-image:url('${e.cover_image_url.replace(/'/g,"\\'")}')"></div>`
-      :`<div class="event-card-img-bg ${colors[i%4]}"></div>`;
-    const badge=isFollowed
-      ?'<div class="event-card-badge" style="background:var(--green);color:#000">Following</div>'
-      :e.is_boosted?'<div class="event-card-badge">Featured</div>':'';
-    return `<div class="event-card" onclick="window.open('https://cbusevents.com','_blank')">
-      <div class="event-card-img">${imgBg}<div class="event-card-img-overlay"></div>${badge}</div>
-      <div class="event-card-body">
-        <div class="event-card-venue">${venueName}</div>
-        <div class="event-card-name">${e.title}</div>
-        <div class="event-card-meta"><span class="event-card-date">${dateStr} · ${timeStr}</span></div>
-      </div></div>`;
+    return '<div class="event-card" onclick="window.open('https://cbusevents.com','_blank')" role="button" tabindex="0">'
+      +'<div class="event-card-img">'
+      +(e.cover_image_url
+        ?'<div class="event-card-img-bg" style="background-image:url(''+e.cover_image_url+'')"></div>'
+        :'<div class="event-card-img-bg '+colors[i%4]+'"></div>')
+      +'<div class="event-card-img-overlay"></div>'
+      +(isFollowed?'<div class="event-card-badge" style="background:var(--green);color:#000">Following</div>'
+        :e.is_boosted?'<div class="event-card-badge">Featured</div>':'')
+      +'</div>'
+      +'<div class="event-card-body">'
+      +'<div class="event-card-venue">'+venueName+'</div>'
+      +'<div class="event-card-name">'+e.title+'</div>'
+      +'<div class="event-card-meta"><span class="event-card-date">'+dateStr+' · '+timeStr+'</span></div>'
+      +'</div></div>';
   }).join('');
 }
 
@@ -860,8 +1201,6 @@ async function loadLiveTickets(user){
 }
 
 // ── INIT ────────────────────────────────────────────────────
-let _initDone=false;
-
 (async function init(){
   const params=new URLSearchParams(window.location.search);
   const{data:{session}}=await sb.auth.getSession();
@@ -872,34 +1211,53 @@ let _initDone=false;
     showAuthGate();
     if(params.get('tab')==='signup')setTimeout(()=>switchTab('signup'),100);
   }
-  _initDone=true;
-  sb.auth.onAuthStateChange((event,session)=>{
-    // Only react to explicit sign-in/sign-out — ignore TOKEN_REFRESHED and other noise
-    if(event==='SIGNED_IN' && session?.user && !currentUser && _initDone){
-      currentUser=session.user;
-      hideAuthGate(session.user);
-    } else if(event==='SIGNED_OUT'){
-      currentUser=null;
-      showAuthGate();
-    }
+  sb.auth.onAuthStateChange((_,session)=>{
+    if(session?.user){currentUser=session.user;hideAuthGate(session.user);}
+    else showAuthGate();
   });
 })();
 
-// ── WIRE AUTH BUTTONS — DOM is already ready at this point ──
-(function wireAuthButtons(){
-  var authBtn=document.getElementById('authBtn');
-  if(authBtn) authBtn.addEventListener('click', doAuth);
+// ── WIRE UP AUTH BUTTONS via event listeners (avoids inline onclick timing issues) ──
+document.addEventListener('DOMContentLoaded', function() {
+  var authBtn = document.getElementById('authBtn');
+  if(authBtn) authBtn.addEventListener('click', function(){ if(window.doAuth) window.doAuth(); });
 
-  var switchBtn=document.getElementById('authSwitchBtn');
+  var authPassInput = document.getElementById('authPassInput')||document.getElementById('authPass');
+  if(authPassInput) authPassInput.addEventListener('keydown', function(e){ if(e.key==='Enter' && window.doAuth) window.doAuth(); });
+
+  var authEmailInput = document.getElementById('authEmail');
+  if(authEmailInput) authEmailInput.addEventListener('keydown', function(e){ if(e.key==='Enter' && window.doAuth) window.doAuth(); });
+
+  var switchBtn = document.getElementById('authSwitchBtnEl');
   if(switchBtn) switchBtn.addEventListener('click', function(){
-    switchTab(window.currentTab==='signin'?'signup':'signin');
+    if(window.switchTab) window.switchTab(window.currentTab==='signin'?'signup':'signin');
+  });
+});
+</script>
+
+<script>
+// Wire auth gate buttons after DOM + scripts are fully loaded
+window.addEventListener('load', function() {
+  var authBtn = document.getElementById('authBtn');
+  if(authBtn) authBtn.addEventListener('click', function(){ if(window.doAuth) window.doAuth(); });
+
+  var switchBtn = document.getElementById('authSwitchBtnWrap');
+  if(switchBtn) switchBtn.addEventListener('click', function(){
+    if(window.switchTab && window.currentTab) window.switchTab(window.currentTab==='signin'?'signup':'signin');
   });
 
   document.querySelectorAll('.auth-enter-submit').forEach(function(el){
-    el.addEventListener('keydown', function(e){ if(e.key==='Enter') doAuth(); });
+    el.addEventListener('keydown', function(e){ if(e.key==='Enter' && window.doAuth) window.doAuth(); });
   });
-})();
+});
 </script>
 
+<script>
+// Global aliases so inline onclick handlers can find these functions
+function doAuth(){ if(window.doAuth) window.doAuth(); }
+function switchTab(t){ if(window.switchTab) window.switchTab(t); }
+function doSignOut(){ if(window.doSignOut) window.doSignOut(); }
+function setTier(t){ if(window.setTier) window.setTier(t); }
+</script>
 </body>
 </html>

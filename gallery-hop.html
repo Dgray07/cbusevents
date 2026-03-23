@@ -1,14 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <!-- Google tag (gtag.js) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-P70BRSL5E5"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-      gtag('config', 'G-P70BRSL5E5');
-    </script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Gallery Hop — CBUSEVENTS</title>
@@ -347,13 +339,27 @@ footer {
   .join-banner { padding: 24px 20px; }
   #hopMap { height: 320px; }
 }
+
+/* ── ADA COMPLIANCE ── */
+/* Skip navigation */
+.skip-link{position:absolute;top:-100px;left:8px;background:var(--orange,#FF6B35);color:#fff;padding:8px 16px;border-radius:0 0 8px 8px;font-weight:700;font-size:14px;z-index:99999;text-decoration:none;transition:top 0.2s;}
+.skip-link:focus{top:0;}
+
+/* Focus styles - visible for keyboard navigation */
+*:focus-visible{outline:2px solid #FF6B35;outline-offset:3px;border-radius:4px;}
+button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px solid #FF6B35;outline-offset:3px;}
+
+/* Reduced motion */
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:0.01ms!important;animation-iteration-count:1!important;transition-duration:0.01ms!important;}
+}
 </style>
 </head>
 <body>
 
 <!-- NAV -->
 <nav>
-  <div class="nav-logo" onclick="window.location.href='https://cbusevents.com'">CBUS<span>EVENTS</span></div>
+  <div class="nav-logo" onclick="window.location.href='https://cbusevents.com'" role="button" tabindex="0">CBUS<span>EVENTS</span></div>
   <a href="https://cbusevents.com" class="nav-back">
     <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
     Back to CBUSEVENTS
@@ -384,14 +390,14 @@ footer {
 
 <!-- FILTER BAR -->
 <div class="filter-bar">
-  <div class="filter-chip active" onclick="filterVenues('All',this)">All Stops</div>
-  <div class="filter-chip" onclick="filterVenues('Gallery',this)">Galleries</div>
-  <div class="filter-chip" onclick="filterVenues('Bar',this)">Bars & Restaurants</div>
-  <div class="filter-chip" onclick="filterVenues('Boutique',this)">Boutiques</div>
-  <div class="filter-chip" onclick="filterVenues('Studio',this)">Studios</div>
-  <div class="filter-chip" onclick="filterVenues('Performance',this)">Performance</div>
+  <div class="filter-chip active" onclick="filterVenues('All',this)" role="button" tabindex="0">All Stops</div>
+  <div class="filter-chip" onclick="filterVenues('Gallery',this)" role="button" tabindex="0">Galleries</div>
+  <div class="filter-chip" onclick="filterVenues('Bar',this)" role="button" tabindex="0">Bars & Restaurants</div>
+  <div class="filter-chip" onclick="filterVenues('Boutique',this)" role="button" tabindex="0">Boutiques</div>
+  <div class="filter-chip" onclick="filterVenues('Studio',this)" role="button" tabindex="0">Studios</div>
+  <div class="filter-chip" onclick="filterVenues('Performance',this)" role="button" tabindex="0">Performance</div>
   <div class="filter-sep"></div>
-  <div class="filter-chip" onclick="filterVenues('Featured',this)">Featured Stops</div>
+  <div class="filter-chip" onclick="filterVenues('Featured',this)" role="button" tabindex="0">Featured Stops</div>
 </div>
 
 <!-- PAGE CONTENT -->
@@ -610,7 +616,7 @@ function renderGrid(participants) {
     const desc = p.tonight_desc || p.special_offer || ('Join us for Gallery Hop at ' + v.name + ' in ' + (v.neighborhood||'Short North') + '.');
     const mapsUrl = 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent((v.address||v.name) + ' Columbus OH');
 
-    return `<div class="venue-card${p.is_featured?' featured':''}" onclick="window.open('${mapsUrl}','_blank')">
+    return `<div class="venue-card${p.is_featured?' featured':''}" onclick="window.open('${mapsUrl}','_blank')" role="button" tabindex="0">
       <div class="vc-img">
         ${img ? `<img src="${img}" alt="${v.name}" onerror="this.style.display='none'">` : `<div style="width:100%;height:100%;background:linear-gradient(135deg,rgba(255,107,53,0.1),rgba(129,140,248,0.07))"></div>`}
         <div class="vc-img-overlay"></div>

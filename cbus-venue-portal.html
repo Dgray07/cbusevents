@@ -1,14 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <!-- Google tag (gtag.js) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-P70BRSL5E5"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-      gtag('config', 'G-P70BRSL5E5');
-    </script>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>CBUSEVENTS — Venue Portal</title>
@@ -36,19 +28,11 @@ textarea { resize: vertical; min-height: 90px; }
 @keyframes spin { to { transform: rotate(360deg); } }
 
 /* ── MOBILE PORTAL ── */
-/* Mobile bottom nav */
-.mobile-bottom-nav{display:none;position:fixed;bottom:0;left:0;right:0;background:var(--surface);border-top:1px solid var(--border);z-index:200;padding:0 8px;padding-bottom:env(safe-area-inset-bottom);}
-.mobile-bottom-nav-inner{display:flex;align-items:stretch;height:58px;}
-.mobile-nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;background:none;border:none;cursor:pointer;color:var(--sub);font-family:'DM Sans',sans-serif;font-size:10px;font-weight:500;transition:color 0.15s;padding:4px 2px;}
-.mobile-nav-btn.active{color:var(--orange);}
-.mobile-nav-btn svg{width:20px;height:20px;flex-shrink:0;}
-
 @media(max-width:680px){
   html,body{overflow-x:hidden;}
   .portal-nav{padding:0 16px !important;height:54px !important;}
   .portal-sidebar{display:none !important;}
-  .portal-main{margin-left:0 !important;padding:16px !important;padding-bottom:80px !important;}
-  .mobile-bottom-nav{display:block;}
+  .portal-main{margin-left:0 !important;padding:16px !important;}
   .portal-content{padding:16px !important;}
   .stats-grid{grid-template-columns:1fr 1fr !important;gap:10px !important;}
   .modal-inner,.modal-box{width:calc(100vw - 32px) !important;max-width:100% !important;margin:16px !important;}
@@ -65,6 +49,12 @@ textarea { resize: vertical; min-height: 90px; }
   .portal-sidebar{width:200px !important;}
 }
 
+
+/* ── ADA COMPLIANCE ── */
+.skip-link{position:absolute;top:-100px;left:8px;background:#FF6B35;color:#fff;padding:8px 16px;border-radius:0 0 8px 8px;font-weight:700;font-size:14px;z-index:99999;text-decoration:none;transition:top 0.2s;}
+.skip-link:focus{top:0;}
+*:focus-visible{outline:2px solid #FF6B35;outline-offset:3px;border-radius:4px;}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:0.01ms!important;transition-duration:0.01ms!important;}}
 </style>
 <style>
 *{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;}
@@ -268,14 +258,10 @@ function AuthProvider({ children }) {
  if (session?.user) fetchProfile(session.user.id);
  else setLoading(false);
  });
- const { data: { subscription } } = sb.auth.onAuthStateChange((event, session) => {
-   // Only react to explicit sign-in / sign-out events — ignore TOKEN_REFRESHED etc.
-   if (event === 'SIGNED_IN') {
-     setUser(session?.user ?? null);
-     if (session?.user) fetchProfile(session.user.id);
-   } else if (event === 'SIGNED_OUT') {
-     setUser(null); setProfile(null); setLoading(false);
-   }
+ const { data: { subscription } } = sb.auth.onAuthStateChange((_e, session) => {
+ setUser(session?.user ?? null);
+ if (session?.user) fetchProfile(session.user.id);
+ else { setProfile(null); setLoading(false); }
  });
  return () => subscription.unsubscribe();
  }, []);
@@ -314,8 +300,8 @@ function AuthPage() {
  setBusy(true); setErr(""); setMsg("");
  try {
  if (mode==="signin") { const {error}=await sb.auth.signInWithPassword({email,password:pw}); if(error) setErr(error.message); }
- else if (mode==="signup") { const {data:suData,error}=await sb.auth.signUp({email,password:pw,options:{emailRedirectTo:'https://cbusevents.com/cbus-venue-portal.html',data:{full_name:name}}}); if(error) setErr(error.message); else { if(suData?.user){await sb.from('user_roles').insert({user_id:suData.user.id,role:'venue_owner'}).select().maybeSingle().catch(()=>{});} setMsg("Check your email to confirm, then sign in!"); } }
- else { const {error}=await sb.auth.resetPasswordForEmail(email,{redirectTo:'https://cbusevents.com/cbus-venue-portal.html'}); if(error) setErr(error.message); else setMsg("Reset email sent! Check your inbox."); }
+ else if (mode==="signup") { const {data:suData,error}=await sb.auth.signUp({email,password:pw,options:{emailRedirectTo:'https://cbusevents.com/auth.html',data:{full_name:name}}}); if(error) setErr(error.message); else { if(suData?.user){await sb.from('user_roles').insert({user_id:suData.user.id,role:'venue_owner'}).select().maybeSingle().catch(()=>{});} setMsg("Check your email to confirm, then sign in!"); } }
+ else { const {error}=await sb.auth.resetPasswordForEmail(email,{redirectTo:'https://cbusevents.com/auth.html'}); if(error) setErr(error.message); else setMsg("Reset email sent! Check your inbox."); }
  } catch(e) { setErr("Network error. Check your connection."); }
  setBusy(false);
  };
@@ -357,7 +343,7 @@ function Sidebar({active,setActive,profile}) {
      ))}
    </nav>
    <div style={{padding:18,borderTop:"1px solid var(--border-sub)"}}>
-     <div style={{background:"linear-gradient(135deg,rgba(255,107,53,0.15),rgba(255,107,53,0.06))",border:"1px solid rgba(255,107,53,0.25)",borderRadius:8,padding:"6px 10px",fontSize:10,fontWeight:700,textAlign:"center",letterSpacing:"0.08em",textTransform:"uppercase",color:"#FF6B35",marginBottom:10}}>Venue Standard · $39/mo</div>
+     <div style={{background:"linear-gradient(135deg,rgba(255,107,53,0.15),rgba(255,107,53,0.06))",border:"1px solid rgba(255,107,53,0.25)",borderRadius:8,padding:"6px 10px",fontSize:10,fontWeight:700,textAlign:"center",letterSpacing:"0.08em",textTransform:"uppercase",color:"#FF6B35",marginBottom:10}}>Founding Member · $40/mo</div>
      <button onClick={()=>sb.auth.signOut()} style={{width:"100%",background:"rgba(255,255,255,0.04)",color:"var(--sub)",border:"1px solid var(--border)",borderRadius:10,padding:"8px",fontSize:12,fontWeight:700,cursor:"pointer",fontFamily:"'DM Sans',sans-serif"}}>Sign Out</button>
    </div>
  </div> );
@@ -733,8 +719,8 @@ function Inquiries({venue}) {
 }
 
 // Stripe config
-const PAYMENT_LINK_STANDARD="https://buy.stripe.com/9B64gz8Qg1Wa6d93Zuc3m03";
-const PAYMENT_LINK_PREMIUM="https://buy.stripe.com/cNi8wPc2sfN030X7bGc3m04";
+const PAYMENT_LINK_STANDARD="https://buy.stripe.com/28E9AT0jK7gufNJ2Vqc3m00"; // Founding $40/mo
+const PAYMENT_LINK_PREMIUM="https://buy.stripe.com/28E9AT0jK7gufNJ2Vqc3m00";  // TODO: replace with Premium Stripe link when ready
 
 
 
@@ -790,29 +776,37 @@ function MarketingServices({venue}) {
 // Plan & Billing
 function PlanBilling({venue}) {
  const cur=venue?.tier||"free";
- const {user}=useAuth();
  const [loading,setLoading]=React.useState(null);
  const [err,setErr]=React.useState(null);
 
  const plans=[
- {id:"free", name:"Free", price:0, priceId:null, perks:["1 venue listing","Up to 4 events/month","Public venue page","Venue automatically submitted to Google","Promoted on CBUSEVENTS social media"]},
- {id:"standard",name:"Standard", price:39, priceId:"standard", perks:["Up to 20 events/month","Priority search placement","Inquiry inbox enabled","Analytics dashboard","Email support"]},
- {id:"premium", name:"Premium", price:99, priceId:"premium", perks:["Unlimited events","Top of all search results","Homepage feature slot","Multi-account and staff management","Geolocation promos","Ticket revenue share","Featured placement","Dedicated support"]},
+ {id:"free", name:"Free", price:0, priceId:null, perks:["1 venue listing","Up to 4 events/month","Basic search placement","Public venue page"]},
+ {id:"standard",name:"Standard", price:40, priceId:"standard", perks:["Up to 20 events/month","Priority search placement","Inquiry inbox enabled","Email support","Analytics dashboard","Founding rate — locked forever"]},
+ {id:"premium", name:"Premium", price:79, priceId:"premium", perks:["Unlimited events","Top of all search results","Homepage feature slot","Flyer & merch design included","Dedicated support","Founding rate — locked forever"]},
  ];
 
  const checkout=(plan)=>{
  if(!plan.priceId)return;
  const links={standard:PAYMENT_LINK_STANDARD,premium:PAYMENT_LINK_PREMIUM};
  const url=links[plan.id];
- const returnUrl=`https://cbusevents.com/cbus-venue-portal.html?upgrade=success&tier=${plan.id}`;
- if(url) window.location.href=url+"?client_reference_id="+(venue?.id||"unknown")+"&prefilled_email="+(user?.email||"");
+ if(!url)return;
+ // Pass tier, user email and venue ID so return URL can update correct tier
+ const params=new URLSearchParams({
+   client_reference_id: venue?.id||"unknown",
+   prefilled_email: user?.email||"",
+ });
+ window.location.href=url+"?"+params.toString()+"#tier="+plan.id;
+ // NOTE: Update PAYMENT_LINK_STANDARD and PAYMENT_LINK_PREMIUM to separate Stripe links
+ // when you create them in the Stripe dashboard
  };
 
  // Handle return from Stripe — auto-update tier
  React.useEffect(()=>{
  const p=new URLSearchParams(window.location.search);
  if(p.get("upgrade")==="success"&&venue?.id){
-   const newTier=p.get("tier")||"standard";
+   // Get tier from param or hash fallback
+   const hashTier=window.location.hash.replace('#tier=','');
+   const newTier=p.get("tier")||hashTier||"standard";
    // Write tier to Supabase immediately
    sb.from("venues").update({
      tier:newTier,
@@ -860,16 +854,6 @@ function Portal() {
  const [venue,setVenue]=useState(null);
  const [events,setEvents]=useState([]);
  const [busy,setBusy]=useState(true);
-
- // Role guard — redirect if this user belongs to a different portal
- useEffect(()=>{
-   if(!user)return;
-   sb.from('user_roles').select('role').eq('user_id',user.id).maybeSingle().then(({data})=>{
-     const role=data?.role;
-     if(role==='vendor'){window.location.href='https://cbusevents.com/cbus-vendor-portal.html';}
-     else if(role==='planner'){window.location.href='https://cbusevents.com/cbus-planner-portal.html';}
-   });
- },[user?.id]);
  const load=async(retry=0)=>{
  setBusy(true);
  const {data:v}=await sb.from("venues").select("*").eq("owner_id",user.id).maybeSingle();
@@ -885,23 +869,7 @@ function Portal() {
  };
  useEffect(()=>{load();},[]);
  return (
- <div style={{display:"flex",minHeight:"100vh"}}>
-   <Sidebar active={page} setActive={setPage} profile={profile}/>
-   {/* Mobile bottom nav */}
-   <div className="mobile-bottom-nav">
-     <div className="mobile-bottom-nav-inner">
-       {NAV.map(n=>(
-         <button key={n.key} className={"mobile-nav-btn"+(page===n.key?" active":"")} onClick={()=>setPage(n.key)}>
-           {n.key==="dashboard" && <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>}
-           {n.key==="venue"     && <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>}
-           {n.key==="events"    && <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>}
-           {n.key==="inquiries" && <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>}
-           {n.key==="plan"      && <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>}
-           <span>{n.label}</span>
-         </button>
-       ))}
-     </div>
-   </div> <main style={{flex:1,padding:36,overflowY:"auto",background:"var(--bg)",minHeight:"100vh"}}> {busy?<Spin/>:<> {page==="dashboard"&&<Dashboard venue={venue} events={events}/>}
+ <div style={{display:"flex",minHeight:"100vh"}}> <Sidebar active={page} setActive={setPage} profile={profile}/> <main style={{flex:1,padding:36,overflowY:"auto",background:"var(--bg)",minHeight:"100vh"}}> {busy?<Spin/>:<> {page==="dashboard"&&<Dashboard venue={venue} events={events}/>}
  {page==="venue" &&<VenueForm venue={venue} onSave={load}/>}
  {page==="events" &&<EventsManager venue={venue} events={events} onRefresh={load}/>}
  {page==="inquiries"&&<Inquiries venue={venue}/>}

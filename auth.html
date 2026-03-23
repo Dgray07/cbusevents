@@ -1,14 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <!-- Google tag (gtag.js) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-P70BRSL5E5"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-      gtag('config', 'G-P70BRSL5E5');
-    </script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Sign In — CBUSEVENTS</title>
@@ -91,13 +83,27 @@ input::placeholder{color:var(--muted);}
   .auth-card{padding:24px;}
   .role-grid{grid-template-columns:1fr 1fr;}
 }
+
+/* ── ADA COMPLIANCE ── */
+/* Skip navigation */
+.skip-link{position:absolute;top:-100px;left:8px;background:var(--orange,#FF6B35);color:#fff;padding:8px 16px;border-radius:0 0 8px 8px;font-weight:700;font-size:14px;z-index:99999;text-decoration:none;transition:top 0.2s;}
+.skip-link:focus{top:0;}
+
+/* Focus styles - visible for keyboard navigation */
+*:focus-visible{outline:2px solid #FF6B35;outline-offset:3px;border-radius:4px;}
+button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px solid #FF6B35;outline-offset:3px;}
+
+/* Reduced motion */
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:0.01ms!important;animation-iteration-count:1!important;transition-duration:0.01ms!important;}
+}
 </style>
 </head>
 <body>
 
 <div class="auth-wrap">
   <div class="auth-logo">
-    <div class="auth-logo-text" onclick="window.location.href='https://cbusevents.com'">CBUS<span>EVENTS</span></div>
+    <div class="auth-logo-text" onclick="window.location.href='https://cbusevents.com'" role="button" tabindex="0">CBUS<span>EVENTS</span></div>
     <div class="auth-logo-sub">Columbus Event Ecosystem</div>
   </div>
 
@@ -128,8 +134,8 @@ input::placeholder{color:var(--muted);}
 
     <div class="auth-divider">or sign in with email</div>
 
-    <div class="auth-field"><label>Email</label><input type="email" id="siEmail" placeholder="you@email.com" onkeydown="if(event.key==='Enter')doSignIn()"></div>
-    <div class="auth-field"><label>Password</label><input type="password" id="siPass" placeholder="••••••••" onkeydown="if(event.key==='Enter')doSignIn()"></div>
+    <div class="auth-field"><label>Email</label><input type="email" id="siEmail" autocomplete="email" placeholder="you@email.com" onkeydown="if(event.key==='Enter')doSignIn()"></div>
+    <div class="auth-field"><label>Password</label><input type="password" id="siPass" autocomplete="current-password" placeholder="••••••••" onkeydown="if(event.key==='Enter')doSignIn()"></div>
     <div class="auth-err" id="siErr"></div>
     <button class="btn-primary" id="siBtn" onclick="doSignIn()">Sign In</button>
     <div class="auth-footer">

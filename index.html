@@ -832,6 +832,20 @@ footer { background:var(--surface); border-top:1px solid var(--border); padding:
 @media(max-width:900px){
   .hero-cards-desktop { display:none !important; }
 }
+
+/* ── ADA COMPLIANCE ── */
+/* Skip navigation */
+.skip-link{position:absolute;top:-100px;left:8px;background:var(--orange,#FF6B35);color:#fff;padding:8px 16px;border-radius:0 0 8px 8px;font-weight:700;font-size:14px;z-index:99999;text-decoration:none;transition:top 0.2s;}
+.skip-link:focus{top:0;}
+
+/* Focus styles - visible for keyboard navigation */
+*:focus-visible{outline:2px solid #FF6B35;outline-offset:3px;border-radius:4px;}
+button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px solid #FF6B35;outline-offset:3px;}
+
+/* Reduced motion */
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:0.01ms!important;animation-iteration-count:1!important;transition-duration:0.01ms!important;}
+}
 </style>
 <style>
 *{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;}
@@ -993,7 +1007,7 @@ h1,h2,h3,h4,h5,h6{font-family:var(--font);letter-spacing:-0.02em;}
 </style>
 </head>
 <body> <!-- NAV -->
-<nav id="topNav"> <div class="nav-logo" onclick="showPage('home')"> CBUS<span>EVENTS</span> </div> <div class="nav-links"> <button class="nav-link" id="nav-home" onclick="showPage('home')">Home</button> <button class="nav-link" id="nav-venues" onclick="showPage('venues')">Venues</button> <button class="nav-link" id="nav-vendors" onclick="showPage('vendors')">Vendors</button> <button class="nav-link" id="nav-events" onclick="showPage('events')">Events</button> <div style="position:relative" id="columbusDropdown">
+<nav id="topNav"> <div class="nav-logo" onclick="showPage('home')" role="button" tabindex="0"> CBUS<span>EVENTS</span> </div> <div class="nav-links"> <button class="nav-link" id="nav-home" onclick="showPage('home')">Home</button> <button class="nav-link" id="nav-venues" onclick="showPage('venues')">Venues</button> <button class="nav-link" id="nav-vendors" onclick="showPage('vendors')">Vendors</button> <button class="nav-link" id="nav-events" onclick="showPage('events')">Events</button> <div style="position:relative" id="columbusDropdown">
   <button class="nav-link" onclick="toggleColumbusMenu()" style="display:flex;align-items:center;gap:4px">Columbus ▾</button>
   <div id="columbusMenu" style="display:none;position:absolute;top:calc(100% + 8px);left:0;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:8px;min-width:210px;box-shadow:0 16px 40px rgba(0,0,0,0.5);z-index:200;">
     <a href="https://cbusevents.com/gallery-hop.html" style="display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:8px;font-size:13px;font-weight:600;color:var(--text);text-decoration:none;transition:background 0.15s" onmouseover="this.style.background='rgba(255,255,255,0.05)'" onmouseout="this.style.background='transparent'">
@@ -1053,13 +1067,13 @@ h1,h2,h3,h4,h5,h6{font-family:var(--font);letter-spacing:-0.02em;}
   <a href="https://cbusevents.com/cbus-vendor-portal.html" class="nav-mobile-link" style="font-size:18px">Vendor</a>
   <a href="https://cbusevents.com/cbus-planner-portal.html" class="nav-mobile-link" style="font-size:18px">Event Planner</a>
   <a href="https://cbusevents.com/customer-portal.html" class="nav-mobile-link nav-mobile-cta" style="font-size:18px">Customer Account</a>
-</div> <div id="app"> <div style="min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px"> <div style="font-family:var(--font);font-weight:800;font-size:28px">CBUS<span style="color:#FF6B35">EVENTS</span></div> <div style="width:32px;height:32px;border:3px solid #25252f;border-top-color:#FF6B35;border-radius:50%;animation:spin 0.8s linear infinite"></div> <div style="color:#8888a0;font-size:13px">Loading Columbus venues...</div> </div>
+</div> <div id="app" id="main-content"> <div style="min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px"> <div style="font-family:var(--font);font-weight:800;font-size:28px">CBUS<span style="color:#FF6B35">EVENTS</span></div> <div style="width:32px;height:32px;border:3px solid #25252f;border-top-color:#FF6B35;border-radius:50%;animation:spin 0.8s linear infinite"></div> <div style="color:#8888a0;font-size:13px">Loading Columbus venues...</div> </div>
 </div> <!-- EVENT MODAL -->
-<div id="eventModal" style="display:none" class="modal-overlay" onclick="if(event.target===this)closeEventModal()"> <div class="modal" id="eventModalContent"></div>
+<div id="eventModal" style="display:none" class="modal-overlay" onclick="if(event.target===this)closeEventModal()" role="button" tabindex="0"> <div class="modal" id="eventModalContent"></div>
 </div>
 
 <!-- VENDOR MODAL -->
-<div id="vendorModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:500;overflow-y:auto;padding:20px 16px;" onclick="if(event.target===this)closeVendorModal()">
+<div id="vendorModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:500;overflow-y:auto;padding:20px 16px;" onclick="if(event.target===this)closeVendorModal()" role="button" tabindex="0">
  <div style="background:var(--card);border:1px solid var(--border);border-radius:16px;max-width:520px;margin:0 auto;overflow:hidden" id="vendorModalContent"></div>
 </div> <script src="https://unpkg.com/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 
@@ -1136,7 +1150,7 @@ async function init(){
  try {
  const [vRes,eRes,vendRes]=await Promise.all([
  sb.from('venues').select('*').eq('status','approved').order('tier',{ascending:false}),
- sb.from('events').select('*,lat,lng,venues(name,neighborhood,lat,lng)').eq('status','published')
+ sb.from('events').select('*,venues(name,neighborhood,lat,lng)').eq('status','published')
  .gte('start_time',new Date().toISOString()).order('start_time',{ascending:true}),
  sb.from('vendors').select('*').order('admin_promoted',{ascending:false})
  ]);
@@ -1256,7 +1270,7 @@ function renderFeaturedEvent(){
   if(!slot)return;
   var fe=allEvents.find(function(e){return isPromoted(e);});
   if(!fe){slot.innerHTML='';return;}
-  var img=fe.cover_image_url?'<div style="position:relative;height:180px;overflow:hidden"><img src="'+fe.cover_image_url+'" style="width:100%;height:100%;object-fit:cover"/><div style="position:absolute;inset:0;background:linear-gradient(to bottom,transparent 30%,#0f0a00 100%)"></div></div>':'';
+  var img=fe.cover_image_url?'<div style="position:relative;height:180px;overflow:hidden"><img src="'+fe.cover_image_url+'" alt=""  style="width:100%;height:100%;object-fit:cover"/><div style="position:absolute;inset:0;background:linear-gradient(to bottom,transparent 30%,#0f0a00 100%)"></div></div>':'';
   var price=fe.is_free?'<span style="background:#0a2a14;border:1px solid #22c55e40;border-radius:8px;padding:6px 12px;font-size:13px;color:#22c55e;font-weight:700">Free</span>':(fe.price_min?'<span style="background:var(--card);border-radius:8px;padding:6px 12px;font-size:13px">From $'+fe.price_min+'</span>':'');
   var venueLine=(fe.venues&&fe.venues.name)?'<div style="font-size:13px;color:#8888a0;margin-bottom:6px">'+fe.venues.name+(fe.venues.neighborhood?' - '+fe.venues.neighborhood:'')+'</div>':'';
   var desc=fe.description?'<div style="font-size:13px;color:#8888a0;max-width:480px;line-height:1.6">'+fe.description+'</div>':'';
@@ -1293,7 +1307,7 @@ function renderHomeEventCards(events){
       </div>`).join('');
   }
   return items.map((e,i)=>`
-    <div class="rh-event-card" onclick="openEventModal('${e.id}')">
+    <div class="rh-event-card" onclick="openEventModal('${e.id}')" role="button" tabindex="0">
       <div class="rh-event-card-img">
         ${e.cover_image_url?`<img src="${e.cover_image_url}" alt="${e.title}" onerror="this.parentNode.innerHTML='<span>${HOME_EVENT_ICONS[i]}</span>'">`:`<span>${HOME_EVENT_ICONS[i%HOME_EVENT_ICONS.length]}</span>`}
         ${e.is_boosted?'<div class="rh-badge-featured">Featured</div>':''}
@@ -1402,7 +1416,7 @@ function renderHome(){
      </div>
      <!-- Slide dots -->
      <div id="heroDots" style="display:flex;gap:6px">
-       ${HERO_SLIDES.map((_,i)=>`<div class="hero-dot${i===0?' active':''}" onclick="goSlide(${i})" style="width:${i===0?'36px':'24px'};height:3px;border-radius:2px;background:${i===0?'var(--orange)':'rgba(255,255,255,0.2)'};cursor:pointer;transition:all 0.3s"></div>`).join('')}
+       ${HERO_SLIDES.map((_,i)=>`<div class="hero-dot${i===0?' active':''}" onclick="goSlide(${i})" style="width:${i===0?'36px':'24px'};height:3px;border-radius:2px;background:${i===0?'var(--orange)':'rgba(255,255,255,0.2)'};cursor:pointer;transition:all 0.3s" role="button" tabindex="0"></div>`).join('')}
      </div>
    </div>
 
@@ -1441,7 +1455,7 @@ function renderHome(){
      <div id="catAll" onclick="filterHomeMap('All',this)"
        style="position:relative;border-radius:var(--r-lg);overflow:hidden;cursor:pointer;transition:transform 0.2s;aspect-ratio:4/3;min-height:100px;outline:3px solid var(--orange);outline-offset:2px"
        onmouseover="this.style.transform='scale(1.02)'"
-       onmouseout="this.style.transform='scale(1)'">
+       onmouseout="this.style.transform='scale(1)'" role="button" tabindex="0">
        <div style="position:absolute;inset:0;background:linear-gradient(135deg,#1a0800,#0f0f1a)"></div>
        <div style="position:absolute;inset:0;padding:14px 16px;display:flex;flex-direction:column;justify-content:flex-end">
          <div style="font-family:var(--font);font-weight:800;font-size:15px;color:#fff;margin-bottom:3px;letter-spacing:-0.02em">All Events</div>
@@ -1452,7 +1466,7 @@ function renderHome(){
        <div id="cat${cat.key}" onclick="filterHomeMap('${cat.key}',this)"
          style="position:relative;border-radius:var(--r-lg);overflow:hidden;cursor:pointer;transition:all 0.2s;aspect-ratio:4/3;min-height:100px"
          onmouseover="this.style.transform='scale(1.02)'"
-         onmouseout="this.style.transform='scale(1)'">
+         onmouseout="this.style.transform='scale(1)'" role="button" tabindex="0">
          <img src="${cat.img}" alt="${cat.name}"
            style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:transform 0.4s"
            loading="lazy" onerror="this.style.display='none'">
@@ -1526,11 +1540,11 @@ function renderHome(){
          <div onclick="openEventModal('${e.id}')"
            style="cursor:pointer;transition:transform 0.2s"
            onmouseover="this.style.transform='translateY(-3px)'"
-           onmouseout="this.style.transform='translateY(0)'">
+           onmouseout="this.style.transform='translateY(0)'" role="button" tabindex="0">
            <!-- Image -->
            <div style="width:100%;aspect-ratio:1/1;border-radius:16px;overflow:hidden;background:var(--surface);margin-bottom:14px;position:relative">
              ${img
-               ? `<img src="${img}" alt="${e.title}" style="width:100%;height:100%;object-fit:cover">`
+               ? `<img src="${img}" alt="${e.title}" alt=""  style="width:100%;height:100%;object-fit:cover">`
                : `<div style="width:100%;height:100%;background:linear-gradient(135deg,rgba(255,107,53,0.15),rgba(129,140,248,0.1))"></div>`
              }
              ${tw ? `<div style="position:absolute;top:10px;left:10px;background:var(--green);color:#000;font-family:var(--mono);font-size:8px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;padding:3px 9px;border-radius:9999px">This Week</div>` : ''}
@@ -1604,7 +1618,7 @@ function renderHome(){
      ${(venueScroll.length?venueScroll:allVenues.slice(0,6)).map(v=>{
        const img = getVenueImg(v);
        const venueEvents = allEvents.filter(e=>e.venue_id===v.id&&isThisWeek(e.start_time)).length;
-       return `<div class="rh-venue-card" onclick="showPage('venue',allVenues.find(x=>x.id==='${v.id}'))">
+       return `<div class="rh-venue-card" onclick="showPage('venue',allVenues.find(x=>x.id==='${v.id}'))" role="button" tabindex="0">
          <div class="rh-venue-img">${img?`<img src="${img}" alt="${v.name}" onerror="this.style.display='none'">`:''}
            ${v.is_featured?'<div class="rh-badge-featured">Featured</div>':''}
            <span class="rh-venue-tag">${v.venue_type||'Venue'}</span>
@@ -1617,48 +1631,11 @@ function renderHome(){
          </div>
        </div>`;
      }).join('')}
-     <div class="rh-venue-card" onclick="window.location.href='https://cbusevents.com/signup.html?role=venue'" style="border:1px dashed rgba(255,107,53,0.3);background:rgba(255,107,53,0.03);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:24px 16px">
+     <div class="rh-venue-card" onclick="window.location.href='https://cbusevents.com/signup.html?role=venue'" style="border:1px dashed rgba(255,107,53,0.3);background:rgba(255,107,53,0.03);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:24px 16px" role="button" tabindex="0">
        <div style="font-family:var(--font);font-weight:700;font-size:14px;color:var(--text);margin-bottom:5px">Your Venue Here</div>
        <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:var(--orange);margin-bottom:8px">Founding spots open</div>
        <div style="font-family:var(--mono);font-size:8px;letter-spacing:0.08em;color:var(--muted)">List free · Be discoverable</div>
      </div>
-   </div>
- </section>
-
- <!-- ══════════════════════════════════════════
-      COLUMBUS COMMUNITIES
- ══════════════════════════════════════════ -->
- <section style="padding:52px 48px;background:var(--bg);">
-   <div style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:20px">
-     <div>
-       <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.2em;text-transform:uppercase;color:var(--orange);margin-bottom:6px">Columbus Communities</div>
-       <h2 style="font-family:var(--font);font-size:22px;font-weight:800;letter-spacing:-0.03em;color:var(--text)">Find Your Scene</h2>
-     </div>
-     <a href="https://cbusevents.com/community.html" style="font-family:var(--mono);font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:var(--orange);text-decoration:none">All Communities</a>
-   </div>
-   <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px">
-     ${[
-       {slug:'black-columbus',      label:'Black Columbus',        accent:'#fbbf24'},
-       {slug:'latino-columbus',     label:'Latino Columbus',       accent:'#f87171'},
-       {slug:'lgbtq-columbus',      label:'LGBTQ+ Columbus',       accent:'#818cf8'},
-       {slug:'arts-creative',       label:'Arts & Creative',       accent:'#f472b6'},
-       {slug:'tech-startup',        label:'Tech & Startup',        accent:'#60a5fa'},
-       {slug:'osu-campus',          label:'OSU & Campus',          accent:'#ef4444'},
-       {slug:'young-professionals', label:'Young Professionals',   accent:'#2dd4bf'},
-       {slug:'short-north-scene',   label:'Short North',           accent:'#FF6B35'},
-       {slug:'south-asian',         label:'South Asian',           accent:'#a78bfa'},
-       {slug:'west-african',        label:'West African',          accent:'#fb923c'},
-       {slug:'somali-east-african', label:'Somali & East African', accent:'#34d399'},
-       {slug:'faith-communities',   label:'Faith Communities',     accent:'#fef08a'},
-     ].map(c=>`
-       <a href="https://cbusevents.com/community.html?c=${c.slug}"
-         style="background:var(--card);border:1px solid var(--border);border-radius:var(--r-lg);padding:16px;text-decoration:none;display:block;transition:all 0.18s"
-         onmouseover="this.style.borderColor='${c.accent}';this.style.transform='translateY(-2px)'"
-         onmouseout="this.style.borderColor='var(--border)';this.style.transform='translateY(0)'">
-         <div style="width:28px;height:3px;border-radius:2px;background:${c.accent};margin-bottom:10px"></div>
-         <div style="font-family:var(--font);font-weight:700;font-size:13px;color:var(--text);letter-spacing:-0.01em;line-height:1.3">${c.label}</div>
-         <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-top:5px">View events</div>
-       </a>`).join('')}
    </div>
  </section>
 
@@ -1754,7 +1731,7 @@ function initHero(){
  slidesEl.innerHTML=HERO_SLIDES.map((s,i)=>`
  <div class="hero-slide${i===0?' active':''}" style="background-image:url('${s.bg}')"></div> `).join('');
  dotsEl.innerHTML=HERO_SLIDES.map((_,i)=>`
- <div class="hero-dot${i===0?' active':''}" onclick="goSlide(${i})"></div> `).join('');
+ <div class="hero-dot${i===0?' active':''}" onclick="goSlide(${i})" role="button" tabindex="0"></div> `).join('');
  heroIdx=0;
  heroTimer=setInterval(()=>goSlide((heroIdx+1)%HERO_SLIDES.length),5000);
 }
@@ -1858,7 +1835,7 @@ function showHomeMapPopup(e){
   if(!popup) return;
 
   img.innerHTML = e.cover_image_url
-    ? `<img src="${e.cover_image_url}" style="width:100%;height:100%;object-fit:cover" onerror="this.style.display='none'">`
+    ? `<img src="${e.cover_image_url}" alt=""  style="width:100%;height:100%;object-fit:cover" onerror="this.style.display='none'">`
     : `<div style="width:100%;height:100%;background:linear-gradient(135deg,rgba(255,107,53,0.15),rgba(129,140,248,0.1))"></div>`;
   cat.textContent   = e.category || 'Event';
   title.textContent = e.title;
@@ -1913,9 +1890,9 @@ function filterHomeMap(category, clickedEl){
     return `<div onclick="openEventModal('${e.id}')"
       style="cursor:pointer;transition:transform 0.2s;scroll-snap-align:start;flex:0 0 72vw;max-width:280px"
       onmouseover="this.style.transform='translateY(-3px)'"
-      onmouseout="this.style.transform='translateY(0)'">
+      onmouseout="this.style.transform='translateY(0)'" role="button" tabindex="0">
       <div style="width:100%;aspect-ratio:1/1;border-radius:16px;overflow:hidden;background:var(--surface);margin-bottom:12px;position:relative">
-        ${img?`<img src="${img}" alt="${e.title}" style="width:100%;height:100%;object-fit:cover">`:`<div style="width:100%;height:100%;background:linear-gradient(135deg,rgba(255,107,53,0.15),rgba(129,140,248,0.1))"></div>`}
+        ${img?`<img src="${img}" alt="${e.title}" alt=""  style="width:100%;height:100%;object-fit:cover">`:`<div style="width:100%;height:100%;background:linear-gradient(135deg,rgba(255,107,53,0.15),rgba(129,140,248,0.1))"></div>`}
         ${tw?`<div style="position:absolute;top:10px;left:10px;background:var(--green);color:#000;font-family:var(--mono);font-size:8px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;padding:3px 9px;border-radius:9999px">This Week</div>`:''}
         ${e.is_third_party?`<div style="position:absolute;top:10px;right:10px;background:rgba(8,8,16,0.7);color:var(--sub);font-family:var(--mono);font-size:8px;letter-spacing:0.08em;padding:2px 8px;border-radius:9999px;border:1px solid var(--border)">Ticketmaster</div>`:''}
       </div>
@@ -1948,7 +1925,7 @@ function buildHeroCards(){
    }]:[])
  ];
  el.innerHTML=items.map(item=>`
-   <div class="hero-card" onclick="${item.onclick}">
+   <div class="hero-card" onclick="${item.onclick}" role="button" tabindex="0">
      <div class="hero-card-icon">${item.icon}</div>
      <div style="flex:1;min-width:0">
        <div class="hero-card-label">${item.label}</div>
@@ -2149,7 +2126,7 @@ function showMapPopup(venue){
  window._mapPopupVenue=venue;
  const popup=document.getElementById('mapPopup');
  const img=getVenueImg(venue);
- document.getElementById('mapPopupImg').innerHTML=img?`<img src="${img}" style="width:100%;height:100%;object-fit:cover;" onerror="this.style.display='none'">`:'';
+ document.getElementById('mapPopupImg').innerHTML=img?`<img src="${img}" alt=""  style="width:100%;height:100%;object-fit:cover;" onerror="this.style.display='none'">`:'';
  document.getElementById('mapPopupType').textContent=venue.venue_type||'Venue';
  document.getElementById('mapPopupName').textContent=venue.name;
  document.getElementById('mapPopupHood').textContent=venue.neighborhood?`${venue.neighborhood}, Columbus`:'Columbus, OH';
@@ -2392,9 +2369,9 @@ function venueCard(v){
  const img=getVenueImg(v);
  const tw=allEvents.filter(e=>e.venue_id===v.id&&isThisWeek(e.start_time)).length;
  const totalEvents=allEvents.filter(e=>e.venue_id===v.id).length;
- return`<div class="venue-card" onclick="showPage('venue',allVenues.find(x=>x.id==='${v.id}'))">
+ return`<div class="venue-card" onclick="showPage('venue',allVenues.find(x=>x.id==='${v.id}'))" role="button" tabindex="0">
    <div style="width:100%;height:200px;overflow:hidden;position:relative;background:linear-gradient(135deg,rgba(255,107,53,0.08),rgba(129,140,248,0.06));flex-shrink:0">
-     ${img?`<img src="${img}" alt="${v.name}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:transform 0.4s" onerror="this.style.display='none'">`:''}
+     ${img?`<img src="${img}" alt="${v.name}" alt=""  style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:transform 0.4s" onerror="this.style.display='none'">`:''}
      <div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(8,8,16,0.5) 0%,transparent 60%);pointer-events:none"></div>
      ${v.tier==='premium'?'<div style="position:absolute;top:10px;right:10px;background:rgba(251,191,36,0.9);color:#000;border-radius:9999px;padding:2px 10px;font-size:10px;font-weight:700">Premium</div>':v.tier==='standard'?'<div style="position:absolute;top:10px;right:10px;background:rgba(129,140,248,0.9);color:#fff;border-radius:9999px;padding:2px 10px;font-size:10px;font-weight:700">Standard</div>':''}
      ${v.is_featured?'<div style="position:absolute;top:10px;left:10px;background:var(--orange);color:#fff;border-radius:9999px;padding:2px 10px;font-size:10px;font-weight:700">Featured</div>':''}
@@ -2426,9 +2403,9 @@ function vendorCard(v){
  else if(catLower.includes('floral')||catLower.includes('flower')) {placeholderIcon='';placeholderBg='linear-gradient(135deg,#0a1a00,#0b0b0f)';}
  else if(catLower.includes('video'))  {placeholderIcon='';placeholderBg='linear-gradient(135deg,#001a1a,#0b0b0f)';}
  else if(catLower.includes('design')) {placeholderIcon='';placeholderBg='linear-gradient(135deg,#10001a,#0b0b0f)';}
- return`<div class="venue-card" onclick="openVendorModal('${v.id}')" style="cursor:pointer">
+ return`<div class="venue-card" onclick="openVendorModal('${v.id}')" style="cursor:pointer" role="button" tabindex="0">
    <div class="venue-card-img">
-     ${img?`<img src="${img}" alt="${name}" style="width:100%;height:100%;object-fit:cover" onerror="this.parentNode.innerHTML='<div style=\\'width:100%;height:170px;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:40px;${placeholderBg}\\'>${placeholderIcon}</div>'">`
+     ${img?`<img src="${img}" alt="${name}" style="width:100%;height:100%;object-fit:cover" onerror="this.parentNode.innerHTML='<div alt=""  style=\\'width:100%;height:170px;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:40px;${placeholderBg}\\'>${placeholderIcon}</div>'">`
      :`<div style="width:100%;height:170px;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:40px;background:${placeholderBg}">${placeholderIcon}</div>`}
      ${promoted?'<div class="venue-badge" style="background:#f59e0b">Featured</div>':''}
    </div>
@@ -2445,9 +2422,9 @@ function eventCard(e){
  const tw=isThisWeek(e.start_time);
  const venueName=e.venue_name_override||e.venues?.name||'Columbus Venue';
  const img=e.cover_image_url;
- return`<div onclick="openEventModal('${e.id}')" style="cursor:pointer;transition:transform 0.2s" onmouseover="this.style.transform='translateY(-3px)'" onmouseout="this.style.transform='translateY(0)'">
+ return`<div onclick="openEventModal('${e.id}')" style="cursor:pointer;transition:transform 0.2s" onmouseover="this.style.transform='translateY(-3px)'" onmouseout="this.style.transform='translateY(0)'" role="button" tabindex="0">
    <div style="width:100%;aspect-ratio:1/1;border-radius:16px;overflow:hidden;background:var(--surface);margin-bottom:14px;position:relative">
-     ${img?`<img src="${img}" alt="${e.title}" style="width:100%;height:100%;object-fit:cover" onerror="this.style.display='none'">`:`<div style="width:100%;height:100%;background:linear-gradient(135deg,rgba(255,107,53,0.12),rgba(129,140,248,0.08))"></div>`}
+     ${img?`<img src="${img}" alt="${e.title}" alt=""  style="width:100%;height:100%;object-fit:cover" onerror="this.style.display='none'">`:`<div style="width:100%;height:100%;background:linear-gradient(135deg,rgba(255,107,53,0.12),rgba(129,140,248,0.08))"></div>`}
      ${tw?`<div style="position:absolute;top:10px;left:10px;background:var(--green);color:#000;font-family:var(--mono);font-size:8px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;padding:3px 9px;border-radius:9999px">This Week</div>`:''}
      ${e.is_boosted?`<div style="position:absolute;top:10px;left:10px;background:var(--orange);color:#fff;font-family:var(--mono);font-size:8px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;padding:3px 9px;border-radius:9999px">Featured</div>`:''}
      ${e.is_third_party?`<div style="position:absolute;top:10px;right:10px;background:rgba(8,8,16,0.7);color:var(--sub);font-family:var(--mono);font-size:8px;letter-spacing:0.08em;padding:2px 8px;border-radius:9999px;border:1px solid var(--border)">Ticketmaster</div>`:''}
@@ -2459,8 +2436,89 @@ function eventCard(e){
 }
 
 // ── EVENT MODAL ───────────────────────────────────────────────
-function openEventModal(id){
-  window.location.href = 'https://cbusevents.com/event.html?id=' + id;
+async function openEventModal(id){
+ const e=allEvents.find(x=>x.id===id);
+ if(!e)return;
+ const venue=allVenues.find(v=>v.id===e.venue_id);
+
+ // Fetch ticket tiers from Supabase
+ let tiers=[];
+ if(!e.is_free){
+   const {data}=await sb.from('ticket_tiers').select('*').eq('event_id',e.id).order('price',{ascending:true});
+   tiers=data||[];
+ }
+
+
+ // Build ticket tiers HTML safely (no nested template literal quoting issues)
+ const tiersHtml=()=>{
+   // Third-party Ticketmaster event — always link out
+   if(e.is_third_party){
+     const src=e.ticket_source||'Ticketmaster';
+     if(e.ticket_url){
+       return '<div style="margin-bottom:16px">'
+         +'<div style="font-family:var(--mono);font-size:9px;letter-spacing:0.14em;text-transform:uppercase;color:var(--muted);margin-bottom:10px">Tickets via '+src+'</div>'
+         +'<a href="'+e.ticket_url+'" target="_blank" rel="noopener" style="display:block;background:var(--orange);color:#fff;font-family:var(--font);font-weight:700;font-size:15px;padding:14px;border-radius:var(--r-md);text-align:center;text-decoration:none;margin-bottom:8px">Get Tickets on '+src+' →</a>'
+         +'<div style="font-size:11px;color:var(--muted);text-align:center">You will be redirected to '+src+' to complete your purchase.</div>'
+         +'</div>';
+     }
+     return '<div style="color:var(--muted);font-size:13px;margin-bottom:16px">Visit '+src+' for ticket information.</div>';
+   }
+   if(e.is_free&&!e.is_third_party)return'<div style="background:rgba(52,211,153,0.08);border:1px solid rgba(52,211,153,0.2);border-radius:var(--r-md);padding:14px 16px;margin-bottom:16px;display:flex;align-items:center;gap:10px"><div><div style="font-weight:700;color:var(--green)">Free Event</div><div style="font-size:12px;color:var(--sub);margin-top:2px">No ticket required</div></div></div>';
+   if(tiers.length===0){
+     if(e.ticket_url)return'<a href="'+e.ticket_url+'" target="_blank" style="display:block;margin-bottom:16px"><button class="btn-primary" style="width:100%">Get Tickets &rarr;</button></a>';
+     return'';
+   }
+   let rows='';
+   tiers.forEach(function(t){
+     var remaining=t.quantity_remaining;
+     var soldOut=remaining!==null&&remaining<=0;
+     var priceLabel=t.price===0?'Free':'$'+t.price;
+     var priceColor=t.price===0?'#22c55e':'var(--orange)';
+     var btn=soldOut
+       ?'<button disabled style="background:var(--card);color:#555;border:1px solid var(--border);border-radius:8px;padding:8px 16px;font-size:13px;font-weight:700;cursor:not-allowed;font-family:var(--font)">Sold Out</button>'
+       :'<button class="cbus-buy-btn" data-eid="'+e.id+'" data-tid="'+t.id+'" data-tname="'+t.name.replace(/"/g,'&quot;')+'" data-price="'+t.price+'" style="background:#FF6B35;color:#fff;border:none;border-radius:8px;padding:8px 16px;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font)">Buy &rarr;</button>';
+     rows+='<div style="display:flex;justify-content:space-between;align-items:center;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px 16px;margin-bottom:8px">'
+       +'<div>'
+       +'<div style="font-weight:700;font-size:14px">'+t.name+'</div>'
+       +(t.description?'<div style="font-size:12px;color:var(--sub);margin-top:2px">'+t.description+'</div>':'')
+       +(remaining!==null?'<div style="font-size:11px;color:'+(remaining<10?'#ef4444':'#888')+';margin-top:3px">'+remaining+' left</div>':'')
+       +'</div>'
+       +'<div style="display:flex;align-items:center;gap:10px;flex-shrink:0">'
+       +'<div style="font-family:var(--font);font-weight:800;font-size:16px;color:'+priceColor+'">'+priceLabel+'</div>'
+       +btn
+       +'</div>'
+       +'</div>';
+   });
+   return'<div style="margin-bottom:16px"><div style="font-size:12px;font-weight:700;color:#8888a0;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">Tickets</div>'+rows+'</div>';
+ };
+
+ document.getElementById('eventModalContent').innerHTML=`
+ <div style="position:relative">
+   ${e.cover_image_url?`<img src="${e.cover_image_url}" alt="${e.title}" alt=""  style="width:100%;height:200px;object-fit:cover" onerror="this.style.display='none'">`:`<div style="width:100%;height:140px;display:flex;align-items:center;justify-content:center;font-size:52px;background:var(--surface)">&#127881;</div>`}
+   <button class="modal-close-btn" onclick="closeEventModal()" aria-label="Close">&times;</button>
+   ${isThisWeek(e.start_time)?`<div style="position:absolute;top:12px;left:12px;background:var(--green);color:#000;border-radius:20px;padding:3px 12px;font-size:11px;font-weight:700">THIS WEEK</div>`:''}
+ </div>
+ <div style="padding:24px">
+   <div style="font-size:11px;color:var(--orange);font-weight:700;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px">${e.category||'Event'}</div>
+   <h2 style="font-family:var(--font);font-size:22px;font-weight:800;margin-bottom:14px">${e.title}</h2>
+   <div style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:16px">
+     <span style="background:var(--surface);border-radius:8px;padding:6px 12px;font-size:13px">&#128197; ${fmt(e.start_time)}</span>
+     <span style="background:var(--surface);border-radius:8px;padding:6px 12px;font-size:13px">&#128336; ${fmtTime(e.start_time)}</span>
+     ${e.end_time?`<span style="background:var(--surface);border-radius:8px;padding:6px 12px;font-size:13px">Until ${fmtTime(e.end_time)}</span>`:''}
+     ${(e.is_free&&!e.is_third_party)?`<span style="background:rgba(52,211,153,0.1);border:1px solid rgba(52,211,153,0.2);border-radius:var(--r-sm);padding:5px 12px;font-size:12px;font-weight:700;color:var(--green)">Free</span>`:e.price_min!=null?`<span style="background:var(--surface);border-radius:8px;padding:6px 12px;font-size:13px">From $${e.price_min}${e.price_max&&e.price_max!==e.price_min?` \u2013 $${e.price_max}`:''}</span>`:''}
+   </div>
+   ${venue?`<div style="display:flex;align-items:center;gap:10px;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-bottom:16px;cursor:pointer" onclick="closeEventModal();showPage('venue',allVenues.find(x=>x.id==='${venue.id}'))" role="button" tabindex="0"><div style="font-size:24px">${venueEmoji(venue.venue_type)}</div><div><div style="font-weight:600;font-size:14px">${venue.name}</div><div style="font-size:12px;color:var(--sub)">${venue.neighborhood||venue.city} \u2014 click to view venue</div></div></div>`:''}
+   ${(e.description&&!e.description.toLowerCase().includes('ticket delivery')&&!e.description.toLowerCase().includes('delayed'))?`<p style="color:var(--sub);font-size:14px;line-height:1.7;margin-bottom:20px">${e.description}</p>`:''}
+   ${tiersHtml()}
+   <div id="ticketMsg" style="display:none;background:var(--card);border-radius:10px;padding:14px;margin-bottom:16px;font-size:13px;text-align:center;color:#8888a0"></div>
+   <div style="display:flex;gap:10px;flex-wrap:wrap">
+     ${venue?`<button class="btn-secondary" onclick="closeEventModal();showPage('venue',allVenues.find(x=>x.id==='${venue.id}'))">View Venue</button>`:''}
+     <button onclick="(function(){var url='https://cbusevents.com/event.html?id=${e.id}';if(navigator.share){navigator.share({title:'${e.title}',url:url});}else{navigator.clipboard.writeText(url).then(function(){alert('Link copied!');});}})()" style="background:var(--surface);color:var(--sub);border:1px solid var(--border);border-radius:8px;padding:10px 16px;font-size:14px;cursor:pointer;font-family:var(--font);">&#128279; Share</button>
+     <button id="modalSaveBtn" onclick="toggleSaveEvent('${e.id}',this,event)" style="background:${savedEventIds.has(e.id)?'#FF6B3520':'var(--surface)'};color:${savedEventIds.has(e.id)?'var(--orange)':'var(--sub)'};border:1px solid var(--border);border-radius:8px;padding:10px 16px;font-size:14px;cursor:pointer;font-family:var(--font);">${savedEventIds.has(e.id)?'\u2665 Saved':'\u2661 Save Event'}</button>
+   </div>
+ </div>`;
+ document.getElementById('eventModal').style.display='flex';
+ document.body.style.overflow='hidden';
 }
 async function buyTicket(eventId, tierId, tierName, price){
  const msgEl=document.getElementById('ticketMsg');
@@ -2510,7 +2568,7 @@ function openVendorModal(id){
  else if(catLower.includes('video'))  {placeholderIcon='';placeholderBg='#001a1a';}
  else if(catLower.includes('design')) {placeholderIcon='';placeholderBg='#10001a';}
  document.getElementById('vendorModalContent').innerHTML=`
- ${img?`<img src="${img}" alt="${name}" style="width:100%;height:200px;object-fit:cover" onerror="this.style.display='none'"/>`:
+ ${img?`<img src="${img}" alt="${name}" alt=""  style="width:100%;height:200px;object-fit:cover" onerror="this.style.display='none'"/>`:
  `<div style="width:100%;height:120px;background:${placeholderBg};display:flex;align-items:center;justify-content:center;font-size:52px">${placeholderIcon}</div>`}
  <div style="padding:24px">
    ${promoted?'<div style="display:inline-block;background:#f59e0b;color:#000;border-radius:20px;padding:3px 12px;font-size:11px;font-weight:700;margin-bottom:10px">Featured Vendor</div>':''}
@@ -2552,7 +2610,7 @@ function closeVendorModal(){
 
 // ── FOOTER ────────────────────────────────────────────────────
 function footer(){
- return`<footer> <div class="footer-grid"> <div> <div class="footer-logo">CBUS<span>EVENTS</span></div> <p class="footer-desc">The Columbus event directory connecting venues, organizers, and audiences. Discover spaces, find events, make things happen.</p> </div> <div class="footer-col"> <h4>Discover</h4> <div class="footer-link" onclick="showPage('venues')">All Venues</div> <div class="footer-link" onclick="showPage('events')">Upcoming Events</div> <a class="footer-link" href="https://cbusevents.com/blog.html" style="text-decoration:none">Columbus Blog</a> <div class="footer-link" onclick="showPage('category','bars')">Bars & Nightlife</div> <div class="footer-link" onclick="showPage('category','comedy')">Comedy Clubs</div> <div class="footer-link" onclick="showPage('category','rooftop')">Rooftop Bars</div> </div> <div class="footer-col"> <h4>For Venues</h4> <div class="footer-link" onclick="window.location.href='https://cbusevents.com/signup.html?role=venue'">List Your Venue</div> <div class="footer-link" onclick="window.location.href='https://cbusevents.com/signup.html'">Manage Events</div> <div class="footer-link" onclick="showPricing()">Pricing Plans</div> <div class="footer-link" onclick="window.location.href='https://cbusevents.com/signup.html'">Venue Sign In</div> </div> <div class="footer-col"> <h4>For Planners</h4> <div class="footer-link" onclick="window.location.href='https://cbusevents.com/signup.html?role=planner'">Create Free Account</div> <div class="footer-link" onclick="window.location.href='https://cbusevents.com/signup.html'">Browse Venues</div> <div class="footer-link" onclick="window.location.href='https://cbusevents.com/signup.html'">List Your Event</div> <div class="footer-link" onclick="window.location.href='https://cbusevents.com/signup.html'">Boost an Event</div> </div> <div class="footer-col"> <h4>Columbus</h4> <div class="footer-link" onclick="homeNeighborhood&&homeNeighborhood('Short North',{classList:{remove:()=>{},add:()=>{}}})">Short North</div> <div class="footer-link">Downtown</div> <div class="footer-link">Clintonville</div> <div class="footer-link">Easton</div> <div class="footer-link">Brewery District</div> </div> </div> <div class="footer-bottom"> <span class="footer-copy">© 2026 CBUSEVENTS · Columbus, Ohio</span> <div style="display:flex;align-items:center;gap:20px"> <span class="footer-copy">Made for Columbus </span> <a href="https://cbusevents.com/cbus-admin.html" style="color:var(--muted);font-size:11px;font-weight:600;letter-spacing:0.5px;opacity:0.5;transition:opacity 0.2s" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.5'">Admin</a> </div> </div> </footer>`;
+ return`<footer> <div class="footer-grid"> <div> <div class="footer-logo">CBUS<span>EVENTS</span></div> <p class="footer-desc">The Columbus event directory connecting venues, organizers, and audiences. Discover spaces, find events, make things happen.</p> </div> <div class="footer-col"> <h4>Discover</h4> <div class="footer-link" onclick="showPage('venues')">All Venues</div> <div class="footer-link" onclick="showPage('events')">Upcoming Events</div> <a class="footer-link" href="https://cbusevents.com/blog.html" style="text-decoration:none">Columbus Blog</a> <div class="footer-link" onclick="showPage('category','bars')">Bars & Nightlife</div> <div class="footer-link" onclick="showPage('category','comedy')">Comedy Clubs</div> <div class="footer-link" onclick="showPage('category','rooftop')">Rooftop Bars</div> </div> <div class="footer-col"> <h4>For Venues</h4> <div class="footer-link" onclick="window.location.href='https://cbusevents.com/signup.html?role=venue'">List Your Venue</div> <div class="footer-link" onclick="window.location.href='https://cbusevents.com/signup.html'">Manage Events</div> <div class="footer-link" onclick="showPricing()">Pricing Plans</div> <div class="footer-link" onclick="window.location.href='https://cbusevents.com/signup.html'">Venue Sign In</div> </div> <div class="footer-col"> <h4>For Planners</h4> <div class="footer-link" onclick="window.location.href='https://cbusevents.com/signup.html?role=planner'" role="button" tabindex="0">Create Free Account</div> <div class="footer-link" onclick="window.location.href='https://cbusevents.com/signup.html'" role="button" tabindex="0">Browse Venues</div> <div class="footer-link" onclick="window.location.href='https://cbusevents.com/signup.html'" role="button" tabindex="0">List Your Event</div> <div class="footer-link" onclick="window.location.href='https://cbusevents.com/signup.html'" role="button" tabindex="0">Boost an Event</div> </div> <div class="footer-col"> <h4>Columbus</h4> <div class="footer-link" onclick="homeNeighborhood&&homeNeighborhood('Short North',{classList:{remove:()=>{},add:()=>{}}})" role="button" tabindex="0">Short North</div> <div class="footer-link">Downtown</div> <div class="footer-link">Clintonville</div> <div class="footer-link">Easton</div> <div class="footer-link">Brewery District</div> </div> </div> <div class="footer-bottom"> <span class="footer-copy">© 2026 CBUSEVENTS · Columbus, Ohio</span> <div style="display:flex;align-items:center;gap:20px"> <span class="footer-copy">Made for Columbus </span> <a href="https://cbusevents.com/cbus-admin.html" style="color:var(--muted);font-size:11px;font-weight:600;letter-spacing:0.5px;opacity:0.5;transition:opacity 0.2s" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.5'">Admin</a> </div> </div> </footer>`;
 }
 
 

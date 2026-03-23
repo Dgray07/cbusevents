@@ -1,14 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <!-- Google tag (gtag.js) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-P70BRSL5E5"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-      gtag('config', 'G-P70BRSL5E5');
-    </script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title id="pageTitle">Event — CBUSEVENTS</title>
@@ -179,14 +171,28 @@ footer{background:var(--surface);border-top:1px solid var(--border);padding:24px
   footer{padding:20px;}
   .more-grid{grid-template-columns:1fr 1fr;}
 }
+
+/* ── ADA COMPLIANCE ── */
+/* Skip navigation */
+.skip-link{position:absolute;top:-100px;left:8px;background:var(--orange,#FF6B35);color:#fff;padding:8px 16px;border-radius:0 0 8px 8px;font-weight:700;font-size:14px;z-index:99999;text-decoration:none;transition:top 0.2s;}
+.skip-link:focus{top:0;}
+
+/* Focus styles - visible for keyboard navigation */
+*:focus-visible{outline:2px solid #FF6B35;outline-offset:3px;border-radius:4px;}
+button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px solid #FF6B35;outline-offset:3px;}
+
+/* Reduced motion */
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:0.01ms!important;animation-iteration-count:1!important;transition-duration:0.01ms!important;}
+}
 </style>
 </head>
 <body>
 
 <!-- NAV -->
 <nav>
-  <div class="nav-logo" onclick="window.location.href='https://cbusevents.com'">CBUS<span>EVENTS</span></div>
-  <div class="nav-back" onclick="window.location.href='https://cbusevents.com'">
+  <div class="nav-logo" onclick="window.location.href='https://cbusevents.com'" role="button" tabindex="0">CBUS<span>EVENTS</span></div>
+  <div class="nav-back" onclick="window.location.href='https://cbusevents.com'" role="button" tabindex="0">
     <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
     All Events
   </div>
@@ -278,7 +284,7 @@ footer{background:var(--surface);border-top:1px solid var(--border);padding:24px
 
 <!-- FOOTER -->
 <footer>
-  <div class="f-logo" onclick="window.location.href='https://cbusevents.com'">CBUS<span>EVENTS</span></div>
+  <div class="f-logo" onclick="window.location.href='https://cbusevents.com'" role="button" tabindex="0">CBUS<span>EVENTS</span></div>
   <div class="f-copy">Columbus Event Ecosystem</div>
   <div class="f-copy">© 2026 CBUSEVENTS · Columbus, Ohio</div>
 </footer>
@@ -383,7 +389,7 @@ async function loadEvent() {
   if (venue) {
     const vs = document.getElementById('venueSection');
     vs.innerHTML = `
-    <div class="venue-card" onclick="window.location.href='https://cbusevents.com/?venue=${venue.id}'">
+    <div class="venue-card" onclick="window.location.href='https://cbusevents.com/?venue=${venue.id}'" role="button" tabindex="0">
       <div class="venue-card-img">
         ${venue.cover_image_url ? `<img src="${venue.cover_image_url}" alt="${venue.name}" onerror="this.style.display='none'">` : '<div style="width:100%;height:100%;background:linear-gradient(135deg,rgba(255,107,53,0.08),rgba(129,140,248,0.06))"></div>'}
       </div>
@@ -442,97 +448,9 @@ async function loadEvent() {
   // ── MORE EVENTS ──
   loadMoreEvents(event);
 
-  // ── GOOGLE STRUCTURED DATA (schema.org Event) ──
-  injectEventSchema(event, venue, eventTiers);
-
   // Show page
   document.getElementById('loadingState').style.display = 'none';
   document.getElementById('pageBody').style.display = 'grid';
-}
-
-function injectEventSchema(event, venue, tiers) {
-  // Build location object
-  const location = {
-    '@type': 'Place',
-    name: venue?.name || event.venue_name_override || 'Columbus, Ohio',
-    address: {
-      '@type': 'PostalAddress',
-      streetAddress: venue?.address || '',
-      addressLocality: 'Columbus',
-      addressRegion: 'OH',
-      addressCountry: 'US'
-    }
-  };
-  if (venue?.lat && venue?.lng) {
-    location.geo = {
-      '@type': 'GeoCoordinates',
-      latitude: venue.lat,
-      longitude: venue.lng
-    };
-  }
-
-  // Build offers array
-  let offers = [];
-  if (event.is_free) {
-    offers.push({
-      '@type': 'Offer',
-      price: '0',
-      priceCurrency: 'USD',
-      availability: 'https://schema.org/InStock',
-      url: window.location.href
-    });
-  } else if (tiers && tiers.length > 0) {
-    tiers.forEach(function(tier) {
-      const soldOut = tier.quantity_remaining !== null && tier.quantity_remaining <= 0;
-      offers.push({
-        '@type': 'Offer',
-        name: tier.name,
-        price: String(tier.price),
-        priceCurrency: 'USD',
-        availability: soldOut ? 'https://schema.org/SoldOut' : 'https://schema.org/InStock',
-        url: window.location.href
-      });
-    });
-  } else if (event.price_min != null) {
-    offers.push({
-      '@type': 'Offer',
-      price: String(event.price_min),
-      priceCurrency: 'USD',
-      availability: 'https://schema.org/InStock',
-      url: event.ticket_url || window.location.href
-    });
-  }
-
-  // Build schema object
-  const schema = {
-    '@context': 'https://schema.org',
-    '@type': 'Event',
-    name: event.title,
-    startDate: event.start_time,
-    endDate: event.end_time || event.start_time,
-    description: event.description || ('Columbus event on CBUSEVENTS: ' + event.title),
-    url: window.location.href,
-    image: event.cover_image_url || 'https://cbusevents.com/assets/cbus-shield.png',
-    location: location,
-    organizer: {
-      '@type': 'Organization',
-      name: 'CBUSEVENTS',
-      url: 'https://cbusevents.com'
-    },
-    eventStatus: 'https://schema.org/EventScheduled',
-    eventAttendanceMode: 'https://schema.org/OfflineEventAttendanceMode'
-  };
-
-  if (offers.length > 0) schema.offers = offers.length === 1 ? offers[0] : offers;
-
-  // Inject into head
-  const existing = document.getElementById('eventSchema');
-  if (existing) existing.remove();
-  const script = document.createElement('script');
-  script.id = 'eventSchema';
-  script.type = 'application/ld+json';
-  script.textContent = JSON.stringify(schema, null, 2);
-  document.head.appendChild(script);
 }
 
 // ── TICKET RENDERING ─────────────────────────────────────────
@@ -684,7 +602,7 @@ async function loadMoreEvents(event) {
   section.style.display = 'block';
   grid.innerHTML = data.map(e => {
     const vname = e.venue_name_override || e.venues?.name || 'Columbus Venue';
-    return `<div class="more-card" onclick="window.location.href='event.html?id=${e.id}'">
+    return `<div class="more-card" onclick="window.location.href='event.html?id=${e.id}'" role="button" tabindex="0">
       <div class="more-card-img">
         ${e.cover_image_url ? `<img src="${e.cover_image_url}" alt="${e.title}" loading="lazy" onerror="this.style.display='none'">` : '<div class="more-card-img-grad"></div>'}
       </div>
