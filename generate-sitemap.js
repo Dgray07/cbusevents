@@ -51,7 +51,7 @@ async function generate() {
   const { data: events, error } = await sb
     .from('events')
     .select('id, title, start_time, updated_at')
-    .eq('is_published', true)
+    .eq('status', 'published')
     .gte('start_time', new Date().toISOString()) // Only future + today events
     .order('start_time', { ascending: true });
 
