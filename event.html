@@ -442,9 +442,97 @@ async function loadEvent() {
   // ── MORE EVENTS ──
   loadMoreEvents(event);
 
+  // ── GOOGLE STRUCTURED DATA (schema.org Event) ──
+  injectEventSchema(event, venue, eventTiers);
+
   // Show page
   document.getElementById('loadingState').style.display = 'none';
   document.getElementById('pageBody').style.display = 'grid';
+}
+
+function injectEventSchema(event, venue, tiers) {
+  // Build location object
+  const location = {
+    '@type': 'Place',
+    name: venue?.name || event.venue_name_override || 'Columbus, Ohio',
+    address: {
+      '@type': 'PostalAddress',
+      streetAddress: venue?.address || '',
+      addressLocality: 'Columbus',
+      addressRegion: 'OH',
+      addressCountry: 'US'
+    }
+  };
+  if (venue?.lat && venue?.lng) {
+    location.geo = {
+      '@type': 'GeoCoordinates',
+      latitude: venue.lat,
+      longitude: venue.lng
+    };
+  }
+
+  // Build offers array
+  let offers = [];
+  if (event.is_free) {
+    offers.push({
+      '@type': 'Offer',
+      price: '0',
+      priceCurrency: 'USD',
+      availability: 'https://schema.org/InStock',
+      url: window.location.href
+    });
+  } else if (tiers && tiers.length > 0) {
+    tiers.forEach(function(tier) {
+      const soldOut = tier.quantity_remaining !== null && tier.quantity_remaining <= 0;
+      offers.push({
+        '@type': 'Offer',
+        name: tier.name,
+        price: String(tier.price),
+        priceCurrency: 'USD',
+        availability: soldOut ? 'https://schema.org/SoldOut' : 'https://schema.org/InStock',
+        url: window.location.href
+      });
+    });
+  } else if (event.price_min != null) {
+    offers.push({
+      '@type': 'Offer',
+      price: String(event.price_min),
+      priceCurrency: 'USD',
+      availability: 'https://schema.org/InStock',
+      url: event.ticket_url || window.location.href
+    });
+  }
+
+  // Build schema object
+  const schema = {
+    '@context': 'https://schema.org',
+    '@type': 'Event',
+    name: event.title,
+    startDate: event.start_time,
+    endDate: event.end_time || event.start_time,
+    description: event.description || ('Columbus event on CBUSEVENTS: ' + event.title),
+    url: window.location.href,
+    image: event.cover_image_url || 'https://cbusevents.com/assets/cbus-shield.png',
+    location: location,
+    organizer: {
+      '@type': 'Organization',
+      name: 'CBUSEVENTS',
+      url: 'https://cbusevents.com'
+    },
+    eventStatus: 'https://schema.org/EventScheduled',
+    eventAttendanceMode: 'https://schema.org/OfflineEventAttendanceMode'
+  };
+
+  if (offers.length > 0) schema.offers = offers.length === 1 ? offers[0] : offers;
+
+  // Inject into head
+  const existing = document.getElementById('eventSchema');
+  if (existing) existing.remove();
+  const script = document.createElement('script');
+  script.id = 'eventSchema';
+  script.type = 'application/ld+json';
+  script.textContent = JSON.stringify(schema, null, 2);
+  document.head.appendChild(script);
 }
 
 // ── TICKET RENDERING ─────────────────────────────────────────
