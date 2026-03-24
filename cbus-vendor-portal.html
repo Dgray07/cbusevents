@@ -361,14 +361,20 @@ function openVendorShareModal(eventId, eventTitle, venueName, eventDate){
 }
 
 // ── AUTH ──────────────────────────────────────────────────────
+let _initDone=false;
+
 async function init(){
  const params=new URLSearchParams(window.location.search);
  const{data:{session}}=await sb.auth.getSession();
  if(session?.user){currentUser=session.user;await enterPortal();}
  else if(params.get("tab")==="signup"){setTimeout(()=>switchTab("signup"),100);}
- sb.auth.onAuthStateChange(async(_,session)=>{
- currentUser=session?.user??null;
- if(currentUser)await enterPortal(); else exitPortal();
+ _initDone=true;
+ sb.auth.onAuthStateChange(async(event,session)=>{
+   if(event==='SIGNED_IN'&&session?.user&&!currentUser&&_initDone){
+     currentUser=session.user;await enterPortal();
+   } else if(event==='SIGNED_OUT'){
+     currentUser=null;exitPortal();
+   }
  });
 }
 
@@ -391,27 +397,32 @@ async function doAuth(){
  const btn=document.getElementById('authBtn');
  if(!email||!pass){errEl.textContent='Email and password required.';return;}
  btn.disabled=true;btn.textContent='Please wait…';errEl.textContent='';
- let error;
- if(currentTab==='signin'){
- ({error}=await sb.auth.signInWithPassword({email,password:pass}));
- } else {
- const{data,error:e}=await sb.auth.signUp({email,password:pass});
- error=e;
- if(!error){
-   if(!data.session){
-     // Email confirmation required
-     errEl.style.color='#22c55e';
-     errEl.textContent=`Check your email — we sent a confirmation link to ${email}.`;
-     btn.disabled=false;btn.textContent='Create Account';
-     return;
+ try{
+   if(currentTab==='signin'){
+     const{data,error}=await sb.auth.signInWithPassword({email,password:pass});
+     if(error){errEl.textContent=error.message;btn.disabled=false;btn.textContent='Sign In';return;}
+     currentUser=data.user;
+     await enterPortal();
+   } else {
+     const{data,error}=await sb.auth.signUp({email,password:pass});
+     if(error){errEl.textContent=error.message;btn.disabled=false;btn.textContent='Create Account';return;}
+     if(!data.session){
+       errEl.style.color='#22c55e';
+       errEl.textContent=`Check your email — we sent a confirmation link to ${email}.`;
+       btn.disabled=false;btn.textContent='Create Account';
+       return;
+     }
+     if(data.user){
+       await sb.from('vendors').upsert({user_id:data.user.id,email,business_name:name&&name!==email?name:null,name:name&&name!==email?name:null,subscription_tier:'FREE',subscription_status:'free'},{onConflict:'user_id'});
+       await sb.from('user_roles').insert({user_id:data.user.id,role:'vendor'}).select().maybeSingle().catch(()=>{});
+       currentUser=data.user;
+       await enterPortal();
+     }
    }
-   if(data.user){
-     await sb.from('vendors').upsert({user_id:data.user.id,email,business_name:name&&name!==email?name:null,name:name&&name!==email?name:null,subscription_tier:'FREE',subscription_status:'free'},{onConflict:'user_id'});
-     await sb.from('user_roles').insert({user_id:data.user.id,role:'vendor'}).select().maybeSingle().catch(()=>{});
-   }
+ }catch(e){
+   errEl.textContent='Network error. Check your connection.';
+   btn.disabled=false;btn.textContent=currentTab==='signin'?'Sign In':'Create Account';
  }
- }
- if(error){errEl.textContent=error.message;btn.disabled=false;btn.textContent=currentTab==='signin'?'Sign In':'Create Account';}
 }
 
 async function doSignOut(){
@@ -469,8 +480,7 @@ async function enterPortal(){
 }
 
 function exitPortal(){
- document.getElementById('authGate').style.display='';
- // portal hide handled;
+ document.getElementById('authGate').style.display='flex';
 }
 
 function updatePlanBadge(){
@@ -956,6 +966,26 @@ function closeModal(){document.getElementById('modalContainer').innerHTML='';}
 
 // ── INIT ──────────────────────────────────────────────────────
 init();
+
+// ── GLOBAL ALIASES — required for inline onclick handlers ──────
+window.doAuth             = doAuth;
+window.doSignOut          = doSignOut;
+window.switchTab          = switchTab;
+window.showPage           = showPage;
+window.toggleService      = toggleService;
+window.removePhoto        = removePhoto;
+window.openProposalModal  = openProposalModal;
+window.openVendorShareModal = openVendorShareModal;
+window.sendProposal       = sendProposal;
+window.closeModal         = closeModal;
+window.saveProfile        = saveProfile;
+window.saveServices       = saveServices;
+window.addPhotoByUrl      = addPhotoByUrl;
+window.handlePhotoUpload  = handlePhotoUpload;
+window.handleCoverPhoto   = handleCoverPhoto;
+window.renderProfilePage  = renderProfilePage;
+window.renderServicesPage = renderServicesPage;
+window.renderPortfolioPage= renderPortfolioPage;
 </script>
 
 <div id="toast" style="display:none;position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:var(--card);border:1px solid var(--border);border-radius:var(--r-md);padding:10px 20px;font-size:13px;font-weight:600;z-index:1000;white-space:nowrap;box-shadow:0 8px 32px rgba(0,0,0,0.5)"></div>
