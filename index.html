@@ -861,6 +861,10 @@ h1,h2,h3,h4,h5,h6{font-family:var(--font);letter-spacing:-0.02em;}
 ═══════════════════════════════════════════════════════ */
 
 /* ── 1. STICKY CTA BAR (mobile only) ── */
+/* Prevent sticky bar from covering content */
+#app { padding-bottom: 100px; }
+@media(min-width:681px){ #app { padding-bottom: 0; } }
+
 #sticky-cta-bar {
   display: none;
   position: fixed;
@@ -1054,20 +1058,21 @@ h1,h2,h3,h4,h5,h6{font-family:var(--font);letter-spacing:-0.02em;}
 </nav>
 <div id="navMobileMenu" class="nav-mobile-menu">
   <a onclick="showPage('home')" class="nav-mobile-link" style="cursor:pointer">Home</a>
+  <a onclick="showPage('events')" class="nav-mobile-link" style="cursor:pointer">Events</a>
   <a onclick="showPage('venues')" class="nav-mobile-link" style="cursor:pointer">Venues</a>
   <a onclick="showPage('vendors')" class="nav-mobile-link" style="cursor:pointer">Vendors</a>
-  <a onclick="showPage('events')" class="nav-mobile-link" style="cursor:pointer">Events</a>
   <a href="https://cbusevents.com/signup.html?role=planner" class="nav-mobile-link">Planners</a>
   <div class="nav-mobile-divider"></div>
-  <a onclick="showPage('events')" class="nav-mobile-link" style="cursor:pointer">Find Events</a>
-  <a href="https://cbusevents.com/blog.html" class="nav-mobile-link" style="color:var(--orange)">Blog</a>
+  <a href="https://cbusevents.com/gallery-hop.html" class="nav-mobile-link" style="color:var(--orange)">Gallery Hop</a>
+  <a href="https://cbusevents.com/community.html" class="nav-mobile-link" style="color:var(--orange)">Communities</a>
+  <a href="https://cbusevents.com/blog.html" class="nav-mobile-link">Blog</a>
   <div class="nav-mobile-divider"></div>
   <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.14em;text-transform:uppercase;color:var(--muted);text-align:center;margin-bottom:4px">Sign in as</div>
   <a href="https://cbusevents.com/cbus-venue-portal.html" class="nav-mobile-link" style="font-size:18px">Venue Owner</a>
   <a href="https://cbusevents.com/cbus-vendor-portal.html" class="nav-mobile-link" style="font-size:18px">Vendor</a>
   <a href="https://cbusevents.com/cbus-planner-portal.html" class="nav-mobile-link" style="font-size:18px">Event Planner</a>
   <a href="https://cbusevents.com/customer-portal.html" class="nav-mobile-link nav-mobile-cta" style="font-size:18px">Customer Account</a>
-</div> <div id="app" id="main-content"> <div style="min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px"> <div style="font-family:var(--font);font-weight:800;font-size:28px">CBUS<span style="color:#FF6B35">EVENTS</span></div> <div style="width:32px;height:32px;border:3px solid #25252f;border-top-color:#FF6B35;border-radius:50%;animation:spin 0.8s linear infinite"></div> <div style="color:#8888a0;font-size:13px">Loading Columbus venues...</div> </div>
+</div> <div id="app" id="main-content" style="padding-bottom:100px"> <div style="min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px"> <div style="font-family:var(--font);font-weight:800;font-size:28px">CBUS<span style="color:#FF6B35">EVENTS</span></div> <div style="width:32px;height:32px;border:3px solid #25252f;border-top-color:#FF6B35;border-radius:50%;animation:spin 0.8s linear infinite"></div> <div style="color:#8888a0;font-size:13px">Loading Columbus venues...</div> </div>
 </div> <!-- EVENT MODAL -->
 <div id="eventModal" style="display:none" class="modal-overlay" onclick="if(event.target===this)closeEventModal()" role="button" tabindex="0"> <div class="modal" id="eventModalContent"></div>
 </div>
