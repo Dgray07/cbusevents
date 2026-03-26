@@ -471,12 +471,9 @@ async function enterPortal(){
  updatePlanBadge();
 
  document.getElementById('authGate').style.display='none';
- // portal show handled;
 
- // Load dashboard
+ // Load dashboard only — other pages render their HTML on nav click
  renderDashboard();
- renderServicesGrid();
- renderPortfolioGrid();
 }
 
 function exitPortal(){
@@ -492,17 +489,135 @@ function updatePlanBadge(){
 
 // ── PAGE NAV ──────────────────────────────────────────────────
 function showPage(p){
- document.querySelectorAll('.page').forEach(el=>el.classList.remove('active'));
  document.querySelectorAll('.nav-item[id^="nav-"]').forEach(el=>el.classList.remove('active'));
- document.getElementById('page-'+p)?.classList.add('active');
  document.getElementById('nav-'+p)?.classList.add('active');
- if(p==='proposals')loadProposals();
- else if(p==='events')loadBrowseEvents();
- else if(p==='plan')renderPlan();
- else if(p==='profile')prefillProfile();
- else if(p==='services')renderServicesGrid();
- else if(p==='portfolio')renderPortfolioGrid();
- else if(p==='dashboard')renderDashboard();
+ // Mobile nav
+ document.querySelectorAll('.mobile-nav-btn').forEach(el=>el.classList.remove('active'));
+ document.getElementById('mnav-'+p)?.classList.add('active');
+ // Each page renders its own HTML into pageContent first, then populates
+ if(p==='profile'){renderProfilePage();prefillProfile();}
+ else if(p==='services'){renderServicesPage();renderServicesGrid();}
+ else if(p==='portfolio'){renderPortfolioPage();renderPortfolioGrid();}
+ else if(p==='proposals'){renderProposalsPage();loadProposals();}
+ else if(p==='events'){loadBrowseEvents();}
+ else if(p==='plan'){renderPlan();}
+ else if(p==='dashboard'){renderDashboard();}
+}
+
+// ── PAGE RENDERERS (inject HTML scaffold before populating) ────
+function renderProfilePage(){
+ document.getElementById('pageContent').innerHTML=`
+ <div style="margin-bottom:24px">
+   <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.18em;text-transform:uppercase;color:var(--muted);margin-bottom:4px">My Profile</div>
+   <div style="font-size:22px;font-weight:800;letter-spacing:-0.03em;margin-bottom:2px">Business Profile</div>
+   <div style="font-size:13px;color:var(--sub)">How planners and venues will discover you.</div>
+ </div>
+ <div class="card" style="margin-bottom:20px">
+   <div class="card-header"><div class="card-title">Cover Photo</div></div>
+   <div style="padding:20px 24px">
+     <div id="profCoverPreview" style="width:100%;height:160px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-md);display:flex;align-items:center;justify-content:center;font-size:40px;margin-bottom:12px;overflow:hidden"></div>
+     <div style="display:flex;gap:10px;align-items:center">
+       <input id="profCoverUrl" placeholder="Paste image URL..." style="flex:1" oninput="updateCoverPreview(this.value)">
+       <label style="display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-md);padding:9px 14px;cursor:pointer;font-size:12px;font-weight:600;color:var(--sub);text-transform:none;letter-spacing:0;margin:0">
+         Upload
+         <input type="file" accept="image/*" style="display:none" onchange="handleCoverPhoto(event)">
+       </label>
+     </div>
+   </div>
+ </div>
+ <div class="card" style="margin-bottom:20px">
+   <div class="card-header"><div class="card-title">Business Info</div></div>
+   <div style="padding:20px 24px">
+     <div class="form-grid">
+       <div class="form-field"><label>Business Name *</label><input id="profName" placeholder="Your business name"></div>
+       <div class="form-field"><label>Contact Email</label><input id="profEmail" type="email" placeholder="you@email.com"></div>
+       <div class="form-field"><label>Phone</label><input id="profPhone" placeholder="(614) 000-0000"></div>
+       <div class="form-field"><label>Website</label><input id="profWebsite" placeholder="https://"></div>
+       <div class="form-field"><label>Years in Business</label><input id="profYears" type="number" placeholder="0" min="0"></div>
+     </div>
+     <div class="form-field"><label>Bio / Description</label><textarea id="profBio" placeholder="Tell planners and venues about your business..."></textarea></div>
+   </div>
+ </div>
+ <div class="card" style="margin-bottom:20px">
+   <div class="card-header"><div class="card-title">Social Links</div></div>
+   <div style="padding:20px 24px">
+     <div class="form-grid">
+       <div class="form-field"><label>Instagram</label><input id="profInsta" placeholder="@handle"></div>
+       <div class="form-field"><label>TikTok</label><input id="profTiktok" placeholder="@handle"></div>
+       <div class="form-field"><label>Facebook</label><input id="profFacebook" placeholder="Page URL or name"></div>
+       <div class="form-field"><label>X / Twitter</label><input id="profTwitter" placeholder="@handle"></div>
+     </div>
+   </div>
+ </div>
+ <div style="display:flex;align-items:center;gap:12px">
+   <button class="btn btn-primary" onclick="saveProfile()">Save Profile</button>
+   <div class="form-msg" id="profMsg"></div>
+ </div>`;
+}
+
+function renderServicesPage(){
+ document.getElementById('pageContent').innerHTML=`
+ <div style="margin-bottom:24px">
+   <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.18em;text-transform:uppercase;color:var(--muted);margin-bottom:4px">Services</div>
+   <div style="font-size:22px;font-weight:800;letter-spacing:-0.03em;margin-bottom:2px">Your Services</div>
+   <div style="font-size:13px;color:var(--sub)">Select everything you offer so planners can find you.</div>
+ </div>
+ <div class="card" style="margin-bottom:20px">
+   <div class="card-header"><div class="card-title">Service Categories</div></div>
+   <div style="padding:20px 24px">
+     <div class="services-grid" id="servicesGrid"></div>
+     <div class="form-field" style="margin-top:8px">
+       <label>Custom Service (optional)</label>
+       <input id="customService" placeholder="e.g. balloon art, face painting — comma separated">
+     </div>
+   </div>
+ </div>
+ <div style="display:flex;align-items:center;gap:12px">
+   <button class="btn btn-primary" onclick="saveServices()">Save Services</button>
+   <div class="form-msg" id="servMsg"></div>
+ </div>`;
+}
+
+function renderPortfolioPage(){
+ document.getElementById('pageContent').innerHTML=`
+ <div style="margin-bottom:24px">
+   <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.18em;text-transform:uppercase;color:var(--muted);margin-bottom:4px">Portfolio</div>
+   <div style="font-size:22px;font-weight:800;letter-spacing:-0.03em;margin-bottom:2px">Portfolio Photos</div>
+   <div style="font-size:13px;color:var(--sub)">Show planners the quality of your work.</div>
+ </div>
+ <div class="card" style="margin-bottom:20px">
+   <div class="card-header">
+     <div class="card-title">Photos</div>
+     <button class="btn btn-primary btn-sm" onclick="document.getElementById('photoFileInput').click()">+ Upload</button>
+   </div>
+   <div style="padding:20px 24px">
+     <div class="photo-grid" id="portfolioGrid"></div>
+     <div id="uploadProgress" style="display:none;margin-top:12px">
+       <div style="background:var(--border);border-radius:4px;height:4px;overflow:hidden">
+         <div id="uploadBar" style="height:100%;background:var(--orange);transition:width 0.3s;width:0%"></div>
+       </div>
+       <div id="uploadStatus" style="font-size:11px;color:var(--muted);margin-top:6px"></div>
+     </div>
+     <div style="margin-top:16px;display:flex;gap:10px">
+       <input id="photoUrl" placeholder="Or paste an image URL..." style="flex:1">
+       <button class="btn btn-ghost btn-sm" onclick="addPhotoByUrl()">Add URL</button>
+     </div>
+     <input type="file" id="photoFileInput" accept="image/*" multiple style="display:none" onchange="handlePhotoUpload(event)">
+   </div>
+ </div>
+ <div class="form-msg" id="portMsg"></div>`;
+}
+
+function renderProposalsPage(){
+ document.getElementById('pageContent').innerHTML=`
+ <div style="margin-bottom:24px">
+   <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.18em;text-transform:uppercase;color:var(--muted);margin-bottom:4px">Growth</div>
+   <div style="font-size:22px;font-weight:800;letter-spacing:-0.03em;margin-bottom:2px">Inquiries</div>
+   <div style="font-size:13px;color:var(--sub)">Proposals you've sent to events and planners.</div>
+ </div>
+ <div class="card">
+   <div id="proposalsContent" style="min-height:120px"><div class="spinner"></div></div>
+ </div>`;
 }
 
 // ── DASHBOARD ─────────────────────────────────────────────────
@@ -688,7 +803,7 @@ function renderServicesGrid(){
 function toggleService(key){
  if(selectedServices.has(key))selectedServices.delete(key);
  else selectedServices.add(key);
- document.getElementById('svc-'+key)?.classList.toggle('selected',selectedServices.has(key));
+ renderServicesGrid();
 }
 
 async function saveServices(){
@@ -918,7 +1033,7 @@ function openProposalModal(eventId,eventTitle,venueName){
 }
 
 async function sendProposal(eventId){
- const message=(document.getElementById('pageContent'))?.value.trim();
+ const message=document.getElementById('proposalMsg')?.value.trim();
  const rate=document.getElementById('proposalRate')?.value.trim();
  if(!message){toast('Please write a pitch message','error');return;}
 
