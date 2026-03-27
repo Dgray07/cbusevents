@@ -318,7 +318,7 @@ function AuthPage() {
 }
 
 // Sidebar
-const NAV = [{key:"dashboard",icon:"⊞",label:"Dashboard"},{key:"venue",icon:"",label:"My Venue"},{key:"events",icon:"",label:"Events"},{key:"inquiries",icon:"",label:"Inquiries"},{key:"plan",icon:"⭐",label:"Plan & Billing"}];
+const NAV = [{key:"dashboard",icon:"⊞",label:"Dashboard"},{key:"venue",icon:"",label:"My Venue"},{key:"events",icon:"",label:"Events"},{key:"calendar",icon:"",label:"Booking Calendar"},{key:"earnings",icon:"",label:"Earnings"},{key:"inquiries",icon:"",label:"Inquiries"},{key:"plan",icon:"⭐",label:"Plan & Billing"}];
 const HOME_BTN_STYLE = {display:"flex",alignItems:"center",gap:10,width:"100%",background:"transparent",color:"var(--sub)",border:"1px solid transparent",borderRadius:10,padding:"10px 12px",cursor:"pointer",fontSize:13,fontFamily:"'DM Sans',sans-serif",fontWeight:400,marginBottom:2,textAlign:"left",transition:"color 0.15s"};
 
 function Sidebar({active,setActive,profile}) {
@@ -773,6 +773,277 @@ function MarketingServices({venue}) {
  </div> );
 }
 
+// Booking Calendar
+function BookingCalendar({venue, events}) {
+ const [selected, setSelected] = React.useState(null);
+ const [inquiries, setInquiries] = React.useState([]);
+ const [month, setMonth] = React.useState(new Date());
+
+ React.useEffect(()=>{
+   if(!venue?.id) return;
+   sb.from("inquiries").select("*").eq("venue_id", venue.id)
+     .then(({data})=>setInquiries(data||[]));
+ },[venue?.id]);
+
+ const year = month.getFullYear();
+ const mon = month.getMonth();
+ const firstDay = new Date(year, mon, 1).getDay();
+ const daysInMonth = new Date(year, mon+1, 0).getDate();
+ const monthName = month.toLocaleDateString("en-US",{month:"long",year:"numeric"});
+
+ const prevMonth = ()=>setMonth(new Date(year, mon-1, 1));
+ const nextMonth = ()=>setMonth(new Date(year, mon+1, 1));
+
+ // Map events and inquiries to dates
+ const eventsByDate = {};
+ events.forEach(e=>{
+   if(!e.start_time) return;
+   const d = new Date(e.start_time);
+   if(d.getFullYear()===year && d.getMonth()===mon){
+     const key = d.getDate();
+     if(!eventsByDate[key]) eventsByDate[key]=[];
+     eventsByDate[key].push({...e, _type:"event"});
+   }
+ });
+ inquiries.forEach(i=>{
+   if(!i.event_date) return;
+   const d = new Date(i.event_date);
+   if(d.getFullYear()===year && d.getMonth()===mon){
+     const key = d.getDate();
+     if(!eventsByDate[key]) eventsByDate[key]=[];
+     eventsByDate[key].push({...i, _type:"inquiry"});
+   }
+ });
+
+ const today = new Date();
+ const cells = [];
+ for(let i=0;i<firstDay;i++) cells.push(null);
+ for(let d=1;d<=daysInMonth;d++) cells.push(d);
+
+ const STATUS_COLOR = {
+   published:"var(--green)", draft:"var(--muted)", cancelled:"#f87171",
+   new:"#FF6B35", read:"var(--muted)", confirmed:"var(--green)"
+ };
+
+ const selectedItems = selected ? (eventsByDate[selected]||[]) : [];
+
+ if(!venue) return (
+   <div>
+     <h2 style={{fontFamily:"'DM Sans',sans-serif",fontSize:22,fontWeight:800,marginBottom:6}}>Booking Calendar</h2>
+     <Card style={{textAlign:"center",padding:48}}><p style={{color:"var(--sub)"}}>Set up your venue first.</p></Card>
+   </div>
+ );
+
+ return (
+ <div>
+   <h2 style={{fontFamily:"'DM Sans',sans-serif",fontSize:22,fontWeight:800,marginBottom:4}}>Booking Calendar</h2>
+   <p style={{color:"var(--sub)",fontSize:14,marginBottom:24}}>All events and inquiries at your venue in one view.</p>
+
+   {/* Legend */}
+   <div style={{display:"flex",gap:16,marginBottom:20,flexWrap:"wrap"}}>
+     {[{color:"var(--green)",label:"Published Event"},{color:"#FF6B35",label:"New Inquiry"},{color:"var(--muted)",label:"Draft / Read"}].map(l=>(
+       <div key={l.label} style={{display:"flex",alignItems:"center",gap:6,fontSize:12,color:"var(--sub)"}}>
+         <div style={{width:8,height:8,borderRadius:"50%",background:l.color}}/>
+         {l.label}
+       </div>
+     ))}
+   </div>
+
+   <Card style={{padding:0,overflow:"hidden"}}>
+     {/* Calendar Header */}
+     <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"16px 20px",borderBottom:"1px solid var(--border-sub)"}}>
+       <button onClick={prevMonth} style={{background:"none",border:"none",color:"var(--sub)",cursor:"pointer",fontSize:18,padding:"4px 8px",borderRadius:6,transition:"color 0.15s"}} onMouseOver={e=>e.target.style.color="var(--text)"} onMouseOut={e=>e.target.style.color="var(--sub)"}>‹</button>
+       <div style={{fontFamily:"'DM Sans',sans-serif",fontWeight:700,fontSize:15}}>{monthName}</div>
+       <button onClick={nextMonth} style={{background:"none",border:"none",color:"var(--sub)",cursor:"pointer",fontSize:18,padding:"4px 8px",borderRadius:6,transition:"color 0.15s"}} onMouseOver={e=>e.target.style.color="var(--text)"} onMouseOut={e=>e.target.style.color="var(--sub)"}>›</button>
+     </div>
+
+     {/* Day Labels */}
+     <div style={{display:"grid",gridTemplateColumns:"repeat(7,1fr)",borderBottom:"1px solid var(--border-sub)"}}>
+       {["Sun","Mon","Tue","Wed","Thu","Fri","Sat"].map(d=>(
+         <div key={d} style={{padding:"8px 4px",textAlign:"center",fontFamily:"'DM Mono',monospace",fontSize:9,letterSpacing:"0.1em",textTransform:"uppercase",color:"var(--muted)"}}>{d}</div>
+       ))}
+     </div>
+
+     {/* Calendar Grid */}
+     <div style={{display:"grid",gridTemplateColumns:"repeat(7,1fr)"}}>
+       {cells.map((day,i)=>{
+         if(!day) return <div key={"e"+i} style={{minHeight:72,borderRight:"1px solid var(--border-sub)",borderBottom:"1px solid var(--border-sub)"}}/>;
+         const items = eventsByDate[day]||[];
+         const isToday = today.getDate()===day && today.getMonth()===mon && today.getFullYear()===year;
+         const isSelected = selected===day;
+         return (
+           <div key={day} onClick={()=>setSelected(isSelected?null:day)}
+             style={{minHeight:72,padding:"6px 4px",borderRight:"1px solid var(--border-sub)",borderBottom:"1px solid var(--border-sub)",cursor:items.length?"pointer":"default",background:isSelected?"rgba(255,107,53,0.06)":"transparent",transition:"background 0.15s"}}>
+             <div style={{fontFamily:"'DM Mono',monospace",fontSize:11,fontWeight:500,color:isToday?"#FF6B35":"var(--sub)",background:isToday?"rgba(255,107,53,0.1)":"transparent",borderRadius:"50%",width:22,height:22,display:"flex",alignItems:"center",justifyContent:"center",marginBottom:4}}>{day}</div>
+             <div style={{display:"flex",flexDirection:"column",gap:2}}>
+               {items.slice(0,2).map((item,idx)=>(
+                 <div key={idx} style={{fontSize:9,fontWeight:600,color:STATUS_COLOR[item.status]||"var(--muted)",background:"rgba(255,255,255,0.04)",borderRadius:3,padding:"1px 4px",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>
+                   {item._type==="inquiry"?"⬤ ":""}{item.title||item.name||"Inquiry"}
+                 </div>
+               ))}
+               {items.length>2&&<div style={{fontSize:9,color:"var(--muted)"}}>+{items.length-2} more</div>}
+             </div>
+           </div>
+         );
+       })}
+     </div>
+   </Card>
+
+   {/* Selected Day Detail */}
+   {selected && selectedItems.length>0 && (
+     <Card style={{marginTop:16,padding:20}}>
+       <div style={{fontFamily:"'DM Sans',sans-serif",fontWeight:700,fontSize:15,marginBottom:16}}>
+         {month.toLocaleDateString("en-US",{month:"long"})} {selected}
+       </div>
+       <div style={{display:"flex",flexDirection:"column",gap:10}}>
+         {selectedItems.map((item,i)=>(
+           <div key={i} style={{display:"flex",alignItems:"center",gap:12,padding:"10px 14px",background:"var(--surface)",borderRadius:10,border:"1px solid var(--border-sub)"}}>
+             <div style={{width:8,height:8,borderRadius:"50%",flexShrink:0,background:STATUS_COLOR[item.status]||"var(--muted)"}}/>
+             <div style={{flex:1}}>
+               <div style={{fontWeight:600,fontSize:13}}>{item.title||item.name||"Booking Inquiry"}</div>
+               <div style={{fontSize:11,color:"var(--muted)",marginTop:2}}>
+                 {item._type==="inquiry"?`Inquiry · ${item.email||""} · ${item.guest_count||"?"} guests`:`Event · ${item.category||""} · ${item.status}`}
+               </div>
+             </div>
+             <span style={{fontFamily:"'DM Mono',monospace",fontSize:9,letterSpacing:"0.1em",textTransform:"uppercase",padding:"3px 8px",borderRadius:20,background:"rgba(255,255,255,0.04)",color:STATUS_COLOR[item.status]||"var(--muted)",border:"1px solid var(--border)"}}>
+               {item.status}
+             </span>
+           </div>
+         ))}
+       </div>
+     </Card>
+   )}
+   {selected && selectedItems.length===0 && (
+     <Card style={{marginTop:16,padding:20,textAlign:"center"}}>
+       <p style={{color:"var(--sub)",fontSize:13}}>No events or inquiries on this date.</p>
+     </Card>
+   )}
+ </div>
+ );
+}
+
+// Earnings Dashboard
+function Earnings({venue}) {
+ const [orders, setOrders] = React.useState([]);
+ const [ledger, setLedger] = React.useState([]);
+ const [busy, setBusy] = React.useState(true);
+ const tier = venue?.tier||"free";
+ const isPaid = tier==="standard"||tier==="premium";
+
+ React.useEffect(()=>{
+   if(!venue?.id||!isPaid){setBusy(false);return;}
+   Promise.all([
+     sb.from("orders")
+       .select("*")
+       .eq("status","paid")
+       .order("created_at",{ascending:false})
+       .limit(50),
+     sb.from("venue_commission_ledger")
+       .select("*")
+       .eq("venue_id",venue.id)
+       .order("created_at",{ascending:false})
+       .limit(50),
+   ]).then(([ordersRes, ledgerRes])=>{
+     setOrders(ordersRes.data||[]);
+     setLedger(ledgerRes.data||[]);
+     setBusy(false);
+   });
+ },[venue?.id, isPaid]);
+
+ if(!venue) return (
+   <div>
+     <h2 style={{fontFamily:"'DM Sans',sans-serif",fontSize:22,fontWeight:800,marginBottom:6}}>Earnings</h2>
+     <Card style={{textAlign:"center",padding:48}}><p style={{color:"var(--sub)"}}>Set up your venue first.</p></Card>
+   </div>
+ );
+
+ if(!isPaid) return (
+   <div>
+     <h2 style={{fontFamily:"'DM Sans',sans-serif",fontSize:22,fontWeight:800,marginBottom:6}}>Earnings</h2>
+     <Card style={{textAlign:"center",padding:48,borderColor:"rgba(255,107,53,0.3)"}}>
+       <div style={{fontSize:40,marginBottom:16}}>💰</div>
+       <div style={{fontWeight:800,fontSize:18,marginBottom:8}}>Unlock Revenue Share</div>
+       <div style={{color:"var(--sub)",fontSize:14,maxWidth:400,margin:"0 auto 24px",lineHeight:1.7}}>Standard and Premium venues earn 25% of the platform fee on every ticket sold at their venue. Upgrade to start earning.</div>
+       <Btn onClick={()=>window.open(PAYMENT_LINK_STANDARD,"_blank")}>Upgrade to Standard →</Btn>
+     </Card>
+   </div>
+ );
+
+ if(busy) return <Spin/>;
+
+ // Calculate totals from ledger
+ const totalEarned = ledger.filter(l=>l.status==="paid").reduce((s,l)=>s+(l.amount||0),0);
+ const pending = ledger.filter(l=>l.status==="pending").reduce((s,l)=>s+(l.amount||0),0);
+ const thisMonth = ledger.filter(l=>{
+   const d = new Date(l.created_at);
+   const now = new Date();
+   return d.getMonth()===now.getMonth()&&d.getFullYear()===now.getFullYear()&&l.status==="paid";
+ }).reduce((s,l)=>s+(l.amount||0),0);
+
+ const fmt = n => "$"+(n||0).toFixed(2);
+ const fmtDate = iso => new Date(iso).toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric"});
+
+ return (
+ <div>
+   <h2 style={{fontFamily:"'DM Sans',sans-serif",fontSize:22,fontWeight:800,marginBottom:4}}>Earnings</h2>
+   <p style={{color:"var(--sub)",fontSize:14,marginBottom:24}}>Your 25% share of platform fees from ticket sales at your venue.</p>
+
+   {/* Stat Cards */}
+   <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(160px,1fr))",gap:14,marginBottom:28}}>
+     {[
+       {label:"This Month",value:fmt(thisMonth),color:"var(--green)"},
+       {label:"Pending Payout",value:fmt(pending),color:"#f59e0b"},
+       {label:"Total Earned",value:fmt(totalEarned),color:"#FF6B35"},
+       {label:"Payout Schedule",value:"Monthly",color:"var(--blue)"},
+     ].map(s=>(
+       <Card key={s.label} style={{padding:20}}>
+         <div style={{fontFamily:"'DM Mono',monospace",fontSize:22,fontWeight:500,color:s.color,marginBottom:6,letterSpacing:"-0.02em",lineHeight:1}}>{s.value}</div>
+         <div style={{color:"var(--sub)",fontSize:12}}>{s.label}</div>
+       </Card>
+     ))}
+   </div>
+
+   {/* Payout Info */}
+   <div style={{background:"linear-gradient(135deg,rgba(129,140,248,0.06),rgba(129,140,248,0.02))",border:"1px solid rgba(129,140,248,0.2)",borderRadius:12,padding:"14px 18px",marginBottom:24,fontSize:13,color:"var(--sub)",lineHeight:1.7}}>
+     Payouts are processed on the 1st of each month for the prior month's earnings. Questions? Email <a href="mailto:info@cbusevents.com" style={{color:"#FF6B35"}}>info@cbusevents.com</a>
+   </div>
+
+   {/* Ledger */}
+   <Card style={{padding:0,overflow:"hidden"}}>
+     <div style={{padding:"16px 20px",borderBottom:"1px solid var(--border-sub)",display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+       <div style={{fontFamily:"'DM Sans',sans-serif",fontWeight:700,fontSize:15}}>Earnings History</div>
+     </div>
+     {ledger.length===0?(
+       <div style={{textAlign:"center",padding:48,color:"var(--sub)"}}>
+         <div style={{fontSize:36,marginBottom:12}}>📊</div>
+         <div style={{fontWeight:700,fontSize:15,color:"var(--text)",marginBottom:6}}>No earnings yet</div>
+         <div style={{fontSize:13}}>Earnings appear here when tickets are sold at your venue through CBUSEVENTS.</div>
+       </div>
+     ):(
+       <div>
+         {/* Table Header */}
+         <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 120px 100px",padding:"8px 20px",borderBottom:"1px solid var(--border-sub)"}}>
+           {["Date","Event","Amount","Status"].map(h=>(
+             <div key={h} style={{fontFamily:"'DM Mono',monospace",fontSize:9,letterSpacing:"0.12em",textTransform:"uppercase",color:"var(--muted)"}}>{h}</div>
+           ))}
+         </div>
+         {ledger.map((l,i)=>(
+           <div key={l.id||i} style={{display:"grid",gridTemplateColumns:"1fr 1fr 120px 100px",padding:"12px 20px",borderBottom:"1px solid var(--border-sub)",alignItems:"center",transition:"background 0.15s"}} onMouseOver={e=>e.currentTarget.style.background="rgba(255,255,255,0.02)"} onMouseOut={e=>e.currentTarget.style.background="transparent"}>
+             <div style={{fontSize:13,color:"var(--sub)"}}>{fmtDate(l.created_at)}</div>
+             <div style={{fontSize:13,fontWeight:500,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{l.event_title||"Ticket Sale"}</div>
+             <div style={{fontFamily:"'DM Mono',monospace",fontSize:14,color:"var(--green)",fontWeight:500}}>{fmt(l.amount)}</div>
+             <span style={{fontFamily:"'DM Mono',monospace",fontSize:9,letterSpacing:"0.1em",textTransform:"uppercase",padding:"3px 8px",borderRadius:20,width:"fit-content",background:l.status==="paid"?"var(--green-dim)":"rgba(251,191,36,0.1)",color:l.status==="paid"?"var(--green)":"#f59e0b",border:`1px solid ${l.status==="paid"?"rgba(52,211,153,0.2)":"rgba(251,191,36,0.2)"}`}}>
+               {l.status}
+             </span>
+           </div>
+         ))}
+       </div>
+     )}
+   </Card>
+ </div>
+ );
+}
+
 // Plan & Billing
 function PlanBilling({venue}) {
  const cur=venue?.tier||"free";
@@ -865,6 +1136,8 @@ function Portal() {
  <div style={{display:"flex",minHeight:"100vh"}}> <Sidebar active={page} setActive={setPage} profile={profile}/> <main style={{flex:1,padding:36,overflowY:"auto",background:"var(--bg)",minHeight:"100vh"}}> {busy?<Spin/>:<> {page==="dashboard"&&<Dashboard venue={venue} events={events}/>}
  {page==="venue" &&<VenueForm venue={venue} onSave={load}/>}
  {page==="events" &&<EventsManager venue={venue} events={events} onRefresh={load}/>}
+ {page==="calendar"&&<BookingCalendar venue={venue} events={events}/>}
+ {page==="earnings"&&<Earnings venue={venue}/>}
  {page==="inquiries"&&<Inquiries venue={venue}/>}
  {page==="plan" &&<PlanBilling venue={venue}/>}
  </>}
