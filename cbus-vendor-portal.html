@@ -247,6 +247,10 @@ label{display:block;font-family:var(--mono);font-size:10px;font-weight:700;lette
     Portfolio
   </button>
   <div class="sidebar-section">Growth</div>
+  <button class="nav-item" id="nav-store" onclick="showPage('store')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+    My Store
+  </button>
   <button class="nav-item" id="nav-proposals" onclick="showPage('proposals')">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
     Inquiries
@@ -495,6 +499,7 @@ function showPage(p){
  else if(p==='services'){renderServicesPage();renderServicesGrid();}
  else if(p==='portfolio'){renderPortfolioPage();renderPortfolioGrid();}
  else if(p==='proposals'){renderProposalsPage();loadProposals();}
+ else if(p==='store'){renderStorePage();}
  else if(p==='events'){loadBrowseEvents();}
  else if(p==='plan'){renderPlan();}
  else if(p==='dashboard'){renderDashboard();}
@@ -1039,6 +1044,167 @@ function renderPlan(){
  </div>`;
 }
 
+// ── STORE PAGE ────────────────────────────────────────────────
+async function renderStorePage(){
+ const tier=(vendorProfile?.subscription_tier||'FREE').toUpperCase();
+ const canSell=tier==='STANDARD'||tier==='PREMIUM';
+
+ if(!canSell){
+   document.getElementById('pageContent').innerHTML=`
+   <div style="margin-bottom:24px"><div style="font-family:var(--mono);font-size:9px;letter-spacing:0.18em;text-transform:uppercase;color:var(--muted);margin-bottom:4px">My Store</div><div style="font-size:22px;font-weight:800;letter-spacing:-0.03em;margin-bottom:2px">Vendor Storefront</div></div>
+   <div class="card" style="padding:48px 32px;text-align:center">
+     <div style="font-size:40px;margin-bottom:16px">🏪</div>
+     <div style="font-size:18px;font-weight:800;margin-bottom:8px">Unlock Your Storefront</div>
+     <div style="font-size:14px;color:var(--sub);max-width:400px;margin:0 auto 24px;line-height:1.7">Upgrade to Standard or Premium to list products and services on the CBUSEVENTS Marketplace. Sell physical goods, digital downloads, and more.</div>
+     <button class="btn btn-primary" onclick="showPage('plan')">Upgrade to Sell →</button>
+   </div>`;
+   return;
+ }
+
+ document.getElementById('pageContent').innerHTML=`
+ <div style="margin-bottom:24px;display:flex;align-items:center;justify-content:space-between">
+   <div><div style="font-family:var(--mono);font-size:9px;letter-spacing:0.18em;text-transform:uppercase;color:var(--muted);margin-bottom:4px">My Store</div><div style="font-size:22px;font-weight:800;letter-spacing:-0.03em">Vendor Storefront</div></div>
+   <div style="display:flex;gap:10px">
+     <a href="/marketplace.html?vendor=${vendorProfile.id}" target="_blank" class="btn btn-ghost btn-sm">View Store →</a>
+     <button class="btn btn-primary btn-sm" onclick="openProductModal()">+ Add Product</button>
+   </div>
+ </div>
+ <div id="storeProducts"><div class="spinner"></div></div>`;
+
+ await loadStoreProducts();
+}
+
+async function loadStoreProducts(){
+ const el=document.getElementById('storeProducts');
+ if(!el)return;
+
+ const{data:products,error}=await sb.from('vendor_products')
+   .select('*')
+   .eq('vendor_id',vendorProfile.id)
+   .order('created_at',{ascending:false});
+
+ if(error){el.innerHTML=`<div style="color:var(--red);font-size:13px;padding:20px">Error loading products: ${error.message}</div>`;return;}
+
+ if(!products?.length){
+   el.innerHTML=`
+   <div class="card" style="padding:48px 32px;text-align:center">
+     <div style="font-size:36px;margin-bottom:12px">📦</div>
+     <div style="font-weight:700;font-size:15px;margin-bottom:6px">No products yet</div>
+     <div style="font-size:13px;color:var(--sub);margin-bottom:20px">Add your first product to appear on the CBUSEVENTS Marketplace.</div>
+     <button class="btn btn-primary" onclick="openProductModal()">+ Add Your First Product</button>
+   </div>`;
+   return;
+ }
+
+ el.innerHTML=`
+ <div class="card">
+   ${products.map(p=>`
+   <div style="display:flex;align-items:center;gap:14px;padding:16px 20px;border-bottom:1px solid var(--border-sub)">
+     <div style="width:52px;height:52px;border-radius:var(--r-md);background:var(--surface);border:1px solid var(--border);overflow:hidden;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:22px">
+       ${p.images?.[0]?`<img src="${p.images[0]}" style="width:100%;height:100%;object-fit:cover">`:'📦'}
+     </div>
+     <div style="flex:1;min-width:0">
+       <div style="font-weight:700;font-size:14px;margin-bottom:2px">${p.name}</div>
+       <div style="font-size:11px;color:var(--muted)">${p.category||'General'} · ${p.product_type} · ${p.inventory_count!==null&&p.inventory_count!==undefined?p.inventory_count+' in stock':'Unlimited'}</div>
+     </div>
+     <div style="font-family:var(--mono);font-size:16px;font-weight:500;color:var(--orange);flex-shrink:0">$${Number(p.price).toFixed(2)}</div>
+     <div style="flex-shrink:0">
+       <span style="font-family:var(--mono);font-size:9px;letter-spacing:0.1em;text-transform:uppercase;padding:3px 9px;border-radius:var(--r-full);${p.status==='active'?'background:var(--green-dim);color:var(--green);border:1px solid var(--green-border)':'background:rgba(255,255,255,0.04);color:var(--muted);border:1px solid var(--border)'}">${p.status}</span>
+     </div>
+     <div style="display:flex;gap:6px;flex-shrink:0">
+       <button class="btn btn-ghost btn-sm" onclick="openProductModal('${p.id}')">Edit</button>
+       <button class="btn btn-danger btn-sm" onclick="deleteProduct('${p.id}')">Delete</button>
+     </div>
+   </div>`).join('')}
+ </div>`;
+}
+
+const STORE_CATEGORIES=['Photography','Videography','DJ Services','Live Music','Catering','Bartending','Florist & Decor','Lighting & AV','Merch & Apparel','Rentals','Printing & Signage','Photo Booth','Other'];
+
+function openProductModal(productId){
+ document.getElementById('modalContainer').style.display='flex';
+ document.getElementById('modalContainer').innerHTML=`
+ <div class="modal-overlay" onclick="if(event.target===this)closeModal()">
+   <div class="modal">
+     <div style="padding:20px 24px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between">
+       <div style="font-weight:800;font-size:16px">${productId?'Edit Product':'New Product'}</div>
+       <button onclick="closeModal()" style="background:none;border:none;color:var(--sub);font-size:22px;cursor:pointer;line-height:1">×</button>
+     </div>
+     <div style="padding:24px" id="productFormWrap"><div class="spinner"></div></div>
+   </div>
+ </div>`;
+ loadProductForm(productId||null);
+}
+
+async function loadProductForm(productId){
+ const wrap=document.getElementById('productFormWrap');
+ let p=null;
+ if(productId){
+   const{data}=await sb.from('vendor_products').select('*').eq('id',productId).single();
+   p=data;
+ }
+ wrap.innerHTML=`
+ <div class="form-field"><label>Product Name *</label><input id="pName" placeholder="What are you selling?" value="${p?.name||''}"></div>
+ <div class="form-grid">
+   <div class="form-field"><label>Price *</label><input id="pPrice" type="number" step="0.01" min="0" placeholder="0.00" value="${p?.price||''}"></div>
+   <div class="form-field"><label>Category</label><select id="pCategory"><option value="">Select category</option>${STORE_CATEGORIES.map(c=>`<option value="${c}"${p?.category===c?' selected':''}>${c}</option>`).join('')}</select></div>
+ </div>
+ <div class="form-grid">
+   <div class="form-field"><label>Product Type</label><select id="pType"><option value="physical"${(!p||p.product_type==='physical')?' selected':''}>Physical</option><option value="digital"${p?.product_type==='digital'?' selected':''}>Digital</option></select></div>
+   <div class="form-field"><label>Inventory Count</label><input id="pInventory" type="number" min="0" placeholder="Leave blank for unlimited" value="${p?.inventory_count??''}"></div>
+ </div>
+ <div class="form-field"><label>Description</label><textarea id="pDesc" placeholder="Describe your product...">${p?.description||''}</textarea></div>
+ <div class="form-field"><label>Image URL</label><input id="pImage" placeholder="https://... (shown in marketplace)" value="${p?.images?.[0]||''}"></div>
+ <div class="form-field"><label>Digital File URL</label><input id="pDigitalUrl" placeholder="Link to file (digital products only)" value="${p?.digital_file_url||''}"></div>
+ <div class="form-field"><label>Status</label><select id="pStatus"><option value="active"${(!p||p.status==='active')?' selected':''}>Active - visible on marketplace</option><option value="paused"${p?.status==='paused'?' selected':''}>Paused - hidden from marketplace</option><option value="sold_out"${p?.status==='sold_out'?' selected':''}>Sold Out</option></select></div>
+ <div style="display:flex;gap:10px;margin-top:8px">
+   <button class="btn btn-primary" style="flex:1" onclick="saveProduct('${productId||''}')">Save Product</button>
+   <button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
+ </div>
+ <div class="form-msg" id="productMsg" style="margin-top:8px"></div>`;
+}
+
+async function saveProduct(productId){
+ const msg=document.getElementById('productMsg');
+ const name=document.getElementById('pName').value.trim();
+ const price=parseFloat(document.getElementById('pPrice').value);
+ if(!name){msg.style.color='var(--red)';msg.textContent='Product name is required';return;}
+ if(isNaN(price)||price<0){msg.style.color='var(--red)';msg.textContent='Valid price is required';return;}
+ const imageUrl=document.getElementById('pImage').value.trim();
+ const inventoryVal=document.getElementById('pInventory').value.trim();
+ const payload={
+   vendor_id:vendorProfile.id,
+   name,price,
+   category:document.getElementById('pCategory').value||null,
+   product_type:document.getElementById('pType').value,
+   description:document.getElementById('pDesc').value.trim()||null,
+   images:imageUrl?[imageUrl]:[],
+   digital_file_url:document.getElementById('pDigitalUrl').value.trim()||null,
+   inventory_count:inventoryVal!==''?parseInt(inventoryVal):null,
+   status:document.getElementById('pStatus').value,
+   updated_at:new Date().toISOString(),
+ };
+ msg.style.color='var(--sub)';msg.textContent='Saving...';
+ let error;
+ if(productId){
+   ({error}=await sb.from('vendor_products').update(payload).eq('id',productId));
+ } else {
+   ({error}=await sb.from('vendor_products').insert({...payload,created_at:new Date().toISOString()}));
+ }
+ if(error){msg.style.color='var(--red)';msg.textContent='Error: '+error.message;return;}
+ closeModal();
+ toast(productId?'Product updated!':'Product listed on marketplace!');
+ await loadStoreProducts();
+}
+
+async function deleteProduct(productId){
+ if(!confirm('Delete this product? This cannot be undone.'))return;
+ const{error}=await sb.from('vendor_products').delete().eq('id',productId);
+ if(error){toast('Error: '+error.message,'error');return;}
+ toast('Product deleted');
+ await loadStoreProducts();
+}
+
 // ── HELPERS ───────────────────────────────────────────────────
 function fmt(iso){
  if(!iso)return'TBD';
@@ -1076,6 +1242,9 @@ window.renderProfilePage  = renderProfilePage;
 window.renderServicesPage = renderServicesPage;
 window.renderPortfolioPage= renderPortfolioPage;
 window.renderProposalsPage= renderProposalsPage;
+window.openProductModal   = openProductModal;
+window.saveProduct        = saveProduct;
+window.deleteProduct      = deleteProduct;
 </script>
 
 <div id="toast" style="display:none;position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:var(--card);border:1px solid var(--border);border-radius:var(--r-md);padding:10px 20px;font-size:13px;font-weight:600;z-index:1000;white-space:nowrap;box-shadow:0 8px 32px rgba(0,0,0,0.5)"></div>
