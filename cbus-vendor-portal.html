@@ -1016,7 +1016,7 @@ function renderPlan(){
        ?'<button style="width:100%;background:var(--surface);color:var(--muted);border:1px solid var(--border);border-radius:var(--r-md);padding:10px;font-size:13px;font-weight:600;margin-top:8px" disabled>Current Plan</button>'
        :isPremium
          ?'<button style="width:100%;background:var(--surface);color:var(--muted);border:1px solid var(--border);border-radius:var(--r-md);padding:10px;font-size:13px;font-weight:600;margin-top:8px" disabled>Included in Premium</button>'
-         :`<button class="btn btn-primary" style="width:100%;padding:10px;font-size:13px;margin-top:8px" onclick="window.location.href='${STRIPE_LINKS.standard}&prefilled_email='+encodeURIComponent(currentUser?.email||'')">Get Standard →</button>`}
+         :`<button class="btn btn-primary" style="width:100%;padding:10px;font-size:13px;margin-top:8px" onclick="window.open('${STRIPE_LINKS.standard}','_blank')">Get Standard →</button>`}
    </div>
 
    <!-- PREMIUM -->
@@ -1035,7 +1035,7 @@ function renderPlan(){
      </div>
      ${isPremium
        ?'<button style="width:100%;background:var(--surface);color:var(--muted);border:1px solid var(--border);border-radius:var(--r-md);padding:10px;font-size:13px;font-weight:600;margin-top:8px" disabled>Current Plan</button>'
-       :`<button style="width:100%;background:var(--gold);color:#000;border:none;border-radius:var(--r-md);padding:10px;font-size:13px;font-weight:700;margin-top:8px;cursor:pointer;transition:opacity 0.18s" onmouseover="this.style.opacity='0.9'" onmouseout="this.style.opacity='1'" onclick="window.location.href='${STRIPE_LINKS.premium}&prefilled_email='+encodeURIComponent(currentUser?.email||'')">Get Premium →</button>`}
+       :`<button style="width:100%;background:var(--gold);color:#000;border:none;border-radius:var(--r-md);padding:10px;font-size:13px;font-weight:700;margin-top:8px;cursor:pointer;transition:opacity 0.18s" onmouseover="this.style.opacity='0.9'" onmouseout="this.style.opacity='1'" onclick="window.open('${STRIPE_LINKS.premium}','_blank')">Get Premium →</button>`}
    </div>
 
  </div>
