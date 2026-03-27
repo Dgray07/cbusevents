@@ -313,8 +313,8 @@ const sb=supabase.createClient(SB_URL,SB_KEY);
 
 // Stripe payment links
 const STRIPE_LINKS={
- standard:'https://buy.stripe.com/aFa3cv3vWasGdFBdA4c3m02',
- premium:'https://buy.stripe.com/aFa3cv3vWasGdFBdA4c3m02',
+ standard:'https://buy.stripe.com/28EbJ17Mc8ky30XanSc3m05',
+ premium:'https://buy.stripe.com/eVq8wP2rSeIW7hdeE8c3m06',
 };
 
 const SERVICES=[
@@ -471,8 +471,6 @@ async function enterPortal(){
  updatePlanBadge();
 
  document.getElementById('authGate').style.display='none';
-
- // Load dashboard only — other pages render their HTML on nav click
  renderDashboard();
 }
 
@@ -491,10 +489,8 @@ function updatePlanBadge(){
 function showPage(p){
  document.querySelectorAll('.nav-item[id^="nav-"]').forEach(el=>el.classList.remove('active'));
  document.getElementById('nav-'+p)?.classList.add('active');
- // Mobile nav
  document.querySelectorAll('.mobile-nav-btn').forEach(el=>el.classList.remove('active'));
  document.getElementById('mnav-'+p)?.classList.add('active');
- // Each page renders its own HTML into pageContent first, then populates
  if(p==='profile'){renderProfilePage();prefillProfile();}
  else if(p==='services'){renderServicesPage();renderServicesGrid();}
  else if(p==='portfolio'){renderPortfolioPage();renderPortfolioGrid();}
@@ -504,120 +500,33 @@ function showPage(p){
  else if(p==='dashboard'){renderDashboard();}
 }
 
-// ── PAGE RENDERERS (inject HTML scaffold before populating) ────
 function renderProfilePage(){
  document.getElementById('pageContent').innerHTML=`
- <div style="margin-bottom:24px">
-   <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.18em;text-transform:uppercase;color:var(--muted);margin-bottom:4px">My Profile</div>
-   <div style="font-size:22px;font-weight:800;letter-spacing:-0.03em;margin-bottom:2px">Business Profile</div>
-   <div style="font-size:13px;color:var(--sub)">How planners and venues will discover you.</div>
- </div>
- <div class="card" style="margin-bottom:20px">
-   <div class="card-header"><div class="card-title">Cover Photo</div></div>
-   <div style="padding:20px 24px">
-     <div id="profCoverPreview" style="width:100%;height:160px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-md);display:flex;align-items:center;justify-content:center;font-size:40px;margin-bottom:12px;overflow:hidden"></div>
-     <div style="display:flex;gap:10px;align-items:center">
-       <input id="profCoverUrl" placeholder="Paste image URL..." style="flex:1" oninput="updateCoverPreview(this.value)">
-       <label style="display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-md);padding:9px 14px;cursor:pointer;font-size:12px;font-weight:600;color:var(--sub);text-transform:none;letter-spacing:0;margin:0">
-         Upload
-         <input type="file" accept="image/*" style="display:none" onchange="handleCoverPhoto(event)">
-       </label>
-     </div>
-   </div>
- </div>
- <div class="card" style="margin-bottom:20px">
-   <div class="card-header"><div class="card-title">Business Info</div></div>
-   <div style="padding:20px 24px">
-     <div class="form-grid">
-       <div class="form-field"><label>Business Name *</label><input id="profName" placeholder="Your business name"></div>
-       <div class="form-field"><label>Contact Email</label><input id="profEmail" type="email" placeholder="you@email.com"></div>
-       <div class="form-field"><label>Phone</label><input id="profPhone" placeholder="(614) 000-0000"></div>
-       <div class="form-field"><label>Website</label><input id="profWebsite" placeholder="https://"></div>
-       <div class="form-field"><label>Years in Business</label><input id="profYears" type="number" placeholder="0" min="0"></div>
-     </div>
-     <div class="form-field"><label>Bio / Description</label><textarea id="profBio" placeholder="Tell planners and venues about your business..."></textarea></div>
-   </div>
- </div>
- <div class="card" style="margin-bottom:20px">
-   <div class="card-header"><div class="card-title">Social Links</div></div>
-   <div style="padding:20px 24px">
-     <div class="form-grid">
-       <div class="form-field"><label>Instagram</label><input id="profInsta" placeholder="@handle"></div>
-       <div class="form-field"><label>TikTok</label><input id="profTiktok" placeholder="@handle"></div>
-       <div class="form-field"><label>Facebook</label><input id="profFacebook" placeholder="Page URL or name"></div>
-       <div class="form-field"><label>X / Twitter</label><input id="profTwitter" placeholder="@handle"></div>
-     </div>
-   </div>
- </div>
- <div style="display:flex;align-items:center;gap:12px">
-   <button class="btn btn-primary" onclick="saveProfile()">Save Profile</button>
-   <div class="form-msg" id="profMsg"></div>
- </div>`;
+ <div style="margin-bottom:24px"><div style="font-family:var(--mono);font-size:9px;letter-spacing:0.18em;text-transform:uppercase;color:var(--muted);margin-bottom:4px">My Profile</div><div style="font-size:22px;font-weight:800;letter-spacing:-0.03em;margin-bottom:2px">Business Profile</div><div style="font-size:13px;color:var(--sub)">How planners and venues will discover you.</div></div>
+ <div class="card" style="margin-bottom:20px"><div class="card-header"><div class="card-title">Cover Photo</div></div><div style="padding:20px 24px"><div id="profCoverPreview" style="width:100%;height:160px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-md);display:flex;align-items:center;justify-content:center;font-size:40px;margin-bottom:12px;overflow:hidden"></div><div style="display:flex;gap:10px;align-items:center"><input id="profCoverUrl" placeholder="Paste image URL..." style="flex:1" oninput="updateCoverPreview(this.value)"><label style="display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-md);padding:9px 14px;cursor:pointer;font-size:12px;font-weight:600;color:var(--sub);text-transform:none;letter-spacing:0;margin:0">Upload<input type="file" accept="image/*" style="display:none" onchange="handleCoverPhoto(event)"></label></div></div></div>
+ <div class="card" style="margin-bottom:20px"><div class="card-header"><div class="card-title">Business Info</div></div><div style="padding:20px 24px"><div class="form-grid"><div class="form-field"><label>Business Name *</label><input id="profName" placeholder="Your business name"></div><div class="form-field"><label>Contact Email</label><input id="profEmail" type="email" placeholder="you@email.com"></div><div class="form-field"><label>Phone</label><input id="profPhone" placeholder="(614) 000-0000"></div><div class="form-field"><label>Website</label><input id="profWebsite" placeholder="https://"></div><div class="form-field"><label>Years in Business</label><input id="profYears" type="number" placeholder="0" min="0"></div></div><div class="form-field"><label>Bio / Description</label><textarea id="profBio" placeholder="Tell planners and venues about your business..."></textarea></div></div></div>
+ <div class="card" style="margin-bottom:20px"><div class="card-header"><div class="card-title">Social Links</div></div><div style="padding:20px 24px"><div class="form-grid"><div class="form-field"><label>Instagram</label><input id="profInsta" placeholder="@handle"></div><div class="form-field"><label>TikTok</label><input id="profTiktok" placeholder="@handle"></div><div class="form-field"><label>Facebook</label><input id="profFacebook" placeholder="Page URL or name"></div><div class="form-field"><label>X / Twitter</label><input id="profTwitter" placeholder="@handle"></div></div></div></div>
+ <div style="display:flex;align-items:center;gap:12px"><button class="btn btn-primary" onclick="saveProfile()">Save Profile</button><div class="form-msg" id="profMsg"></div></div>`;
 }
 
 function renderServicesPage(){
  document.getElementById('pageContent').innerHTML=`
- <div style="margin-bottom:24px">
-   <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.18em;text-transform:uppercase;color:var(--muted);margin-bottom:4px">Services</div>
-   <div style="font-size:22px;font-weight:800;letter-spacing:-0.03em;margin-bottom:2px">Your Services</div>
-   <div style="font-size:13px;color:var(--sub)">Select everything you offer so planners can find you.</div>
- </div>
- <div class="card" style="margin-bottom:20px">
-   <div class="card-header"><div class="card-title">Service Categories</div></div>
-   <div style="padding:20px 24px">
-     <div class="services-grid" id="servicesGrid"></div>
-     <div class="form-field" style="margin-top:8px">
-       <label>Custom Service (optional)</label>
-       <input id="customService" placeholder="e.g. balloon art, face painting — comma separated">
-     </div>
-   </div>
- </div>
- <div style="display:flex;align-items:center;gap:12px">
-   <button class="btn btn-primary" onclick="saveServices()">Save Services</button>
-   <div class="form-msg" id="servMsg"></div>
- </div>`;
+ <div style="margin-bottom:24px"><div style="font-family:var(--mono);font-size:9px;letter-spacing:0.18em;text-transform:uppercase;color:var(--muted);margin-bottom:4px">Services</div><div style="font-size:22px;font-weight:800;letter-spacing:-0.03em;margin-bottom:2px">Your Services</div><div style="font-size:13px;color:var(--sub)">Select everything you offer so planners can find you.</div></div>
+ <div class="card" style="margin-bottom:20px"><div class="card-header"><div class="card-title">Service Categories</div></div><div style="padding:20px 24px"><div class="services-grid" id="servicesGrid"></div><div class="form-field" style="margin-top:8px"><label>Custom Service (optional)</label><input id="customService" placeholder="e.g. balloon art, face painting — comma separated"></div></div></div>
+ <div style="display:flex;align-items:center;gap:12px"><button class="btn btn-primary" onclick="saveServices()">Save Services</button><div class="form-msg" id="servMsg"></div></div>`;
 }
 
 function renderPortfolioPage(){
  document.getElementById('pageContent').innerHTML=`
- <div style="margin-bottom:24px">
-   <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.18em;text-transform:uppercase;color:var(--muted);margin-bottom:4px">Portfolio</div>
-   <div style="font-size:22px;font-weight:800;letter-spacing:-0.03em;margin-bottom:2px">Portfolio Photos</div>
-   <div style="font-size:13px;color:var(--sub)">Show planners the quality of your work.</div>
- </div>
- <div class="card" style="margin-bottom:20px">
-   <div class="card-header">
-     <div class="card-title">Photos</div>
-     <button class="btn btn-primary btn-sm" onclick="document.getElementById('photoFileInput').click()">+ Upload</button>
-   </div>
-   <div style="padding:20px 24px">
-     <div class="photo-grid" id="portfolioGrid"></div>
-     <div id="uploadProgress" style="display:none;margin-top:12px">
-       <div style="background:var(--border);border-radius:4px;height:4px;overflow:hidden">
-         <div id="uploadBar" style="height:100%;background:var(--orange);transition:width 0.3s;width:0%"></div>
-       </div>
-       <div id="uploadStatus" style="font-size:11px;color:var(--muted);margin-top:6px"></div>
-     </div>
-     <div style="margin-top:16px;display:flex;gap:10px">
-       <input id="photoUrl" placeholder="Or paste an image URL..." style="flex:1">
-       <button class="btn btn-ghost btn-sm" onclick="addPhotoByUrl()">Add URL</button>
-     </div>
-     <input type="file" id="photoFileInput" accept="image/*" multiple style="display:none" onchange="handlePhotoUpload(event)">
-   </div>
- </div>
+ <div style="margin-bottom:24px"><div style="font-family:var(--mono);font-size:9px;letter-spacing:0.18em;text-transform:uppercase;color:var(--muted);margin-bottom:4px">Portfolio</div><div style="font-size:22px;font-weight:800;letter-spacing:-0.03em;margin-bottom:2px">Portfolio Photos</div><div style="font-size:13px;color:var(--sub)">Show planners the quality of your work.</div></div>
+ <div class="card" style="margin-bottom:20px"><div class="card-header"><div class="card-title">Photos</div><button class="btn btn-primary btn-sm" onclick="document.getElementById('photoFileInput').click()">+ Upload</button></div><div style="padding:20px 24px"><div class="photo-grid" id="portfolioGrid"></div><div id="uploadProgress" style="display:none;margin-top:12px"><div style="background:var(--border);border-radius:4px;height:4px;overflow:hidden"><div id="uploadBar" style="height:100%;background:var(--orange);transition:width 0.3s;width:0%"></div></div><div id="uploadStatus" style="font-size:11px;color:var(--muted);margin-top:6px"></div></div><div style="margin-top:16px;display:flex;gap:10px"><input id="photoUrl" placeholder="Or paste an image URL..." style="flex:1"><button class="btn btn-ghost btn-sm" onclick="addPhotoByUrl()">Add URL</button></div><input type="file" id="photoFileInput" accept="image/*" multiple style="display:none" onchange="handlePhotoUpload(event)"></div></div>
  <div class="form-msg" id="portMsg"></div>`;
 }
 
 function renderProposalsPage(){
  document.getElementById('pageContent').innerHTML=`
- <div style="margin-bottom:24px">
-   <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.18em;text-transform:uppercase;color:var(--muted);margin-bottom:4px">Growth</div>
-   <div style="font-size:22px;font-weight:800;letter-spacing:-0.03em;margin-bottom:2px">Inquiries</div>
-   <div style="font-size:13px;color:var(--sub)">Proposals you've sent to events and planners.</div>
- </div>
- <div class="card">
-   <div id="proposalsContent" style="min-height:120px"><div class="spinner"></div></div>
- </div>`;
+ <div style="margin-bottom:24px"><div style="font-family:var(--mono);font-size:9px;letter-spacing:0.18em;text-transform:uppercase;color:var(--muted);margin-bottom:4px">Growth</div><div style="font-size:22px;font-weight:800;letter-spacing:-0.03em;margin-bottom:2px">Inquiries</div><div style="font-size:13px;color:var(--sub)">Proposals you've sent to events and planners.</div></div>
+ <div class="card"><div id="proposalsContent" style="min-height:120px"><div class="spinner"></div></div></div>`;
 }
 
 // ── DASHBOARD ─────────────────────────────────────────────────
@@ -1059,10 +968,75 @@ function renderPlan(){
  const isPremium=tier==='PREMIUM';
 
  document.getElementById('pageContent').innerHTML=`
- <div class="plan-grid"> <!-- FREE --> <div class="plan-card ${!isStandard&&!isPremium?'current':''}"> <div class="plan-name" style="color:var(--muted)">Free</div> <div class="plan-price">$0<span>/mo</span></div> <div class="plan-period">forever</div> <div class="plan-perks"> <div class="plan-perk"><span class="check"></span>Vendor profile & bio</div> <div class="plan-perk"><span class="check"></span>Select all your services</div> <div class="plan-perk"><span class="check"></span>Portfolio photos (unlimited)</div> <div class="plan-perk"><span class="check" style="color:var(--muted)"></span><span style="color:var(--muted)">Featured in directory</span></div> <div class="plan-perk"><span class="check" style="color:var(--muted)"></span><span style="color:var(--muted)">Send proposals</span></div> </div> <button class="plan-btn" style="background:var(--surface);color:var(--sub);border:1px solid var(--border)" disabled>${!isStandard&&!isPremium?'Current Plan':'Free Plan'}</button> </div> <!-- FOUNDING MEMBER --> <div class="plan-card ${isStandard||isPremium?'current':'popular'}" style="${isStandard||isPremium?'':'background:linear-gradient(135deg,#1a0800,#200d00);border-color:#FF6B3580;'}"> ${!isStandard&&!isPremium?'<div class="plan-badge">FOUNDING MEMBER</div>':''} <div class="plan-name" style="color:var(--orange)">Founding Member</div> <div class="plan-price" style="color:var(--orange)">$20<span>/mo</span></div> <div class="plan-period">Rate locked forever</div> <div class="plan-perks"> <div class="plan-perk"><span class="check"></span>Everything in Free</div> <div class="plan-perk"><span class="check"></span>Featured in vendor directory</div> <div class="plan-perk"><span class="check"></span>Priority search placement</div> <div class="plan-perk premium-perk"><span class="check"></span>Send proposals to venues</div> <div class="plan-perk premium-perk"><span class="check"></span>Send proposals to planners</div> <div class="plan-perk premium-perk"><span class="check"></span>Browse all upcoming events</div> </div> ${isStandard||isPremium
- ?'<button class="plan-btn" style="background:var(--surface);color:var(--sub);border:1px solid var(--border)" disabled>Current Plan</button>'
- :`<button class="plan-btn" style="background:#FF6B35;color:#fff" onclick="window.location.href='${STRIPE_LINKS.standard}&prefilled_email='+encodeURIComponent(currentUser?.email||'')">Claim Founding Rate →</button>`}
- </div> </div> <div style="margin-top:20px;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px 20px;font-size:13px;color:var(--sub);line-height:1.7"> After payment your plan upgrades automatically within a few minutes. Questions? Email <a href="mailto:info@cbusevents.com" style="color:var(--orange)">info@cbusevents.com</a> </div>`;
+ <div style="margin-bottom:24px">
+   <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.18em;text-transform:uppercase;color:var(--muted);margin-bottom:4px">Plan</div>
+   <div style="font-size:22px;font-weight:800;letter-spacing:-0.03em;margin-bottom:2px">Choose Your Plan</div>
+   <div style="font-size:13px;color:var(--sub)">Upgrade to get discovered, send proposals, and sell on the marketplace.</div>
+ </div>
+ <div class="plan-grid">
+
+   <!-- FREE -->
+   <div class="plan-card ${!isStandard&&!isPremium?'current':''}">
+     <div class="plan-name" style="color:var(--muted)">Free</div>
+     <div class="plan-price" style="color:var(--muted)">$0<span>/mo</span></div>
+     <div class="plan-period" style="font-size:12px;color:var(--muted);margin-bottom:16px">forever</div>
+     <div class="plan-perks">
+       <div class="plan-perk">Vendor profile and bio</div>
+       <div class="plan-perk">Select your services</div>
+       <div class="plan-perk">Portfolio photos (unlimited)</div>
+       <div class="plan-perk" style="opacity:0.35">Featured in directory</div>
+       <div class="plan-perk" style="opacity:0.35">Send proposals</div>
+       <div class="plan-perk" style="opacity:0.35">Sell on marketplace</div>
+     </div>
+     <button style="width:100%;background:var(--surface);color:var(--muted);border:1px solid var(--border);border-radius:var(--r-md);padding:10px;font-size:13px;font-weight:600;margin-top:auto" disabled>
+       ${!isStandard&&!isPremium?'Current Plan':'Free Plan'}
+     </button>
+   </div>
+
+   <!-- STANDARD -->
+   <div class="plan-card ${isStandard?'current':''}" style="${!isStandard&&!isPremium?'border-color:rgba(255,107,53,0.4);background:linear-gradient(135deg,#110800,#1a0c00);':isStandard?'border-color:rgba(255,107,53,0.4);':''}">
+     ${!isStandard&&!isPremium?'<div class="plan-card-badge" style="background:var(--orange);color:#fff">Most Popular</div>':''}
+     <div class="plan-name" style="color:var(--orange)">Standard</div>
+     <div class="plan-price">$15<span>/mo</span></div>
+     <div style="font-size:12px;color:var(--muted);margin-bottom:16px">billed monthly</div>
+     <div class="plan-perks">
+       <div class="plan-perk">Everything in Free</div>
+       <div class="plan-perk">Featured in vendor directory</div>
+       <div class="plan-perk">Priority search placement</div>
+       <div class="plan-perk">Send proposals to venues and planners</div>
+       <div class="plan-perk">Browse upcoming events</div>
+       <div class="plan-perk">Sell on the CBUSEVENTS Marketplace</div>
+     </div>
+     ${isStandard
+       ?'<button style="width:100%;background:var(--surface);color:var(--muted);border:1px solid var(--border);border-radius:var(--r-md);padding:10px;font-size:13px;font-weight:600;margin-top:8px" disabled>Current Plan</button>'
+       :isPremium
+         ?'<button style="width:100%;background:var(--surface);color:var(--muted);border:1px solid var(--border);border-radius:var(--r-md);padding:10px;font-size:13px;font-weight:600;margin-top:8px" disabled>Included in Premium</button>'
+         :`<button class="btn btn-primary" style="width:100%;padding:10px;font-size:13px;margin-top:8px" onclick="window.location.href='${STRIPE_LINKS.standard}&prefilled_email='+encodeURIComponent(currentUser?.email||'')">Get Standard →</button>`}
+   </div>
+
+   <!-- PREMIUM -->
+   <div class="plan-card ${isPremium?'current':''}" style="${isPremium?'border-color:rgba(251,191,36,0.4);':'border-color:rgba(251,191,36,0.2);background:linear-gradient(135deg,#0f0e00,#181500);'}">
+     <div class="plan-name" style="color:var(--gold)">Premium</div>
+     <div class="plan-price" style="color:var(--gold)">$45<span>/mo</span></div>
+     <div style="font-size:12px;color:var(--muted);margin-bottom:16px">billed monthly</div>
+     <div class="plan-perks">
+       <div class="plan-perk">Everything in Standard</div>
+       <div class="plan-perk">Multi-account access for your team</div>
+       <div class="plan-perk">Ticket revenue share (25% of platform fee)</div>
+       <div class="plan-perk">Staff management tools</div>
+       <div class="plan-perk">Geolocation promotions</div>
+       <div class="plan-perk">Sitewide promo banner placement</div>
+       <div class="plan-perk">Featured placement across platform</div>
+     </div>
+     ${isPremium
+       ?'<button style="width:100%;background:var(--surface);color:var(--muted);border:1px solid var(--border);border-radius:var(--r-md);padding:10px;font-size:13px;font-weight:600;margin-top:8px" disabled>Current Plan</button>'
+       :`<button style="width:100%;background:var(--gold);color:#000;border:none;border-radius:var(--r-md);padding:10px;font-size:13px;font-weight:700;margin-top:8px;cursor:pointer;transition:opacity 0.18s" onmouseover="this.style.opacity='0.9'" onmouseout="this.style.opacity='1'" onclick="window.location.href='${STRIPE_LINKS.premium}&prefilled_email='+encodeURIComponent(currentUser?.email||'')">Get Premium →</button>`}
+   </div>
+
+ </div>
+ <div style="margin-top:8px;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px 20px;font-size:13px;color:var(--sub);line-height:1.7">
+   Your plan upgrades automatically within a few minutes of payment. Questions? Email <a href="mailto:info@cbusevents.com" style="color:var(--orange)">info@cbusevents.com</a>
+ </div>`;
 }
 
 // ── HELPERS ───────────────────────────────────────────────────
@@ -1101,6 +1075,7 @@ window.handleCoverPhoto   = handleCoverPhoto;
 window.renderProfilePage  = renderProfilePage;
 window.renderServicesPage = renderServicesPage;
 window.renderPortfolioPage= renderPortfolioPage;
+window.renderProposalsPage= renderProposalsPage;
 </script>
 
 <div id="toast" style="display:none;position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:var(--card);border:1px solid var(--border);border-radius:var(--r-md);padding:10px 20px;font-size:13px;font-weight:600;z-index:1000;white-space:nowrap;box-shadow:0 8px 32px rgba(0,0,0,0.5)"></div>
