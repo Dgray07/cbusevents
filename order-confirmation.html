@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Your Tickets — CBUSEVENTS</title>
+<meta name="theme-color" content="#080810">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700;9..40,800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<style>
+:root{
+  --bg:#080810;--surface:#0d0d1a;--card:#0f0f1e;
+  --border:rgba(255,255,255,0.07);--border-mid:rgba(255,255,255,0.12);
+  --orange:#FF6B35;--orange-soft:rgba(255,107,53,0.1);--orange-glow:rgba(255,107,53,0.25);
+  --text:#eeeef8;--text-dim:#7878a0;--text-faint:#3a3a58;
+  --green:#34d399;--green-soft:rgba(52,211,153,0.1);--green-border:rgba(52,211,153,0.2);
+  --red:#f87171;--gold:#fbbf24;
+  --mono:'DM Mono',monospace;--sans:'DM Sans',sans-serif;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-font-smoothing:antialiased;}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:100vh;}
+a{text-decoration:none;color:inherit;}
+
+/* NAV */
+nav{height:56px;display:flex;align-items:center;justify-content:space-between;padding:0 24px;background:rgba(8,8,16,0.95);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100;}
+.nav-logo{font-weight:800;font-size:15px;letter-spacing:-0.03em;text-transform:uppercase;}
+.nav-logo span{color:var(--orange);}
+.nav-home{font-size:12px;color:var(--text-dim);padding:6px 12px;border-radius:6px;border:1px solid var(--border);background:none;cursor:pointer;font-family:var(--sans);transition:all 0.15s;}
+.nav-home:hover{color:var(--text);border-color:var(--border-mid);}
+
+/* PAGE */
+.page{max-width:680px;margin:0 auto;padding:40px 20px 80px;}
+
+/* SUCCESS BANNER */
+.success-banner{background:var(--green-soft);border:1px solid var(--green-border);border-radius:14px;padding:24px;display:flex;align-items:center;gap:16px;margin-bottom:32px;animation:fadeUp 0.4s ease;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+.success-icon{width:44px;height:44px;border-radius:50%;background:rgba(52,211,153,0.15);border:1px solid var(--green-border);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;}
+.success-title{font-size:16px;font-weight:700;color:var(--green);margin-bottom:3px;}
+.success-sub{font-size:13px;color:var(--text-dim);line-height:1.5;}
+
+/* SECTION LABEL */
+.section-label{font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--text-faint);margin-bottom:14px;}
+
+/* TICKET CARD */
+.ticket-card{background:var(--card);border:1px solid var(--border-mid);border-radius:18px;overflow:hidden;margin-bottom:16px;animation:fadeUp 0.4s ease both;}
+.ticket-card:nth-child(2){animation-delay:0.05s;}
+.ticket-card:nth-child(3){animation-delay:0.1s;}
+.ticket-card:nth-child(4){animation-delay:0.15s;}
+
+/* TICKET HEADER */
+.ticket-header{padding:20px 22px;border-bottom:1px solid var(--border);}
+.ticket-event{font-size:17px;font-weight:800;letter-spacing:-0.02em;margin-bottom:4px;}
+.ticket-venue{font-size:13px;color:var(--text-dim);margin-bottom:10px;}
+.ticket-meta-row{display:flex;flex-wrap:wrap;gap:8px;}
+.ticket-meta-pill{font-family:var(--mono);font-size:10px;font-weight:600;padding:4px 10px;border-radius:100px;background:rgba(255,255,255,0.05);border:1px solid var(--border);color:var(--text-dim);}
+.ticket-meta-pill.tier{background:var(--orange-soft);border-color:var(--orange-glow);color:var(--orange);}
+
+/* TICKET BODY - QR + INFO */
+.ticket-body{display:flex;align-items:center;gap:0;}
+
+.ticket-qr-section{padding:22px;border-right:1px dashed rgba(255,255,255,0.1);flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:10px;}
+.qr-wrap{width:140px;height:140px;background:#fff;border-radius:10px;padding:8px;display:flex;align-items:center;justify-content:center;}
+.qr-wrap canvas,.qr-wrap img{width:100%!important;height:100%!important;}
+.qr-id{font-family:var(--mono);font-size:9px;color:var(--text-faint);letter-spacing:0.08em;text-align:center;max-width:140px;word-break:break-all;}
+
+.ticket-info-section{flex:1;padding:22px;}
+.ticket-info-row{display:flex;flex-direction:column;gap:14px;}
+.ticket-info-item{}
+.ticket-info-label{font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--text-faint);margin-bottom:4px;}
+.ticket-info-value{font-size:14px;font-weight:600;color:var(--text);}
+
+/* TICKET FOOTER */
+.ticket-footer{padding:14px 22px;background:rgba(255,255,255,0.02);border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+.ticket-status{font-family:var(--mono);font-size:10px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;display:flex;align-items:center;gap:6px;}
+.ticket-status.valid{color:var(--green);}
+.ticket-status.used{color:var(--text-faint);}
+.ticket-status.invalid{color:var(--red);}
+.status-dot{width:6px;height:6px;border-radius:50%;background:currentColor;}
+.ticket-view-btn{font-size:11px;font-weight:700;color:var(--orange);padding:5px 12px;border-radius:6px;border:1px solid var(--orange-glow);background:var(--orange-soft);cursor:pointer;transition:all 0.15s;font-family:var(--sans);}
+.ticket-view-btn:hover{background:var(--orange);color:#fff;border-color:var(--orange);}
+
+/* PERFORATED DIVIDER */
+.perf{height:1px;border:none;border-top:1px dashed rgba(255,255,255,0.1);margin:0;}
+
+/* ORDER SUMMARY */
+.order-summary{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:20px 22px;margin-bottom:24px;animation:fadeUp 0.4s 0.2s ease both;}
+.order-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px;}
+.order-row:last-child{border-bottom:none;font-weight:700;font-size:14px;color:var(--text);}
+.order-row-label{color:var(--text-dim);}
+.order-row-val{font-family:var(--mono);}
+
+/* ACTIONS */
+.actions{display:flex;flex-direction:column;gap:10px;margin-bottom:32px;animation:fadeUp 0.4s 0.25s ease both;}
+.btn-primary{display:block;text-align:center;padding:13px;background:var(--orange);color:#fff;font-weight:700;font-size:14px;border-radius:10px;border:none;cursor:pointer;font-family:var(--sans);transition:opacity 0.15s;}
+.btn-primary:hover{opacity:0.88;}
+.btn-ghost{display:block;text-align:center;padding:12px;background:rgba(255,255,255,0.04);color:var(--text-dim);font-weight:600;font-size:13px;border-radius:10px;border:1px solid var(--border);cursor:pointer;font-family:var(--sans);transition:all 0.15s;}
+.btn-ghost:hover{color:var(--text);border-color:var(--border-mid);}
+
+/* LOADING / ERROR */
+.state-box{text-align:center;padding:60px 20px;}
+.state-icon{font-size:40px;margin-bottom:14px;opacity:0.5;}
+.state-title{font-size:16px;font-weight:700;margin-bottom:6px;}
+.state-sub{font-size:13px;color:var(--text-dim);line-height:1.6;}
+.spinner{width:24px;height:24px;border:2px solid var(--border);border-top-color:var(--orange);border-radius:50%;animation:spin 0.75s linear infinite;margin:0 auto 16px;}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* SIGN IN PROMPT */
+.signin-prompt{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:24px;text-align:center;margin-bottom:24px;animation:fadeUp 0.4s 0.3s ease both;}
+.signin-prompt p{font-size:13px;color:var(--text-dim);margin-bottom:14px;line-height:1.6;}
+
+@media(max-width:500px){
+  .ticket-body{flex-direction:column;}
+  .ticket-qr-section{border-right:none;border-bottom:1px dashed rgba(255,255,255,0.1);width:100%;}
+  .page{padding:24px 16px 60px;}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="https://cbusevents.com" class="nav-logo">CBUS<span>EVENTS</span></a>
+  <button class="nav-home" onclick="window.location.href='https://cbusevents.com'">← Back to Home</button>
+</nav>
+
+<div class="page" id="page">
+  <div class="state-box">
+    <div class="spinner"></div>
+    <div class="state-title">Loading your tickets...</div>
+  </div>
+</div>
+
+<script>
+const SB_URL='https://toblgvatvsjljbqogzsv.supabase.co';
+const SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRvYmxndmF0dnNqbGpicW9nenN2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMDgwNTAsImV4cCI6MjA4NzY4NDA1MH0._WJEQPizNDiQfDXQB_DHPaQhixPGpMdmYQSmyWmm_FQ';
+const sb=supabase.createClient(SB_URL,SB_KEY);
+
+function fmt(iso){
+  if(!iso)return'TBD';
+  return new Date(iso).toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric',timeZone:'America/New_York'});
+}
+function fmtTime(iso){
+  if(!iso)return'';
+  return new Date(iso).toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit',timeZone:'America/New_York'});
+}
+function shortId(id){return (id||'').slice(0,8).toUpperCase();}
+
+function renderQR(containerId, ticketUrl){
+  const el=document.getElementById(containerId);
+  if(!el)return;
+  try{
+    new QRCode(el,{
+      text:ticketUrl,
+      width:124,height:124,
+      colorDark:'#000000',colorLight:'#ffffff',
+      correctLevel:QRCode.CorrectLevel.M
+    });
+  } catch(e){
+    el.innerHTML=`<div style="font-size:10px;color:#999;text-align:center;padding:8px">QR unavailable</div>`;
+  }
+}
+
+function ticketCard(t, idx){
+  const ev=t.events||{};
+  const ticketUrl=`https://cbusevents.com/ticket.html?id=${t.id}`;
+  const statusClass=t.is_valid===false?'invalid':t.checked_in?'used':'valid';
+  const statusLabel=t.is_valid===false?'Invalid':t.checked_in?'Used':'Valid';
+  const qrId=`qr-${t.id}`;
+
+  return `
+  <div class="ticket-card">
+    <div class="ticket-header">
+      <div class="ticket-event">${ev.title||'Event'}</div>
+      <div class="ticket-venue">${ev.venues?.name||'Columbus Venue'}</div>
+      <div class="ticket-meta-row">
+        <span class="ticket-meta-pill">${fmt(ev.start_time)}</span>
+        ${ev.start_time?`<span class="ticket-meta-pill">${fmtTime(ev.start_time)}</span>`:''}
+        ${t.tier_name?`<span class="ticket-meta-pill tier">${t.tier_name}</span>`:''}
+      </div>
+    </div>
+    <div class="ticket-body">
+      <div class="ticket-qr-section">
+        <div class="qr-wrap" id="${qrId}"></div>
+        <div class="qr-id">${shortId(t.id)}</div>
+      </div>
+      <div class="ticket-info-section">
+        <div class="ticket-info-row">
+          <div class="ticket-info-item">
+            <div class="ticket-info-label">Holder</div>
+            <div class="ticket-info-value">${t.holder_name||'—'}</div>
+          </div>
+          <div class="ticket-info-item">
+            <div class="ticket-info-label">Ticket #</div>
+            <div class="ticket-info-value">${shortId(t.id)}</div>
+          </div>
+          ${t.amount_paid?`
+          <div class="ticket-info-item">
+            <div class="ticket-info-label">Paid</div>
+            <div class="ticket-info-value">$${(t.amount_paid/100).toFixed(2)}</div>
+          </div>`:''}
+        </div>
+      </div>
+    </div>
+    <div class="ticket-footer">
+      <div class="ticket-status ${statusClass}">
+        <div class="status-dot"></div>
+        ${statusLabel}${t.checked_in&&t.checked_in_at?' · '+new Date(t.checked_in_at).toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'}):''}
+      </div>
+      <button class="ticket-view-btn" onclick="window.open('${ticketUrl}','_blank')">View Ticket →</button>
+    </div>
+  </div>`;
+}
+
+async function init(){
+  const page=document.getElementById('page');
+  const params=new URLSearchParams(location.search);
+  const sessionId=params.get('session_id');
+  const orderId=params.get('order_id');
+  const guestEmail=params.get('email');
+
+  // Get current user session
+  const{data:{session}}=await sb.auth.getSession();
+  const user=session?.user||null;
+
+  let tickets=[];
+  let order=null;
+
+  // Load by Stripe session_id if present (immediate post-checkout)
+  if(sessionId){
+    // Find order by stripe session id
+    const{data:ord}=await sb.from('orders')
+      .select('*,events(id,title,start_time,venues(name))')
+      .eq('stripe_session_id',sessionId)
+      .maybeSingle();
+    order=ord;
+
+    if(ord){
+      const{data:tix}=await sb.from('tickets')
+        .select('*,events(id,title,start_time,venues(name))')
+        .eq('order_id',ord.id)
+        .order('created_at',{ascending:true});
+      tickets=tix||[];
+    }
+  }
+  // Load by order_id
+  else if(orderId){
+    const{data:ord}=await sb.from('orders')
+      .select('*,events(id,title,start_time,venues(name))')
+      .eq('id',orderId)
+      .maybeSingle();
+    order=ord;
+    if(ord){
+      const{data:tix}=await sb.from('tickets')
+        .select('*,events(id,title,start_time,venues(name))')
+        .eq('order_id',orderId)
+        .order('created_at',{ascending:true});
+      tickets=tix||[];
+    }
+  }
+  // Load by user email - show all their tickets
+  else if(user){
+    const{data:tix}=await sb.from('tickets')
+      .select('*,events(id,title,start_time,venues(name))')
+      .eq('holder_email',user.email)
+      .eq('is_valid',true)
+      .order('created_at',{ascending:false})
+      .limit(20);
+    tickets=tix||[];
+  }
+  // Guest with email param
+  else if(guestEmail){
+    const{data:tix}=await sb.from('tickets')
+      .select('*,events(id,title,start_time,venues(name))')
+      .eq('holder_email',guestEmail)
+      .order('created_at',{ascending:false})
+      .limit(10);
+    tickets=tix||[];
+  }
+
+  if(!tickets.length&&!sessionId){
+    page.innerHTML=`
+    <div class="state-box">
+      <div class="state-icon">🎟</div>
+      <div class="state-title">No tickets found</div>
+      <div class="state-sub">If you just purchased, it may take a moment to process.<br>Check your email for a confirmation link.</div>
+    </div>
+    <div class="actions">
+      <a href="https://cbusevents.com" class="btn-primary">Browse Events</a>
+    </div>`;
+    return;
+  }
+
+  // Build order summary if we have an order
+  const orderSummaryHtml=order?`
+  <div class="section-label">Order Summary</div>
+  <div class="order-summary">
+    ${order.subtotal!=null?`<div class="order-row"><span class="order-row-label">Subtotal</span><span class="order-row-val">$${(order.subtotal/100||order.subtotal).toFixed(2)}</span></div>`:''}
+    ${order.platform_fee!=null?`<div class="order-row"><span class="order-row-label">Platform fee</span><span class="order-row-val">$${(order.platform_fee/100||order.platform_fee).toFixed(2)}</span></div>`:''}
+    ${order.total_charged!=null?`<div class="order-row"><span class="order-row-label">Total charged</span><span class="order-row-val">$${(order.total_charged/100||order.total_charged).toFixed(2)}</span></div>`:''}
+  </div>`:'';
+
+  // Sign in prompt for guests
+  const signinHtml=!user?`
+  <div class="signin-prompt">
+    <p>Save your tickets to your CBUSEVENTS account so you can access them anytime - no need to search your email.</p>
+    <a href="https://cbusevents.com/customer-portal.html" class="btn-primary">Create Free Account →</a>
+  </div>`:'';
+
+  page.innerHTML=`
+  <div class="success-banner">
+    <div class="success-icon">✓</div>
+    <div>
+      <div class="success-title">You're in. Tickets confirmed.</div>
+      <div class="success-sub">A confirmation has been sent to your email. Show the QR code at the door.</div>
+    </div>
+  </div>
+
+  <div class="section-label">${tickets.length} Ticket${tickets.length!==1?'s':''}</div>
+  ${tickets.map((t,i)=>ticketCard(t,i)).join('')}
+
+  ${orderSummaryHtml}
+
+  <div class="actions">
+    <button class="btn-ghost" onclick="window.print()">Save / Print Tickets</button>
+    <a href="https://cbusevents.com" class="btn-ghost">Browse More Events</a>
+  </div>
+
+  ${signinHtml}`;
+
+  // Render QR codes after DOM is set
+  tickets.forEach(t=>{
+    const url=`https://cbusevents.com/ticket.html?id=${t.id}`;
+    renderQR(`qr-${t.id}`,url);
+  });
+
+  // Clean URL after loading
+  if(sessionId){
+    history.replaceState({},'',`/order-confirmation.html?order_id=${order?.id||''}`);
+  }
+}
+
+init();
+</script>
+</body>
+</html>

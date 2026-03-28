@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Ticket — CBUSEVENTS</title>
+<meta name="theme-color" content="#080810">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,600;9..40,700;9..40,800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<style>
+:root{
+  --bg:#080810;--surface:#0d0d1a;--card:#0f0f1e;
+  --border:rgba(255,255,255,0.08);--border-mid:rgba(255,255,255,0.13);
+  --orange:#FF6B35;--orange-soft:rgba(255,107,53,0.1);--orange-glow:rgba(255,107,53,0.25);
+  --text:#eeeef8;--text-dim:#7878a0;--text-faint:#3a3a58;
+  --green:#34d399;--green-soft:rgba(52,211,153,0.1);--green-border:rgba(52,211,153,0.25);
+  --red:#f87171;--red-soft:rgba(248,113,113,0.1);--red-border:rgba(248,113,113,0.25);
+  --mono:'DM Mono',monospace;--sans:'DM Sans',sans-serif;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-font-smoothing:antialiased;}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding:0;}
+
+/* NAV */
+nav{width:100%;height:52px;display:flex;align-items:center;justify-content:space-between;padding:0 20px;background:rgba(8,8,16,0.96);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100;}
+.nav-logo{font-weight:800;font-size:15px;letter-spacing:-0.03em;text-transform:uppercase;}
+.nav-logo span{color:var(--orange);}
+
+/* TICKET WRAPPER */
+.ticket-wrap{width:100%;max-width:420px;padding:28px 16px 60px;}
+
+/* CHECKED IN BANNER */
+.checked-in-banner{background:var(--green-soft);border:1px solid var(--green-border);border-radius:14px;padding:18px 20px;display:flex;align-items:center;gap:14px;margin-bottom:20px;animation:fadeUp 0.3s ease;}
+.checked-in-icon{width:40px;height:40px;border-radius:50%;background:rgba(52,211,153,0.15);border:1px solid var(--green-border);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}
+.checked-in-title{font-size:14px;font-weight:700;color:var(--green);margin-bottom:2px;}
+.checked-in-sub{font-size:12px;color:var(--text-dim);}
+
+/* INVALID BANNER */
+.invalid-banner{background:var(--red-soft);border:1px solid var(--red-border);border-radius:14px;padding:18px 20px;display:flex;align-items:center;gap:14px;margin-bottom:20px;animation:fadeUp 0.3s ease;}
+.invalid-icon{width:40px;height:40px;border-radius:50%;background:rgba(248,113,113,0.1);border:1px solid var(--red-border);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}
+.invalid-title{font-size:14px;font-weight:700;color:var(--red);margin-bottom:2px;}
+.invalid-sub{font-size:12px;color:var(--text-dim);}
+
+/* TICKET CARD */
+.ticket-card{background:var(--card);border:1px solid var(--border-mid);border-radius:20px;overflow:hidden;animation:fadeUp 0.3s ease;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+
+/* EVENT COVER */
+.event-cover{height:140px;position:relative;overflow:hidden;background:linear-gradient(135deg,#0f0f22,#1a0e08);}
+.event-cover img{width:100%;height:100%;object-fit:cover;}
+.event-cover-placeholder{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:52px;opacity:0.2;}
+.event-cover-gradient{position:absolute;inset:0;background:linear-gradient(to top,rgba(15,15,30,0.9) 0%,transparent 60%);}
+.event-cover-text{position:absolute;bottom:14px;left:18px;right:18px;}
+.event-cover-title{font-size:18px;font-weight:800;letter-spacing:-0.02em;line-height:1.2;margin-bottom:3px;}
+.event-cover-venue{font-size:12px;color:rgba(255,255,255,0.65);}
+
+/* QR SECTION */
+.qr-section{padding:24px;display:flex;flex-direction:column;align-items:center;gap:14px;border-bottom:1px dashed rgba(255,255,255,0.08);}
+.qr-outer{background:#fff;border-radius:14px;padding:10px;display:flex;align-items:center;justify-content:center;width:180px;height:180px;}
+.qr-outer canvas,.qr-outer img{width:100%!important;height:100%!important;}
+.qr-instruction{font-size:11px;color:var(--text-faint);text-align:center;line-height:1.5;}
+.qr-code-text{font-family:var(--mono);font-size:11px;color:var(--text-faint);letter-spacing:0.12em;text-align:center;}
+
+/* TICKET DETAILS */
+.ticket-details{padding:20px;}
+.detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;}
+.detail-item{}
+.detail-label{font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--text-faint);margin-bottom:4px;}
+.detail-value{font-size:13px;font-weight:600;color:var(--text);}
+
+/* STATUS ROW */
+.status-row{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:rgba(255,255,255,0.02);border-radius:10px;border:1px solid var(--border);}
+.status-badge{display:flex;align-items:center;gap:7px;font-family:var(--mono);font-size:10px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;}
+.status-dot{width:7px;height:7px;border-radius:50%;background:currentColor;}
+.status-badge.valid{color:var(--green);}
+.status-badge.used{color:var(--text-faint);}
+.status-badge.invalid{color:var(--red);}
+.ticket-id-label{font-family:var(--mono);font-size:10px;color:var(--text-faint);letter-spacing:0.08em;}
+
+/* PERFORATED EDGE */
+.perf-edge{height:1px;border:none;border-top:2px dashed rgba(255,255,255,0.06);margin:0;}
+
+/* LOADING / ERROR */
+.state-box{text-align:center;padding:60px 20px;width:100%;max-width:420px;}
+.state-icon{font-size:40px;margin-bottom:14px;}
+.state-title{font-size:16px;font-weight:700;margin-bottom:6px;}
+.state-sub{font-size:13px;color:var(--text-dim);line-height:1.6;}
+.spinner{width:28px;height:28px;border:2px solid var(--border);border-top-color:var(--orange);border-radius:50%;animation:spin 0.75s linear infinite;margin:0 auto 20px;}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+.btn-home{display:block;text-align:center;padding:12px;background:var(--orange);color:#fff;font-weight:700;font-size:14px;border-radius:10px;margin-top:20px;transition:opacity 0.15s;}
+.btn-home:hover{opacity:0.88;}
+
+/* CBUSEVENTS WATERMARK */
+.ticket-watermark{padding:16px;text-align:center;border-top:1px solid var(--border);}
+.watermark-logo{font-weight:800;font-size:13px;letter-spacing:-0.02em;text-transform:uppercase;color:var(--text-faint);}
+.watermark-logo span{color:var(--orange);}
+.watermark-sub{font-family:var(--mono);font-size:9px;color:var(--text-faint);letter-spacing:0.1em;margin-top:2px;}
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="https://cbusevents.com" class="nav-logo">CBUS<span>EVENTS</span></a>
+</nav>
+
+<div id="root"></div>
+
+<script>
+const SB_URL='https://toblgvatvsjljbqogzsv.supabase.co';
+const SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRvYmxndmF0dnNqbGpicW9nenN2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMDgwNTAsImV4cCI6MjA4NzY4NDA1MH0._WJEQPizNDiQfDXQB_DHPaQhixPGpMdmYQSmyWmm_FQ';
+const sb=supabase.createClient(SB_URL,SB_KEY);
+
+function fmt(iso){
+  if(!iso)return'TBD';
+  const d=new Date(iso);
+  return d.toLocaleDateString('en-US',{weekday:'short',month:'long',day:'numeric',year:'numeric',timeZone:'America/New_York'})
+    +' at '+d.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit',timeZone:'America/New_York'});
+}
+function shortId(id){return(id||'').slice(0,8).toUpperCase();}
+
+function renderQR(containerId,url){
+  const el=document.getElementById(containerId);
+  if(!el)return;
+  try{
+    new QRCode(el,{text:url,width:160,height:160,colorDark:'#000',colorLight:'#fff',correctLevel:QRCode.CorrectLevel.H});
+  }catch(e){
+    el.innerHTML=`<div style="font-size:11px;color:#999;text-align:center">QR unavailable</div>`;
+  }
+}
+
+async function init(){
+  const root=document.getElementById('root');
+  const params=new URLSearchParams(location.search);
+  const ticketId=params.get('id');
+
+  if(!ticketId){
+    root.innerHTML=`
+    <div class="state-box">
+      <div class="state-icon">🎟</div>
+      <div class="state-title">No ticket ID provided</div>
+      <div class="state-sub">This link appears to be invalid. Check your confirmation email for the correct ticket link.</div>
+      <a href="https://cbusevents.com" class="btn-home">Back to CBUSEVENTS</a>
+    </div>`;
+    return;
+  }
+
+  root.innerHTML=`<div class="state-box"><div class="spinner"></div><div class="state-title">Loading ticket...</div></div>`;
+
+  const{data:ticket,error}=await sb
+    .from('tickets')
+    .select('*,events(id,title,start_time,cover_image_url,venues(name,neighborhood))')
+    .eq('id',ticketId)
+    .maybeSingle();
+
+  if(error||!ticket){
+    root.innerHTML=`
+    <div class="state-box">
+      <div class="state-icon">❌</div>
+      <div class="state-title">Ticket not found</div>
+      <div class="state-sub">This ticket ID doesn't exist or may have been removed.</div>
+      <a href="https://cbusevents.com" class="btn-home">Back to CBUSEVENTS</a>
+    </div>`;
+    return;
+  }
+
+  const ev=ticket.events||{};
+  const ticketUrl=`https://cbusevents.com/ticket.html?id=${ticket.id}`;
+  const isInvalid=ticket.is_valid===false;
+  const isCheckedIn=ticket.checked_in===true;
+
+  // Status banner
+  let bannerHtml='';
+  if(isInvalid){
+    bannerHtml=`
+    <div class="invalid-banner">
+      <div class="invalid-icon">✕</div>
+      <div>
+        <div class="invalid-title">This ticket is invalid</div>
+        <div class="invalid-sub">This ticket has been voided or refunded and cannot be used for entry.</div>
+      </div>
+    </div>`;
+  } else if(isCheckedIn){
+    const checkedTime=ticket.checked_in_at?new Date(ticket.checked_in_at).toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'}):'';
+    bannerHtml=`
+    <div class="checked-in-banner">
+      <div class="checked-in-icon">✓</div>
+      <div>
+        <div class="checked-in-title">Already Checked In${checkedTime?' at '+checkedTime:''}</div>
+        <div class="checked-in-sub">This ticket was scanned and used for entry. It cannot be used again.</div>
+      </div>
+    </div>`;
+  }
+
+  const statusClass=isInvalid?'invalid':isCheckedIn?'used':'valid';
+  const statusLabel=isInvalid?'Invalid':isCheckedIn?'Used':'Valid - Ready to Scan';
+
+  const coverHtml=ev.cover_image_url
+    ?`<img src="${ev.cover_image_url}" alt="${ev.title||'Event'}" loading="lazy">`
+    :`<div class="event-cover-placeholder">🎟</div>`;
+
+  root.innerHTML=`
+  <div class="ticket-wrap">
+    ${bannerHtml}
+    <div class="ticket-card">
+      <div class="event-cover">
+        ${coverHtml}
+        <div class="event-cover-gradient"></div>
+        <div class="event-cover-text">
+          <div class="event-cover-title">${ev.title||'Event'}</div>
+          <div class="event-cover-venue">${ev.venues?.name||'Columbus Venue'}${ev.venues?.neighborhood?' · '+ev.venues.neighborhood:''}</div>
+        </div>
+      </div>
+
+      ${!isInvalid?`
+      <div class="qr-section">
+        <div class="qr-outer" id="qr-main"></div>
+        <div class="qr-code-text">${shortId(ticket.id)}</div>
+        <div class="qr-instruction">${isCheckedIn?'This ticket has already been scanned':'Show this QR code at the door'}</div>
+      </div>`:`
+      <div class="qr-section">
+        <div style="width:180px;height:180px;background:rgba(248,113,113,0.05);border:1px solid var(--red-border);border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:48px;opacity:0.4">✕</div>
+        <div class="qr-instruction" style="color:var(--red)">Invalid ticket - entry not permitted</div>
+      </div>`}
+
+      <div class="ticket-details">
+        <div class="detail-grid">
+          <div class="detail-item">
+            <div class="detail-label">Date & Time</div>
+            <div class="detail-value" style="font-size:12px">${fmt(ev.start_time)}</div>
+          </div>
+          <div class="detail-item">
+            <div class="detail-label">Ticket Type</div>
+            <div class="detail-value">${ticket.tier_name||'General Admission'}</div>
+          </div>
+          ${ticket.holder_name?`
+          <div class="detail-item">
+            <div class="detail-label">Holder</div>
+            <div class="detail-value">${ticket.holder_name}</div>
+          </div>`:''}
+          ${ticket.amount_paid?`
+          <div class="detail-item">
+            <div class="detail-label">Amount Paid</div>
+            <div class="detail-value">$${(ticket.amount_paid/100).toFixed(2)}</div>
+          </div>`:''}
+        </div>
+
+        <div class="status-row">
+          <div class="status-badge ${statusClass}">
+            <div class="status-dot"></div>
+            ${statusLabel}
+          </div>
+          <div class="ticket-id-label">#${shortId(ticket.id)}</div>
+        </div>
+      </div>
+
+      <div class="ticket-watermark">
+        <div class="watermark-logo">CBUS<span>EVENTS</span></div>
+        <div class="watermark-sub">Official Ticket · Columbus, Ohio</div>
+      </div>
+    </div>
+  </div>`;
+
+  // Render QR only if ticket is valid and not checked in
+  if(!isInvalid){
+    renderQR('qr-main',ticketUrl);
+  }
+}
+
+init();
+</script>
+</body>
+</html>
