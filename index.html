@@ -1011,7 +1011,7 @@ h1,h2,h3,h4,h5,h6{font-family:var(--font);letter-spacing:-0.02em;}
 </style>
 </head>
 <body> <!-- NAV -->
-<nav id="topNav"> <div class="nav-logo" onclick="showPage('home')" role="button" tabindex="0"> CBUS<span>EVENTS</span> </div> <div class="nav-links"> <button class="nav-link" id="nav-home" onclick="showPage('home')">Home</button> <button class="nav-link" id="nav-venues" onclick="showPage('venues')">Venues</button> <button class="nav-link" id="nav-vendors" onclick="showPage('vendors')">Vendors</button> <button class="nav-link" id="nav-events" onclick="showPage('events')">Events</button> <div style="position:relative" id="columbusDropdown">
+<nav id="topNav"> <div class="nav-logo" onclick="showPage('home')" role="button" tabindex="0"> CBUS<span>EVENTS</span> </div> <div class="nav-links"> <button class="nav-link" id="nav-home" onclick="showPage('home')">Home</button> <button class="nav-link" id="nav-venues" onclick="showPage('venues')">Venues</button> <button class="nav-link" id="nav-vendors" onclick="window.location.href='https://cbusevents.com/vendors.html'">Vendors</button> <button class="nav-link" id="nav-events" onclick="showPage('events')">Events</button> <div style="position:relative" id="columbusDropdown">
   <button class="nav-link" onclick="toggleColumbusMenu()" style="display:flex;align-items:center;gap:4px">Columbus ▾</button>
   <div id="columbusMenu" style="display:none;position:absolute;top:calc(100% + 8px);left:0;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:8px;min-width:210px;box-shadow:0 16px 40px rgba(0,0,0,0.5);z-index:200;">
     <a href="https://cbusevents.com/gallery-hop.html" style="display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:8px;font-size:13px;font-weight:600;color:var(--text);text-decoration:none;transition:background 0.15s" onmouseover="this.style.background='rgba(255,255,255,0.05)'" onmouseout="this.style.background='transparent'">
@@ -1060,7 +1060,7 @@ h1,h2,h3,h4,h5,h6{font-family:var(--font);letter-spacing:-0.02em;}
   <a onclick="showPage('home')" class="nav-mobile-link" style="cursor:pointer">Home</a>
   <a onclick="showPage('events')" class="nav-mobile-link" style="cursor:pointer">Events</a>
   <a onclick="showPage('venues')" class="nav-mobile-link" style="cursor:pointer">Venues</a>
-  <a onclick="showPage('vendors')" class="nav-mobile-link" style="cursor:pointer">Vendors</a>
+  <a href="https://cbusevents.com/vendors.html" class="nav-mobile-link">Vendors</a>
   <a href="https://cbusevents.com/signup.html?role=planner" class="nav-mobile-link">Planners</a>
   <div class="nav-mobile-divider"></div>
   <a href="https://cbusevents.com/gallery-hop.html" class="nav-mobile-link" style="color:var(--orange)">Gallery Hop</a>
@@ -1654,7 +1654,7 @@ function renderHome(){
    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px">
      ${[
        {role:'venue',    label:'Venue Owners',   desc:'Get discovered, receive booking inquiries, publish events, and sell tickets.',    link:'List your venue'},
-       {role:'vendor',   label:'Vendors',         desc:'Showcase your services and get booked by planners and venues searching Columbus.', link:'List your services'},
+       {role:'vendor',   label:'Vendors',         desc:'Columbus planners search CBUSEVENTS when they need catering, florals, DJs, and more. Get your business in front of them. Free to start.', link:'List your services'},
        {role:'planner',  label:'Event Planners',  desc:'Browse venues, send inquiries, hire vendors, and manage your events.',            link:'Join as a planner'},
        {role:'attendee', label:'Customers',        desc:'Discover Columbus events, buy tickets, and never miss a night worth going to.',   link:'Find events'},
      ].map(c=>`

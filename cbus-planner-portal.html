@@ -730,7 +730,6 @@ async function renderPayouts(){
 async function renderBilling(){
  const planParam=new URLSearchParams(window.location.search).get('upgrade');
 
- // If returning from Stripe with success - write tier to DB immediately
  if(planParam==='success'){
    const tierParam=new URLSearchParams(window.location.search).get('tier')||'pro';
    await sb.from('customer_profiles').upsert({
@@ -739,50 +738,123 @@ async function renderBilling(){
      plan_status:'active',
      plan_updated_at:new Date().toISOString()
    },{onConflict:'user_id'}).catch(e=>console.warn('tier update:',e));
-   // Clean URL
    window.history.replaceState({},'',window.location.pathname);
  }
+
+ // Read current tier from plannerProfile
+ const tier=(plannerProfile?.plan_tier||'free').toLowerCase();
+ const isBasic=tier==='free'||tier==='basic';
+ const isStandard=tier==='standard'||tier==='pro';
+ const isPremium=tier==='premium'||tier==='agency';
+ const curLabel=isPremium?'Premium':isStandard?'Standard':'Basic';
+ const curDesc=isPremium
+   ?'You have full access to all planner tools including unlimited events, priority placement, and advanced analytics.'
+   :isStandard
+   ?'Your planner profile is active with full vendor directory access, ticketing, and marketing features. Upgrade to Premium for unlimited events and dedicated support.'
+   :'Your planner account is live. Upgrade to Standard to access the vendor directory, sell tickets, and unlock marketing tools.';
+
+ const lockedBasic=[
+   ['Full Vendor Directory','Browse and contact every Columbus vendor on CBUSEVENTS - photographers, DJs, caterers, and more.'],
+   ['Sell Tickets','Create paid ticket tiers for your events and collect revenue directly through CBUSEVENTS.'],
+   ['Featured Planner Profile','Get a public-facing profile that planners and venues can discover and reach out to.'],
+   ['Marketing Features','Promote your events through CBUSEVENTS channels and unlock event boost tools.'],
+ ];
+ const lockedStandard=[
+   ['Unlimited Events','Standard is capped on event volume. Premium removes the limit entirely.'],
+   ['Priority Search Placement','Show up first when venues and clients search for planners in Columbus.'],
+   ['Advanced Analytics','Deep event performance data, attendee insights, and revenue tracking.'],
+   ['Dedicated Support','Direct line to the CBUSEVENTS team for setup, strategy, and troubleshooting.'],
+ ];
+ const locked=isBasic?lockedBasic:isStandard?lockedStandard:[];
+ const lockedTitle=isBasic?'Locked on Basic':'Unlock with Premium';
 
  document.getElementById('app').innerHTML=`
  <div class="page">
    <div class="section-title">Plan & Billing</div>
-   <div class="section-sub" style="margin-bottom:32px">Upgrade to unlock more tools and visibility across CBUSEVENTS.</div>
-   ${planParam==='success'?`<div style="background:#0a2a14;border:1px solid #1a4a24;border-radius:10px;padding:14px 18px;margin-bottom:28px;color:#22c55e;font-size:14px;font-weight:600;">Upgrade successful! Your plan will be activated within a minute.</div>`:''}
-   <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:18px">
+   <div class="section-sub" style="margin-bottom:24px">Manage your CBUSEVENTS planner subscription.</div>
 
-     <!-- FREE -->
-     <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:28px">
-       <div style="font-weight:800;font-size:18px;margin-bottom:8px;color:var(--muted)">Free</div>
-       <div style="font-size:28px;font-weight:800;letter-spacing:-0.03em;line-height:1;margin-bottom:20px;color:var(--muted)">$0<span style="font-size:14px;color:var(--muted)">/mo</span></div>
+   ${planParam==='success'?`<div style="background:#0a2a14;border:1px solid #1a4a24;border-radius:10px;padding:14px 18px;margin-bottom:24px;color:#22c55e;font-size:14px;font-weight:600;">Upgrade successful! Your plan will be activated within a minute.</div>`:''}
+
+   <!-- Current plan banner -->
+   <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:20px 24px;display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:28px;flex-wrap:wrap">
+     <div style="flex:1;min-width:200px">
+       <div style="font-family:'DM Mono',monospace;font-size:9px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--muted);margin-bottom:6px">Current Plan</div>
+       <div style="font-size:18px;font-weight:800;letter-spacing:-0.02em;margin-bottom:4px">${curLabel}</div>
+       <div style="font-size:12px;color:var(--sub);line-height:1.6">${curDesc}</div>
+     </div>
+     <div style="font-family:'DM Mono',monospace;font-size:10px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;padding:5px 14px;border-radius:9999px;white-space:nowrap;${isPremium?'background:rgba(251,191,36,0.1);color:#fbbf24;border:1px solid rgba(251,191,36,0.25)':isStandard?'background:rgba(255,107,53,0.1);color:var(--orange);border:1px solid rgba(255,107,53,0.25)':'background:rgba(255,255,255,0.05);color:var(--muted);border:1px solid var(--border)'}">${curLabel}</div>
+   </div>
+
+   <!-- Locked features -->
+   ${locked.length?`
+   <div style="font-family:'DM Mono',monospace;font-size:9px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--muted);margin-bottom:12px">${lockedTitle}</div>
+   <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:10px;margin-bottom:28px">
+     ${locked.map(([t,d])=>`
+     <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px;opacity:0.78;position:relative">
+       <div style="position:absolute;top:10px;right:10px;font-family:'DM Mono',monospace;font-size:8px;font-weight:700;padding:2px 7px;border-radius:9999px;background:rgba(255,255,255,0.05);color:var(--muted);border:1px solid var(--border);text-transform:uppercase;letter-spacing:0.08em">Locked</div>
+       <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:5px">${t}</div>
+       <div style="font-size:11px;color:var(--sub);line-height:1.5">${d}</div>
+     </div>`).join('')}
+   </div>`:''}
+
+   <!-- ROI callout -->
+   ${!isPremium?`
+   <div style="background:linear-gradient(135deg,rgba(52,211,153,0.07),rgba(52,211,153,0.03));border:1px solid rgba(52,211,153,0.2);border-radius:14px;padding:20px 24px;margin-bottom:28px;display:flex;gap:16px;align-items:flex-start">
+     <div style="font-size:22px;flex-shrink:0;margin-top:2px">💡</div>
+     <div>
+       <div style="font-family:'DM Mono',monospace;font-size:9px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:#34d399;margin-bottom:4px">Think About It This Way</div>
+       <div style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:6px">${isBasic?'Standard pays for itself the moment you book a paid event.':'Premium pays for itself with one major event.'}</div>
+       <div style="font-size:12px;color:var(--sub);line-height:1.6">${isBasic?'At <strong style="color:var(--text)">$20/mo</strong>, Standard unlocks ticketing, the vendor directory, and marketing tools. One ticketed event with 50 attendees at $20/ticket generates $1,000 in ticket sales - Standard is covered for over 4 years.':'At <strong style="color:var(--text)">$75/mo</strong>, Premium removes event limits and puts you at the top of planner search. One corporate event contract worth $5,000 covers Premium for 5+ years.'}</div>
+     </div>
+   </div>`:''}
+
+   <!-- Plan comparison -->
+   <div style="font-family:'DM Mono',monospace;font-size:9px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--muted);margin-bottom:12px">Compare Plans</div>
+   <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:18px;margin-bottom:28px">
+
+     <div style="background:var(--card);border:${isBasic?'2px solid var(--orange)':'1px solid var(--border)'};border-radius:14px;padding:28px;position:relative;${isBasic?'margin-top:16px':''}">
+       ${isBasic?'<div style="position:absolute;top:-12px;left:50%;transform:translateX(-50%);background:var(--orange);color:#fff;border-radius:20px;padding:2px 14px;font-size:11px;font-weight:700;white-space:nowrap">Current Plan</div>':''}
+       <div style="font-weight:800;font-size:18px;margin-bottom:8px;color:var(--muted)">Basic</div>
+       <div style="font-size:28px;font-weight:800;letter-spacing:-0.03em;line-height:1;margin-bottom:4px;color:var(--muted)">Free<span style="font-size:14px;color:var(--muted)">/mo</span></div>
+       <div style="font-size:11px;color:var(--muted);margin-bottom:20px">always included</div>
        <div style="display:flex;flex-direction:column;gap:9px;margin-bottom:24px;font-size:13px;color:var(--sub)">
-         <div>Browse all Columbus venues</div>
+         <div>Browse Columbus venues</div>
          <div>Send venue inquiries</div>
          <div>Create and publish events</div>
+         <div style="opacity:0.4;text-decoration:line-through">Vendor directory</div>
+         <div style="opacity:0.4;text-decoration:line-through">Sell tickets</div>
        </div>
-       <div style="text-align:center;padding:10px;background:var(--surface);border:1px solid var(--border);border-radius:8px;font-size:13px;color:var(--muted)">Current Plan</div>
+       <div style="text-align:center;padding:10px;background:var(--surface);border:1px solid var(--border);border-radius:8px;font-size:13px;color:var(--muted)">${isBasic?'Current Plan':'Basic'}</div>
      </div>
 
-     <!-- STANDARD -->
-     <div style="background:linear-gradient(135deg,#110800,#1a0c00);border:2px solid #FF6B35;border-radius:14px;padding:28px;position:relative">
-       <div style="position:absolute;top:-11px;left:50%;transform:translateX(-50%);background:#FF6B35;color:#fff;border-radius:20px;padding:2px 14px;font-size:11px;font-weight:700;white-space:nowrap">Most Popular</div>
+     <div style="background:linear-gradient(135deg,#110800,#1a0c00);border:${isStandard?'2px solid #FF6B35':'1.5px solid rgba(255,107,53,0.35)'};border-radius:14px;padding:28px;position:relative;margin-top:16px">
+       ${isStandard?'<div style="position:absolute;top:-12px;left:50%;transform:translateX(-50%);background:var(--orange);color:#fff;border-radius:20px;padding:2px 14px;font-size:11px;font-weight:700;white-space:nowrap">Current Plan</div>':''}
+       ${!isStandard&&!isPremium?'<div style="position:absolute;top:-12px;left:50%;transform:translateX(-50%);background:var(--orange);color:#fff;border-radius:20px;padding:2px 14px;font-size:11px;font-weight:700;white-space:nowrap">Most Popular</div>':''}
        <div style="font-weight:800;font-size:18px;color:#FF6B35;margin-bottom:8px">Standard</div>
-       <div style="font-size:28px;font-weight:800;letter-spacing:-0.03em;line-height:1;color:#FF6B35;margin-bottom:4px">$15<span style="font-size:14px;color:var(--sub)">/mo</span></div>
+       <div style="font-size:28px;font-weight:800;letter-spacing:-0.03em;line-height:1;color:#FF6B35;margin-bottom:4px">$20<span style="font-size:14px;color:var(--sub)">/mo</span></div>
        <div style="font-size:11px;color:var(--muted);margin-bottom:20px">billed monthly</div>
        <div style="display:flex;flex-direction:column;gap:9px;margin-bottom:24px;font-size:13px;color:var(--sub)">
-         <div style="color:var(--text)">Everything in Free</div>
+         <div style="color:var(--text)">Everything in Basic</div>
          <div style="color:var(--text)">Full vendor directory access</div>
          <div style="color:var(--text)">Receive vendor proposals</div>
          <div style="color:var(--text)">Featured planner profile</div>
          <div style="color:var(--text)">Sell tickets through CBUSEVENTS</div>
-         <div style="color:var(--text)">Unlimited marketing features</div>
+         <div style="color:var(--text)">Marketing features</div>
+         <div style="opacity:0.4;text-decoration:line-through">Unlimited events</div>
+         <div style="opacity:0.4;text-decoration:line-through">Priority placement</div>
        </div>
-       <button onclick="window.open('https://buy.stripe.com/6oU8wP6I8fN0595dA4c3m07','_blank')" style="width:100%;padding:11px;background:#FF6B35;color:#fff;border:none;border-radius:8px;font-weight:700;font-size:14px;cursor:pointer">Get Standard →</button>
+       ${isStandard
+         ?'<div style="text-align:center;padding:10px;background:var(--surface);border:1px solid var(--border);border-radius:8px;font-size:13px;color:var(--muted)">Current Plan</div>'
+         :isPremium
+         ?'<div style="text-align:center;padding:10px;background:var(--surface);border:1px solid var(--border);border-radius:8px;font-size:13px;color:var(--muted)">Included in Premium</div>'
+         :`<button onclick="window.open('https://buy.stripe.com/6oU8wP6I8fN0595dA4c3m07','_blank')" style="width:100%;padding:11px;background:#FF6B35;color:#fff;border:none;border-radius:8px;font-weight:700;font-size:14px;cursor:pointer">Get Standard - $20/mo →</button>`}
      </div>
 
-     <!-- PREMIUM -->
-     <div style="background:linear-gradient(135deg,#0f0e00,#181500);border:2px solid #fbbf24;border-radius:14px;padding:28px">
+     <div style="background:linear-gradient(135deg,#0f0e00,#181500);border:${isPremium?'2px solid #fbbf24':'1.5px solid rgba(251,191,36,0.25)'};border-radius:14px;padding:28px;position:relative;margin-top:16px">
+       ${isPremium?'<div style="position:absolute;top:-12px;left:50%;transform:translateX(-50%);background:#fbbf24;color:#000;border-radius:20px;padding:2px 14px;font-size:11px;font-weight:700;white-space:nowrap">Current Plan</div>':''}
+       ${!isPremium?'<div style="position:absolute;top:-12px;left:50%;transform:translateX(-50%);background:#fbbf24;color:#000;border-radius:20px;padding:2px 14px;font-size:11px;font-weight:700;white-space:nowrap">Best Value</div>':''}
        <div style="font-weight:800;font-size:18px;color:#fbbf24;margin-bottom:8px">Premium</div>
-       <div style="font-size:28px;font-weight:800;letter-spacing:-0.03em;line-height:1;color:#fbbf24;margin-bottom:4px">$45<span style="font-size:14px;color:var(--sub)">/mo</span></div>
+       <div style="font-size:28px;font-weight:800;letter-spacing:-0.03em;line-height:1;color:#fbbf24;margin-bottom:4px">$75<span style="font-size:14px;color:var(--sub)">/mo</span></div>
        <div style="font-size:11px;color:var(--muted);margin-bottom:20px">billed monthly</div>
        <div style="display:flex;flex-direction:column;gap:9px;margin-bottom:24px;font-size:13px;color:var(--sub)">
          <div style="color:var(--text)">Everything in Standard</div>
@@ -792,13 +864,16 @@ async function renderBilling(){
          <div style="color:var(--text)">Advanced analytics</div>
          <div style="color:var(--text)">Dedicated support</div>
        </div>
-       <button onclick="window.open('https://buy.stripe.com/9B6aEX9UkdES451gMgc3m08','_blank')" style="width:100%;padding:11px;background:#fbbf24;color:#000;border:none;border-radius:8px;font-weight:700;font-size:14px;cursor:pointer">Get Premium →</button>
+       ${isPremium
+         ?'<div style="text-align:center;padding:10px;background:var(--surface);border:1px solid var(--border);border-radius:8px;font-size:13px;color:var(--muted)">Current Plan</div>'
+         :`<button onclick="window.open('https://buy.stripe.com/9B6aEX9UkdES451gMgc3m08','_blank')" style="width:100%;padding:11px;background:#fbbf24;color:#000;border:none;border-radius:8px;font-weight:700;font-size:14px;cursor:pointer">Get Premium - $75/mo →</button>`}
      </div>
 
    </div>
-   <div style="margin-top:28px;padding:18px;background:var(--surface);border:1px solid var(--border);border-radius:12px">
+
+   <div style="padding:18px;background:var(--surface);border:1px solid var(--border);border-radius:12px">
      <div style="font-weight:700;font-size:14px;margin-bottom:6px">Billing & Cancellation</div>
-     <div style="color:var(--sub);font-size:13px;line-height:1.7">Subscriptions are billed monthly and can be cancelled anytime. To manage or cancel your subscription, contact <a href="mailto:info@cbusevents.com" style="color:var(--orange)">info@cbusevents.com</a>.</div>
+     <div style="color:var(--sub);font-size:13px;line-height:1.7">Subscriptions are billed monthly and can be cancelled anytime. Your tier activates automatically within a few minutes of payment. To manage your subscription, contact <a href="mailto:info@cbusevents.com" style="color:var(--orange)">info@cbusevents.com</a>.</div>
    </div>
  </div>`;
 }

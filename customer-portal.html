@@ -615,11 +615,11 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
     </div>
     <div style="margin-bottom:14px">
       <label style="display:block;font-size:12px;color:var(--sub);font-weight:500;margin-bottom:5px">Email</label>
-      <input type="email" id="authEmail" autocomplete="email" placeholder="you@email.com" id="authPassInput" style="width:100%;background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:9px;padding:10px 14px;color:var(--text);font-family:var(--font);font-size:14px;outline:none"/>
+      <input type="email" id="authEmail" autocomplete="email" placeholder="you@email.com" style="width:100%;background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:9px;padding:10px 14px;color:var(--text);font-family:var(--font);font-size:14px;outline:none"/>
     </div>
     <div style="margin-bottom:14px">
       <label style="display:block;font-size:12px;color:var(--sub);font-weight:500;margin-bottom:5px">Password</label>
-      <input type="password" id="authPass" autocomplete="current-password" placeholder="••••••••" id="authPassInput" style="width:100%;background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:9px;padding:10px 14px;color:var(--text);font-family:var(--font);font-size:14px;outline:none"/>
+      <input type="password" id="authPass" autocomplete="current-password" placeholder="••••••••" style="width:100%;background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:9px;padding:10px 14px;color:var(--text);font-family:var(--font);font-size:14px;outline:none"/>
     </div>
     <div id="authErr" role="alert" aria-live="polite" style="color:var(--red);font-size:13px;margin-bottom:10px;min-height:18px"></div>
     <button id="authBtn" onclick="doAuth()" style="width:100%;background:var(--orange);color:#fff;border:none;border-radius:9px;padding:12px;font-size:14px;font-weight:700;cursor:pointer;font-family:var(--font)">Sign In</button>
@@ -1095,6 +1095,7 @@ async function doAuth(){
     }
   }
 }
+window.doAuth = doAuth;
 
 window.doSignOut = async function doSignOut(){
   await sb.auth.signOut();
@@ -1155,10 +1156,10 @@ async function loadLiveEvents(user){
     const dateStr=d.toLocaleDateString('en-US',{month:'short',day:'numeric',timeZone:'America/New_York'});
     const timeStr=d.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit',timeZone:'America/New_York'});
     const isFollowed=followedIds.includes(e.venues?.id);
-    return '<div class="event-card" onclick="window.open('https://cbusevents.com','_blank')" role="button" tabindex="0">'
+    return '<div class="event-card" onclick="window.open(\'https://cbusevents.com\',\'_blank\')" role="button" tabindex="0">'
       +'<div class="event-card-img">'
       +(e.cover_image_url
-        ?'<div class="event-card-img-bg" style="background-image:url(''+e.cover_image_url+'')"></div>'
+        ?'<div class="event-card-img-bg" style="background-image:url(\''+e.cover_image_url+'\')"></div>'
         :'<div class="event-card-img-bg '+colors[i%4]+'"></div>')
       +'<div class="event-card-img-overlay"></div>'
       +(isFollowed?'<div class="event-card-badge" style="background:var(--green);color:#000">Following</div>'

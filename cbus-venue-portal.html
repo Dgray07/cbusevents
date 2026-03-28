@@ -1046,14 +1046,17 @@ function Earnings({venue}) {
 
 // Plan & Billing
 function PlanBilling({venue}) {
- const cur=venue?.tier||"free";
+ const cur=(venue?.tier||"free").toLowerCase();
+ const isBasic=cur==='free';
+ const isStandard=cur==='standard';
+ const isPremium=cur==='premium';
  const [loading,setLoading]=React.useState(null);
  const [err,setErr]=React.useState(null);
 
  const plans=[
- {id:"free", name:"Free", price:0, priceId:null, perks:["1 venue listing","Up to 4 events/month","Basic search placement","Public venue page"]},
- {id:"standard",name:"Standard", price:39, priceId:"standard", perks:["Up to 20 events/month","Priority search placement","Inquiry inbox enabled","Email support","Analytics dashboard","Featured in venue directory"]},
- {id:"premium", name:"Premium", price:99, priceId:"premium", perks:["Unlimited events","Top of all search results","Homepage feature slot","Multi-account access","Staff management tools","Ticket revenue share (25% of platform fee)","Geolocation promotions","Dedicated support"]},
+ {id:"free",  name:"Basic",    price:0,  priceId:null,    perks:["1 venue listing","Up to 4 events/month","Basic search placement","Public venue page"]},
+ {id:"standard",name:"Standard",price:39, priceId:"standard",perks:["Up to 20 events/month","Priority search placement","Inquiry inbox enabled","Analytics dashboard","Featured in venue directory","Sell tickets through CBUSEVENTS"]},
+ {id:"premium", name:"Premium", price:99, priceId:"premium", perks:["Unlimited events","Top of all search results","Homepage feature slot","Multi-account access","Staff management","Ticket revenue share (25% of platform fee)","Geolocation promotions","Dedicated support"]},
  ];
 
  const checkout=(plan)=>{
@@ -1064,49 +1067,132 @@ function PlanBilling({venue}) {
  window.open(url,'_blank');
  };
 
- // Handle return from Stripe — auto-update tier
  React.useEffect(()=>{
  const p=new URLSearchParams(window.location.search);
  if(p.get("upgrade")==="success"&&venue?.id){
-   // Get tier from param or hash fallback
    const hashTier=window.location.hash.replace('#tier=','');
    const newTier=p.get("tier")||hashTier||"standard";
-   // Write tier to Supabase immediately
-   sb.from("venues").update({
-     tier:newTier,
-     subscription_status:"active",
-     subscription_tier:newTier.toUpperCase(),
-   }).eq("id",venue.id).then(({error})=>{
-     if(!error){
-       // Reload venue data to reflect new tier
-       sb.from("venues").select("*").eq("id",venue.id).single().then(({data})=>{
-         if(data) setVenue(data);
-       });
-     }
+   sb.from("venues").update({tier:newTier,subscription_status:"active",subscription_tier:newTier.toUpperCase()}).eq("id",venue.id).then(({error})=>{
+     if(!error){sb.from("venues").select("*").eq("id",venue.id).single().then(({data})=>{if(data)setVenue(data);});}
    });
    window.history.replaceState({},"",window.location.pathname);
  }
  },[venue?.id]);
 
  const upgraded=new URLSearchParams(window.location.search).get("upgrade")==="success";
+ const curLabel=isPremium?"Premium":isStandard?"Standard":"Basic";
+ const curDesc=isPremium
+   ?"You have full access to all venue features including unlimited events, top search placement, and ticket revenue share."
+   :isStandard
+   ?"Your venue is live with priority placement, inquiry tools, and ticketing. Upgrade to Premium for unlimited events and homepage feature slots."
+   :"Your venue is listed on CBUSEVENTS. Upgrade to Standard to unlock priority search, analytics, and the ability to sell tickets.";
+
+ const lockedBasic=[
+   ["Priority Search Placement","Standard and Premium venues appear above Basic in all search results and planner browsing."],
+   ["Analytics Dashboard","See how many planners viewed your venue, inquiry conversion rates, and event performance."],
+   ["Inquiry Inbox","Receive and manage booking requests from planners directly inside your portal."],
+   ["Sell Tickets","Create paid ticket tiers for your events and collect revenue through CBUSEVENTS."],
+ ];
+ const lockedStandard=[
+   ["Unlimited Events","Standard caps at 20 events/month. Premium removes the limit entirely."],
+   ["Homepage Feature Slot","Your venue promoted on the CBUSEVENTS homepage, seen by every visitor."],
+   ["Ticket Revenue Share","Earn 25% of the platform fee on every ticket sold at your venue."],
+   ["Multi-Account Access","Add staff members to manage bookings, check-in, and events on your behalf."],
+ ];
+ const locked=isBasic?lockedBasic:isStandard?lockedStandard:[];
 
  return (
- <div> <h2 style={{fontFamily:"'DM Sans',sans-serif",fontSize:22,fontWeight:800,marginBottom:6}}>Plan & Billing</h2> <p style={{color:"var(--sub)",fontSize:14,marginBottom:upgraded?16:32}}>Current plan: <strong style={{color:"#f59e0b"}}>{cur[0].toUpperCase()+cur.slice(1)}</strong></p> {upgraded&&<div style={{background:"rgba(52,211,153,0.08)",border:"1px solid #1a4a24",borderRadius:10,padding:"14px 18px",marginBottom:28,display:"flex",alignItems:"center",gap:10,color:"var(--green)",fontSize:14,fontWeight:600}}> Upgrade successful! Your plan will be activated within a minute.
- </div>}
+ <div>
+   <h2 style={{fontFamily:"'DM Sans',sans-serif",fontSize:22,fontWeight:800,marginBottom:6,letterSpacing:"-0.03em"}}>Plan & Billing</h2>
+   <p style={{color:"var(--sub)",fontSize:14,marginBottom:24}}>Manage your CBUSEVENTS venue subscription.</p>
 
- {err&&<div style={{background:"rgba(248,113,113,0.08)",border:"1px solid #4a1a1a",borderRadius:10,padding:"12px 16px",marginBottom:20,color:"#ef4444",fontSize:13}}> {err}</div>}
+   {upgraded&&<div style={{background:"rgba(52,211,153,0.08)",border:"1px solid #1a4a24",borderRadius:10,padding:"14px 18px",marginBottom:24,display:"flex",alignItems:"center",gap:10,color:"var(--green)",fontSize:14,fontWeight:600}}>Upgrade successful! Your plan will be activated within a minute.</div>}
+   {err&&<div style={{background:"rgba(248,113,113,0.08)",border:"1px solid #4a1a1a",borderRadius:10,padding:"12px 16px",marginBottom:20,color:"#ef4444",fontSize:13}}>{err}</div>}
 
- <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(220px,1fr))",gap:20}}> {plans.map(p=>{const active=p.id===cur;const isLoading=loading===p.id;return(
- <div key={p.id} style={{background:active?"var(--card)":"var(--surface)",border:`1.5px solid ${active?"#FF6B35":"var(--border)"}`,borderRadius:14,padding:24,position:"relative",marginTop:16}}> {active&&<div style={{position:"absolute",top:-12,left:"50%",transform:"translateX(-50%)",background:"#FF6B35",color:"#fff",borderRadius:20,padding:"2px 14px",fontSize:11,fontWeight:700,whiteSpace:"nowrap"}}>CURRENT</div>}
- {p.id==="premium"&&!active&&<div style={{position:"absolute",top:-12,left:"50%",transform:"translateX(-50%)",background:"#f59e0b",color:"#000",borderRadius:20,padding:"2px 14px",fontSize:11,fontWeight:700,whiteSpace:"nowrap"}}>MOST POPULAR</div>}
- <h3 style={{fontFamily:"'DM Sans',sans-serif",fontWeight:800,fontSize:20,marginBottom:4}}>{p.name}</h3> <div style={{marginBottom:18}}> <span style={{fontFamily:"'DM Sans',sans-serif",fontSize:32,fontWeight:800,color:p.price===0?"var(--text)":"#FF6B35"}}>{p.price===0?"Free":`$${p.price}`}</span> {p.price>0&&<span style={{color:"var(--sub)",fontSize:13}}>/mo</span>}
- </div> <div style={{display:"flex",flexDirection:"column",gap:8,marginBottom:22}}> {p.perks.map(k=><div key={k} style={{display:"flex",gap:8,fontSize:13,color:"var(--sub)"}}><span style={{color:"var(--green)"}}></span>{k}</div>)}
- </div> {active
- ?<Btn variant="ghost" style={{width:"100%"}} disabled>Current Plan</Btn> :p.price===0
- ?<Btn variant="ghost" style={{width:"100%",opacity:0.5}} disabled>Downgrade</Btn> :<Btn style={{width:"100%",opacity:isLoading?0.7:1}} variant={p.id==="premium"?"primary":"secondary"} onClick={()=>checkout(p)} disabled={!!loading}> {isLoading?"Redirecting to Stripe...":"Upgrade Now →"}
- </Btn> }
- </div> );})}
- </div> <div style={{marginTop:32,padding:20,background:"var(--surface)",border:"1px solid var(--border)",borderRadius:14}}> <h4 style={{fontWeight:700,fontSize:14,marginBottom:8}}>Billing & Cancellation</h4> <p style={{color:"var(--sub)",fontSize:13,lineHeight:1.7}}>Subscriptions are billed monthly and can be cancelled anytime. After upgrading, your tier is activated automatically within 1–2 minutes via Stripe webhook. To manage or cancel your subscription, contact <a href="mailto:info@cbusevents.com" style={{color:"#FF6B35"}}>info@cbusevents.com</a>.</p> </div> <MarketingServices venue={venue}/> </div> );
+   {/* Current Plan Banner */}
+   <div style={{background:"var(--card)",border:"1px solid var(--border)",borderRadius:14,padding:"20px 24px",display:"flex",alignItems:"center",justifyContent:"space-between",gap:16,marginBottom:28,flexWrap:"wrap"}}>
+     <div style={{flex:1,minWidth:200}}>
+       <div style={{fontFamily:"'DM Mono',monospace",fontSize:9,fontWeight:700,letterSpacing:"0.14em",textTransform:"uppercase",color:"var(--muted)",marginBottom:6}}>Current Plan</div>
+       <div style={{fontSize:18,fontWeight:800,letterSpacing:"-0.02em",marginBottom:4}}>{curLabel}</div>
+       <div style={{fontSize:12,color:"var(--sub)",lineHeight:1.6}}>{curDesc}</div>
+     </div>
+     <div style={{fontFamily:"'DM Mono',monospace",fontSize:10,fontWeight:700,letterSpacing:"0.1em",textTransform:"uppercase",padding:"5px 14px",borderRadius:9999,whiteSpace:"nowrap",...(isPremium?{background:"rgba(251,191,36,0.1)",color:"#fbbf24",border:"1px solid rgba(251,191,36,0.25)"}:isStandard?{background:"rgba(255,107,53,0.1)",color:"var(--orange)",border:"1px solid rgba(255,107,53,0.25)"}:{background:"rgba(255,255,255,0.05)",color:"var(--muted)",border:"1px solid var(--border)"})}}>{curLabel}</div>
+   </div>
+
+   {/* Locked features */}
+   {locked.length>0&&<>
+   <div style={{fontFamily:"'DM Mono',monospace",fontSize:9,fontWeight:700,letterSpacing:"0.14em",textTransform:"uppercase",color:"var(--muted)",marginBottom:12}}>
+     {isBasic?"Locked on Basic":"Unlock with Premium"}
+   </div>
+   <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(220px,1fr))",gap:10,marginBottom:28}}>
+     {locked.map(([title,desc])=>(
+     <div key={title} style={{background:"var(--surface)",border:"1px solid var(--border)",borderRadius:12,padding:16,opacity:0.78,position:"relative"}}>
+       <div style={{position:"absolute",top:10,right:10,fontFamily:"'DM Mono',monospace",fontSize:8,fontWeight:700,padding:"2px 7px",borderRadius:9999,background:"rgba(255,255,255,0.05)",color:"var(--muted)",border:"1px solid var(--border)",textTransform:"uppercase",letterSpacing:"0.08em"}}>Locked</div>
+       <div style={{fontSize:13,fontWeight:700,color:"var(--text)",marginBottom:5}}>{title}</div>
+       <div style={{fontSize:11,color:"var(--sub)",lineHeight:1.5}}>{desc}</div>
+     </div>
+     ))}
+   </div>
+   </>}
+
+   {/* ROI callout - only for non-premium */}
+   {!isPremium&&<div style={{background:"linear-gradient(135deg,rgba(52,211,153,0.07),rgba(52,211,153,0.03))",border:"1px solid rgba(52,211,153,0.2)",borderRadius:14,padding:"20px 24px",marginBottom:28,display:"flex",gap:16,alignItems:"flex-start"}}>
+     <div style={{fontSize:22,flexShrink:0,marginTop:2}}>💡</div>
+     <div>
+       <div style={{fontFamily:"'DM Mono',monospace",fontSize:9,fontWeight:700,letterSpacing:"0.12em",textTransform:"uppercase",color:"var(--green)",marginBottom:4}}>Think About It This Way</div>
+       <div style={{fontSize:14,fontWeight:700,color:"var(--text)",marginBottom:6}}>{isBasic?"Standard pays for itself with one booking inquiry.":"Premium pays for itself with one ticketed event."}</div>
+       <div style={{fontSize:12,color:"var(--sub)",lineHeight:1.6}}>
+         {isBasic
+           ?"At <strong style='color:var(--text)'>$39/mo</strong>, Standard gets your venue in front of every planner actively searching Columbus. One booked event generates far more than $39. Priority placement and inquiry tools mean more visibility with zero extra work."
+           :"At <strong style='color:var(--text)'>$99/mo</strong>, Premium adds homepage placement, unlimited events, and a 25% ticket revenue share. One sold-out event at 200 tickets x $25 generates $5,000 in ticket sales - your 25% cut of the platform fee alone covers months of Premium."}
+       </div>
+     </div>
+   </div>}
+
+   {/* Plan grid */}
+   <div style={{fontFamily:"'DM Mono',monospace",fontSize:9,fontWeight:700,letterSpacing:"0.14em",textTransform:"uppercase",color:"var(--muted)",marginBottom:12}}>Compare Plans</div>
+   <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(220px,1fr))",gap:20,marginBottom:28}}>
+     {plans.map(p=>{
+       const active=p.id===cur;
+       const isLoading=loading===p.id;
+       const isPrem=p.id==="premium";
+       const isStd=p.id==="standard";
+       return(
+       <div key={p.id} style={{background:active?"var(--card)":isPrem?"linear-gradient(135deg,#0f0e00,#181500)":isStd?"linear-gradient(135deg,#110800,#1a0c00)":"var(--surface)",border:`1.5px solid ${active&&isPrem?"#fbbf24":active?"#FF6B35":isPrem?"rgba(251,191,36,0.25)":isStd?"rgba(255,107,53,0.25)":"var(--border)"}`,borderRadius:14,padding:24,position:"relative",marginTop:16}}>
+         {active&&<div style={{position:"absolute",top:-12,left:"50%",transform:"translateX(-50%)",background:isPrem?"#fbbf24":"#FF6B35",color:isPrem?"#000":"#fff",borderRadius:20,padding:"2px 14px",fontSize:11,fontWeight:700,whiteSpace:"nowrap"}}>Current Plan</div>}
+         {!active&&isPrem&&<div style={{position:"absolute",top:-12,left:"50%",transform:"translateX(-50%)",background:"#fbbf24",color:"#000",borderRadius:20,padding:"2px 14px",fontSize:11,fontWeight:700,whiteSpace:"nowrap"}}>Best Value</div>}
+         {!active&&isStd&&isBasic&&<div style={{position:"absolute",top:-12,left:"50%",transform:"translateX(-50%)",background:"#FF6B35",color:"#fff",borderRadius:20,padding:"2px 14px",fontSize:11,fontWeight:700,whiteSpace:"nowrap"}}>Most Popular</div>}
+         <h3 style={{fontFamily:"'DM Sans',sans-serif",fontWeight:800,fontSize:18,marginBottom:4,color:isPrem?"#fbbf24":isStd?"var(--orange)":"var(--muted)"}}>{p.name}</h3>
+         <div style={{marginBottom:18}}>
+           <span style={{fontFamily:"'DM Sans',sans-serif",fontSize:30,fontWeight:800,color:p.price===0?"var(--muted)":isPrem?"#fbbf24":"var(--orange)"}}>{p.price===0?"Free":`$${p.price}`}</span>
+           {p.price>0&&<span style={{color:"var(--sub)",fontSize:13}}>/mo</span>}
+         </div>
+         <div style={{display:"flex",flexDirection:"column",gap:8,marginBottom:22}}>
+           {p.perks.map(k=>(
+           <div key={k} style={{display:"flex",gap:8,fontSize:12,color:active||!p.priceId?"var(--muted)":"var(--sub)"}}>
+             <span style={{color:active?"var(--green)":"var(--muted)",fontSize:10,marginTop:2}}>✓</span>{k}
+           </div>
+           ))}
+         </div>
+         {active
+           ?<Btn variant="ghost" style={{width:"100%"}} disabled>Current Plan</Btn>
+           :p.price===0
+           ?<Btn variant="ghost" style={{width:"100%",opacity:0.4}} disabled>Basic</Btn>
+           :<Btn style={{width:"100%",opacity:isLoading?0.7:1,background:isPrem?"#fbbf24":undefined,color:isPrem?"#000":undefined}} variant={isPrem?"primary":"secondary"} onClick={()=>checkout(p)} disabled={!!loading}>
+             {isLoading?"Redirecting to Stripe...":isPrem?"Upgrade to Premium →":"Upgrade to Standard →"}
+           </Btn>}
+       </div>
+       );
+     })}
+   </div>
+
+   <div style={{marginTop:8,padding:20,background:"var(--surface)",border:"1px solid var(--border)",borderRadius:14}}>
+     <h4 style={{fontWeight:700,fontSize:14,marginBottom:8}}>Billing & Cancellation</h4>
+     <p style={{color:"var(--sub)",fontSize:13,lineHeight:1.7}}>Subscriptions are billed monthly and can be cancelled anytime. Your tier activates automatically within a few minutes of payment. To manage your subscription, contact <a href="mailto:info@cbusevents.com" style={{color:"var(--orange)"}}>info@cbusevents.com</a>.</p>
+   </div>
+   <MarketingServices venue={venue}/>
+ </div>
+ );
 }
 
 // Portal Shell
