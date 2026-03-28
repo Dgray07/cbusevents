@@ -290,7 +290,8 @@ function render(){
 }
 
 function card(v,i){
-  const name=v.business_name||v.name||'Columbus Vendor';
+  const rawName=v.business_name||v.name||v.email||'Columbus Vendor';
+  const name=rawName.includes('@')?rawName.split('@')[0]:rawName;
   const tier=(v.subscription_tier||'').toUpperCase();
   const svcs=(v.services||[]).slice(0,3);
   const icon=ICONS[svcs[0]]||ICONS[v.category]||'⭐';
@@ -315,7 +316,8 @@ function card(v,i){
 
 function openModal(id){
   const v=all.find(x=>x.id===id);if(!v)return;
-  const name=v.business_name||v.name||'Columbus Vendor';
+  const rawName=v.business_name||v.name||v.email||'Columbus Vendor';
+  const name=rawName.includes('@')?rawName.split('@')[0]:rawName;
   const tier=(v.subscription_tier||'').toUpperCase();
   const svcs=v.services||[];
   const icon=ICONS[svcs[0]]||ICONS[v.category]||'⭐';
@@ -356,8 +358,19 @@ function handleSort(val){sortMode=val;render();}
 window.setFilter=setFilter;window.handleSearch=handleSearch;window.handleSort=handleSort;window.openModal=openModal;window.closeModal=closeModal;window.goToInquiry=goToInquiry;
 
 (async()=>{
-  const{data,error}=await sb.from('vendors').select('id,business_name,name,category,subscription_tier,services,description,cover_image_url,profile_image_url,instagram,tiktok,website,years_in_business,created_at').not('business_name','is',null).limit(100);
-  if(error){document.getElementById('vendorGrid').innerHTML=`<div class="grid-empty"><div class="grid-empty-title">Could not load vendors</div><div class="grid-empty-sub">Please refresh</div></div>`;return;}
+  const{data,error}=await sb.from('vendors').select('id,business_name,name,category,subscription_tier,services,description,cover_image_url,profile_image_url,instagram,tiktok,website,years_in_business,created_at').limit(100);
+  if(error){
+    console.error('Vendor load error:',error);
+    // Try simpler query as fallback - RLS may be restricting columns
+    const{data:d2,error:e2}=await sb.from('vendors').select('*').limit(100);
+    if(e2||!d2?.length){
+      document.getElementById('vendorGrid').innerHTML=`<div class="grid-empty"><div class="grid-empty-title">No vendors listed yet</div><div class="grid-empty-sub">Be the first - <a href="https://cbusevents.com/signup.html?role=vendor" style="color:var(--orange)">list your business →</a></div></div>`;
+      document.getElementById('resultCount').textContent='0 vendors on the platform';
+      return;
+    }
+    all=(d2||[]).filter(v=>v.business_name||v.name);
+    render();return;
+  }
   all=(data||[]);
   render();
 })();
