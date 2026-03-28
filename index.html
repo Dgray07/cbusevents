@@ -1171,10 +1171,8 @@ async function init(){
  }
  // Handle ?p= SPA routing (used when venues/events nav is within the SPA)
  const pParam = new URLSearchParams(location.search).get('p');
- const eventParam = new URLSearchParams(location.search).get('event');
  if(pParam==='venues'){showPage('venues',null,false);}
  else if(pParam==='events'){showPage('events',null,false);}
- else if(eventParam){renderEventDetail(eventParam,null);}
  else {
    // Handle 404 redirect from GitHub Pages (?r= param)
    const rParam = new URLSearchParams(location.search).get('r');
@@ -1232,7 +1230,6 @@ function showPage(page,data=null,pushState=true){
  if(page==='home')renderHome();
  else if(page==='venues')renderVenues();
  else if(page==='events')renderEvents();
- else if(page==='eventDetail'&&data)renderEventDetail(data.id,null);
  else if(page==='venue')renderVenueDetail(data);
  else if(page==='category')renderCategory(data);
  else if(page==='listVenue')renderVenueLanding();
@@ -1243,7 +1240,6 @@ function showPage(page,data=null,pushState=true){
  let title=titles[page]||document.title;
  if(page==='venues'){url='/?p=venues';}
  else if(page==='events'){url='/events';}
- else if(page==='eventDetail'&&data){url=`/?event=${data.id}`;title=(allEvents.find(e=>e.id===data.id)?.title||'Event')+' — CBUSEVENTS';}
  else if(page==='venue'&&data){
    const slug=data.slug||toSlug(data.name);
    url=`/venues/${slug}`;
@@ -1261,7 +1257,6 @@ window.addEventListener('popstate',(e)=>{
  if(!s||s.page==='home'){showPage('home',null,false);}
  else if(s.page==='venues'){showPage('venues',null,false);}
  else if(s.page==='events'){showPage('events',null,false);}
- else if(s.page==='eventDetail'&&s.data){renderEventDetail(s.data.id,null);}
  else if(s.page==='venue'&&s.data){
    const v=allVenues.find(x=>x.id===s.data.id);
    if(v)showPage('venue',v,false);
@@ -2448,262 +2443,19 @@ function eventCard(e){
 }
 
 // ── EVENT MODAL ───────────────────────────────────────────────
-// ── EVENT DETAIL PAGE ─────────────────────────────────────────
+// ── EVENT DETAIL ─────────────────────────────────────────────
 async function openEventModal(id){
-  // Find event from allEvents first, then fetch full detail + tiers
-  const cached=allEvents.find(e=>e.id===id);
-  showPage('eventDetail',{id},true);
-  renderEventDetail(id,cached);
+ window.location.href='https://cbusevents.com/event.html?id='+id;
 }
-
-async function renderEventDetail(id, cached){
-  const app=document.getElementById('app');
-  setNavActive('events');
-
-  // Show skeleton while loading
-  app.innerHTML=`
-  <div style="max-width:760px;margin:0 auto;padding:32px 24px 80px">
-    <div style="height:320px;background:var(--card);border-radius:18px;margin-bottom:28px;animation:pulse 1.5s ease-in-out infinite"></div>
-    <div style="height:24px;background:var(--card);border-radius:8px;width:60%;margin-bottom:14px;animation:pulse 1.5s ease-in-out infinite"></div>
-    <div style="height:16px;background:var(--card);border-radius:8px;width:40%;animation:pulse 1.5s ease-in-out infinite"></div>
-  </div>
-  <style>@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}</style>`;
-
-  // Fetch full event with tiers
-  const {data:ev, error}=await sb.from('events')
-    .select('*,venues(id,name,neighborhood,address,lat,lng)')
-    .eq('id',id)
-    .maybeSingle();
-
-  const event=ev||cached||null;
-  if(!event){
-    app.innerHTML=`<div style="text-align:center;padding:80px 24px;color:var(--sub)">Event not found. <button onclick="showPage('events')" style="background:none;border:none;color:var(--orange);cursor:pointer;font-size:14px">Browse Events →</button></div>`;
-    return;
-  }
-
-  // Fetch ticket tiers
-  const {data:tiers}=await sb.from('ticket_tiers')
-    .select('*')
-    .eq('event_id',id)
-    .order('price',{ascending:true});
-
-  const tierList=tiers||[];
-  const venue=event.venues||{};
-  const img=event.cover_image_url||null;
-  const isFree=event.is_free||(!tierList.length&&!event.price_min);
-  const priceFrom=tierList.length?Math.min(...tierList.map(t=>t.price)):event.price_min||0;
-
-  function fmtDate(dt){
-    if(!dt)return'TBD';
-    const d=new Date(dt);
-    return d.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric',timeZone:'America/New_York'});
-  }
-  function fmtTime(dt){
-    if(!dt)return'';
-    return new Date(dt).toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit',timeZone:'America/New_York'});
-  }
-
-  // Build tiers HTML
-  const tiersHtml=tierList.length?`
-  <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:20px" id="tiersList">
-    ${tierList.map(t=>{
-      const sold=t.sold_count||0;
-      const cap=t.capacity;
-      const remaining=cap?cap-sold:null;
-      const soldOut=remaining!==null&&remaining<=0;
-      const lowStock=remaining!==null&&remaining<=10&&remaining>0;
-      return `
-      <div class="tier-row${soldOut?' tier-sold-out':''}" data-tier-id="${t.id}">
-        <div style="flex:1">
-          <div style="font-size:15px;font-weight:700;color:${soldOut?'var(--text-faint)':'var(--text)'};margin-bottom:3px">${t.name}</div>
-          ${t.description?`<div style="font-size:12px;color:var(--text-dim);margin-bottom:4px">${t.description}</div>`:''}
-          <div style="display:flex;gap:8px;align-items:center">
-            <span style="font-size:16px;font-weight:800;color:${soldOut?'var(--text-faint)':t.price===0?'var(--green)':'var(--orange)'}">
-              ${t.price===0?'Free':'$'+parseFloat(t.price).toFixed(2)}
-            </span>
-            ${soldOut?'<span style="font-size:11px;font-weight:700;color:var(--text-faint);background:rgba(255,255,255,0.05);padding:2px 8px;border-radius:100px">Sold Out</span>':''}
-            ${lowStock?`<span style="font-size:11px;font-weight:700;color:#f59e0b;background:rgba(245,158,11,0.1);padding:2px 8px;border-radius:100px">${remaining} left</span>`:''}
-          </div>
-        </div>
-        <div style="display:flex;align-items:center;gap:8px;flex-shrink:0">
-          ${!soldOut?`
-          <div style="display:flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:4px 6px">
-            <button onclick="adjustQty('${t.id}',-1)" style="width:26px;height:26px;background:none;border:none;color:var(--text);font-size:18px;cursor:pointer;border-radius:4px;display:flex;align-items:center;justify-content:center">−</button>
-            <span id="qty-${t.id}" style="min-width:20px;text-align:center;font-family:var(--mono);font-size:14px;font-weight:600">0</span>
-            <button onclick="adjustQty('${t.id}',1)" style="width:26px;height:26px;background:none;border:none;color:var(--text);font-size:18px;cursor:pointer;border-radius:4px;display:flex;align-items:center;justify-content:center">+</button>
-          </div>`:''}
-        </div>
-      </div>`;
-    }).join('')}
-  </div>`:
-  isFree?`<div style="background:rgba(52,211,153,0.08);border:1px solid rgba(52,211,153,0.2);border-radius:10px;padding:14px 16px;margin-bottom:20px;font-size:14px;font-weight:600;color:var(--green)">Free Event - No tickets required</div>`:'';
-
-  const hasCheckout=tierList.length>0;
-
-  app.innerHTML=`
-  <div style="max-width:760px;margin:0 auto;padding:0 0 80px">
-
-    <!-- COVER -->
-    <div style="height:320px;position:relative;overflow:hidden;background:linear-gradient(135deg,#0f0f22,#1a0e08);border-radius:0 0 20px 20px">
-      ${img?`<img src="${img}" alt="${event.title}" style="width:100%;height:100%;object-fit:cover">`:'<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:72px;opacity:0.15">🎟</div>'}
-      <div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(8,8,16,0.9) 0%,rgba(8,8,16,0.3) 50%,transparent 100%)"></div>
-      <button onclick="showPage('events')" style="position:absolute;top:16px;left:16px;background:rgba(0,0,0,0.5);border:1px solid rgba(255,255,255,0.15);color:#fff;border-radius:8px;padding:7px 14px;font-size:12px;font-weight:600;cursor:pointer;font-family:var(--font);backdrop-filter:blur(8px)">← Events</button>
-      <div style="position:absolute;bottom:24px;left:24px;right:24px">
-        <div style="font-size:11px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--orange);margin-bottom:8px">${event.category||'Event'}</div>
-        <h1 style="font-family:var(--font);font-size:clamp(22px,4vw,32px);font-weight:800;letter-spacing:-0.02em;line-height:1.2;margin-bottom:6px">${event.title}</h1>
-        <div style="font-size:14px;color:rgba(255,255,255,0.7)">${venue.name||'Columbus Venue'}${venue.neighborhood?' · '+venue.neighborhood:''}</div>
-      </div>
-    </div>
-
-    <div style="padding:28px 24px 0">
-
-      <!-- META PILLS -->
-      <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:24px">
-        <span style="background:var(--card);border:1px solid var(--border);border-radius:100px;padding:6px 14px;font-size:13px;font-weight:500">📅 ${fmtDate(event.start_time)}</span>
-        ${event.start_time?`<span style="background:var(--card);border:1px solid var(--border);border-radius:100px;padding:6px 14px;font-size:13px;font-weight:500">🕐 ${fmtTime(event.start_time)}</span>`:''}
-        ${venue.address||venue.neighborhood?`<span style="background:var(--card);border:1px solid var(--border);border-radius:100px;padding:6px 14px;font-size:13px;font-weight:500">📍 ${venue.address||venue.name}</span>`:''}
-        <span style="background:${isFree?'rgba(52,211,153,0.1)':'var(--orange-soft)'};border:1px solid ${isFree?'rgba(52,211,153,0.2)':'rgba(255,107,53,0.25)'};border-radius:100px;padding:6px 14px;font-size:13px;font-weight:700;color:${isFree?'var(--green)':'var(--orange)'}">
-          ${isFree?'Free':priceFrom?'From $'+parseFloat(priceFrom).toFixed(2):'Tickets Available'}
-        </span>
-      </div>
-
-      <div style="display:grid;grid-template-columns:${hasCheckout?'1fr 340px':'1fr'};gap:28px;align-items:start">
-
-        <!-- LEFT: Description -->
-        <div>
-          ${event.description?`
-          <div style="font-family:'DM Mono',monospace;font-size:9px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--text-faint);margin-bottom:10px">About This Event</div>
-          <div style="font-size:14px;color:var(--text-dim);line-height:1.75;margin-bottom:28px;white-space:pre-line">${event.description}</div>`:''}
-
-          ${venue.name?`
-          <div style="font-family:'DM Mono',monospace;font-size:9px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--text-faint);margin-bottom:10px">Venue</div>
-          <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:28px">
-            <div style="font-size:15px;font-weight:700;margin-bottom:4px">${venue.name}</div>
-            ${venue.neighborhood?`<div style="font-size:13px;color:var(--text-dim)">📍 ${venue.neighborhood}</div>`:''}
-            ${venue.address?`<div style="font-size:12px;color:var(--text-faint);margin-top:3px">${venue.address}</div>`:''}
-          </div>`:''}
-        </div>
-
-        <!-- RIGHT: Ticket box -->
-        ${hasCheckout?`
-        <div style="background:var(--card);border:1px solid var(--border-mid);border-radius:16px;padding:22px;position:sticky;top:76px">
-          <div style="font-family:'DM Mono',monospace;font-size:9px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--text-faint);margin-bottom:14px">Select Tickets</div>
-          ${tiersHtml}
-          <div id="checkoutErr" style="display:none;color:var(--red);font-size:12px;margin-bottom:12px;padding:8px 12px;background:rgba(248,113,113,0.08);border-radius:8px;border:1px solid rgba(248,113,113,0.2)"></div>
-          <div style="margin-bottom:14px">
-            <input id="buyerName" placeholder="Your name" style="width:100%;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:10px 12px;color:var(--text);font-family:var(--font);font-size:13px;outline:none;margin-bottom:8px">
-            <input id="buyerEmail" type="email" placeholder="Email for confirmation" style="width:100%;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:10px 12px;color:var(--text);font-family:var(--font);font-size:13px;outline:none">
-          </div>
-          <button id="checkoutBtn" onclick="startCheckout('${event.id}')" style="width:100%;background:var(--orange);color:#fff;border:none;border-radius:10px;padding:14px;font-size:15px;font-weight:700;cursor:pointer;font-family:var(--font);transition:opacity 0.15s">
-            Get Tickets →
-          </button>
-          <div style="font-size:11px;color:var(--text-faint);text-align:center;margin-top:10px">6.5% + $1.00 platform fee per ticket · Powered by Stripe</div>
-        </div>`:''}
-
-      </div>
-    </div>
-  </div>
-
-  <!-- TICKET PURCHASE MODAL (shown during checkout loading) -->
-  <div id="checkoutLoadingOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.8);z-index:500;align-items:center;justify-content:center;backdrop-filter:blur(4px)">
-    <div style="background:var(--card);border:1px solid var(--border);border-radius:16px;padding:36px;text-align:center;max-width:340px;width:90%">
-      <div style="width:36px;height:36px;border:3px solid var(--border);border-top-color:var(--orange);border-radius:50%;animation:spin 0.75s linear infinite;margin:0 auto 16px"></div>
-      <div style="font-size:15px;font-weight:700;margin-bottom:6px">Preparing checkout...</div>
-      <div style="font-size:13px;color:var(--text-dim)">Redirecting to Stripe</div>
-    </div>
-  </div>`;
-
-  // Store tiers in memory for checkout
-  window._currentEventTiers=tierList.reduce((acc,t)=>{acc[t.id]=t;return acc;},{});
-}
-
-function adjustQty(tierId, delta){
-  const el=document.getElementById('qty-'+tierId);
-  if(!el)return;
-  const current=parseInt(el.textContent)||0;
-  const next=Math.max(0,current+delta);
-  const tier=window._currentEventTiers?.[tierId];
-  const cap=tier?.capacity;
-  const sold=tier?.sold_count||0;
-  const remaining=cap?cap-sold:99;
-  el.textContent=Math.min(next,remaining,10); // max 10 per order
-}
-
-async function startCheckout(eventId){
-  const btn=document.getElementById('checkoutBtn');
-  const errEl=document.getElementById('checkoutErr');
-  const overlay=document.getElementById('checkoutLoadingOverlay');
-  errEl.style.display='none';
-
-  const name=document.getElementById('buyerName')?.value?.trim();
-  const email=document.getElementById('buyerEmail')?.value?.trim();
-
-  if(!name){errEl.textContent='Please enter your name.';errEl.style.display='block';return;}
-  if(!email||!email.includes('@')){errEl.textContent='Please enter a valid email.';errEl.style.display='block';return;}
-
-  // Collect selected tiers
-  const tiers=window._currentEventTiers||{};
-  const selected=Object.keys(tiers).filter(tid=>{
-    const qty=parseInt(document.getElementById('qty-'+tid)?.textContent)||0;
-    return qty>0;
-  });
-
-  if(!selected.length){errEl.textContent='Select at least one ticket.';errEl.style.display='block';return;}
-
-  // For now handle first selected tier (multi-tier in one checkout is a Stripe limitation without line items)
-  // Simple approach: create one checkout session per tier, start with first
-  const tierId=selected[0];
-  const qty=parseInt(document.getElementById('qty-'+tierId)?.textContent)||1;
-
-  btn.disabled=true;
-  btn.textContent='Redirecting to Stripe...';
-  overlay.style.display='flex';
-
-  try{
-    const {data:{session:authSession}}=await sb.auth.getSession();
-    const userId=authSession?.user?.id||null;
-
-    const res=await fetch('https://toblgvatvsjljbqogzsv.supabase.co/functions/v1/create-checkout-session',{
-      method:'POST',
-      headers:{'Content-Type':'application/json','Authorization':'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRvYmxndmF0dnNqbGpicW9nenN2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMDgwNTAsImV4cCI6MjA4NzY4NDA1MH0._WJEQPizNDiQfDXQB_DHPaQhixPGpMdmYQSmyWmm_FQ'},
-      body:JSON.stringify({
-        tier_id:tierId,
-        quantity:qty,
-        holder_name:name,
-        holder_email:email,
-        user_id:userId,
-        success_url:`https://cbusevents.com/ticket-success.html?session_id={CHECKOUT_SESSION_ID}`,
-        cancel_url:`https://cbusevents.com/?event=${eventId}`,
-      })
-    });
-
-    const data=await res.json();
-    if(data.url){
-      window.location.href=data.url;
-    } else {
-      throw new Error(data.error||'Could not create checkout session');
-    }
-  } catch(e){
-    overlay.style.display='none';
-    btn.disabled=false;
-    btn.textContent='Get Tickets →';
-    errEl.textContent=e.message||'Something went wrong. Please try again.';
-    errEl.style.display='block';
-  }
-}
-window.adjustQty=adjustQty;
-window.startCheckout=startCheckout;
-
 function closeEventModal(){
-  document.getElementById('eventModal')?.remove();
-  document.body.style.overflow='';
+ document.getElementById('eventModal')?.remove();
+ document.body.style.overflow='';
 }
-
 // Delegated click handler for dynamically rendered Buy buttons
 document.addEventListener('click',function(ev){
-  var btn=ev.target.closest('.cbus-buy-btn');
-  if(!btn)return;
-  openEventModal(btn.dataset.eid);
+ var btn=ev.target.closest('.cbus-buy-btn');
+ if(!btn)return;
+ window.location.href='https://cbusevents.com/event.html?id='+btn.dataset.eid;
 });
 
 function openVendorModal(id){

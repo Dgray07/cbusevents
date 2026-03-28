@@ -516,62 +516,115 @@ function renderTickets(event, tiers) {
         <div class="tier-price ${isFree ? 'free' : ''}">${priceLabel}</div>
         ${soldOut
           ? '<button class="btn-sold">Sold Out</button>'
-          : `<button class="btn-buy cbus-buy-btn" data-eid="${event.id}" data-tid="${tier.id}" data-tname="${tier.name.replace(/"/g,'&quot;')}" data-price="${tier.price}">Buy →</button>`
+          : `<div style="display:flex;align-items:center;gap:4px;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:3px 6px">
+               <button onclick="adjQty('${tier.id}',-1)" style="width:24px;height:24px;background:none;border:none;color:var(--text);font-size:17px;cursor:pointer;display:flex;align-items:center;justify-content:center;border-radius:4px">−</button>
+               <span id="qty-${tier.id}" style="min-width:18px;text-align:center;font-size:13px;font-weight:700;font-family:var(--mono)">0</span>
+               <button onclick="adjQty('${tier.id}',1,${remaining !== null ? remaining : 10})" style="width:24px;height:24px;background:none;border:none;color:var(--text);font-size:17px;cursor:pointer;display:flex;align-items:center;justify-content:center;border-radius:4px">+</button>
+             </div>
+             <button class="btn-buy cbus-buy-btn" data-eid="${event.id}" data-tid="${tier.id}" data-tname="${tier.name.replace(/"/g,'&quot;')}" data-price="${tier.price}">Buy →</button>`
         }
       </div>
     </div>`;
   }).join('');
 
-  // Wire up buy buttons
+  // Buyer info fields + checkout button
+  body.innerHTML += `
+  <div id="buyerFields" style="margin-top:14px;display:none">
+    <input id="buyerName" placeholder="Your name" style="width:100%;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:9px 12px;color:var(--text);font-size:13px;font-family:var(--font);outline:none;margin-bottom:8px">
+    <input id="buyerEmail" type="email" placeholder="Email for confirmation" style="width:100%;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:9px 12px;color:var(--text);font-size:13px;font-family:var(--font);outline:none;margin-bottom:12px">
+    <button id="checkoutSubmitBtn" style="width:100%;background:var(--orange);color:#fff;border:none;border-radius:10px;padding:13px;font-size:14px;font-weight:700;cursor:pointer;font-family:var(--font)">Get Tickets →</button>
+    <div style="font-size:11px;color:var(--muted);text-align:center;margin-top:8px">6.5% + $1.00 platform fee · Powered by Stripe</div>
+  </div>`;
+
+  // Show buyer fields when any qty > 0
+  window._eventTiers = {};
+  tiers.forEach(t => { window._eventTiers[t.id] = t; });
+
+  // Wire up buy buttons - open buyer fields
   document.querySelectorAll('.cbus-buy-btn').forEach(btn => {
-    btn.addEventListener('click', () => initCheckout(btn));
+    btn.addEventListener('click', () => {
+      document.getElementById('buyerFields').style.display = 'block';
+      document.getElementById('buyerName').focus();
+      window._pendingTierId = btn.dataset.tid;
+      window._pendingEventId = btn.dataset.eid;
+    });
+  });
+
+  document.getElementById('checkoutSubmitBtn')?.addEventListener('click', () => {
+    doCheckout();
   });
 }
 
 // ── CHECKOUT ─────────────────────────────────────────────────
-async function initCheckout(btn) {
-  const eventId = btn.dataset.eid;
-  const tierId  = btn.dataset.tid;
-  const tierName = btn.dataset.tname;
-  const price   = parseFloat(btn.dataset.price);
-  const msgEl   = document.getElementById('ticketMsg');
+function adjQty(tierId, delta, max) {
+  const el = document.getElementById('qty-' + tierId);
+  if (!el) return;
+  const current = parseInt(el.textContent) || 0;
+  const next = Math.max(0, current + delta);
+  el.textContent = Math.min(next, max || 10);
+}
+window.adjQty = adjQty;
 
-  // Check auth
-  const { data: { session } } = await sb.auth.getSession();
-  if (!session) {
-    msgEl.style.display = 'block';
-    msgEl.innerHTML = 'Please <a href="https://cbusevents.com/auth.html" style="color:var(--orange);font-weight:700">sign in</a> to purchase tickets.';
-    return;
-  }
+async function doCheckout() {
+  const tierId = window._pendingTierId;
+  const eventId = window._pendingEventId;
+  const msgEl = document.getElementById('ticketMsg');
+  const submitBtn = document.getElementById('checkoutSubmitBtn');
+  msgEl.style.display = 'none';
 
+  const name = document.getElementById('buyerName')?.value?.trim();
+  const email = document.getElementById('buyerEmail')?.value?.trim();
+  const qty = parseInt(document.getElementById('qty-' + tierId)?.textContent) || 1;
+
+  if (!name) { msgEl.style.display='block'; msgEl.textContent='Please enter your name.'; return; }
+  if (!email || !email.includes('@')) { msgEl.style.display='block'; msgEl.textContent='Please enter a valid email.'; return; }
+
+  const tier = window._eventTiers?.[tierId];
+  const price = tier?.price ?? 0;
+
+  // Free ticket - create directly without Stripe
   if (price === 0) {
-    // Free ticket - create directly
-    btn.disabled = true; btn.textContent = 'Processing...';
-    const code = 'CBE-' + Math.random().toString(36).substring(2,8).toUpperCase();
+    submitBtn.disabled = true; submitBtn.textContent = 'Processing...';
+    const { data: { session } } = await sb.auth.getSession();
+    const userId = session?.user?.id || null;
+    const code = 'CBE-' + Math.random().toString(36).substring(2, 8).toUpperCase();
     const { error } = await sb.from('tickets').insert({
-      event_id: eventId, tier_id: tierId, user_id: session.user.id,
-      email: session.user.email, tier_name: tierName,
-      amount_paid: 0, ticket_code: code, status: 'active'
+      event_id: eventId, tier_id: tierId, ticket_tier_id: tierId,
+      user_id: userId, email: email, attendee_email: email,
+      attendee_name: name, tier_name: tier?.name || 'General Admission',
+      status: 'active', checked_in: false, is_valid: true
     });
     if (error) {
-      btn.disabled = false; btn.textContent = 'Buy →';
+      submitBtn.disabled = false; submitBtn.textContent = 'Get Tickets →';
       msgEl.style.display = 'block'; msgEl.textContent = 'Error: ' + error.message;
     } else {
-      btn.textContent = 'Registered!';
-      btn.style.background = 'var(--green)';
+      submitBtn.textContent = 'Registered!';
+      submitBtn.style.background = 'var(--green)';
       msgEl.style.display = 'block';
-      msgEl.innerHTML = 'You are registered! Your ticket code: <strong style="color:var(--orange);font-family:var(--mono)">' + code + '</strong>';
+      msgEl.innerHTML = `<span style="color:var(--green);font-weight:700">You're registered!</span> Check your email for confirmation.`;
     }
     return;
   }
 
-  // Paid - call Stripe checkout
-  btn.disabled = true; btn.textContent = 'Loading...';
+  // Paid - call create-checkout-session Edge Function
+  submitBtn.disabled = true; submitBtn.textContent = 'Redirecting to Stripe...';
   try {
-    const res = await fetch(`${SB_URL}/functions/v1/create-checkout`, {
+    const { data: { session } } = await sb.auth.getSession();
+    const res = await fetch(`${SB_URL}/functions/v1/create-checkout-session`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + session.access_token },
-      body: JSON.stringify({ event_id: eventId, tier_id: tierId, quantity: 1 })
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + SB_KEY
+      },
+      body: JSON.stringify({
+        tier_id: tierId,
+        quantity: qty,
+        holder_name: name,
+        holder_email: email,
+        user_id: session?.user?.id || null,
+        success_url: `https://cbusevents.com/ticket-success.html?session_id={CHECKOUT_SESSION_ID}`,
+        cancel_url: window.location.href
+      })
     });
     const data = await res.json();
     if (data.url) {
@@ -580,7 +633,7 @@ async function initCheckout(btn) {
       throw new Error(data.error || 'Could not start checkout');
     }
   } catch (err) {
-    btn.disabled = false; btn.textContent = 'Buy →';
+    submitBtn.disabled = false; submitBtn.textContent = 'Get Tickets →';
     msgEl.style.display = 'block'; msgEl.textContent = err.message;
   }
 }
