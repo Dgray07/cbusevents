@@ -1340,7 +1340,7 @@ async function deleteProduct(productId){
 }
 
 // ── STRIPE CONNECT PAYOUTS ────────────────────────────────────
-const CONNECT_FN='https://toblgvatvsjljbqogzsv.supabase.co/functions/v1/stripeconnectonboard';
+const CONNECT_FN='https://toblgvatvsjljbqogzsv.supabase.co/functions/v1/stripe-connect-onboard';
 
 async function getAuthToken(){
  const s=await sb.auth.getSession();

@@ -318,7 +318,7 @@ function AuthPage() {
 }
 
 // Sidebar
-const NAV = [{key:"dashboard",icon:"⊞",label:"Dashboard"},{key:"venue",icon:"",label:"My Venue"},{key:"events",icon:"",label:"Events"},{key:"calendar",icon:"",label:"Booking Calendar"},{key:"earnings",icon:"",label:"Earnings"},{key:"inquiries",icon:"",label:"Inquiries"},{key:"plan",icon:"⭐",label:"Plan & Billing"}];
+const NAV = [{key:"dashboard",icon:"⊞",label:"Dashboard"},{key:"venue",icon:"",label:"My Venue"},{key:"events",icon:"",label:"Events"},{key:"calendar",icon:"",label:"Booking Calendar"},{key:"earnings",icon:"",label:"Earnings"},{key:"payouts",icon:"$",label:"Payouts"},{key:"inquiries",icon:"",label:"Inquiries"},{key:"plan",icon:"⭐",label:"Plan & Billing"}];
 const HOME_BTN_STYLE = {display:"flex",alignItems:"center",gap:10,width:"100%",background:"transparent",color:"var(--sub)",border:"1px solid transparent",borderRadius:10,padding:"10px 12px",cursor:"pointer",fontSize:13,fontFamily:"'DM Sans',sans-serif",fontWeight:400,marginBottom:2,textAlign:"left",transition:"color 0.15s"};
 
 const PORTAL_LINKS = {
@@ -1112,6 +1112,125 @@ function Earnings({venue}) {
  );
 }
 
+// Stripe Connect
+const VENUE_CONNECT_FN='https://toblgvatvsjljbqogzsv.supabase.co/functions/v1/stripe-connect-onboard';
+
+async function venueGetAuthToken(){
+ const s=await sb.auth.getSession();
+ return s.data.session?.access_token||'';
+}
+
+function VenuePayouts({venue}){
+ const [status,setStatus]=React.useState(null);
+ const [busy,setBusy]=React.useState(true);
+ const tier=venue?.tier||'free';
+ const isPaid=tier==='standard'||tier==='premium';
+
+ React.useEffect(()=>{
+   if(!isPaid){setBusy(false);return;}
+   checkStatus();
+ },[isPaid]);
+
+ async function checkStatus(){
+   setBusy(true);
+   try{
+     const token=await venueGetAuthToken();
+     const res=await fetch(VENUE_CONNECT_FN,{
+       method:'POST',
+       headers:{'Content-Type':'application/json','Authorization':'Bearer '+token,'apikey':SB_KEY},
+       body:JSON.stringify({action:'status',role:'venue_owner'})
+     });
+     const data=await res.json();
+     setStatus(data);
+   }catch(e){setStatus({connected:false,status:'none'});}
+   setBusy(false);
+ }
+
+ async function startOnboard(){
+   try{
+     const token=await venueGetAuthToken();
+     const res=await fetch(VENUE_CONNECT_FN,{
+       method:'POST',
+       headers:{'Content-Type':'application/json','Authorization':'Bearer '+token,'apikey':SB_KEY},
+       body:JSON.stringify({action:'onboard',role:'venue_owner'})
+     });
+     const data=await res.json();
+     if(data.url) window.location.href=data.url;
+     else alert('Error: '+(data.error||'Could not connect'));
+   }catch(e){alert('Network error - try again');}
+ }
+
+ async function openDashboard(){
+   try{
+     const token=await venueGetAuthToken();
+     const res=await fetch(VENUE_CONNECT_FN,{
+       method:'POST',
+       headers:{'Content-Type':'application/json','Authorization':'Bearer '+token,'apikey':SB_KEY},
+       body:JSON.stringify({action:'dashboard',role:'venue_owner'})
+     });
+     const data=await res.json();
+     if(data.url) window.open(data.url,'_blank');
+     else alert('Error opening dashboard');
+   }catch(e){alert('Network error');}
+ }
+
+ if(!venue) return React.createElement('div',null,
+   React.createElement('h2',{style:{fontFamily:"'DM Sans',sans-serif",fontSize:22,fontWeight:800,marginBottom:6}},'Payouts'),
+   React.createElement(Card,{style:{textAlign:'center',padding:48}},
+     React.createElement('p',{style:{color:'var(--sub)'}},'Set up your venue first.')
+   )
+ );
+
+ if(!isPaid) return React.createElement('div',null,
+   React.createElement('h2',{style:{fontFamily:"'DM Sans',sans-serif",fontSize:22,fontWeight:800,marginBottom:6}},'Payouts'),
+   React.createElement(Card,{style:{textAlign:'center',padding:48,borderColor:'rgba(255,107,53,0.3)'}},
+     React.createElement('div',{style:{fontSize:40,marginBottom:16}},'💰'),
+     React.createElement('div',{style:{fontWeight:800,fontSize:18,marginBottom:8}},'Unlock Ticket Payouts'),
+     React.createElement('div',{style:{color:'var(--sub)',fontSize:14,maxWidth:400,margin:'0 auto 24px',lineHeight:1.7}},'Upgrade to Standard or Premium to connect your Stripe account and receive ticket sale payouts directly to your bank.'),
+     React.createElement(Btn,{onClick:()=>window.open(PAYMENT_LINK_STANDARD,'_blank')},'Upgrade to Standard →')
+   )
+ );
+
+ if(busy) return React.createElement(Spin,null);
+
+ const connected=status?.connected;
+ const connectStatus=status?.status||'none';
+ const statusLabel=connected?'Active - payouts enabled':connectStatus==='pending'?'Pending - finish Stripe setup':connectStatus==='incomplete'?'Incomplete - resume setup':'Not connected';
+ const statusColor=connected?'var(--green)':connectStatus==='pending'?'#f59e0b':'var(--muted)';
+
+ return React.createElement('div',null,
+   React.createElement('h2',{style:{fontFamily:"'DM Sans',sans-serif",fontSize:22,fontWeight:800,marginBottom:4}},'Payouts'),
+   React.createElement('p',{style:{color:'var(--sub)',fontSize:14,marginBottom:24}},'Connect your Stripe account to receive ticket sale payouts directly.'),
+
+   React.createElement(Card,{style:{padding:28,marginBottom:24,borderColor:connected?'rgba(52,211,153,0.3)':'rgba(255,107,53,0.25)'}},
+     React.createElement('div',{style:{display:'flex',alignItems:'center',gap:14,marginBottom:20}},
+       React.createElement('div',{style:{width:44,height:44,borderRadius:'50%',background:connected?'var(--green-dim)':'var(--orange-dim)',display:'flex',alignItems:'center',justifyContent:'center',fontSize:20,flexShrink:0}},connected?'✅':'💳'),
+       React.createElement('div',null,
+         React.createElement('div',{style:{fontWeight:700,fontSize:15}}),
+         React.createElement('div',{style:{fontSize:12,marginTop:2,color:statusColor}},statusLabel)
+       )
+     ),
+     React.createElement('div',{style:{background:'var(--surface)',border:'1px solid var(--border)',borderRadius:10,padding:'14px 16px',marginBottom:20}},
+       React.createElement('div',{style:{fontSize:13,fontWeight:600,marginBottom:10}},'How ticket payouts work'),
+       React.createElement('div',{style:{display:'flex',flexDirection:'column',gap:7,fontSize:13,color:'var(--sub)'}},
+         React.createElement('div',null,'Attendees buy tickets through CBUSEVENTS at your venue events'),
+         React.createElement('div',null,'CBUSEVENTS takes 6.5% + $1.00 per ticket as the platform fee'),
+         React.createElement('div',null,'Your share deposits directly to your bank via Stripe in 2 business days'),
+         React.createElement('div',null,'Manage everything from your Stripe Express Dashboard')
+       )
+     ),
+     connected
+       ? React.createElement('div',{style:{display:'flex',gap:10}},
+           React.createElement('button',{onClick:openDashboard,style:{flex:1,padding:12,background:'#635bff',color:'#fff',border:'none',borderRadius:10,fontWeight:700,fontSize:14,cursor:'pointer',fontFamily:"'DM Sans',sans-serif"}},'Open Stripe Dashboard'),
+           React.createElement('button',{onClick:startOnboard,style:{padding:12,paddingLeft:16,paddingRight:16,background:'var(--surface)',color:'var(--sub)',border:'1px solid var(--border)',borderRadius:10,fontSize:13,cursor:'pointer',fontFamily:"'DM Sans',sans-serif"}},'Update')
+         )
+       : React.createElement('button',{onClick:startOnboard,style:{width:'100%',padding:13,background:'#FF6B35',color:'#fff',border:'none',borderRadius:10,fontWeight:700,fontSize:15,cursor:'pointer',fontFamily:"'DM Sans',sans-serif"}},
+           connectStatus==='pending'||connectStatus==='incomplete'?'Resume Stripe Setup →':'Connect Stripe Account →'
+         )
+   )
+ );
+}
+
 // Plan & Billing
 function PlanBilling({venue}) {
  const cur=venue?.tier||"free";
@@ -1206,6 +1325,7 @@ function Portal() {
  {page==="events" &&<EventsManager venue={venue} events={events} onRefresh={load}/>}
  {page==="calendar"&&<BookingCalendar venue={venue} events={events}/>}
  {page==="earnings"&&<Earnings venue={venue}/>}
+ {page==="payouts"&&<VenuePayouts venue={venue}/>}
  {page==="inquiries"&&<Inquiries venue={venue}/>}
  {page==="plan" &&<PlanBilling venue={venue}/>}
  </>}
