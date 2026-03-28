@@ -1228,18 +1228,16 @@ function showPage(page,data=null,pushState=true){
  window.scrollTo({top:0,behavior:'smooth'});
  if(page==='home')renderHome();
  else if(page==='venues')renderVenues();
- else if(page==='vendors')renderVendors();
  else if(page==='events')renderEvents();
  else if(page==='venue')renderVenueDetail(data);
  else if(page==='category')renderCategory(data);
  else if(page==='listVenue')renderVenueLanding();
 
  // Update URL and SEO title
- const titles={home:'CBUSEVENTS — Columbus Ohio Venues & Events',venues:'Columbus Venues — CBUSEVENTS',vendors:'Columbus Vendors — CBUSEVENTS',events:'Columbus Events — CBUSEVENTS'};
+ const titles={home:'CBUSEVENTS — Columbus Ohio Venues & Events',venues:'Columbus Venues — CBUSEVENTS',events:'Columbus Events — CBUSEVENTS'};
  let url='/';
  let title=titles[page]||document.title;
  if(page==='venues'){url='/venues';}
- else if(page==='vendors'){url='/vendors';}
  else if(page==='events'){url='/events';}
  else if(page==='venue'&&data){
    const slug=data.slug||toSlug(data.name);
