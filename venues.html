@@ -1,266 +1,523 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <!-- Google tag (gtag.js) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-P70BRSL5E5"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-      gtag('config', 'G-P70BRSL5E5');
-    </script>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>List Your Venue — CBUSEVENTS</title>
-<meta name="description" content="Get your Columbus venue discovered by thousands of event planners and attendees. List on CBUSEVENTS today."/>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Columbus Venues — CBUSEVENTS</title>
+<meta name="description" content="Browse Columbus event venues — bars, rooftops, event spaces, restaurants, and more. Book your next event through CBUSEVENTS.">
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-P70BRSL5E5"></script>
+<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-P70BRSL5E5');</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700;9..40,800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <style>
-*{box-sizing:border-box;margin:0;padding:0;}
-:root{--bg:#0b0b0f;--surface:#13131a;--card:#1a1a24;--border:#25252f;--text:#e8e8f0;--sub:#8888a0;--muted:#55556a;--orange:#FF6B35;--green:#22c55e;--gold:#f59e0b;--blue:#60a5fa;}
-body{background:var(--bg);color:var(--text);font-family:Inter,sans-serif;}
-@keyframes fadeUp{from{opacity:0;transform:translateY(24px);}to{opacity:1;transform:translateY(0);}}
-@keyframes scroll{0%{transform:translateX(0);}100%{transform:translateX(-50%);}}
+:root{
+  --bg:#080810;--surface:#0d0d1a;--card:#0f0f1e;--card-hover:#131325;
+  --border:rgba(255,255,255,0.07);--border-mid:rgba(255,255,255,0.11);
+  --orange:#FF6B35;--orange-soft:rgba(255,107,53,0.1);--orange-glow:rgba(255,107,53,0.22);
+  --text:#eeeef8;--text-dim:#7878a0;--text-faint:#3a3a58;
+  --green:#34d399;--gold:#fbbf24;
+  --mono:'DM Mono',monospace;--sans:'DM Sans',sans-serif;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-font-smoothing:antialiased;}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:100vh;}
+a{text-decoration:none;color:inherit;}
 
 /* NAV */
-nav{position:sticky;top:0;z-index:100;background:rgba(11,11,15,0.95);backdrop-filter:blur(16px);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 48px;height:62px;}
-.nav-logo{font-family:Inter,sans-serif;font-weight:800;font-size:20px;cursor:pointer;text-decoration:none;color:var(--text);}
+nav{position:sticky;top:0;z-index:200;height:60px;display:flex;align-items:center;justify-content:space-between;padding:0 32px;background:rgba(8,8,16,0.92);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);}
+.nav-logo{font-weight:800;font-size:16px;letter-spacing:-0.03em;text-transform:uppercase;}
 .nav-logo span{color:var(--orange);}
-.nav-links{display:flex;gap:4px;}
-.nav-link{background:none;border:none;color:var(--sub);font-size:14px;padding:7px 16px;border-radius:8px;font-weight:500;cursor:pointer;font-family:Inter,sans-serif;text-decoration:none;transition:all 0.15s;}
-.nav-link:hover{background:var(--card);color:var(--text);}
-.nav-cta{background:var(--orange);color:#fff;padding:8px 20px;border-radius:8px;font-size:13px;font-weight:700;text-decoration:none;transition:opacity 0.15s;border:none;cursor:pointer;font-family:Inter,sans-serif;}
-.nav-cta:hover{opacity:0.85;}
+.nav-center{display:flex;gap:2px;}
+.nav-link{font-size:13px;font-weight:500;color:var(--text-dim);padding:6px 14px;border-radius:6px;transition:color 0.15s;}
+.nav-link:hover{color:var(--text);}
+.nav-link.active{color:var(--orange);}
+.nav-right{display:flex;gap:10px;align-items:center;}
+.nav-btn-ghost{font-size:12px;font-weight:600;color:var(--text-dim);padding:7px 14px;border-radius:7px;border:1px solid var(--border);background:none;cursor:pointer;font-family:var(--sans);transition:all 0.15s;}
+.nav-btn-ghost:hover{color:var(--text);border-color:var(--border-mid);}
+.nav-btn-primary{font-size:12px;font-weight:700;color:#fff;padding:7px 16px;border-radius:7px;background:var(--orange);border:none;cursor:pointer;font-family:var(--sans);transition:opacity 0.15s;}
+.nav-btn-primary:hover{opacity:0.88;}
 
-/* DROPDOWN */
-.dropdown{position:relative;}
-.dropdown-menu{display:none;position:absolute;top:calc(100% + 4px);left:50%;transform:translateX(-50%);background:var(--card);border:1px solid var(--border);border-radius:12px;padding:8px;min-width:180px;box-shadow:0 16px 40px rgba(0,0,0,0.5);z-index:200;}
-.dropdown-menu.open{display:block;}
-.dropdown-item{display:block;padding:9px 14px;border-radius:8px;font-size:13px;font-weight:500;color:var(--sub);text-decoration:none;transition:all 0.15s;white-space:nowrap;}
-.dropdown-item:hover{background:var(--surface);color:var(--text);}
-.dropdown-item.active{color:var(--orange);}
+/* PAGE HEADER */
+.page-head{padding:48px 32px 0;max-width:1280px;margin:0 auto;display:flex;align-items:flex-end;justify-content:space-between;gap:24px;flex-wrap:wrap;}
+.page-eyebrow{font-family:var(--mono);font-size:10px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:var(--orange);margin-bottom:8px;display:flex;align-items:center;gap:8px;}
+.page-eyebrow::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--orange);animation:blink 2s ease-in-out infinite;}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0.3}}
+.page-title{font-size:clamp(28px,4vw,40px);font-weight:800;letter-spacing:-0.03em;line-height:1.1;}
+.page-count{font-size:13px;color:var(--text-dim);margin-top:6px;}
 
-/* HERO */
-.hero{min-height:88vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:80px 24px 60px;position:relative;overflow:hidden;}
-.hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 70% 50% at 50% 0%,#FF6B3518 0%,transparent 70%);}
-.hero-eyebrow{display:inline-flex;align-items:center;gap:6px;background:#FF6B3520;color:var(--orange);border:1px solid #FF6B3540;border-radius:20px;padding:5px 16px;font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-bottom:24px;animation:fadeUp 0.5s ease;}
-.hero h1{font-family:Inter,sans-serif;font-size:clamp(40px,7vw,72px);font-weight:800;line-height:1.05;margin-bottom:20px;animation:fadeUp 0.5s 0.1s ease both;}
-.hero h1 span{color:var(--orange);}
-.hero p{color:var(--sub);font-size:18px;max-width:520px;line-height:1.7;margin-bottom:36px;animation:fadeUp 0.5s 0.2s ease both;}
-.hero-btns{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;animation:fadeUp 0.5s 0.3s ease both;}
-.btn-hero{padding:14px 32px;border-radius:10px;font-size:15px;font-weight:700;cursor:pointer;font-family:Inter,sans-serif;text-decoration:none;transition:all 0.2s;border:none;display:inline-block;}
-.btn-hero-primary{background:var(--orange);color:#fff;}
-.btn-hero-primary:hover{opacity:0.85;transform:translateY(-1px);}
-.btn-hero-ghost{background:var(--card);color:var(--text);border:1px solid var(--border);}
-.btn-hero-ghost:hover{border-color:var(--muted);transform:translateY(-1px);}
-.hero-stats{display:flex;gap:40px;margin-top:48px;animation:fadeUp 0.5s 0.4s ease both;}
-.hero-stat-num{font-family:Inter,sans-serif;font-size:28px;font-weight:800;color:var(--orange);}
-.hero-stat-label{font-size:12px;color:var(--muted);margin-top:2px;}
+/* TOOLBAR */
+.toolbar{max-width:1280px;margin:24px auto 0;padding:0 32px;display:flex;flex-direction:column;gap:14px;}
+.search-bar{display:flex;align-items:center;gap:12px;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:0 16px;height:46px;transition:border-color 0.15s;}
+.search-bar:focus-within{border-color:var(--orange-glow);}
+.search-icon{color:var(--text-faint);font-size:18px;flex-shrink:0;}
+.search-input{flex:1;background:none;border:none;outline:none;color:var(--text);font-family:var(--sans);font-size:14px;}
+.search-input::placeholder{color:var(--text-faint);}
+.filter-row{display:flex;gap:8px;flex-wrap:wrap;}
+.filter-chip{font-size:12px;font-weight:600;padding:6px 14px;border-radius:100px;cursor:pointer;border:1px solid var(--border);background:none;color:var(--text-dim);font-family:var(--sans);transition:all 0.15s;white-space:nowrap;}
+.filter-chip:hover{border-color:var(--border-mid);color:var(--text);}
+.filter-chip.active{background:var(--orange);border-color:var(--orange);color:#fff;}
 
-/* SLIDER */
-.slider-section{padding:60px 0;overflow:hidden;border-top:1px solid var(--border);border-bottom:1px solid var(--border);}
-.slider-label{text-align:center;font-size:11px;font-weight:700;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-bottom:24px;}
-.slider-track{display:flex;gap:16px;width:max-content;animation:scroll 35s linear infinite;}
-.slider-track:hover{animation-play-state:paused;}
-.slider-card{background:var(--card);border:1px solid var(--border);border-radius:14px;overflow:hidden;width:260px;flex-shrink:0;cursor:pointer;transition:border-color 0.2s;}
-.slider-card:hover{border-color:var(--orange);}
-.slider-card-img{height:140px;background:linear-gradient(135deg,var(--surface),var(--border));display:flex;align-items:center;justify-content:center;font-size:36px;overflow:hidden;}
-.slider-card-img img{width:100%;height:100%;object-fit:cover;}
-.slider-card-body{padding:12px 14px;}
-.slider-card-type{font-size:10px;color:var(--orange);font-weight:700;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;}
-.slider-card-name{font-family:Inter,sans-serif;font-weight:700;font-size:14px;margin-bottom:3px;}
-.slider-card-meta{font-size:12px;color:var(--sub);}
-.slider-badge{display:inline-block;background:#f59e0b20;color:var(--gold);border:1px solid #f59e0b30;border-radius:20px;padding:2px 8px;font-size:10px;font-weight:700;margin-top:5px;}
+/* SORT ROW */
+.sort-row{max-width:1280px;margin:16px auto 0;padding:0 32px;display:flex;align-items:center;justify-content:space-between;gap:16px;}
+.results-label{font-size:12px;color:var(--text-dim);font-family:var(--mono);}
+.sort-select{background:var(--surface);border:1px solid var(--border);border-radius:7px;padding:6px 12px;color:var(--text);font-family:var(--sans);font-size:12px;outline:none;cursor:pointer;}
 
-/* FEATURES */
-.features{padding:80px 48px;max-width:1100px;margin:0 auto;}
-.section-label{font-size:11px;font-weight:700;color:var(--orange);letter-spacing:2px;text-transform:uppercase;margin-bottom:10px;}
-.section-title{font-family:Inter,sans-serif;font-size:clamp(28px,4vw,42px);font-weight:800;margin-bottom:14px;line-height:1.15;}
-.section-sub{color:var(--sub);font-size:16px;max-width:480px;line-height:1.7;margin-bottom:52px;}
-.features-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;}
-@media(max-width:768px){.features-grid{grid-template-columns:1fr;}}
-.feature-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:28px;}
-.feature-accent{width:32px;height:3px;background:var(--orange);border-radius:2px;margin-bottom:18px;}
-.feature-title{font-family:Inter,sans-serif;font-size:17px;font-weight:700;margin-bottom:8px;}
-.feature-desc{color:var(--sub);font-size:14px;line-height:1.65;}
+/* GRID */
+.marketplace-grid{max-width:1280px;margin:24px auto 0;padding:0 32px;display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px;}
 
-/* PRICING */
-.pricing{padding:80px 48px;background:var(--surface);border-top:1px solid var(--border);border-bottom:1px solid var(--border);}
-.pricing-inner{max-width:900px;margin:0 auto;}
-.plan-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:48px;}
-@media(max-width:700px){.plan-grid{grid-template-columns:1fr;}}
-.plan-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:28px;position:relative;}
-.plan-card.featured{border-color:#FF6B3560;background:linear-gradient(135deg,#1a0800,#1a1a24);}
-.plan-badge-top{position:absolute;top:-12px;left:50%;transform:translateX(-50%);background:var(--orange);color:#fff;border-radius:20px;padding:3px 14px;font-size:11px;font-weight:700;white-space:nowrap;}
-.plan-name{font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-bottom:8px;color:var(--sub);}
-.plan-price{font-family:Inter,sans-serif;font-size:28px;font-weight:800;letter-spacing:-0.03em;margin-bottom:4px;}
-.plan-price span{font-size:14px;color:var(--sub);font-weight:400;}
-.plan-mo{color:var(--sub);font-size:13px;margin-bottom:20px;}
-.plan-perks{display:flex;flex-direction:column;gap:9px;margin-bottom:24px;}
-.plan-perk{display:flex;gap:8px;font-size:13px;color:var(--sub);}
-.plan-perk .ck{flex-shrink:0;}
-.plan-btn{width:100%;border:none;border-radius:9px;padding:11px;font-size:14px;font-weight:700;cursor:pointer;font-family:Inter,sans-serif;transition:opacity 0.15s;text-decoration:none;display:block;text-align:center;}
-.plan-btn:hover{opacity:0.85;}
+/* VENUE CARD */
+.venue-card{background:var(--card);border:1px solid var(--border);border-radius:16px;overflow:hidden;cursor:pointer;transition:border-color 0.18s,transform 0.18s,box-shadow 0.18s;display:flex;flex-direction:column;animation:cardIn 0.35s ease both;}
+@keyframes cardIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+.venue-card:hover{border-color:rgba(255,107,53,0.3);transform:translateY(-3px);box-shadow:0 12px 40px rgba(0,0,0,0.4);background:var(--card-hover);}
 
-/* CTA BANNER */
-.cta-banner{padding:100px 48px;text-align:center;}
-.cta-banner h2{font-family:Inter,sans-serif;font-size:clamp(28px,4vw,48px);font-weight:800;margin-bottom:16px;}
-.cta-banner p{color:var(--sub);font-size:16px;max-width:440px;margin:0 auto 36px;line-height:1.7;}
+.card-cover{height:160px;position:relative;overflow:hidden;background:linear-gradient(135deg,#0f0f22,#1a0e08);flex-shrink:0;}
+.card-cover img{width:100%;height:100%;object-fit:cover;display:block;transition:transform 0.4s;}
+.venue-card:hover .card-cover img{transform:scale(1.04);}
+.card-cover-placeholder{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:44px;opacity:0.3;}
+.card-cover-gradient{position:absolute;inset:0;background:linear-gradient(to top,rgba(15,15,30,0.8) 0%,transparent 55%);}
+.card-tier-badge{position:absolute;top:12px;right:12px;font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;padding:3px 9px;border-radius:100px;}
+.badge-premium{background:rgba(251,191,36,0.15);color:var(--gold);border:1px solid rgba(251,191,36,0.3);}
+.badge-standard{background:var(--orange-soft);color:var(--orange);border:1px solid var(--orange-glow);}
+.card-capacity{position:absolute;bottom:12px;left:12px;font-family:var(--mono);font-size:10px;font-weight:600;color:rgba(255,255,255,0.7);background:rgba(0,0,0,0.5);padding:3px 9px;border-radius:100px;backdrop-filter:blur(4px);}
+
+.card-body{padding:18px 20px 20px;flex:1;display:flex;flex-direction:column;gap:8px;}
+.card-type{font-family:var(--mono);font-size:9px;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:var(--orange);}
+.card-name{font-size:16px;font-weight:700;letter-spacing:-0.02em;color:var(--text);line-height:1.3;}
+.card-hood{font-size:12px;color:var(--text-dim);}
+.card-desc{font-size:12px;color:var(--text-dim);line-height:1.55;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+.card-tags{display:flex;flex-wrap:wrap;gap:5px;}
+.card-tag{font-size:11px;padding:3px 9px;border-radius:100px;background:rgba(255,255,255,0.04);border:1px solid var(--border);color:var(--text-dim);}
+.card-footer{display:flex;align-items:center;justify-content:space-between;margin-top:auto;padding-top:12px;border-top:1px solid var(--border);}
+.card-meta{font-size:11px;color:var(--text-faint);}
+.card-cta{font-size:11px;font-weight:700;color:var(--orange);padding:5px 12px;border-radius:6px;border:1px solid var(--orange-glow);background:var(--orange-soft);transition:all 0.15s;}
+.venue-card:hover .card-cta{background:var(--orange);color:#fff;border-color:var(--orange);}
+
+/* STATES */
+.grid-loading{grid-column:1/-1;display:flex;align-items:center;justify-content:center;padding:80px;gap:12px;color:var(--text-dim);font-size:13px;}
+.spinner{width:20px;height:20px;border:2px solid var(--border);border-top-color:var(--orange);border-radius:50%;animation:spin 0.75s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg)}}
+.grid-empty{grid-column:1/-1;text-align:center;padding:80px 20px;}
+.grid-empty-icon{font-size:40px;margin-bottom:14px;opacity:0.4;}
+.grid-empty-title{font-size:16px;font-weight:700;margin-bottom:6px;}
+.grid-empty-sub{font-size:13px;color:var(--text-dim);}
+
+/* MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.78);z-index:500;display:flex;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(4px);animation:fadeIn 0.15s ease;}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.modal{background:var(--card);border:1px solid var(--border-mid);border-radius:20px;width:100%;max-width:560px;max-height:90vh;overflow-y:auto;animation:slideUp 0.2s ease;}
+@keyframes slideUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+.modal-cover{height:200px;position:relative;overflow:hidden;background:linear-gradient(135deg,#0f0f22,#1a0e08);}
+.modal-cover img{width:100%;height:100%;object-fit:cover;}
+.modal-cover-placeholder{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:64px;opacity:0.2;}
+.modal-close{position:absolute;top:14px;right:14px;background:rgba(0,0,0,0.6);border:1px solid rgba(255,255,255,0.1);color:#fff;width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;cursor:pointer;}
+.modal-body{padding:24px;}
+.modal-type{font-family:var(--mono);font-size:9px;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:var(--orange);margin-bottom:4px;}
+.modal-name{font-size:22px;font-weight:800;letter-spacing:-0.03em;margin-bottom:14px;}
+.modal-pills{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:16px;}
+.modal-pill{font-size:12px;padding:4px 11px;border-radius:100px;background:rgba(255,255,255,0.05);border:1px solid var(--border);color:var(--text-dim);}
+.modal-desc{font-size:13px;color:var(--text-dim);line-height:1.65;margin-bottom:18px;}
+.modal-amenities{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:20px;}
+.modal-amenity{font-size:11px;padding:3px 9px;border-radius:6px;background:rgba(255,255,255,0.04);border:1px solid var(--border);color:var(--text-dim);}
+.modal-cta{display:block;text-align:center;padding:13px;background:var(--orange);color:#fff;font-weight:700;font-size:14px;border-radius:10px;border:none;cursor:pointer;font-family:var(--sans);transition:opacity 0.15s;width:100%;}
+.modal-cta:hover{opacity:0.88;}
+.modal-cta-sub{text-align:center;font-size:11px;color:var(--text-faint);margin-top:10px;}
+
+/* ── DIVIDER ─────────────────────────────────────────────── */
+.section-divider{max-width:1280px;margin:60px auto 0;padding:0 32px;}
+.divider-line{height:1px;background:linear-gradient(90deg,transparent,var(--border),transparent);}
+
+/* ── LIST YOUR VENUE CTA SECTION ─────────────────────────── */
+.list-section{max-width:1280px;margin:0 auto;padding:60px 32px 80px;}
+.list-section-inner{background:linear-gradient(135deg,#0f0800,#1a0c00,#080810);border:1px solid rgba(255,107,53,0.2);border-radius:20px;overflow:hidden;position:relative;}
+.list-section-inner::before{content:'';position:absolute;top:-80px;right:-80px;width:280px;height:280px;background:radial-gradient(circle,rgba(255,107,53,0.08),transparent 70%);pointer-events:none;}
+.list-section-inner::after{content:'';position:absolute;bottom:-60px;left:-60px;width:200px;height:200px;background:radial-gradient(circle,rgba(255,107,53,0.05),transparent 70%);pointer-events:none;}
+
+.list-hero{padding:56px 56px 40px;display:flex;align-items:center;justify-content:space-between;gap:40px;flex-wrap:wrap;position:relative;z-index:1;}
+.list-hero-text{}
+.list-eyebrow{font-family:var(--mono);font-size:10px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--orange);margin-bottom:12px;display:flex;align-items:center;gap:8px;}
+.list-eyebrow::before{content:'';width:20px;height:2px;background:var(--orange);}
+.list-title{font-size:clamp(24px,3.5vw,38px);font-weight:800;letter-spacing:-0.03em;line-height:1.15;margin-bottom:14px;}
+.list-sub{font-size:15px;color:var(--text-dim);line-height:1.7;max-width:480px;margin-bottom:28px;}
+.list-btns{display:flex;gap:12px;flex-wrap:wrap;}
+.btn-list-primary{font-size:14px;font-weight:700;color:#fff;padding:12px 28px;border-radius:9px;background:var(--orange);border:none;cursor:pointer;font-family:var(--sans);transition:all 0.15s;text-decoration:none;display:inline-block;}
+.btn-list-primary:hover{opacity:0.88;transform:translateY(-1px);}
+.btn-list-ghost{font-size:14px;font-weight:600;color:var(--text-dim);padding:12px 24px;border-radius:9px;background:rgba(255,255,255,0.04);border:1px solid var(--border);cursor:pointer;font-family:var(--sans);transition:all 0.15s;text-decoration:none;display:inline-block;}
+.btn-list-ghost:hover{color:var(--text);border-color:var(--border-mid);}
+
+.list-stats{display:flex;flex-direction:column;gap:12px;flex-shrink:0;}
+.list-stat{background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:12px;padding:18px 24px;text-align:center;min-width:140px;}
+.list-stat-num{font-family:var(--mono);font-size:28px;font-weight:500;color:var(--orange);line-height:1;margin-bottom:4px;}
+.list-stat-label{font-size:11px;color:var(--text-dim);letter-spacing:0.04em;}
+
+/* FEATURES GRID */
+.features-section{padding:0 56px 56px;position:relative;z-index:1;}
+.features-label{font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--text-faint);margin-bottom:20px;}
+.features-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;}
+.feature-item{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);border-radius:12px;padding:18px;}
+.feature-item-title{font-size:13px;font-weight:700;color:var(--text);margin-bottom:5px;}
+.feature-item-desc{font-size:12px;color:var(--text-dim);line-height:1.5;}
+.feature-accent{width:24px;height:2px;background:var(--orange);border-radius:2px;margin-bottom:12px;}
+
+/* PRICING STRIP */
+.pricing-strip{border-top:1px solid rgba(255,255,255,0.06);margin:0 56px;padding:32px 0;display:grid;grid-template-columns:repeat(3,1fr);gap:12px;position:relative;z-index:1;}
+.price-item{text-align:center;padding:20px;}
+.price-name{font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;margin-bottom:8px;}
+.price-item.free .price-name{color:var(--text-dim);}
+.price-item.standard .price-name{color:var(--orange);}
+.price-item.premium .price-name{color:var(--gold);}
+.price-amount{font-size:26px;font-weight:800;letter-spacing:-0.03em;line-height:1;margin-bottom:4px;}
+.price-item.free .price-amount{color:var(--text-dim);}
+.price-item.standard .price-amount{color:var(--orange);}
+.price-item.premium .price-amount{color:var(--gold);}
+.price-period{font-size:11px;color:var(--text-faint);margin-bottom:14px;}
+.price-perks{display:flex;flex-direction:column;gap:6px;text-align:left;max-width:180px;margin:0 auto;}
+.price-perk{font-size:12px;color:var(--text-dim);display:flex;gap:7px;align-items:flex-start;}
+.price-perk::before{content:'✓';font-size:10px;color:var(--green);flex-shrink:0;margin-top:1px;}
+.price-divider{position:absolute;top:32px;left:33.33%;width:1px;height:calc(100% - 64px);background:rgba(255,255,255,0.06);}
+.price-divider-2{position:absolute;top:32px;left:66.66%;width:1px;height:calc(100% - 64px);background:rgba(255,255,255,0.06);}
 
 /* FOOTER */
-
-/* ── MOBILE ─────────────────────────────────────────────────── */
-@media(max-width:680px){
- nav{padding:0 16px;height:54px;}
- nav .nav-links{display:none;}
- .nav-cta{font-size:12px;padding:7px 14px;}
- .nav-logo{font-size:17px;}
- .hero{min-height:auto;padding:60px 20px 40px;}
- .hero h1{font-size:clamp(32px,8vw,52px);}
- .hero p{font-size:15px;}
- .hero-btns{flex-direction:column;align-items:stretch;}
- .btn-hero{text-align:center;padding:13px 20px;}
- .hero-stats{gap:20px;flex-wrap:wrap;justify-content:center;}
- .features{padding:48px 20px;}
- .features-grid{grid-template-columns:1fr !important;}
- .plan-grid{grid-template-columns:1fr !important;}
- .pricing{padding:48px 20px;}
- .cta-banner{padding:60px 20px;}
- .cta-banner h2{font-size:clamp(24px,6vw,36px);}
- .section-title{font-size:clamp(24px,5vw,36px);}
- footer{padding:20px 16px;flex-direction:column;gap:10px;}
- .services-showcase{padding:48px 20px;}
- .services-tags{gap:8px;}
- .service-tag{font-size:12px;padding:6px 12px;}
- .hood-grid{grid-template-columns:1fr 1fr !important;}
- .categories{gap:6px;}
- .cat-chip{font-size:12px;padding:6px 12px;}
- .slider-section{padding:40px 0;}
- .role-grid{grid-template-columns:1fr 1fr;}
-}
-footer{background:var(--surface);border-top:1px solid var(--border);padding:24px 48px;display:flex;justify-content:space-between;align-items:center;}
-.footer-copy{color:var(--muted);font-size:12px;}
-.footer-admin{color:var(--muted);font-size:11px;opacity:0.4;transition:opacity 0.2s;text-decoration:none;}
+footer{border-top:1px solid var(--border);padding:28px 32px;display:flex;justify-content:space-between;align-items:center;}
+.footer-copy{font-size:12px;color:var(--text-faint);}
+.footer-admin{font-size:11px;color:var(--text-faint);opacity:0.4;transition:opacity 0.2s;text-decoration:none;}
 .footer-admin:hover{opacity:1;}
 
-/* ── HAMBURGER NAV (mobile) ── */
-.nav-hamburger{display:none;flex-direction:column;gap:5px;cursor:pointer;padding:6px;background:none;border:none;z-index:110;}
-.nav-hamburger span{display:block;width:22px;height:2px;background:var(--text);border-radius:2px;transition:all 0.3s ease;}
-.nav-hamburger.open span:nth-child(1){transform:translateY(7px) rotate(45deg);}
-.nav-hamburger.open span:nth-child(2){opacity:0;}
-.nav-hamburger.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg);}
-.nav-mobile-menu{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(11,11,15,0.98);backdrop-filter:blur(20px);z-index:105;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:80px 24px 40px;}
-.nav-mobile-menu.open{display:flex;}
-.nav-mobile-link{font-family:Inter,sans-serif;font-size:26px;font-weight:700;color:var(--text);text-decoration:none;padding:12px 24px;border-radius:12px;transition:color 0.2s;text-align:center;width:100%;cursor:pointer;border:none;background:none;font-family:Inter,sans-serif;}
-.nav-mobile-link:hover,.nav-mobile-link.active{color:var(--orange);}
-.nav-mobile-divider{width:40px;height:1px;background:var(--border);margin:6px 0;}
-.nav-mobile-cta{margin-top:12px;background:var(--orange) !important;color:#fff !important;border-radius:12px;padding:14px 32px !important;font-size:16px !important;}
-@media(max-width:680px){
-  .nav-hamburger{display:flex;}
-  .nav-links{display:none !important;}
-  html,body{overflow-x:hidden;}
+/* RESPONSIVE */
+@media(max-width:900px){
+  nav{padding:0 20px;}
+  .nav-center{display:none;}
+  .page-head,.toolbar,.sort-row,.marketplace-grid,.section-divider,.list-section{padding-left:20px;padding-right:20px;}
+  .marketplace-grid{grid-template-columns:repeat(auto-fill,minmax(260px,1fr));}
+  .list-hero{padding:36px 28px 28px;}
+  .list-stats{flex-direction:row;}
+  .features-section{padding:0 28px 36px;}
+  .features-grid{grid-template-columns:1fr 1fr;}
+  .pricing-strip{margin:0 28px;grid-template-columns:1fr;}
+  .price-divider,.price-divider-2{display:none;}
 }
-
-</style>
-<style>
-*{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;}
-body{font-family:Inter,sans-serif;}
-h1,h2,h3,h4,h5,h6{font-family:Inter,sans-serif;letter-spacing:-0.02em;}
-.nav-logo,.auth-logo,.login-logo,.sidebar-logo-text{font-family:Inter,sans-serif!important;font-weight:800!important;letter-spacing:-0.04em!important;text-transform:uppercase;}
-.nav-logo span,.auth-logo span,.login-logo span,.sidebar-logo-text span{color:#FF6B35;}
+@media(max-width:560px){
+  .marketplace-grid{grid-template-columns:1fr;}
+  .page-head{flex-direction:column;align-items:flex-start;}
+  .features-grid{grid-template-columns:1fr;}
+  .list-stats{flex-wrap:wrap;justify-content:center;}
+  footer{flex-direction:column;gap:10px;text-align:center;}
+}
 </style>
 </head>
-<body> <nav> <a class="nav-logo" href="https://cbusevents.com"> CBUS<span>EVENTS</span> </a> <div class="nav-links"> <a href="https://cbusevents.com" class="nav-link">Home</a> <div class="dropdown"> <a class="nav-link active" style="color:var(--text)">Join ▾</a> <div class="dropdown-menu"> <a href="https://cbusevents.com/venues.html" class="dropdown-item active"> Venues</a> <a href="https://cbusevents.com/vendors.html" class="dropdown-item"> Vendors</a> <a href="https://cbusevents.com/planners.html" class="dropdown-item"> Planners</a> <a href="https://cbusevents.com/attendees.html" class="dropdown-item"> Attendees</a> </div> </div> </div> <a href="https://cbusevents.com/signup.html?role=venue" class="nav-cta">List Your Venue →</a>
-<button class="nav-hamburger" id="navHamburger" aria-label="Menu"><span></span><span></span><span></span></button>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="https://cbusevents.com" class="nav-logo">CBUS<span>EVENTS</span></a>
+  <div class="nav-center">
+    <a href="https://cbusevents.com" class="nav-link">Home</a>
+    <a href="https://cbusevents.com/events.html" class="nav-link">Events</a>
+    <a href="https://cbusevents.com/venues.html" class="nav-link active">Venues</a>
+    <a href="https://cbusevents.com/vendors.html" class="nav-link">Vendors</a>
+  </div>
+  <div class="nav-right">
+    <button class="nav-btn-ghost" onclick="window.location.href='https://cbusevents.com/cbus-venue-portal.html'">Sign In</button>
+    <button class="nav-btn-primary" onclick="window.location.href='https://cbusevents.com/signup.html?role=venue'">List Your Venue</button>
+  </div>
 </nav>
-<div id="navMobileMenu" class="nav-mobile-menu">
-  <a href="https://cbusevents.com" class="nav-mobile-link">Home</a>
-  <a href="https://cbusevents.com/venues.html" class="nav-mobile-link active">Venues</a>
-  <a href="https://cbusevents.com/vendors.html" class="nav-mobile-link">Vendors</a>
-  <a href="https://cbusevents.com/planners.html" class="nav-mobile-link">Planners</a>
-  <div class="nav-mobile-divider"></div>
-  <a href="https://cbusevents.com/signup.html?role=venue" class="nav-mobile-link nav-mobile-cta">List Your Venue →</a>
-</div> <!-- HERO -->
-<section class="hero"> <div class="hero-eyebrow"> For Venue Owners</div> <h1>Put Your Venue<br>on the <span>Columbus Map</span></h1> <p>CBUSEVENTS connects your space with thousands of event planners, corporate clients, and locals looking for their next venue.</p> <div class="hero-btns"> <a href="https://cbusevents.com/signup.html?role=venue" class="btn-hero btn-hero-primary">List Your Venue Free →</a> <a href="https://cbusevents.com/cbus-venue-portal.html" class="btn-hero btn-hero-ghost">Sign In</a> </div> <div class="hero-stats"> <div style="text-align:center"><div class="hero-stat-num" id="statVenues">—</div><div class="hero-stat-label">Venues Listed</div></div> <div style="text-align:center"><div class="hero-stat-num" id="statEvents">—</div><div class="hero-stat-label">Events Hosted</div></div> <div style="text-align:center"><div class="hero-stat-num">Columbus</div><div class="hero-stat-label">Ohio's #1 Event Platform</div></div> </div>
-</section> <!-- FEATURED VENUES SLIDER -->
-<section class="slider-section"> <div class="slider-label">Featured Venues on CBUSEVENTS</div> <div style="overflow:hidden"> <div class="slider-track" id="venueSlider"> <!-- populated by JS, duplicated for infinite scroll --> </div> </div>
-</section> <!-- FEATURES -->
-<section class="features"> <div class="section-label">Why CBUSEVENTS</div> <div class="section-title">Everything your venue<br>needs to get booked</div> <div class="section-sub">From discovery to inquiry, we handle the marketing so you can focus on the experience.</div> <div class="features-grid"> <div class="feature-card"> <div class="feature-title">Get Discovered</div> <div class="feature-desc">Your venue appears in search results when planners look for spaces in Columbus. Premium listings appear first.</div> </div> <div class="feature-card"> <div class="feature-title">Receive Inquiries</div> <div class="feature-desc">Planners and clients send booking inquiries directly through your listing. Respond from your venue portal.</div> </div> <div class="feature-card"> <div class="feature-title">Publish Events</div> <div class="feature-desc">List your own events and sell tickets directly through CBUSEVENTS with our built-in ticketing system.</div> </div> <div class="feature-card"> <div class="feature-title">Showcase Your Space</div> <div class="feature-desc">Upload photos, set your capacity, amenities, and pricing so clients know exactly what to expect.</div> </div> <div class="feature-card"> <div class="feature-title">Design Services</div> <div class="feature-desc">Premium venues get access to our in-house design team for flyers, merch, and promotional materials.</div> </div> <div class="feature-card"> <div class="feature-title">Track Performance</div> <div class="feature-desc">See how many people viewed your listing, sent inquiries, and attended your events all in one dashboard.</div> </div> </div>
-</section> <!-- PRICING -->
-<section class="pricing"> <div class="pricing-inner"> <div style="text-align:center"> <div class="section-label">Pricing</div> <div class="section-title">Simple, transparent plans</div> </div> <div class="plan-grid"> <div class="plan-card"> <div class="plan-name">Free</div> <div class="plan-price">$0<span>/mo</span></div> <div class="plan-mo">forever</div> <div class="plan-perks"> <div class="plan-perk"><span class="ck"></span>Basic venue listing</div> <div class="plan-perk"><span class="ck"></span>Receive inquiries</div> <div class="plan-perk"><span class="ck"></span>Publish events</div> <div class="plan-perk"><span class="ck" style="color:var(--muted)"></span><span style="color:var(--muted)">Featured placement</span></div> <div class="plan-perk"><span class="ck" style="color:var(--muted)"></span><span style="color:var(--muted)">Design services</span></div> </div> <a href="https://cbusevents.com/signup.html?role=venue" class="plan-btn" style="background:var(--surface);color:var(--text);border:1px solid var(--border)">Get Started Free</a> </div> <div class="plan-card featured"> <div class="plan-badge-top">MOST POPULAR</div> <div class="plan-name" style="color:var(--orange)">Standard</div> <div class="plan-price">$29<span>/mo</span></div> <div class="plan-mo">cancel anytime</div> <div class="plan-perks"> <div class="plan-perk"><span class="ck"></span>Everything in Free</div> <div class="plan-perk"><span class="ck" style="color:var(--orange)"></span>Featured in search results</div> <div class="plan-perk"><span class="ck" style="color:var(--orange)"></span>Priority listing placement</div> <div class="plan-perk"><span class="ck" style="color:var(--orange)"></span>Verified venue badge</div> <div class="plan-perk"><span class="ck" style="color:var(--muted)"></span><span style="color:var(--muted)">Design services</span></div> </div> <a href="https://cbusevents.com/cbus-venue-portal.html" class="plan-btn" style="background:var(--orange);color:#fff">Get Standard →</a> </div> <div class="plan-card"> <div class="plan-name" style="color:var(--gold)">Premium</div> <div class="plan-price">$79<span>/mo</span></div> <div class="plan-mo">cancel anytime</div> <div class="plan-perks"> <div class="plan-perk"><span class="ck"></span>Everything in Standard</div> <div class="plan-perk"><span class="ck" style="color:var(--gold)"></span>Top of all listings</div> <div class="plan-perk"><span class="ck" style="color:var(--gold)"></span>Homepage feature slot</div> <div class="plan-perk"><span class="ck" style="color:var(--gold)"></span>Flyer & merch design</div> <div class="plan-perk"><span class="ck" style="color:var(--gold)"></span>Dedicated support</div> </div> <a href="https://cbusevents.com/cbus-venue-portal.html" class="plan-btn" style="background:var(--gold);color:#000">Get Premium →</a> </div> </div> </div>
-</section> <!-- CTA -->
-<section class="cta-banner"> <h2>Ready to fill your calendar?</h2> <p>Join Columbus venues already using CBUSEVENTS to get discovered and booked.</p> <a href="https://cbusevents.com/signup.html?role=venue" class="btn-hero btn-hero-primary">List Your Venue Free →</a>
-</section> <footer> <span class="footer-copy">© 2026 CBUSEVENTS · Columbus, Ohio</span> <div style="display:flex;gap:20px;align-items:center"> <span class="footer-copy">Made for Columbus </span> <a href="https://cbusevents.com/cbus-admin.html" class="footer-admin">Admin</a> </div>
-</footer> <script src="https://unpkg.com/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+
+<!-- PAGE HEADER -->
+<div class="page-head">
+  <div>
+    <div class="page-eyebrow">Columbus Event Venues</div>
+    <h1 class="page-title">Find the perfect space<br>for your next event.</h1>
+    <p class="page-count" id="resultCount">Loading venues...</p>
+  </div>
+</div>
+
+<!-- TOOLBAR -->
+<div class="toolbar">
+  <div class="search-bar">
+    <span class="search-icon">⌕</span>
+    <input class="search-input" id="searchInput" placeholder="Search by name, neighborhood, or type..." oninput="handleSearch(this.value)">
+  </div>
+  <div class="filter-row">
+    <button class="filter-chip active" onclick="setFilter('all',this)">All</button>
+    <button class="filter-chip" onclick="setFilter('bar',this)">Bars & Nightlife</button>
+    <button class="filter-chip" onclick="setFilter('restaurant',this)">Restaurants</button>
+    <button class="filter-chip" onclick="setFilter('event',this)">Event Spaces</button>
+    <button class="filter-chip" onclick="setFilter('rooftop',this)">Rooftops</button>
+    <button class="filter-chip" onclick="setFilter('comedy',this)">Comedy Clubs</button>
+    <button class="filter-chip" onclick="setFilter('concert',this)">Concert Halls</button>
+    <button class="filter-chip" onclick="setFilter('gallery',this)">Galleries</button>
+    <button class="filter-chip" onclick="setFilter('outdoor',this)">Outdoor</button>
+  </div>
+</div>
+
+<!-- SORT ROW -->
+<div class="sort-row">
+  <div class="results-label" id="sortLabel"></div>
+  <select class="sort-select" onchange="handleSort(this.value)">
+    <option value="tier">Featured First</option>
+    <option value="capacity">Largest First</option>
+    <option value="name">A - Z</option>
+    <option value="newest">Newest</option>
+  </select>
+</div>
+
+<!-- VENUE GRID -->
+<div class="marketplace-grid" id="venueGrid">
+  <div class="grid-loading"><div class="spinner"></div> Loading venues...</div>
+</div>
+
+<!-- DIVIDER -->
+<div class="section-divider"><div class="divider-line"></div></div>
+
+<!-- LIST YOUR VENUE CTA SECTION -->
+<div class="list-section">
+  <div class="list-section-inner">
+
+    <div class="list-hero">
+      <div class="list-hero-text">
+        <div class="list-eyebrow">For Venue Owners</div>
+        <h2 class="list-title">Columbus planners are<br>searching for your space.</h2>
+        <p class="list-sub">Every event planner, corporate organizer, and group looking for a Columbus venue starts their search here. Get your space in front of them before they book somewhere else.</p>
+        <div class="list-btns">
+          <a href="https://cbusevents.com/signup.html?role=venue" class="btn-list-primary">List Your Venue Free →</a>
+          <a href="https://cbusevents.com/cbus-venue-portal.html" class="btn-list-ghost">Sign In to Portal</a>
+        </div>
+      </div>
+      <div class="list-stats" id="listStats">
+        <div class="list-stat">
+          <div class="list-stat-num" id="statPlanners">500+</div>
+          <div class="list-stat-label">Active Planners</div>
+        </div>
+        <div class="list-stat">
+          <div class="list-stat-num" id="statEvents">—</div>
+          <div class="list-stat-label">Events Hosted</div>
+        </div>
+        <div class="list-stat">
+          <div class="list-stat-num">Free</div>
+          <div class="list-stat-label">To Start</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="features-section">
+      <div class="features-label">What you get</div>
+      <div class="features-grid">
+        <div class="feature-item">
+          <div class="feature-accent"></div>
+          <div class="feature-item-title">Get Discovered</div>
+          <div class="feature-item-desc">Your venue appears when planners search Columbus spaces. Premium listings surface first.</div>
+        </div>
+        <div class="feature-item">
+          <div class="feature-accent"></div>
+          <div class="feature-item-title">Receive Inquiries</div>
+          <div class="feature-item-desc">Planners send booking requests directly through your listing. Manage everything from your portal.</div>
+        </div>
+        <div class="feature-item">
+          <div class="feature-accent"></div>
+          <div class="feature-item-title">Sell Tickets</div>
+          <div class="feature-item-desc">Publish events and sell tickets through CBUSEVENTS. Earn 25% of the platform fee on every sale.</div>
+        </div>
+        <div class="feature-item">
+          <div class="feature-accent"></div>
+          <div class="feature-item-title">Showcase Your Space</div>
+          <div class="feature-item-desc">Photos, capacity, amenities, and neighborhood all visible to planners before they reach out.</div>
+        </div>
+        <div class="feature-item">
+          <div class="feature-accent"></div>
+          <div class="feature-item-title">Booking Calendar</div>
+          <div class="feature-item-desc">See all your events and inquiries in one place. Set availability and manage requests without a spreadsheet.</div>
+        </div>
+        <div class="feature-item">
+          <div class="feature-accent"></div>
+          <div class="feature-item-title">Track Performance</div>
+          <div class="feature-item-desc">Profile views, inquiry rates, ticket revenue, and event attendance all in your earnings dashboard.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="pricing-strip" style="position:relative;">
+      <div class="price-divider"></div>
+      <div class="price-divider-2"></div>
+      <div class="price-item free">
+        <div class="price-name">Basic</div>
+        <div class="price-amount">Free</div>
+        <div class="price-period">always included</div>
+        <div class="price-perks">
+          <div class="price-perk">Venue listing and profile</div>
+          <div class="price-perk">Receive inquiries</div>
+          <div class="price-perk">Up to 4 events/month</div>
+        </div>
+      </div>
+      <div class="price-item standard">
+        <div class="price-name">Standard</div>
+        <div class="price-amount">$39<span style="font-size:14px;font-weight:400;color:var(--text-dim)">/mo</span></div>
+        <div class="price-period">cancel anytime</div>
+        <div class="price-perks">
+          <div class="price-perk">Everything in Basic</div>
+          <div class="price-perk">Priority search placement</div>
+          <div class="price-perk">Up to 20 events/month</div>
+          <div class="price-perk">Analytics dashboard</div>
+        </div>
+      </div>
+      <div class="price-item premium">
+        <div class="price-name">Premium</div>
+        <div class="price-amount">$99<span style="font-size:14px;font-weight:400;color:var(--text-dim)">/mo</span></div>
+        <div class="price-period">cancel anytime</div>
+        <div class="price-perks">
+          <div class="price-perk">Unlimited events</div>
+          <div class="price-perk">Homepage feature slot</div>
+          <div class="price-perk">Ticket revenue share</div>
+          <div class="price-perk">Staff management</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<footer>
+  <span class="footer-copy">© 2026 CBUSEVENTS · Columbus, Ohio</span>
+  <div style="display:flex;gap:20px;align-items:center">
+    <span class="footer-copy">Made for Columbus</span>
+    <a href="https://cbusevents.com/cbus-admin.html" class="footer-admin">Admin</a>
+  </div>
+</footer>
+
+<div id="modalContainer"></div>
+
 <script>
-const sb=supabase.createClient("https://toblgvatvsjljbqogzsv.supabase.co","eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRvYmxndmF0dnNqbGpicW9nenN2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMDgwNTAsImV4cCI6MjA4NzY4NDA1MH0._WJEQPizNDiQfDXQB_DHPaQhixPGpMdmYQSmyWmm_FQ");
+const sb=supabase.createClient(
+  'https://toblgvatvsjljbqogzsv.supabase.co',
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRvYmxndmF0dnNqbGpicW9nenN2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMDgwNTAsImV4cCI6MjA4NzY4NDA1MH0._WJEQPizNDiQfDXQB_DHPaQhixPGpMdmYQSmyWmm_FQ'
+);
 
-async function loadSlider(){
- const{data:venues}=await sb.from('venues').select('id,name,venue_type,neighborhood,cover_image_url,tier').eq('status','approved').order('rank_score',{ascending:false}).limit(12);
- const{data:vCount}=await sb.from('venues').select('id',{count:'exact',head:true}).eq('status','approved');
- const{data:eCount}=await sb.from('events').select('id',{count:'exact',head:true});
- if(vCount)document.getElementById('statVenues').textContent=(vCount.length||0)+'+'||'50+';
- if(eCount)document.getElementById('statEvents').textContent=(eCount.length||0)+'+'||'200+';
+const TIER_RANK={PREMIUM:0,STANDARD:1,FREE:2,'':3};
+const tRank=v=>TIER_RANK[(v.tier||v.subscription_tier||'').toUpperCase()]??3;
 
- const items=(venues||[]);
- if(!items.length){
- // Show placeholder cards
- const placeholders=[
- {name:'The Basement Bar',venue_type:'Bar & Lounge',neighborhood:'Short North',tier:'premium',icon:''},
- {name:'Columbus Ballroom',venue_type:'Event Space',neighborhood:'Downtown',tier:'premium',icon:''},
- {name:'Arena District Loft',venue_type:'Loft Space',neighborhood:'Arena District',tier:'standard',icon:''},
- {name:'German Village Hall',venue_type:'Historic Venue',neighborhood:'German Village',tier:'standard',icon:''},
- {name:'Easton Rooftop',venue_type:'Rooftop Bar',neighborhood:'Easton',tier:'premium',icon:''},
- {name:'Short North Studio',venue_type:'Art Studio',neighborhood:'Short North',tier:'free',icon:''},
- ];
- renderSlider(placeholders,true);
- } else {
- renderSlider(items,false);
- }
+const VENUE_ICONS={'bar':'🍹','lounge':'🍹','nightlife':'🎵','restaurant':'🍽','food':'🍽','event':'🎪','space':'🎪','rooftop':'🌆','comedy':'😂','concert':'🎸','music':'🎸','gallery':'🎨','art':'🎨','outdoor':'🌿','hotel':'🏨','historic':'🏛'};
+
+function getIcon(v){
+  const t=(v.venue_type||'').toLowerCase();
+  for(const[k,ic] of Object.entries(VENUE_ICONS)){if(t.includes(k))return ic;}
+  return '📍';
 }
 
-function renderSlider(items,isPlaceholder){
- const track=document.getElementById('venueSlider');
- const makeCard=(v)=>`
- <div class="slider-card"> <div class="slider-card-img">${v.cover_image_url?`<img src="${v.cover_image_url}" alt="${v.name}" loading="lazy">`:(v.icon||'')}</div> <div class="slider-card-body"> <div class="slider-card-type">${v.venue_type||'Venue'}</div> <div class="slider-card-name">${v.name}</div> <div class="slider-card-meta"> ${v.neighborhood||'Columbus'}</div> ${(v.tier==='premium'||v.subscription_tier==='PREMIUM')?'<span class="slider-badge">⭐ Premium</span>':''}
- </div> </div>`;
- const html=items.map(makeCard).join('');
- track.innerHTML=html+html; // duplicate for seamless loop
+let all=[], activeFilter='all', searchQuery='', sortMode='tier';
+
+function filtered(){
+  return all.filter(v=>{
+    if(searchQuery){
+      const q=searchQuery.toLowerCase();
+      const hay=[v.name,v.venue_type,v.neighborhood,v.description,v.city,...(v.tags||[]),...(v.amenities||[])].join(' ').toLowerCase();
+      if(!hay.includes(q))return false;
+    }
+    if(activeFilter!=='all'){
+      const t=(v.venue_type||'').toLowerCase();
+      const tags=(v.tags||[]).join(' ').toLowerCase();
+      if(!t.includes(activeFilter)&&!tags.includes(activeFilter))return false;
+    }
+    return true;
+  }).sort((a,b)=>{
+    if(sortMode==='tier')return tRank(a)-tRank(b)||new Date(b.created_at||0)-new Date(a.created_at||0);
+    if(sortMode==='capacity')return(b.capacity||0)-(a.capacity||0);
+    if(sortMode==='name')return(a.name||'').localeCompare(b.name||'');
+    return new Date(b.created_at||0)-new Date(a.created_at||0);
+  });
 }
 
-loadSlider();
-
-// ── DROPDOWN TOGGLE ───────────────────────────────────────────
-function toggleDrop(e){
- e.stopPropagation();
- const menu=document.querySelector('.dropdown-menu');
- if(menu)menu.classList.toggle('open');
+function render(){
+  const list=filtered();
+  document.getElementById('resultCount').textContent=`${all.length} venues in Columbus`;
+  document.getElementById('sortLabel').textContent=`${list.length} result${list.length!==1?'s':''}`;
+  const grid=document.getElementById('venueGrid');
+  if(!list.length){
+    grid.innerHTML=`<div class="grid-empty"><div class="grid-empty-icon">🔍</div><div class="grid-empty-title">No venues found</div><div class="grid-empty-sub">Try a different search or filter</div></div>`;
+    return;
+  }
+  grid.innerHTML=list.map((v,i)=>venueCard(v,i)).join('');
 }
-document.addEventListener('click',function(){
- const menu=document.querySelector('.dropdown-menu');
- if(menu)menu.classList.remove('open');
-});
-</script>
-<script>
-(function(){
-  var btn=document.getElementById('navHamburger');
-  var menu=document.getElementById('navMobileMenu');
-  if(!btn||!menu)return;
-  btn.addEventListener('click',function(e){
-    e.stopPropagation();
-    btn.classList.toggle('open');
-    menu.classList.toggle('open');
-    document.body.style.overflow=menu.classList.contains('open')?'hidden':'';
-  });
-  document.addEventListener('keydown',function(e){
-    if(e.key==='Escape'){btn.classList.remove('open');menu.classList.remove('open');document.body.style.overflow='';}
-  });
-  // Close on link click
-  menu.querySelectorAll('a,.nav-mobile-link').forEach(function(el){
-    el.addEventListener('click',function(){
-      btn.classList.remove('open');menu.classList.remove('open');document.body.style.overflow='';
-    });
-  });
+
+function venueCard(v,i){
+  const tier=(v.tier||v.subscription_tier||'').toUpperCase();
+  const icon=getIcon(v);
+  const delay=Math.min(i*35,400);
+  const tierBadge=tier==='PREMIUM'?`<div class="card-tier-badge badge-premium">Premium</div>`:tier==='STANDARD'?`<div class="card-tier-badge badge-standard">Standard</div>`:'';
+  const cover=v.cover_image_url?`<img src="${v.cover_image_url}" alt="${v.name}" loading="lazy">`:`<div class="card-cover-placeholder">${icon}</div>`;
+  const capBadge=v.capacity?`<div class="card-capacity">Up to ${v.capacity}</div>`:'';
+  const tags=(v.tags||[]).slice(0,3).map(t=>`<span class="card-tag">${t}</span>`).join('');
+  return `
+  <div class="venue-card" style="animation-delay:${delay}ms" onclick="openModal('${v.id}')">
+    <div class="card-cover">${cover}<div class="card-cover-gradient"></div>${tierBadge}${capBadge}</div>
+    <div class="card-body">
+      <div class="card-type">${v.venue_type||'Venue'}</div>
+      <div class="card-name">${v.name}</div>
+      <div class="card-hood">📍 ${v.neighborhood||v.city||'Columbus, OH'}</div>
+      ${v.description?`<div class="card-desc">${v.description}</div>`:''}
+      ${tags?`<div class="card-tags">${tags}</div>`:''}
+      <div class="card-footer">
+        <div class="card-meta">${v.capacity?`Up to ${v.capacity} guests`:''}</div>
+        <div class="card-cta">Send Inquiry</div>
+      </div>
+    </div>
+  </div>`;
+}
+
+function openModal(id){
+  const v=all.find(x=>x.id===id);if(!v)return;
+  const icon=getIcon(v);
+  const tier=(v.tier||v.subscription_tier||'').toUpperCase();
+  const cover=v.cover_image_url?`<img src="${v.cover_image_url}" alt="${v.name}">`:`<div class="modal-cover-placeholder">${icon}</div>`;
+  const tierBadge=tier==='PREMIUM'?`<span style="font-family:var(--mono);font-size:9px;font-weight:700;padding:3px 9px;border-radius:100px;background:rgba(251,191,36,0.12);color:var(--gold);border:1px solid rgba(251,191,36,0.25)">Premium</span>`:tier==='STANDARD'?`<span style="font-family:var(--mono);font-size:9px;font-weight:700;padding:3px 9px;border-radius:100px;background:var(--orange-soft);color:var(--orange);border:1px solid var(--orange-glow)">Standard</span>`:'';
+  const pills=[v.neighborhood&&`<span class="modal-pill">📍 ${v.neighborhood}</span>`,v.capacity&&`<span class="modal-pill">👥 Up to ${v.capacity}</span>`,v.phone&&`<span class="modal-pill">📞 ${v.phone}</span>`].filter(Boolean).join('');
+  const amenities=(v.amenities||[]).map(a=>`<span class="modal-amenity">${a}</span>`).join('');
+  document.getElementById('modalContainer').innerHTML=`
+  <div class="modal-overlay" onclick="if(event.target===this)closeModal()">
+    <div class="modal">
+      <div class="modal-cover">${cover}<button class="modal-close" onclick="closeModal()">✕</button></div>
+      <div class="modal-body">
+        <div class="modal-type">${v.venue_type||'Venue'} ${tierBadge}</div>
+        <div class="modal-name">${v.name}</div>
+        ${pills?`<div class="modal-pills">${pills}</div>`:''}
+        ${v.description?`<p class="modal-desc">${v.description}</p>`:''}
+        ${amenities?`<div class="modal-amenities">${amenities}</div>`:''}
+        ${v.website?`<div style="margin-bottom:16px"><a href="${v.website}" target="_blank" style="font-size:12px;color:var(--orange)">${v.website} →</a></div>`:''}
+        <button class="modal-cta" onclick="goToInquiry('${v.id}')">Send Booking Inquiry</button>
+        <div class="modal-cta-sub">Sign in or create a free planner account to send an inquiry</div>
+      </div>
+    </div>
+  </div>`;
+}
+
+function closeModal(){document.getElementById('modalContainer').innerHTML='';}
+function goToInquiry(id){localStorage.setItem('pendingVenueInquiry',id);window.location.href='https://cbusevents.com/signup.html?role=planner';}
+function setFilter(cat,btn){activeFilter=cat;document.querySelectorAll('.filter-chip').forEach(b=>b.classList.remove('active'));btn.classList.add('active');render();}
+function handleSearch(val){searchQuery=val.trim();render();}
+function handleSort(val){sortMode=val;render();}
+window.setFilter=setFilter;window.handleSearch=handleSearch;window.handleSort=handleSort;window.openModal=openModal;window.closeModal=closeModal;window.goToInquiry=goToInquiry;
+
+(async()=>{
+  // Load venues
+  const{data,error}=await sb.from('venues').select('id,name,venue_type,neighborhood,city,capacity,description,cover_image_url,tier,subscription_tier,tags,amenities,phone,website,created_at,status').eq('status','approved').limit(100);
+
+  if(error||!data?.length){
+    // Try without status filter - some venues may not have status set
+    const{data:d2}=await sb.from('venues').select('id,name,venue_type,neighborhood,city,capacity,description,cover_image_url,tier,subscription_tier,tags,amenities,phone,website,created_at').limit(100);
+    all=(d2||[]);
+  } else {
+    all=data;
+  }
+
+  all.sort((a,b)=>tRank(a)-tRank(b)||new Date(b.created_at||0)-new Date(a.created_at||0));
+  render();
+
+  // Load event count for CTA stats
+  const{data:eCount}=await sb.from('events').select('id',{count:'exact',head:true});
+  if(eCount!==null){
+    const el=document.getElementById('statEvents');
+    if(el)el.textContent=(all.length||0)+'+'||'—';
+  }
+  const evEl=document.getElementById('statEvents');
+  if(evEl&&all.length)evEl.textContent=all.length+'+';
 })();
 </script>
 </body>
