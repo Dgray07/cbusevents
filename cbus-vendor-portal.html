@@ -227,7 +227,7 @@ label{display:block;font-family:var(--mono);font-size:10px;font-weight:700;lette
   <div class="sidebar-vendor">
     <div class="vendor-initials" id="sidebarInitials">VD</div>
     <div class="vendor-name" id="sidebarName">Your Business</div>
-    <div class="vendor-tier tier-free" id="sidebarTier">Free</div>
+    <div class="vendor-tier tier-free" id="sidebarTier">Basic</div>
   </div>
   <div class="sidebar-section">Main</div>
   <button class="nav-item active" id="nav-dashboard" onclick="showPage('dashboard')">
@@ -261,7 +261,7 @@ label{display:block;font-family:var(--mono);font-size:10px;font-weight:700;lette
     Browse Events
   </button>
   <div class="sidebar-bottom">
-    <div class="sidebar-plan-badge" id="planBadge">Free Tier</div>
+    <div class="sidebar-plan-badge" id="planBadge">Basic</div>
     <button class="btn-signout" onclick="doSignOut()">Sign Out</button>
   </div>
 </aside>
@@ -484,9 +484,12 @@ function exitPortal(){
 
 function updatePlanBadge(){
  const badge=document.getElementById('planBadge');
+ const tierEl=document.getElementById('sidebarTier');
  const tier=(vendorProfile?.subscription_tier||'FREE').toUpperCase();
- badge.textContent=tier==='PREMIUM'?'⭐ Premium':tier==='STANDARD'?' Standard':'Free';
- badge.className='nav-plan '+(tier==='PREMIUM'?'plan-premium':tier==='STANDARD'?'plan-standard':'plan-free');
+ const label=tier==='PREMIUM'?'Premium':tier==='STANDARD'?'Standard':'Basic';
+ const tierClass=tier==='PREMIUM'?'tier-premium':tier==='STANDARD'?'tier-standard':'tier-free';
+ badge.textContent=tier==='PREMIUM'?'⭐ Premium':tier==='STANDARD'?'Standard':'Basic';
+ if(tierEl){tierEl.textContent=label;tierEl.className='vendor-tier '+tierClass;}
 }
 
 // ── PAGE NAV ──────────────────────────────────────────────────
@@ -969,78 +972,162 @@ async function sendProposal(eventId){
 // ── PLAN ──────────────────────────────────────────────────────
 function renderPlan(){
  const tier=(vendorProfile?.subscription_tier||'FREE').toUpperCase();
+ const isBasic=tier==='FREE';
  const isStandard=tier==='STANDARD';
  const isPremium=tier==='PREMIUM';
 
+ const currentLabel=isPremium?'Premium':isStandard?'Standard':'Basic';
+ const currentDesc=isPremium
+   ?'You have full access to all vendor features including sitewide promo placement, priority search, and profile analytics.'
+   :isStandard
+   ?'Your profile is discoverable by planners and venues. You can send proposals, list products, and build your reputation on the platform.'
+   :'Your profile is live on CBUSEVENTS. Upgrade to Standard to get discovered by planners actively searching Columbus vendors right now.';
+
  document.getElementById('pageContent').innerHTML=`
  <div style="margin-bottom:24px">
-   <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.18em;text-transform:uppercase;color:var(--muted);margin-bottom:4px">Plan</div>
-   <div style="font-size:22px;font-weight:800;letter-spacing:-0.03em;margin-bottom:2px">Choose Your Plan</div>
-   <div style="font-size:13px;color:var(--sub)">Upgrade to get discovered, send proposals, and sell on the marketplace.</div>
+   <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.18em;text-transform:uppercase;color:var(--muted);margin-bottom:4px">Plan & Billing</div>
+   <div style="font-size:22px;font-weight:800;letter-spacing:-0.03em;margin-bottom:2px">Your Plan</div>
+   <div style="font-size:13px;color:var(--sub)">Manage your CBUSEVENTS vendor subscription.</div>
  </div>
+
+ <!-- CURRENT PLAN BANNER -->
+ <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--r-lg);padding:20px 24px;display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:28px;flex-wrap:wrap;">
+   <div style="flex:1;min-width:200px">
+     <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.14em;text-transform:uppercase;color:var(--muted);margin-bottom:6px">Current Plan</div>
+     <div style="font-size:18px;font-weight:800;letter-spacing:-0.02em;margin-bottom:4px">${currentLabel}</div>
+     <div style="font-size:12px;color:var(--sub);line-height:1.6;">${currentDesc}</div>
+   </div>
+   <div style="font-family:var(--mono);font-size:10px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;padding:5px 14px;border-radius:var(--r-full);white-space:nowrap;${isPremium?'background:rgba(251,191,36,0.1);color:var(--gold);border:1px solid rgba(251,191,36,0.25);':isStandard?'background:var(--orange-dim);color:var(--orange);border:1px solid var(--orange-border);':'background:rgba(255,255,255,0.05);color:var(--muted);border:1px solid var(--border);'}">${currentLabel}</div>
+ </div>
+
+ ${isBasic?`
+ <!-- LOCKED FEATURES - shown to basic users -->
+ <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.14em;text-transform:uppercase;color:var(--muted);margin-bottom:12px">Locked on Basic</div>
+ <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:28px">
+   ${[
+     ['Featured in Vendor Directory','Planners searching Columbus vendors see Standard and Premium accounts first. Basic profiles don\'t appear in filtered search results.'],
+     ['Send Proposals to Events','Browse upcoming events on CBUSEVENTS and pitch your services directly to the organizer - before they\'ve hired anyone.'],
+     ['Vendor Storefront (My Store)','List products and services for sale on the CBUSEVENTS marketplace. Physical goods, digital downloads, packages.'],
+     ['Sitewide Promo Banner','Premium only - your business promoted across every page on cbusevents.com, seen by every planner and attendee.'],
+   ].map(([title,desc])=>`
+   <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--r-lg);padding:16px;position:relative;opacity:0.72">
+     <div style="position:absolute;top:10px;right:10px;font-family:var(--mono);font-size:8px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;padding:2px 7px;border-radius:var(--r-full);background:rgba(255,255,255,0.05);color:var(--muted);border:1px solid var(--border)">Locked</div>
+     <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:5px">${title}</div>
+     <div style="font-size:11px;color:var(--sub);line-height:1.5">${desc}</div>
+   </div>`).join('')}
+ </div>
+
+ <!-- ROI CALLOUT -->
+ <div style="background:linear-gradient(135deg,rgba(34,211,153,0.07),rgba(34,211,153,0.03));border:1px solid rgba(34,211,153,0.2);border-radius:var(--r-lg);padding:20px 24px;margin-bottom:28px;display:flex;gap:16px;align-items:flex-start">
+   <div style="font-size:22px;flex-shrink:0;margin-top:2px">💡</div>
+   <div>
+     <div style="font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--green);margin-bottom:4px">Think About It This Way</div>
+     <div style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:6px">Standard pays for itself with one inquiry. Premium pays for itself with one booking.</div>
+     <div style="font-size:12px;color:var(--sub);line-height:1.6">At <strong style="color:var(--text)">$15/mo</strong>, Standard gets your profile in front of planners actively searching Columbus vendors. One catering inquiry that converts covers Standard for months. At <strong style="color:var(--text)">$45/mo</strong>, Premium puts you first in search and adds a sitewide promo banner - one booked event covers it several times over.</div>
+   </div>
+ </div>`:''}
+
+ ${isStandard?`
+ <!-- WHAT'S LEFT TO UNLOCK - shown to standard users -->
+ <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.14em;text-transform:uppercase;color:var(--muted);margin-bottom:12px">Premium Features You're Missing</div>
+ <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:28px">
+   ${[
+     ['Sitewide Promo Banner','Your business promoted across cbusevents.com - seen by every planner and attendee browsing the platform.'],
+     ['Priority Search Placement','Show up above other Standard vendors when planners search your service category.'],
+     ['Profile View Analytics','See how many planners viewed your profile, which services got clicks, and where inquiries are coming from.'],
+     ['Featured Vendor Badge','A verified badge on your profile that signals credibility to planners who don\'t know your business yet.'],
+   ].map(([title,desc])=>`
+   <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--r-lg);padding:16px;position:relative;opacity:0.75">
+     <div style="position:absolute;top:10px;right:10px;font-family:var(--mono);font-size:8px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;padding:2px 7px;border-radius:var(--r-full);background:rgba(251,191,36,0.08);color:var(--gold);border:1px solid rgba(251,191,36,0.2)">Premium</div>
+     <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:5px">${title}</div>
+     <div style="font-size:11px;color:var(--sub);line-height:1.5">${desc}</div>
+   </div>`).join('')}
+ </div>`:''}
+
+ <!-- PLAN COMPARISON -->
+ <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.14em;text-transform:uppercase;color:var(--muted);margin-bottom:12px">Compare Plans</div>
  <div class="plan-grid">
 
-   <!-- FREE -->
-   <div class="plan-card ${!isStandard&&!isPremium?'current':''}">
-     <div class="plan-name" style="color:var(--muted)">Free</div>
+   <!-- BASIC -->
+   <div class="plan-card ${isBasic?'current':''}" style="${isBasic?'border-color:rgba(255,107,53,0.3);':''}">
+     ${isBasic?'<div class="plan-card-badge" style="background:var(--orange);color:#fff">Current Plan</div>':''}
+     <div class="plan-name" style="color:var(--muted)">Basic</div>
      <div class="plan-price" style="color:var(--muted)">$0<span>/mo</span></div>
-     <div class="plan-period" style="font-size:12px;color:var(--muted);margin-bottom:16px">forever</div>
+     <div style="font-size:12px;color:var(--muted);margin-bottom:16px">always free</div>
      <div class="plan-perks">
        <div class="plan-perk">Vendor profile and bio</div>
        <div class="plan-perk">Select your services</div>
-       <div class="plan-perk">Portfolio photos (unlimited)</div>
-       <div class="plan-perk" style="opacity:0.35">Featured in directory</div>
-       <div class="plan-perk" style="opacity:0.35">Send proposals</div>
-       <div class="plan-perk" style="opacity:0.35">Sell on marketplace</div>
+       <div class="plan-perk">Portfolio photos</div>
+       <div class="plan-perk" style="opacity:0.3;text-decoration:line-through">Featured in directory</div>
+       <div class="plan-perk" style="opacity:0.3;text-decoration:line-through">Send proposals</div>
+       <div class="plan-perk" style="opacity:0.3;text-decoration:line-through">Sell on marketplace</div>
      </div>
-     <button style="width:100%;background:var(--surface);color:var(--muted);border:1px solid var(--border);border-radius:var(--r-md);padding:10px;font-size:13px;font-weight:600;margin-top:auto" disabled>
-       ${!isStandard&&!isPremium?'Current Plan':'Free Plan'}
+     <button style="width:100%;background:var(--surface);color:var(--muted);border:1px solid var(--border);border-radius:var(--r-md);padding:10px;font-size:13px;font-weight:600;margin-top:8px" disabled>
+       ${isBasic?'Current Plan':'Basic'}
      </button>
    </div>
 
    <!-- STANDARD -->
-   <div class="plan-card ${isStandard?'current':''}" style="${!isStandard&&!isPremium?'border-color:rgba(255,107,53,0.4);background:linear-gradient(135deg,#110800,#1a0c00);':isStandard?'border-color:rgba(255,107,53,0.4);':''}">
-     ${!isStandard&&!isPremium?'<div class="plan-card-badge" style="background:var(--orange);color:#fff">Most Popular</div>':''}
+   <div class="plan-card ${isStandard?'current':''}" style="${isBasic?'border-color:rgba(255,107,53,0.4);background:linear-gradient(135deg,#110800,#1a0c00);':isStandard?'border-color:rgba(255,107,53,0.4);':''}">
+     ${isBasic?'<div class="plan-card-badge" style="background:var(--orange);color:#fff">Most Popular</div>':''}
+     ${isStandard?'<div class="plan-card-badge" style="background:var(--orange);color:#fff">Current Plan</div>':''}
      <div class="plan-name" style="color:var(--orange)">Standard</div>
      <div class="plan-price">$15<span>/mo</span></div>
      <div style="font-size:12px;color:var(--muted);margin-bottom:16px">billed monthly</div>
      <div class="plan-perks">
-       <div class="plan-perk">Everything in Free</div>
+       <div class="plan-perk">Everything in Basic</div>
        <div class="plan-perk">Featured in vendor directory</div>
-       <div class="plan-perk">Priority search placement</div>
        <div class="plan-perk">Send proposals to venues and planners</div>
        <div class="plan-perk">Browse upcoming events</div>
-       <div class="plan-perk">Sell on the CBUSEVENTS Marketplace</div>
+       <div class="plan-perk">Vendor storefront (My Store)</div>
+       <div class="plan-perk" style="opacity:0.3;text-decoration:line-through">Sitewide promo banner</div>
+       <div class="plan-perk" style="opacity:0.3;text-decoration:line-through">Priority search placement</div>
      </div>
      ${isStandard
        ?'<button style="width:100%;background:var(--surface);color:var(--muted);border:1px solid var(--border);border-radius:var(--r-md);padding:10px;font-size:13px;font-weight:600;margin-top:8px" disabled>Current Plan</button>'
        :isPremium
          ?'<button style="width:100%;background:var(--surface);color:var(--muted);border:1px solid var(--border);border-radius:var(--r-md);padding:10px;font-size:13px;font-weight:600;margin-top:8px" disabled>Included in Premium</button>'
-         :`<button class="btn btn-primary" style="width:100%;padding:10px;font-size:13px;margin-top:8px" onclick="window.open('${STRIPE_LINKS.standard}','_blank')">Get Standard →</button>`}
+         :`<button class="btn btn-primary" style="width:100%;padding:10px;font-size:13px;margin-top:8px" onclick="window.open('${STRIPE_LINKS.standard}','_blank')">Get Standard - $15/mo →</button>`}
    </div>
 
    <!-- PREMIUM -->
    <div class="plan-card ${isPremium?'current':''}" style="${isPremium?'border-color:rgba(251,191,36,0.4);':'border-color:rgba(251,191,36,0.2);background:linear-gradient(135deg,#0f0e00,#181500);'}">
+     ${isPremium?'<div class="plan-card-badge" style="background:var(--gold);color:#000">Current Plan</div>':''}
+     ${!isPremium?'<div class="plan-card-badge" style="background:var(--gold);color:#000">Best Value</div>':''}
      <div class="plan-name" style="color:var(--gold)">Premium</div>
      <div class="plan-price" style="color:var(--gold)">$45<span>/mo</span></div>
      <div style="font-size:12px;color:var(--muted);margin-bottom:16px">billed monthly</div>
      <div class="plan-perks">
        <div class="plan-perk">Everything in Standard</div>
-       <div class="plan-perk">Multi-account access for your team</div>
-       <div class="plan-perk">Ticket revenue share (25% of platform fee)</div>
-       <div class="plan-perk">Staff management tools</div>
-       <div class="plan-perk">Geolocation promotions</div>
        <div class="plan-perk">Sitewide promo banner placement</div>
-       <div class="plan-perk">Featured placement across platform</div>
+       <div class="plan-perk">Priority search placement</div>
+       <div class="plan-perk">Featured Vendor badge</div>
+       <div class="plan-perk">Profile view analytics</div>
+       <div class="plan-perk">Unlimited portfolio images</div>
      </div>
      ${isPremium
        ?'<button style="width:100%;background:var(--surface);color:var(--muted);border:1px solid var(--border);border-radius:var(--r-md);padding:10px;font-size:13px;font-weight:600;margin-top:8px" disabled>Current Plan</button>'
-       :`<button style="width:100%;background:var(--gold);color:#000;border:none;border-radius:var(--r-md);padding:10px;font-size:13px;font-weight:700;margin-top:8px;cursor:pointer;transition:opacity 0.18s" onmouseover="this.style.opacity='0.9'" onmouseout="this.style.opacity='1'" onclick="window.open('${STRIPE_LINKS.premium}','_blank')">Get Premium →</button>`}
+       :`<button style="width:100%;background:var(--gold);color:#000;border:none;border-radius:var(--r-md);padding:10px;font-size:13px;font-weight:700;margin-top:8px;cursor:pointer;transition:opacity 0.18s" onmouseover="this.style.opacity='0.9'" onmouseout="this.style.opacity='1'" onclick="window.open('${STRIPE_LINKS.premium}','_blank')">Get Premium - $45/mo →</button>`}
    </div>
 
  </div>
- <div style="margin-top:8px;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px 20px;font-size:13px;color:var(--sub);line-height:1.7">
-   Your plan upgrades automatically within a few minutes of payment. Questions? Email <a href="mailto:info@cbusevents.com" style="color:var(--orange)">info@cbusevents.com</a>
+
+ <!-- FAQ -->
+ <div style="margin-top:24px;background:var(--card);border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden">
+   ${[
+     ['Can I cancel anytime?','Yes. Cancel before your next billing date and you won\'t be charged again. Your profile stays active on Basic after cancellation.'],
+     ['How fast does my plan upgrade?','Within a few minutes of payment. Stripe notifies CBUSEVENTS automatically and your portal updates.'],
+     ['I\'m a food truck - is this worth it?','Food trucks are one of the most searched vendor categories on CBUSEVENTS. Planners look here when they need unique food for private events, corporate lunches, and pop-ups. One private event booking typically covers months of Standard.'],
+     ['What\'s the difference between Standard and Premium?','Standard gets you discovered - you show up in filtered search results and can send proposals. Premium gets you prioritized - you show up first, and your business is promoted sitewide via the promo banner.'],
+   ].map(([q,a],i)=>`
+   <div style="border-bottom:1px solid var(--border-sub);padding:16px 20px;cursor:pointer" onclick="this.querySelector('.faq-a').style.display=this.querySelector('.faq-a').style.display==='block'?'none':'block'">
+     <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;font-size:13px;font-weight:600;color:var(--text)">${q}<span style="color:var(--muted);font-size:16px;flex-shrink:0">+</span></div>
+     <div class="faq-a" style="display:none;font-size:12px;color:var(--sub);line-height:1.6;margin-top:8px">${a}</div>
+   </div>`).join('')}
+ </div>
+
+ <div style="margin-top:16px;font-size:12px;color:var(--sub);line-height:1.7;padding:0 4px">
+   Questions? Email <a href="mailto:info@cbusevents.com" style="color:var(--orange)">info@cbusevents.com</a>
  </div>`;
 }
 
