@@ -340,6 +340,52 @@ footer {
   #hopMap { height: 320px; }
 }
 
+/* ── SCHEDULE ── */
+.schedule-wrap { margin-bottom: 52px; }
+.schedule-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; flex-wrap: wrap; gap: 10px; }
+.schedule-timeline { display: flex; flex-direction: column; gap: 0; position: relative; }
+.schedule-timeline::before { content: ''; position: absolute; left: 26px; top: 12px; bottom: 12px; width: 1px; background: linear-gradient(to bottom, var(--orange), rgba(255,107,53,0.1)); }
+.sched-block {
+  display: flex; align-items: flex-start; gap: 20px;
+  padding: 16px 0; position: relative;
+}
+.sched-dot {
+  width: 14px; height: 14px; border-radius: 50%; flex-shrink: 0;
+  border: 2px solid var(--orange); background: var(--bg);
+  margin-top: 3px; position: relative; z-index: 1;
+  margin-left: 20px;
+  transition: background 0.2s;
+}
+.sched-dot.active { background: var(--orange); box-shadow: 0 0 12px rgba(255,107,53,0.6); }
+.sched-dot.past { border-color: var(--muted); }
+.sched-time { font-family: var(--mono); font-size: 11px; font-weight: 500; color: var(--orange); letter-spacing: 0.06em; white-space: nowrap; width: 78px; flex-shrink: 0; padding-top: 1px; }
+.sched-time.past { color: var(--muted); }
+.sched-body { flex: 1; }
+.sched-title { font-weight: 700; font-size: 14px; color: var(--text); margin-bottom: 3px; letter-spacing: -0.01em; }
+.sched-desc { font-size: 12px; color: var(--sub); line-height: 1.55; }
+.sched-tag { display: inline-block; font-family: var(--mono); font-size: 8px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; padding: 2px 9px; border-radius: var(--r-full); margin-bottom: 5px; }
+.tag-orange { background: rgba(255,107,53,0.15); color: var(--orange); border: 1px solid rgba(255,107,53,0.25); }
+.tag-green  { background: var(--green-dim);  color: var(--green);  border: 1px solid var(--green-border); }
+.tag-blue   { background: rgba(129,140,248,0.1); color: var(--blue); border: 1px solid rgba(129,140,248,0.2); }
+
+/* ── TIPS ── */
+.tips-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px,1fr)); gap: 12px; margin-bottom: 52px; }
+.tip-card { background: var(--card); border: 1px solid var(--border); border-radius: var(--r-lg); padding: 20px; }
+.tip-icon { font-size: 20px; margin-bottom: 10px; line-height: 1; }
+.tip-title { font-weight: 700; font-size: 13px; color: var(--text); margin-bottom: 5px; letter-spacing: -0.01em; }
+.tip-desc  { font-size: 12px; color: var(--sub); line-height: 1.6; }
+
+/* ── NEIGHBORHOOD STRIP ── */
+.neighborhood-strip { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; margin-bottom: 52px; }
+.nbhd-card { background: var(--card); border: 1px solid var(--border); border-radius: var(--r-lg); padding: 18px 16px; display: flex; flex-direction: column; gap: 6px; }
+.nbhd-zone { font-family: var(--mono); font-size: 8px; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; color: var(--orange); }
+.nbhd-name { font-weight: 700; font-size: 14px; color: var(--text); }
+.nbhd-desc { font-size: 11px; color: var(--sub); line-height: 1.5; }
+
+/* ── ROUTE BADGE ── */
+.route-badge { display: inline-flex; align-items: center; gap: 6px; font-family: var(--mono); font-size: 9px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; }
+.route-num { width: 20px; height: 20px; border-radius: 50%; background: var(--orange); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 9px; flex-shrink: 0; }
+
 /* ── ADA COMPLIANCE ── */
 /* Skip navigation */
 .skip-link{position:absolute;top:-100px;left:8px;background:var(--orange,#FF6B35);color:#fff;padding:8px 16px;border-radius:0 0 8px 8px;font-weight:700;font-size:14px;z-index:99999;text-decoration:none;transition:top 0.2s;}
@@ -452,6 +498,119 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
     </div>
   </div>
 
+  <!-- SCHEDULE -->
+  <div class="schedule-wrap">
+    <div class="s-label">Timeline</div>
+    <div class="s-title" style="margin-bottom:6px">Night of the Hop</div>
+    <div class="s-sub">First Friday runs 6:00 PM to 10:00 PM. Here's how the night typically flows.</div>
+    <div class="schedule-timeline">
+      <div class="sched-block">
+        <div class="sched-dot" id="dot-18"></div>
+        <div class="sched-time" id="time-18">6:00 PM</div>
+        <div class="sched-body">
+          <div class="sched-tag tag-orange">Doors Open</div>
+          <div class="sched-title">Gallery Hop Begins</div>
+          <div class="sched-desc">All participating venues open simultaneously. This is the least crowded window - ideal for galleries that get packed later. Start north of High &amp; Buttles and work your way south.</div>
+        </div>
+      </div>
+      <div class="sched-block">
+        <div class="sched-dot" id="dot-19"></div>
+        <div class="sched-time" id="time-19">7:00 PM</div>
+        <div class="sched-body">
+          <div class="sched-tag tag-green">Peak Energy</div>
+          <div class="sched-title">High Street Fills Up</div>
+          <div class="sched-desc">The main strip from Goodale to 5th Ave hits peak foot traffic. Most galleries host artist receptions and live music during this window. Great time to be on foot, bar-to-gallery hopping.</div>
+        </div>
+      </div>
+      <div class="sched-block">
+        <div class="sched-dot" id="dot-20"></div>
+        <div class="sched-time" id="time-20">8:00 PM</div>
+        <div class="sched-body">
+          <div class="sched-tag tag-blue">Sweet Spot</div>
+          <div class="sched-title">Best Time for Restaurants &amp; Bars</div>
+          <div class="sched-desc">Dinner rush starts to clear. Many Short North restaurants offer hop specials. Boutiques stay open late. Crowds at galleries start to thin - good time to actually talk to the artists.</div>
+        </div>
+      </div>
+      <div class="sched-block">
+        <div class="sched-dot" id="dot-21"></div>
+        <div class="sched-time" id="time-21">9:00 PM</div>
+        <div class="sched-body">
+          <div class="sched-tag tag-orange">Final Hour</div>
+          <div class="sched-title">Last Lap</div>
+          <div class="sched-desc">Most galleries begin wrapping up at 9:30. Hit any remaining stops on your list. The bar and restaurant scene stays lively well past 10 PM if you want to extend the night.</div>
+        </div>
+      </div>
+      <div class="sched-block">
+        <div class="sched-dot past"></div>
+        <div class="sched-time past">10:00 PM</div>
+        <div class="sched-body">
+          <div class="sched-tag" style="background:rgba(112,112,160,0.1);color:var(--sub);border:1px solid var(--border)">Wrap</div>
+          <div class="sched-title" style="color:var(--sub)">Gallery Hop Closes</div>
+          <div class="sched-desc">Official hop ends. The Short North stays active - Ace of Cups, Tip Top Kitchen, and the High St. bar corridor are all walkable for an after-hop.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- NEIGHBORHOODS -->
+  <div class="s-label">Know the Area</div>
+  <div class="s-title" style="margin-bottom:8px">Short North Zones</div>
+  <div class="s-sub">Gallery Hop is walkable end-to-end. These are the three main clusters to plan around.</div>
+  <div class="neighborhood-strip">
+    <div class="nbhd-card">
+      <div class="nbhd-zone">North End</div>
+      <div class="nbhd-name">Goodale &amp; Beyond</div>
+      <div class="nbhd-desc">Quieter, more gallery-forward. Starts at Goodale Park. Ideal first stop - less crowded early in the night and anchored by longtime arts institutions.</div>
+    </div>
+    <div class="nbhd-card" style="border-color:rgba(255,107,53,0.25)">
+      <div class="nbhd-zone">Core Strip</div>
+      <div class="nbhd-name">High St. - 5th to Buttles</div>
+      <div class="nbhd-desc">The heart of the hop. Densest concentration of galleries, boutiques, and restaurants all on one walkable stretch. Budget the most time here.</div>
+    </div>
+    <div class="nbhd-card">
+      <div class="nbhd-zone">South End</div>
+      <div class="nbhd-name">Short North x Downtown</div>
+      <div class="nbhd-desc">Where the Short North bleeds into the Arena District. Lofts, rooftop bars, and creative studios. Closer to parking garages - a good entry or exit point.</div>
+    </div>
+  </div>
+
+  <!-- FIRST-TIMER TIPS -->
+  <div class="s-label">First Time?</div>
+  <div class="s-title" style="margin-bottom:8px">What to Know Before You Go</div>
+  <div class="s-sub">Gallery Hop has been running since 1984. Here's what regulars wish they knew the first time.</div>
+  <div class="tips-grid">
+    <div class="tip-card">
+      <div class="tip-icon">🅿️</div>
+      <div class="tip-title">Parking - Don't Fight High Street</div>
+      <div class="tip-desc">The High St. garages fill fast after 7 PM. Use the Nationwide Arena garage off Neil Ave or street park on 4th, 5th, or in the side streets east of High. Budget 10 minutes to walk in.</div>
+    </div>
+    <div class="tip-card">
+      <div class="tip-icon">👟</div>
+      <div class="tip-title">Wear Comfortable Shoes</div>
+      <div class="tip-desc">A full hop is 1.5 to 2 miles on foot. The Short North sidewalks are brick in spots. Comfortable walking shoes will carry the night - you'll thank yourself at stop nine.</div>
+    </div>
+    <div class="tip-card">
+      <div class="tip-icon">🍷</div>
+      <div class="tip-title">Drinks Are Part of the Experience</div>
+      <div class="tip-desc">Most galleries offer complimentary wine or beer during the hop - it's part of the tradition. You're not obligated to buy anything. Pace yourself if you're hitting eight or more spots.</div>
+    </div>
+    <div class="tip-card">
+      <div class="tip-icon">💬</div>
+      <div class="tip-title">Talk to the Artists</div>
+      <div class="tip-desc">Many galleries have the featured artists in the room. They want to talk. Don't be intimidated - the Gallery Hop culture is approachable. Ask questions. That's the whole point.</div>
+    </div>
+    <div class="tip-card">
+      <div class="tip-icon">🌧️</div>
+      <div class="tip-title">Rain Doesn't Cancel It</div>
+      <div class="tip-desc">Gallery Hop runs every first Friday regardless of weather. A rainy hop is actually a great experience - thinner crowds, cozier galleries. Bring an umbrella and lean in.</div>
+    </div>
+    <div class="tip-card">
+      <div class="tip-icon">📱</div>
+      <div class="tip-title">Use This Map - Not Just Google</div>
+      <div class="tip-desc">Google won't show you which venues are Gallery Hop participants. Use the map above to see exactly who's participating tonight, their hours, and what's featured - then tap Directions from each card.</div>
+    </div>
+  </div>
+
   <!-- HOW IT WORKS -->
   <div class="s-label">In the Field</div>
   <div class="s-title" style="margin-bottom:20px">How Gallery Hop Works</div>
@@ -548,45 +707,138 @@ function setNextHopUI() {
   document.getElementById('bannerTitle').textContent = monthName + ' Gallery Hop';
 }
 
+// ── HARDCODED GALLERY HOP VENUES ────────────────────────────
+const HARDCODED_VENUES = [
+  {
+    is_featured: true,
+    hop_hours: '6:00 – 10:00 PM',
+    admission: 'Free',
+    tonight_desc: 'One of the Short North\'s longest-running galleries featuring contemporary works by Central Ohio artists. Receptions with the featured artists every first Friday.',
+    special_offer: null,
+    filter_type: 'Gallery',
+    venues: { name: 'Hammond Harkins Galleries', venue_type: 'Gallery', address: '724 N High St, Columbus, OH 43215', neighborhood: 'Short North', lat: 39.9714, lng: -83.0004, website: 'https://hammondharkins.com', cover_image_url: '' }
+  },
+  {
+    is_featured: true,
+    hop_hours: '6:00 – 10:00 PM',
+    admission: 'Free',
+    tonight_desc: 'Contemporary fine art gallery in the heart of the Short North presenting rotating exhibitions by regional and national artists. Wine served during the hop.',
+    special_offer: null,
+    filter_type: 'Gallery',
+    venues: { name: 'Sherrie Gallerie', venue_type: 'Gallery', address: '694 N High St, Columbus, OH 43215', neighborhood: 'Short North', lat: 39.9709, lng: -83.0005, website: 'https://sherriegallerie.com', cover_image_url: '' }
+  },
+  {
+    is_featured: false,
+    hop_hours: '6:00 – 10:00 PM',
+    admission: 'Free',
+    tonight_desc: 'Internationally acclaimed contemporary art with a focus on glass, ceramics, and mixed media. One of the anchor galleries of the Short North arts scene since 1981.',
+    special_offer: null,
+    filter_type: 'Gallery',
+    venues: { name: 'Beeler Gallery', venue_type: 'Gallery', address: '60 Cleveland Ave, Columbus, OH 43215', neighborhood: 'Short North', lat: 39.9601, lng: -82.9982, website: '', cover_image_url: '' }
+  },
+  {
+    is_featured: false,
+    hop_hours: '6:00 – 10:00 PM',
+    admission: 'Free',
+    tonight_desc: 'Functional art, studio glass, and handmade jewelry. A Short North staple where you can purchase directly from the artists. Open late for the hop.',
+    special_offer: null,
+    filter_type: 'Studio',
+    venues: { name: 'Alchemy Arts', venue_type: 'Studio', address: '782 N High St, Columbus, OH 43215', neighborhood: 'Short North', lat: 39.9721, lng: -83.0003, website: '', cover_image_url: '' }
+  },
+  {
+    is_featured: true,
+    hop_hours: '5:00 – 11:00 PM',
+    admission: 'Free',
+    tonight_desc: 'Gallery Hop specials on select cocktails all night. Local art displayed throughout the bar with rotating featured artists each month. One of the most social stops on the hop.',
+    special_offer: 'Hop Night Drink Specials',
+    filter_type: 'Bar',
+    venues: { name: 'Ace of Cups', venue_type: 'Bar', address: '2619 N High St, Columbus, OH 43202', neighborhood: 'Short North', lat: 39.9898, lng: -83.0068, website: 'https://aceofcupsbar.com', cover_image_url: '' }
+  },
+  {
+    is_featured: false,
+    hop_hours: '6:00 – 10:00 PM',
+    admission: 'Free',
+    tonight_desc: 'Boutique retail space hosting a monthly pop-up showcasing work by Columbus makers and independent designers. New featured artist every Gallery Hop.',
+    special_offer: null,
+    filter_type: 'Boutique',
+    venues: { name: 'The Crest Boutique', venue_type: 'Boutique', address: '2619 N High St, Columbus, OH 43202', neighborhood: 'Short North', lat: 39.9891, lng: -83.0065, website: '', cover_image_url: '' }
+  },
+  {
+    is_featured: false,
+    hop_hours: '6:00 – 10:30 PM',
+    admission: 'Free',
+    tonight_desc: 'Intimate restaurant and bar hosting local artists with work on display throughout the dining room. Arrive early for dinner before the hop crowd arrives.',
+    special_offer: null,
+    filter_type: 'Bar',
+    venues: { name: 'Tip Top Kitchen & Cocktails', venue_type: 'Bar', address: '73 E Gay St, Columbus, OH 43215', neighborhood: 'Short North', lat: 39.9607, lng: -82.9991, website: 'https://tiptopcolumbus.com', cover_image_url: '' }
+  },
+  {
+    is_featured: false,
+    hop_hours: '6:00 – 9:30 PM',
+    admission: 'Free',
+    tonight_desc: 'Working photography studio opening its doors for Gallery Hop with prints available for purchase. Behind-the-scenes access to the studio space included.',
+    special_offer: null,
+    filter_type: 'Studio',
+    venues: { name: 'Short North Studios', venue_type: 'Studio', address: '718 N High St, Columbus, OH 43215', neighborhood: 'Short North', lat: 39.9712, lng: -83.0004, website: '', cover_image_url: '' }
+  },
+  {
+    is_featured: false,
+    hop_hours: '6:00 – 10:00 PM',
+    admission: 'Free',
+    tonight_desc: 'Live acoustic performances and open mic alongside curated visual art. One of the few Gallery Hop stops with consistent live music every first Friday.',
+    special_offer: null,
+    filter_type: 'Performance',
+    venues: { name: 'Rumba Cafe', venue_type: 'Performance', address: '2507 Summit St, Columbus, OH 43202', neighborhood: 'Short North', lat: 39.9875, lng: -83.0042, website: '', cover_image_url: '' }
+  },
+  {
+    is_featured: false,
+    hop_hours: '6:00 – 10:00 PM',
+    admission: 'Free',
+    tonight_desc: 'Design-forward boutique with rotating local artist features and handcrafted goods. A quieter stop on the hop, great for browsing without the gallery crowd.',
+    special_offer: null,
+    filter_type: 'Boutique',
+    venues: { name: 'Homage', venue_type: 'Boutique', address: '745 N High St, Columbus, OH 43215', neighborhood: 'Short North', lat: 39.9716, lng: -83.0003, website: 'https://shopHomage.com', cover_image_url: '' }
+  },
+  {
+    is_featured: false,
+    hop_hours: '6:00 – 10:00 PM',
+    admission: 'Free',
+    tonight_desc: 'Gallery specializing in photography and digital art with a new themed exhibition each month. Artist talks at 7:30 PM on Gallery Hop nights.',
+    special_offer: 'Artist Talk at 7:30 PM',
+    filter_type: 'Gallery',
+    venues: { name: 'Roy G Biv Gallery', venue_type: 'Gallery', address: '395 W Rich St, Columbus, OH 43215', neighborhood: 'Short North', lat: 39.9567, lng: -83.0073, website: '', cover_image_url: '' }
+  },
+  {
+    is_featured: false,
+    hop_hours: '6:00 – 11:00 PM',
+    admission: 'Free',
+    tonight_desc: 'Lively wine bar featuring a curated selection of local art for sale. Columbus artists rotate monthly. Complimentary tastings for Gallery Hop visitors.',
+    special_offer: 'Complimentary Wine Tastings',
+    filter_type: 'Bar',
+    venues: { name: 'Mouton Wine Bar', venue_type: 'Bar', address: '795 N High St, Columbus, OH 43215', neighborhood: 'Short North', lat: 39.9724, lng: -83.0003, website: '', cover_image_url: '' }
+  }
+];
+
 // ── LOAD DATA ────────────────────────────────────────────────
 async function loadParticipants() {
-  const hopDate = getNextFirstFriday().toISOString().split('T')[0];
+  // Use hardcoded venues as the primary source
+  allParticipants = HARDCODED_VENUES;
 
-  // Try the view first; fall back to direct join if view doesn't exist yet
-  const { data, error } = await sb
-    .from('gallery_hop_participants')
-    .select('*, venues(id,name,venue_type,address,neighborhood,cover_image_url,lat,lng,website,instagram)')
-    .eq('hop_date', hopDate)
-    .eq('is_active', true)
-    .order('is_featured', { ascending: false })
-    .order('sort_order', { ascending: true });
+  // Also try Supabase - if there's live data, merge/prefer it
+  try {
+    const hopDate = getNextFirstFriday().toISOString().split('T')[0];
+    const { data } = await sb
+      .from('gallery_hop_participants')
+      .select('*, venues(id,name,venue_type,address,neighborhood,cover_image_url,lat,lng,website,instagram)')
+      .eq('hop_date', hopDate)
+      .eq('is_active', true)
+      .order('is_featured', { ascending: false })
+      .order('sort_order', { ascending: true });
 
-  if(error || !data || data.length === 0) {
-    // Fallback: show Short North venues from main venues table
-    const { data: fallback } = await sb
-      .from('venues')
-      .select('id,name,venue_type,address,neighborhood,cover_image_url,lat,lng,website')
-      .eq('status', 'approved')
-      .ilike('neighborhood', '%short north%')
-      .limit(12);
-
-    if(fallback && fallback.length > 0) {
-      allParticipants = fallback.map(v => ({
-        venues: v,
-        is_featured: v.is_featured || false,
-        tonight_desc: '',
-        hop_hours: '6:00 – 10:00 PM',
-        admission: 'Free',
-        special_offer: null
-      }));
-    } else {
-      document.getElementById('venueGrid').innerHTML =
-        '<div class="empty"><h3>Gallery Hop listings coming soon</h3><p>Venues are signing up now. Check back closer to the first Friday.</p></div>';
-      return;
+    if(data && data.length > 0) {
+      allParticipants = data;
     }
-  } else {
-    allParticipants = data;
-  }
+  } catch(e) { /* stay with hardcoded */ }
 
   document.getElementById('heroVenueCount').textContent = allParticipants.length;
   document.getElementById('statStops').textContent = allParticipants.length;
@@ -648,7 +900,10 @@ function filterVenues(type, el) {
 
   const filtered = type === 'All' ? allParticipants
     : type === 'Featured' ? allParticipants.filter(p => p.is_featured)
-    : allParticipants.filter(p => (p.venues?.venue_type||'').toLowerCase().includes(type.toLowerCase()));
+    : allParticipants.filter(p => {
+        const ft = p.filter_type || p.venues?.venue_type || '';
+        return ft.toLowerCase().includes(type.toLowerCase());
+      });
 
   renderGrid(filtered);
   renderMapMarkers(filtered);
@@ -739,6 +994,20 @@ function centerOnUser() {
 // ── INIT ─────────────────────────────────────────────────────
 setNextHopUI();
 loadParticipants();
+
+// Highlight current schedule block if it's Gallery Hop night
+function highlightSchedule() {
+  const now = new Date();
+  const h = now.getHours();
+  const isFirstFriday = now.getDay() === 5;
+  if(!isFirstFriday) return;
+  const activeHour = h >= 18 && h < 22 ? h : null;
+  if(!activeHour) return;
+  const dotId = 'dot-' + activeHour;
+  const dot = document.getElementById(dotId);
+  if(dot) { dot.classList.add('active'); }
+}
+highlightSchedule();
 
 // Filter chip clicks
 document.querySelectorAll('.filter-chip').forEach(chip => {
