@@ -625,7 +625,7 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
     <button id="authBtn" onclick="doAuth()" style="width:100%;background:var(--orange);color:#fff;border:none;border-radius:9px;padding:12px;font-size:14px;font-weight:700;cursor:pointer;font-family:var(--font)">Sign In</button>
     <div style="text-align:center;margin-top:16px;font-size:13px;color:var(--sub)">
       <span id="authSwitchText">New to CBUSEVENTS?</span>
-      <button id="authSwitchBtn" id="authSwitchBtnEl" style="background:none;border:none;color:var(--orange);font-size:13px;font-weight:600;cursor:pointer;font-family:var(--font);margin-left:4px">Create a free account</button>
+      <button id="authSwitchBtn" style="background:none;border:none;color:var(--orange);font-size:13px;font-weight:600;cursor:pointer;font-family:var(--font);margin-left:4px">Create a free account</button>
     </div>
     <div style="text-align:center;margin-top:12px">
       <a href="https://cbusevents.com" style="color:var(--muted);font-size:12px">← Back to CBUSEVENTS</a>
@@ -1223,29 +1223,16 @@ async function loadLiveTickets(user){
 })();
 
 
-  var authPassInput = document.getElementById('authPassInput')||document.getElementById('authPass');
+document.addEventListener('DOMContentLoaded', function(){
+  var authPassInput = document.getElementById('authPass');
   if(authPassInput) authPassInput.addEventListener('keydown', function(e){ if(e.key==='Enter' && window.doAuth) window.doAuth(); });
 
   var authEmailInput = document.getElementById('authEmail');
   if(authEmailInput) authEmailInput.addEventListener('keydown', function(e){ if(e.key==='Enter' && window.doAuth) window.doAuth(); });
 
-  var switchBtn = document.getElementById('authSwitchBtnEl');
-  if(switchBtn) switchBtn.addEventListener('click', function(){
-    switchTab(window.currentTab==='signin'?'signup':'signin');
-  });
-});
-</script>
-
-<script>
-// Wire auth gate buttons after DOM + scripts are fully loaded
-
-  var switchBtn = document.getElementById('authSwitchBtnWrap');
+  var switchBtn = document.getElementById('authSwitchBtn');
   if(switchBtn) switchBtn.addEventListener('click', function(){
     if(window.switchTab && window.currentTab) window.switchTab(window.currentTab==='signin'?'signup':'signin');
-  });
-
-  document.querySelectorAll('.auth-enter-submit').forEach(function(el){
-    el.addEventListener('keydown', function(e){ if(e.key==='Enter') doAuth(); });
   });
 });
 </script>
