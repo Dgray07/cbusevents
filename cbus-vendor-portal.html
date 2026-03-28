@@ -262,6 +262,7 @@ label{display:block;font-family:var(--mono);font-size:10px;font-weight:700;lette
   </button>
   <div class="sidebar-bottom">
     <div class="sidebar-plan-badge" id="planBadge">Basic</div>
+    <div id="portalSwitcherVendor" style="margin-bottom:8px"></div>
     <button class="btn-signout" onclick="doSignOut()">Sign Out</button>
   </div>
 </aside>
@@ -436,12 +437,14 @@ async function doSignOut(){
 }
 
 async function enterPortal(){
- // Check role first — redirect if wrong portal
- const{data:roleData}=await sb.from('user_roles').select('role').eq('user_id',currentUser.id).maybeSingle();
- const role=roleData?.role||'vendor';
- const rolePortals={venue_owner:'cbus-venue-portal.html',planner:'cbus-planner-portal.html',customer:'customer-portal.html'};
- if(rolePortals[role]){
-   window.location.href='https://cbusevents.com/'+rolePortals[role];
+ // Check role — support multi-role accounts
+ const{data:roleRows}=await sb.from('user_roles').select('role').eq('user_id',currentUser.id);
+ const roles=(roleRows||[]).map(r=>r.role);
+ window._userRoles=roles;
+ if(!roles.includes('vendor')){
+   const rolePortals={venue_owner:'cbus-venue-portal.html',planner:'cbus-planner-portal.html',customer:'customer-portal.html'};
+   const redirect=Object.entries(rolePortals).find(([r])=>roles.includes(r));
+   if(redirect){window.location.href='https://cbusevents.com/'+redirect[1];return;}
    return;
  }
 
@@ -473,6 +476,7 @@ async function enterPortal(){
 
  // Update nav plan badge
  updatePlanBadge();
+ renderPortalSwitcher();
 
  document.getElementById('authGate').style.display='none';
  renderDashboard();
@@ -491,6 +495,34 @@ function updatePlanBadge(){
  badge.textContent=tier==='PREMIUM'?'⭐ Premium':tier==='STANDARD'?'Standard':'Basic';
  if(tierEl){tierEl.textContent=label;tierEl.className='vendor-tier '+tierClass;}
 }
+
+function renderPortalSwitcher(){
+ const el=document.getElementById('portalSwitcherVendor');
+ if(!el)return;
+ const roles=window._userRoles||[];
+ const portals={
+   venue_owner:{label:'Venue Portal',url:'https://cbusevents.com/cbus-venue-portal.html'},
+   planner:{label:'Planner Portal',url:'https://cbusevents.com/cbus-planner-portal.html'},
+ };
+ const links=Object.entries(portals).filter(([r])=>roles.includes(r));
+ if(!links.length){
+   // Offer to add planner role
+   el.innerHTML=`<button onclick="addPlannerRoleVendor()" style="width:100%;background:rgba(255,107,53,0.06);color:var(--orange);border:1px solid rgba(255,107,53,0.2);border-radius:var(--r-md);padding:6px 10px;font-size:11px;font-weight:600;cursor:pointer;font-family:var(--font);margin-bottom:6px">+ Add Planner Access</button>`;
+   return;
+ }
+ el.innerHTML=links.map(([r,{label,url}])=>`<a href="${url}" style="display:block;text-align:center;padding:6px 10px;border-radius:var(--r-md);background:rgba(255,255,255,0.03);border:1px solid var(--border);color:var(--sub);font-size:11px;font-weight:600;text-decoration:none;margin-bottom:6px;font-family:var(--font)">${label} →</a>`).join('');
+}
+window.renderPortalSwitcher=renderPortalSwitcher;
+
+async function addPlannerRoleVendor(){
+ const el=document.getElementById('portalSwitcherVendor');
+ if(el)el.innerHTML=`<div style="font-size:11px;color:var(--sub);text-align:center;padding:6px">Adding...</div>`;
+ await sb.from('user_roles').upsert({user_id:currentUser.id,role:'planner'},{onConflict:'user_id,role'}).catch(()=>{});
+ window._userRoles=[...(window._userRoles||[]),'planner'];
+ renderPortalSwitcher();
+ toast('Planner access added! Visit the Planner Portal to get started.');
+}
+window.addPlannerRoleVendor=addPlannerRoleVendor;
 
 // ── PAGE NAV ──────────────────────────────────────────────────
 function showPage(p){

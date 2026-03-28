@@ -453,10 +453,15 @@ async function init(){
  if(session){
  currentUser=session.user;
  // Redirect if wrong portal
- const{data:rd}=await sb.from('user_roles').select('role').eq('user_id',currentUser.id).maybeSingle();
- const role=rd?.role;
- if(role==='vendor'){window.location.href='https://cbusevents.com/cbus-vendor-portal.html';return;}
- if(role==='venue_owner'){window.location.href='https://cbusevents.com/cbus-venue-portal.html';return;}
+ const{data:roleRows}=await sb.from('user_roles').select('role').eq('user_id',currentUser.id);
+ const roles=(roleRows||[]).map(r=>r.role);
+ // Only redirect if user has NO planner role at all
+ if(!roles.includes('planner')){
+   if(roles.includes('vendor')){window.location.href='https://cbusevents.com/cbus-vendor-portal.html';return;}
+   if(roles.includes('venue_owner')){window.location.href='https://cbusevents.com/cbus-venue-portal.html';return;}
+ }
+ // Store all roles globally for portal switcher
+ window._userRoles=roles;
  await loadData();
  await handleBoostReturn();
  setLoggedInNav();
@@ -472,8 +477,20 @@ async function init(){
 function setLoggedInNav(){
  document.getElementById('navLinks').style.display='flex';
  const name=currentUser.user_metadata?.full_name||currentUser.email.split('@')[0];
+ // Build portal switcher links based on roles
+ const roles=window._userRoles||[];
+ const portalLinks={
+   venue_owner:{label:'Venue Portal',url:'https://cbusevents.com/cbus-venue-portal.html'},
+   vendor:{label:'Vendor Portal',url:'https://cbusevents.com/cbus-vendor-portal.html'},
+ };
+ const switcherHtml=Object.entries(portalLinks)
+   .filter(([r])=>roles.includes(r))
+   .map(([r,{label,url}])=>`<a href="${url}" style="font-size:12px;font-weight:600;color:var(--sub);padding:6px 12px;border-radius:7px;border:1px solid var(--border);background:rgba(255,255,255,0.03);text-decoration:none">${label} →</a>`)
+   .join('');
  document.getElementById('navRight').innerHTML=`
- <span class="nav-user"> ${name}</span> <button class="nav-outline" onclick="signOut()">Sign Out</button> `;
+ ${switcherHtml}
+ <span class="nav-user"> ${name}</span>
+ <button class="nav-outline" onclick="signOut()">Sign Out</button>`;
 }
 
 async function signOut(){
@@ -587,7 +604,7 @@ async function doSignup(){
    return;
  }
  currentUser=data.user;
- await sb.from('user_roles').insert({user_id:data.user.id,role:'planner'}).select().maybeSingle().catch(()=>{});
+ await sb.from('user_roles').upsert({user_id:data.user.id,role:'planner'},{onConflict:'user_id,role'}).select().maybeSingle().catch(()=>{});
  await loadData();
  setLoggedInNav();
  nav('dashboard');
