@@ -251,6 +251,10 @@ label{display:block;font-family:var(--mono);font-size:10px;font-weight:700;lette
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
     My Store
   </button>
+  <button class="nav-item" id="nav-payouts" onclick="showPage('payouts')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+    Payouts
+  </button>
   <button class="nav-item" id="nav-proposals" onclick="showPage('proposals')">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
     Inquiries
@@ -535,6 +539,7 @@ function showPage(p){
  else if(p==='portfolio'){renderPortfolioPage();renderPortfolioGrid();}
  else if(p==='proposals'){renderProposalsPage();loadProposals();}
  else if(p==='store'){renderStorePage();}
+ else if(p==='payouts'){renderPayoutsPage();}
  else if(p==='events'){loadBrowseEvents();}
  else if(p==='plan'){renderPlan();}
  else if(p==='dashboard'){renderDashboard();}
@@ -1181,11 +1186,21 @@ async function renderStorePage(){
  }
 
  document.getElementById('pageContent').innerHTML=`
- <div style="margin-bottom:24px;display:flex;align-items:center;justify-content:space-between">
+ <div style="margin-bottom:20px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px">
    <div><div style="font-family:var(--mono);font-size:9px;letter-spacing:0.18em;text-transform:uppercase;color:var(--muted);margin-bottom:4px">My Store</div><div style="font-size:22px;font-weight:800;letter-spacing:-0.03em">Vendor Storefront</div></div>
-   <div style="display:flex;gap:10px">
-     <a href="/marketplace.html?vendor=${vendorProfile.id}" target="_blank" class="btn btn-ghost btn-sm">View Store →</a>
+   <div style="display:flex;gap:10px;flex-wrap:wrap">
+     <a href="https://cbusevents.com/marketplace.html?vendor=${vendorProfile.id}" target="_blank" class="btn btn-ghost btn-sm">View Public Store →</a>
      <button class="btn btn-primary btn-sm" onclick="openProductModal()">+ Add Product</button>
+   </div>
+ </div>
+ <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r-md);padding:12px 16px;margin-bottom:20px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap">
+   <div>
+     <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);margin-bottom:4px">Your public storefront</div>
+     <div style="font-family:var(--mono);font-size:12px;color:var(--orange)">cbusevents.com/marketplace.html?vendor=${vendorProfile.id}</div>
+   </div>
+   <div style="display:flex;gap:8px;flex-shrink:0">
+     <button class="btn btn-ghost btn-sm" onclick="navigator.clipboard.writeText('https://cbusevents.com/marketplace.html?vendor=${vendorProfile.id}').then(()=>toast('Link copied!'))">Copy Link</button>
+     <button class="btn btn-ghost btn-sm" onclick="showPage('payouts')" style="color:var(--green);border-color:rgba(52,211,153,0.3)">View Earnings</button>
    </div>
  </div>
  <div id="storeProducts"><div class="spinner"></div></div>`;
@@ -1324,6 +1339,170 @@ async function deleteProduct(productId){
  await loadStoreProducts();
 }
 
+// ── STRIPE CONNECT PAYOUTS ────────────────────────────────────
+const CONNECT_FN='https://toblgvatvsjljbqogzsv.supabase.co/functions/v1/stripeconnectonboard';
+
+async function getAuthToken(){
+ const s=await sb.auth.getSession();
+ return s.data.session?.access_token||'';
+}
+
+async function startConnectOnboard(){
+ toast('Redirecting to Stripe...');
+ try{
+   const res=await fetch(CONNECT_FN,{
+     method:'POST',
+     headers:{'Content-Type':'application/json','Authorization':'Bearer '+await getAuthToken(),'apikey':SB_KEY},
+     body:JSON.stringify({action:'onboard'})
+   });
+   const data=await res.json();
+   if(data.url) window.location.href=data.url;
+   else toast('Error: '+(data.error||'Could not connect to Stripe'),'error');
+ }catch(e){toast('Network error - try again','error');}
+}
+
+async function openStripeDashboard(){
+ try{
+   const res=await fetch(CONNECT_FN,{
+     method:'POST',
+     headers:{'Content-Type':'application/json','Authorization':'Bearer '+await getAuthToken(),'apikey':SB_KEY},
+     body:JSON.stringify({action:'dashboard'})
+   });
+   const data=await res.json();
+   if(data.url) window.open(data.url,'_blank');
+   else toast('Error opening dashboard','error');
+ }catch(e){toast('Network error','error');}
+}
+
+async function renderPayoutsPage(){
+ const tier=(vendorProfile?.subscription_tier||'FREE').toUpperCase();
+ const canSell=tier==='STANDARD'||tier==='PREMIUM';
+
+ document.getElementById('pageContent').innerHTML=`
+ <div style="margin-bottom:24px">
+   <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.18em;text-transform:uppercase;color:var(--muted);margin-bottom:4px">Payouts</div>
+   <div style="font-size:22px;font-weight:800;letter-spacing:-0.03em;margin-bottom:2px">Earnings & Payouts</div>
+   <div style="font-size:13px;color:var(--sub)">Connect your Stripe account to receive marketplace sales directly.</div>
+ </div>
+ <div id="payoutsContent"><div class="spinner"></div></div>`;
+
+ if(!canSell){
+   document.getElementById('payoutsContent').innerHTML=`
+   <div class="card" style="padding:48px 32px;text-align:center">
+     <div style="font-size:40px;margin-bottom:16px">💰</div>
+     <div style="font-size:18px;font-weight:800;margin-bottom:8px">Unlock Marketplace Sales</div>
+     <div style="font-size:14px;color:var(--sub);max-width:400px;margin:0 auto 24px;line-height:1.7">Upgrade to Standard or Premium to sell on the CBUSEVENTS Marketplace and receive direct Stripe payouts for your sales.</div>
+     <button class="btn btn-primary" onclick="showPage('plan')">Upgrade to Start Selling →</button>
+   </div>`;
+   return;
+ }
+
+ // Check Stripe Connect status
+ let connectStatus={connected:false,status:'none'};
+ const token=await getAuthToken();
+ if(token){
+   try{
+     const res=await fetch(CONNECT_FN,{
+       method:'POST',
+       headers:{'Content-Type':'application/json','Authorization':'Bearer '+token,'apikey':SB_KEY},
+       body:JSON.stringify({action:'status'})
+     });
+     connectStatus=await res.json();
+   }catch(e){console.log('Connect status check failed',e);}
+ }
+
+ // Load vendor's marketplace orders
+ const{data:orders}=await sb.from('orders')
+   .select('*')
+   .eq('status','paid')
+   .order('created_at',{ascending:false})
+   .limit(50);
+
+ const vendorOrders=(orders||[]).filter(o=>(o.items||[]).some(i=>i.vendor_id===vendorProfile.id));
+ const vendorEarnings=vendorOrders.map(o=>{
+   const myItems=(o.items||[]).filter(i=>i.vendor_id===vendorProfile.id);
+   const subtotal=myItems.reduce((s,i)=>s+(i.price*i.quantity),0);
+   const platformFee=(subtotal*0.065)+1.00;
+   const net=subtotal-platformFee;
+   return{...o,myItems,subtotal,platformFee,net};
+ });
+
+ const totalGross=vendorEarnings.reduce((s,o)=>s+o.subtotal,0);
+ const totalNet=vendorEarnings.reduce((s,o)=>s+o.net,0);
+ const fmtMoney=n=>'$'+(n||0).toFixed(2);
+ const fmtDate=iso=>new Date(iso).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+
+ const connected=connectStatus.connected;
+ const status=connectStatus.status||'none';
+ const statusLabel=connected?'Active - payouts enabled':status==='pending'?'Pending - finish Stripe setup':status==='incomplete'?'Incomplete - resume setup':'Not connected';
+ const statusColor=connected?'var(--green)':status==='pending'?'#f59e0b':'var(--muted)';
+
+ const connectBtn=connected
+   ?`<div style="display:flex;gap:10px">
+       <button onclick="openStripeDashboard()" style="flex:1;padding:12px;background:#635bff;color:#fff;border:none;border-radius:var(--r-md);font-weight:700;font-size:14px;cursor:pointer;font-family:var(--font)">Open Stripe Dashboard</button>
+       <button onclick="startConnectOnboard()" style="padding:12px 16px;background:var(--surface);color:var(--sub);border:1px solid var(--border);border-radius:var(--r-md);font-size:13px;cursor:pointer;font-family:var(--font)">Update</button>
+     </div>`
+   :`<button onclick="startConnectOnboard()" style="width:100%;padding:13px;background:var(--orange);color:#fff;border:none;border-radius:var(--r-md);font-weight:700;font-size:15px;cursor:pointer;font-family:var(--font)">
+       ${status==='pending'||status==='incomplete'?'Resume Stripe Setup →':'Connect Stripe Account →'}
+     </button>`;
+
+ document.getElementById('payoutsContent').innerHTML=`
+ <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;margin-bottom:24px">
+   <div class="stat-card"><div class="stat-num" style="color:var(--green)">${fmtMoney(totalNet)}</div><div class="stat-label">Total Earned (Net)</div></div>
+   <div class="stat-card"><div class="stat-num">${fmtMoney(totalGross)}</div><div class="stat-label">Gross Sales</div></div>
+   <div class="stat-card"><div class="stat-num" style="color:var(--blue)">${vendorEarnings.length}</div><div class="stat-label">Orders</div></div>
+   <div class="stat-card"><div class="stat-num" style="color:${statusColor};font-size:12px;font-weight:700">${connected?'Active':'Not Set Up'}</div><div class="stat-label">Stripe Status</div></div>
+ </div>
+
+ <!-- Stripe Connect Card -->
+ <div class="card" style="padding:28px;margin-bottom:24px;border-color:${connected?'rgba(52,211,153,0.3)':'rgba(255,107,53,0.25)'}">
+   <div style="display:flex;align-items:center;gap:14px;margin-bottom:20px">
+     <div style="width:44px;height:44px;border-radius:50%;background:${connected?'var(--green-dim)':'var(--orange-dim)'};display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0">
+       ${connected?'✅':'💳'}
+     </div>
+     <div>
+       <div style="font-weight:700;font-size:15px">${connected?'Stripe Connected':'Connect Your Stripe Account'}</div>
+       <div style="font-size:12px;margin-top:2px;color:${statusColor}">${statusLabel}</div>
+     </div>
+   </div>
+   <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r-md);padding:14px 16px;margin-bottom:20px">
+     <div style="font-size:12px;font-weight:700;color:var(--text);margin-bottom:10px">How payouts work</div>
+     <div style="display:flex;flex-direction:column;gap:7px;font-size:13px;color:var(--sub)">
+       <div>Customers buy your products on the CBUSEVENTS Marketplace</div>
+       <div>CBUSEVENTS takes 6.5% + $1.00 per order as the platform fee</div>
+       <div>Your net earnings are deposited directly to your bank via Stripe in 2 business days</div>
+       <div>You manage everything through your Stripe Express Dashboard</div>
+     </div>
+   </div>
+   ${connectBtn}
+ </div>
+
+ <!-- Sales History -->
+ <div class="card" style="padding:0;overflow:hidden">
+   <div class="card-header"><div class="card-title">Sales History</div></div>
+   ${vendorEarnings.length===0?`
+   <div style="text-align:center;padding:48px 20px;color:var(--sub)">
+     <div style="font-size:36px;margin-bottom:12px">📦</div>
+     <div style="font-weight:700;font-size:15px;color:var(--text);margin-bottom:6px">No sales yet</div>
+     <div style="font-size:13px">Sales appear here when customers purchase from your storefront.</div>
+     <button class="btn btn-primary" style="margin-top:16px" onclick="showPage('store')">Go to My Store →</button>
+   </div>`:`
+   <div>
+     <div style="display:grid;grid-template-columns:120px 1fr 90px 90px 100px;padding:10px 20px;border-bottom:1px solid var(--border-sub)">
+       ${['Date','Items','Gross','Fee','Your Cut'].map(h=>`<div style="font-family:var(--mono);font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted)">${h}</div>`).join('')}
+     </div>
+     ${vendorEarnings.map(o=>`
+     <div style="display:grid;grid-template-columns:120px 1fr 90px 90px 100px;padding:13px 20px;border-bottom:1px solid var(--border-sub);align-items:center" onmouseover="this.style.background='rgba(255,255,255,0.02)'" onmouseout="this.style.background='transparent'">
+       <div style="font-size:12px;color:var(--sub)">${fmtDate(o.created_at)}</div>
+       <div style="font-size:13px;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${o.myItems.map(i=>i.name).join(', ')}</div>
+       <div style="font-family:var(--mono);font-size:13px">${fmtMoney(o.subtotal)}</div>
+       <div style="font-family:var(--mono);font-size:13px;color:var(--muted)">-${fmtMoney(o.platformFee)}</div>
+       <div style="font-family:var(--mono);font-size:14px;font-weight:500;color:var(--green)">${fmtMoney(o.net)}</div>
+     </div>`).join('')}
+   </div>`}
+ </div>`;
+}
+
 // ── HELPERS ───────────────────────────────────────────────────
 function fmt(iso){
  if(!iso)return'TBD';
@@ -1364,6 +1543,9 @@ window.renderProposalsPage= renderProposalsPage;
 window.openProductModal   = openProductModal;
 window.saveProduct        = saveProduct;
 window.deleteProduct      = deleteProduct;
+window.renderPayoutsPage  = renderPayoutsPage;
+window.startConnectOnboard= startConnectOnboard;
+window.openStripeDashboard= openStripeDashboard;
 </script>
 
 <div id="toast" style="display:none;position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:var(--card);border:1px solid var(--border);border-radius:var(--r-md);padding:10px 20px;font-size:13px;font-weight:600;z-index:1000;white-space:nowrap;box-shadow:0 8px 32px rgba(0,0,0,0.5)"></div>

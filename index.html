@@ -1014,7 +1014,7 @@ h1,h2,h3,h4,h5,h6{font-family:var(--font);letter-spacing:-0.02em;}
 </style>
 </head>
 <body> <!-- NAV -->
-<nav id="topNav"> <div class="nav-logo" onclick="showPage('home')" role="button" tabindex="0"> CBUS<span>EVENTS</span> </div> <div class="nav-links"> <button class="nav-link" id="nav-home" onclick="showPage('home')">Home</button> <button class="nav-link" id="nav-venues" onclick="window.location.href='https://cbusevents.com/venues.html'">Venues</button> <button class="nav-link" id="nav-vendors" onclick="window.location.href='https://cbusevents.com/vendors.html'">Vendors</button> <button class="nav-link" id="nav-events" onclick="showPage('events')">Events</button> <div style="position:relative" id="columbusDropdown">
+<nav id="topNav"> <div class="nav-logo" onclick="showPage('home')" role="button" tabindex="0"> CBUS<span>EVENTS</span> </div> <div class="nav-links"> <button class="nav-link" id="nav-home" onclick="showPage('home')">Home</button> <button class="nav-link" id="nav-venues" onclick="window.location.href='https://cbusevents.com/venues.html'">Venues</button> <button class="nav-link" id="nav-vendors" onclick="window.location.href='https://cbusevents.com/vendors.html'">Vendors</button> <button class="nav-link" id="nav-events" onclick="showPage('events')">Events</button> <button class="nav-link" id="nav-marketplace" onclick="window.location.href='https://cbusevents.com/marketplace.html'" style="color:var(--orange)">Marketplace</button> <div style="position:relative" id="columbusDropdown">
   <button class="nav-link" onclick="toggleColumbusMenu()" style="display:flex;align-items:center;gap:4px">Columbus ▾</button>
   <div id="columbusMenu" style="display:none;position:absolute;top:calc(100% + 8px);left:0;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:8px;min-width:210px;box-shadow:0 16px 40px rgba(0,0,0,0.5);z-index:200;">
     <a href="https://cbusevents.com/gallery-hop.html" style="display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:8px;font-size:13px;font-weight:600;color:var(--text);text-decoration:none;transition:background 0.15s" onmouseover="this.style.background='rgba(255,255,255,0.05)'" onmouseout="this.style.background='transparent'">
@@ -1688,6 +1688,38 @@ function renderHome(){
        </div>`).join('')}
    </div>
    <p style="font-size:10px;color:rgba(255,255,255,0.15);text-align:center">Sources: Experience Columbus 2023 · Bank of America 2024 · U.S. Census Bureau</p>
+ </section>
+
+ <!-- ══════════════════════════════════════════
+      MARKETPLACE SECTION
+ ══════════════════════════════════════════ -->
+ <section style="padding:52px 48px;background:linear-gradient(135deg,#0d0800,#100a00,#080810);border-top:1px solid var(--border);border-bottom:1px solid var(--border)">
+   <div style="max-width:1100px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:center">
+     <div>
+       <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.2em;text-transform:uppercase;color:var(--orange);margin-bottom:12px">New - Columbus Event Marketplace</div>
+       <h2 style="font-family:var(--font);font-size:clamp(26px,3.5vw,42px);font-weight:900;letter-spacing:-0.04em;line-height:1.05;margin-bottom:16px">Shop local.<br><span style="color:var(--orange)">Buy direct.</span></h2>
+       <p style="color:var(--sub);font-size:15px;line-height:1.7;margin-bottom:28px">Products, services, and digital goods from Columbus's best event vendors - all in one place. From photographers selling preset packs to caterers taking orders, the marketplace brings the market online.</p>
+       <div style="display:flex;gap:12px;flex-wrap:wrap">
+         <a href="https://cbusevents.com/marketplace.html" style="display:inline-flex;align-items:center;gap:8px;background:var(--orange);color:#fff;font-family:var(--font);font-weight:700;font-size:14px;padding:12px 28px;border-radius:var(--r-md);text-decoration:none;transition:opacity 0.18s" onmouseover="this.style.opacity='0.9'" onmouseout="this.style.opacity='1'">Browse Marketplace →</a>
+         <a href="https://cbusevents.com/cbus-vendor-portal.html" style="display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,0.04);color:var(--sub);border:1px solid var(--border);font-family:var(--font);font-weight:600;font-size:14px;padding:12px 24px;border-radius:var(--r-md);text-decoration:none;transition:all 0.18s" onmouseover="this.style.borderColor='rgba(255,107,53,0.4)';this.style.color='var(--text)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--sub)'">Sell Your Products</a>
+       </div>
+     </div>
+     <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+       ${[
+         {icon:'📷', label:'Photography', desc:'Presets, prints, packages'},
+         {icon:'🎧', label:'DJ Services', desc:'Beat leases, sample kits'},
+         {icon:'🌸', label:'Floral & Decor', desc:'Arrangements, rentals'},
+         {icon:'👕', label:'Merch & Apparel', desc:'Custom branded gear'},
+         {icon:'🍽️', label:'Catering', desc:'Menus, deposits, packages'},
+         {icon:'💡', label:'Lighting & AV', desc:'Equipment, production'},
+       ].map(c=>`
+         <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--r-lg);padding:16px;transition:all 0.18s;cursor:pointer" onclick="window.location.href='https://cbusevents.com/marketplace.html'" onmouseover="this.style.borderColor='rgba(255,107,53,0.3)';this.style.transform='translateY(-2px)'" onmouseout="this.style.borderColor='var(--border)';this.style.transform='translateY(0)'">
+           <div style="font-size:22px;margin-bottom:8px">${c.icon}</div>
+           <div style="font-weight:700;font-size:13px;margin-bottom:3px">${c.label}</div>
+           <div style="font-size:11px;color:var(--muted)">${c.desc}</div>
+         </div>`).join('')}
+     </div>
+   </div>
  </section>
 
  <!-- ══════════════════════════════════════════
