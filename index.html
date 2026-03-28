@@ -1011,7 +1011,7 @@ h1,h2,h3,h4,h5,h6{font-family:var(--font);letter-spacing:-0.02em;}
 </style>
 </head>
 <body> <!-- NAV -->
-<nav id="topNav"> <div class="nav-logo" onclick="showPage('home')" role="button" tabindex="0"> CBUS<span>EVENTS</span> </div> <div class="nav-links"> <button class="nav-link" id="nav-home" onclick="showPage('home')">Home</button> <button class="nav-link" id="nav-venues" onclick="showPage('venues')">Venues</button> <button class="nav-link" id="nav-vendors" onclick="window.location.href='https://cbusevents.com/vendors.html'">Vendors</button> <button class="nav-link" id="nav-events" onclick="showPage('events')">Events</button> <div style="position:relative" id="columbusDropdown">
+<nav id="topNav"> <div class="nav-logo" onclick="showPage('home')" role="button" tabindex="0"> CBUS<span>EVENTS</span> </div> <div class="nav-links"> <button class="nav-link" id="nav-home" onclick="showPage('home')">Home</button> <button class="nav-link" id="nav-venues" onclick="window.location.href='https://cbusevents.com/venues.html'">Venues</button> <button class="nav-link" id="nav-vendors" onclick="window.location.href='https://cbusevents.com/vendors.html'">Vendors</button> <button class="nav-link" id="nav-events" onclick="showPage('events')">Events</button> <div style="position:relative" id="columbusDropdown">
   <button class="nav-link" onclick="toggleColumbusMenu()" style="display:flex;align-items:center;gap:4px">Columbus ▾</button>
   <div id="columbusMenu" style="display:none;position:absolute;top:calc(100% + 8px);left:0;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:8px;min-width:210px;box-shadow:0 16px 40px rgba(0,0,0,0.5);z-index:200;">
     <a href="https://cbusevents.com/gallery-hop.html" style="display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:8px;font-size:13px;font-weight:600;color:var(--text);text-decoration:none;transition:background 0.15s" onmouseover="this.style.background='rgba(255,255,255,0.05)'" onmouseout="this.style.background='transparent'">
@@ -1059,7 +1059,7 @@ h1,h2,h3,h4,h5,h6{font-family:var(--font);letter-spacing:-0.02em;}
 <div id="navMobileMenu" class="nav-mobile-menu">
   <a onclick="showPage('home')" class="nav-mobile-link" style="cursor:pointer">Home</a>
   <a onclick="showPage('events')" class="nav-mobile-link" style="cursor:pointer">Events</a>
-  <a onclick="showPage('venues')" class="nav-mobile-link" style="cursor:pointer">Venues</a>
+  <a href="https://cbusevents.com/venues.html" class="nav-mobile-link" style="cursor:pointer">Venues</a>
   <a href="https://cbusevents.com/vendors.html" class="nav-mobile-link">Vendors</a>
   <a href="https://cbusevents.com/signup.html?role=planner" class="nav-mobile-link">Planners</a>
   <div class="nav-mobile-divider"></div>
@@ -1166,29 +1166,27 @@ async function init(){
  allVenues=[];
  allEvents=[];
  }
- // Handle 404 redirect from GitHub Pages
- const rParam = new URLSearchParams(location.search).get('r');
- const pathToRoute = rParam ? decodeURIComponent(rParam) : location.pathname;
- 
- if(pathToRoute && pathToRoute !== '/') {
-   const parts = pathToRoute.replace(/^\//,'').split('/');
-   if(parts[0]==='venues' && parts[1]) {
-     // /venues/slug — find venue by slug
-     const slug = parts[1];
-     const v = allVenues.find(x=>(x.slug||toSlug(x.name))===slug);
-     if(v){ showPage('venue',v); }
-     else { showPage('venues'); }
-   } else if(parts[0]==='venues') {
-     showPage('venues');
-   } else if(parts[0]==='events') {
-     showPage('events');
+ // Handle ?p= SPA routing (used when venues/events nav is within the SPA)
+ const pParam = new URLSearchParams(location.search).get('p');
+ if(pParam==='venues'){showPage('venues',null,false);}
+ else if(pParam==='events'){showPage('events',null,false);}
+ else {
+   // Handle 404 redirect from GitHub Pages (?r= param)
+   const rParam = new URLSearchParams(location.search).get('r');
+   const pathToRoute = rParam ? decodeURIComponent(rParam) : location.pathname;
+   if(pathToRoute && pathToRoute !== '/') {
+     const parts = pathToRoute.replace(/^\//,'').split('/');
+     if(parts[0]==='events') {
+       showPage('events');
+     } else if(parts[0]==='category') {
+       showPage('category',parts[1]||null);
+     } else {
+       renderHome();
+     }
+     if(rParam) history.replaceState({},'',pathToRoute);
    } else {
      renderHome();
    }
-   // Clean up the ?r= param from URL
-   if(rParam) history.replaceState({},'',pathToRoute);
- } else {
-   renderHome();
  }
  await initNavAuth();
  await loadSavedState();
@@ -1237,7 +1235,7 @@ function showPage(page,data=null,pushState=true){
  const titles={home:'CBUSEVENTS — Columbus Ohio Venues & Events',venues:'Columbus Venues — CBUSEVENTS',events:'Columbus Events — CBUSEVENTS'};
  let url='/';
  let title=titles[page]||document.title;
- if(page==='venues'){url='/venues';}
+ if(page==='venues'){url='/?p=venues';}
  else if(page==='events'){url='/events';}
  else if(page==='venue'&&data){
    const slug=data.slug||toSlug(data.name);
@@ -1615,7 +1613,7 @@ function renderHome(){
        <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.2em;text-transform:uppercase;color:var(--orange);margin-bottom:6px">Available for Booking</div>
        <h2 style="font-family:var(--font);font-size:22px;font-weight:800;letter-spacing:-0.03em;color:var(--text)">Book Your Space</h2>
      </div>
-     <button onclick="showPage('venues')" style="font-family:var(--mono);font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:var(--orange);background:none;border:none;cursor:pointer">Browse All</button>
+     <button onclick="window.location.href='https://cbusevents.com/venues.html'" style="font-family:var(--mono);font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:var(--orange);background:none;border:none;cursor:pointer">Browse All</button>
    </div>
    <div class="rh-venues-scroll">
      ${(venueScroll.length?venueScroll:allVenues.slice(0,6)).map(v=>{
@@ -1948,17 +1946,17 @@ const RH_AUDIENCES={
  venues:{
    headline:'Your Venue.<br>Every <span class="rh-accent">Planner</span><br>In Columbus.',
    sub:'<strong>Stop waiting for word of mouth.</strong> Get your space in front of the planners, organizers, and bookers who are actively searching — right now.',
-   ctas:`<a href="https://cbusevents.com/signup.html?role=venue" class="rh-btn-primary">List Your Venue Free →</a><button class="rh-btn-secondary" onclick="showPage('venues')">Browse Venues</button>`
+   ctas:`<a href="https://cbusevents.com/signup.html?role=venue" class="rh-btn-primary">List Your Venue Free →</a><button class="rh-btn-secondary" onclick="window.location.href='https://cbusevents.com/venues.html'">Browse Venues</button>`
  },
  vendors:{
    headline:'Get Booked By<br>Columbus <span class="rh-accent">Planners</span><br>&amp; Venues.',
    sub:'<strong>Your next client is already on CBUSEVENTS.</strong> Showcase your services, build your Columbus portfolio, and start receiving booking requests from active local planners and venues.',
-   ctas:`<a href="https://cbusevents.com/signup.html?role=vendor" class="rh-btn-primary">List Your Services Free →</a><button class="rh-btn-secondary" onclick="showPage('venues')">Browse Venues</button>`
+   ctas:`<a href="https://cbusevents.com/signup.html?role=vendor" class="rh-btn-primary">List Your Services Free →</a><button class="rh-btn-secondary" onclick="window.location.href='https://cbusevents.com/venues.html'">Browse Venues</button>`
  },
  planners:{
    headline:'Every Columbus<br>Venue. One<br><span class="rh-accent">Dashboard.</span>',
    sub:'<strong>Stop juggling spreadsheets and DMs.</strong> Browse every Columbus venue, send booking inquiries, hire vendors, and manage your events — all in one free planner portal.',
-   ctas:`<a href="https://cbusevents.com/signup.html?role=planner" class="rh-btn-primary">Create Free Planner Account →</a><button class="rh-btn-secondary" onclick="showPage('venues')">Browse Venues</button>`
+   ctas:`<a href="https://cbusevents.com/signup.html?role=planner" class="rh-btn-primary">Create Free Planner Account →</a><button class="rh-btn-secondary" onclick="window.location.href='https://cbusevents.com/venues.html'">Browse Venues</button>`
  },
  attendees:{
    headline:'Columbus Is<br><span class="rh-accent">Always On.</span><br>Are You?',
@@ -2239,7 +2237,7 @@ async function renderVenueDetail(venue){
  const img=getVenueImg(venue);
 
  document.getElementById('app').innerHTML=`
- <!-- BREADCRUMB --> <div style="padding:14px 48px;background:var(--surface);border-bottom:1px solid var(--border)"> <div class="breadcrumb"> <button onclick="showPage('home')">Home</button> <span>›</span> <button onclick="showPage('venues')">Venues</button> <span>›</span> <span>${venue.name}</span> </div> </div> <!-- HERO IMAGE --> <div class="venue-detail-header"> ${img?`<img class="venue-detail-bg" src="${img}" alt="${venue.name}" onerror="this.style.display='none'">`:''}
+ <!-- BREADCRUMB --> <div style="padding:14px 48px;background:var(--surface);border-bottom:1px solid var(--border)"> <div class="breadcrumb"> <button onclick="showPage('home')">Home</button> <span>›</span> <button onclick="window.location.href='https://cbusevents.com/venues.html'">Venues</button> <span>›</span> <span>${venue.name}</span> </div> </div> <!-- HERO IMAGE --> <div class="venue-detail-header"> ${img?`<img class="venue-detail-bg" src="${img}" alt="${venue.name}" onerror="this.style.display='none'">`:''}
  <div class="venue-detail-overlay"></div> <div class="venue-detail-meta"> <div class="venue-detail-type">${venue.venue_type||'Venue'} ${venue.tier==='premium'?'<span style="background:#f59e0b;color:#000;border-radius:20px;padding:2px 10px;font-size:10px;font-weight:700;margin-left:6px">⭐ PREMIUM</span>':''}</div> <h1 class="venue-detail-name">${venue.name}</h1> </div> </div> <!-- BODY --> <div class="venue-detail-body"> <div class="venue-detail-grid"> <!-- LEFT --> <div> <!-- Quick info --> <div style="display:flex;flex-wrap:wrap;gap:20px;margin-bottom:28px;padding:20px;background:var(--surface);border:1px solid var(--border);border-radius:12px"> ${venue.neighborhood?`<div class="info-row"> <strong>${venue.neighborhood}, Columbus OH</strong></div>`:''}
  ${venue.capacity?`<div class="info-row"> <strong>Up to ${venue.capacity} guests</strong></div>`:''}
  ${venue.indoor_outdoor?`<div class="info-row">${venue.indoor_outdoor==='indoor'?' Indoor':venue.indoor_outdoor==='outdoor'?' Outdoor':' Indoor & Outdoor'}</div>`:''}
@@ -2364,7 +2362,7 @@ function renderCategory(cat){
  document.title=`${c.name} — CBUSEVENTS`;
 
  document.getElementById('app').innerHTML=`
- <div class="cat-hero"> <div class="breadcrumb"> <button onclick="showPage('home')">Home</button> <span>›</span> <button onclick="showPage('venues')">Venues</button> <span>›</span> <span>${c.name}</span> </div> <div style="font-size:48px;margin-bottom:12px">${c.icon}</div> <h1 class="cat-hero-title">${c.name}</h1> <p class="cat-hero-sub">${c.desc}</p> <div style="margin-top:16px;color:var(--orange);font-size:14px;font-weight:600">${venues.length} venues in Columbus</div> </div> <section class="section"> <div class="venue-grid">${venues.map(v=>venueCard(v)).join('')||'<div class="empty"><div class="empty-icon">${c.icon}</div><h3>No venues in this category yet</h3></div>'}</div> </section> ${catEvents.length?`
+ <div class="cat-hero"> <div class="breadcrumb"> <button onclick="showPage('home')">Home</button> <span>›</span> <button onclick="window.location.href='https://cbusevents.com/venues.html'">Venues</button> <span>›</span> <span>${c.name}</span> </div> <div style="font-size:48px;margin-bottom:12px">${c.icon}</div> <h1 class="cat-hero-title">${c.name}</h1> <p class="cat-hero-sub">${c.desc}</p> <div style="margin-top:16px;color:var(--orange);font-size:14px;font-weight:600">${venues.length} venues in Columbus</div> </div> <section class="section"> <div class="venue-grid">${venues.map(v=>venueCard(v)).join('')||'<div class="empty"><div class="empty-icon">${c.icon}</div><h3>No venues in this category yet</h3></div>'}</div> </section> ${catEvents.length?`
  <section class="section section-alt"> <div class="section-header"> <div><div class="section-title">Upcoming ${c.icon} Events</div></div> <button class="see-all" onclick="showPage('events')">See all →</button> </div> <div class="event-grid">${catEvents.map(e=>eventCard(e)).join('')}</div> </section>`:''}
 
  ${footer()}
@@ -2516,7 +2514,7 @@ function closeVendorModal(){
 
 // ── FOOTER ────────────────────────────────────────────────────
 function footer(){
- return`<footer> <div class="footer-grid"> <div> <div class="footer-logo">CBUS<span>EVENTS</span></div> <p class="footer-desc">The Columbus event directory connecting venues, organizers, and audiences. Discover spaces, find events, make things happen.</p> </div> <div class="footer-col"> <h4>Discover</h4> <div class="footer-link" onclick="showPage('venues')">All Venues</div> <div class="footer-link" onclick="showPage('events')">Upcoming Events</div> <a class="footer-link" href="https://cbusevents.com/blog.html" style="text-decoration:none">Columbus Blog</a> <div class="footer-link" onclick="showPage('category','bars')">Bars & Nightlife</div> <div class="footer-link" onclick="showPage('category','comedy')">Comedy Clubs</div> <div class="footer-link" onclick="showPage('category','rooftop')">Rooftop Bars</div> </div> <div class="footer-col"> <h4>For Venues</h4> <div class="footer-link" onclick="window.location.href='https://cbusevents.com/signup.html?role=venue'">List Your Venue</div> <div class="footer-link" onclick="window.location.href='https://cbusevents.com/signup.html'">Manage Events</div> <div class="footer-link" onclick="showPricing()">Pricing Plans</div> <div class="footer-link" onclick="window.location.href='https://cbusevents.com/signup.html'">Venue Sign In</div> </div> <div class="footer-col"> <h4>For Planners</h4> <div class="footer-link" onclick="window.location.href='https://cbusevents.com/signup.html?role=planner'" role="button" tabindex="0">Create Free Account</div> <div class="footer-link" onclick="window.location.href='https://cbusevents.com/signup.html'" role="button" tabindex="0">Browse Venues</div> <div class="footer-link" onclick="window.location.href='https://cbusevents.com/signup.html'" role="button" tabindex="0">List Your Event</div> <div class="footer-link" onclick="window.location.href='https://cbusevents.com/signup.html'" role="button" tabindex="0">Boost an Event</div> </div> <div class="footer-col"> <h4>Columbus</h4> <div class="footer-link" onclick="homeNeighborhood&&homeNeighborhood('Short North',{classList:{remove:()=>{},add:()=>{}}})" role="button" tabindex="0">Short North</div> <div class="footer-link">Downtown</div> <div class="footer-link">Clintonville</div> <div class="footer-link">Easton</div> <div class="footer-link">Brewery District</div> </div> </div> <div class="footer-bottom"> <span class="footer-copy">© 2026 CBUSEVENTS · Columbus, Ohio</span> <div style="display:flex;align-items:center;gap:20px"> <span class="footer-copy">Made for Columbus </span> <a href="https://cbusevents.com/cbus-admin.html" style="color:var(--muted);font-size:11px;font-weight:600;letter-spacing:0.5px;opacity:0.5;transition:opacity 0.2s" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.5'">Admin</a> </div> </div> </footer>`;
+ return`<footer> <div class="footer-grid"> <div> <div class="footer-logo">CBUS<span>EVENTS</span></div> <p class="footer-desc">The Columbus event directory connecting venues, organizers, and audiences. Discover spaces, find events, make things happen.</p> </div> <div class="footer-col"> <h4>Discover</h4> <div class="footer-link" onclick="window.location.href='https://cbusevents.com/venues.html'">All Venues</div> <div class="footer-link" onclick="showPage('events')">Upcoming Events</div> <a class="footer-link" href="https://cbusevents.com/blog.html" style="text-decoration:none">Columbus Blog</a> <div class="footer-link" onclick="showPage('category','bars')">Bars & Nightlife</div> <div class="footer-link" onclick="showPage('category','comedy')">Comedy Clubs</div> <div class="footer-link" onclick="showPage('category','rooftop')">Rooftop Bars</div> </div> <div class="footer-col"> <h4>For Venues</h4> <div class="footer-link" onclick="window.location.href='https://cbusevents.com/signup.html?role=venue'">List Your Venue</div> <div class="footer-link" onclick="window.location.href='https://cbusevents.com/signup.html'">Manage Events</div> <div class="footer-link" onclick="showPricing()">Pricing Plans</div> <div class="footer-link" onclick="window.location.href='https://cbusevents.com/signup.html'">Venue Sign In</div> </div> <div class="footer-col"> <h4>For Planners</h4> <div class="footer-link" onclick="window.location.href='https://cbusevents.com/signup.html?role=planner'" role="button" tabindex="0">Create Free Account</div> <div class="footer-link" onclick="window.location.href='https://cbusevents.com/venues.html'" role="button" tabindex="0">Browse Venues</div> <div class="footer-link" onclick="window.location.href='https://cbusevents.com/signup.html'" role="button" tabindex="0">List Your Event</div> <div class="footer-link" onclick="window.location.href='https://cbusevents.com/signup.html'" role="button" tabindex="0">Boost an Event</div> </div> <div class="footer-col"> <h4>Columbus</h4> <div class="footer-link" onclick="homeNeighborhood&&homeNeighborhood('Short North',{classList:{remove:()=>{},add:()=>{}}})" role="button" tabindex="0">Short North</div> <div class="footer-link">Downtown</div> <div class="footer-link">Clintonville</div> <div class="footer-link">Easton</div> <div class="footer-link">Brewery District</div> </div> </div> <div class="footer-bottom"> <span class="footer-copy">© 2026 CBUSEVENTS · Columbus, Ohio</span> <div style="display:flex;align-items:center;gap:20px"> <span class="footer-copy">Made for Columbus </span> <a href="https://cbusevents.com/cbus-admin.html" style="color:var(--muted);font-size:11px;font-weight:600;letter-spacing:0.5px;opacity:0.5;transition:opacity 0.2s" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.5'">Admin</a> </div> </div> </footer>`;
 }
 
 
@@ -2802,7 +2800,7 @@ async function toggleSaveEvent(eventId, btn, e){
     <a id="sticky-cta-btn" href="https://cbusevents.com/signup.html">
       Join Free Today
     </a>
-    <button class="sticky-nav-btn" onclick="showPage('venues')">
+    <button class="sticky-nav-btn" onclick="window.location.href='https://cbusevents.com/venues.html'">
       <span class="sticky-nav-btn-icon"></span>Venues
     </button>
   </div>
