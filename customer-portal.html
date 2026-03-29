@@ -840,7 +840,7 @@ async function loadLivePlanners(){
     const availText = avail === 'limited' ? 'Limited' : 'Available';
     const href = 'https://cbusevents.com/planner-portal.html';
     const palette = paletteClasses[i % paletteClasses.length];
-    return '<div class="planner-card" onclick="window.open('https://cbusevents.com','_blank')" style="cursor:pointer">'
+    return '<div class="planner-card" onclick="window.open(\'https://cbusevents.com\',\'_blank\')" style="cursor:pointer">'
       + '<div class="planner-card-top">'
       + '<div class="planner-card-avatar ' + palette + '">' + initials + '</div>'
       + '<div><div class="planner-card-name">' + name + '</div>'
@@ -919,7 +919,7 @@ async function loadLiveRecommendations(user){
     const label = savedIds.includes(e.id) ? 'Saved Event' : e.is_boosted ? 'Featured' : labels[i % labels.length];
     const matchColor = savedIds.includes(e.id) ? 'var(--green)' : e.is_boosted ? 'var(--orange)' : '';
     const matchText = savedIds.includes(e.id) ? 'Saved' : e.is_boosted ? 'Featured' : '';
-    return '<div class="rec-card" onclick="window.open('' + href + '','_blank')" style="cursor:pointer">'
+    return '<div class="rec-card" onclick="window.open(\'' + href + '\',\'_blank\')" style="cursor:pointer">'
       + '<div class="rec-card-body">'
       + '<div class="rec-card-label">' + label + '</div>'
       + '<div class="rec-card-title">' + e.title + '</div>'
@@ -964,7 +964,7 @@ async function loadLiveAlerts(user){
     const msg = e.is_boosted
       ? '<span>' + e.title + '</span> is featured at ' + venueName + '.'
       : 'Upcoming: <span>' + e.title + '</span> at ' + venueName + '.';
-    return '<div class="notif-row" onclick="window.open('' + href + '','_blank')" style="cursor:pointer">'
+    return '<div class="notif-row" onclick="window.open(\'' + href + '\',\'_blank\')" style="cursor:pointer">'
       + '<div class="notif-dot-wrap"><div class="notif-dot ' + dot + '"></div></div>'
       + '<div class="notif-text">' + msg + '</div>'
       + '<div class="notif-time">' + timeLabel + '</div>'
