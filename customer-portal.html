@@ -715,6 +715,7 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
 
 
 <script>
+if(typeof supabase === 'undefined'){ console.error('Supabase failed to load'); }
 const SB_URL="https://toblgvatvsjljbqogzsv.supabase.co";
 const SB_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRvYmxndmF0dnNqbGpicW9nenN2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMDgwNTAsImV4cCI6MjA4NzY4NDA1MH0._WJEQPizNDiQfDXQB_DHPaQhixPGpMdmYQSmyWmm_FQ";
 const sb=supabase.createClient(SB_URL,SB_KEY);
@@ -737,7 +738,7 @@ window.switchTab = function switchTab(tab){
   document.getElementById('authErr').textContent='';
 }
 
-async function doAuth(){
+window.doAuth = async function doAuth(){
   const email=document.getElementById('authEmail').value.trim();
   const pass=(document.getElementById('authPass')||{value:''}).value;
   const name=document.getElementById('authName')?document.getElementById('authName').value.trim():'';
@@ -777,7 +778,7 @@ async function doAuth(){
     }
   }
 }
-window.doAuth = doAuth;
+// doAuth assigned to window above
 
 window.doSignOut = async function doSignOut(){
   await sb.auth.signOut();
