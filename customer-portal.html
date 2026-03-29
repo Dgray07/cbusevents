@@ -816,53 +816,30 @@ async function loadLivePlanners(){
   const grid = document.getElementById('plannerGrid');
   if(!grid) return;
 
-  // Try planner_profiles table first
-  let { data: planners, error } = await sb
-    .from('planner_profiles')
-    .select('user_id, business_name, planner_type, specialties, starting_price, availability_status, slug')
+  const { data: planners, error } = await sb
+    .from('planners')
+    .select('id, business_name, contact_name, specialties, categories, rate_from, rate_display, availability, is_discoverable, neighborhood')
+    .eq('is_discoverable', true)
+    .order('created_at', { ascending: false })
     .limit(8);
 
-  console.log('[planners] planner_profiles result:', planners, error);
-
-  // Fallback: query user_roles for planner role and join profiles
   if(error || !planners || planners.length === 0){
-    const { data: roles, error: e2 } = await sb
-      .from('user_roles')
-      .select('user_id, tier')
-      .eq('role', 'planner')
-      .limit(8);
-    console.log('[planners] user_roles fallback:', roles, e2);
-
-    if(roles && roles.length > 0){
-      planners = roles.map(r => ({
-        user_id: r.user_id,
-        business_name: null,
-        planner_type: 'Event Planner',
-        specialties: [],
-        starting_price: null,
-        availability_status: 'available',
-        slug: null
-      }));
-    }
-  }
-
-  if(!planners || planners.length === 0){
     grid.innerHTML = '<div style="padding:32px;text-align:center;color:var(--sub);grid-column:1/-1">No planners listed yet. <a href="https://cbusevents.com" style="color:var(--orange)">Check back soon →</a></div>';
     return;
   }
 
   const paletteClasses = ['pa1','pa2','pa3','pa4'];
   grid.innerHTML = planners.map((p, i) => {
-    const name = p.business_name || 'Columbus Planner';
+    const name = p.business_name || p.contact_name || 'Columbus Planner';
     const initials = name.split(' ').map(w => w[0]).join('').substring(0,2).toUpperCase();
-    const type = p.planner_type || 'Event Planner';
-    const tags = Array.isArray(p.specialties) ? p.specialties.slice(0,3) : [];
-    const price = p.starting_price ? 'From $' + Number(p.starting_price).toLocaleString() : 'Contact for Pricing';
-    const avail = p.availability_status === 'limited' ? 'limited' : '';
-    const availText = p.availability_status === 'limited' ? 'Limited' : 'Available';
-    const href = p.slug ? 'https://cbusevents.com/planner/' + p.slug : 'https://cbusevents.com';
+    const tags = (Array.isArray(p.specialties) && p.specialties.length ? p.specialties : (Array.isArray(p.categories) ? p.categories : [])).slice(0,3);
+    const type = tags[0] || 'Event Planner';
+    const price = p.rate_display || (p.rate_from ? 'From $' + Number(p.rate_from).toLocaleString() : 'Contact for Pricing');
+    const avail = (p.availability || '').toLowerCase() === 'limited' ? 'limited' : '';
+    const availText = avail === 'limited' ? 'Limited' : 'Available';
+    const href = 'https://cbusevents.com/planner-portal.html';
     const palette = paletteClasses[i % paletteClasses.length];
-    return '<div class="planner-card" onclick="window.open(\'' + href + '\',\'_blank\')" style="cursor:pointer">'
+    return '<div class="planner-card" onclick="window.open('https://cbusevents.com','_blank')" style="cursor:pointer">'
       + '<div class="planner-card-top">'
       + '<div class="planner-card-avatar ' + palette + '">' + initials + '</div>'
       + '<div><div class="planner-card-name">' + name + '</div>'
@@ -899,53 +876,55 @@ async function loadLiveRecommendations(user){
   const subtitle = document.getElementById('recSubtitle');
   if(!container) return;
 
-  // Get user's existing ticket event IDs to exclude them
+  // Get user's already-ticketed event IDs
   const { data: myTickets } = await sb.from('tickets')
     .select('event_id').eq('email', user.email).eq('status','active');
   const myEventIds = (myTickets || []).map(t => t.event_id).filter(Boolean);
 
-  // Pull published events - try upcoming first, fall back to any published
-  let { data: events, error } = await sb.from('events')
-    .select('id, title, start_time, slug, is_boosted, venue_name_override, venues(name, neighborhood)')
+  // Also check customer_saved_events
+  const { data: saved } = await sb.from('customer_saved_events')
+    .select('event_id').eq('user_id', user.id);
+  const savedIds = (saved || []).map(s => s.event_id).filter(Boolean);
+
+  const { data: events } = await sb.from('events')
+    .select('id, title, start_time, venue_name_override, venue_id, featured, is_boosted, category')
     .eq('status', 'published')
     .gte('start_time', new Date().toISOString())
+    .order('is_boosted', { ascending: false })
     .order('start_time', { ascending: true })
     .limit(6);
 
-  // If no upcoming, show most recent published events instead
-  if((!events || events.length === 0) && !error){
-    const { data: fallback } = await sb.from('events')
-      .select('id, title, start_time, slug, is_boosted, venue_name_override, venues(name, neighborhood)')
-      .eq('status', 'published')
-      .order('start_time', { ascending: false })
-      .limit(6);
-    events = fallback;
-  }
-
   if(!events || events.length === 0){
-    container.innerHTML = '<div style="padding:20px;text-align:center;color:var(--sub);font-size:13px">No events right now. <a href="https://cbusevents.com" style="color:var(--orange)">Browse all →</a></div>';
+    container.innerHTML = '<div style="padding:20px;text-align:center;color:var(--sub);font-size:13px">No upcoming events. <a href="https://cbusevents.com" style="color:var(--orange)">Browse all →</a></div>';
     return;
   }
 
-  const recs = events.filter(e => !myEventIds.includes(e.id));
-  const display = (recs.length ? recs : events).slice(0, 4);
-  if(subtitle) subtitle.textContent = display.length + ' events for you';
+  // Prioritize: saved > not yet ticketed > everything else
+  const prioritized = [
+    ...events.filter(e => savedIds.includes(e.id) && !myEventIds.includes(e.id)),
+    ...events.filter(e => !savedIds.includes(e.id) && !myEventIds.includes(e.id)),
+    ...events.filter(e => myEventIds.includes(e.id)),
+  ].slice(0, 4);
 
-  const labels = ['Upcoming', 'Happening Soon', 'Trending in Columbus', 'This Week', 'Don\'t Miss', 'On the Radar'];
+  if(subtitle) subtitle.textContent = prioritized.length + ' upcoming events';
 
-  container.innerHTML = display.map((e, i) => {
-    const venueName = e.venue_name_override || e.venues?.name || 'Columbus Venue';
+  const labels = ['Upcoming', 'Happening Soon', 'Trending in Columbus', 'This Week'];
+
+  container.innerHTML = prioritized.map((e, i) => {
+    const venueName = e.venue_name_override || 'Columbus Venue';
     const d = new Date(e.start_time);
     const dateStr = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', timeZone: 'America/New_York' });
-    const href = e.slug ? 'https://cbusevents.com/event/' + e.slug : 'https://cbusevents.com';
-    const label = e.is_boosted ? 'Featured Event' : labels[i % labels.length];
-    return '<div class="rec-card" onclick="window.open(\'' + href + '\',\'_blank\')" style="cursor:pointer">'
+    const href = 'https://cbusevents.com/event/' + e.id;
+    const label = savedIds.includes(e.id) ? 'Saved Event' : e.is_boosted ? 'Featured' : labels[i % labels.length];
+    const matchColor = savedIds.includes(e.id) ? 'var(--green)' : e.is_boosted ? 'var(--orange)' : '';
+    const matchText = savedIds.includes(e.id) ? 'Saved' : e.is_boosted ? 'Featured' : '';
+    return '<div class="rec-card" onclick="window.open('' + href + '','_blank')" style="cursor:pointer">'
       + '<div class="rec-card-body">'
       + '<div class="rec-card-label">' + label + '</div>'
       + '<div class="rec-card-title">' + e.title + '</div>'
       + '<div class="rec-card-detail">' + venueName + ' &middot; ' + dateStr + '</div>'
       + '</div>'
-      + (e.is_boosted ? '<div class="rec-card-match" style="color:var(--orange)">Featured</div>' : '')
+      + (matchText ? '<div class="rec-card-match" style="color:' + matchColor + '">' + matchText + '</div>' : '')
       + '</div>';
   }).join('');
 }
@@ -954,25 +933,16 @@ async function loadLiveAlerts(user){
   const container = document.getElementById('alertsContainer');
   if(!container) return;
 
-  // Try upcoming published events first, then fall back to any published
-  let { data: events } = await sb.from('events')
-    .select('id, title, start_time, slug, is_boosted, venue_name_override, venues(name, neighborhood)')
+  const { data: events } = await sb.from('events')
+    .select('id, title, start_time, venue_name_override, is_boosted, featured')
     .eq('status', 'published')
     .gte('start_time', new Date().toISOString())
+    .order('is_boosted', { ascending: false })
     .order('start_time', { ascending: true })
     .limit(5);
 
   if(!events || events.length === 0){
-    const { data: fallback } = await sb.from('events')
-      .select('id, title, start_time, slug, is_boosted, venue_name_override, venues(name, neighborhood)')
-      .eq('status', 'published')
-      .order('start_time', { ascending: false })
-      .limit(5);
-    events = fallback;
-  }
-
-  if(!events || events.length === 0){
-    container.innerHTML = '<div style="padding:20px;text-align:center;color:var(--sub);font-size:13px">No events right now.</div>';
+    container.innerHTML = '<div style="padding:20px;text-align:center;color:var(--sub);font-size:13px">No upcoming events.</div>';
     return;
   }
 
@@ -980,39 +950,26 @@ async function loadLiveAlerts(user){
   const now = new Date();
 
   container.innerHTML = events.map((e, i) => {
-    const venueName = e.venue_name_override || e.venues?.name || 'Columbus Venue';
+    const venueName = e.venue_name_override || 'Columbus Venue';
     const d = new Date(e.start_time);
     const diffMs = d - now;
     const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
     const diffHrs = Math.floor(diffMs / (1000 * 60 * 60));
-    const timeLabel = diffHrs < 0
-      ? d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', timeZone: 'America/New_York' })
-      : diffHrs < 24 ? 'Today'
+    const timeLabel = diffHrs < 24 ? 'Today'
       : diffDays === 1 ? 'Tomorrow'
       : diffDays + 'd away';
-    const href = e.slug ? 'https://cbusevents.com/event/' + e.slug : 'https://cbusevents.com';
-    const dot = dotColors[i % dotColors.length];
+    const href = 'https://cbusevents.com/event/' + e.id;
+    const dot = e.is_boosted ? 'orange' : dotColors[i % dotColors.length];
     const msg = e.is_boosted
-      ? '<span>' + e.title + '</span> is featured - happening at ' + venueName + '.'
+      ? '<span>' + e.title + '</span> is featured at ' + venueName + '.'
       : 'Upcoming: <span>' + e.title + '</span> at ' + venueName + '.';
-    return '<div class="notif-row" onclick="window.open(\'' + href + '\',\'_blank\')" style="cursor:pointer">'
+    return '<div class="notif-row" onclick="window.open('' + href + '','_blank')" style="cursor:pointer">'
       + '<div class="notif-dot-wrap"><div class="notif-dot ' + dot + '"></div></div>'
       + '<div class="notif-text">' + msg + '</div>'
       + '<div class="notif-time">' + timeLabel + '</div>'
       + '</div>';
   }).join('');
 }
-
-async function loadLivePlannersFallback(grid){
-  // Try alternate table name: profiles with role filter
-  const { data } = await sb.from('user_roles')
-    .select('user_id, tier, profiles:user_id(display_name, bio, avatar_url)')
-    .eq('role', 'planner')
-    .limit(8);
-  return data;
-}
-
-
 
 async function loadLiveEvents(user){
   const grid=document.getElementById('liveEventsGrid');
@@ -1021,7 +978,7 @@ async function loadLiveEvents(user){
   const{data:follows}=await sb.from('customer_venue_follows').select('venue_id').eq('user_id',user.id);
   const followedIds=(follows||[]).map(f=>f.venue_id);
   const { data: events, error: evErr } = await sb.from('events')
-    .select('id,title,start_time,cover_image_url,is_boosted,is_third_party,venue_name_override,slug,venues(id,name,neighborhood)')
+    .select('id,title,start_time,cover_image_url,is_boosted,is_third_party,venue_name_override,featured')
     .gte('start_time',new Date().toISOString())
     .eq('status','published')
     .order('start_time',{ascending:true})
@@ -1034,17 +991,17 @@ async function loadLiveEvents(user){
   }
   // Sort followed venues first
   const sorted=[...events].sort((a,b)=>{
-    return (followedIds.includes(b.venues?.id)?1:0)-(followedIds.includes(a.venues?.id)?1:0);
+    return 0; // venue follow sort disabled - no join available
   });
   if(subtitle)subtitle.textContent=sorted.length+' upcoming events';
   const colors=['ec1','ec2','ec3','ec4'];
   grid.innerHTML=sorted.map((e,i)=>{
-    const venueName=e.venue_name_override||e.venues?.name||'Columbus Venue';
+    const venueName=e.venue_name_override||'Columbus Venue';
     const d=new Date(e.start_time);
     const dateStr=d.toLocaleDateString('en-US',{month:'short',day:'numeric',timeZone:'America/New_York'});
     const timeStr=d.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit',timeZone:'America/New_York'});
-    const isFollowed=followedIds.includes(e.venues?.id);
-    const eventHref = e.slug ? 'https://cbusevents.com/event/' + e.slug : 'https://cbusevents.com';
+    const isFollowed=false;
+    const eventHref = 'https://cbusevents.com/event/' + e.id;
     return '<div class="event-card" onclick="window.open(\'' + eventHref + '\',\'_blank\')" role="button" tabindex="0">'
       +'<div class="event-card-img">'
       +(e.cover_image_url
@@ -1066,7 +1023,7 @@ async function loadLiveTickets(user){
   const container=document.getElementById('ticketsContainer');
   if(!container)return;
   const{data:tickets,error}=await sb.from('tickets')
-    .select('*,events(id,title,start_time,venues(name))')
+    .select('*,events(id,title,start_time)')
     .eq('email',user.email)
     .eq('status','active')
     .order('created_at',{ascending:false})
@@ -1085,7 +1042,7 @@ async function loadLiveTickets(user){
       +'<div class="ticket-date-block"><div class="ticket-date-month">'+month+'</div><div class="ticket-date-day">'+day+'</div></div>'
       +'<div class="ticket-info">'
       +'<div class="ticket-name">'+(ev?.title||'Event')+'</div>'
-      +'<div class="ticket-detail">'+(ev?.venues?.name||'Columbus Venue')+(t.tier_name?' · '+t.tier_name:'')+'</div>'
+      +'<div class="ticket-detail">'+('Columbus Venue')+(t.tier_name?' · '+t.tier_name:'')+'</div>'
       +'</div>'
       +'<div class="ticket-right">'
       +(t.ticket_code?'<div class="ticket-type" style="font-family:var(--mono);font-size:12px;color:var(--orange);letter-spacing:2px">'+t.ticket_code+'</div>':'')
