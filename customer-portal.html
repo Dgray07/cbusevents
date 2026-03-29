@@ -662,82 +662,11 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
         </div>
       </div>
 
-      <div class="planner-grid">
-
-        <div class="planner-card">
-          <div class="planner-card-top">
-            <div class="planner-card-avatar pa1">MJ</div>
-            <div>
-              <div class="planner-card-name">Marcus Johnson Events</div>
-              <div class="planner-card-type">Full Service Planner</div>
-            </div>
-          </div>
-          <div class="planner-card-tags">
-            <span class="planner-tag">Corporate</span>
-            <span class="planner-tag">Private Parties</span>
-            <span class="planner-tag">Concerts</span>
-          </div>
-          <div class="planner-card-footer">
-            <span class="planner-card-rate">From $1,200</span>
-            <span class="planner-card-avail">Available</span>
-          </div>
+      <div class="planner-grid" id="plannerGrid">
+        <div style="padding:32px;text-align:center;color:var(--muted);grid-column:1/-1">
+          <div style="width:20px;height:20px;border:2px solid var(--border);border-top-color:var(--orange);border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 10px"></div>
+          Loading planners...
         </div>
-
-        <div class="planner-card">
-          <div class="planner-card-top">
-            <div class="planner-card-avatar pa2">SE</div>
-            <div>
-              <div class="planner-card-name">Simone Ellis Co.</div>
-              <div class="planner-card-type">Wedding + Events</div>
-            </div>
-          </div>
-          <div class="planner-card-tags">
-            <span class="planner-tag">Weddings</span>
-            <span class="planner-tag">Brand Activations</span>
-          </div>
-          <div class="planner-card-footer">
-            <span class="planner-card-rate">From $2,400</span>
-            <span class="planner-card-avail">Available</span>
-          </div>
-        </div>
-
-        <div class="planner-card">
-          <div class="planner-card-top">
-            <div class="planner-card-avatar pa3">RP</div>
-            <div>
-              <div class="planner-card-name">Renee Productions</div>
-              <div class="planner-card-type">Event Production</div>
-            </div>
-          </div>
-          <div class="planner-card-tags">
-            <span class="planner-tag">Concerts</span>
-            <span class="planner-tag">Corporate</span>
-            <span class="planner-tag">Activations</span>
-          </div>
-          <div class="planner-card-footer">
-            <span class="planner-card-rate">From $3,500</span>
-            <span class="planner-card-avail limited">Limited</span>
-          </div>
-        </div>
-
-        <div class="planner-card">
-          <div class="planner-card-top">
-            <div class="planner-card-avatar pa4">AT</div>
-            <div>
-              <div class="planner-card-name">Andre Thomas Events</div>
-              <div class="planner-card-type">Private + Social</div>
-            </div>
-          </div>
-          <div class="planner-card-tags">
-            <span class="planner-tag">Private Parties</span>
-            <span class="planner-tag">Weddings</span>
-          </div>
-          <div class="planner-card-footer">
-            <span class="planner-card-rate">Contact for Pricing</span>
-            <span class="planner-card-avail">Available</span>
-          </div>
-        </div>
-
       </div>
     </div>
 
@@ -750,33 +679,13 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
             <div class="table-header">
               <div>
                 <div class="table-title">Recommended For You</div>
-                <div class="table-title-sub">Based on your event history</div>
+                <div class="table-title-sub" id="recSubtitle">Upcoming Columbus events</div>
               </div>
             </div>
-            <div style="padding:14px 16px;display:flex;flex-direction:column;gap:10px;">
-              <div class="rec-card">
-                <div class="rec-card-body">
-                  <div class="rec-card-label">Strong Match</div>
-                  <div class="rec-card-title">Short North Poetry Slam</div>
-                  <div class="rec-card-detail">Land Grant Brewing &middot; May 14</div>
-                </div>
-                <div class="rec-card-match">94% match</div>
-              </div>
-              <div class="rec-card">
-                <div class="rec-card-body">
-                  <div class="rec-card-label">Based on R&B</div>
-                  <div class="rec-card-title">Rooftop Summer Series</div>
-                  <div class="rec-card-detail">The Exchange &middot; Jun 14</div>
-                </div>
-                <div class="rec-card-match">88% match</div>
-              </div>
-              <div class="rec-card">
-                <div class="rec-card-body">
-                  <div class="rec-card-label">Trending Near You</div>
-                  <div class="rec-card-title">Columbus Arts Festival</div>
-                  <div class="rec-card-detail">Goodale Park &middot; Jun 6</div>
-                </div>
-                <div class="rec-card-match">81% match</div>
+            <div style="padding:14px 16px;display:flex;flex-direction:column;gap:10px;" id="recContainer">
+              <div style="padding:20px;text-align:center;color:var(--muted)">
+                <div style="width:18px;height:18px;border:2px solid var(--border);border-top-color:var(--orange);border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 8px"></div>
+                Loading events...
               </div>
             </div>
           </div>
@@ -786,27 +695,13 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
       <div id="featureAlerts">
           <div class="table-card" style="margin-bottom:0;">
             <div class="table-header">
-              <div class="table-title">Priority Alerts</div>
+              <div class="table-title">Happening Soon</div>
             </div>
-            <div class="notif-row">
-              <div class="notif-dot-wrap"><div class="notif-dot orange"></div></div>
-              <div class="notif-text"><span>Friday Night R&B</span> is 80% sold out. Only 24 GA tickets left.</div>
-              <div class="notif-time">Now</div>
-            </div>
-            <div class="notif-row">
-              <div class="notif-dot-wrap"><div class="notif-dot green"></div></div>
-              <div class="notif-text">New event added in <span>Short North</span> matching your interests.</div>
-              <div class="notif-time">2h ago</div>
-            </div>
-            <div class="notif-row">
-              <div class="notif-dot-wrap"><div class="notif-dot blue"></div></div>
-              <div class="notif-text"><span>Sonic Temple</span> early bird tickets end in 48 hours.</div>
-              <div class="notif-time">1d ago</div>
-            </div>
-            <div class="notif-row">
-              <div class="notif-dot-wrap"><div class="notif-dot muted"></div></div>
-              <div class="notif-text">Your saved event <span>Columbus Arts Festival</span> just announced its lineup.</div>
-              <div class="notif-time">2d ago</div>
+            <div id="alertsContainer">
+              <div style="padding:20px;text-align:center;color:var(--muted)">
+                <div style="width:18px;height:18px;border:2px solid var(--border);border-top-color:var(--orange);border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 8px"></div>
+                Loading events...
+              </div>
             </div>
           </div>
       </div>
@@ -912,7 +807,160 @@ function hideAuthGate(user){
 async function loadLiveData(user){
   loadLiveEvents(user);
   loadLiveTickets(user);
+  loadLivePlanners();
+  loadLiveRecommendations(user);
+  loadLiveAlerts(user);
 }
+
+async function loadLivePlanners(){
+  const grid = document.getElementById('plannerGrid');
+  if(!grid) return;
+
+  // Pull planner profiles joined to user_roles
+  const { data: planners, error } = await sb
+    .from('planner_profiles')
+    .select('user_id, business_name, planner_type, specialties, starting_price, availability_status, slug')
+    .limit(8);
+
+  if(error || !planners || planners.length === 0){
+    grid.innerHTML = '<div style="padding:32px;text-align:center;color:var(--sub);grid-column:1/-1">No planners listed yet. <a href="https://cbusevents.com" style="color:var(--orange)">Check back soon →</a></div>';
+    return;
+  }
+
+  const paletteClasses = ['pa1','pa2','pa3','pa4'];
+  grid.innerHTML = planners.map((p, i) => {
+    const name = p.business_name || 'Columbus Planner';
+    const initials = name.split(' ').map(w => w[0]).join('').substring(0,2).toUpperCase();
+    const type = p.planner_type || 'Event Planner';
+    const tags = Array.isArray(p.specialties) ? p.specialties.slice(0,3) : [];
+    const price = p.starting_price ? 'From $' + Number(p.starting_price).toLocaleString() : 'Contact for Pricing';
+    const avail = p.availability_status === 'limited' ? 'limited' : '';
+    const availText = p.availability_status === 'limited' ? 'Limited' : 'Available';
+    const href = p.slug ? 'https://cbusevents.com/planner/' + p.slug : 'https://cbusevents.com';
+    const palette = paletteClasses[i % paletteClasses.length];
+    return '<div class="planner-card" onclick="window.open(\'' + href + '\',\'_blank\')" style="cursor:pointer">'
+      + '<div class="planner-card-top">'
+      + '<div class="planner-card-avatar ' + palette + '">' + initials + '</div>'
+      + '<div><div class="planner-card-name">' + name + '</div>'
+      + '<div class="planner-card-type">' + type + '</div></div>'
+      + '</div>'
+      + (tags.length ? '<div class="planner-card-tags">' + tags.map(t => '<span class="planner-tag">' + t + '</span>').join('') + '</div>' : '')
+      + '<div class="planner-card-footer">'
+      + '<span class="planner-card-rate">' + price + '</span>'
+      + '<span class="planner-card-avail ' + avail + '">' + availText + '</span>'
+      + '</div></div>';
+  }).join('');
+
+  // Wire filter chips to filter rendered cards by specialty
+  document.querySelectorAll('#plannerSection .filter-chip').forEach(chip => {
+    chip.addEventListener('click', function(){
+      document.querySelectorAll('#plannerSection .filter-chip').forEach(c => c.classList.remove('active'));
+      this.classList.add('active');
+      const filter = this.textContent.trim().toLowerCase();
+      document.querySelectorAll('#plannerGrid .planner-card').forEach(card => {
+        if(filter === 'all'){
+          card.style.display = '';
+        } else {
+          const tags = card.querySelectorAll('.planner-tag');
+          const match = Array.from(tags).some(t => t.textContent.toLowerCase().includes(filter));
+          card.style.display = match ? '' : 'none';
+        }
+      });
+    });
+  });
+}
+
+async function loadLiveRecommendations(user){
+  const container = document.getElementById('recContainer');
+  const subtitle = document.getElementById('recSubtitle');
+  if(!container) return;
+
+  // Get user's existing ticket event IDs to exclude them
+  const { data: myTickets } = await sb.from('tickets')
+    .select('event_id').eq('email', user.email).eq('status','active');
+  const myEventIds = (myTickets || []).map(t => t.event_id).filter(Boolean);
+
+  // Pull upcoming published events
+  let query = sb.from('events')
+    .select('id, title, start_time, slug, is_boosted, venue_name_override, venues(name, neighborhood)')
+    .gte('start_time', new Date().toISOString())
+    .eq('status', 'published')
+    .order('start_time', { ascending: true })
+    .limit(6);
+
+  const { data: events } = await query;
+
+  if(!events || events.length === 0){
+    container.innerHTML = '<div style="padding:20px;text-align:center;color:var(--sub);font-size:13px">No upcoming events right now. <a href="https://cbusevents.com" style="color:var(--orange)">Browse all →</a></div>';
+    return;
+  }
+
+  // Exclude already-ticketed events, show rest
+  const recs = events.filter(e => !myEventIds.includes(e.id));
+  if(subtitle) subtitle.textContent = recs.length + ' upcoming events';
+
+  const labels = ['Upcoming', 'Happening Soon', 'Trending in Columbus', 'This Week', 'Don\'t Miss', 'On the Radar'];
+
+  container.innerHTML = (recs.length ? recs : events).slice(0, 4).map((e, i) => {
+    const venueName = e.venue_name_override || e.venues?.name || 'Columbus Venue';
+    const d = new Date(e.start_time);
+    const dateStr = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', timeZone: 'America/New_York' });
+    const href = e.slug
+      ? 'https://cbusevents.com/event/' + e.slug
+      : 'https://cbusevents.com';
+    const label = e.is_boosted ? 'Featured Event' : labels[i % labels.length];
+    return '<div class="rec-card" onclick="window.open(\'' + href + '\',\'_blank\')" style="cursor:pointer">'
+      + '<div class="rec-card-body">'
+      + '<div class="rec-card-label">' + label + '</div>'
+      + '<div class="rec-card-title">' + e.title + '</div>'
+      + '<div class="rec-card-detail">' + venueName + ' &middot; ' + dateStr + '</div>'
+      + '</div>'
+      + (e.is_boosted ? '<div class="rec-card-match" style="color:var(--orange)">Featured</div>' : '')
+      + '</div>';
+  }).join('');
+}
+
+async function loadLiveAlerts(user){
+  const container = document.getElementById('alertsContainer');
+  if(!container) return;
+
+  // Pull boosted + soonest upcoming events as "alerts"
+  const { data: events } = await sb.from('events')
+    .select('id, title, start_time, slug, is_boosted, venue_name_override, venues(name, neighborhood)')
+    .gte('start_time', new Date().toISOString())
+    .eq('status', 'published')
+    .order('start_time', { ascending: true })
+    .limit(5);
+
+  if(!events || events.length === 0){
+    container.innerHTML = '<div style="padding:20px;text-align:center;color:var(--sub);font-size:13px">No alerts right now.</div>';
+    return;
+  }
+
+  const dotColors = ['orange','green','blue','orange','muted'];
+  const now = new Date();
+
+  container.innerHTML = events.map((e, i) => {
+    const venueName = e.venue_name_override || e.venues?.name || 'Columbus Venue';
+    const d = new Date(e.start_time);
+    const diffMs = d - now;
+    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+    const diffHrs = Math.floor(diffMs / (1000 * 60 * 60));
+    const timeLabel = diffHrs < 24 ? 'Today' : diffDays === 1 ? 'Tomorrow' : diffDays + 'd away';
+    const href = e.slug ? 'https://cbusevents.com/event/' + e.slug : 'https://cbusevents.com';
+    const dot = dotColors[i % dotColors.length];
+    const msg = e.is_boosted
+      ? '<span>' + e.title + '</span> is a featured event at ' + venueName + '.'
+      : 'Upcoming: <span>' + e.title + '</span> at ' + venueName + '.';
+    return '<div class="notif-row" onclick="window.open(\'' + href + '\',\'_blank\')" style="cursor:pointer">'
+      + '<div class="notif-dot-wrap"><div class="notif-dot ' + dot + '"></div></div>'
+      + '<div class="notif-text">' + msg + '</div>'
+      + '<div class="notif-time">' + timeLabel + '</div>'
+      + '</div>';
+  }).join('');
+}
+
+
 
 async function loadLiveEvents(user){
   const grid=document.getElementById('liveEventsGrid');
@@ -920,8 +968,8 @@ async function loadLiveEvents(user){
   if(!grid)return;
   const{data:follows}=await sb.from('customer_venue_follows').select('venue_id').eq('user_id',user.id);
   const followedIds=(follows||[]).map(f=>f.venue_id);
-  const{data:events}=await sb.from('events')
-    .select('id,title,start_time,cover_image_url,is_boosted,is_third_party,venue_name_override,venues(id,name,neighborhood)')
+  const { data: events } = await sb.from('events')
+    .select('id,title,start_time,cover_image_url,is_boosted,is_third_party,venue_name_override,slug,venues(id,name,neighborhood)')
     .gte('start_time',new Date().toISOString())
     .eq('status','published')
     .order('start_time',{ascending:true})
@@ -943,7 +991,8 @@ async function loadLiveEvents(user){
     const dateStr=d.toLocaleDateString('en-US',{month:'short',day:'numeric',timeZone:'America/New_York'});
     const timeStr=d.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit',timeZone:'America/New_York'});
     const isFollowed=followedIds.includes(e.venues?.id);
-    return '<div class="event-card" onclick="window.open(\'https://cbusevents.com\',\'_blank\')" role="button" tabindex="0">'
+    const eventHref = e.slug ? 'https://cbusevents.com/event/' + e.slug : 'https://cbusevents.com';
+    return '<div class="event-card" onclick="window.open(\'' + eventHref + '\',\'_blank\')" role="button" tabindex="0">'
       +'<div class="event-card-img">'
       +(e.cover_image_url
         ?'<div class="event-card-img-bg" style="background-image:url(\''+e.cover_image_url+'\')"></div>'
