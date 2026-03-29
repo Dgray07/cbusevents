@@ -454,6 +454,7 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
   *,*::before,*::after{animation-duration:0.01ms!important;animation-iteration-count:1!important;transition-duration:0.01ms!important;}
 }
 </style>
+<script src="https://unpkg.com/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 </head>
 <body>
 
@@ -481,7 +482,7 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
       <input type="password" id="authPass" autocomplete="current-password" placeholder="••••••••" style="width:100%;background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:9px;padding:10px 14px;color:var(--text);font-family:var(--font);font-size:14px;outline:none"/>
     </div>
     <div id="authErr" role="alert" aria-live="polite" style="color:var(--red);font-size:13px;margin-bottom:10px;min-height:18px"></div>
-    <button id="authBtn" onclick="doAuth()" style="width:100%;background:var(--orange);color:#fff;border:none;border-radius:9px;padding:12px;font-size:14px;font-weight:700;cursor:pointer;font-family:var(--font)">Sign In</button>
+    <button id="authBtn" onclick="window.doAuth&&window.doAuth()" style="width:100%;background:var(--orange);color:#fff;border:none;border-radius:9px;padding:12px;font-size:14px;font-weight:700;cursor:pointer;font-family:var(--font)">Sign In</button>
     <div style="text-align:center;margin-top:16px;font-size:13px;color:var(--sub)">
       <span id="authSwitchText">New to CBUSEVENTS?</span>
       <button id="authSwitchBtn" style="background:none;border:none;color:var(--orange);font-size:13px;font-weight:600;cursor:pointer;font-family:var(--font);margin-left:4px">Create a free account</button>
@@ -713,7 +714,6 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
 </div>
 
 
-<script src="https://unpkg.com/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <script>
 const SB_URL="https://toblgvatvsjljbqogzsv.supabase.co";
 const SB_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRvYmxndmF0dnNqbGpicW9nenN2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMDgwNTAsImV4cCI6MjA4NzY4NDA1MH0._WJEQPizNDiQfDXQB_DHPaQhixPGpMdmYQSmyWmm_FQ";
