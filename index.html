@@ -170,6 +170,51 @@ nav {
 .hero-card-title { font-weight:600; font-size:13px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 .hero-card-meta { font-size:11px; color:var(--sub); margin-top:2px; }
 
+/* ── SOCIAL TICKER ── */
+.hero-ticker {
+  position:absolute; bottom:0; left:0; right:0; z-index:4;
+  background:rgba(8,8,16,0.82); backdrop-filter:blur(14px);
+  border-top:1px solid rgba(255,107,53,0.15);
+  display:flex; align-items:center; height:42px; overflow:hidden;
+}
+.ticker-label {
+  flex-shrink:0; display:flex; align-items:center; gap:7px;
+  padding:0 18px; border-right:1px solid rgba(255,255,255,0.07);
+  font-family:var(--mono); font-size:9px; font-weight:600;
+  letter-spacing:0.18em; text-transform:uppercase; color:var(--orange);
+  height:100%; white-space:nowrap;
+}
+.ticker-dot {
+  width:5px; height:5px; border-radius:50%; background:var(--orange);
+  animation:pulse 2s infinite; flex-shrink:0;
+}
+.ticker-track-wrap { flex:1; overflow:hidden; position:relative; }
+.ticker-track {
+  display:flex; align-items:center; gap:0;
+  animation:tickerScroll 40s linear infinite;
+  will-change:transform; white-space:nowrap;
+}
+.ticker-track:hover { animation-play-state:paused; }
+.ticker-item {
+  display:inline-flex; align-items:center; gap:10px;
+  padding:0 28px; border-right:1px solid rgba(255,255,255,0.06);
+  font-size:12px; color:rgba(240,240,250,0.7); cursor:default;
+  transition:color 0.2s; flex-shrink:0;
+}
+.ticker-item:hover { color:var(--text); }
+.ticker-source {
+  font-family:var(--mono); font-size:9px; font-weight:600;
+  letter-spacing:0.1em; text-transform:uppercase; padding:2px 7px;
+  border-radius:4px; flex-shrink:0;
+}
+.ticker-src-x    { background:rgba(255,255,255,0.07); color:#a0a0c0; }
+.ticker-src-rss  { background:rgba(255,107,53,0.12); color:var(--orange); }
+.ticker-src-alert{ background:rgba(129,140,248,0.12); color:var(--blue); }
+@keyframes tickerScroll {
+  0%   { transform:translateX(0); }
+  100% { transform:translateX(-50%); }
+}
+
 /* Hero stats bar */
 .hero-stats {
  position:absolute; bottom:0; left:0; right:0; z-index:2;
@@ -462,6 +507,77 @@ footer { background:var(--surface); border-top:1px solid var(--border); padding:
   .nav-hamburger{display:flex;}
   .nav-links{display:none !important;}
   html,body{overflow-x:hidden;}
+  /* tighter mobile menu - scrollable so all tabs fit */
+  .nav-mobile-menu{justify-content:flex-start;padding:72px 24px 32px;overflow-y:auto;}
+  .nav-mobile-link{font-size:20px;padding:10px 20px;}
+  .nav-mobile-cta{padding:12px 28px !important;font-size:15px !important;margin-top:8px;}
+}
+
+/* ── CATEGORY STRIP ── */
+.cat-section { padding:40px 48px 0; }
+.cat-section-header {
+  display:flex; justify-content:space-between; align-items:flex-end;
+  margin-bottom:16px;
+}
+/* Desktop: auto-fill grid, keeps image cards */
+.cat-scroll-track {
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(150px,1fr));
+  gap:10px;
+}
+.cat-card {
+  position:relative; border-radius:var(--r-lg); overflow:hidden;
+  cursor:pointer; aspect-ratio:4/3; min-height:90px;
+  transition:transform 0.2s, outline 0.15s;
+  outline:2px solid transparent; outline-offset:2px;
+}
+.cat-card:hover { transform:scale(1.02); }
+.cat-card-active { outline-color:var(--orange); }
+.cat-card-img {
+  position:absolute; inset:0; width:100%; height:100%;
+  object-fit:cover; transition:transform 0.4s;
+}
+.cat-card:hover .cat-card-img { transform:scale(1.04); }
+.cat-card-body {
+  position:absolute; inset:0; padding:10px 12px;
+  display:flex; flex-direction:column; justify-content:flex-end;
+}
+.cat-card-name {
+  font-family:var(--font); font-weight:800; font-size:14px;
+  color:#fff; margin-bottom:2px; letter-spacing:-0.02em;
+}
+.cat-card-count {
+  font-family:var(--mono); font-size:9px; color:var(--orange);
+  letter-spacing:0.14em; text-transform:uppercase;
+}
+
+/* Mobile: horizontal scroll row, smaller cards */
+@media(max-width:680px){
+  .cat-section { padding:28px 0 0; }
+  .cat-section-header { padding:0 16px; margin-bottom:14px; }
+  .cat-scroll-track {
+    display:flex;
+    flex-direction:row;
+    overflow-x:auto;
+    overflow-y:visible;
+    gap:10px;
+    padding:4px 16px 16px;
+    scroll-snap-type:x mandatory;
+    -webkit-overflow-scrolling:touch;
+    scrollbar-width:none;
+  }
+  .cat-scroll-track::-webkit-scrollbar { display:none; }
+  .cat-card {
+    flex:0 0 120px;
+    width:120px;
+    min-height:90px;
+    aspect-ratio:unset;
+    height:90px;
+    scroll-snap-align:start;
+    border-radius:10px;
+  }
+  .cat-card-name { font-size:12px; }
+  .cat-card-count { font-size:8px; }
 }
 
 /* ═══ REDESIGN HOME STYLES ═══ */
@@ -1425,6 +1541,19 @@ function renderHome(){
 
    <!-- Hero floating cards - desktop only -->
    <div id="heroCards" class="hero-cards-desktop" style="position:absolute;right:48px;top:50%;transform:translateY(-50%);z-index:3;display:flex;flex-direction:column;gap:10px;width:280px"></div>
+
+   <!-- ── SOCIAL TICKER ── -->
+   <div class="hero-ticker" id="heroTicker">
+     <div class="ticker-label">
+       <span class="ticker-dot"></span>
+       Columbus Buzz
+     </div>
+     <div class="ticker-track-wrap">
+       <div class="ticker-track" id="tickerTrack">
+         <!-- JS populates items x2 for seamless loop -->
+       </div>
+     </div>
+   </div>
  </section>
 
  <!-- ══════════════════════════════════════════
@@ -1446,37 +1575,32 @@ function renderHome(){
  <!-- ══════════════════════════════════════════
       CATEGORY CARDS
  ══════════════════════════════════════════ -->
- <section style="padding:48px 48px 0">
-   <div style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:20px">
+ <!-- ══════════════════════════════════════════
+      CATEGORY STRIP (horizontal scroll on mobile, grid on desktop)
+ ══════════════════════════════════════════ -->
+ <section class="cat-section">
+   <div class="cat-section-header">
      <div>
        <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.2em;text-transform:uppercase;color:var(--orange);margin-bottom:6px">Browse by Category</div>
        <h2 style="font-family:var(--font);font-size:22px;font-weight:800;letter-spacing:-0.03em;color:var(--text)">What are you looking for?</h2>
      </div>
-     <button onclick="showPage('events')" style="font-family:var(--mono);font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:var(--orange);background:none;border:none;cursor:pointer">View All</button>
+     <button onclick="showPage('events')" style="font-family:var(--mono);font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:var(--orange);background:none;border:none;cursor:pointer;white-space:nowrap">View All</button>
    </div>
-   <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px">
-     <div id="catAll" onclick="filterHomeMap('All',this)"
-       style="position:relative;border-radius:var(--r-lg);overflow:hidden;cursor:pointer;transition:transform 0.2s;aspect-ratio:4/3;min-height:100px;outline:3px solid var(--orange);outline-offset:2px"
-       onmouseover="this.style.transform='scale(1.02)'"
-       onmouseout="this.style.transform='scale(1)'" role="button" tabindex="0">
+   <div class="cat-scroll-track">
+     <div id="catAll" class="cat-card cat-card-active" onclick="filterHomeMap('All',this)" role="button" tabindex="0">
        <div style="position:absolute;inset:0;background:linear-gradient(135deg,#1a0800,#0f0f1a)"></div>
-       <div style="position:absolute;inset:0;padding:14px 16px;display:flex;flex-direction:column;justify-content:flex-end">
-         <div style="font-family:var(--font);font-weight:800;font-size:15px;color:#fff;margin-bottom:3px;letter-spacing:-0.02em">All Events</div>
-         <div style="font-family:var(--mono);font-size:9px;color:var(--orange);letter-spacing:0.14em;text-transform:uppercase">${allEvents.length} total</div>
+       <div class="cat-card-body">
+         <div class="cat-card-name">All Events</div>
+         <div class="cat-card-count">${allEvents.length} total</div>
        </div>
      </div>
      ${CATEGORIES.map(cat=>`
-       <div id="cat${cat.key}" onclick="filterHomeMap('${cat.key}',this)"
-         style="position:relative;border-radius:var(--r-lg);overflow:hidden;cursor:pointer;transition:all 0.2s;aspect-ratio:4/3;min-height:100px"
-         onmouseover="this.style.transform='scale(1.02)'"
-         onmouseout="this.style.transform='scale(1)'" role="button" tabindex="0">
-         <img src="${cat.img}" alt="${cat.name}"
-           style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:transform 0.4s"
-           loading="lazy" onerror="this.style.display='none'">
-         <div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(8,8,16,0.92) 0%,rgba(8,8,16,0.4) 50%,rgba(8,8,16,0.15) 100%)"></div>
-         <div style="position:absolute;inset:0;padding:14px 16px;display:flex;flex-direction:column;justify-content:flex-end">
-           <div style="font-family:var(--font);font-weight:800;font-size:15px;color:#fff;margin-bottom:3px;letter-spacing:-0.02em">${cat.name}</div>
-           <div style="font-family:var(--mono);font-size:9px;color:var(--orange);letter-spacing:0.14em;text-transform:uppercase">${cat.count} event${cat.count!==1?'s':''}</div>
+       <div id="cat${cat.key}" class="cat-card" onclick="filterHomeMap('${cat.key}',this)" role="button" tabindex="0">
+         <img src="${cat.img}" alt="${cat.name}" class="cat-card-img" loading="lazy" onerror="this.style.display='none'">
+         <div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(8,8,16,0.88) 0%,rgba(8,8,16,0.3) 60%,transparent 100%)"></div>
+         <div class="cat-card-body">
+           <div class="cat-card-name">${cat.name}</div>
+           <div class="cat-card-count">${cat.count} event${cat.count!==1?'s':''}</div>
          </div>
        </div>`).join('')}
    </div>
@@ -2803,6 +2927,34 @@ async function toggleSaveEvent(eventId, btn, e){
   }
 }
 
+</script>
+<script>
+// ── SOCIAL TICKER ─────────────────────────────────────────────
+(function initTicker(){
+  var TICKER_ITEMS = [
+    { src:'rss',   label:'Columbus Underground', text:'Spring festival season is ramping up across Short North and the Arena District' },
+    { src:'x',     label:'@marloncolumbus',      text:'The energy in Columbus right now is unmatched. Vendors: get on @cbusevents before this city blows up' },
+    { src:'alert', label:'Google Alert',         text:'Columbus events scene sees surge in independent venue bookings outside major ticketing platforms' },
+    { src:'rss',   label:'Experience Columbus',  text:'40+ new community events launching this April across the city' },
+    { src:'x',     label:'@djreese614',          text:'Booked two gigs through the vendor network this month. #cbusevents is doing something different' },
+    { src:'alert', label:'Google Alert',         text:'Reddit r/Columbus: best way to find local events thread hitting 200+ comments' },
+    { src:'x',     label:'@tanya.cbus',          text:'Looking for Columbus events this weekend - anyone have a single go-to spot?' },
+    { src:'rss',   label:'Columbus Underground', text:'Short North Gallery Hop drawing record crowds as local artists expand April programming' },
+  ];
+  var srcClass = { rss:'ticker-src-rss', x:'ticker-src-x', alert:'ticker-src-alert' };
+  var srcLabel = { rss:'RSS', x:'X', alert:'Alert' };
+  function buildItem(item){
+    return '<span class="ticker-item">'
+      + '<span class="ticker-source ' + srcClass[item.src] + '">' + srcLabel[item.src] + '</span>'
+      + '<span style="font-family:var(--mono);font-size:9px;color:var(--muted);letter-spacing:0.06em">' + item.label + '</span>'
+      + '<span>' + item.text + '</span>'
+      + '</span>';
+  }
+  var track = document.getElementById('tickerTrack');
+  if(!track) return;
+  var html = TICKER_ITEMS.map(buildItem).join('');
+  track.innerHTML = html + html;
+})();
 </script>
 <script>
 (function(){
