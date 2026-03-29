@@ -68,39 +68,6 @@ body { background: var(--bg); color: var(--text); font-family: var(--font); disp
 @keyframes pulse   { 0%,100%{opacity:1} 50%{opacity:0.35} }
 @keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
 
-/* ════════════════════════
-   TIER DEMO TOGGLE
-════════════════════════ */
-.tier-toggle {
-  position: fixed;
-  bottom: 24px;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 999;
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: var(--r-full);
-  padding: 4px;
-  box-shadow: 0 8px 40px rgba(0,0,0,0.6);
-}
-.tier-btn {
-  font-family: var(--mono);
-  font-size: 10px;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  padding: 8px 18px;
-  border-radius: var(--r-full);
-  border: none;
-  cursor: pointer;
-  transition: all 0.2s;
-  background: transparent;
-  color: var(--muted);
-}
-.tier-btn.active { background: var(--orange); color: #fff; font-weight: 700; }
-.tier-label { font-family: var(--mono); font-size: 9px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); padding: 0 10px; }
 
 /* ════════════════════════
    SIDEBAR
@@ -190,39 +157,7 @@ body { background: var(--bg); color: var(--text); font-family: var(--font); disp
 .nav-item svg { width: 15px; height: 15px; flex-shrink: 0; opacity: 0.65; }
 .nav-badge { background: var(--orange); color: #fff; border-radius: var(--r-full); padding: 1px 8px; font-size: 9px; font-weight: 800; margin-left: auto; }
 
-/* Locked nav item */
-.nav-item.locked { opacity: 0.45; cursor: default; }
-.nav-item.locked:hover { background: transparent; color: var(--sub); border-left-color: transparent; }
-.lock-icon { margin-left: auto; }
-.lock-icon svg { width: 11px; height: 11px; color: var(--muted); opacity: 0.7; }
-
 .sidebar-bottom { margin-top: auto; padding: 18px; border-top: 1px solid var(--border-sub); }
-
-/* Upgrade prompt in sidebar */
-.upgrade-prompt {
-  background: var(--orange-dim);
-  border: 1px solid var(--orange-border);
-  border-radius: var(--r-md);
-  padding: 12px 14px;
-  margin-bottom: 10px;
-}
-.upgrade-prompt-title { font-size: 12px; font-weight: 700; color: var(--orange); margin-bottom: 4px; letter-spacing: -0.01em; }
-.upgrade-prompt-text { font-size: 11px; color: var(--sub); line-height: 1.5; margin-bottom: 10px; }
-.btn-upgrade {
-  width: 100%;
-  background: var(--orange);
-  color: #fff;
-  font-family: var(--font);
-  font-weight: 700;
-  font-size: 11px;
-  letter-spacing: 0.02em;
-  padding: 8px;
-  border: none;
-  border-radius: var(--r-sm);
-  cursor: pointer;
-  transition: opacity 0.2s;
-}
-.btn-upgrade:hover { opacity: 0.9; }
 
 /* ════════════════════════
    MAIN
@@ -455,83 +390,7 @@ body { background: var(--bg); color: var(--text); font-family: var(--font); disp
 .planner-card-avail.limited { color: var(--gold); }
 
 /* ════════════════════════
-   FREEMIUM BLUR TREATMENT
-   Applied to growth tools
-════════════════════════ */
-.locked-feature {
-  position: relative;
-  border-radius: var(--r-lg);
-  overflow: hidden;
-}
-
-.locked-feature .locked-content {
-  filter: blur(4px);
-  pointer-events: none;
-  user-select: none;
-  opacity: 0.6;
-}
-
-.locked-overlay {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  background: rgba(8,8,16,0.55);
-  backdrop-filter: blur(2px);
-  z-index: 10;
-  text-align: center;
-  padding: 24px;
-}
-
-.locked-overlay-title {
-  font-size: 15px;
-  font-weight: 700;
-  letter-spacing: -0.02em;
-  color: var(--text);
-  margin-bottom: 6px;
-}
-
-.locked-overlay-sub {
-  font-size: 12px;
-  color: var(--sub);
-  line-height: 1.55;
-  max-width: 280px;
-  margin-bottom: 16px;
-}
-
-.btn-unlock {
-  background: var(--orange);
-  color: #fff;
-  font-family: var(--font);
-  font-weight: 700;
-  font-size: 12px;
-  letter-spacing: 0.02em;
-  padding: 9px 22px;
-  border: none;
-  border-radius: var(--r-md);
-  cursor: pointer;
-  transition: opacity 0.2s, transform 0.15s;
-  box-shadow: 0 4px 20px rgba(255,107,53,0.3);
-}
-.btn-unlock:hover { opacity: 0.9; transform: translateY(-1px); }
-
-.locked-tier-badge {
-  font-family: var(--mono);
-  font-size: 9px;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  padding: 3px 10px;
-  border-radius: var(--r-full);
-  margin-bottom: 10px;
-  display: inline-block;
-}
-.locked-tier-badge.standard { background: var(--orange-dim); color: var(--orange); border: 1px solid var(--orange-border); }
-.locked-tier-badge.premium  { background: rgba(251,191,36,0.1); color: var(--gold); border: 1px solid rgba(251,191,36,0.2); }
-
-/* ════════════════════════
-   GROWTH TOOLS (blurred for free tier)
+   GROWTH TOOLS
 ════════════════════════ */
 
 /* Recommendation engine */
@@ -644,7 +503,7 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
   <div class="sidebar-customer">
     <div class="customer-initials" id="sidebarInitials">CB</div>
     <div class="customer-name" id="sidebarName">Account</div>
-    <div class="customer-tier tier-free" id="sidebarTier">Free</div>
+    <div class="customer-tier tier-free" id="sidebarTier">Member</div>
   </div>
 
   <div class="sidebar-section">Discover</div>
@@ -672,24 +531,16 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
     Hire a Planner
   </a>
 
-  <!-- Locked nav items for free tier -->
-  <a class="nav-item locked" id="navRecommendations" href="#">
+  <a class="nav-item" id="navRecommendations" href="#">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
     Recommendations
-    <span class="lock-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></span>
   </a>
-  <a class="nav-item locked" id="navNotifications" href="#">
+  <a class="nav-item" id="navNotifications" href="#">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
     Priority Alerts
-    <span class="lock-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></span>
   </a>
 
   <div class="sidebar-bottom">
-    <div class="upgrade-prompt" id="sidebarUpgrade">
-      <div class="upgrade-prompt-title" id="upgradeTitle">Unlock More</div>
-      <div class="upgrade-prompt-text" id="upgradeText">Get personalized recommendations and priority event alerts.</div>
-      <button class="btn-upgrade" id="upgradeBtn">Upgrade Now</button>
-    </div>
   </div>
 </aside>
 
@@ -889,9 +740,8 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
     <!-- GROWTH TOOLS (gated) -->
     <div class="two-col">
 
-      <!-- Personalized Recommendations — Standard+ -->
-      <div class="locked-feature" id="featureRec">
-        <div class="locked-content">
+      <!-- Personalized Recommendations -->
+      <div id="featureRec">
           <div class="table-card" style="margin-bottom:0;">
             <div class="table-header">
               <div>
@@ -926,18 +776,10 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
               </div>
             </div>
           </div>
-        </div>
-        <div class="locked-overlay" id="recOverlay">
-          <span class="locked-tier-badge standard">Standard</span>
-          <div class="locked-overlay-title">Events picked for you</div>
-          <div class="locked-overlay-sub">Your listing is visible. Upgrade to get personalized event recommendations based on your taste and history.</div>
-          <button class="btn-unlock" onclick="setTier('standard')">Unlock Recommendations</button>
-        </div>
       </div>
 
-      <!-- Priority Alerts — Standard+ -->
-      <div class="locked-feature" id="featureAlerts">
-        <div class="locked-content">
+      <!-- Priority Alerts -->
+      <div id="featureAlerts">
           <div class="table-card" style="margin-bottom:0;">
             <div class="table-header">
               <div class="table-title">Priority Alerts</div>
@@ -963,13 +805,6 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
               <div class="notif-time">2d ago</div>
             </div>
           </div>
-        </div>
-        <div class="locked-overlay" id="alertsOverlay">
-          <span class="locked-tier-badge standard">Standard</span>
-          <div class="locked-overlay-title">Never miss a moment</div>
-          <div class="locked-overlay-sub">Get alerts when saved events sell out, drop new lineups, or offer early bird pricing.</div>
-          <button class="btn-unlock" onclick="setTier('standard')">Unlock Priority Alerts</button>
-        </div>
       </div>
 
     </div>
@@ -977,13 +812,6 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
   </div>
 </div>
 
-<!-- TIER TOGGLE -->
-<div class="tier-toggle">
-  <span class="tier-label">Preview as</span>
-  <button class="tier-btn active" id="btnFree"     onclick="setTier('free')">Free</button>
-  <button class="tier-btn"        id="btnStandard" onclick="setTier('standard')">Standard</button>
-  <button class="tier-btn"        id="btnPremium"  onclick="setTier('premium')">Premium</button>
-</div>
 
 <script src="https://unpkg.com/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <script>
@@ -993,53 +821,7 @@ const sb=supabase.createClient(SB_URL,SB_KEY);
 let currentUser=null;
 window.currentTab='signin'; let currentTab=window.currentTab;
 
-// ── TIER TOGGLE (demo) ──────────────────────────────────────
-window.setTier = function setTier(tier) {
-  document.querySelectorAll('.tier-btn').forEach(b=>b.classList.remove('active'));
-  const btn=document.getElementById('btn'+tier.charAt(0).toUpperCase()+tier.slice(1));
-  if(btn)btn.classList.add('active');
-  const recFeature=document.getElementById('featureRec');
-  const alertsFeature=document.getElementById('featureAlerts');
-  const recOverlay=document.getElementById('recOverlay');
-  const alertsOverlay=document.getElementById('alertsOverlay');
-  const sidebarTier=document.getElementById('sidebarTier');
-  const upgradeBlock=document.getElementById('sidebarUpgrade');
-  const navRec=document.getElementById('navRecommendations');
-  const navAlerts=document.getElementById('navNotifications');
-  const upgradeTitle=document.getElementById('upgradeTitle');
-  const upgradeText=document.getElementById('upgradeText');
-  const welcomeSub=document.getElementById('welcomeSub');
-  if(tier==='free'){
-    if(recFeature)recFeature.querySelector('.locked-content').style.filter='blur(4px)';
-    if(alertsFeature)alertsFeature.querySelector('.locked-content').style.filter='blur(4px)';
-    if(recOverlay)recOverlay.style.display='flex';
-    if(alertsOverlay)alertsOverlay.style.display='flex';
-    if(sidebarTier){sidebarTier.className='customer-tier tier-free';sidebarTier.textContent='Free';}
-    if(upgradeBlock)upgradeBlock.style.display='block';
-    if(navRec)navRec.classList.add('locked');
-    if(navAlerts)navAlerts.classList.add('locked');
-  } else if(tier==='standard'){
-    if(recFeature)recFeature.querySelector('.locked-content').style.filter='none';
-    if(alertsFeature)alertsFeature.querySelector('.locked-content').style.filter='none';
-    if(recOverlay)recOverlay.style.display='none';
-    if(alertsOverlay)alertsOverlay.style.display='none';
-    if(sidebarTier){sidebarTier.className='customer-tier tier-standard';sidebarTier.textContent='Standard';}
-    if(upgradeBlock)upgradeBlock.style.display='block';
-    if(upgradeTitle)upgradeTitle.textContent='Go Premium';
-    if(upgradeText)upgradeText.textContent='Get priority placement, advanced insights, and exclusive early access.';
-    if(navRec)navRec.classList.remove('locked');
-    if(navAlerts)navAlerts.classList.remove('locked');
-  } else if(tier==='premium'){
-    if(recFeature)recFeature.querySelector('.locked-content').style.filter='none';
-    if(alertsFeature)alertsFeature.querySelector('.locked-content').style.filter='none';
-    if(recOverlay)recOverlay.style.display='none';
-    if(alertsOverlay)alertsOverlay.style.display='none';
-    if(sidebarTier){sidebarTier.className='customer-tier tier-premium';sidebarTier.textContent='Premium';}
-    if(upgradeBlock)upgradeBlock.style.display='none';
-    if(navRec)navRec.classList.remove('locked');
-    if(navAlerts)navAlerts.classList.remove('locked');
-  }
-}
+
 
 // ── AUTH ────────────────────────────────────────────────────
 window.switchTab = function switchTab(tab){
