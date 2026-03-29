@@ -507,35 +507,35 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
   </div>
 
   <div class="sidebar-section">Discover</div>
-  <a class="nav-item active" href="#">
+  <a class="nav-item active" href="#" onclick="showSection('dashboard');return false;" data-section="dashboard">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
     Dashboard
   </a>
-  <a class="nav-item" href="#">
+  <a class="nav-item" href="#" onclick="window.open('https://cbusevents.com','_blank');return false;">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
     Browse Events
   </a>
-  <a class="nav-item" href="#">
+  <a class="nav-item" href="#" onclick="showSection('saved');return false;" data-section="saved">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
     Saved Events
     <span class="nav-badge">4</span>
   </a>
-  <a class="nav-item" href="#">
+  <a class="nav-item" href="#" onclick="showSection('tickets');return false;" data-section="tickets">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v2z"/></svg>
     My Tickets
   </a>
 
   <div class="sidebar-section">Plan</div>
-  <a class="nav-item" href="#">
+  <a class="nav-item" href="#" onclick="showSection('planner');return false;" data-section="planner">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
     Hire a Planner
   </a>
 
-  <a class="nav-item" id="navRecommendations" href="#">
+  <a class="nav-item" id="navRecommendations" href="#" onclick="showSection('recommendations');return false;" data-section="recommendations">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
     Recommendations
   </a>
-  <a class="nav-item" id="navNotifications" href="#">
+  <a class="nav-item" id="navNotifications" href="#" onclick="showSection('alerts');return false;" data-section="alerts">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
     Priority Alerts
   </a>
@@ -558,6 +558,7 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
   <div class="content" id="main-content">
 
     <!-- WELCOME STRIP -->
+    <!-- SECTION: dashboard -->
     <div class="welcome-strip">
       <div class="welcome-text">
         <div class="welcome-greeting">Welcome back</div>
@@ -580,6 +581,7 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
       </div>
     </div>
 
+    <div id="section-dashboard">
     <!-- UPCOMING EVENTS - live from Supabase -->
     <div class="table-card">
       <div class="table-header">
@@ -598,12 +600,13 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
     </div>
 
     <!-- TICKET HISTORY - live from Supabase -->
-    <div class="table-card">
+    <div class="table-card" id="ticketsSection">
       <div class="table-header">
         <div class="table-title">My Tickets</div>
         <button class="btn btn-ghost btn-sm">View All</button>
       </div>
 
+      <div id="ticketsContainer">
       <div class="ticket-row">
         <div class="ticket-date-block"><div class="ticket-date-month">Apr</div><div class="ticket-date-day">26</div></div>
         <div class="ticket-info">
@@ -639,11 +642,12 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
           <div class="ticket-price" style="color:var(--sub)">$92.00</div>
         </div>
       </div>
+      </div><!-- /ticketsContainer -->
 
     </div>
 
     <!-- HIRE A PLANNER — Discovery layer -->
-    <div class="planner-section">
+    <div class="planner-section" id="plannerSection">
       <div class="planner-section-header">
         <div>
           <div class="planner-discover-label">New on CBUSEVENTS</div>
@@ -808,6 +812,7 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
       </div>
 
     </div>
+    </div><!-- /section-dashboard -->
 
   </div>
 </div>
@@ -986,6 +991,66 @@ async function loadLiveTickets(user){
       +'</div></div>';
   }).join('');
 }
+
+// ── NAV ROUTER ──────────────────────────────────────────────
+const SECTION_TITLES = {
+  dashboard:       'My Dashboard',
+  saved:           'Saved Events',
+  tickets:         'My Tickets',
+  planner:         'Hire a Planner',
+  recommendations: 'Recommended For You',
+  alerts:          'Priority Alerts',
+};
+
+window.showSection = function showSection(section) {
+  // Update active nav item
+  document.querySelectorAll('.nav-item[data-section]').forEach(el => {
+    el.classList.toggle('active', el.dataset.section === section);
+  });
+
+  // Update topbar title
+  const titleEl = document.getElementById('topbarTitle');
+  if (titleEl) titleEl.textContent = SECTION_TITLES[section] || 'My Dashboard';
+
+  // All content lives in section-dashboard wrapper - show/hide subsections
+  const dashboard = document.getElementById('section-dashboard');
+  if (!dashboard) return;
+
+  if (section === 'dashboard') {
+    // Show everything
+    dashboard.querySelectorAll('[data-hide-on]').forEach(el => el.style.display = '');
+    return;
+  }
+
+  // Map sections to their anchor elements
+  const sectionMap = {
+    saved:           document.getElementById('savedSection'),
+    tickets:         document.getElementById('ticketsSection'),
+    planner:         document.getElementById('plannerSection'),
+    recommendations: document.getElementById('featureRec'),
+    alerts:          document.getElementById('featureAlerts'),
+  };
+
+  const target = sectionMap[section];
+  if (target) {
+    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    // Briefly highlight
+    target.style.outline = '2px solid var(--orange)';
+    target.style.outlineOffset = '4px';
+    setTimeout(() => { target.style.outline = ''; target.style.outlineOffset = ''; }, 1200);
+  }
+};
+
+// ── FILTER CHIPS ────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', function() {
+  document.querySelectorAll('.filter-chip').forEach(chip => {
+    chip.addEventListener('click', function() {
+      const parent = this.closest('.planner-section-header, .filter-row');
+      if (parent) parent.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+      this.classList.add('active');
+    });
+  });
+});
 
 // ── INIT ────────────────────────────────────────────────────
 (async function init(){
