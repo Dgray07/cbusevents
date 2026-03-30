@@ -693,27 +693,36 @@ function prefillProfile(){
  document.getElementById('profYears').value=f.years_in_business||'';
 }
 
-function handleCoverPhoto(e){
+async function handleCoverPhoto(e){
  const file=e.target.files[0];
  if(!file)return;
- const reader=new FileReader();
- reader.onload=ev=>{
-   const img=new Image();
-   img.onload=()=>{
-     const canvas=document.createElement('canvas');
-     const size=Math.min(img.width,img.height);
-     canvas.width=400;canvas.height=400;
-     const ctx=canvas.getContext('2d');
-     const sx=(img.width-size)/2,sy=(img.height-size)/2;
-     ctx.drawImage(img,sx,sy,size,size,0,0,400,400);
-     const data=canvas.toDataURL('image/jpeg',0.85);
-     const prev=document.getElementById('profCoverPreview');
-     prev.innerHTML=`<img src="${data}" style="width:100%;height:100%;object-fit:cover">`;
-     prev.dataset.imgData=data;
-   };
-   img.src=ev.target.result;
- };
- reader.readAsDataURL(file);
+ const prev=document.getElementById('profCoverPreview');
+ if(prev) prev.innerHTML='<div style="display:flex;align-items:center;justify-content:center;height:100%;color:var(--sub);font-size:13px">Uploading...</div>';
+ try {
+   // Convert using createImageBitmap for iOS HEIC support
+   const bitmap = await createImageBitmap(file);
+   const canvas = document.createElement('canvas');
+   const size = Math.min(bitmap.width, bitmap.height);
+   canvas.width = 600; canvas.height = 600;
+   const ctx = canvas.getContext('2d');
+   const sx = (bitmap.width - size) / 2, sy = (bitmap.height - size) / 2;
+   ctx.drawImage(bitmap, sx, sy, size, size, 0, 0, 600, 600);
+   bitmap.close();
+   const blob = await new Promise(res => canvas.toBlob(res, 'image/jpeg', 0.85));
+   // Upload to Supabase Storage
+   const path = `vendors/${currentUser.id}/cover_${Date.now()}.jpg`;
+   const { error: upErr } = await sb.storage.from('vendor-portfolio').upload(path, blob, { upsert: true, contentType: 'image/jpeg' });
+   if(upErr) throw upErr;
+   const { data: urlData } = sb.storage.from('vendor-portfolio').getPublicUrl(path);
+   const url = urlData.publicUrl;
+   if(prev) {
+     prev.innerHTML = `<img src="${url}" style="width:100%;height:100%;object-fit:cover">`;
+     prev.dataset.imgData = url;
+   }
+ } catch(err) {
+   console.error('Cover upload error:', err);
+   if(prev) prev.innerHTML = '<div style="color:#f87171;font-size:12px;padding:8px">Upload failed. Try a JPEG or PNG.</div>';
+ }
  e.target.value='';
 }
 
@@ -842,13 +851,29 @@ async function handlePhotoUpload(event){
    bar.style.width=`${Math.round(((i+0.5)/files.length)*100)}%`;
 
    try {
-     // Compress to reasonable size then store as data URL
-     // This works without any storage bucket setup
-     const dataUrl = await compressImage(file, 1000, 0.78);
-     portfolioPhotos=[...portfolioPhotos, dataUrl];
+     // Upload to Supabase Storage - handles HEIC/HEIF from iPhone
+     const bitmap = await createImageBitmap(file);
+     const canvas = document.createElement('canvas');
+     let w = bitmap.width, h = bitmap.height;
+     if(w > 1200){ h = Math.round(h*(1200/w)); w = 1200; }
+     canvas.width = w; canvas.height = h;
+     canvas.getContext('2d').drawImage(bitmap, 0, 0, w, h);
+     bitmap.close();
+     const blob = await new Promise(res => canvas.toBlob(res, 'image/jpeg', 0.82));
+     const path = `vendors/${currentUser.id}/portfolio_${Date.now()}_${Math.random().toString(36).slice(2)}.jpg`;
+     const { error: upErr } = await sb.storage.from('vendor-portfolio').upload(path, blob, { upsert: true, contentType: 'image/jpeg' });
+     if(upErr) throw upErr;
+     const { data: urlData } = sb.storage.from('vendor-portfolio').getPublicUrl(path);
+     portfolioPhotos = [...portfolioPhotos, urlData.publicUrl];
      uploaded++;
    } catch(e){
-     console.error('Photo error:',e);
+     console.error('Photo upload error:', e);
+     // Fallback to base64
+     try {
+       const dataUrl = await compressImage(file, 1000, 0.78);
+       portfolioPhotos = [...portfolioPhotos, dataUrl];
+       uploaded++;
+     } catch(e2){ console.error('Fallback also failed:', e2); }
    }
  }
 
@@ -863,27 +888,44 @@ async function handlePhotoUpload(event){
  toast(`${uploaded} photo${uploaded>1?'s':''} added!`);
 }
 
-function compressImage(file, maxWidth, quality){
- return new Promise((resolve, reject)=>{
-   const reader=new FileReader();
-   reader.onload=(e)=>{
-     const img=new Image();
-     img.onload=()=>{
-       try {
-         const canvas=document.createElement('canvas');
-         let w=img.width, h=img.height;
-         if(w>maxWidth){h=Math.round(h*(maxWidth/w));w=maxWidth;}
-         canvas.width=w; canvas.height=h;
-         canvas.getContext('2d').drawImage(img,0,0,w,h);
-         resolve(canvas.toDataURL('image/jpeg', quality));
-       } catch(e){ reject(e); }
+async function compressImage(file, maxWidth, quality){
+ // Use createImageBitmap for iOS HEIC/HEIF support
+ try {
+   const bitmap = await createImageBitmap(file);
+   const canvas = document.createElement('canvas');
+   let w = bitmap.width, h = bitmap.height;
+   if(w > maxWidth){ h = Math.round(h*(maxWidth/w)); w = maxWidth; }
+   canvas.width = w; canvas.height = h;
+   canvas.getContext('2d').drawImage(bitmap, 0, 0, w, h);
+   bitmap.close();
+   return new Promise(res => canvas.toBlob(blob => {
+     const reader = new FileReader();
+     reader.onload = e => res(e.target.result);
+     reader.readAsDataURL(blob);
+   }, 'image/jpeg', quality));
+ } catch(e) {
+   // Fallback to FileReader for non-HEIC
+   return new Promise((resolve, reject) => {
+     const reader = new FileReader();
+     reader.onload = (e) => {
+       const img = new Image();
+       img.onload = () => {
+         try {
+           const canvas = document.createElement('canvas');
+           let w = img.width, h = img.height;
+           if(w > maxWidth){ h = Math.round(h*(maxWidth/w)); w = maxWidth; }
+           canvas.width = w; canvas.height = h;
+           canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+           resolve(canvas.toDataURL('image/jpeg', quality));
+         } catch(e){ reject(e); }
+       };
+       img.onerror = reject;
+       img.src = e.target.result;
      };
-     img.onerror=reject;
-     img.src=e.target.result;
-   };
-   reader.onerror=reject;
-   reader.readAsDataURL(file);
- });
+     reader.onerror = reject;
+     reader.readAsDataURL(file);
+   });
+ }
 }
 
 function fileToDataUrl(file){

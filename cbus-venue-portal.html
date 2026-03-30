@@ -516,38 +516,42 @@ function VenueForm({venue,onSave}) {
  const [toast,setToast]=useState({msg:"",type:"success"});
  const set=k=>e=>setF(p=>({...p,[k]:e.target.value}));
 
- const compressImage=(file,maxWidth=1200,quality=0.82)=>new Promise((resolve,reject)=>{
-   const reader=new FileReader();
-   reader.onload=e=>{
-     const img=new Image();
-     img.onload=()=>{
-       try{
-         const canvas=document.createElement('canvas');
-         let w=img.width,h=img.height;
-         if(w>maxWidth){h=Math.round(h*(maxWidth/w));w=maxWidth;}
-         canvas.width=w;canvas.height=h;
-         canvas.getContext('2d').drawImage(img,0,0,w,h);
-         resolve(canvas.toDataURL('image/jpeg',quality));
-       }catch(e){reject(e);}
-     };
-     img.onerror=reject;
-     img.src=e.target.result;
-   };
-   reader.onerror=reject;
-   reader.readAsDataURL(file);
- });
+const uploadImageToStorage = async (file, bucket, path) => {
+   // Use createImageBitmap for HEIC/HEIF support on iOS
+   let blob = file;
+   try {
+     const bitmap = await createImageBitmap(file);
+     const canvas = document.createElement('canvas');
+     let w = bitmap.width, h = bitmap.height;
+     const maxW = 1400;
+     if (w > maxW) { h = Math.round(h * (maxW / w)); w = maxW; }
+     canvas.width = w; canvas.height = h;
+     canvas.getContext('2d').drawImage(bitmap, 0, 0, w, h);
+     blob = await new Promise(res => canvas.toBlob(res, 'image/jpeg', 0.85));
+     bitmap.close();
+   } catch(e) {
+     console.warn('createImageBitmap failed, using original file:', e);
+   }
+   const { data, error } = await sb.storage.from(bucket).upload(path, blob, {
+     upsert: true, contentType: 'image/jpeg'
+   });
+   if (error) throw error;
+   const { data: urlData } = sb.storage.from(bucket).getPublicUrl(path);
+   return urlData.publicUrl;
+ };
 
  const handleCoverPhoto=async(e)=>{
    const file=e.target.files[0];
    if(!file)return;
    try{
-     setToast({msg:'Compressing photo...',type:'success'});
-     const dataUrl=await compressImage(file);
-     setF(p=>({...p,cover_image_url:dataUrl}));
-     setToast({msg:'Photo ready — click Save to apply',type:'success'});
+     setToast({msg:'Uploading photo...',type:'success'});
+     const path=`venues/${user.id}/cover_${Date.now()}.jpg`;
+     const url = await uploadImageToStorage(file, 'venue-photos', path);
+     setF(p=>({...p,cover_image_url:url}));
+     setToast({msg:'Photo uploaded — click Save to apply',type:'success'});
      setTimeout(()=>setToast({msg:''}),3000);
    }catch(err){
-     setToast({msg:'Photo failed: '+err.message,type:'error'});
+     setToast({msg:'Upload failed: '+err.message,type:'error'});
    }
    e.target.value='';
  };
@@ -617,20 +621,29 @@ function VenueForm({venue,onSave}) {
  <input type="file" id="spacePhotoInput" accept="image/*" multiple style={{display:"none"}} onChange={async(e)=>{
    const files=Array.from(e.target.files).slice(0,6-(f.photos||[]).length);
    const compressed=await Promise.all(files.map(file=>new Promise((res)=>{
-     const reader=new FileReader();
-     reader.onload=ev=>{
-       const img=new Image();
-       img.onload=()=>{
-         const canvas=document.createElement('canvas');
-         let w=img.width,h=img.height;
-         if(w>1200){h=Math.round(h*(1200/w));w=1200;}
-         canvas.width=w;canvas.height=h;
-         canvas.getContext('2d').drawImage(img,0,0,w,h);
-         res(canvas.toDataURL('image/jpeg',0.82));
-       };
-       img.src=ev.target.result;
-     };
-     reader.readAsDataURL(file);
+     // Upload to storage using createImageBitmap for iOS HEIC support
+     try {
+       const bitmap = await createImageBitmap(file);
+       const canvas = document.createElement('canvas');
+       let w = bitmap.width, h = bitmap.height;
+       if(w>1200){h=Math.round(h*(1200/w));w=1200;}
+       canvas.width=w;canvas.height=h;
+       canvas.getContext('2d').drawImage(bitmap,0,0,w,h);
+       const blob = await new Promise(r=>canvas.toBlob(r,'image/jpeg',0.82));
+       bitmap.close();
+       const path = `venues/${user.id}/photo_${Date.now()}_${Math.random().toString(36).slice(2)}.jpg`;
+       const {error:upErr} = await sb.storage.from('venue-photos').upload(path, blob, {upsert:true,contentType:'image/jpeg'});
+       if(upErr) throw upErr;
+       const {data:urlData} = sb.storage.from('venue-photos').getPublicUrl(path);
+       return urlData.publicUrl;
+     } catch(e) {
+       // fallback to FileReader base64
+       return new Promise(res => {
+         const reader=new FileReader();
+         reader.onload=ev=>res(ev.target.result);
+         reader.readAsDataURL(file);
+       });
+     }
    })));
    setF(p=>({...p,photos:[...(p.photos||[]),...compressed].slice(0,6)}));
    e.target.value='';
