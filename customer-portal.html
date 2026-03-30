@@ -453,6 +453,20 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
 @media(prefers-reduced-motion:reduce){
   *,*::before,*::after{animation-duration:0.01ms!important;animation-iteration-count:1!important;transition-duration:0.01ms!important;}
 }
+
+/* ── PORTAL MOBILE BOTTOM NAV ── */
+.portal-mobile-nav{display:none;position:fixed;bottom:0;left:0;right:0;background:var(--surface);border-top:1px solid var(--border);z-index:300;padding-bottom:env(safe-area-inset-bottom);}
+.portal-mobile-nav-inner{display:flex;align-items:stretch;height:58px;padding:0 4px;}
+.pmn-btn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;background:none;border:none;cursor:pointer;color:var(--sub);font-size:9px;font-weight:600;transition:color 0.15s;padding:4px 2px;font-family:'DM Sans',sans-serif;letter-spacing:0.02em;text-transform:uppercase;}
+.pmn-btn.active{color:#FF6B35;}
+.pmn-btn svg{width:20px;height:20px;flex-shrink:0;}
+.pmn-icon{position:relative;display:inline-flex;}
+.pmn-badge{position:absolute;top:-3px;right:-6px;background:#FF6B35;color:#fff;border-radius:99px;font-size:8px;font-weight:800;padding:1px 4px;min-width:14px;text-align:center;line-height:1.4;}
+
+@media(max-width:860px){
+  .portal-mobile-nav{display:block;}
+  .content{padding-bottom:76px !important;}
+}
 </style>
 <script src="https://unpkg.com/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 </head>
@@ -1144,5 +1158,50 @@ document.addEventListener('DOMContentLoaded', function(){
 });
 </script>
 
+
+<div class="portal-mobile-nav" id="customerMobileNav">
+  <div class="portal-mobile-nav-inner">
+  <button class="pmn-btn" id="pmn-dashboard" onclick="showSection('dashboard')">
+    <div class="pmn-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg></div>
+    <span>Home</span>
+  </button>
+  <button class="pmn-btn" id="pmn-saved" onclick="showSection('saved')">
+    <div class="pmn-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg></div>
+    <span>Saved</span>
+  </button>
+  <button class="pmn-btn" id="pmn-tickets" onclick="showSection('tickets')">
+    <div class="pmn-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 9a3 3 0 010-6h20a3 3 0 010 6v1a3 3 0 000 6v1a3 3 0 01-20 0v-1a3 3 0 010-6V9z"/></svg></div>
+    <span>Tickets</span>
+  </button>
+  <button class="pmn-btn" id="pmn-inbox" onclick="showSection('inbox')">
+    <div class="pmn-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></div>
+    <span>Inbox</span>
+  </button>
+  <button class="pmn-btn" id="pmn-profile" onclick="showSection('profile')">
+    <div class="pmn-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
+    <span>Profile</span>
+  </button>
+  </div>
+</div>
+<script>
+(function(){
+  function syncCustomerMobileNav(section){
+    document.querySelectorAll('.pmn-btn').forEach(function(b){b.classList.remove('active');});
+    var btn=document.getElementById('pmn-'+section);
+    if(btn)btn.classList.add('active');
+  }
+  var checkShow=setInterval(function(){
+    if(typeof window.showSection==='function'){
+      clearInterval(checkShow);
+      var orig=window.showSection;
+      window.showSection=function(s){
+        orig(s);
+        syncCustomerMobileNav(s);
+      };
+      syncCustomerMobileNav('dashboard');
+    }
+  },100);
+})();
+</script>
 </body>
 </html>

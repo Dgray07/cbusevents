@@ -336,6 +336,21 @@ tr:hover td{ background:rgba(255,255,255,0.02) !important; }
   height:1px !important; background:linear-gradient(90deg,var(--orange),transparent) !important; opacity:0.4 !important;
 }
 /* ── END DESIGN SYSTEM ─────────────────────────────────────── */
+
+/* ── PORTAL MOBILE BOTTOM NAV ── */
+.portal-mobile-nav{display:none;position:fixed;bottom:0;left:0;right:0;background:var(--surface);border-top:1px solid var(--border);z-index:300;padding-bottom:env(safe-area-inset-bottom);}
+.portal-mobile-nav-inner{display:flex;align-items:stretch;height:58px;padding:0 4px;}
+.pmn-btn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;background:none;border:none;cursor:pointer;color:var(--sub);font-size:9px;font-weight:600;transition:color 0.15s;padding:4px 2px;font-family:'DM Sans',sans-serif;letter-spacing:0.02em;text-transform:uppercase;}
+.pmn-btn.active{color:#FF6B35;}
+.pmn-btn svg{width:20px;height:20px;flex-shrink:0;}
+.pmn-icon{position:relative;display:inline-flex;}
+.pmn-badge{position:absolute;top:-3px;right:-6px;background:#FF6B35;color:#fff;border-radius:99px;font-size:8px;font-weight:800;padding:1px 4px;min-width:14px;text-align:center;line-height:1.4;}
+
+@media(max-width:700px){
+  .portal-mobile-nav{display:block;}
+  #app,.page{padding-bottom:76px !important;}
+  nav#topNav{display:none !important;}
+}
 </style>
 </head>
 <body> <nav id="topNav"> <div class="nav-logo" onclick="currentUser?nav('dashboard'):showAuth('login')"> CBUS<span>EVENTS</span> <span class="nav-logo-sub">Planner</span> </div> <div class="nav-links" id="navLinks" style="display:none"> <button class="nav-btn" onclick="window.location.href='https://cbusevents.com'"> Home</button> <button class="nav-btn" id="nav-dashboard" onclick="nav('dashboard')">Dashboard</button> <button class="nav-btn" id="nav-venues" onclick="nav('venues')">Find Venues</button> <button class="nav-btn" id="nav-inquiries" onclick="nav('inquiries')">My Inquiries</button> <button class="nav-btn" id="nav-events" onclick="nav('events')">My Events</button> <button class="nav-btn" id="nav-payouts" onclick="nav('payouts')">Payouts</button> <button class="nav-btn" id="nav-profile" onclick="nav('profile')">My Profile</button> <button class="nav-btn" id="nav-billing" onclick="nav('billing')">Plan & Billing</button> <button class="nav-btn" id="nav-inbox" onclick="nav('inbox')">Inbox <span id="inboxNavBadge" style="display:none;background:#FF6B35;color:#fff;border-radius:99px;font-size:10px;font-weight:700;padding:1px 7px;margin-left:4px"></span></button> </div> <div class="nav-right" id="navRight"> <button class="nav-outline" onclick="showAuth('login')">Sign In</button> <button class="nav-cta" onclick="showAuth('signup')">Get Started Free →</button> </div>
@@ -1546,6 +1561,53 @@ document.addEventListener('click', function(e){
 
 // ── START ─────────────────────────────────────────────────────
 init();
+</script>
+
+<div class="portal-mobile-nav" id="plannerMobileNav">
+  <div class="portal-mobile-nav-inner">
+  <button class="pmn-btn" id="pmn-dashboard" onclick="nav('dashboard')">
+    <div class="pmn-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg></div>
+    <span>Home</span>
+  </button>
+  <button class="pmn-btn" id="pmn-venues" onclick="nav('venues')">
+    <div class="pmn-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg></div>
+    <span>Venues</span>
+  </button>
+  <button class="pmn-btn" id="pmn-events" onclick="nav('events')">
+    <div class="pmn-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div>
+    <span>Events</span>
+  </button>
+  <button class="pmn-btn" id="pmn-inbox" onclick="nav('inbox')">
+    <div class="pmn-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg><span class="pmn-badge" id="pmn-planner-inbox-badge" style="display:none"></span></div>
+    <span>Inbox</span>
+  </button>
+  <button class="pmn-btn" id="pmn-profile" onclick="nav('profile')">
+    <div class="pmn-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
+    <span>Profile</span>
+  </button>
+  </div>
+</div>
+<script>
+(function(){
+  var _origNav=window.nav;
+  function syncPlannerMobileNav(page){
+    document.querySelectorAll('.pmn-btn').forEach(function(b){b.classList.remove('active');});
+    var btn=document.getElementById('pmn-'+page);
+    if(btn)btn.classList.add('active');
+  }
+  // Wrap nav function
+  var checkNav=setInterval(function(){
+    if(typeof window.nav==='function'){
+      clearInterval(checkNav);
+      var orig=window.nav;
+      window.nav=function(page){
+        orig(page);
+        syncPlannerMobileNav(page);
+      };
+      syncPlannerMobileNav('dashboard');
+    }
+  },100);
+})();
 </script>
 </body>
 </html>
