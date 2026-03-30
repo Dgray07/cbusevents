@@ -351,6 +351,19 @@ tr:hover td{ background:rgba(255,255,255,0.02) !important; }
   #app,.page{padding-bottom:76px !important;}
   nav#topNav{display:none !important;}
 }
+
+/* ── MOBILE MORE SHEET ── */
+.pmn-more-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:399;}
+.pmn-more-overlay.open{display:block;}
+.pmn-more-sheet{position:fixed;bottom:0;left:0;right:0;background:var(--surface);border-top:1px solid var(--border);border-radius:20px 20px 0 0;z-index:400;padding:12px 16px calc(env(safe-area-inset-bottom) + 16px);transform:translateY(100%);transition:transform 0.25s ease;}
+.pmn-more-sheet.open{transform:translateY(0);}
+.pmn-more-handle{width:36px;height:4px;background:var(--border);border-radius:2px;margin:0 auto 20px;}
+.pmn-more-item{display:flex;align-items:center;gap:14px;width:100%;padding:14px 16px;border:none;background:none;color:var(--text);font-size:15px;font-weight:600;cursor:pointer;border-radius:12px;font-family:'DM Sans',sans-serif;text-decoration:none;transition:background 0.15s;}
+.pmn-more-item:hover,.pmn-more-item:active{background:rgba(255,255,255,0.06);}
+.pmn-more-item svg{width:20px;height:20px;flex-shrink:0;color:var(--sub);}
+.pmn-more-item.danger{color:#f87171;}
+.pmn-more-item.danger svg{color:#f87171;}
+.pmn-more-divider{height:1px;background:var(--border);margin:6px 0;}
 </style>
 </head>
 <body> <nav id="topNav"> <div class="nav-logo" onclick="currentUser?nav('dashboard'):showAuth('login')"> CBUS<span>EVENTS</span> <span class="nav-logo-sub">Planner</span> </div> <div class="nav-links" id="navLinks" style="display:none"> <button class="nav-btn" onclick="window.location.href='https://cbusevents.com'"> Home</button> <button class="nav-btn" id="nav-dashboard" onclick="nav('dashboard')">Dashboard</button> <button class="nav-btn" id="nav-venues" onclick="nav('venues')">Find Venues</button> <button class="nav-btn" id="nav-inquiries" onclick="nav('inquiries')">My Inquiries</button> <button class="nav-btn" id="nav-events" onclick="nav('events')">My Events</button> <button class="nav-btn" id="nav-payouts" onclick="nav('payouts')">Payouts</button> <button class="nav-btn" id="nav-profile" onclick="nav('profile')">My Profile</button> <button class="nav-btn" id="nav-billing" onclick="nav('billing')">Plan & Billing</button> <button class="nav-btn" id="nav-inbox" onclick="nav('inbox')">Inbox <span id="inboxNavBadge" style="display:none;background:#FF6B35;color:#fff;border-radius:99px;font-size:10px;font-weight:700;padding:1px 7px;margin-left:4px"></span></button> </div> <div class="nav-right" id="navRight"> <button class="nav-outline" onclick="showAuth('login')">Sign In</button> <button class="nav-cta" onclick="showAuth('signup')">Get Started Free →</button> </div>
@@ -1581,9 +1594,9 @@ init();
     <div class="pmn-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg><span class="pmn-badge" id="pmn-planner-inbox-badge" style="display:none"></span></div>
     <span>Inbox</span>
   </button>
-  <button class="pmn-btn" id="pmn-profile" onclick="nav('profile')">
-    <div class="pmn-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
-    <span>Profile</span>
+  <button class="pmn-btn" id="pmn-more" onclick="openPmnMore()">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg>
+    <span>More</span>
   </button>
   </div>
 </div>
@@ -1608,6 +1621,49 @@ init();
     }
   },100);
 })();
+</script>
+
+<!-- Mobile More Sheet -->
+<div class="pmn-more-overlay" id="pmnMoreOverlay" onclick="closePmnMore()"></div>
+<div class="pmn-more-sheet" id="pmnMoreSheet">
+  <div class="pmn-more-handle"></div>
+  <a href="https://cbusevents.com" class="pmn-more-item">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>
+    Go to CBUSEVENTS
+  </a>
+  <a href="https://cbusevents.com/venues.html" class="pmn-more-item">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    Browse Venues
+  </a>
+  <a href="https://cbusevents.com/vendors.html" class="pmn-more-item">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+    Browse Vendors
+  </a>
+  <div class="pmn-more-divider"></div>
+  <button class="pmn-more-item danger" id="pmnSignOutBtn">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+    Sign Out
+  </button>
+</div>
+
+<script>
+function openPmnMore(){
+  document.getElementById('pmnMoreOverlay').classList.add('open');
+  document.getElementById('pmnMoreSheet').classList.add('open');
+  document.body.style.overflow='hidden';
+}
+function closePmnMore(){
+  document.getElementById('pmnMoreOverlay').classList.remove('open');
+  document.getElementById('pmnMoreSheet').classList.remove('open');
+  document.body.style.overflow='';
+}
+document.addEventListener('DOMContentLoaded',function(){
+  var btn=document.getElementById('pmnSignOutBtn');
+  if(btn) btn.addEventListener('click',function(){
+    sb.auth.signOut().then(function(){ window.location.href='https://cbusevents.com'; });
+    closePmnMore();
+  });
+});
 </script>
 </body>
 </html>
