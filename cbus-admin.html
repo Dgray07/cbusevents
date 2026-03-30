@@ -1425,9 +1425,8 @@ async function toggleVenueFeature(id,val){
 
 // ── VENDORS ───────────────────────────────────────────────────
 async function renderPlanners(){
- // Use admin RPC to get planner emails directly from auth.users
  const{data:roles, error:rolesErr}=await sb.from('user_roles')
-   .select('user_id, role')
+   .select('user_id, role, tier')
    .eq('role','planner');
 
  if(rolesErr){
@@ -1441,10 +1440,14 @@ async function renderPlanners(){
  // Pull emails via admin_user_emails view
  let emailMap={};
  if(userIds.length){
-   const{data:users}=await sb.from('admin_user_emails')
-     .select('id,email,created_at')
-     .in('id',userIds);
+   const{data:users, error:emailErr}=await sb.from('admin_user_emails')
+     .select('id,email,created_at');
+   if(emailErr) console.error('admin_user_emails error:',emailErr);
+   console.log('admin_user_emails returned:',users?.length,'rows');
    (users||[]).forEach(u=>emailMap[u.id]={email:u.email,created_at:u.created_at});
+   console.log('emailMap keys:',Object.keys(emailMap).length);
+   console.log('looking for:',userIds[0]);
+   console.log('found:',emailMap[userIds[0]]);
  }
 
  document.getElementById('pageContent').innerHTML=`
