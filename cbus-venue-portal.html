@@ -293,9 +293,17 @@ function AuthProvider({ children }) {
  return () => subscription.unsubscribe();
  }, []);
  async function fetchProfile(id) {
- sb.from("profiles").select("*").eq("id", id).single().then(({data}) => {
-   setProfile(data); setLoading(false);
- }).catch(() => setLoading(false));
+   sb.from("profiles").select("*").eq("id", id).single().then(({data}) => {
+     setProfile(data); setLoading(false);
+   }).catch(() => setLoading(false));
+   // Auto-accept pending staff invites for this user's email
+   const {data:{user:u}}=await sb.auth.getUser();
+   if(u?.email){
+     await sb.from('venue_staff')
+       .update({staff_user_id:id, status:'active', accepted_at:new Date().toISOString()})
+       .eq('staff_email',u.email)
+       .eq('status','pending');
+   }
  }
  return <AuthCtx.Provider value={{ user, profile, loading }}>{children}</AuthCtx.Provider>;
 }
@@ -345,7 +353,7 @@ function AuthPage() {
 }
 
 // Sidebar
-const NAV = [{key:"dashboard",icon:"⊞",label:"Dashboard"},{key:"venue",icon:"",label:"My Venue"},{key:"events",icon:"",label:"Events"},{key:"calendar",icon:"",label:"Booking Calendar"},{key:"earnings",icon:"",label:"Earnings"},{key:"payouts",icon:"$",label:"Payouts"},{key:"inquiries",icon:"",label:"Inquiries"},{key:"inbox",icon:"✉",label:"Inbox"},{key:"plan",icon:"⭐",label:"Plan & Billing"}];
+const NAV = [{key:"dashboard",icon:"⊞",label:"Dashboard"},{key:"venue",icon:"",label:"My Venue"},{key:"events",icon:"",label:"Events"},{key:"calendar",icon:"",label:"Booking Calendar"},{key:"earnings",icon:"",label:"Earnings"},{key:"payouts",icon:"$",label:"Payouts"},{key:"inquiries",icon:"",label:"Inquiries"},{key:"inbox",icon:"✉",label:"Inbox"},{key:"staff",icon:"👥",label:"Staff"},{key:"plan",icon:"⭐",label:"Plan & Billing"}];
 const HOME_BTN_STYLE = {display:"flex",alignItems:"center",gap:10,width:"100%",background:"transparent",color:"var(--sub)",border:"1px solid transparent",borderRadius:10,padding:"10px 12px",cursor:"pointer",fontSize:13,fontFamily:"'DM Sans',sans-serif",fontWeight:400,marginBottom:2,textAlign:"left",transition:"color 0.15s"};
 
 const PORTAL_LINKS = {
@@ -405,8 +413,9 @@ function PortalSwitcher({userId}) {
   );
 }
 
-function Sidebar({active,setActive,profile,userId}) {
+function Sidebar({active,setActive,profile,userId,navItems,staffRole}) {
  const [roles,setRoles]=React.useState([]);
+ const nav = navItems||NAV;
  React.useEffect(()=>{
    if(userId){
      sb.from('user_roles').select('role').eq('user_id',userId).then(({data})=>{
@@ -424,14 +433,17 @@ function Sidebar({active,setActive,profile,userId}) {
    </div>
    <div style={{padding:"16px 22px",borderBottom:"1px solid var(--border-sub)"}}>
      <div style={{fontFamily:"'DM Sans',sans-serif",fontWeight:700,fontSize:13,color:"var(--text)",marginBottom:3,letterSpacing:"-0.02em"}}>{profile?.full_name||"Your Venue"}</div>
-     <div style={{fontFamily:"'DM Mono',monospace",fontSize:8,letterSpacing:"0.14em",textTransform:"uppercase",color:"var(--green)"}}>Live on Platform</div>
+     {staffRole
+       ? <div style={{fontFamily:"'DM Mono',monospace",fontSize:8,letterSpacing:"0.14em",textTransform:"uppercase",color:"#818cf8"}}>👥 {staffRole}</div>
+       : <div style={{fontFamily:"'DM Mono',monospace",fontSize:8,letterSpacing:"0.14em",textTransform:"uppercase",color:"var(--green)"}}>Live on Platform</div>
+     }
    </div>
    <nav style={{flex:1,padding:"16px 8px 8px"}}>
      <div style={{padding:"0 14px 8px",fontFamily:"'DM Mono',monospace",fontSize:9,color:"var(--muted)",fontWeight:700,letterSpacing:"0.15em",textTransform:"uppercase"}}>Main</div>
      <button onClick={()=>window.open("https://cbusevents.com","_self")} style={{display:"flex",alignItems:"center",gap:10,width:"100%",background:"transparent",color:"var(--sub)",border:"1px solid transparent",borderLeft:"2px solid transparent",borderRadius:10,padding:"8px 14px 8px 18px",cursor:"pointer",fontSize:13,fontFamily:"'DM Sans',sans-serif",fontWeight:500,marginBottom:1,textAlign:"left",transition:"all 0.18s"}}>
        View Site →
      </button>
-     {NAV.map(n=>(
+     {nav.map(n=>(
        <button key={n.key} onClick={()=>setActive(n.key)} style={{display:"flex",alignItems:"center",gap:10,width:"100%",background:active===n.key?"linear-gradient(135deg,rgba(255,107,53,0.1),rgba(255,107,53,0.04))":"transparent",color:active===n.key?"var(--text)":"var(--sub)",border:"1px solid transparent",borderLeft:`2px solid ${active===n.key?"#FF6B35":"transparent"}`,borderRadius:10,padding:"8px 14px 8px 18px",cursor:"pointer",fontSize:13,fontFamily:"'DM Sans',sans-serif",fontWeight:active===n.key?600:500,marginBottom:1,textAlign:"left",transition:"all 0.18s"}}>{n.label}
        </button>
      ))}
@@ -1729,6 +1741,176 @@ function Inbox({ userId }) {
   );
 }
 
+// ── STAFF MANAGEMENT ─────────────────────────────────────────
+function StaffManagement({venue, userId}) {
+ const [staff, setStaff] = React.useState([]);
+ const [busy, setBusy] = React.useState(true);
+ const [inviteEmail, setInviteEmail] = React.useState('');
+ const [inviteRole, setInviteRole] = React.useState('staff');
+ const [inviting, setInviting] = React.useState(false);
+ const [msg, setMsg] = React.useState({text:'',type:''});
+ const isPremium = venue?.tier==='premium';
+ const STAFF_LIMIT = 2;
+
+ React.useEffect(()=>{
+   if(venue?.id) loadStaff();
+ },[venue?.id]);
+
+ async function loadStaff(){
+   setBusy(true);
+   const {data}=await sb.from('venue_staff').select('*').eq('venue_id',venue.id).neq('status','removed').order('created_at',{ascending:true});
+   setStaff(data||[]);
+   setBusy(false);
+ }
+
+ async function inviteStaff(){
+   if(!inviteEmail.trim()){setMsg({text:'Enter an email address.',type:'error'});return;}
+   if(!isPremium){setMsg({text:'Staff accounts require a Premium plan.',type:'error'});return;}
+   const activeStaff=staff.filter(s=>s.status!=='removed');
+   if(activeStaff.length>=STAFF_LIMIT){setMsg({text:`You've reached the ${STAFF_LIMIT} staff limit on Premium. Contact us to add unlimited staff for $25/mo.`,type:'error'});return;}
+   setInviting(true);
+   // Check if user exists
+   const {data:existing}=await sb.from('venue_staff').select('id').eq('venue_id',venue.id).eq('staff_email',inviteEmail.trim()).maybeSingle();
+   if(existing){setMsg({text:'This person is already on your staff.',type:'error'});setInviting(false);return;}
+   // Look up user by email
+   const {data:userRecord}=await sb.rpc('get_planner_emails',{user_ids:[]}).catch(()=>({data:null}));
+   // Insert invite - staff_user_id will be null until they accept
+   const {error}=await sb.from('venue_staff').insert({
+     venue_id:venue.id,
+     owner_id:userId,
+     staff_email:inviteEmail.trim(),
+     role:inviteRole,
+     status:'pending',
+   });
+   if(error){setMsg({text:'Error: '+error.message,type:'error'});}
+   else{setMsg({text:`Invite sent to ${inviteEmail}. They'll need to sign in and accept.`,type:'success'});setInviteEmail('');}
+   setInviting(false);
+   loadStaff();
+ }
+
+ async function removeStaff(id){
+   if(!confirm('Remove this staff member?'))return;
+   await sb.from('venue_staff').update({status:'removed'}).eq('id',id);
+   loadStaff();
+ }
+
+ async function updateRole(id, role){
+   await sb.from('venue_staff').update({role}).eq('id',id);
+   loadStaff();
+ }
+
+ const activeStaff=staff.filter(s=>s.status!=='removed');
+
+ if(!isPremium) return (
+   <div>
+     <h1 style={{fontFamily:"'DM Sans',sans-serif",fontSize:24,fontWeight:800,letterSpacing:"-0.03em",marginBottom:6}}>Staff & Access</h1>
+     <p style={{color:"var(--sub)",fontSize:14,marginBottom:24}}>Add team members to help manage your venue.</p>
+     <div style={{background:"var(--card)",border:"1px solid var(--border)",borderRadius:16,padding:48,textAlign:"center"}}>
+       <div style={{fontSize:32,marginBottom:16}}>👥</div>
+       <div style={{fontWeight:800,fontSize:18,marginBottom:8,letterSpacing:"-0.02em"}}>Staff Access is a Premium Feature</div>
+       <div style={{color:"var(--sub)",fontSize:14,marginBottom:24,maxWidth:360,margin:"0 auto 24px",lineHeight:1.6}}>Upgrade to Premium to add up to 2 staff members who can manage events, bookings, and inquiries on your behalf.</div>
+       <button onClick={()=>{}} style={{background:"#FF6B35",color:"#fff",border:"none",borderRadius:10,padding:"12px 28px",fontSize:14,fontWeight:700,cursor:"pointer",fontFamily:"'DM Sans',sans-serif"}}>Upgrade to Premium →</button>
+     </div>
+   </div>
+ );
+
+ return (
+ <div>
+   <h1 style={{fontFamily:"'DM Sans',sans-serif",fontSize:24,fontWeight:800,letterSpacing:"-0.03em",marginBottom:6}}>Staff & Access</h1>
+   <p style={{color:"var(--sub)",fontSize:14,marginBottom:24}}>Manage who can access your venue portal. Premium includes {STAFF_LIMIT} staff accounts.</p>
+
+   {/* Invite form */}
+   <div style={{background:"var(--card)",border:"1px solid var(--border)",borderRadius:14,padding:24,marginBottom:20}}>
+     <div style={{fontWeight:700,fontSize:15,marginBottom:4}}>Invite Staff Member</div>
+     <div style={{fontSize:13,color:"var(--sub)",marginBottom:16}}>{activeStaff.length}/{STAFF_LIMIT} staff slots used{activeStaff.length>=STAFF_LIMIT?' · <a href="mailto:info@cbusevents.com" style="color:#FF6B35">Contact us for unlimited ($25/mo)</a>':''}</div>
+     <div style={{display:"grid",gridTemplateColumns:"1fr auto auto",gap:10,alignItems:"flex-end"}}>
+       <div>
+         <label style={{fontSize:12,color:"var(--sub)",display:"block",marginBottom:6,fontWeight:600}}>Email Address</label>
+         <input value={inviteEmail} onChange={e=>setInviteEmail(e.target.value)} onKeyDown={e=>e.key==='Enter'&&inviteStaff()} placeholder="staff@email.com" style={{width:"100%",background:"var(--surface)",border:"1px solid var(--border)",borderRadius:8,padding:"9px 12px",color:"var(--text)",fontSize:13,fontFamily:"'DM Sans',sans-serif"}}/>
+       </div>
+       <div>
+         <label style={{fontSize:12,color:"var(--sub)",display:"block",marginBottom:6,fontWeight:600}}>Role</label>
+         <select value={inviteRole} onChange={e=>setInviteRole(e.target.value)} style={{background:"var(--surface)",border:"1px solid var(--border)",borderRadius:8,padding:"9px 12px",color:"var(--text)",fontSize:13,fontFamily:"'DM Sans',sans-serif",height:38}}>
+           <option value="staff">Staff</option>
+           <option value="manager">Manager</option>
+         </select>
+       </div>
+       <button onClick={inviteStaff} disabled={inviting||activeStaff.length>=STAFF_LIMIT} style={{background:"#FF6B35",color:"#fff",border:"none",borderRadius:8,padding:"9px 20px",fontSize:13,fontWeight:700,cursor:"pointer",fontFamily:"'DM Sans',sans-serif",opacity:inviting||activeStaff.length>=STAFF_LIMIT?0.5:1,height:38}}>
+         {inviting?'Inviting...':'Invite'}
+       </button>
+     </div>
+     {msg.text&&<div style={{marginTop:10,fontSize:13,color:msg.type==='error'?'#f87171':'#34d399'}} dangerouslySetInnerHTML={{__html:msg.text}}/>}
+   </div>
+
+   {/* Role guide */}
+   <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12,marginBottom:20}}>
+     {[
+       {role:'Manager',color:'#818cf8',perms:['All venue features','Events & bookings','Earnings & analytics','Inquiries & inbox','Venue profile']},
+       {role:'Staff',color:'#34d399',perms:['Dashboard view','Events & bookings','Calendar','Inquiries & inbox','NOT earnings/billing']},
+     ].map(r=>(
+       <div key={r.role} style={{background:"var(--card)",border:"1px solid var(--border)",borderRadius:12,padding:16}}>
+         <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:12}}>
+           <span style={{fontFamily:"'DM Mono',monospace",fontSize:10,textTransform:"uppercase",letterSpacing:"0.1em",padding:"3px 8px",borderRadius:20,background:`${r.color}22`,color:r.color}}>{r.role}</span>
+         </div>
+         {r.perms.map(p=>(
+           <div key={p} style={{display:"flex",alignItems:"center",gap:8,marginBottom:6,fontSize:12,color:p.startsWith('NOT')?'var(--muted)':'var(--sub)'}}>
+             <span style={{color:p.startsWith('NOT')?'#f87171':r.color,fontSize:10}}>{p.startsWith('NOT')?'✕':'✓'}</span>
+             {p.replace('NOT ','')}
+           </div>
+         ))}
+       </div>
+     ))}
+   </div>
+
+   {/* Staff list */}
+   <div style={{background:"var(--card)",border:"1px solid var(--border)",borderRadius:14,overflow:"hidden"}}>
+     <div style={{padding:"14px 20px",borderBottom:"1px solid var(--border-sub)",fontWeight:700,fontSize:14}}>
+       Current Staff {busy?'':'('+activeStaff.length+')'}
+     </div>
+     {busy?<div style={{padding:32,textAlign:"center"}}><div className="spinner"/></div>
+     :activeStaff.length===0
+       ?<div style={{padding:32,textAlign:"center",color:"var(--sub)",fontSize:13}}>No staff members yet. Invite someone above.</div>
+       :<table style={{width:"100%",borderCollapse:"collapse"}}>
+         <thead><tr style={{borderBottom:"1px solid var(--border-sub)"}}>
+           <th style={{padding:"10px 20px",textAlign:"left",fontSize:11,fontFamily:"'DM Mono',monospace",letterSpacing:"0.1em",textTransform:"uppercase",color:"var(--muted)"}}>Email</th>
+           <th style={{padding:"10px 20px",textAlign:"left",fontSize:11,fontFamily:"'DM Mono',monospace",letterSpacing:"0.1em",textTransform:"uppercase",color:"var(--muted)"}}>Role</th>
+           <th style={{padding:"10px 20px",textAlign:"left",fontSize:11,fontFamily:"'DM Mono',monospace",letterSpacing:"0.1em",textTransform:"uppercase",color:"var(--muted)"}}>Status</th>
+           <th style={{padding:"10px 20px",textAlign:"right",fontSize:11,fontFamily:"'DM Mono',monospace",letterSpacing:"0.1em",textTransform:"uppercase",color:"var(--muted)"}}>Actions</th>
+         </tr></thead>
+         <tbody>
+           {activeStaff.map(s=>(
+             <tr key={s.id} style={{borderBottom:"1px solid var(--border-sub)"}}>
+               <td style={{padding:"14px 20px",fontSize:13,fontWeight:500}}>{s.staff_email}</td>
+               <td style={{padding:"14px 20px"}}>
+                 <select value={s.role} onChange={e=>updateRole(s.id,e.target.value)} style={{background:"var(--surface)",border:"1px solid var(--border)",borderRadius:6,padding:"4px 8px",color:"var(--text)",fontSize:12,fontFamily:"'DM Sans',sans-serif",cursor:"pointer"}}>
+                   <option value="staff">Staff</option>
+                   <option value="manager">Manager</option>
+                 </select>
+               </td>
+               <td style={{padding:"14px 20px"}}>
+                 <span style={{fontFamily:"'DM Mono',monospace",fontSize:9,textTransform:"uppercase",letterSpacing:"0.1em",padding:"3px 8px",borderRadius:20,background:s.status==='active'?'rgba(52,211,153,0.12)':'rgba(251,191,36,0.12)',color:s.status==='active'?'#34d399':'#fbbf24'}}>{s.status}</span>
+               </td>
+               <td style={{padding:"14px 20px",textAlign:"right"}}>
+                 <button onClick={()=>removeStaff(s.id)} style={{background:"transparent",border:"1px solid rgba(248,113,113,0.3)",color:"#f87171",borderRadius:6,padding:"5px 12px",fontSize:12,fontWeight:600,cursor:"pointer",fontFamily:"'DM Sans',sans-serif"}}>Remove</button>
+               </td>
+             </tr>
+           ))}
+         </tbody>
+       </table>
+     }
+   </div>
+
+   {/* Accept invite info */}
+   <div style={{background:"rgba(129,140,248,0.06)",border:"1px solid rgba(129,140,248,0.2)",borderRadius:12,padding:16,marginTop:16}}>
+     <div style={{fontSize:13,color:"#818cf8",fontWeight:600,marginBottom:4}}>How staff invites work</div>
+     <div style={{fontSize:12,color:"var(--sub)",lineHeight:1.6}}>
+       After you invite someone, they need to sign up or sign in at <strong style={{color:"var(--text)"}}>cbusevents.com/cbus-venue-portal.html</strong> using the exact email you invited. Their account will automatically gain access to your venue portal. Status will update from Pending to Active once they log in.
+     </div>
+   </div>
+ </div>
+ );
+}
+
 function PlanBilling({venue}) {
  const cur=venue?.tier||"free";
  const [loading,setLoading]=React.useState(null);
@@ -1796,38 +1978,69 @@ function PlanBilling({venue}) {
 // Portal Shell
 function Portal() {
  const {user,profile}=useAuth();
- // If arriving from pricing page with ?upgrade=standard or ?upgrade=premium, go straight to plan tab
  const initPage = ['standard','premium'].includes(new URLSearchParams(window.location.search).get('upgrade')) ? 'plan' : 'dashboard';
  const [page,setPage]=useState(initPage);
  const [venue,setVenue]=useState(null);
  const [events,setEvents]=useState([]);
  const [busy,setBusy]=useState(true);
+ const [staffRole,setStaffRole]=useState(null);
+
  const load=async(retry=0)=>{
- setBusy(true);
- const {data:v}=await sb.from("venues").select("*").eq("owner_id",user.id).maybeSingle();
- if(!v && retry < 2){
-   // Venue write may still be in-flight after email confirmation — retry after short delay
-   setTimeout(()=>load(retry+1), 1200);
-   return;
- }
- setVenue(v||null);
- if(v?.id){const {data:ev}=await sb.from("events").select("*").eq("venue_id",v.id).order("start_time",{ascending:true});setEvents(ev||[]);}
- else setEvents([]);
- setBusy(false);
+   setBusy(true);
+   const {data:v}=await sb.from("venues").select("*").eq("owner_id",user.id).maybeSingle();
+   if(v){
+     setVenue(v);
+     if(v?.id){const {data:ev}=await sb.from("events").select("*").eq("venue_id",v.id).order("start_time",{ascending:true});setEvents(ev||[]);}
+     setStaffRole(null);
+     setBusy(false);
+     return;
+   }
+   const {data:staffRecord}=await sb.from("venue_staff").select("*,venues(*)").eq("staff_user_id",user.id).eq("status","active").maybeSingle();
+   if(staffRecord?.venues){
+     setVenue(staffRecord.venues);
+     setStaffRole(staffRecord.role);
+     const {data:ev}=await sb.from("events").select("*").eq("venue_id",staffRecord.venues.id).order("start_time",{ascending:true});
+     setEvents(ev||[]);
+     setBusy(false);
+     return;
+   }
+   if(!v && !staffRecord && retry < 2){setTimeout(()=>load(retry+1),1200);return;}
+   setVenue(null);
+   setBusy(false);
  };
+
  useEffect(()=>{load();},[]);
+
+ const isOwner=staffRole===null;
+ const isManager=staffRole==='manager';
+ const filteredNav=NAV.filter(n=>{
+   if(n.key==='staff') return isOwner;
+   if(n.key==='plan') return isOwner;
+   if(n.key==='payouts') return isOwner||isManager;
+   if(n.key==='earnings') return isOwner||isManager;
+   return true;
+ });
+
  return (
- <div style={{display:"flex",minHeight:"100vh"}}> <Sidebar active={page} setActive={setPage} profile={profile} userId={user?.id}/> <main style={{flex:1,padding:36,overflowY:"auto",background:"var(--bg)",minHeight:"100vh"}}> {busy?<Spin/>:<> {page==="dashboard"&&<Dashboard venue={venue} events={events}/>}
- {page==="venue" &&<VenueForm venue={venue} onSave={load}/>}
- {page==="events" &&<EventsManager venue={venue} events={events} onRefresh={load}/>}
- {page==="calendar"&&<BookingCalendar venue={venue} events={events}/>}
- {page==="earnings"&&<Earnings venue={venue}/>}
- {page==="payouts"&&<VenuePayouts venue={venue}/>}
- {page==="inquiries"&&<Inquiries venue={venue}/>}
- {page==="inbox"&&<Inbox userId={user?.id}/>}
-{page==="plan" &&<PlanBilling venue={venue}/>}
- </>}
- </main> </div> );
+ <div style={{display:"flex",minHeight:"100vh"}}>
+   <Sidebar active={page} setActive={setPage} profile={profile} userId={user?.id} navItems={filteredNav} staffRole={staffRole}/>
+   <main style={{flex:1,padding:36,overflowY:"auto",background:"var(--bg)",minHeight:"100vh"}}>
+     {staffRole&&<div style={{background:"rgba(129,140,248,0.1)",border:"1px solid rgba(129,140,248,0.25)",borderRadius:10,padding:"8px 16px",marginBottom:20,fontSize:13,color:"#818cf8",display:"flex",alignItems:"center",gap:8}}><span>👥</span> You are viewing as <strong style={{textTransform:"capitalize"}}>{staffRole}</strong></div>}
+     {busy?<Spin/>:<>
+       {page==="dashboard"&&<Dashboard venue={venue} events={events}/>}
+       {page==="venue"&&<VenueForm venue={venue} onSave={load}/>}
+       {page==="events"&&<EventsManager venue={venue} events={events} onRefresh={load}/>}
+       {page==="calendar"&&<BookingCalendar venue={venue} events={events}/>}
+       {page==="earnings"&&<Earnings venue={venue}/>}
+       {page==="payouts"&&<VenuePayouts venue={venue}/>}
+       {page==="inquiries"&&<Inquiries venue={venue}/>}
+       {page==="inbox"&&<Inbox userId={user?.id}/>}
+       {page==="staff"&&<StaffManagement venue={venue} userId={user?.id}/>}
+       {page==="plan"&&<PlanBilling venue={venue}/>}
+     </>}
+   </main>
+ </div>
+ );
 }
 
 function App() {
