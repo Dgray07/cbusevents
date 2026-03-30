@@ -2236,8 +2236,52 @@ window.openStripeDashboard= openStripeDashboard;
 
 <!-- Mobile More Sheet -->
 <div class="pmn-more-overlay" id="pmnMoreOverlay" onclick="closePmnMore()"></div>
-<div class="pmn-more-sheet" id="pmnMoreSheet">
+<div class="pmn-more-sheet" id="pmnMoreSheet" style="max-height:85vh;overflow-y:auto;">
   <div class="pmn-more-handle"></div>
+
+  <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.15em;text-transform:uppercase;color:var(--muted);padding:0 4px;margin-bottom:8px">My Account</div>
+  <button class="pmn-more-item" onclick="showPage('dashboard');closePmnMore()">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+    Dashboard
+  </button>
+  <button class="pmn-more-item" onclick="showPage('profile');closePmnMore()">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+    My Profile
+  </button>
+  <button class="pmn-more-item" onclick="showPage('services');closePmnMore()">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"/></svg>
+    Services
+  </button>
+  <button class="pmn-more-item" onclick="showPage('portfolio');closePmnMore()">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+    Portfolio
+  </button>
+
+  <div class="pmn-more-divider"></div>
+  <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.15em;text-transform:uppercase;color:var(--muted);padding:0 4px;margin-bottom:8px">Growth</div>
+  <button class="pmn-more-item" onclick="showPage('store');closePmnMore()">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
+    My Store
+  </button>
+  <button class="pmn-more-item" onclick="showPage('payouts');closePmnMore()">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
+    Payouts
+  </button>
+  <button class="pmn-more-item" onclick="showPage('analytics');closePmnMore()">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+    Analytics
+  </button>
+  <button class="pmn-more-item" onclick="showPage('events');closePmnMore()">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+    Browse Events
+  </button>
+  <button class="pmn-more-item" onclick="showPage('plan');closePmnMore()">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+    Plan & Billing
+  </button>
+
+  <div class="pmn-more-divider"></div>
+  <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.15em;text-transform:uppercase;color:var(--muted);padding:0 4px;margin-bottom:8px">Site</div>
   <a href="https://cbusevents.com" class="pmn-more-item">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>
     Go to CBUSEVENTS
@@ -2246,10 +2290,7 @@ window.openStripeDashboard= openStripeDashboard;
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
     Browse Venues
   </a>
-  <a href="https://cbusevents.com/vendors.html" class="pmn-more-item">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
-    Browse Vendors
-  </a>
+
   <div class="pmn-more-divider"></div>
   <button class="pmn-more-item danger" id="pmnSignOutBtn">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
