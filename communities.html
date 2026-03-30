@@ -60,18 +60,61 @@ footer{background:var(--surface);border-top:1px solid var(--border);padding:24px
   .grid-wrap{padding:32px 16px;}
   footer{padding:20px;}
 }
+
+/* ── STANDARD NAV ── */
+nav.site-nav{display:flex;align-items:center;justify-content:space-between;padding:0 48px;height:62px;border-bottom:1px solid rgba(255,255,255,0.07);position:sticky;top:0;background:rgba(8,8,16,0.96);backdrop-filter:blur(14px);z-index:200;}
+.site-nav .nav-logo{font-family:'DM Sans',sans-serif;font-size:19px;font-weight:900;text-decoration:none;color:#f0f0fa;letter-spacing:-0.05em;text-transform:uppercase;}
+.site-nav .nav-logo span{color:#FF6B35;}
+.site-nav .nav-links{display:flex;gap:4px;align-items:center;}
+.site-nav .nav-link{background:none;border:none;color:#7070a0;font-size:13px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;text-decoration:none;padding:7px 13px;border-radius:7px;transition:color 0.15s,background 0.15s;}
+.site-nav .nav-link:hover{color:#f0f0fa;background:rgba(255,255,255,0.05);}
+.site-nav .nav-link.active{color:#f0f0fa;}
+.site-nav .nav-right{display:flex;gap:8px;align-items:center;}
+.site-nav .nav-btn-ghost{font-size:12px;font-weight:600;color:#7070a0;padding:7px 14px;border-radius:7px;border:1px solid rgba(255,255,255,0.1);background:none;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all 0.15s;text-decoration:none;display:inline-flex;align-items:center;}
+.site-nav .nav-btn-ghost:hover{color:#f0f0fa;border-color:rgba(255,255,255,0.2);}
+.site-nav .nav-btn-primary{font-size:12px;font-weight:700;color:#fff;padding:7px 16px;border-radius:7px;background:#FF6B35;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;transition:opacity 0.15s;text-decoration:none;display:inline-flex;align-items:center;}
+.site-nav .nav-btn-primary:hover{opacity:0.88;}
+/* Hamburger */
+.site-nav .nav-hamburger{display:none;flex-direction:column;gap:5px;cursor:pointer;padding:6px;background:none;border:none;z-index:210;}
+.site-nav .nav-hamburger span{display:block;width:22px;height:2px;background:#f0f0fa;border-radius:2px;transition:all 0.3s ease;}
+.site-nav .nav-hamburger.open span:nth-child(1){transform:translateY(7px) rotate(45deg);}
+.site-nav .nav-hamburger.open span:nth-child(2){opacity:0;}
+.site-nav .nav-hamburger.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg);}
+/* Mobile overlay */
+.site-mobile-menu{display:none;position:fixed;inset:0;background:rgba(8,8,16,0.99);backdrop-filter:blur(20px);z-index:205;flex-direction:column;align-items:center;justify-content:center;gap:6px;padding:80px 24px 40px;}
+.site-mobile-menu.open{display:flex;}
+.site-mobile-menu .nav-mobile-link{font-family:'DM Sans',sans-serif;font-size:26px;font-weight:800;color:#f0f0fa;text-decoration:none;padding:12px 24px;border-radius:12px;transition:color 0.2s;text-align:center;width:100%;cursor:pointer;border:none;background:none;letter-spacing:-0.03em;}
+.site-mobile-menu .nav-mobile-link:hover,.site-mobile-menu .nav-mobile-link.active{color:#FF6B35;}
+.site-mobile-menu .nav-mobile-divider{width:40px;height:1px;background:rgba(255,255,255,0.1);margin:6px 0;}
+.site-mobile-menu .nav-mobile-cta{margin-top:8px;background:#FF6B35 !important;color:#fff !important;border-radius:12px;padding:14px 32px !important;font-size:16px !important;}
+@media(max-width:700px){
+  nav.site-nav{padding:0 18px;}
+  .site-nav .nav-hamburger{display:flex;}
+  .site-nav .nav-links,.site-nav .nav-right{display:none !important;}
+  html,body{overflow-x:hidden;}
+}
 </style>
 </head>
 <body>
 
-<nav>
-  <div class="nav-logo" onclick="window.location.href='https://cbusevents.com'">CBUS<span>EVENTS</span></div>
-  <a href="https://cbusevents.com" class="nav-back">
-    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
-    Back
-  </a>
-  <button class="nav-cta" onclick="window.location.href='https://cbusevents.com/signup.html'">Join Free</button>
+<nav class="site-nav">
+  <a href="https://cbusevents.com" class="nav-logo">CBUS<span>EVENTS</span></a>
+  <div class="nav-links"><a href="https://cbusevents.com" class="nav-link">Home</a>
+    <a href="https://cbusevents.com/venues.html" class="nav-link">Venues</a>
+    <a href="https://cbusevents.com/vendors.html" class="nav-link">Vendors</a>
+    <a href="https://cbusevents.com/blog.html" class="nav-link">Blog</a></div>
+  <div class="nav-right"><a href="https://cbusevents.com/auth.html" class="nav-btn-ghost">Sign In</a>
+    <a href="https://cbusevents.com/signup.html" class="nav-btn-primary">Get Started</a></div>
+  <button class="nav-hamburger" id="siteNavHamburger" aria-label="Menu"><span></span><span></span><span></span></button>
 </nav>
+<div class="site-mobile-menu" id="siteMobileMenu">
+  <a href="https://cbusevents.com" class="nav-mobile-link">Home</a>
+  <a href="https://cbusevents.com/venues.html" class="nav-mobile-link">Venues</a>
+  <a href="https://cbusevents.com/vendors.html" class="nav-mobile-link">Vendors</a>
+  <a href="https://cbusevents.com/blog.html" class="nav-mobile-link">Blog</a>
+  <div class="nav-mobile-divider"></div>
+  <a href="https://cbusevents.com/signup.html" class="nav-mobile-link nav-mobile-cta">Get Started</a>
+</div>
 
 <div class="hero">
   <div class="hero-eyebrow">Columbus, Ohio</div>
@@ -239,5 +282,28 @@ grid.innerHTML = Object.entries(COMMUNITIES).map(([slug, c]) => `
   </a>
 `).join('');
 </script>
+
+<script>
+(function(){
+  var btn=document.getElementById('siteNavHamburger');
+  var menu=document.getElementById('siteMobileMenu');
+  if(!btn||!menu)return;
+  btn.addEventListener('click',function(e){
+    e.stopPropagation();
+    btn.classList.toggle('open');
+    menu.classList.toggle('open');
+    document.body.style.overflow=menu.classList.contains('open')?'hidden':'';
+  });
+  document.addEventListener('keydown',function(e){
+    if(e.key==='Escape'){btn.classList.remove('open');menu.classList.remove('open');document.body.style.overflow='';}
+  });
+  menu.querySelectorAll('.nav-mobile-link,.nav-mobile-cta').forEach(function(a){
+    a.addEventListener('click',function(){
+      btn.classList.remove('open');menu.classList.remove('open');document.body.style.overflow='';
+    });
+  });
+})();
+</script>
+
 </body>
 </html>
