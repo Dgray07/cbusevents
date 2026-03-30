@@ -287,6 +287,10 @@ label{display:block;font-family:var(--mono);font-size:10px;font-weight:700;lette
     Booking Calendar
     <span id="bookingBadge" style="display:none;margin-left:auto;background:var(--orange);color:#fff;border-radius:var(--r-full);padding:1px 8px;font-size:9px;font-weight:800">0</span>
   </button>
+  <button class="nav-item" id="nav-analytics" onclick="showPage('analytics')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+    Analytics
+  </button>
   <div class="sidebar-bottom">
     <div class="sidebar-plan-badge" id="planBadge">Basic</div>
     <div id="portalSwitcherVendor" style="margin-bottom:8px"></div>
@@ -569,6 +573,7 @@ function showPage(p){
  else if(p==='payouts'){renderPayoutsPage();}
  else if(p==='events'){loadBrowseEvents();}
  else if(p==='inbox'){renderInboxPage();}
+ else if(p==='analytics'){renderAnalyticsPage();}
  else if(p==='plan'){renderPlan();}
  else if(p==='dashboard'){renderDashboard();}
 }
@@ -1222,6 +1227,161 @@ async function declineInboxRequest(reqId, convoId){
   await sb.from('message_requests').update({status:'declined'}).eq('id',reqId);
   await sb.from('conversations').update({status:'archived'}).eq('id',convoId);
   loadInboxConversations(currentUser?.id);
+}
+
+// ── ANALYTICS ────────────────────────────────────────────────
+async function renderAnalyticsPage(){
+  const vid=vendorProfile?.id;
+  const tier=(vendorProfile?.subscription_tier||'FREE').toUpperCase();
+  const isPaid=tier==='STANDARD'||tier==='PREMIUM';
+
+  document.getElementById('pageContent').innerHTML=`
+  <div style="margin-bottom:24px">
+    <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.18em;text-transform:uppercase;color:var(--muted);margin-bottom:4px">Growth</div>
+    <div style="font-size:22px;font-weight:800;letter-spacing:-0.03em;margin-bottom:2px">Profile Analytics</div>
+    <div style="font-size:13px;color:var(--sub)">See who's viewing your profile and when.</div>
+  </div>
+  <div id="analyticsContent"><div class="spinner" style="margin:48px auto"></div></div>`;
+
+  if(!isPaid){
+    document.getElementById('analyticsContent').innerHTML=`
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:16px;padding:48px;text-align:center">
+      <div style="font-size:32px;margin-bottom:16px">📊</div>
+      <div style="font-weight:800;font-size:18px;margin-bottom:8px;letter-spacing:-0.02em">Analytics is a paid feature</div>
+      <div style="color:var(--sub);font-size:14px;margin-bottom:24px;max-width:360px;margin-left:auto;margin-right:auto;line-height:1.6">Upgrade to Standard or Premium to see how many planners and venues are viewing your profile.</div>
+      <button onclick="showPage('plan')" style="background:#FF6B35;color:#fff;border:none;border-radius:10px;padding:12px 28px;font-size:14px;font-weight:700;cursor:pointer;font-family:var(--font)">View Plans →</button>
+    </div>`;
+    return;
+  }
+
+  if(!vid){
+    document.getElementById('analyticsContent').innerHTML='<div style="padding:48px;text-align:center;color:var(--sub)">Complete your profile setup first.</div>';
+    return;
+  }
+
+  // Load views data
+  const now=new Date();
+  const day7=new Date(now.getTime()-7*24*60*60*1000).toISOString();
+  const day30=new Date(now.getTime()-30*24*60*60*1000).toISOString();
+
+  const [{data:views30},{data:views7},{data:recentViews}]=await Promise.all([
+    sb.from('vendor_profile_views').select('id,created_at,viewer_role,source').eq('vendor_id',vid).gte('created_at',day30).order('created_at',{ascending:false}),
+    sb.from('vendor_profile_views').select('id').eq('vendor_id',vid).gte('created_at',day7),
+    sb.from('vendor_profile_views').select('created_at,viewer_role,source').eq('vendor_id',vid).order('created_at',{ascending:false}).limit(10),
+  ]);
+
+  const all30=views30||[];
+  const all7=views7||[];
+
+  // Build daily chart data for last 14 days
+  const chartDays=14;
+  const dailyCounts={};
+  for(let i=0;i<chartDays;i++){
+    const d=new Date(now.getTime()-i*24*60*60*1000);
+    const key=d.toLocaleDateString('en-US',{month:'short',day:'numeric'});
+    dailyCounts[key]=0;
+  }
+  all30.forEach(v=>{
+    const d=new Date(v.created_at);
+    const key=d.toLocaleDateString('en-US',{month:'short',day:'numeric'});
+    if(dailyCounts[key]!==undefined) dailyCounts[key]++;
+  });
+
+  const chartEntries=Object.entries(dailyCounts).reverse();
+  const maxVal=Math.max(...chartEntries.map(e=>e[1]),1);
+
+  // Role breakdown
+  const roles={planner:0,venue:0,customer:0,anonymous:0};
+  all30.forEach(v=>{roles[v.viewer_role||'anonymous']=(roles[v.viewer_role||'anonymous']||0)+1;});
+
+  // Source breakdown
+  const sources={vendors_page:0,direct:0,search:0,unknown:0};
+  all30.forEach(v=>{sources[v.source||'unknown']=(sources[v.source||'unknown']||0)+1;});
+
+  const roleLabels={planner:'Planners',venue:'Venues',customer:'Attendees',anonymous:'Public'};
+  const roleColors={planner:'#FF6B35',venue:'#818cf8',customer:'#34d399',anonymous:'#7070a0'};
+
+  document.getElementById('analyticsContent').innerHTML=`
+  <!-- Stats row -->
+  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:14px;margin-bottom:24px">
+    <div class="stat-card"><div class="stat-num" style="color:#FF6B35">${all30.length}</div><div class="stat-label">Views (30 days)</div></div>
+    <div class="stat-card"><div class="stat-num" style="color:var(--green)">${all7.length}</div><div class="stat-label">Views (7 days)</div></div>
+    <div class="stat-card"><div class="stat-num">${(all30.length/30).toFixed(1)}</div><div class="stat-label">Daily Average</div></div>
+    <div class="stat-card"><div class="stat-num" style="color:var(--blue)">${roles.planner||0}</div><div class="stat-label">Planner Views</div></div>
+  </div>
+
+  <!-- Chart -->
+  <div class="card" style="margin-bottom:20px">
+    <div class="card-header"><div class="card-title">Daily Views — Last 14 Days</div></div>
+    <div style="padding:20px 24px">
+      <div style="display:flex;align-items:flex-end;gap:6px;height:120px">
+        ${chartEntries.map(([label,count])=>`
+        <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;height:100%">
+          <div style="flex:1;display:flex;align-items:flex-end;width:100%">
+            <div style="width:100%;background:${count>0?'#FF6B35':'var(--border)'};border-radius:4px 4px 0 0;height:${count===0?'4px':Math.max(8,Math.round((count/maxVal)*100))+'%'};opacity:${count>0?1:0.3};transition:height 0.3s"></div>
+          </div>
+          <div style="font-family:var(--mono);font-size:8px;color:var(--muted);white-space:nowrap;transform:rotate(-45deg);transform-origin:top right;margin-top:4px;height:24px">${label}</div>
+        </div>`).join('')}
+      </div>
+    </div>
+  </div>
+
+  <!-- Breakdown row -->
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px">
+    <!-- Viewer types -->
+    <div class="card">
+      <div class="card-header"><div class="card-title">Who's Viewing</div></div>
+      <div style="padding:16px 20px;display:flex;flex-direction:column;gap:10px">
+        ${Object.entries(roles).filter(([,v])=>v>0).sort((a,b)=>b[1]-a[1]).map(([role,count])=>{
+          const pct=all30.length>0?Math.round((count/all30.length)*100):0;
+          return `<div>
+            <div style="display:flex;justify-content:space-between;margin-bottom:4px">
+              <span style="font-size:13px;font-weight:600">${roleLabels[role]||role}</span>
+              <span style="font-size:13px;color:var(--sub)">${count} <span style="font-size:11px">(${pct}%)</span></span>
+            </div>
+            <div style="height:6px;background:var(--border);border-radius:3px;overflow:hidden">
+              <div style="height:100%;width:${pct}%;background:${roleColors[role]||'var(--orange)'};border-radius:3px;transition:width 0.4s"></div>
+            </div>
+          </div>`;
+        }).join('')||'<div style="color:var(--sub);font-size:13px">No views yet</div>'}
+      </div>
+    </div>
+    <!-- Sources -->
+    <div class="card">
+      <div class="card-header"><div class="card-title">Traffic Sources</div></div>
+      <div style="padding:16px 20px;display:flex;flex-direction:column;gap:10px">
+        ${Object.entries(sources).filter(([,v])=>v>0).sort((a,b)=>b[1]-a[1]).map(([src,count])=>{
+          const pct=all30.length>0?Math.round((count/all30.length)*100):0;
+          const srcLabel={vendors_page:'Vendors Page',direct:'Direct Link',search:'Search',unknown:'Unknown'}[src]||src;
+          return `<div>
+            <div style="display:flex;justify-content:space-between;margin-bottom:4px">
+              <span style="font-size:13px;font-weight:600">${srcLabel}</span>
+              <span style="font-size:13px;color:var(--sub)">${count} <span style="font-size:11px">(${pct}%)</span></span>
+            </div>
+            <div style="height:6px;background:var(--border);border-radius:3px;overflow:hidden">
+              <div style="height:100%;width:${pct}%;background:var(--blue);border-radius:3px;transition:width 0.4s"></div>
+            </div>
+          </div>`;
+        }).join('')||'<div style="color:var(--sub);font-size:13px">No views yet</div>'}
+      </div>
+    </div>
+  </div>
+
+  <!-- Recent views -->
+  <div class="card">
+    <div class="card-header"><div class="card-title">Recent Views</div></div>
+    ${(recentViews||[]).length===0?'<div style="padding:32px;text-align:center;color:var(--sub);font-size:13px">No views recorded yet. Share your profile to get discovered.</div>':`
+    <table class="data-table">
+      <thead><tr><th>When</th><th>Viewer Type</th><th>Source</th></tr></thead>
+      <tbody>
+        ${(recentViews||[]).map(v=>`<tr>
+          <td>${new Date(v.created_at).toLocaleDateString('en-US',{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'})}</td>
+          <td><span style="font-family:var(--mono);font-size:10px;text-transform:uppercase;letter-spacing:0.08em;padding:2px 8px;border-radius:20px;background:${roleColors[v.viewer_role||'anonymous']||'var(--muted)'}22;color:${roleColors[v.viewer_role||'anonymous']||'var(--muted)'}">${roleLabels[v.viewer_role||'anonymous']||'Public'}</span></td>
+          <td style="color:var(--sub);font-size:13px">${{vendors_page:'Vendors Page',direct:'Direct',search:'Search',unknown:'Unknown'}[v.source||'unknown']||v.source||'Unknown'}</td>
+        </tr>`).join('')}
+      </tbody>
+    </table>`}
+  </div>`;
 }
 
 function renderPlan(){

@@ -356,6 +356,19 @@ function card(v,i){
 
 function openModal(id){
   const v=all.find(x=>x.id===id);if(!v)return;
+  // Track profile view (fire and forget)
+  (async()=>{
+    try{
+      const {data:{session}}=await sb.auth.getSession();
+      await sb.from('vendor_profile_views').insert({
+        vendor_id:id,
+        viewer_id:session?.user?.id||null,
+        viewer_role:session?.user?.id?(await sb.from('user_roles').select('role').eq('user_id',session.user.id).limit(1).maybeSingle()).data?.role||'customer':null,
+        source: document.referrer.includes('search')?'search':'vendors_page',
+        user_agent: navigator.userAgent.slice(0,200)
+      });
+    }catch(e){/* silent */}
+  })();
   const rawName=v.business_name||v.name||v.email||'Columbus Vendor';
   const name=rawName.includes('@')?rawName.split('@')[0]:rawName;
   const tier=(v.subscription_tier||'').toUpperCase();
