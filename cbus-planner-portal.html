@@ -441,7 +441,7 @@ sb.auth.onAuthStateChange(async(event, session)=>{
  // init() handles the initial session restore itself — _initDone guards against double-fire
  if(event==='SIGNED_IN' && session?.user && !currentUser && _initDone){
    currentUser=session.user;
-   await loadData();setLoggedInNav();nav('dashboard');
+   await loadData();await handlePendingBooking();setLoggedInNav();nav('dashboard');
  } else if(event==='SIGNED_OUT'){
    currentUser=null;renderHero();
  }
@@ -464,6 +464,7 @@ async function init(){
  window._userRoles=roles;
  await loadData();
  await handleBoostReturn();
+ await handlePendingBooking();
  setLoggedInNav();
  nav('dashboard');
  } else {
@@ -519,6 +520,138 @@ async function handleBoostReturn(){
  boost_tier:tier
  }).eq('id',eventId);
  if(!error) toast(` Event boosted for ${days} days!`);
+}
+
+async function handlePendingBooking(){
+  // Venue booking
+  const vPending=localStorage.getItem('pendingVenueBooking');
+  if(vPending){
+    try{
+      const {venueId}=JSON.parse(vPending);
+      localStorage.removeItem('pendingVenueBooking');
+      if(!venueId||!currentUser)return;
+      const app=document.getElementById('app');
+      app.innerHTML=`
+      <div class="page">
+        <div class="section-title">Complete Your Booking Request</div>
+        <div class="section-sub">You were redirected here to finish your venue booking request.</div>
+        <div class="card" style="max-width:520px;padding:28px;display:flex;flex-direction:column;gap:14px">
+          <div class="field"><label>Event Date *</label><input id="pbDate" type="date" min="${new Date().toISOString().split('T')[0]}"/></div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+            <div class="field"><label>Event Type</label>
+              <select id="pbType">
+                <option value="">Select...</option>
+                <option>Wedding</option><option>Birthday</option><option>Corporate</option>
+                <option>Baby Shower</option><option>Anniversary</option><option>Graduation</option>
+                <option>Holiday Party</option><option>Networking</option><option>Concert</option>
+                <option>Pop-Up</option><option>Other</option>
+              </select>
+            </div>
+            <div class="field"><label>Guest Count</label><input id="pbGuests" type="number" placeholder="e.g. 75" min="1"/></div>
+          </div>
+          <div class="field"><label>Message</label><textarea id="pbMsg" placeholder="Tell the venue about your event..." rows="3"></textarea></div>
+          <div id="pbStatus" style="font-size:12px;min-height:16px;color:var(--green)"></div>
+          <button class="btn btn-primary" onclick="submitPendingVenueBooking('${venueId}')" style="align-self:flex-start;padding:10px 28px">Send Booking Request →</button>
+        </div>
+      </div>`;
+    }catch(e){localStorage.removeItem('pendingVenueBooking');}
+  }
+
+  // Vendor booking
+  const vendPending=localStorage.getItem('pendingVendorBooking');
+  if(vendPending){
+    try{
+      const {vendorId}=JSON.parse(vendPending);
+      localStorage.removeItem('pendingVendorBooking');
+      if(!vendorId||!currentUser)return;
+      const app=document.getElementById('app');
+      app.innerHTML=`
+      <div class="page">
+        <div class="section-title">Complete Your Booking Request</div>
+        <div class="section-sub">You were redirected here to finish your vendor booking request.</div>
+        <div class="card" style="max-width:520px;padding:28px;display:flex;flex-direction:column;gap:14px">
+          <div class="field"><label>Event Date *</label><input id="pbDate" type="date" min="${new Date().toISOString().split('T')[0]}"/></div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+            <div class="field"><label>Event Type</label>
+              <select id="pbType">
+                <option value="">Select...</option>
+                <option>Wedding</option><option>Birthday</option><option>Corporate</option>
+                <option>Baby Shower</option><option>Anniversary</option><option>Graduation</option>
+                <option>Holiday Party</option><option>Networking</option><option>Concert</option>
+                <option>Pop-Up</option><option>Other</option>
+              </select>
+            </div>
+            <div class="field"><label>Guest Count</label><input id="pbGuests" type="number" placeholder="e.g. 75" min="1"/></div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+            <div class="field"><label>Location / Venue</label><input id="pbLocation" placeholder="e.g. The 101, Columbus OH"/></div>
+            <div class="field"><label>Budget Range</label>
+              <select id="pbBudget">
+                <option value="">Select...</option>
+                <option>Under $500</option><option>$500 - $1,000</option><option>$1,000 - $2,500</option>
+                <option>$2,500 - $5,000</option><option>$5,000+</option><option>Flexible</option>
+              </select>
+            </div>
+          </div>
+          <div class="field"><label>Message</label><textarea id="pbMsg" placeholder="Tell the vendor about your event..." rows="3"></textarea></div>
+          <div id="pbStatus" style="font-size:12px;min-height:16px;color:var(--green)"></div>
+          <button class="btn btn-primary" onclick="submitPendingVendorBooking('${vendorId}')" style="align-self:flex-start;padding:10px 28px">Send Booking Request →</button>
+        </div>
+      </div>`;
+    }catch(e){localStorage.removeItem('pendingVendorBooking');}
+  }
+}
+
+async function submitPendingVenueBooking(venueId){
+  const date=document.getElementById('pbDate')?.value;
+  const status=document.getElementById('pbStatus');
+  if(!date){if(status){status.textContent='Please select a date.';status.style.color='var(--red)';}return;}
+  const btn=document.querySelector('.card .btn-primary');
+  if(btn){btn.textContent='Sending...';btn.disabled=true;}
+  const {error}=await sb.from('booking_requests').insert({
+    venue_id:venueId,
+    planner_id:currentUser.id,
+    planner_name:currentUser.user_metadata?.full_name||currentUser.email.split('@')[0],
+    planner_email:currentUser.email,
+    event_date:date,
+    event_type:document.getElementById('pbType')?.value||null,
+    guest_count:parseInt(document.getElementById('pbGuests')?.value)||null,
+    message:document.getElementById('pbMsg')?.value||null,
+  });
+  if(error){
+    if(status){status.textContent='Error sending. Please try again.';status.style.color='var(--red)';}
+    if(btn){btn.textContent='Send Booking Request →';btn.disabled=false;}
+    return;
+  }
+  if(status){status.textContent='Request sent! The venue will respond soon.';status.style.color='var(--green)';}
+  setTimeout(()=>nav('dashboard'),2000);
+}
+
+async function submitPendingVendorBooking(vendorId){
+  const date=document.getElementById('pbDate')?.value;
+  const status=document.getElementById('pbStatus');
+  if(!date){if(status){status.textContent='Please select a date.';status.style.color='var(--red)';}return;}
+  const btn=document.querySelector('.card .btn-primary');
+  if(btn){btn.textContent='Sending...';btn.disabled=true;}
+  const {error}=await sb.from('vendor_booking_requests').insert({
+    vendor_id:vendorId,
+    planner_id:currentUser.id,
+    planner_name:currentUser.user_metadata?.full_name||currentUser.email.split('@')[0],
+    planner_email:currentUser.email,
+    event_date:date,
+    event_type:document.getElementById('pbType')?.value||null,
+    guest_count:parseInt(document.getElementById('pbGuests')?.value)||null,
+    location:document.getElementById('pbLocation')?.value||null,
+    budget_range:document.getElementById('pbBudget')?.value||null,
+    message:document.getElementById('pbMsg')?.value||null,
+  });
+  if(error){
+    if(status){status.textContent='Error sending. Please try again.';status.style.color='var(--red)';}
+    if(btn){btn.textContent='Send Booking Request →';btn.disabled=false;}
+    return;
+  }
+  if(status){status.textContent='Request sent! The vendor will respond soon.';status.style.color='var(--green)';}
+  setTimeout(()=>nav('dashboard'),2000);
 }
 
 async function loadData(){
@@ -583,7 +716,7 @@ async function doLogin(){
  const{error,data}=await sb.auth.signInWithPassword({email,password:pass});
  if(error){const el=document.getElementById('aErr');if(el){el.textContent=error.message;el.style.display='block';}return;}
  currentUser=data.user;
- await loadData();await handleBoostReturn();setLoggedInNav();
+ await loadData();await handleBoostReturn();await handlePendingBooking();setLoggedInNav();
  const upgradeParam=new URLSearchParams(window.location.search).get('upgrade');
  if(upgradeParam&&['pro','agency'].includes(upgradeParam)) nav('billing');
  else nav('events');
@@ -606,6 +739,7 @@ async function doSignup(){
  currentUser=data.user;
  await sb.from('user_roles').upsert({user_id:data.user.id,role:'planner'},{onConflict:'user_id,role'}).select().maybeSingle().catch(()=>{});
  await loadData();
+ await handlePendingBooking();
  setLoggedInNav();
  nav('dashboard');
  toast('Welcome to CBUSEVENTS!');

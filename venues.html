@@ -489,7 +489,84 @@ function openModal(id){
 }
 
 function closeModal(){document.getElementById('modalContainer').innerHTML='';}
-function goToInquiry(id){localStorage.setItem('pendingVenueInquiry',id);window.location.href='https://cbusevents.com/signup.html?role=planner';}
+
+async function goToInquiry(venueId){
+  const {data:{session}}=await sb.auth.getSession();
+  if(!session){
+    localStorage.setItem('pendingVenueBooking', JSON.stringify({venueId, returnTo:'venues'}));
+    window.location.href='https://cbusevents.com/signup.html?role=planner';
+    return;
+  }
+  const {data:roles}=await sb.from('user_roles').select('role').eq('user_id',session.user.id);
+  const isPlanner=(roles||[]).some(r=>r.role==='planner'||r.role==='customer');
+  if(!isPlanner){alert('Please sign in with a planner account to send booking requests.');return;}
+  const existing=document.querySelector('.modal-body');
+  if(!existing)return;
+  existing.innerHTML+=`
+  <div id="bookingForm" style="margin-top:0;border-top:1px solid rgba(255,255,255,0.08);padding-top:20px">
+    <div style="font-family:'DM Mono',monospace;font-size:9px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--text-faint);margin-bottom:14px">Booking Request</div>
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <div>
+        <label style="font-size:11px;color:var(--text-dim);display:block;margin-bottom:5px;font-weight:600">Event Date *</label>
+        <input id="bkDate" type="date" min="${new Date().toISOString().split('T')[0]}" style="width:100%;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:9px 12px;color:#f0f0fa;font-size:13px;font-family:'DM Sans',sans-serif">
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div>
+          <label style="font-size:11px;color:var(--text-dim);display:block;margin-bottom:5px;font-weight:600">Event Type</label>
+          <select id="bkType" style="width:100%;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:9px 12px;color:#f0f0fa;font-size:13px;font-family:'DM Sans',sans-serif">
+            <option value="">Select...</option>
+            <option>Wedding</option><option>Birthday</option><option>Corporate</option>
+            <option>Baby Shower</option><option>Anniversary</option><option>Graduation</option>
+            <option>Holiday Party</option><option>Networking</option><option>Concert</option>
+            <option>Pop-Up</option><option>Other</option>
+          </select>
+        </div>
+        <div>
+          <label style="font-size:11px;color:var(--text-dim);display:block;margin-bottom:5px;font-weight:600">Guest Count</label>
+          <input id="bkGuests" type="number" placeholder="e.g. 75" min="1" style="width:100%;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:9px 12px;color:#f0f0fa;font-size:13px;font-family:'DM Sans',sans-serif">
+        </div>
+      </div>
+      <div>
+        <label style="font-size:11px;color:var(--text-dim);display:block;margin-bottom:5px;font-weight:600">Message</label>
+        <textarea id="bkMsg" placeholder="Tell the venue about your event, any special requirements..." rows="3" style="width:100%;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:9px 12px;color:#f0f0fa;font-size:13px;font-family:'DM Sans',sans-serif;resize:none"></textarea>
+      </div>
+      <div id="bkStatus" style="font-size:12px;min-height:16px;color:#34d399"></div>
+      <button onclick="submitVenueBooking('${venueId}')" style="width:100%;padding:13px;background:#FF6B35;color:#fff;font-weight:700;font-size:14px;border-radius:10px;border:none;cursor:pointer;font-family:'DM Sans',sans-serif">Send Booking Request →</button>
+    </div>
+  </div>`;
+  document.querySelector('.modal').scrollTo({top:9999,behavior:'smooth'});
+}
+
+async function submitVenueBooking(venueId){
+  const date=document.getElementById('bkDate')?.value;
+  const status=document.getElementById('bkStatus');
+  if(!date){if(status){status.textContent='Please select an event date.';status.style.color='#f87171';}return;}
+  const {data:{session}}=await sb.auth.getSession();
+  if(!session)return;
+  const btn=document.querySelector('#bookingForm button');
+  if(btn){btn.textContent='Sending...';btn.disabled=true;}
+  const {error}=await sb.from('booking_requests').insert({
+    venue_id:venueId,
+    planner_id:session.user.id,
+    planner_name:session.user.user_metadata?.full_name||session.user.email.split('@')[0],
+    planner_email:session.user.email,
+    event_date:date,
+    event_type:document.getElementById('bkType')?.value||null,
+    guest_count:parseInt(document.getElementById('bkGuests')?.value)||null,
+    message:document.getElementById('bkMsg')?.value||null,
+  });
+  if(error){
+    if(status){status.textContent='Error sending request. Please try again.';status.style.color='#f87171';}
+    if(btn){btn.textContent='Send Booking Request →';btn.disabled=false;}
+    return;
+  }
+  document.getElementById('bookingForm').innerHTML=`
+  <div style="text-align:center;padding:24px 0">
+    <div style="font-size:32px;margin-bottom:12px">✓</div>
+    <div style="font-weight:800;font-size:16px;margin-bottom:6px">Request Sent!</div>
+    <div style="font-size:13px;color:var(--text-dim)">The venue will review your request and respond soon.</div>
+  </div>`;
+}
 function setFilter(cat,btn){activeFilter=cat;document.querySelectorAll('.filter-chip').forEach(b=>b.classList.remove('active'));btn.classList.add('active');render();}
 function handleSearch(val){searchQuery=val.trim();render();}
 function handleSort(val){sortMode=val;render();}
