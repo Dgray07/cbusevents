@@ -1437,17 +1437,12 @@ async function renderPlanners(){
  const list=roles||[];
  const userIds=list.map(r=>r.user_id);
 
- // Pull emails via admin_user_emails view
+ // Pull emails via secure RPC function
  let emailMap={};
  if(userIds.length){
-   const{data:users, error:emailErr}=await sb.from('admin_user_emails')
-     .select('id,email,created_at');
-   if(emailErr) console.error('admin_user_emails error:',emailErr);
-   console.log('admin_user_emails returned:',users?.length,'rows');
+   const{data:users, error:emailErr}=await sb.rpc('get_planner_emails',{user_ids:userIds});
+   if(emailErr) console.error('get_planner_emails error:',emailErr);
    (users||[]).forEach(u=>emailMap[u.id]={email:u.email,created_at:u.created_at});
-   console.log('emailMap keys:',Object.keys(emailMap).length);
-   console.log('looking for:',userIds[0]);
-   console.log('found:',emailMap[userIds[0]]);
  }
 
  document.getElementById('pageContent').innerHTML=`
