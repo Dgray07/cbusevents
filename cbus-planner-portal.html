@@ -338,7 +338,7 @@ tr:hover td{ background:rgba(255,255,255,0.02) !important; }
 /* ── END DESIGN SYSTEM ─────────────────────────────────────── */
 </style>
 </head>
-<body> <nav id="topNav"> <div class="nav-logo" onclick="currentUser?nav('dashboard'):showAuth('login')"> CBUS<span>EVENTS</span> <span class="nav-logo-sub">Planner</span> </div> <div class="nav-links" id="navLinks" style="display:none"> <button class="nav-btn" onclick="window.location.href='https://cbusevents.com'"> Home</button> <button class="nav-btn" id="nav-dashboard" onclick="nav('dashboard')">Dashboard</button> <button class="nav-btn" id="nav-venues" onclick="nav('venues')">Find Venues</button> <button class="nav-btn" id="nav-inquiries" onclick="nav('inquiries')">My Inquiries</button> <button class="nav-btn" id="nav-events" onclick="nav('events')">My Events</button> <button class="nav-btn" id="nav-payouts" onclick="nav('payouts')">Payouts</button> <button class="nav-btn" id="nav-profile" onclick="nav('profile')">My Profile</button> <button class="nav-btn" id="nav-billing" onclick="nav('billing')">Plan & Billing</button> </div> <div class="nav-right" id="navRight"> <button class="nav-outline" onclick="showAuth('login')">Sign In</button> <button class="nav-cta" onclick="showAuth('signup')">Get Started Free →</button> </div>
+<body> <nav id="topNav"> <div class="nav-logo" onclick="currentUser?nav('dashboard'):showAuth('login')"> CBUS<span>EVENTS</span> <span class="nav-logo-sub">Planner</span> </div> <div class="nav-links" id="navLinks" style="display:none"> <button class="nav-btn" onclick="window.location.href='https://cbusevents.com'"> Home</button> <button class="nav-btn" id="nav-dashboard" onclick="nav('dashboard')">Dashboard</button> <button class="nav-btn" id="nav-venues" onclick="nav('venues')">Find Venues</button> <button class="nav-btn" id="nav-inquiries" onclick="nav('inquiries')">My Inquiries</button> <button class="nav-btn" id="nav-events" onclick="nav('events')">My Events</button> <button class="nav-btn" id="nav-payouts" onclick="nav('payouts')">Payouts</button> <button class="nav-btn" id="nav-profile" onclick="nav('profile')">My Profile</button> <button class="nav-btn" id="nav-billing" onclick="nav('billing')">Plan & Billing</button> <button class="nav-btn" id="nav-inbox" onclick="nav('inbox')">Inbox <span id="inboxNavBadge" style="display:none;background:#FF6B35;color:#fff;border-radius:99px;font-size:10px;font-weight:700;padding:1px 7px;margin-left:4px"></span></button> </div> <div class="nav-right" id="navRight"> <button class="nav-outline" onclick="showAuth('login')">Sign In</button> <button class="nav-cta" onclick="showAuth('signup')">Get Started Free →</button> </div>
 </nav> <div id="app" id="main-content"></div>
 <div id="modal"></div>
 <div id="toast" class="toast"></div> <script src="https://unpkg.com/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
@@ -625,6 +625,7 @@ function nav(page){
  else if(page==='profile')renderProfile();
  else if(page==='billing')renderBilling();
   else if(page==='payouts')renderPayouts();
+  else if(page==='inbox')renderInboxPage();
 }
 
 // ── BILLING ───────────────────────────────────────────────────
@@ -742,6 +743,188 @@ async function renderPayouts(){
       +'</div>'
     +'</div>'
     +'</div>';
+}
+
+function renderInboxPage(){
+  const uid=currentUser?.id;
+  const app=document.getElementById('app');
+  app.innerHTML=`
+  <div class="page">
+    <div class="section-title">Inbox <span id="inboxUnreadBadge" style="display:none;background:#FF6B35;color:#fff;border-radius:99px;font-size:14px;font-weight:700;padding:2px 8px;margin-left:8px;vertical-align:middle"></span></div>
+    <div class="section-sub">Messages with venues and vendors.</div>
+    <div style="display:flex;height:calc(100vh - 180px);background:var(--card);border-radius:16px;border:1px solid var(--border);overflow:hidden">
+      <div style="width:280px;border-right:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0">
+        <div style="padding:14px 14px 10px;border-bottom:1px solid var(--border);display:flex;gap:6px">
+          <button id="inboxTabMsg" onclick="switchInboxTab('messages')" style="flex:1;padding:7px 0;border-radius:8px;border:1px solid var(--border);background:#FF6B35;color:#fff;font-weight:700;font-size:12px;cursor:pointer;font-family:'DM Sans',sans-serif">Messages</button>
+          <button id="inboxTabReq" onclick="switchInboxTab('requests')" style="flex:1;padding:7px 0;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--sub);font-weight:700;font-size:12px;cursor:pointer;font-family:'DM Sans',sans-serif">Requests</button>
+        </div>
+        <div id="inboxList" style="flex:1;overflow-y:auto"><div style="padding:24px;color:var(--sub);font-size:13px;text-align:center">Loading...</div></div>
+      </div>
+      <div id="inboxThread" style="flex:1;display:flex;align-items:center;justify-content:center;color:var(--sub);font-size:14px">
+        Select a conversation to start messaging
+      </div>
+    </div>
+  </div>`;
+  loadInboxConversations(uid);
+}
+
+let _inboxTab='messages',_inboxConvos=[],_inboxRequests=[],_activeConvo=null,_inboxChannel=null,_inboxAttachment=null;
+
+function switchInboxTab(tab){
+  _inboxTab=tab;
+  document.getElementById('inboxTabMsg').style.background=tab==='messages'?'#FF6B35':'transparent';
+  document.getElementById('inboxTabMsg').style.color=tab==='messages'?'#fff':'var(--sub)';
+  document.getElementById('inboxTabReq').style.background=tab==='requests'?'#FF6B35':'transparent';
+  document.getElementById('inboxTabReq').style.color=tab==='requests'?'#fff':'var(--sub)';
+  renderInboxList();
+}
+
+async function loadInboxConversations(uid){
+  const {data:convos}=await sb.from('conversations').select('*')
+    .or('participant_a.eq.'+uid+',participant_b.eq.'+uid)
+    .eq('status','active').order('last_message_at',{ascending:false});
+  _inboxConvos=convos||[];
+  const {data:reqs}=await sb.from('message_requests').select('*,conversations(*)')
+    .eq('recipient_id',uid).eq('status','pending');
+  _inboxRequests=reqs||[];
+  let unread=0;
+  for(const c of _inboxConvos){
+    const {count}=await sb.from('messages').select('id',{count:'exact',head:true})
+      .eq('conversation_id',c.id).neq('sender_id',uid).is('read_at',null);
+    unread+=count||0;
+  }
+  ['inboxUnreadBadge','inboxNavBadge'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el){el.textContent=unread;el.style.display=unread>0?'inline':'none';}
+  });
+  renderInboxList();
+}
+
+function renderInboxList(){
+  const el=document.getElementById('inboxList');if(!el)return;
+  const uid=currentUser?.id;
+  if(_inboxTab==='messages'){
+    if(_inboxConvos.length===0){el.innerHTML='<div style="padding:24px;color:var(--sub);font-size:13px;text-align:center">No active conversations yet.</div>';return;}
+    el.innerHTML=_inboxConvos.map(c=>{
+      const role=c.participant_a===uid?c.participant_b_role:c.participant_a_role;
+      const active=_activeConvo?.id===c.id;
+      return `<div onclick="openInboxConvo('${c.id}')" style="padding:14px 16px;border-bottom:1px solid var(--border);cursor:pointer;background:${active?'rgba(255,107,53,0.06)':'transparent'};border-left:${active?'2px solid #FF6B35':'2px solid transparent'}">
+        <div style="display:flex;justify-content:space-between;margin-bottom:3px">
+          <span style="font-weight:700;font-size:13px;text-transform:capitalize">${role}</span>
+          <span style="font-size:10px;color:var(--muted)">${new Date(c.last_message_at).toLocaleDateString()}</span>
+        </div>
+        <div style="font-size:11px;color:var(--sub);text-transform:uppercase;letter-spacing:0.08em">Active thread</div>
+      </div>`;
+    }).join('');
+  } else {
+    if(_inboxRequests.length===0){el.innerHTML='<div style="padding:24px;color:var(--sub);font-size:13px;text-align:center">No pending requests.</div>';return;}
+    el.innerHTML=_inboxRequests.map(r=>`
+      <div style="padding:16px;border-bottom:1px solid var(--border)">
+        <div style="font-weight:700;font-size:13px;margin-bottom:4px;text-transform:capitalize">${r.conversations?.participant_a_role||'Someone'} wants to connect</div>
+        <div style="font-size:12px;color:var(--sub);margin-bottom:12px">${new Date(r.created_at).toLocaleDateString()}</div>
+        <div style="display:flex;gap:8px">
+          <button onclick="acceptInboxRequest('${r.id}','${r.conversation_id}')" style="flex:1;padding:7px 0;border-radius:8px;background:#FF6B35;color:#fff;border:none;font-weight:700;font-size:12px;cursor:pointer">Accept</button>
+          <button onclick="declineInboxRequest('${r.id}','${r.conversation_id}')" style="flex:1;padding:7px 0;border-radius:8px;background:transparent;color:var(--sub);border:1px solid var(--border);font-weight:700;font-size:12px;cursor:pointer">Decline</button>
+        </div>
+      </div>`).join('');
+  }
+}
+
+async function openInboxConvo(convoId){
+  const uid=currentUser?.id;
+  _activeConvo=_inboxConvos.find(c=>c.id===convoId);
+  renderInboxList();
+  const {data:msgs}=await sb.from('messages').select('*').eq('conversation_id',convoId).order('created_at',{ascending:true});
+  await sb.from('messages').update({read_at:new Date().toISOString()}).eq('conversation_id',convoId).neq('sender_id',uid).is('read_at',null);
+  loadInboxConversations(uid);
+  const role=_activeConvo.participant_a===uid?_activeConvo.participant_b_role:_activeConvo.participant_a_role;
+  const thread=document.getElementById('inboxThread');
+  thread.style.cssText='flex:1;display:flex;flex-direction:column;align-items:unset;justify-content:unset';
+  thread.innerHTML=`
+    <div style="padding:14px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px;flex-shrink:0">
+      <div style="width:34px;height:34px;border-radius:50%;background:rgba(255,107,53,0.15);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;color:#FF6B35;flex-shrink:0">${role[0].toUpperCase()}</div>
+      <div><div style="font-weight:700;font-size:14px;text-transform:capitalize">${role}</div><div style="font-size:10px;color:var(--sub);text-transform:uppercase;letter-spacing:0.08em">Active</div></div>
+    </div>
+    <div id="msgFeed" style="flex:1;overflow-y:auto;padding:16px 20px;display:flex;flex-direction:column;gap:10px"></div>
+    <div style="padding:12px 20px;border-top:1px solid var(--border)">
+      <div id="attachPreview" style="display:none;margin-bottom:8px;padding:6px 12px;background:var(--bg);border-radius:8px;font-size:12px;color:var(--sub);display:flex;justify-content:space-between;align-items:center"></div>
+      <div style="display:flex;gap:8px;align-items:flex-end">
+        <textarea id="msgInput" placeholder="Type a message... (Enter to send)" rows="2" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendInboxMessage();}" style="flex:1;resize:none;border-radius:10px;padding:10px 14px;font-size:14px;background:var(--bg);border:1px solid var(--border);color:var(--text);font-family:'DM Sans',sans-serif"></textarea>
+        <div style="display:flex;flex-direction:column;gap:6px">
+          <button onclick="document.getElementById('inboxFileInput').click()" style="width:38px;height:38px;border-radius:10px;background:var(--bg);border:1px solid var(--border);color:var(--sub);cursor:pointer;font-size:15px;display:flex;align-items:center;justify-content:center">📎</button>
+          <button onclick="sendInboxMessage()" style="width:38px;height:38px;border-radius:10px;background:#FF6B35;border:none;color:#fff;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center">↑</button>
+        </div>
+        <input type="file" id="inboxFileInput" style="display:none" accept="image/*,.pdf,.doc,.docx" onchange="previewInboxAttachment(event)">
+      </div>
+    </div>`;
+  renderMsgFeed(msgs||[],uid);
+  if(_inboxChannel)sb.removeChannel(_inboxChannel);
+  _inboxChannel=sb.channel('inbox-planner-'+convoId)
+    .on('postgres_changes',{event:'INSERT',schema:'public',table:'messages',filter:'conversation_id=eq.'+convoId},
+      payload=>{
+        const feed=document.getElementById('msgFeed');
+        if(feed){feed.innerHTML+=renderMsgBubble(payload.new,uid);document.getElementById('msgFeedBottom')?.scrollIntoView({behavior:'smooth'});}
+      }).subscribe();
+}
+
+function renderMsgBubble(m,uid){
+  const mine=m.sender_id===uid;
+  const d=new Date(m.created_at);
+  const ts=d.toLocaleDateString('en-US',{month:'short',day:'numeric'})+' · '+d.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
+  return `<div style="display:flex;flex-direction:column;align-items:${mine?'flex-end':'flex-start'}">
+    <div style="max-width:70%;background:${mine?'#FF6B35':'var(--bg)'};color:${mine?'#fff':'var(--text)'};border-radius:${mine?'16px 16px 4px 16px':'16px 16px 16px 4px'};padding:10px 14px;font-size:14px;line-height:1.5">
+      ${m.body?`<div>${m.body}</div>`:''}
+      ${m.attachment_url&&m.attachment_type==='image'?`<img src="${m.attachment_url}" style="max-width:100%;border-radius:8px;margin-top:${m.body?'8px':'0'}">`:''}
+      ${m.attachment_url&&m.attachment_type==='file'?`<a href="${m.attachment_url}" target="_blank" style="color:${mine?'rgba(255,255,255,0.85)':'#FF6B35'};font-size:13px;display:block">Download attachment</a>`:''}
+    </div>
+    <div style="font-size:10px;color:var(--muted);margin-top:4px">${ts}</div>
+  </div>`;
+}
+
+function renderMsgFeed(msgs,uid){
+  const feed=document.getElementById('msgFeed');if(!feed)return;
+  feed.innerHTML=msgs.map(m=>renderMsgBubble(m,uid)).join('')+'<div id="msgFeedBottom"></div>';
+  document.getElementById('msgFeedBottom')?.scrollIntoView();
+}
+
+function previewInboxAttachment(e){
+  const file=e.target.files[0];if(!file)return;
+  _inboxAttachment=file;
+  const prev=document.getElementById('attachPreview');
+  if(prev){prev.style.display='flex';prev.innerHTML=`<span>${file.name}</span><button onclick="clearInboxAttachment()" style="background:none;border:none;color:var(--sub);cursor:pointer;font-size:14px">×</button>`;}
+}
+function clearInboxAttachment(){_inboxAttachment=null;const p=document.getElementById('attachPreview');if(p)p.style.display='none';}
+
+async function sendInboxMessage(){
+  const uid=currentUser?.id;
+  const input=document.getElementById('msgInput');
+  const body=input?.value.trim();
+  if(!body&&!_inboxAttachment)return;
+  let attachment_url=null,attachment_type=null;
+  if(_inboxAttachment){
+    const ext=_inboxAttachment.name.split('.').pop();
+    const path='inbox/'+_activeConvo.id+'/'+Date.now()+'.'+ext;
+    const {error}=await sb.storage.from('attachments').upload(path,_inboxAttachment,{upsert:true});
+    if(!error){const {data:u}=sb.storage.from('attachments').getPublicUrl(path);attachment_url=u.publicUrl;attachment_type=_inboxAttachment.type.startsWith('image/')?'image':'file';}
+    clearInboxAttachment();
+  }
+  await sb.from('messages').insert({conversation_id:_activeConvo.id,sender_id:uid,sender_role:'planner',body:body||null,attachment_url,attachment_type});
+  if(input)input.value='';
+  const {data:msgs}=await sb.from('messages').select('*').eq('conversation_id',_activeConvo.id).order('created_at',{ascending:true});
+  renderMsgFeed(msgs||[],uid);
+}
+
+async function acceptInboxRequest(reqId,convoId){
+  await sb.from('message_requests').update({status:'accepted'}).eq('id',reqId);
+  await sb.from('conversations').update({status:'active'}).eq('id',convoId);
+  switchInboxTab('messages');
+  loadInboxConversations(currentUser?.id);
+}
+
+async function declineInboxRequest(reqId,convoId){
+  await sb.from('message_requests').update({status:'declined'}).eq('id',reqId);
+  await sb.from('conversations').update({status:'archived'}).eq('id',convoId);
+  loadInboxConversations(currentUser?.id);
 }
 
 async function renderBilling(){

@@ -318,7 +318,7 @@ function AuthPage() {
 }
 
 // Sidebar
-const NAV = [{key:"dashboard",icon:"⊞",label:"Dashboard"},{key:"venue",icon:"",label:"My Venue"},{key:"events",icon:"",label:"Events"},{key:"calendar",icon:"",label:"Booking Calendar"},{key:"earnings",icon:"",label:"Earnings"},{key:"payouts",icon:"$",label:"Payouts"},{key:"inquiries",icon:"",label:"Inquiries"},{key:"plan",icon:"⭐",label:"Plan & Billing"}];
+const NAV = [{key:"dashboard",icon:"⊞",label:"Dashboard"},{key:"venue",icon:"",label:"My Venue"},{key:"events",icon:"",label:"Events"},{key:"calendar",icon:"",label:"Booking Calendar"},{key:"earnings",icon:"",label:"Earnings"},{key:"payouts",icon:"$",label:"Payouts"},{key:"inquiries",icon:"",label:"Inquiries"},{key:"inbox",icon:"✉",label:"Inbox"},{key:"plan",icon:"⭐",label:"Plan & Billing"}];
 const HOME_BTN_STYLE = {display:"flex",alignItems:"center",gap:10,width:"100%",background:"transparent",color:"var(--sub)",border:"1px solid transparent",borderRadius:10,padding:"10px 12px",cursor:"pointer",fontSize:13,fontFamily:"'DM Sans',sans-serif",fontWeight:400,marginBottom:2,textAlign:"left",transition:"color 0.15s"};
 
 const PORTAL_LINKS = {
@@ -1232,6 +1232,171 @@ function VenuePayouts({venue}){
 }
 
 // Plan & Billing
+function Inbox({ userId }) {
+  const [tab, setTab] = React.useState('messages');
+  const [conversations, setConversations] = React.useState([]);
+  const [requests, setRequests] = React.useState([]);
+  const [activeConvo, setActiveConvo] = React.useState(null);
+  const [messages, setMessages] = React.useState([]);
+  const [newMessage, setNewMessage] = React.useState('');
+  const [attachment, setAttachment] = React.useState(null);
+  const [sending, setSending] = React.useState(false);
+  const [unreadCount, setUnreadCount] = React.useState(0);
+  const bottomRef = React.useRef(null);
+  const fileRef = React.useRef(null);
+
+  React.useEffect(() => { if (userId) { fetchConversations(); fetchRequests(); } }, [userId]);
+  React.useEffect(() => { bottomRef.current?.scrollIntoView({ behavior: 'smooth' }); }, [messages]);
+
+  React.useEffect(() => {
+    if (!activeConvo) return;
+    const sub = sb.channel('inbox-venue-' + activeConvo.id)
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages', filter: 'conversation_id=eq.' + activeConvo.id },
+        payload => { setMessages(prev => [...prev, payload.new]); markRead(activeConvo.id); })
+      .subscribe();
+    return () => sb.removeChannel(sub);
+  }, [activeConvo]);
+
+  async function fetchConversations() {
+    const { data } = await sb.from('conversations').select('*')
+      .or('participant_a.eq.' + userId + ',participant_b.eq.' + userId)
+      .eq('status', 'active').order('last_message_at', { ascending: false });
+    if (data) { setConversations(data); let u = 0;
+      for (const c of data) { const { count } = await sb.from('messages').select('id', { count: 'exact', head: true }).eq('conversation_id', c.id).neq('sender_id', userId).is('read_at', null); u += count || 0; }
+      setUnreadCount(u); }
+  }
+
+  async function fetchRequests() {
+    const { data } = await sb.from('message_requests').select('*, conversations(*)').eq('recipient_id', userId).eq('status', 'pending');
+    if (data) setRequests(data);
+  }
+
+  async function openConversation(convo) {
+    setActiveConvo(convo);
+    const { data } = await sb.from('messages').select('*').eq('conversation_id', convo.id).order('created_at', { ascending: true });
+    if (data) setMessages(data);
+    await markRead(convo.id); fetchConversations();
+  }
+
+  async function markRead(convoId) {
+    await sb.from('messages').update({ read_at: new Date().toISOString() }).eq('conversation_id', convoId).neq('sender_id', userId).is('read_at', null);
+  }
+
+  async function handleAccept(req) {
+    await sb.from('message_requests').update({ status: 'accepted' }).eq('id', req.id);
+    await sb.from('conversations').update({ status: 'active' }).eq('id', req.conversation_id);
+    fetchRequests(); fetchConversations(); setTab('messages');
+  }
+
+  async function handleDecline(req) {
+    await sb.from('message_requests').update({ status: 'declined' }).eq('id', req.id);
+    await sb.from('conversations').update({ status: 'archived' }).eq('id', req.conversation_id);
+    fetchRequests();
+  }
+
+  async function sendMessage() {
+    if ((!newMessage.trim() && !attachment) || !activeConvo) return;
+    setSending(true);
+    let attachment_url = null, attachment_type = null;
+    if (attachment) {
+      const ext = attachment.name.split('.').pop();
+      const path = 'inbox/' + activeConvo.id + '/' + Date.now() + '.' + ext;
+      const { error } = await sb.storage.from('attachments').upload(path, attachment, { upsert: true });
+      if (!error) { const { data: urlData } = sb.storage.from('attachments').getPublicUrl(path); attachment_url = urlData.publicUrl; attachment_type = attachment.type.startsWith('image/') ? 'image' : 'file'; }
+    }
+    await sb.from('messages').insert({ conversation_id: activeConvo.id, sender_id: userId, sender_role: 'venue', body: newMessage.trim() || null, attachment_url, attachment_type });
+    setNewMessage(''); setAttachment(null); setSending(false);
+    const { data } = await sb.from('messages').select('*').eq('conversation_id', activeConvo.id).order('created_at', { ascending: true });
+    if (data) setMessages(data);
+  }
+
+  function fmt(ts) { const d = new Date(ts); return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) + ' · ' + d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }); }
+  function otherRole(c) { if (!c) return ''; return c.participant_a === userId ? c.participant_b_role : c.participant_a_role; }
+
+  return (
+    <div>
+      <h1 style={{fontFamily:"'DM Sans',sans-serif",fontSize:24,fontWeight:800,marginBottom:6,letterSpacing:"-0.03em"}}>Inbox {unreadCount > 0 && <span style={{background:"#FF6B35",color:"#fff",borderRadius:99,fontSize:12,fontWeight:700,padding:"2px 8px",marginLeft:8}}>{unreadCount}</span>}</h1>
+      <p style={{color:"var(--sub)",marginBottom:24,fontSize:14}}>Messages from planners and vendors.</p>
+      <div style={{display:"flex",height:"calc(100vh - 180px)",background:"var(--surface)",borderRadius:16,border:"1px solid var(--border)",overflow:"hidden"}}>
+        <div style={{width:280,borderRight:"1px solid var(--border)",display:"flex",flexDirection:"column",flexShrink:0}}>
+          <div style={{padding:"16px 16px 12px",borderBottom:"1px solid var(--border)"}}>
+            <div style={{display:"flex",gap:6}}>
+              {['messages','requests'].map(t=>(
+                <button key={t} onClick={()=>setTab(t)} style={{flex:1,padding:"7px 0",borderRadius:8,border:"1px solid var(--border)",background:tab===t?"#FF6B35":"transparent",color:tab===t?"#fff":"var(--sub)",fontWeight:700,fontSize:12,cursor:"pointer",textTransform:"capitalize",fontFamily:"DM Sans,sans-serif"}}>
+                  {t} {t==='requests'&&requests.length>0&&`(${requests.length})`}
+                </button>
+              ))}
+            </div>
+          </div>
+          <div style={{flex:1,overflowY:"auto"}}>
+            {tab==='messages'&&(conversations.length===0
+              ?<div style={{padding:24,color:"var(--sub)",fontSize:13,textAlign:"center"}}>No active conversations yet.</div>
+              :conversations.map(c=>(
+                <div key={c.id} onClick={()=>openConversation(c)} style={{padding:"14px 16px",borderBottom:"1px solid var(--border-sub)",cursor:"pointer",background:activeConvo?.id===c.id?"rgba(255,107,53,0.06)":"transparent",borderLeft:activeConvo?.id===c.id?"2px solid #FF6B35":"2px solid transparent"}}>
+                  <div style={{display:"flex",justifyContent:"space-between",marginBottom:3}}>
+                    <span style={{fontWeight:700,fontSize:13,textTransform:"capitalize"}}>{otherRole(c)}</span>
+                    <span style={{fontSize:10,color:"var(--muted)",fontFamily:"DM Mono,monospace"}}>{new Date(c.last_message_at).toLocaleDateString()}</span>
+                  </div>
+                  <div style={{fontSize:11,color:"var(--sub)",textTransform:"uppercase",letterSpacing:"0.08em",fontFamily:"DM Mono,monospace"}}>Active thread</div>
+                </div>
+              ))
+            )}
+            {tab==='requests'&&(requests.length===0
+              ?<div style={{padding:24,color:"var(--sub)",fontSize:13,textAlign:"center"}}>No pending requests.</div>
+              :requests.map(r=>(
+                <div key={r.id} style={{padding:"16px",borderBottom:"1px solid var(--border-sub)"}}>
+                  <div style={{fontWeight:700,fontSize:13,marginBottom:4,textTransform:"capitalize"}}>{r.conversations?.participant_a_role} wants to connect</div>
+                  <div style={{fontSize:12,color:"var(--sub)",marginBottom:12}}>{new Date(r.created_at).toLocaleDateString()}</div>
+                  <div style={{display:"flex",gap:8}}>
+                    <button onClick={()=>handleAccept(r)} style={{flex:1,padding:"7px 0",borderRadius:8,background:"#FF6B35",color:"#fff",border:"none",fontWeight:700,fontSize:12,cursor:"pointer",fontFamily:"DM Sans,sans-serif"}}>Accept</button>
+                    <button onClick={()=>handleDecline(r)} style={{flex:1,padding:"7px 0",borderRadius:8,background:"transparent",color:"var(--sub)",border:"1px solid var(--border)",fontWeight:700,fontSize:12,cursor:"pointer",fontFamily:"DM Sans,sans-serif"}}>Decline</button>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+        </div>
+        <div style={{flex:1,display:"flex",flexDirection:"column"}}>
+          {!activeConvo
+            ?<div style={{flex:1,display:"flex",alignItems:"center",justifyContent:"center",color:"var(--sub)",fontSize:14}}>Select a conversation to start messaging</div>
+            :<>
+              <div style={{padding:"14px 20px",borderBottom:"1px solid var(--border)",display:"flex",alignItems:"center",gap:12}}>
+                <div style={{width:34,height:34,borderRadius:"50%",background:"rgba(255,107,53,0.15)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:13,fontWeight:800,color:"#FF6B35"}}>{otherRole(activeConvo)?.[0]?.toUpperCase()}</div>
+                <div><div style={{fontWeight:700,fontSize:14,textTransform:"capitalize"}}>{otherRole(activeConvo)}</div><div style={{fontSize:10,color:"var(--sub)",fontFamily:"DM Mono,monospace",letterSpacing:"0.08em",textTransform:"uppercase"}}>Active</div></div>
+              </div>
+              <div style={{flex:1,overflowY:"auto",padding:"16px 20px",display:"flex",flexDirection:"column",gap:10}}>
+                {messages.map(m=>{
+                  const mine=m.sender_id===userId;
+                  return <div key={m.id} style={{display:"flex",flexDirection:"column",alignItems:mine?"flex-end":"flex-start"}}>
+                    <div style={{maxWidth:"70%",background:mine?"#FF6B35":"var(--card)",color:mine?"#fff":"var(--text)",borderRadius:mine?"16px 16px 4px 16px":"16px 16px 16px 4px",padding:"10px 14px",fontSize:14,lineHeight:1.5}}>
+                      {m.body&&<div>{m.body}</div>}
+                      {m.attachment_url&&m.attachment_type==='image'&&<img src={m.attachment_url} alt="attachment" style={{maxWidth:"100%",borderRadius:8,marginTop:m.body?8:0}}/>}
+                      {m.attachment_url&&m.attachment_type==='file'&&<a href={m.attachment_url} target="_blank" rel="noreferrer" style={{color:mine?"rgba(255,255,255,0.85)":"#FF6B35",fontSize:13,display:"block",marginTop:m.body?6:0}}>Download attachment</a>}
+                    </div>
+                    <div style={{fontSize:10,color:"var(--muted)",marginTop:4,fontFamily:"DM Mono,monospace"}}>{fmt(m.created_at)}</div>
+                  </div>;
+                })}
+                <div ref={bottomRef}/>
+              </div>
+              <div style={{padding:"12px 20px",borderTop:"1px solid var(--border)"}}>
+                {attachment&&<div style={{marginBottom:8,padding:"6px 12px",background:"var(--card)",borderRadius:8,fontSize:12,color:"var(--sub)",display:"flex",justifyContent:"space-between",alignItems:"center"}}><span>{attachment.name}</span><button onClick={()=>setAttachment(null)} style={{background:"none",border:"none",color:"var(--sub)",cursor:"pointer",fontSize:14}}>×</button></div>}
+                <div style={{display:"flex",gap:8,alignItems:"flex-end"}}>
+                  <textarea value={newMessage} onChange={e=>setNewMessage(e.target.value)} onKeyDown={e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMessage();}}} placeholder="Type a message... (Enter to send)" rows={2} style={{flex:1,resize:"none",borderRadius:10,padding:"10px 14px",fontSize:14,background:"var(--card)",border:"1px solid var(--border)",color:"var(--text)",fontFamily:"DM Sans,sans-serif"}}/>
+                  <div style={{display:"flex",flexDirection:"column",gap:6}}>
+                    <button onClick={()=>fileRef.current?.click()} style={{width:38,height:38,borderRadius:10,background:"var(--card)",border:"1px solid var(--border)",color:"var(--sub)",cursor:"pointer",fontSize:15,display:"flex",alignItems:"center",justifyContent:"center"}}>📎</button>
+                    <button onClick={sendMessage} disabled={sending} style={{width:38,height:38,borderRadius:10,background:"#FF6B35",border:"none",color:"#fff",cursor:"pointer",fontSize:16,display:"flex",alignItems:"center",justifyContent:"center",opacity:sending?0.6:1}}>{sending?"...":"↑"}</button>
+                  </div>
+                  <input ref={fileRef} type="file" style={{display:"none"}} onChange={e=>setAttachment(e.target.files[0])} accept="image/*,.pdf,.doc,.docx"/>
+                </div>
+              </div>
+            </>
+          }
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function PlanBilling({venue}) {
  const cur=venue?.tier||"free";
  const [loading,setLoading]=React.useState(null);
@@ -1327,7 +1492,8 @@ function Portal() {
  {page==="earnings"&&<Earnings venue={venue}/>}
  {page==="payouts"&&<VenuePayouts venue={venue}/>}
  {page==="inquiries"&&<Inquiries venue={venue}/>}
- {page==="plan" &&<PlanBilling venue={venue}/>}
+ {page==="inbox"&&<Inbox userId={user?.id}/>}
+{page==="plan" &&<PlanBilling venue={venue}/>}
  </>}
  </main> </div> );
 }
