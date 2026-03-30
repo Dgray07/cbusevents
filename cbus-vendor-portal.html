@@ -269,6 +269,11 @@ label{display:block;font-family:var(--mono);font-size:10px;font-weight:700;lette
     Inbox
     <span id="inboxBadge" style="display:none;margin-left:auto;background:var(--orange);color:#fff;border-radius:var(--r-full);padding:1px 8px;font-size:9px;font-weight:800">0</span>
   </button>
+  <button class="nav-item" id="nav-bookings" onclick="showPage('bookings')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="8" y1="14" x2="8" y2="14"/><line x1="12" y1="14" x2="12" y2="14"/><line x1="8" y1="18" x2="8" y2="18"/></svg>
+    Booking Calendar
+    <span id="bookingBadge" style="display:none;margin-left:auto;background:var(--orange);color:#fff;border-radius:var(--r-full);padding:1px 8px;font-size:9px;font-weight:800">0</span>
+  </button>
   <div class="sidebar-bottom">
     <div class="sidebar-plan-badge" id="planBadge">Basic</div>
     <div id="portalSwitcherVendor" style="margin-bottom:8px"></div>
@@ -544,6 +549,7 @@ function showPage(p){
  else if(p==='portfolio'){renderPortfolioPage();renderPortfolioGrid();}
  else if(p==='proposals'){renderProposalsPage();loadProposals();}
  else if(p==='store'){renderStorePage();}
+ else if(p==='bookings'){renderVendorBookingCalendar();}
  else if(p==='payouts'){renderPayoutsPage();}
  else if(p==='events'){loadBrowseEvents();}
  else if(p==='inbox'){renderInboxPage();}
@@ -1362,6 +1368,311 @@ function renderPlan(){
 }
 
 // ── STORE PAGE ────────────────────────────────────────────────
+// ── VENDOR BOOKING CALENDAR ───────────────────────────────────
+let _vendorAvailability=[], _vendorBookingRequests=[], _vcMonth=new Date(), _vcSelected=null, _vcPanel='calendar';
+
+async function renderVendorBookingCalendar(){
+  const vid=vendorProfile?.id;
+  document.getElementById('pageContent').innerHTML=`
+  <div style="margin-bottom:24px">
+    <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.18em;text-transform:uppercase;color:var(--muted);margin-bottom:4px">Availability</div>
+    <div style="font-size:22px;font-weight:800;letter-spacing:-0.03em;margin-bottom:2px">Booking Calendar</div>
+    <div style="font-size:13px;color:var(--sub)">Manage your availability and respond to booking requests.</div>
+  </div>
+  <div style="display:flex;gap:8px;margin-bottom:20px">
+    <button id="vcTabCal" onclick="vcSwitchPanel('calendar')" style="padding:8px 16px;border-radius:8px;border:1px solid var(--border);background:#FF6B35;color:#fff;font-weight:700;font-size:12px;cursor:pointer;font-family:var(--font)">Calendar</button>
+    <button id="vcTabReq" onclick="vcSwitchPanel('requests')" style="padding:8px 16px;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--sub);font-weight:700;font-size:12px;cursor:pointer;font-family:var(--font)">Requests <span id="bookingReqBadgeInner" style="display:none;background:#f87171;color:#fff;border-radius:99px;font-size:10px;font-weight:800;padding:1px 6px;margin-left:4px"></span></button>
+  </div>
+  <div id="vcMain"></div>`;
+  if(!vid){document.getElementById('vcMain').innerHTML='<div style="padding:48px;text-align:center;color:var(--sub);font-size:13px">Complete your profile setup first.</div>';return;}
+  await vcLoadData(vid);
+  vcRender();
+}
+
+async function vcLoadData(vid){
+  const [avail,reqs]=await Promise.all([
+    sb.from('vendor_availability').select('*').eq('vendor_id',vid),
+    sb.from('vendor_booking_requests').select('*').eq('vendor_id',vid).order('created_at',{ascending:false})
+  ]);
+  _vendorAvailability=avail.data||[];
+  _vendorBookingRequests=reqs.data||[];
+  const pending=_vendorBookingRequests.filter(r=>r.status==='pending').length;
+  const badge=document.getElementById('bookingBadge');
+  const inner=document.getElementById('bookingReqBadgeInner');
+  if(badge){badge.textContent=pending;badge.style.display=pending>0?'':'none';}
+  if(inner){inner.textContent=pending;inner.style.display=pending>0?'inline':'none';}
+}
+
+function vcSwitchPanel(p){
+  _vcPanel=p;
+  document.getElementById('vcTabCal').style.background=p==='calendar'?'#FF6B35':'transparent';
+  document.getElementById('vcTabCal').style.color=p==='calendar'?'#fff':'var(--sub)';
+  document.getElementById('vcTabReq').style.background=p==='requests'?'#FF6B35':'transparent';
+  document.getElementById('vcTabReq').style.color=p==='requests'?'#fff':'var(--sub)';
+  vcRender();
+}
+
+function vcDateKey(year,mon,day){
+  return `${year}-${String(mon+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
+}
+
+function vcRender(){
+  const el=document.getElementById('vcMain');if(!el)return;
+  if(_vcPanel==='calendar') vcRenderCalendar(el);
+  else vcRenderRequests(el);
+}
+
+function vcRenderCalendar(el){
+  const year=_vcMonth.getFullYear(), mon=_vcMonth.getMonth();
+  const firstDay=new Date(year,mon,1).getDay();
+  const daysInMonth=new Date(year,mon+1,0).getDate();
+  const monthName=_vcMonth.toLocaleDateString('en-US',{month:'long',year:'numeric'});
+  const today=new Date();
+  const availByDate={};
+  _vendorAvailability.forEach(a=>{availByDate[a.date]=a;});
+  const reqsByDate={};
+  _vendorBookingRequests.forEach(r=>{
+    if(!r.event_date)return;
+    const key=r.event_date;
+    if(!reqsByDate[key])reqsByDate[key]=[];
+    reqsByDate[key].push(r);
+  });
+
+  const cells=[];
+  for(let i=0;i<firstDay;i++)cells.push(null);
+  for(let d=1;d<=daysInMonth;d++)cells.push(d);
+
+  function getDayBg(day){
+    const k=vcDateKey(year,mon,day);
+    const a=availByDate[k];
+    if(a?.status==='blocked')return'rgba(248,113,113,0.12)';
+    if(a?.status==='tentative')return'rgba(251,191,36,0.1)';
+    if(a?.status==='available')return'rgba(52,211,153,0.08)';
+    return'transparent';
+  }
+
+  const selectedAvail=_vcSelected?availByDate[vcDateKey(year,mon,_vcSelected)]:null;
+  const selectedReqs=_vcSelected?(reqsByDate[vcDateKey(year,mon,_vcSelected)]||[]):[];
+
+  el.innerHTML=`
+  <div style="display:flex;gap:12px;margin-bottom:14px;flex-wrap:wrap">
+    ${[{color:'#f87171',l:'Blocked'},{color:'#fbbf24',l:'Tentative'},{color:'#34d399',l:'Available'},{color:'#FF6B35',l:'Booking Request'}].map(x=>`
+    <div style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--sub)">
+      <div style="width:8px;height:8px;border-radius:50%;background:${x.color}"></div>${x.l}
+    </div>`).join('')}
+  </div>
+  <div style="background:var(--card);border-radius:14px;border:1px solid var(--border);overflow:hidden;margin-bottom:16px">
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 20px;border-bottom:1px solid var(--border-sub)">
+      <button onclick="vcNavMonth(-1)" style="background:none;border:none;color:var(--sub);cursor:pointer;font-size:20px;padding:2px 8px">‹</button>
+      <div style="font-weight:700;font-size:15px">${monthName}</div>
+      <button onclick="vcNavMonth(1)" style="background:none;border:none;color:var(--sub);cursor:pointer;font-size:20px;padding:2px 8px">›</button>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(7,1fr);border-bottom:1px solid var(--border-sub)">
+      ${['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].map(d=>`<div style="padding:8px 4px;text-align:center;font-family:var(--mono);font-size:9px;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted)">${d}</div>`).join('')}
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(7,1fr)">
+      ${cells.map((day,i)=>{
+        if(!day)return`<div style="min-height:80px;border-right:1px solid var(--border-sub);border-bottom:1px solid var(--border-sub)"></div>`;
+        const key=vcDateKey(year,mon,day);
+        const avail=availByDate[key];
+        const reqs=reqsByDate[key]||[];
+        const isToday=today.getDate()===day&&today.getMonth()===mon&&today.getFullYear()===year;
+        const isSelected=_vcSelected===day;
+        const isPast=new Date(year,mon,day)<new Date(today.getFullYear(),today.getMonth(),today.getDate());
+        return`<div onclick="vcSelectDay(${day})" style="min-height:80px;padding:6px 4px;border-right:1px solid var(--border-sub);border-bottom:1px solid var(--border-sub);cursor:pointer;background:${isSelected?'rgba(255,107,53,0.08)':getDayBg(day)};opacity:${isPast?0.5:1}">
+          <div style="font-family:var(--mono);font-size:11px;font-weight:500;color:${isToday?'#FF6B35':'var(--sub)'};background:${isToday?'rgba(255,107,53,0.1)':'transparent'};border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center;margin-bottom:4px">${day}</div>
+          ${avail?`<div style="font-size:9px;font-weight:700;color:${avail.status==='blocked'?'#f87171':avail.status==='tentative'?'#fbbf24':'#34d399'};background:rgba(255,255,255,0.04);border-radius:3px;padding:1px 4px;margin-bottom:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${avail.status}</div>`:''}
+          ${reqs.slice(0,1).map(r=>`<div style="font-size:9px;font-weight:600;color:#FF6B35;background:rgba(255,107,53,0.08);border-radius:3px;padding:1px 4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">⬤ ${r.planner_name||'Request'}</div>`).join('')}
+          ${reqs.length>1?`<div style="font-size:9px;color:var(--muted)">+${reqs.length-1} more</div>`:''}
+        </div>`;
+      }).join('')}
+    </div>
+  </div>
+  ${_vcSelected?`
+  <div style="background:var(--card);border-radius:14px;border:1px solid var(--border);padding:20px">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:10px">
+      <div style="font-weight:700;font-size:15px">
+        ${_vcMonth.toLocaleDateString('en-US',{month:'long'})} ${_vcSelected}
+        ${selectedAvail?`<span style="margin-left:10px;font-family:var(--mono);font-size:9px;text-transform:uppercase;letter-spacing:0.1em;padding:3px 8px;border-radius:20px;background:${selectedAvail.status==='blocked'?'rgba(248,113,113,0.15)':selectedAvail.status==='tentative'?'rgba(251,191,36,0.15)':'rgba(52,211,153,0.15)'};color:${selectedAvail.status==='blocked'?'#f87171':selectedAvail.status==='tentative'?'#fbbf24':'#34d399'}">${selectedAvail.status}</span>`:''}
+      </div>
+      <button onclick="vcOpenAvailModal()" style="padding:7px 14px;border-radius:8px;background:var(--surface);border:1px solid var(--border);color:var(--text);font-weight:600;font-size:12px;cursor:pointer;font-family:var(--font)">${selectedAvail?'Edit Availability':'Set Availability'}</button>
+    </div>
+    ${selectedAvail?.note?`<p style="font-size:12px;color:var(--sub);margin-bottom:12px;font-style:italic">Note: ${selectedAvail.note}</p>`:''}
+    ${selectedReqs.length===0?`<p style="color:var(--sub);font-size:13px">No booking requests on this date.</p>`
+    :selectedReqs.map(r=>`
+    <div style="display:flex;align-items:flex-start;gap:12px;padding:12px 14px;background:var(--surface);border-radius:10px;border:1px solid var(--border-sub);margin-bottom:10px;flex-wrap:wrap">
+      <div style="flex:1;min-width:160px">
+        <div style="font-weight:700;font-size:13px;margin-bottom:4px">${r.planner_name||r.planner_email||'Planner'}</div>
+        <div style="font-size:11px;color:var(--sub);display:flex;flex-wrap:wrap;gap:8px">
+          ${r.event_type?`<span>🎉 ${r.event_type}</span>`:''}
+          ${r.guest_count?`<span>👥 ${r.guest_count} guests</span>`:''}
+          ${r.location?`<span>📍 ${r.location}</span>`:''}
+          ${r.budget_range?`<span>💰 ${r.budget_range}</span>`:''}
+        </div>
+        ${r.message?`<div style="font-size:12px;color:var(--text);margin-top:8px;line-height:1.5">${r.message}</div>`:''}
+      </div>
+      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex-shrink:0">
+        <span style="font-family:var(--mono);font-size:9px;text-transform:uppercase;letter-spacing:0.1em;padding:3px 8px;border-radius:20px;background:${r.status==='pending'?'rgba(255,107,53,0.12)':r.status==='approved'?'rgba(52,211,153,0.12)':'rgba(248,113,113,0.12)'};color:${r.status==='pending'?'#FF6B35':r.status==='approved'?'#34d399':'#f87171'}">${r.status}</span>
+        ${r.status==='pending'?`<button onclick="vcOpenResponseModal('${r.id}')" style="padding:6px 12px;border-radius:8px;background:#FF6B35;color:#fff;border:none;font-weight:700;font-size:11px;cursor:pointer;font-family:var(--font)">Respond</button>`:''}
+      </div>
+    </div>`).join('')}
+  </div>`:''}
+  <div id="vcModal"></div>`;
+}
+
+function vcNavMonth(dir){
+  const y=_vcMonth.getFullYear(),m=_vcMonth.getMonth();
+  _vcMonth=new Date(y,m+dir,1);
+  _vcSelected=null;
+  vcRender();
+}
+
+function vcSelectDay(day){
+  _vcSelected=_vcSelected===day?null:day;
+  vcRender();
+}
+
+function vcOpenAvailModal(){
+  const year=_vcMonth.getFullYear(),mon=_vcMonth.getMonth();
+  const key=vcDateKey(year,mon,_vcSelected);
+  const existing=_vendorAvailability.find(a=>a.date===key);
+  document.getElementById('vcModal').innerHTML=`
+  <div id="vcModalBg" style="position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:9999;display:flex;align-items:center;justify-content:center" onclick="if(event.target===this)vcCloseModal()">
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:28px;width:380px;max-width:90vw">
+      <div style="font-weight:800;font-size:17px;margin-bottom:4px">Set Availability</div>
+      <div style="font-size:12px;color:var(--sub);margin-bottom:20px;font-family:var(--mono)">${key}</div>
+      <div style="margin-bottom:16px">
+        <label style="font-size:12px;color:var(--sub);display:block;margin-bottom:8px;font-weight:600">Status</label>
+        <div style="display:flex;gap:8px">
+          ${[{v:'blocked',l:'Blocked',c:'#f87171'},{v:'tentative',l:'Tentative',c:'#fbbf24'},{v:'available',l:'Available',c:'#34d399'}].map(s=>`
+          <button id="vcStatus_${s.v}" onclick="vcSetStatus('${s.v}')" style="flex:1;padding:8px 0;border-radius:8px;border:1px solid ${existing?.status===s.v?s.c:'var(--border)'};background:${existing?.status===s.v?s.c+'22':'transparent'};color:${existing?.status===s.v?s.c:'var(--sub)'};font-weight:700;font-size:12px;cursor:pointer;font-family:var(--font)">${s.l}</button>`).join('')}
+        </div>
+      </div>
+      <div style="margin-bottom:20px">
+        <label style="font-size:12px;color:var(--sub);display:block;margin-bottom:6px;font-weight:600">Note (optional)</label>
+        <input id="vcAvailNote" value="${existing?.note||''}" placeholder="e.g. Already booked, holding for client..." style="width:100%;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:9px 12px;color:var(--text);font-size:13px;font-family:var(--font)">
+      </div>
+      <div style="display:flex;gap:8px">
+        <button onclick="vcSaveAvailability('${key}','${existing?.id||''}')" style="flex:1;padding:10px 0;border-radius:8px;background:#FF6B35;color:#fff;border:none;font-weight:700;font-size:13px;cursor:pointer;font-family:var(--font)">Save</button>
+        ${existing?`<button onclick="vcClearAvailability('${existing.id}')" style="padding:10px 14px;border-radius:8px;background:transparent;color:#f87171;border:1px solid rgba(248,113,113,0.3);font-weight:700;font-size:13px;cursor:pointer;font-family:var(--font)">Clear</button>`:''}
+        <button onclick="vcCloseModal()" style="padding:10px 14px;border-radius:8px;background:transparent;color:var(--sub);border:1px solid var(--border);font-weight:700;font-size:13px;cursor:pointer;font-family:var(--font)">Cancel</button>
+      </div>
+    </div>
+  </div>`;
+  window._vcCurrentStatus=existing?.status||'blocked';
+  vcHighlightStatus(window._vcCurrentStatus);
+}
+
+function vcSetStatus(s){
+  window._vcCurrentStatus=s;
+  vcHighlightStatus(s);
+}
+
+function vcHighlightStatus(s){
+  const colors={blocked:'#f87171',tentative:'#fbbf24',available:'#34d399'};
+  ['blocked','tentative','available'].forEach(v=>{
+    const btn=document.getElementById('vcStatus_'+v);
+    if(!btn)return;
+    const c=colors[v];
+    btn.style.border=`1px solid ${v===s?c:'var(--border)'}`;
+    btn.style.background=v===s?c+'22':'transparent';
+    btn.style.color=v===s?c:'var(--sub)';
+  });
+}
+
+async function vcSaveAvailability(key, existingId){
+  const note=document.getElementById('vcAvailNote')?.value||'';
+  const status=window._vcCurrentStatus||'blocked';
+  if(existingId){
+    await sb.from('vendor_availability').update({status,note}).eq('id',existingId);
+  } else {
+    await sb.from('vendor_availability').insert({vendor_id:vendorProfile.id,date:key,status,note});
+  }
+  vcCloseModal();
+  await vcLoadData(vendorProfile.id);
+  vcRender();
+}
+
+async function vcClearAvailability(id){
+  await sb.from('vendor_availability').delete().eq('id',id);
+  vcCloseModal();
+  await vcLoadData(vendorProfile.id);
+  vcRender();
+}
+
+function vcOpenResponseModal(reqId){
+  const req=_vendorBookingRequests.find(r=>r.id===reqId);
+  if(!req)return;
+  document.getElementById('vcModal').innerHTML=`
+  <div id="vcModalBg" style="position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:9999;display:flex;align-items:center;justify-content:center" onclick="if(event.target===this)vcCloseModal()">
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:28px;width:420px;max-width:90vw">
+      <div style="font-weight:800;font-size:17px;margin-bottom:12px">Respond to Request</div>
+      <div style="background:var(--card);border-radius:10px;padding:14px 16px;margin-bottom:20px">
+        <div style="font-weight:700;font-size:13px;margin-bottom:6px">${req.planner_name||req.planner_email||'Planner'}</div>
+        <div style="font-size:12px;color:var(--sub);display:flex;flex-wrap:wrap;gap:10px;margin-bottom:${req.message?'8px':'0'}">
+          <span>📅 ${new Date(req.event_date+'T00:00:00').toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric',year:'numeric'})}</span>
+          ${req.event_type?`<span>🎉 ${req.event_type}</span>`:''}
+          ${req.guest_count?`<span>👥 ${req.guest_count} guests</span>`:''}
+          ${req.location?`<span>📍 ${req.location}</span>`:''}
+          ${req.budget_range?`<span>💰 ${req.budget_range}</span>`:''}
+        </div>
+        ${req.message?`<div style="font-size:12px;color:var(--text);line-height:1.5">${req.message}</div>`:''}
+      </div>
+      <div style="margin-bottom:20px">
+        <label style="font-size:12px;color:var(--sub);display:block;margin-bottom:6px;font-weight:600">Response note (optional)</label>
+        <textarea id="vcResponseNote" placeholder="Add a note to your response..." rows="3" style="width:100%;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:9px 12px;color:var(--text);font-size:13px;font-family:var(--font);resize:none"></textarea>
+      </div>
+      <div style="display:flex;gap:8px">
+        <button onclick="vcRespondToRequest('${req.id}','approved')" style="flex:1;padding:10px 0;border-radius:8px;background:#34d399;color:#080810;border:none;font-weight:700;font-size:13px;cursor:pointer;font-family:var(--font)">✓ Approve</button>
+        <button onclick="vcRespondToRequest('${req.id}','declined')" style="flex:1;padding:10px 0;border-radius:8px;background:transparent;color:#f87171;border:1px solid rgba(248,113,113,0.35);font-weight:700;font-size:13px;cursor:pointer;font-family:var(--font)">✕ Decline</button>
+        <button onclick="vcCloseModal()" style="padding:10px 14px;border-radius:8px;background:transparent;color:var(--sub);border:1px solid var(--border);font-weight:700;font-size:13px;cursor:pointer;font-family:var(--font)">Cancel</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+async function vcRespondToRequest(reqId, status){
+  const note=document.getElementById('vcResponseNote')?.value||'';
+  await sb.from('vendor_booking_requests').update({status,response_note:note,responded_at:new Date().toISOString()}).eq('id',reqId);
+  vcCloseModal();
+  await vcLoadData(vendorProfile.id);
+  vcRender();
+}
+
+function vcCloseModal(){document.getElementById('vcModal').innerHTML='';}
+
+function vcRenderRequests(el){
+  const pending=_vendorBookingRequests.filter(r=>r.status==='pending');
+  el.innerHTML=`
+  <div style="background:var(--card);border-radius:14px;border:1px solid var(--border);overflow:hidden">
+    <div style="padding:16px 20px;border-bottom:1px solid var(--border-sub)">
+      <div style="font-weight:700;font-size:15px">Booking Requests</div>
+      <div style="font-size:12px;color:var(--sub);margin-top:2px">${_vendorBookingRequests.length} total · ${pending.length} pending</div>
+    </div>
+    ${_vendorBookingRequests.length===0?`<div style="padding:48px;text-align:center;color:var(--sub);font-size:13px">No booking requests yet. Make sure your storefront is complete so planners can find you.</div>`
+    :_vendorBookingRequests.map(r=>`
+    <div style="padding:16px 20px;border-bottom:1px solid var(--border-sub);display:flex;align-items:flex-start;gap:16px;flex-wrap:wrap">
+      <div style="flex:1;min-width:200px">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+          <span style="font-weight:700;font-size:14px">${r.planner_name||r.planner_email||'Planner'}</span>
+          <span style="font-family:var(--mono);font-size:9px;text-transform:uppercase;letter-spacing:0.1em;padding:2px 8px;border-radius:20px;background:${r.status==='pending'?'rgba(255,107,53,0.12)':r.status==='approved'?'rgba(52,211,153,0.12)':'rgba(248,113,113,0.12)'};color:${r.status==='pending'?'#FF6B35':r.status==='approved'?'#34d399':'#f87171'}">${r.status}</span>
+        </div>
+        <div style="font-size:12px;color:var(--sub);display:flex;flex-wrap:wrap;gap:10px;margin-bottom:${r.message?'8px':'0'}">
+          <span>📅 ${new Date(r.event_date+'T00:00:00').toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric',year:'numeric'})}</span>
+          ${r.event_type?`<span>🎉 ${r.event_type}</span>`:''}
+          ${r.guest_count?`<span>👥 ${r.guest_count} guests</span>`:''}
+          ${r.location?`<span>📍 ${r.location}</span>`:''}
+          ${r.budget_range?`<span>💰 ${r.budget_range}</span>`:''}
+        </div>
+        ${r.message?`<div style="font-size:12px;color:var(--text);background:var(--surface);border-radius:8px;padding:8px 12px;line-height:1.5">${r.message}</div>`:''}
+        ${r.response_note?`<div style="font-size:12px;color:var(--sub);margin-top:8px;font-style:italic">Your response: ${r.response_note}</div>`:''}
+      </div>
+      ${r.status==='pending'?`<button onclick="vcOpenResponseModal('${r.id}')" style="padding:7px 14px;border-radius:8px;background:#FF6B35;color:#fff;border:none;font-weight:700;font-size:12px;cursor:pointer;font-family:var(--font);flex-shrink:0">Respond</button>`:''}
+    </div>`).join('')}
+  </div>
+  <div id="vcModal"></div>`;
+}
+
 async function renderStorePage(){
  const tier=(vendorProfile?.subscription_tier||'FREE').toUpperCase();
  const canSell=tier==='STANDARD'||tier==='PREMIUM';

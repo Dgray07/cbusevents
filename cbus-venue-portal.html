@@ -844,14 +844,355 @@ function MarketingServices({venue}) {
 // Booking Calendar
 function BookingCalendar({venue, events}) {
  const [selected, setSelected] = React.useState(null);
- const [inquiries, setInquiries] = React.useState([]);
  const [month, setMonth] = React.useState(new Date());
+ const [availability, setAvailability] = React.useState([]);
+ const [bookingRequests, setBookingRequests] = React.useState([]);
+ const [panel, setPanel] = React.useState('calendar'); // 'calendar' | 'requests'
+ const [blockModal, setBlockModal] = React.useState(null); // {date, existing}
+ const [blockNote, setBlockNote] = React.useState('');
+ const [blockStatus, setBlockStatus] = React.useState('blocked');
+ const [responseModal, setResponseModal] = React.useState(null);
+ const [responseNote, setResponseNote] = React.useState('');
+ const [saving, setSaving] = React.useState(false);
 
- React.useEffect(()=>{
-   if(!venue?.id) return;
-   sb.from("inquiries").select("*").eq("venue_id", venue.id)
-     .then(({data})=>setInquiries(data||[]));
- },[venue?.id]);
+ React.useEffect(()=>{ if(venue?.id){ loadData(); } },[venue?.id]);
+
+ async function loadData() {
+   const [avail, reqs] = await Promise.all([
+     sb.from('venue_availability').select('*').eq('venue_id', venue.id),
+     sb.from('booking_requests').select('*').eq('venue_id', venue.id).order('created_at', {ascending:false})
+   ]);
+   setAvailability(avail.data||[]);
+   setBookingRequests(reqs.data||[]);
+ }
+
+ const year = month.getFullYear();
+ const mon = month.getMonth();
+ const firstDay = new Date(year, mon, 1).getDay();
+ const daysInMonth = new Date(year, mon+1, 0).getDate();
+ const monthName = month.toLocaleDateString('en-US',{month:'long',year:'numeric'});
+ const prevMonth = ()=>setMonth(new Date(year, mon-1, 1));
+ const nextMonth = ()=>setMonth(new Date(year, mon+1, 1));
+ const today = new Date();
+
+ // Build date maps
+ const availByDate = {};
+ availability.forEach(a=>{ availByDate[a.date] = a; });
+
+ const eventsByDate = {};
+ events.forEach(e=>{
+   if(!e.start_time) return;
+   const d = new Date(e.start_time);
+   if(d.getFullYear()===year && d.getMonth()===mon){
+     const key = d.getDate();
+     if(!eventsByDate[key]) eventsByDate[key]=[];
+     eventsByDate[key].push({...e, _type:'event'});
+   }
+ });
+ bookingRequests.forEach(r=>{
+   if(!r.event_date) return;
+   const d = new Date(r.event_date+'T00:00:00');
+   if(d.getFullYear()===year && d.getMonth()===mon){
+     const key = d.getDate();
+     if(!eventsByDate[key]) eventsByDate[key]=[];
+     eventsByDate[key].push({...r, _type:'booking_request'});
+   }
+ });
+
+ const cells = [];
+ for(let i=0;i<firstDay;i++) cells.push(null);
+ for(let d=1;d<=daysInMonth;d++) cells.push(d);
+
+ function dateKey(d) {
+   const y = year;
+   const m = String(mon+1).padStart(2,'0');
+   const day = String(d).padStart(2,'0');
+   return `${y}-${m}-${day}`;
+ }
+
+ function getDayBg(day) {
+   const key = dateKey(day);
+   const avail = availByDate[key];
+   if(avail?.status==='blocked') return 'rgba(248,113,113,0.12)';
+   if(avail?.status==='tentative') return 'rgba(251,191,36,0.1)';
+   if(avail?.status==='available') return 'rgba(52,211,153,0.08)';
+   return 'transparent';
+ }
+
+ function getDayBorder(day) {
+   const key = dateKey(day);
+   const avail = availByDate[key];
+   if(avail?.status==='blocked') return '1px solid rgba(248,113,113,0.3)';
+   if(avail?.status==='tentative') return '1px solid rgba(251,191,36,0.25)';
+   if(avail?.status==='available') return '1px solid rgba(52,211,153,0.2)';
+   return '1px solid var(--border-sub)';
+ }
+
+ function openBlockModal(day) {
+   const key = dateKey(day);
+   const existing = availByDate[key];
+   setBlockNote(existing?.note||'');
+   setBlockStatus(existing?.status||'blocked');
+   setBlockModal({day, key, existing});
+   setSelected(null);
+ }
+
+ async function saveAvailability() {
+   if(!blockModal) return;
+   setSaving(true);
+   const {key, existing} = blockModal;
+   if(existing) {
+     await sb.from('venue_availability').update({status:blockStatus, note:blockNote}).eq('id', existing.id);
+   } else {
+     await sb.from('venue_availability').insert({venue_id:venue.id, date:key, status:blockStatus, note:blockNote});
+   }
+   await loadData();
+   setSaving(false);
+   setBlockModal(null);
+ }
+
+ async function clearAvailability() {
+   if(!blockModal?.existing) return;
+   setSaving(true);
+   await sb.from('venue_availability').delete().eq('id', blockModal.existing.id);
+   await loadData();
+   setSaving(false);
+   setBlockModal(null);
+ }
+
+ async function respondToRequest(req, status) {
+   setSaving(true);
+   await sb.from('booking_requests').update({
+     status, response_note: responseNote, responded_at: new Date().toISOString()
+   }).eq('id', req.id);
+   await loadData();
+   setSaving(false);
+   setResponseModal(null);
+   setResponseNote('');
+ }
+
+ const pending = bookingRequests.filter(r=>r.status==='pending');
+ const selectedItems = selected ? (eventsByDate[selected]||[]) : [];
+ const selectedKey = selected ? dateKey(selected) : null;
+ const selectedAvail = selectedKey ? availByDate[selectedKey] : null;
+
+ const STATUS_COLOR = {
+   published:'var(--green)', draft:'var(--muted)', cancelled:'#f87171',
+   new:'#FF6B35', read:'var(--muted)', confirmed:'var(--green)',
+   pending:'#FF6B35', approved:'var(--green)', declined:'#f87171'
+ };
+
+ if(!venue) return (
+   <div>
+     <h2 style={{fontFamily:"'DM Sans',sans-serif",fontSize:22,fontWeight:800,marginBottom:6}}>Booking Calendar</h2>
+     <div style={{background:'var(--card)',borderRadius:12,border:'1px solid var(--border)',padding:48,textAlign:'center'}}><p style={{color:'var(--sub)'}}>Set up your venue first.</p></div>
+   </div>
+ );
+
+ return (
+ <div>
+   {/* Header */}
+   <div style={{display:'flex',alignItems:'flex-start',justifyContent:'space-between',marginBottom:24,flexWrap:'wrap',gap:12}}>
+     <div>
+       <h1 style={{fontFamily:"'DM Sans',sans-serif",fontSize:24,fontWeight:800,letterSpacing:'-0.03em',marginBottom:4}}>Booking Calendar</h1>
+       <p style={{color:'var(--sub)',fontSize:14}}>Manage your availability and respond to booking requests.</p>
+     </div>
+     <div style={{display:'flex',gap:8}}>
+       <button onClick={()=>setPanel('calendar')} style={{padding:'8px 16px',borderRadius:8,border:'1px solid var(--border)',background:panel==='calendar'?'#FF6B35':'transparent',color:panel==='calendar'?'#fff':'var(--sub)',fontWeight:700,fontSize:12,cursor:'pointer',fontFamily:"'DM Sans',sans-serif"}}>Calendar</button>
+       <button onClick={()=>setPanel('requests')} style={{padding:'8px 16px',borderRadius:8,border:'1px solid var(--border)',background:panel==='requests'?'#FF6B35':'transparent',color:panel==='requests'?'#fff':'var(--sub)',fontWeight:700,fontSize:12,cursor:'pointer',fontFamily:"'DM Sans',sans-serif",position:'relative'}}>
+         Requests {pending.length>0&&<span style={{background:'#f87171',color:'#fff',borderRadius:99,fontSize:10,fontWeight:800,padding:'1px 6px',marginLeft:6}}>{pending.length}</span>}
+       </button>
+     </div>
+   </div>
+
+   {panel==='calendar' && <>
+     {/* Legend */}
+     <div style={{display:'flex',gap:16,marginBottom:16,flexWrap:'wrap'}}>
+       {[
+         {color:'#f87171',label:'Blocked'},
+         {color:'#fbbf24',label:'Tentative'},
+         {color:'#34d399',label:'Available'},
+         {color:'#FF6B35',label:'Booking Request'},
+         {color:'var(--blue)',label:'Your Event'},
+       ].map(l=>(
+         <div key={l.label} style={{display:'flex',alignItems:'center',gap:6,fontSize:12,color:'var(--sub)'}}>
+           <div style={{width:8,height:8,borderRadius:'50%',background:l.color}}/>
+           {l.label}
+         </div>
+       ))}
+     </div>
+
+     {/* Calendar */}
+     <div style={{background:'var(--card)',borderRadius:14,border:'1px solid var(--border)',overflow:'hidden',marginBottom:16}}>
+       {/* Month nav */}
+       <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',padding:'14px 20px',borderBottom:'1px solid var(--border-sub)'}}>
+         <button onClick={prevMonth} style={{background:'none',border:'none',color:'var(--sub)',cursor:'pointer',fontSize:20,padding:'2px 8px',borderRadius:6}}>‹</button>
+         <div style={{fontFamily:"'DM Sans',sans-serif",fontWeight:700,fontSize:15}}>{monthName}</div>
+         <button onClick={nextMonth} style={{background:'none',border:'none',color:'var(--sub)',cursor:'pointer',fontSize:20,padding:'2px 8px',borderRadius:6}}>›</button>
+       </div>
+       {/* Day labels */}
+       <div style={{display:'grid',gridTemplateColumns:'repeat(7,1fr)',borderBottom:'1px solid var(--border-sub)'}}>
+         {['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].map(d=>(
+           <div key={d} style={{padding:'8px 4px',textAlign:'center',fontFamily:"'DM Mono',monospace",fontSize:9,letterSpacing:'0.1em',textTransform:'uppercase',color:'var(--muted)'}}>{d}</div>
+         ))}
+       </div>
+       {/* Grid */}
+       <div style={{display:'grid',gridTemplateColumns:'repeat(7,1fr)'}}>
+         {cells.map((day,i)=>{
+           if(!day) return <div key={'e'+i} style={{minHeight:80,borderRight:'1px solid var(--border-sub)',borderBottom:'1px solid var(--border-sub)'}}/>;
+           const items = eventsByDate[day]||[];
+           const isToday = today.getDate()===day && today.getMonth()===mon && today.getFullYear()===year;
+           const isSelected = selected===day;
+           const isPast = new Date(year,mon,day) < new Date(today.getFullYear(),today.getMonth(),today.getDate());
+           return (
+             <div key={day}
+               style={{minHeight:80,padding:'6px 4px',borderRight:'1px solid var(--border-sub)',borderBottom:getDayBorder(day),cursor:'pointer',background:isSelected?'rgba(255,107,53,0.08)':getDayBg(day),transition:'background 0.15s',opacity:isPast?0.5:1}}
+               onClick={()=>setSelected(isSelected?null:day)}>
+               <div style={{fontFamily:"'DM Mono',monospace",fontSize:11,fontWeight:500,color:isToday?'#FF6B35':'var(--sub)',background:isToday?'rgba(255,107,53,0.1)':'transparent',borderRadius:'50%',width:22,height:22,display:'flex',alignItems:'center',justifyContent:'center',marginBottom:4}}>{day}</div>
+               <div style={{display:'flex',flexDirection:'column',gap:2}}>
+                 {items.slice(0,2).map((item,idx)=>(
+                   <div key={idx} style={{fontSize:9,fontWeight:600,color:item._type==='booking_request'?'#FF6B35':item._type==='event'?'var(--blue)':'var(--muted)',background:'rgba(255,255,255,0.04)',borderRadius:3,padding:'1px 4px',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>
+                     {item._type==='booking_request'?'⬤ req':item.title||'Event'}
+                   </div>
+                 ))}
+                 {items.length>2&&<div style={{fontSize:9,color:'var(--muted)'}}>+{items.length-2} more</div>}
+               </div>
+             </div>
+           );
+         })}
+       </div>
+     </div>
+
+     {/* Selected day detail */}
+     {selected && (
+       <div style={{background:'var(--card)',borderRadius:14,border:'1px solid var(--border)',padding:20,marginBottom:16}}>
+         <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:16}}>
+           <div style={{fontFamily:"'DM Sans',sans-serif",fontWeight:700,fontSize:15}}>
+             {month.toLocaleDateString('en-US',{month:'long'})} {selected}
+             {selectedAvail && <span style={{marginLeft:10,fontFamily:"'DM Mono',monospace",fontSize:9,textTransform:'uppercase',letterSpacing:'0.1em',padding:'3px 8px',borderRadius:20,background:selectedAvail.status==='blocked'?'rgba(248,113,113,0.15)':selectedAvail.status==='tentative'?'rgba(251,191,36,0.15)':'rgba(52,211,153,0.15)',color:selectedAvail.status==='blocked'?'#f87171':selectedAvail.status==='tentative'?'#fbbf24':'#34d399'}}>{selectedAvail.status}</span>}
+           </div>
+           <button onClick={()=>openBlockModal(selected)} style={{padding:'7px 14px',borderRadius:8,background:'var(--surface)',border:'1px solid var(--border)',color:'var(--text)',fontWeight:600,fontSize:12,cursor:'pointer',fontFamily:"'DM Sans',sans-serif"}}>
+             {selectedAvail ? 'Edit Availability' : 'Set Availability'}
+           </button>
+         </div>
+         {selectedAvail?.note && <p style={{fontSize:12,color:'var(--sub)',marginBottom:12,fontStyle:'italic'}}>Note: {selectedAvail.note}</p>}
+         {selectedItems.length===0
+           ? <p style={{color:'var(--sub)',fontSize:13}}>No events or requests on this date.</p>
+           : <div style={{display:'flex',flexDirection:'column',gap:10}}>
+               {selectedItems.map((item,i)=>(
+                 <div key={i} style={{display:'flex',alignItems:'center',gap:12,padding:'10px 14px',background:'var(--surface)',borderRadius:10,border:'1px solid var(--border-sub)'}}>
+                   <div style={{width:8,height:8,borderRadius:'50%',flexShrink:0,background:STATUS_COLOR[item.status]||'var(--muted)'}}/>
+                   <div style={{flex:1}}>
+                     <div style={{fontWeight:600,fontSize:13}}>{item._type==='booking_request'?`Booking Request · ${item.planner_name||item.planner_email||'Planner'}`:item.title||'Event'}</div>
+                     <div style={{fontSize:11,color:'var(--muted)',marginTop:2}}>
+                       {item._type==='booking_request'?`${item.event_type||''} · ${item.guest_count||'?'} guests · ${item.status}`:`${item.category||''} · ${item.status}`}
+                     </div>
+                   </div>
+                   {item._type==='booking_request' && item.status==='pending' && (
+                     <button onClick={()=>{setResponseModal(item);setResponseNote('');}} style={{padding:'5px 12px',borderRadius:7,background:'#FF6B35',color:'#fff',border:'none',fontWeight:700,fontSize:11,cursor:'pointer',fontFamily:"'DM Sans',sans-serif"}}>Respond</button>
+                   )}
+                   <span style={{fontFamily:"'DM Mono',monospace",fontSize:9,letterSpacing:'0.1em',textTransform:'uppercase',padding:'3px 8px',borderRadius:20,background:'rgba(255,255,255,0.04)',color:STATUS_COLOR[item.status]||'var(--muted)',border:'1px solid var(--border)',flexShrink:0}}>{item.status}</span>
+                 </div>
+               ))}
+             </div>
+         }
+       </div>
+     )}
+   </>}
+
+   {/* Requests Panel */}
+   {panel==='requests' && (
+     <div style={{background:'var(--card)',borderRadius:14,border:'1px solid var(--border)',overflow:'hidden'}}>
+       <div style={{padding:'16px 20px',borderBottom:'1px solid var(--border-sub)'}}>
+         <div style={{fontWeight:700,fontSize:15}}>Booking Requests</div>
+         <div style={{fontSize:12,color:'var(--sub)',marginTop:2}}>{bookingRequests.length} total · {pending.length} pending</div>
+       </div>
+       {bookingRequests.length===0
+         ? <div style={{padding:48,textAlign:'center',color:'var(--sub)',fontSize:13}}>No booking requests yet. Share your venue profile to start receiving requests.</div>
+         : <div style={{display:'flex',flexDirection:'column'}}>
+             {bookingRequests.map(req=>(
+               <div key={req.id} style={{padding:'16px 20px',borderBottom:'1px solid var(--border-sub)',display:'flex',alignItems:'flex-start',gap:16,flexWrap:'wrap'}}>
+                 <div style={{flex:1,minWidth:200}}>
+                   <div style={{display:'flex',alignItems:'center',gap:8,marginBottom:6}}>
+                     <span style={{fontWeight:700,fontSize:14}}>{req.planner_name||req.planner_email||'Planner'}</span>
+                     <span style={{fontFamily:"'DM Mono',monospace",fontSize:9,textTransform:'uppercase',letterSpacing:'0.1em',padding:'2px 8px',borderRadius:20,background:req.status==='pending'?'rgba(255,107,53,0.12)':req.status==='approved'?'rgba(52,211,153,0.12)':'rgba(248,113,113,0.12)',color:STATUS_COLOR[req.status]||'var(--muted)'}}>{req.status}</span>
+                   </div>
+                   <div style={{fontSize:12,color:'var(--sub)',display:'flex',flexWrap:'wrap',gap:12,marginBottom:req.message?8:0}}>
+                     <span>📅 {new Date(req.event_date+'T00:00:00').toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric',year:'numeric'})}</span>
+                     {req.event_type&&<span>🎉 {req.event_type}</span>}
+                     {req.guest_count&&<span>👥 {req.guest_count} guests</span>}
+                   </div>
+                   {req.message&&<div style={{fontSize:12,color:'var(--text)',background:'var(--surface)',borderRadius:8,padding:'8px 12px',marginTop:8,lineHeight:1.5}}>{req.message}</div>}
+                   {req.response_note&&<div style={{fontSize:12,color:'var(--sub)',marginTop:8,fontStyle:'italic'}}>Your response: {req.response_note}</div>}
+                 </div>
+                 {req.status==='pending' && (
+                   <div style={{display:'flex',gap:8,flexShrink:0}}>
+                     <button onClick={()=>{setResponseModal(req);setResponseNote('');}} style={{padding:'7px 14px',borderRadius:8,background:'#FF6B35',color:'#fff',border:'none',fontWeight:700,fontSize:12,cursor:'pointer',fontFamily:"'DM Sans',sans-serif"}}>Respond</button>
+                   </div>
+                 )}
+               </div>
+             ))}
+           </div>
+       }
+     </div>
+   )}
+
+   {/* Block/Availability Modal */}
+   {blockModal && (
+     <div style={{position:'fixed',inset:0,background:'rgba(0,0,0,0.7)',zIndex:9999,display:'flex',alignItems:'center',justifyContent:'center'}} onClick={e=>{if(e.target===e.currentTarget)setBlockModal(null);}}>
+       <div style={{background:'var(--surface)',border:'1px solid var(--border)',borderRadius:16,padding:28,width:380,maxWidth:'90vw'}}>
+         <div style={{fontWeight:800,fontSize:17,marginBottom:4,letterSpacing:'-0.02em'}}>Set Availability</div>
+         <div style={{fontSize:12,color:'var(--sub)',marginBottom:20,fontFamily:"'DM Mono',monospace"}}>{blockModal.key}</div>
+         <div style={{marginBottom:16}}>
+           <label style={{fontSize:12,color:'var(--sub)',display:'block',marginBottom:8,fontWeight:600}}>Status</label>
+           <div style={{display:'flex',gap:8}}>
+             {[{v:'blocked',label:'Blocked',color:'#f87171'},{v:'tentative',label:'Tentative',color:'#fbbf24'},{v:'available',label:'Available',color:'#34d399'}].map(s=>(
+               <button key={s.v} onClick={()=>setBlockStatus(s.v)} style={{flex:1,padding:'8px 0',borderRadius:8,border:`1px solid ${blockStatus===s.v?s.color:'var(--border)'}`,background:blockStatus===s.v?`${s.color}22`:'transparent',color:blockStatus===s.v?s.color:'var(--sub)',fontWeight:700,fontSize:12,cursor:'pointer',fontFamily:"'DM Sans',sans-serif"}}>{s.label}</button>
+             ))}
+           </div>
+         </div>
+         <div style={{marginBottom:20}}>
+           <label style={{fontSize:12,color:'var(--sub)',display:'block',marginBottom:6,fontWeight:600}}>Note (optional)</label>
+           <input value={blockNote} onChange={e=>setBlockNote(e.target.value)} placeholder="e.g. Private event, maintenance, hold for client..." style={{width:'100%',background:'var(--bg)',border:'1px solid var(--border)',borderRadius:8,padding:'9px 12px',color:'var(--text)',fontSize:13,fontFamily:"'DM Sans',sans-serif"}}/>
+         </div>
+         <div style={{display:'flex',gap:8}}>
+           <button onClick={saveAvailability} disabled={saving} style={{flex:1,padding:'10px 0',borderRadius:8,background:'#FF6B35',color:'#fff',border:'none',fontWeight:700,fontSize:13,cursor:'pointer',fontFamily:"'DM Sans',sans-serif",opacity:saving?0.6:1}}>{saving?'Saving...':'Save'}</button>
+           {blockModal.existing&&<button onClick={clearAvailability} disabled={saving} style={{padding:'10px 14px',borderRadius:8,background:'transparent',color:'#f87171',border:'1px solid rgba(248,113,113,0.3)',fontWeight:700,fontSize:13,cursor:'pointer',fontFamily:"'DM Sans',sans-serif"}}>Clear</button>}
+           <button onClick={()=>setBlockModal(null)} style={{padding:'10px 14px',borderRadius:8,background:'transparent',color:'var(--sub)',border:'1px solid var(--border)',fontWeight:700,fontSize:13,cursor:'pointer',fontFamily:"'DM Sans',sans-serif"}}>Cancel</button>
+         </div>
+       </div>
+     </div>
+   )}
+
+   {/* Response Modal */}
+   {responseModal && (
+     <div style={{position:'fixed',inset:0,background:'rgba(0,0,0,0.7)',zIndex:9999,display:'flex',alignItems:'center',justifyContent:'center'}} onClick={e=>{if(e.target===e.currentTarget)setResponseModal(null);}}>
+       <div style={{background:'var(--surface)',border:'1px solid var(--border)',borderRadius:16,padding:28,width:420,maxWidth:'90vw'}}>
+         <div style={{fontWeight:800,fontSize:17,marginBottom:4,letterSpacing:'-0.02em'}}>Respond to Request</div>
+         <div style={{background:'var(--card)',borderRadius:10,padding:'12px 16px',marginBottom:20,marginTop:12}}>
+           <div style={{fontWeight:700,fontSize:13,marginBottom:4}}>{responseModal.planner_name||responseModal.planner_email}</div>
+           <div style={{fontSize:12,color:'var(--sub)',display:'flex',gap:12,flexWrap:'wrap'}}>
+             <span>📅 {new Date(responseModal.event_date+'T00:00:00').toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric',year:'numeric'})}</span>
+             {responseModal.event_type&&<span>🎉 {responseModal.event_type}</span>}
+             {responseModal.guest_count&&<span>👥 {responseModal.guest_count} guests</span>}
+           </div>
+           {responseModal.message&&<div style={{fontSize:12,color:'var(--text)',marginTop:8,lineHeight:1.5}}>{responseModal.message}</div>}
+         </div>
+         <div style={{marginBottom:20}}>
+           <label style={{fontSize:12,color:'var(--sub)',display:'block',marginBottom:6,fontWeight:600}}>Response note (optional)</label>
+           <textarea value={responseNote} onChange={e=>setResponseNote(e.target.value)} placeholder="Add a note to your response..." rows={3} style={{width:'100%',background:'var(--bg)',border:'1px solid var(--border)',borderRadius:8,padding:'9px 12px',color:'var(--text)',fontSize:13,fontFamily:"'DM Sans',sans-serif",resize:'none'}}/>
+         </div>
+         <div style={{display:'flex',gap:8}}>
+           <button onClick={()=>respondToRequest(responseModal,'approved')} disabled={saving} style={{flex:1,padding:'10px 0',borderRadius:8,background:'#34d399',color:'#080810',border:'none',fontWeight:700,fontSize:13,cursor:'pointer',fontFamily:"'DM Sans',sans-serif",opacity:saving?0.6:1}}>✓ Approve</button>
+           <button onClick={()=>respondToRequest(responseModal,'declined')} disabled={saving} style={{flex:1,padding:'10px 0',borderRadius:8,background:'transparent',color:'#f87171',border:'1px solid rgba(248,113,113,0.35)',fontWeight:700,fontSize:13,cursor:'pointer',fontFamily:"'DM Sans',sans-serif"}}>✕ Decline</button>
+           <button onClick={()=>setResponseModal(null)} style={{padding:'10px 14px',borderRadius:8,background:'transparent',color:'var(--sub)',border:'1px solid var(--border)',fontWeight:700,fontSize:13,cursor:'pointer',fontFamily:"'DM Sans',sans-serif"}}>Cancel</button>
+         </div>
+       </div>
+     </div>
+   )}
+ </div>
+ );
+}
 
  const year = month.getFullYear();
  const mon = month.getMonth();
@@ -941,55 +1282,6 @@ function BookingCalendar({venue, events}) {
          const isSelected = selected===day;
          return (
            <div key={day} onClick={()=>setSelected(isSelected?null:day)}
-             style={{minHeight:72,padding:"6px 4px",borderRight:"1px solid var(--border-sub)",borderBottom:"1px solid var(--border-sub)",cursor:items.length?"pointer":"default",background:isSelected?"rgba(255,107,53,0.06)":"transparent",transition:"background 0.15s"}}>
-             <div style={{fontFamily:"'DM Mono',monospace",fontSize:11,fontWeight:500,color:isToday?"#FF6B35":"var(--sub)",background:isToday?"rgba(255,107,53,0.1)":"transparent",borderRadius:"50%",width:22,height:22,display:"flex",alignItems:"center",justifyContent:"center",marginBottom:4}}>{day}</div>
-             <div style={{display:"flex",flexDirection:"column",gap:2}}>
-               {items.slice(0,2).map((item,idx)=>(
-                 <div key={idx} style={{fontSize:9,fontWeight:600,color:STATUS_COLOR[item.status]||"var(--muted)",background:"rgba(255,255,255,0.04)",borderRadius:3,padding:"1px 4px",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>
-                   {item._type==="inquiry"?"⬤ ":""}{item.title||item.name||"Inquiry"}
-                 </div>
-               ))}
-               {items.length>2&&<div style={{fontSize:9,color:"var(--muted)"}}>+{items.length-2} more</div>}
-             </div>
-           </div>
-         );
-       })}
-     </div>
-   </Card>
-
-   {/* Selected Day Detail */}
-   {selected && selectedItems.length>0 && (
-     <Card style={{marginTop:16,padding:20}}>
-       <div style={{fontFamily:"'DM Sans',sans-serif",fontWeight:700,fontSize:15,marginBottom:16}}>
-         {month.toLocaleDateString("en-US",{month:"long"})} {selected}
-       </div>
-       <div style={{display:"flex",flexDirection:"column",gap:10}}>
-         {selectedItems.map((item,i)=>(
-           <div key={i} style={{display:"flex",alignItems:"center",gap:12,padding:"10px 14px",background:"var(--surface)",borderRadius:10,border:"1px solid var(--border-sub)"}}>
-             <div style={{width:8,height:8,borderRadius:"50%",flexShrink:0,background:STATUS_COLOR[item.status]||"var(--muted)"}}/>
-             <div style={{flex:1}}>
-               <div style={{fontWeight:600,fontSize:13}}>{item.title||item.name||"Booking Inquiry"}</div>
-               <div style={{fontSize:11,color:"var(--muted)",marginTop:2}}>
-                 {item._type==="inquiry"?`Inquiry · ${item.email||""} · ${item.guest_count||"?"} guests`:`Event · ${item.category||""} · ${item.status}`}
-               </div>
-             </div>
-             <span style={{fontFamily:"'DM Mono',monospace",fontSize:9,letterSpacing:"0.1em",textTransform:"uppercase",padding:"3px 8px",borderRadius:20,background:"rgba(255,255,255,0.04)",color:STATUS_COLOR[item.status]||"var(--muted)",border:"1px solid var(--border)"}}>
-               {item.status}
-             </span>
-           </div>
-         ))}
-       </div>
-     </Card>
-   )}
-   {selected && selectedItems.length===0 && (
-     <Card style={{marginTop:16,padding:20,textAlign:"center"}}>
-       <p style={{color:"var(--sub)",fontSize:13}}>No events or inquiries on this date.</p>
-     </Card>
-   )}
- </div>
- );
-}
-
 // Earnings Dashboard
 function Earnings({venue}) {
  const [orders, setOrders] = React.useState([]);
