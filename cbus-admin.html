@@ -715,7 +715,7 @@ async function adminStartNewConvo(){
   const uid=currentUser?.id;
   const opts=users.filter(u=>u.user_id!==uid).map(u=>`<option value="${u.user_id}|${u.role}">${u.role} - ${u.user_id.slice(0,8)}...</option>`).join('');
   const modal=document.createElement('div');
-  modal.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:9999;display:flex;align-items:center;justify-content:center';
+  modal.id='adminNewConvoModal';
   modal.innerHTML=`<div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:28px;width:400px;max-width:90vw">
     <div style="font-weight:800;font-size:18px;margin-bottom:16px">Start New Conversation</div>
     <label style="font-size:12px;color:var(--sub);display:block;margin-bottom:6px">Select recipient</label>
@@ -724,7 +724,7 @@ async function adminStartNewConvo(){
     <textarea id="adminNewConvoMsg" placeholder="Type your message..." rows="3" style="width:100%;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:9px 12px;color:var(--text);font-size:13px;resize:none;margin-bottom:16px"></textarea>
     <div style="display:flex;gap:10px">
       <button onclick="adminCreateConvo()" style="flex:1;padding:10px;border-radius:8px;background:#FF6B35;color:#fff;border:none;font-weight:700;font-size:13px;cursor:pointer;font-family:var(--font)">Send</button>
-      <button onclick="this.closest('[style*=fixed]').remove()" style="flex:1;padding:10px;border-radius:8px;background:transparent;color:var(--sub);border:1px solid var(--border);font-weight:700;font-size:13px;cursor:pointer;font-family:var(--font)">Cancel</button>
+      <button onclick="document.getElementById('adminNewConvoModal').remove()" style="flex:1;padding:10px;border-radius:8px;background:transparent;color:var(--sub);border:1px solid var(--border);font-weight:700;font-size:13px;cursor:pointer;font-family:var(--font)">Cancel</button>
     </div>
   </div>`;
   document.body.appendChild(modal);
@@ -742,7 +742,7 @@ async function adminCreateConvo(){
   }).select().single();
   if(error||!convo){alert('Error creating conversation.');return;}
   await sb.from('messages').insert({conversation_id:convo.id,sender_id:uid,sender_role:'admin',body:msg});
-  document.querySelector('[style*=fixed][style*=z-index:9999]')?.remove();
+  document.getElementById('adminNewConvoModal')?.remove();
   adminLoadConversations(uid);
   setTimeout(()=>adminOpenConvo(convo.id),500);
 }
