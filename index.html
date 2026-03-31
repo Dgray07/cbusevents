@@ -1203,7 +1203,7 @@ h1,h2,h3,h4,h5,h6{font-family:var(--font);letter-spacing:-0.02em;}
 <!-- VENDOR MODAL -->
 <div id="vendorModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:500;overflow-y:auto;padding:20px 16px;" onclick="if(event.target===this)closeVendorModal()" role="button" tabindex="0">
  <div style="background:var(--card);border:1px solid var(--border);border-radius:16px;max-width:520px;margin:0 auto;overflow:hidden" id="vendorModalContent"></div>
-</div> <script src="https://unpkg.com/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+</div> <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 
 <script>
 const SB_URL="https://toblgvatvsjljbqogzsv.supabase.co";
@@ -1275,42 +1275,41 @@ function getVenueImg(venue){
 
 // ── INIT ──────────────────────────────────────────────────────
 async function init(){
- try {
- const [vRes,eRes,vendRes]=await Promise.all([
- sb.from('venues').select('*').eq('status','approved').order('tier',{ascending:false}),
- sb.from('events').select('*,venues(name,neighborhood,lat,lng)').eq('status','published')
- .gte('start_time',new Date().toISOString()).order('start_time',{ascending:true}),
- sb.from('vendors').select('*').order('admin_promoted',{ascending:false})
- ]);
- allVenues=vRes.data||[];
- allEvents=eRes.data||[];
- allVendors=vendRes.data||[];
- } catch(e) {
- allVenues=[];
- allEvents=[];
- }
- // Handle ?p= SPA routing (used when venues/events nav is within the SPA)
+ // Routing params — handle before any data fetch
  const pParam = new URLSearchParams(location.search).get('p');
- if(pParam==='venues'){showPage('venues',null,false);}
- else if(pParam==='events'){showPage('events',null,false);}
- else {
-   // Handle 404 redirect from GitHub Pages (?r= param)
-   const rParam = new URLSearchParams(location.search).get('r');
-   const pathToRoute = rParam ? decodeURIComponent(rParam) : location.pathname;
-   if(pathToRoute && pathToRoute !== '/') {
-     const parts = pathToRoute.replace(/^\//,'').split('/');
-     if(parts[0]==='events') {
-       showPage('events');
-     } else if(parts[0]==='category') {
-       showPage('category',parts[1]||null);
-     } else {
-       renderHome();
-     }
-     if(rParam) history.replaceState({},'',pathToRoute);
-   } else {
-     renderHome();
-   }
+ const rParam = new URLSearchParams(location.search).get('r');
+ const pathToRoute = rParam ? decodeURIComponent(rParam) : location.pathname;
+
+ // For non-home routes, show the nav immediately then let the page render
+ // (those pages fetch their own data as needed)
+ if(pParam==='venues'){ await initNavAuth(); showPage('venues',null,false); await loadSavedState(); return; }
+ if(pParam==='events'){ await initNavAuth(); showPage('events',null,false); await loadSavedState(); return; }
+ if(pathToRoute && pathToRoute !== '/'){
+   const parts = pathToRoute.replace(/^\//,'').split('/');
+   if(parts[0]==='events'){ await initNavAuth(); showPage('events'); if(rParam) history.replaceState({},'',pathToRoute); await loadSavedState(); return; }
+   if(parts[0]==='category'){ await initNavAuth(); showPage('category',parts[1]||null); if(rParam) history.replaceState({},'',pathToRoute); await loadSavedState(); return; }
  }
+
+ // Home page: show the spinner briefly in #app while all three queries run
+ // The spinner is small and below-fold — hero bg image is already loading from CSS
+ try {
+   const [vRes,eRes,vendRes]=await Promise.all([
+     sb.from('venues').select('*').eq('status','approved').order('tier',{ascending:false}),
+     sb.from('events').select('*,venues(name,neighborhood,lat,lng)').eq('status','published')
+       .gte('start_time',new Date().toISOString()).order('start_time',{ascending:true}),
+     sb.from('vendors').select('*').order('admin_promoted',{ascending:false})
+   ]);
+   allVenues=vRes.data||[];
+   allEvents=eRes.data||[];
+   allVendors=vendRes.data||[];
+ } catch(e) {
+   allVenues=[];
+   allEvents=[];
+   allVendors=[];
+ }
+
+ if(rParam) history.replaceState({},'',pathToRoute);
+ renderHome();
  await initNavAuth();
  await loadSavedState();
 }
@@ -1546,18 +1545,6 @@ function renderHome(){
    <!-- Hero floating cards - desktop only -->
    <div id="heroCards" class="hero-cards-desktop" style="position:absolute;right:48px;top:50%;transform:translateY(-50%);z-index:3;display:flex;flex-direction:column;gap:10px;width:280px"></div>
 
-   <!-- ── SOCIAL TICKER ── -->
-   <div class="hero-ticker" id="heroTicker">
-     <div class="ticker-label">
-       <span class="ticker-dot"></span>
-       Columbus Buzz
-     </div>
-     <div class="ticker-track-wrap">
-       <div class="ticker-track" id="tickerTrack">
-         <!-- JS populates items x2 for seamless loop -->
-       </div>
-     </div>
-   </div>
  </section>
 
  <!-- ══════════════════════════════════════════
@@ -2932,34 +2919,7 @@ async function toggleSaveEvent(eventId, btn, e){
 }
 
 </script>
-<script>
-// ── SOCIAL TICKER ─────────────────────────────────────────────
-(function initTicker(){
-  var TICKER_ITEMS = [
-    { src:'rss',   label:'Columbus Underground', text:'Spring festival season is ramping up across Short North and the Arena District' },
-    { src:'x',     label:'@marloncolumbus',      text:'The energy in Columbus right now is unmatched. Vendors: get on @cbusevents before this city blows up' },
-    { src:'alert', label:'Google Alert',         text:'Columbus events scene sees surge in independent venue bookings outside major ticketing platforms' },
-    { src:'rss',   label:'Experience Columbus',  text:'40+ new community events launching this April across the city' },
-    { src:'x',     label:'@djreese614',          text:'Booked two gigs through the vendor network this month. #cbusevents is doing something different' },
-    { src:'alert', label:'Google Alert',         text:'Reddit r/Columbus: best way to find local events thread hitting 200+ comments' },
-    { src:'x',     label:'@tanya.cbus',          text:'Looking for Columbus events this weekend - anyone have a single go-to spot?' },
-    { src:'rss',   label:'Columbus Underground', text:'Short North Gallery Hop drawing record crowds as local artists expand April programming' },
-  ];
-  var srcClass = { rss:'ticker-src-rss', x:'ticker-src-x', alert:'ticker-src-alert' };
-  var srcLabel = { rss:'RSS', x:'X', alert:'Alert' };
-  function buildItem(item){
-    return '<span class="ticker-item">'
-      + '<span class="ticker-source ' + srcClass[item.src] + '">' + srcLabel[item.src] + '</span>'
-      + '<span style="font-family:var(--mono);font-size:9px;color:var(--muted);letter-spacing:0.06em">' + item.label + '</span>'
-      + '<span>' + item.text + '</span>'
-      + '</span>';
-  }
-  var track = document.getElementById('tickerTrack');
-  if(!track) return;
-  var html = TICKER_ITEMS.map(buildItem).join('');
-  track.innerHTML = html + html;
-})();
-</script>
+
 <script>
 (function(){
   var btn=document.getElementById('navHamburger');
