@@ -1579,7 +1579,8 @@ function renderVendorCards(vendors){
    var cat=v.category||null;
    var catPill=cat?('<span style="display:inline-block;background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:20px;padding:3px 11px;font-size:11px;font-weight:500;color:var(--sub);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:140px;">'+cat+'</span>'):'<span style="color:var(--muted);font-size:12px;">&mdash;</span>';
    var subBadge=v.subscription_status?('<span class="badge '+subClass+'">'+v.subscription_status+'</span>'):'';
-   var promoBtn='<button class="btn '+(v.admin_promoted?'btn-ghost':'btn-success')+' btn-sm" onclick="toggleVendorPromo(\''+v.id+'\','+(!v.admin_promoted)+')">'+(v.admin_promoted?'Unpromo':'&#9733; Promo')+'</button>';
+   var promoBtn='<button class="btn '+(v.admin_promoted?'btn-ghost':'btn-success')+' btn-sm" onclick="toggleVendorPromo(\''+v.id+'\','+(!v.admin_promoted)+')">'+(v.admin_promoted?'Unpromo':'&#9733;
+   var featureBtn='<button class="btn '+(v.is_featured?'btn-ghost':'btn-success')+' btn-sm" onclick="toggleVendorFeature(\''+v.id+'\','+(!v.is_featured)+')">'+(v.is_featured?'Unfeature':'⭐ Feature')+'</button>'; Promo')+'</button>';
    var safeName=(v.business_name||v.name||'this vendor').replace(/'/g,"\\'");
    return '<div style="background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:16px 20px;display:flex;align-items:center;gap:16px;transition:border-color 0.18s;" onmouseover="this.style.borderColor=\'rgba(255,255,255,0.08)\'" onmouseout="this.style.borderColor=\'var(--border)\'">'
      +'<div style="width:40px;height:40px;border-radius:10px;background:linear-gradient(135deg,rgba(255,107,53,0.2),rgba(255,107,53,0.06));border:1px solid rgba(255,107,53,0.2);display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:800;color:var(--orange);flex-shrink:0;">'+name.charAt(0).toUpperCase()+'</div>'
@@ -1593,6 +1594,7 @@ function renderVendorCards(vendors){
        +subBadge
      +'</div>'
      +'<div style="display:flex;gap:6px;flex-shrink:0;">'
+       +featureBtn
        +promoBtn
        +'<button class="btn btn-ghost btn-sm" onclick="openEditVendor(\''+v.id+'\')">Edit</button>'
        +'<button class="btn btn-danger btn-sm" onclick="deleteVendor(\''+v.id+'\',\''+safeName+'\')">Delete</button>'
@@ -1611,6 +1613,14 @@ async function toggleVendorPromo(id,val){
  await sb.from('vendors').update({admin_promoted:val}).eq('id',id);
  await loadData();renderPage();
  toast(val?'⭐ Vendor promoted!':'Promotion removed');
+}
+
+async function toggleVendorFeature(id,val){
+ const isFeatured=val===true||val==='true';
+ const{error}=await sb.from('vendors').update({is_featured:isFeatured}).eq('id',id);
+ if(error){toast('Error: '+error.message);return;}
+ await loadData();renderPage();
+ toast(isFeatured?'⭐ Vendor featured on public page!':'Feature removed');
 }
 
 let editingVendorId=null;
