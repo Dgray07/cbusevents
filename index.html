@@ -1195,51 +1195,7 @@ h1,h2,h3,h4,h5,h6{font-family:var(--font);letter-spacing:-0.02em;}
     <a href="https://cbusevents.com/customer-portal.html" class="nav-mobile-portal-btn" style="border-color:rgba(255,107,53,0.3);color:var(--orange)">Customer</a>
   </div>
   <a href="https://cbusevents.com/signup.html" class="nav-mobile-link nav-mobile-cta" style="display:block;margin-top:10px">Join Free Today</a>
-</div> <div id="app" id="main-content" style="padding-bottom:100px">
-
-  <!-- STATIC HERO: renders immediately on first paint, no JS or Supabase required -->
-  <section id="staticHeroSection" style="position:relative;min-height:600px;display:flex;align-items:center;overflow:hidden">
-    <div id="heroSlides" style="position:absolute;inset:0">
-      <div class="hero-slide active" style="position:absolute;inset:0;opacity:1;transition:opacity 1.2s ease;background:url('https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=1600&q=80') center/cover no-repeat;animation:heroPan 20s ease-in-out infinite"></div>
-      <div class="hero-slide" style="position:absolute;inset:0;opacity:0;transition:opacity 1.2s ease;background:url('https://images.unsplash.com/photo-1501281668745-f7f57925c3b4?w=1600&q=80') center/cover no-repeat;animation:heroPan 20s ease-in-out infinite"></div>
-      <div class="hero-slide" style="position:absolute;inset:0;opacity:0;transition:opacity 1.2s ease;background:url('https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?w=1600&q=80') center/cover no-repeat;animation:heroPan 20s ease-in-out infinite"></div>
-      <div class="hero-slide" style="position:absolute;inset:0;opacity:0;transition:opacity 1.2s ease;background:url('https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=1600&q=80') center/cover no-repeat;animation:heroPan 20s ease-in-out infinite"></div>
-    </div>
-    <div style="position:absolute;inset:0;background:linear-gradient(to right,rgba(8,8,16,0.97) 35%,rgba(8,8,16,0.5) 70%,rgba(8,8,16,0.15) 100%)"></div>
-    <div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(8,8,16,0.95) 0%,transparent 40%)"></div>
-    <div style="position:relative;z-index:2;padding:72px 48px;max-width:640px;animation:fadeUp 0.7s ease">
-      <div style="display:inline-flex;align-items:center;gap:8px;background:rgba(255,107,53,0.12);border:1px solid rgba(255,107,53,0.3);border-radius:9999px;padding:5px 16px;font-family:var(--mono);font-size:10px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:var(--orange);margin-bottom:24px">
-        <span style="width:5px;height:5px;border-radius:50%;background:var(--orange);animation:pulse 2s infinite;flex-shrink:0"></span>
-        Columbus, Ohio
-      </div>
-      <h1 style="font-family:var(--font);font-weight:900;font-size:clamp(44px,7vw,80px);line-height:0.95;letter-spacing:-0.04em;text-transform:uppercase;color:var(--text);margin-bottom:20px">
-        Columbus<br><span style="color:var(--orange)">Events</span><br><span style="color:rgba(255,255,255,0.25)">Start Here.</span>
-      </h1>
-      <p style="color:var(--sub);font-size:17px;line-height:1.65;margin-bottom:32px;max-width:460px;font-weight:500">
-        The platform connecting <strong style="color:var(--text);font-weight:700">venues, vendors, planners</strong> to <strong style="color:var(--text);font-weight:700">customers</strong> across Columbus. One ecosystem for every event.
-      </p>
-      <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:28px">
-        <a href="https://cbusevents.com/signup.html" style="display:inline-flex;align-items:center;gap:8px;background:var(--orange);color:#fff;border:none;font-family:var(--font);font-weight:700;font-size:15px;padding:14px 32px;border-radius:var(--r-md);cursor:pointer;transition:all 0.2s;text-decoration:none">Join Free Today</a>
-        <button onclick="showPage('events')" style="display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,0.06);color:var(--text);border:1px solid var(--border);font-family:var(--font);font-weight:600;font-size:15px;padding:14px 24px;border-radius:var(--r-md);cursor:pointer;transition:all 0.2s">Browse Events</button>
-      </div>
-      <div id="heroDots" style="display:flex;gap:6px">
-        <div class="hero-dot active" onclick="goSlide(0)" style="width:36px;height:3px;border-radius:2px;background:var(--orange);cursor:pointer;transition:all 0.3s" role="button" tabindex="0"></div>
-        <div class="hero-dot" onclick="goSlide(1)" style="width:24px;height:3px;border-radius:2px;background:rgba(255,255,255,0.2);cursor:pointer;transition:all 0.3s" role="button" tabindex="0"></div>
-        <div class="hero-dot" onclick="goSlide(2)" style="width:24px;height:3px;border-radius:2px;background:rgba(255,255,255,0.2);cursor:pointer;transition:all 0.3s" role="button" tabindex="0"></div>
-        <div class="hero-dot" onclick="goSlide(3)" style="width:24px;height:3px;border-radius:2px;background:rgba(255,255,255,0.2);cursor:pointer;transition:all 0.3s" role="button" tabindex="0"></div>
-      </div>
-    </div>
-    <!-- Floating venue/event cards: populated by buildHeroCards() after data loads -->
-    <div id="heroCards" class="hero-cards-desktop" style="position:absolute;right:48px;top:50%;transform:translateY(-50%);z-index:3;display:flex;flex-direction:column;gap:10px;width:280px"></div>
-    <!-- Social ticker: populated by initTicker() immediately (static data) -->
-    <div class="hero-ticker" id="heroTicker">
-      <div class="ticker-label"><span class="ticker-dot"></span>Columbus Buzz</div>
-      <div class="ticker-track-wrap"><div class="ticker-track" id="tickerTrack"></div></div>
-    </div>
-  </section>
-  <!-- Below-fold dynamic content: stat bar, venue cards, event cards, map, CTA -->
-  <div id="homeContent"></div>
-
+</div> <div id="app" id="main-content" style="padding-bottom:100px"> <div style="min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px"> <div style="font-family:var(--font);font-weight:800;font-size:28px">CBUS<span style="color:#FF6B35">EVENTS</span></div> <div style="width:32px;height:32px;border:3px solid #25252f;border-top-color:#FF6B35;border-radius:50%;animation:spin 0.8s linear infinite"></div> <div style="color:#8888a0;font-size:13px">Loading Columbus venues...</div> </div>
 </div> <!-- EVENT MODAL -->
 <div id="eventModal" style="display:none" class="modal-overlay" onclick="if(event.target===this)closeEventModal()" role="button" tabindex="0"> <div class="modal" id="eventModalContent"></div>
 </div>
@@ -1247,7 +1203,7 @@ h1,h2,h3,h4,h5,h6{font-family:var(--font);letter-spacing:-0.02em;}
 <!-- VENDOR MODAL -->
 <div id="vendorModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:500;overflow-y:auto;padding:20px 16px;" onclick="if(event.target===this)closeVendorModal()" role="button" tabindex="0">
  <div style="background:var(--card);border:1px solid var(--border);border-radius:16px;max-width:520px;margin:0 auto;overflow:hidden" id="vendorModalContent"></div>
-</div> <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+</div> <script src="https://unpkg.com/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 
 <script>
 const SB_URL="https://toblgvatvsjljbqogzsv.supabase.co";
@@ -1319,71 +1275,44 @@ function getVenueImg(venue){
 
 // ── INIT ──────────────────────────────────────────────────────
 async function init(){
- // Step 1: Hero is already in static HTML — start the slider immediately, zero waiting
- initStaticHeroSlider();
-
- // Step 2: Handle routing params — non-home pages don't need home data
- const pParam = new URLSearchParams(location.search).get('p');
- const rParam = new URLSearchParams(location.search).get('r');
- const pathToRoute = rParam ? decodeURIComponent(rParam) : location.pathname;
-
- if(pParam==='venues'){ showPage('venues',null,false); initNavAuth(); return; }
- if(pParam==='events'){ showPage('events',null,false); initNavAuth(); return; }
- if(pathToRoute && pathToRoute !== '/'){
-   const parts = pathToRoute.replace(/^\//,'').split('/');
-   if(parts[0]==='events'){ showPage('events'); if(rParam) history.replaceState({},'',pathToRoute); initNavAuth(); return; }
-   if(parts[0]==='category'){ showPage('category',parts[1]||null); if(rParam) history.replaceState({},'',pathToRoute); initNavAuth(); return; }
- }
-
- // Step 3: On home page — show a minimal skeleton in homeContent while data fetches
- const hc = document.getElementById('homeContent');
- if(hc) hc.innerHTML = '<div style="height:100px;display:flex;align-items:center;justify-content:center"><div style="width:22px;height:22px;border:2px solid #25252f;border-top-color:#FF6B35;border-radius:50%;animation:spin 0.8s linear infinite"></div></div>';
-
- // Step 4: Fetch all data in background — hero is already visible and interactive
  try {
-   const [vRes,eRes,vendRes]=await Promise.all([
-     sb.from('venues').select('*').eq('status','approved').order('tier',{ascending:false}),
-     sb.from('events').select('*,venues(name,neighborhood,lat,lng)').eq('status','published')
-       .gte('start_time',new Date().toISOString()).order('start_time',{ascending:true}),
-     sb.from('vendors').select('*').order('admin_promoted',{ascending:false})
-   ]);
-   allVenues=vRes.data||[];
-   allEvents=eRes.data||[];
-   allVendors=vendRes.data||[];
+ const [vRes,eRes,vendRes]=await Promise.all([
+ sb.from('venues').select('*').eq('status','approved').order('tier',{ascending:false}),
+ sb.from('events').select('*,venues(name,neighborhood,lat,lng)').eq('status','published')
+ .gte('start_time',new Date().toISOString()).order('start_time',{ascending:true}),
+ sb.from('vendors').select('*').order('admin_promoted',{ascending:false})
+ ]);
+ allVenues=vRes.data||[];
+ allEvents=eRes.data||[];
+ allVendors=vendRes.data||[];
  } catch(e) {
-   allVenues=[];
-   allEvents=[];
-   allVendors=[];
+ allVenues=[];
+ allEvents=[];
  }
-
- // Step 5: Data ready — render below-fold content and hero floating cards
- renderHomeContent();
- buildHeroCards();
- if(rParam) history.replaceState({},'',pathToRoute);
-
+ // Handle ?p= SPA routing (used when venues/events nav is within the SPA)
+ const pParam = new URLSearchParams(location.search).get('p');
+ if(pParam==='venues'){showPage('venues',null,false);}
+ else if(pParam==='events'){showPage('events',null,false);}
+ else {
+   // Handle 404 redirect from GitHub Pages (?r= param)
+   const rParam = new URLSearchParams(location.search).get('r');
+   const pathToRoute = rParam ? decodeURIComponent(rParam) : location.pathname;
+   if(pathToRoute && pathToRoute !== '/') {
+     const parts = pathToRoute.replace(/^\//,'').split('/');
+     if(parts[0]==='events') {
+       showPage('events');
+     } else if(parts[0]==='category') {
+       showPage('category',parts[1]||null);
+     } else {
+       renderHome();
+     }
+     if(rParam) history.replaceState({},'',pathToRoute);
+   } else {
+     renderHome();
+   }
+ }
  await initNavAuth();
  await loadSavedState();
-}
-
-// Runs the hero slider on the static HTML hero — no renderHome() call needed
-function initStaticHeroSlider(){
- const SLIDE_COUNT = 4;
- heroIdx = 0;
- if(heroTimer){ clearInterval(heroTimer); heroTimer = null; }
- // Define goSlide as a standalone function accessible globally
- window.goSlide = function(idx){
-   heroIdx = idx;
-   document.querySelectorAll('.hero-slide').forEach((el,i)=>{
-     el.style.opacity = i===idx?'1':'0';
-   });
-   const dots = document.getElementById('heroDots');
-   if(dots) dots.querySelectorAll('.hero-dot').forEach((d,i)=>{
-     d.style.width    = i===idx?'36px':'24px';
-     d.style.background = i===idx?'var(--orange)':'rgba(255,255,255,0.2)';
-   });
- };
- heroTimer = setInterval(()=>{ heroIdx=(heroIdx+1)%SLIDE_COUNT; goSlide(heroIdx); }, 5200);
- window.heroTimer = heroTimer;
 }
 
 // ── HELPERS ───────────────────────────────────────────────────
@@ -1418,16 +1347,7 @@ function showPage(page,data=null,pushState=true){
  if(heroTimer){clearInterval(heroTimer);heroTimer=null;}
  setNavActive(page==='venue'||page==='category'?'venues':page);
  window.scrollTo({top:0,behavior:'smooth'});
- if(page==='home'){
-   // Hero is static — only refresh below-fold content when returning home
-   if(document.getElementById('homeContent')){
-     renderHomeContent();
-     buildHeroCards();
-     setTimeout(()=>initHomeMap(), 300);
-   } else {
-     renderHome();
-   }
- }
+ if(page==='home')renderHome();
  else if(page==='venues')renderVenues();
  else if(page==='events')renderEvents();
  else if(page==='venue')renderVenueDetail(data);
@@ -1569,32 +1489,12 @@ function renderHome(){
    .sort((a,b)=>(b.is_featured?1:0)-(a.is_featured?1:0))
    .slice(0,6);
 
- const CATEGORIES = [
-   { name:'Nightlife',  key:'Nightlife',  count: allEvents.filter(e=>e.category==='Nightlife').length,  img:'https://images.unsplash.com/photo-1566737236500-c8ac43014a67?w=600&q=80' },
-   { name:'Concerts',   key:'Concert',    count: allEvents.filter(e=>e.category==='Concert').length,    img:'https://images.unsplash.com/photo-1540039155733-5bb30b4f39c6?w=600&q=80' },
-   { name:'Arts',       key:'Arts',       count: allEvents.filter(e=>e.category==='Arts').length,       img:'https://images.unsplash.com/photo-1460661419201-fd4cecdf8a8b?w=600&q=80' },
-   { name:'Sports',     key:'Sports',     count: allEvents.filter(e=>e.category==='Sports').length,     img:'https://images.unsplash.com/photo-1471295253337-3ceaaedca402?w=600&q=80' },
-   { name:'Comedy',     key:'Comedy',     count: allEvents.filter(e=>e.category==='Comedy').length,     img:'https://images.unsplash.com/photo-1527224857830-43a7acc85260?w=600&q=80' },
-   { name:'Corporate',  key:'Corporate',  count: allEvents.filter(e=>e.category==='Corporate').length,  img:'https://images.unsplash.com/photo-1511578314322-379afb476865?w=600&q=80' },
+ const HERO_SLIDES = [
+   { bg:'https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=1600&q=80', label:'Columbus Events' },
+   { bg:'https://images.unsplash.com/photo-1501281668745-f7f57925c3b4?w=1600&q=80', label:'Live Music' },
+   { bg:'https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?w=1600&q=80', label:'Nightlife' },
+   { bg:'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=1600&q=80', label:'Private Events' },
  ];
-
- // renderHome is now a thin wrapper — hero is static, below-fold content goes to #homeContent
- renderHomeContent();
- buildHeroCards();
- setTimeout(()=>initHomeMap(), 300);
-}
-
-// Renders only the below-fold dynamic sections (stat bar, venue cards, events, map, CTA)
-// Targets #homeContent div — the static hero above it is never touched
-function renderHomeContent(){
- const thisWeek = allEvents.filter(e=>isThisWeek(e.start_time)).slice(0,8);
- const upcoming = allEvents.filter(e=>!isThisWeek(e.start_time)).slice(0,8);
- const allUpcoming = [...thisWeek,...upcoming].slice(0,8);
-
- const venueScroll = allVenues
-   .filter(v=>getVenueImg(v))
-   .sort((a,b)=>(b.is_featured?1:0)-(a.is_featured?1:0))
-   .slice(0,6);
 
  const CATEGORIES = [
    { name:'Nightlife',  key:'Nightlife',  count: allEvents.filter(e=>e.category==='Nightlife').length,  img:'https://images.unsplash.com/photo-1566737236500-c8ac43014a67?w=600&q=80' },
@@ -1605,9 +1505,62 @@ function renderHomeContent(){
    { name:'Corporate',  key:'Corporate',  count: allEvents.filter(e=>e.category==='Corporate').length,  img:'https://images.unsplash.com/photo-1511578314322-379afb476865?w=600&q=80' },
  ];
 
- const el = document.getElementById('homeContent');
- if(!el) return;
- el.innerHTML = ` <!-- ══════════════════════════════════════════
+ document.getElementById('app').innerHTML = `
+
+ <!-- ══════════════════════════════════════════
+      HERO SLIDER
+ ══════════════════════════════════════════ -->
+ <section style="position:relative;min-height:600px;display:flex;align-items:center;overflow:hidden">
+   <div id="heroSlides" style="position:absolute;inset:0">
+     ${HERO_SLIDES.map((s,i)=>`
+       <div class="hero-slide${i===0?' active':''}"
+         style="position:absolute;inset:0;opacity:${i===0?'1':'0'};transition:opacity 1.2s ease;
+         background:url('${s.bg}') center/cover no-repeat;animation:heroPan 20s ease-in-out infinite">
+       </div>`).join('')}
+   </div>
+   <div style="position:absolute;inset:0;background:linear-gradient(to right,rgba(8,8,16,0.97) 35%,rgba(8,8,16,0.5) 70%,rgba(8,8,16,0.15) 100%)"></div>
+   <div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(8,8,16,0.95) 0%,transparent 40%)"></div>
+
+   <!-- Hero content -->
+   <div style="position:relative;z-index:2;padding:72px 48px;max-width:640px;animation:fadeUp 0.7s ease">
+     <div style="display:inline-flex;align-items:center;gap:8px;background:rgba(255,107,53,0.12);border:1px solid rgba(255,107,53,0.3);border-radius:9999px;padding:5px 16px;font-family:var(--mono);font-size:10px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:var(--orange);margin-bottom:24px">
+       <span style="width:5px;height:5px;border-radius:50%;background:var(--orange);animation:pulse 2s infinite;flex-shrink:0"></span>
+       Columbus, Ohio
+     </div>
+     <h1 style="font-family:var(--font);font-weight:900;font-size:clamp(44px,7vw,80px);line-height:0.95;letter-spacing:-0.04em;text-transform:uppercase;color:var(--text);margin-bottom:20px">
+       Columbus<br><span style="color:var(--orange)">Events</span><br><span style="color:rgba(255,255,255,0.25)">Start Here.</span>
+     </h1>
+     <p style="color:var(--sub);font-size:17px;line-height:1.65;margin-bottom:32px;max-width:460px;font-weight:500">
+       The platform connecting <strong style="color:var(--text);font-weight:700">venues, vendors, planners</strong> to <strong style="color:var(--text);font-weight:700">customers</strong> across Columbus. One ecosystem for every event.
+     </p>
+     <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:28px">
+       <a href="https://cbusevents.com/signup.html" style="display:inline-flex;align-items:center;gap:8px;background:var(--orange);color:#fff;border:none;font-family:var(--font);font-weight:700;font-size:15px;padding:14px 32px;border-radius:var(--r-md);cursor:pointer;transition:all 0.2s;text-decoration:none">Join Free Today</a>
+       <button onclick="showPage('events')" style="display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,0.06);color:var(--text);border:1px solid var(--border);font-family:var(--font);font-weight:600;font-size:15px;padding:14px 24px;border-radius:var(--r-md);cursor:pointer;transition:all 0.2s">Browse Events</button>
+     </div>
+     <!-- Slide dots -->
+     <div id="heroDots" style="display:flex;gap:6px">
+       ${HERO_SLIDES.map((_,i)=>`<div class="hero-dot${i===0?' active':''}" onclick="goSlide(${i})" style="width:${i===0?'36px':'24px'};height:3px;border-radius:2px;background:${i===0?'var(--orange)':'rgba(255,255,255,0.2)'};cursor:pointer;transition:all 0.3s" role="button" tabindex="0"></div>`).join('')}
+     </div>
+   </div>
+
+   <!-- Hero floating cards - desktop only -->
+   <div id="heroCards" class="hero-cards-desktop" style="position:absolute;right:48px;top:50%;transform:translateY(-50%);z-index:3;display:flex;flex-direction:column;gap:10px;width:280px"></div>
+
+   <!-- ── SOCIAL TICKER ── -->
+   <div class="hero-ticker" id="heroTicker">
+     <div class="ticker-label">
+       <span class="ticker-dot"></span>
+       Columbus Buzz
+     </div>
+     <div class="ticker-track-wrap">
+       <div class="ticker-track" id="tickerTrack">
+         <!-- JS populates items x2 for seamless loop -->
+       </div>
+     </div>
+   </div>
+ </section>
+
+ <!-- ══════════════════════════════════════════
       STAT BAR
  ══════════════════════════════════════════ -->
  <div style="display:flex;border-top:1px solid var(--border);border-bottom:1px solid var(--border);background:rgba(8,8,16,0.9)">
@@ -1911,17 +1864,42 @@ function renderHomeContent(){
  </section>
 
  ${footer()}
- ``;
+ `;
 
+ // Init hero slider
+ let heroIdx = 0;
+ let heroTimer = setInterval(()=>goSlide((heroIdx+1)%HERO_SLIDES.length), 5200);
+ function goSlide(idx){
+   heroIdx = idx;
+   document.querySelectorAll('.hero-slide').forEach((el,i)=>{
+     el.style.opacity = i===idx?'1':'0';
+   });
+   const dots = document.getElementById('heroDots');
+   if(dots) dots.querySelectorAll('.hero-dot').forEach((d,i)=>{
+     d.style.width    = i===idx?'36px':'24px';
+     d.style.background = i===idx?'var(--orange)':'rgba(255,255,255,0.2)';
+   });
+ }
+ window.goSlide = goSlide;
+ window.heroTimer = heroTimer;
+
+ buildHeroCards();
  setTimeout(()=>initHomeMap(), 300);
 }
 
 function initHero(){
- // Static hero slides are now in the HTML — this function is a no-op kept for compatibility
- // Slider is managed by initStaticHeroSlider() called from init()
+ const slidesEl=document.getElementById('heroSlides');
+ const dotsEl=document.getElementById('heroDots');
+ if(!slidesEl)return;
+ slidesEl.innerHTML=HERO_SLIDES.map((s,i)=>`
+ <div class="hero-slide${i===0?' active':''}" style="background-image:url('${s.bg}')"></div> `).join('');
+ dotsEl.innerHTML=HERO_SLIDES.map((_,i)=>`
+ <div class="hero-dot${i===0?' active':''}" onclick="goSlide(${i})" role="button" tabindex="0"></div> `).join('');
+ heroIdx=0;
+ heroTimer=setInterval(()=>goSlide((heroIdx+1)%HERO_SLIDES.length),5000);
 }
 
-// goSlide defined in initStaticHeroSlider
+// goSlide defined in renderHome
 
 
 // ── HOME MAP ─────────────────────────────────────────────────
