@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Food Professional Portal | CBUSEVENTS</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://unpkg.com/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <style>
   :root {
     --bg: #080810;
@@ -1518,7 +1518,7 @@
 
 <script>
 const SUPABASE_URL = 'https://toblgvatvsjljbqogzsv.supabase.co';
-const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRvYmxndmF0dnNqbGpicW9nenN2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MDQ4MjkwNjMsImV4cCI6MjAyMDQwNTA2M30.tC4qRmC5YkrBpLYb1lZlv-CSHB_tGAjSWTAEfg_K3FU';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRvYmxndmF0dnNqbGpicW9nenN2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMDgwNTAsImV4cCI6MjA4NzY4NDA1MH0._WJEQPizNDiQfDXQB_DHPaQhixPGpMdmYQSmyWmm_FQ';
 
 const { createClient } = supabase;
 const db = createClient(SUPABASE_URL, SUPABASE_KEY);
@@ -1564,6 +1564,8 @@ async function handleSignup() {
 }
 
 async function ensureProfile(data) {
+  // Always upsert user_role so redirect logic works
+  await db.from('user_roles').upsert({ user_id: currentUser.id, role: 'food_professional' }, { onConflict: 'user_id' });
   const { data: existing } = await db.from('food_professionals').select('id').eq('user_id', currentUser.id).single();
   if (!existing) {
     await db.from('food_professionals').insert({
@@ -1962,12 +1964,41 @@ function resetImgUpload() {
 }
 
 // ── INIT ──
+let _initDone = false;
+
+db.auth.onAuthStateChange(async (event, session) => {
+  if (event === 'SIGNED_IN' && session?.user && !currentUser && _initDone) {
+    currentUser = session.user;
+    await loadApp();
+  } else if (event === 'SIGNED_OUT') {
+    currentUser = null;
+    document.getElementById('app').style.display = 'none';
+    document.getElementById('auth-screen').style.display = 'flex';
+  }
+});
+
 (async () => {
   const { data: { session } } = await db.auth.getSession();
   if (session?.user) {
     currentUser = session.user;
+    // Role redirect check
+    const { data: roleRows } = await db.from('user_roles').select('role').eq('user_id', currentUser.id);
+    const roles = (roleRows || []).map(r => r.role);
+    const PORTAL_MAP = {
+      venue_owner:       'https://cbusevents.com/cbus-venue-portal.html',
+      vendor:            'https://cbusevents.com/cbus-vendor-portal.html',
+      planner:           'https://cbusevents.com/cbus-planner-portal.html',
+      customer:          'https://cbusevents.com/customer-portal.html',
+      event_staff:       'https://cbusevents.com/event-staff.html',
+    };
+    if (!roles.includes('food_professional')) {
+      for (const role of roles) {
+        if (PORTAL_MAP[role]) { window.location.href = PORTAL_MAP[role]; return; }
+      }
+    }
     await loadApp();
   }
+  _initDone = true;
 })();
 </script>
 </body>

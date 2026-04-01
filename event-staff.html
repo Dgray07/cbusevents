@@ -1318,7 +1318,7 @@ body {
 
 <script>
 const SUPABASE_URL = 'https://toblgvatvsjljbqogzsv.supabase.co';
-const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRvYmxndmF0dnNqbGpicW9nenN2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MDQ4MjkwNjMsImV4cCI6MjAyMDQwNTA2M30.tC4qRmC5YkrBpLYb1lZlv-CSHB_tGAjSWTAEfg_K3FU';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRvYmxndmF0dnNqbGpicW9nenN2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMDgwNTAsImV4cCI6MjA4NzY4NDA1MH0._WJEQPizNDiQfDXQB_DHPaQhixPGpMdmYQSmyWmm_FQ';
 const { createClient } = supabase;
 const db = createClient(SUPABASE_URL, SUPABASE_KEY);
 
@@ -1363,6 +1363,8 @@ async function handleSignup() {
   if (error) return showToast(error.message, 'error');
   currentUser = data.user;
   if (currentUser) {
+    // Upsert user_role so redirect logic works
+    await db.from('user_roles').upsert({ user_id: currentUser.id, role: 'event_staff' }, { onConflict: 'user_id' });
     await db.from('event_staff').upsert({
       user_id: currentUser.id,
       display_name: `${first} ${last}`,
@@ -1722,12 +1724,41 @@ function handleCredImg(input) {
 }
 
 // ── INIT ──
+let _initDone = false;
+
+db.auth.onAuthStateChange(async (event, session) => {
+  if (event === 'SIGNED_IN' && session?.user && !currentUser && _initDone) {
+    currentUser = session.user;
+    await loadApp();
+  } else if (event === 'SIGNED_OUT') {
+    currentUser = null;
+    document.getElementById('app').style.display = 'none';
+    document.getElementById('auth-screen').style.display = 'flex';
+  }
+});
+
 (async () => {
   const { data: { session } } = await db.auth.getSession();
   if (session?.user) {
     currentUser = session.user;
+    // Role redirect check
+    const { data: roleRows } = await db.from('user_roles').select('role').eq('user_id', currentUser.id);
+    const roles = (roleRows || []).map(r => r.role);
+    const PORTAL_MAP = {
+      venue_owner:       'https://cbusevents.com/cbus-venue-portal.html',
+      vendor:            'https://cbusevents.com/cbus-vendor-portal.html',
+      planner:           'https://cbusevents.com/cbus-planner-portal.html',
+      customer:          'https://cbusevents.com/customer-portal.html',
+      food_professional: 'https://cbusevents.com/food-professional.html',
+    };
+    if (!roles.includes('event_staff')) {
+      for (const role of roles) {
+        if (PORTAL_MAP[role]) { window.location.href = PORTAL_MAP[role]; return; }
+      }
+    }
     await loadApp();
   }
+  _initDone = true;
 })();
 </script>
 </body>
