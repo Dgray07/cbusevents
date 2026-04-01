@@ -2900,14 +2900,13 @@ async function submitCapture(source) {
       // Swap the form out for a success message
       const form = document.getElementById('emailCaptureForm');
       if (form) {
-        form.innerHTML = \`
-          <div style="display:flex;align-items:center;gap:12px;background:rgba(34,197,94,0.08);border:1px solid rgba(34,197,94,0.2);border-radius:12px;padding:16px 20px">
-            <div style="font-size:22px">✓</div>
-            <div>
-              <div style="font-weight:700;color:#4ade80;margin-bottom:3px">You're on the list.</div>
-              <div style="font-size:13px;color:#a0a0c0">Check your inbox for a welcome from CBUS EVENTS.</div>
-            </div>
-          </div>\`;
+        form.innerHTML =
+          '<div style="display:flex;align-items:center;gap:12px;background:rgba(34,197,94,0.08);border:1px solid rgba(34,197,94,0.2);border-radius:12px;padding:16px 20px">' +
+          '<div style="font-size:22px">&#10003;</div>' +
+          '<div>' +
+          '<div style="font-weight:700;color:#4ade80;margin-bottom:3px">You&#39;re on the list.</div>' +
+          '<div style="font-size:13px;color:#a0a0c0">Check your inbox for a welcome from CBUS EVENTS.</div>' +
+          '</div></div>';
       }
     } else {
       status.innerHTML = '<span style="color:#FF6B35">Something went wrong. Try again.</span>';
