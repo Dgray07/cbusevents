@@ -926,7 +926,7 @@ let countdownInterval = null;
     if (userId) query = query.eq('user_id', userId);
     else query = query.eq('slug', slug);
 
-    const { data: prof, error } = await query.single();
+    const { data: prof, error } = await query.maybeSingle();
     if (error || !prof) { showNotFound(); return; }
     profile = prof;
 
@@ -935,7 +935,7 @@ let countdownInterval = null;
       .from('food_professional_events')
       .select('*')
       .eq('user_id', prof.user_id)
-      .single();
+      .maybeSingle();
     eventConfig = evt;
 
     // Load menu items
