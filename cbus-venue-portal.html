@@ -457,11 +457,16 @@ function Sidebar({active,setActive,profile,userId,navItems,staffRole}) {
 }
 
 // Dashboard
-function Dashboard({venue,events}) {
+function Dashboard({venue,events,setPage}) {
  const now=new Date(),week=new Date(now.getTime()+7*24*60*60*1000);
  const thisWeek=events.filter(e=>{const d=new Date(e.start_time);return d>=now&&d<=week;});
+ React.useEffect(()=>{
+  window._dashSetPage=setPage;
+  renderDashboardBanner(venue);
+  renderDashboardChecklist(venue,events);
+ });
  return (
- <div> <h1 style={{fontFamily:"'DM Sans',sans-serif",fontSize:24,fontWeight:800,marginBottom:6}}>{venue?.name ? `Welcome back, ${venue.name}!` : "Welcome to CBUSEVENTS!"}</h1> <p style={{color:"var(--sub)",marginBottom:28,fontSize:14}}>{venue?.name ? "Here's your venue overview." : "Let's get your venue listed and in front of Columbus planners."}</p> <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(160px,1fr))",gap:14,marginBottom:28}}> {[
+ <div> <h1 style={{fontFamily:"'DM Sans',sans-serif",fontSize:24,fontWeight:800,marginBottom:6}}>{venue?.name ? `Welcome back, ${venue.name}!` : "Welcome to CBUSEVENTS!"}</h1> <p style={{color:"var(--sub)",marginBottom:28,fontSize:14}}>{venue?.name ? "Here's your venue overview." : "Let's get your venue listed and in front of Columbus planners."}</p> <div id="dashboardBanner"></div><div id="dashboardChecklist"></div><div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(160px,1fr))",gap:14,marginBottom:28}}> {[
  {label:"Published",value:events.filter(e=>e.status==="published").length,color:"#FF6B35"},
  {label:"This Week",value:thisWeek.length,color:"var(--green)"},
  {label:"Status",value:venue?.status||"—",color:venue?.status==="approved"?"var(--green)":"#f59e0b"},
@@ -2060,6 +2065,64 @@ function Root() {
 }
 
 ReactDOM.createRoot(document.getElementById("root")).render(<Root/>);
+
+// ── DASHBOARD BANNER (plain JS, not JSX) ──────────────────────────────────
+function renderDashboardBanner(venue) {
+  var el = document.getElementById('dashboardBanner');
+  if (!el) return;
+  var tier = venue && venue.tier ? venue.tier : 'free';
+  if (tier === 'standard' || tier === 'premium') { el.innerHTML = ''; return; }
+  el.innerHTML = '<div style="background:linear-gradient(135deg,#130800,#1f0d00);border:2px solid rgba(255,107,53,0.4);border-radius:16px;padding:22px 26px;margin-bottom:22px">'
+    + '<div style="font-family:DM Mono,monospace;font-size:10px;font-weight:700;letter-spacing:0.16em;text-transform:uppercase;color:#FF6B35;margin-bottom:8px">The only subscription that pays you back</div>'
+    + '<div style="font-family:DM Sans,sans-serif;font-size:18px;font-weight:800;margin-bottom:8px;color:#fff">Earn 25% back on every ticket sold at your venue.</div>'
+    + '<div style="color:#8888a0;font-size:13px;line-height:1.6;margin-bottom:14px;max-width:480px">Standard and Premium venues earn 25% of the platform fee on every ticket, paid monthly via Stripe. Run enough events and your subscription pays for itself.</div>'
+    + '<div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px">'
+    + '<div style="background:rgba(255,107,53,0.08);border:1px solid rgba(255,107,53,0.2);border-radius:10px;padding:9px 13px"><div style="font-size:11px;color:#8888a0;margin-bottom:3px">200 guests at $25/ticket</div><div style="font-family:DM Mono,monospace;font-size:14px;font-weight:700;color:#FF6B35">$81 back per event</div></div>'
+    + '<div style="background:rgba(255,107,53,0.08);border:1px solid rgba(255,107,53,0.2);border-radius:10px;padding:9px 13px"><div style="font-size:11px;color:#8888a0;margin-bottom:3px">500 guests at $40/ticket</div><div style="font-family:DM Mono,monospace;font-size:14px;font-weight:700;color:#FF6B35">$325 back per event</div></div>'
+    + '</div>'
+    + '<div style="display:flex;gap:10px;flex-wrap:wrap">'
+    + '<a href="https://buy.stripe.com/9B64gz8Qg1Wa6d93Zuc3m03" style="display:inline-flex;align-items:center;background:#FF6B35;color:#fff;border-radius:10px;padding:10px 18px;font-size:13px;font-weight:700;text-decoration:none">Upgrade to Standard - $39/mo</a>'
+    + '<a href="https://buy.stripe.com/cNi8wPc2sfN030X7bGc3m04" style="display:inline-flex;align-items:center;background:transparent;color:#FF6B35;border:1px solid rgba(255,107,53,0.4);border-radius:10px;padding:10px 18px;font-size:13px;font-weight:700;text-decoration:none">Premium - $99/mo</a>'
+    + '</div>'
+    + '<div style="font-size:11px;color:#55556a;margin-top:8px">No contracts. Cancel anytime. Revenue share activates immediately.</div>'
+    + '</div>';
+}
+
+function renderDashboardChecklist(venue, events) {
+  var el = document.getElementById('dashboardChecklist');
+  if (!el) return;
+  var checks = [
+    {done: !!(venue && venue.name),             label: 'Name your venue',         cta: 'Set up',       page: 'venue'},
+    {done: !!(venue && venue.cover_image_url),  label: 'Add a cover photo',       cta: 'Add photo',    page: 'venue'},
+    {done: !!(venue && venue.description),      label: 'Write a description',     cta: 'Write it',     page: 'venue'},
+    {done: !!(venue && venue.neighborhood),     label: 'Set your neighborhood',   cta: 'Add location', page: 'venue'},
+    {done: !!(venue && venue.capacity),         label: 'Add your capacity',       cta: 'Add capacity', page: 'venue'},
+    {done: events && events.length > 0,         label: 'Create your first event', cta: 'Create event', page: 'events'},
+  ];
+  var doneCount = checks.filter(function(c){ return c.done; }).length;
+  if (doneCount === 6) { el.innerHTML = ''; return; }
+  var items = checks.map(function(c, idx) {
+    var btn = c.done ? '' : '<button onclick="window._dashSetPage && window._dashSetPage(''+c.page+'')" style="background:var(--card);border:1px solid var(--border);border-radius:7px;padding:4px 10px;font-size:11px;font-weight:700;color:var(--text);cursor:pointer;white-space:nowrap">'+c.cta+'</button>';
+    var check = c.done ? '<span style="color:#4ade80;font-size:11px">&#10003;</span>' : '';
+    var textStyle = c.done ? 'color:var(--sub);text-decoration:line-through' : 'color:var(--text)';
+    var bg = c.done ? 'rgba(34,197,94,0.05)' : 'var(--surface)';
+    var border = c.done ? 'rgba(34,197,94,0.15)' : 'var(--border)';
+    return '<div style="display:flex;align-items:center;gap:10px;padding:8px 10px;background:'+bg+';border:1px solid '+border+';border-radius:9px;margin-bottom:6px">'
+      + '<div style="width:18px;height:18px;border-radius:50%;background:'+(c.done?'rgba(34,197,94,0.15)':'var(--card)')+';border:1.5px solid '+(c.done?'#4ade80':'var(--border)')+';display:flex;align-items:center;justify-content:center;flex-shrink:0">'+check+'</div>'
+      + '<div style="flex:1;font-size:13px;'+textStyle+'">'+c.label+'</div>'
+      + btn
+      + '</div>';
+  }).join('');
+  var pct = Math.round(doneCount/6*100);
+  el.innerHTML = '<div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:18px 20px;margin-bottom:22px">'
+    + '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">'
+    + '<div><div style="font-weight:700;font-size:14px;margin-bottom:2px">Complete your listing</div><div style="font-size:12px;color:var(--sub)">Planners cannot find you until your profile is set up.</div></div>'
+    + '<div style="font-family:DM Mono,monospace;font-size:12px;color:#FF6B35;font-weight:700">'+doneCount+'/6</div>'
+    + '</div>'
+    + '<div style="height:3px;background:var(--surface);border-radius:3px;margin-bottom:14px;overflow:hidden"><div style="height:100%;width:'+pct+'%;background:#FF6B35;border-radius:3px"></div></div>'
+    + items
+    + '</div>';
+}
 </script>
 
 <script>
