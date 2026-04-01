@@ -478,7 +478,7 @@ function Dashboard({venue,events,setPage}) {
  return (
   <div>
 
-   {/* HEADER */}
+   {/* header */}
    <h1 style={{fontFamily:"'DM Sans',sans-serif",fontSize:24,fontWeight:800,marginBottom:4}}>
     {venue?.name ? "Welcome back, "+venue.name+"!" : "Welcome to CBUSEVENTS!"}
    </h1>
@@ -486,7 +486,7 @@ function Dashboard({venue,events,setPage}) {
     {!venue ? "Let's get your venue in front of Columbus planners." : isPaid ? "Here's your venue overview." : "Complete your profile and upgrade to start getting inquiries."}
    </p>
 
-   {/* REVENUE SHARE BANNER — free accounts only, always first thing they see */}
+   {/* revenue share banner */}
    {!isPaid && (
     <div style={{background:"linear-gradient(135deg,#130800,#1f0d00,#0d0d1a)",border:"2px solid rgba(255,107,53,0.4)",borderRadius:16,padding:"24px 28px",marginBottom:24,position:"relative",overflow:"hidden"}}>
      <div style={{position:"absolute",top:-20,right:-20,width:160,height:160,borderRadius:"50%",background:"rgba(255,107,53,0.05)",pointerEvents:"none"}}/>
@@ -516,7 +516,7 @@ function Dashboard({venue,events,setPage}) {
     </div>
    )}
 
-   {/* SETUP CHECKLIST — shown until all 6 steps done */}
+   {/* setup checklist */}
    {!profileComplete && (
     <Card style={{marginBottom:24}}>
      <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:16}}>
@@ -526,7 +526,7 @@ function Dashboard({venue,events,setPage}) {
       </div>
       <div style={{fontFamily:"'DM Mono',monospace",fontSize:13,color:"#FF6B35",fontWeight:700,flexShrink:0}}>{doneCount}/6</div>
      </div>
-     {/* Progress bar */}
+     {/* progress bar */}
      <div style={{height:4,background:"var(--surface)",borderRadius:4,marginBottom:18,overflow:"hidden"}}>
       <div style={{height:"100%",width:(doneCount/6*100)+"%",background:"#FF6B35",borderRadius:4,transition:"width 0.4s ease"}}/>
      </div>
@@ -548,7 +548,7 @@ function Dashboard({venue,events,setPage}) {
     </Card>
    )}
 
-   {/* STAT CARDS */}
+   {/* stat cards */}
    <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(150px,1fr))",gap:14,marginBottom:24}}>
     {[
      {label:"Published",value:events.filter(e=>e.status==="published").length,color:"#FF6B35"},
@@ -563,7 +563,7 @@ function Dashboard({venue,events,setPage}) {
     ))}
    </div>
 
-   {/* EVENTS THIS WEEK */}
+   {/* events this week */}
    {thisWeek.length>0 && (
     <Card>
      <h3 style={{fontFamily:"'DM Sans',sans-serif",fontSize:15,fontWeight:700,marginBottom:16}}>Events This Week</h3>
