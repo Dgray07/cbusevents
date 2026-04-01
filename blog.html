@@ -211,8 +211,8 @@ async function init(){
   // Check auth for nav
   const{data:{session}}=await sb.auth.getSession();
   if(session?.user){
-    document.getElementById('navCta').textContent='My Account';
-    document.getElementById('navCta').href='https://cbusevents.com/signup.html';
+    const navCta = document.getElementById('navCta');
+    if(navCta){ navCta.textContent='My Account'; navCta.href='https://cbusevents.com/signup.html'; }
   }
 
   // Load articles
