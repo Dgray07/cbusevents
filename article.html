@@ -16,7 +16,7 @@
 <meta name="description" content="">
 <meta property="og:title" content="">
 <meta property="og:description" content="">
-<meta property="og:image" content="https://cbusevents.com/og-image.png">
+<meta property="og:image" content="https://cbusevents.com/og-image.jpg">
 <meta property="og:type" content="article">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="canonical" href="">
@@ -223,10 +223,10 @@ async function init(){
   setMeta('description', article.seo_description||article.subtitle||'');
   setMeta('og:title', article.seo_title||article.title);
   setMeta('og:description', article.seo_description||article.subtitle||'');
-  setMeta('og:image', article.cover_image_url||'https://cbusevents.com/og-image.png');
+  setMeta('og:image', article.cover_image_url||'https://cbusevents.com/og-image.jpg');
   setMeta('twitter:title', article.seo_title||article.title);
   setMeta('twitter:description', article.seo_description||article.subtitle||'');
-  setMeta('twitter:image', article.cover_image_url||'https://cbusevents.com/og-image.png');
+  setMeta('twitter:image', article.cover_image_url||'https://cbusevents.com/og-image.jpg');
   document.querySelector('link[rel=canonical]').href=`https://cbusevents.com/article.html?slug=${slug}`;
 
   const date=article.published_at
