@@ -204,7 +204,8 @@ async function init(){
   // Auth nav
   const{data:{session}}=await sb.auth.getSession();
   if(session?.user){
-    document.getElementById('navCta').textContent='My Account';
+    const navCta = document.getElementById('navCta');
+    if(navCta){ navCta.textContent='My Account'; }
   }
 
   if(!slug){showNotFound();return;}
