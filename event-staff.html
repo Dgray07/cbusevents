@@ -1,0 +1,1734 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Event Staff Portal | CBUSEVENTS</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700;800;900&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<style>
+:root {
+  --bg: #080810;
+  --bg2: #0f0f1a;
+  --bg3: #16162a;
+  --card: #111120;
+  --border: rgba(255,255,255,0.06);
+  --border2: rgba(255,255,255,0.1);
+  --text: #f0f0fa;
+  --sub: #7070a0;
+  --muted: #40405a;
+  --orange: #FF6B35;
+  --orange-dim: rgba(255,107,53,0.1);
+  --orange-border: rgba(255,107,53,0.25);
+  --green: #34d399;
+  --green-dim: rgba(52,211,153,0.1);
+  --green-border: rgba(52,211,153,0.25);
+  --red: #f87171;
+  --yellow: #fbbf24;
+  --yellow-dim: rgba(251,191,36,0.1);
+  --yellow-border: rgba(251,191,36,0.25);
+  --blue: #60a5fa;
+  --blue-dim: rgba(96,165,250,0.1);
+  --blue-border: rgba(96,165,250,0.25);
+  --font: 'DM Sans', sans-serif;
+  --mono: 'DM Mono', monospace;
+}
+
+*,*::before,*::after { box-sizing: border-box; margin: 0; padding: 0; -webkit-font-smoothing: antialiased; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ── AUTH ── */
+#auth-screen {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background:
+    radial-gradient(ellipse 60% 40% at 30% 0%, rgba(255,107,53,0.07) 0%, transparent 60%),
+    radial-gradient(ellipse 40% 30% at 80% 100%, rgba(96,165,250,0.04) 0%, transparent 50%),
+    var(--bg);
+}
+
+.auth-card {
+  width: 100%;
+  max-width: 420px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 36px 28px;
+  animation: fadeUp 0.4s ease;
+}
+
+.auth-logo {
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--orange);
+  margin-bottom: 28px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.auth-logo span { color: var(--muted); }
+
+.auth-title {
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  margin-bottom: 6px;
+  line-height: 1.2;
+}
+
+.auth-sub {
+  color: var(--sub);
+  font-size: 13px;
+  margin-bottom: 28px;
+  line-height: 1.5;
+}
+
+.field { margin-bottom: 14px; }
+
+.field label {
+  display: block;
+  font-family: var(--mono);
+  font-size: 9px;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+
+.field input, .field select, .field textarea {
+  width: 100%;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 11px 14px;
+  color: var(--text);
+  font-family: var(--font);
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.18s;
+  -webkit-appearance: none;
+}
+
+.field input:focus, .field select:focus, .field textarea:focus { border-color: var(--orange-border); }
+.field input::placeholder { color: var(--muted); }
+.field select option { background: var(--card); }
+
+.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+.btn-primary {
+  width: 100%;
+  background: var(--orange);
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  padding: 13px;
+  font-family: var(--font);
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.18s;
+  margin-top: 4px;
+}
+
+.btn-primary:hover { opacity: 0.9; box-shadow: 0 4px 20px rgba(255,107,53,0.3); }
+.btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.auth-toggle {
+  text-align: center;
+  margin-top: 18px;
+  font-size: 13px;
+  color: var(--sub);
+}
+
+.auth-toggle a { color: var(--orange); cursor: pointer; font-weight: 600; text-decoration: none; }
+
+/* ── APP ── */
+#app { display: none; min-height: 100vh; }
+
+/* NAV */
+.top-nav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  height: 58px;
+  background: rgba(8,8,16,0.96);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+  z-index: 100;
+}
+
+.nav-brand {
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text);
+}
+
+.nav-brand span { color: var(--orange); }
+
+.nav-right { display: flex; align-items: center; gap: 10px; }
+
+.tier-badge {
+  font-family: var(--mono);
+  font-size: 9px;
+  padding: 3px 9px;
+  border-radius: 20px;
+  background: var(--orange-dim);
+  border: 1px solid var(--orange-border);
+  color: var(--orange);
+  letter-spacing: 0.08em;
+}
+
+.nav-avatar {
+  width: 34px; height: 34px;
+  border-radius: 50%;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px; cursor: pointer;
+  position: relative;
+}
+
+.nav-menu {
+  position: absolute;
+  top: 42px; right: 0;
+  background: var(--card);
+  border: 1px solid var(--border2);
+  border-radius: 12px;
+  overflow: hidden;
+  min-width: 170px;
+  display: none;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+}
+
+.nav-menu.open { display: block; }
+
+.nav-menu a {
+  display: block;
+  padding: 11px 16px;
+  font-size: 13px;
+  color: var(--text);
+  text-decoration: none;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.nav-menu a:hover { background: var(--bg3); }
+.nav-menu a.danger { color: var(--red); }
+
+/* LAYOUT */
+.main-layout { padding-top: 58px; display: flex; min-height: 100vh; }
+
+.sidebar {
+  width: 216px;
+  position: fixed;
+  top: 58px; left: 0; bottom: 0;
+  background: var(--bg);
+  border-right: 1px solid var(--border);
+  padding: 20px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  overflow-y: auto;
+  z-index: 50;
+}
+
+.sidebar-section {
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
+  padding: 10px 12px 4px;
+  margin-top: 4px;
+}
+
+.sidebar-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 12px;
+  border-radius: 9px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--sub);
+  transition: all 0.15s;
+}
+
+.sidebar-item:hover { background: var(--bg3); color: var(--text); }
+.sidebar-item.active { background: var(--orange-dim); color: var(--orange); border: 1px solid var(--orange-border); }
+.sidebar-item .ic { font-size: 15px; width: 18px; text-align: center; }
+
+/* CONTENT */
+.content {
+  margin-left: 216px;
+  flex: 1;
+  padding: 28px 24px;
+  max-width: calc(100vw - 216px);
+}
+
+/* PANELS */
+.panel { display: none; }
+.panel.active { display: block; animation: fadeUp 0.25s ease; }
+
+/* PAGE HEADER */
+.page-header { margin-bottom: 24px; }
+.page-header h1 { font-size: 22px; font-weight: 800; letter-spacing: -0.03em; margin-bottom: 4px; }
+.page-header p { color: var(--sub); font-size: 13px; }
+
+/* STATS */
+.stats-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+  margin-bottom: 24px;
+}
+
+.stat-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 18px;
+  transition: border-color 0.2s;
+}
+
+.stat-card:hover { border-color: var(--orange-border); }
+
+.stat-label {
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+
+.stat-value {
+  font-size: 26px;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1;
+}
+
+.stat-sub { font-size: 11px; color: var(--sub); margin-top: 4px; }
+
+/* CARD */
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 22px;
+  margin-bottom: 18px;
+}
+
+.card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 18px;
+}
+
+.card-title { font-size: 15px; font-weight: 700; letter-spacing: -0.02em; }
+
+/* AVAILABILITY CALENDAR */
+.avail-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 6px;
+  margin-bottom: 12px;
+}
+
+.avail-day {
+  aspect-ratio: 1;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--bg2);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.15s;
+  font-size: 11px;
+  gap: 2px;
+}
+
+.avail-day .day-name {
+  font-family: var(--mono);
+  font-size: 8px;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+  text-transform: uppercase;
+}
+
+.avail-day .day-num {
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.avail-day:hover { border-color: var(--orange-border); }
+.avail-day.available { background: var(--green-dim); border-color: var(--green-border); }
+.avail-day.available .day-num { color: var(--green); }
+.avail-day.unavailable { background: var(--bg3); opacity: 0.4; }
+.avail-day.today { border-color: var(--orange-border); }
+.avail-day.today .day-num { color: var(--orange); }
+
+.avail-legend {
+  display: flex;
+  gap: 16px;
+  font-size: 11px;
+  color: var(--sub);
+}
+
+.avail-legend-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+  margin-right: 4px;
+}
+
+/* CREDENTIALS */
+.cred-list { display: flex; flex-direction: column; gap: 10px; }
+
+.cred-item {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 14px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.cred-info { flex: 1; }
+.cred-name { font-size: 14px; font-weight: 600; margin-bottom: 2px; }
+.cred-detail { font-size: 12px; color: var(--sub); }
+
+.cred-badge {
+  font-family: var(--mono);
+  font-size: 9px;
+  padding: 3px 9px;
+  border-radius: 20px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  flex-shrink: 0;
+}
+
+.cred-verified { background: var(--green-dim); border: 1px solid var(--green-border); color: var(--green); }
+.cred-pending { background: var(--yellow-dim); border: 1px solid var(--yellow-border); color: var(--yellow); }
+.cred-expired { background: rgba(248,113,113,0.1); border: 1px solid rgba(248,113,113,0.25); color: var(--red); }
+
+/* BOOKINGS */
+.booking-list { display: flex; flex-direction: column; gap: 10px; }
+
+.booking-card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 16px;
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  transition: border-color 0.15s;
+}
+
+.booking-card:hover { border-color: var(--orange-border); }
+
+.booking-date-box {
+  background: var(--orange-dim);
+  border: 1px solid var(--orange-border);
+  border-radius: 10px;
+  padding: 8px 10px;
+  text-align: center;
+  flex-shrink: 0;
+  min-width: 52px;
+}
+
+.booking-month {
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--orange);
+}
+
+.booking-day {
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--orange);
+  line-height: 1.1;
+}
+
+.booking-info { flex: 1; }
+.booking-event { font-size: 14px; font-weight: 700; margin-bottom: 3px; }
+.booking-venue { font-size: 12px; color: var(--sub); margin-bottom: 6px; }
+
+.booking-tags { display: flex; gap: 6px; flex-wrap: wrap; }
+
+.booking-tag {
+  font-size: 11px;
+  padding: 2px 8px;
+  border-radius: 20px;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  color: var(--sub);
+}
+
+.booking-actions { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; flex-shrink: 0; }
+
+.booking-status {
+  font-family: var(--mono);
+  font-size: 9px;
+  padding: 3px 9px;
+  border-radius: 20px;
+  letter-spacing: 0.08em;
+}
+
+.status-confirmed { background: var(--green-dim); border: 1px solid var(--green-border); color: var(--green); }
+.status-pending { background: var(--yellow-dim); border: 1px solid var(--yellow-border); color: var(--yellow); }
+.status-declined { background: rgba(248,113,113,0.1); border: 1px solid rgba(248,113,113,0.25); color: var(--red); }
+.status-completed { background: var(--bg3); border: 1px solid var(--border); color: var(--sub); }
+
+/* PROFILE */
+.profile-cover-wrap {
+  border-radius: 14px;
+  overflow: hidden;
+  background: linear-gradient(135deg, #0d0d1f, #1a1030);
+  height: 130px;
+  display: flex; align-items: center; justify-content: center;
+  position: relative;
+  margin-bottom: 0;
+}
+
+.profile-cover-wrap .cover-emoji { font-size: 44px; }
+
+.profile-cover-wrap .cover-change-btn {
+  position: absolute;
+  bottom: 10px; right: 10px;
+  background: rgba(0,0,0,0.6);
+  border: 1px solid var(--border2);
+  color: var(--text);
+  padding: 5px 12px;
+  border-radius: 8px;
+  font-size: 11px;
+  cursor: pointer;
+  font-family: var(--font);
+}
+
+.profile-avatar-row {
+  display: flex;
+  align-items: flex-end;
+  gap: 14px;
+  margin-top: -36px;
+  padding: 0 4px;
+  margin-bottom: 14px;
+}
+
+.profile-avatar {
+  width: 68px; height: 68px;
+  border-radius: 50%;
+  background: var(--bg3);
+  border: 3px solid var(--card);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 26px;
+  flex-shrink: 0;
+  overflow: hidden;
+  cursor: pointer;
+  position: relative;
+}
+
+.profile-avatar input[type=file] {
+  position: absolute; inset: 0; opacity: 0; cursor: pointer;
+}
+
+.profile-name { font-size: 19px; font-weight: 800; letter-spacing: -0.03em; margin-bottom: 2px; }
+.profile-role-tag {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  color: var(--orange);
+  text-transform: uppercase;
+}
+
+/* STAFF TYPES */
+.staff-type-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.staff-type-card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 12px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.staff-type-card:hover { border-color: var(--orange-border); }
+.staff-type-card.selected { background: var(--orange-dim); border-color: var(--orange); }
+.staff-type-card .st-icon { font-size: 22px; margin-bottom: 4px; }
+.staff-type-card .st-name { font-size: 11px; font-weight: 600; }
+.staff-type-card.selected .st-name { color: var(--orange); }
+
+/* QUICK ACTIONS */
+.quick-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+  margin-bottom: 22px;
+}
+
+.quick-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 16px;
+  cursor: pointer;
+  transition: all 0.18s;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.quick-card:hover { border-color: var(--orange-border); background: var(--orange-dim); }
+
+.quick-icon {
+  width: 40px; height: 40px;
+  border-radius: 10px;
+  background: var(--orange-dim);
+  border: 1px solid var(--orange-border);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px;
+  flex-shrink: 0;
+}
+
+.quick-label { font-size: 13px; font-weight: 700; }
+.quick-sub { font-size: 11px; color: var(--sub); margin-top: 1px; }
+
+/* MODAL */
+.modal-overlay {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.75);
+  backdrop-filter: blur(4px);
+  z-index: 200;
+  display: none;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.modal-overlay.open { display: flex; }
+
+.modal {
+  background: var(--card);
+  border: 1px solid var(--border2);
+  border-radius: 20px 20px 0 0;
+  width: 100%;
+  max-width: 520px;
+  max-height: 90vh;
+  overflow-y: auto;
+  padding: 24px 22px 40px;
+  animation: slideUp 0.28s ease;
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.modal-title { font-size: 17px; font-weight: 800; letter-spacing: -0.02em; }
+
+.modal-close {
+  width: 30px; height: 30px;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--sub);
+  cursor: pointer;
+  font-size: 15px;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.15s;
+}
+
+.modal-close:hover { border-color: var(--red); color: var(--red); }
+
+/* TOGGLE */
+.toggle-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 13px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.toggle-row:last-child { border-bottom: none; }
+.toggle-label { font-size: 13px; font-weight: 500; }
+.toggle-sub { font-size: 11px; color: var(--sub); margin-top: 2px; }
+
+.toggle {
+  width: 42px; height: 22px;
+  background: var(--bg3);
+  border-radius: 11px;
+  cursor: pointer;
+  position: relative;
+  transition: background 0.2s;
+  border: none;
+  flex-shrink: 0;
+}
+
+.toggle::after {
+  content: '';
+  position: absolute;
+  top: 3px; left: 3px;
+  width: 16px; height: 16px;
+  background: var(--muted);
+  border-radius: 50%;
+  transition: all 0.2s;
+}
+
+.toggle.on { background: var(--orange); }
+.toggle.on::after { left: 23px; background: white; }
+
+/* IMG UPLOAD */
+.img-upload {
+  width: 100%;
+  height: 120px;
+  border: 2px dashed var(--border);
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: border-color 0.18s;
+  background: var(--bg2);
+  position: relative;
+  overflow: hidden;
+  margin-bottom: 14px;
+}
+
+.img-upload:hover { border-color: var(--orange-border); }
+.img-upload .upload-ico { font-size: 24px; margin-bottom: 6px; }
+.img-upload .upload-txt { font-size: 12px; color: var(--sub); }
+.img-upload input[type=file] { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+.img-upload img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+
+/* BTN SECONDARY */
+.btn-secondary {
+  background: transparent;
+  border: 1px solid var(--border2);
+  color: var(--text);
+  border-radius: 9px;
+  padding: 9px 16px;
+  font-family: var(--font);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.btn-secondary:hover { border-color: var(--orange); color: var(--orange); }
+
+.btn-danger {
+  background: transparent;
+  border: 1px solid rgba(248,113,113,0.3);
+  color: var(--red);
+  border-radius: 9px;
+  padding: 9px 16px;
+  font-family: var(--font);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.btn-danger:hover { background: rgba(248,113,113,0.1); }
+
+/* EMPTY STATE */
+.empty-state {
+  text-align: center;
+  padding: 48px 20px;
+  color: var(--sub);
+}
+
+.empty-state .ei { font-size: 44px; margin-bottom: 14px; }
+.empty-state h3 { font-size: 16px; font-weight: 700; color: var(--text); margin-bottom: 6px; }
+.empty-state p { font-size: 13px; line-height: 1.5; }
+
+/* TOAST */
+.toast {
+  position: fixed;
+  bottom: 90px; left: 50%;
+  transform: translateX(-50%) translateY(16px);
+  background: var(--card);
+  border: 1px solid var(--border2);
+  border-radius: 10px;
+  padding: 10px 18px;
+  font-size: 13px;
+  font-weight: 500;
+  opacity: 0;
+  transition: all 0.25s;
+  z-index: 300;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+.toast.success { border-color: var(--green-border); color: var(--green); }
+.toast.error { border-color: rgba(248,113,113,0.35); color: var(--red); }
+
+/* BOTTOM NAV */
+.bottom-nav {
+  display: none;
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  background: rgba(8,8,16,0.97);
+  border-top: 1px solid var(--border);
+  padding: 6px 0 18px;
+  z-index: 100;
+}
+
+.bn-inner { display: flex; justify-content: space-around; }
+
+.bn-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 6px 10px;
+  cursor: pointer;
+  color: var(--sub);
+  transition: color 0.15s;
+}
+
+.bn-item.active { color: var(--orange); }
+.bn-item .ic { font-size: 19px; }
+.bn-item .lbl { font-size: 9px; font-weight: 500; font-family: var(--mono); letter-spacing: 0.08em; }
+
+/* SETTINGS */
+.settings-label {
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--orange);
+  margin-bottom: 14px;
+}
+
+/* SPINNER */
+.spinner { width: 13px; height: 13px; border: 2px solid rgba(255,255,255,0.3); border-top-color: #fff; border-radius: 50%; display: inline-block; animation: spin 0.7s linear infinite; margin-right: 7px; vertical-align: middle; }
+
+@keyframes fadeUp { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
+  .sidebar { display: none; }
+  .content { margin-left: 0; padding: 20px 16px 96px; max-width: 100%; }
+  .stats-row { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  .bottom-nav { display: block; }
+  .staff-type-grid { grid-template-columns: repeat(3, 1fr); }
+  .avail-grid { gap: 4px; }
+  .two-col { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 480px) {
+  .stats-row { grid-template-columns: repeat(2, 1fr); }
+  .quick-grid { grid-template-columns: 1fr 1fr; }
+  .staff-type-grid { grid-template-columns: repeat(3, 1fr); }
+}
+</style>
+</head>
+<body>
+
+<!-- AUTH -->
+<div id="auth-screen">
+  <div class="auth-card">
+    <div class="auth-logo">CBUSEVENTS <span>/ Event Staff</span></div>
+
+    <div id="login-form">
+      <h2 class="auth-title">Welcome back.</h2>
+      <p class="auth-sub">Sign in to manage your availability, credentials, and bookings.</p>
+      <div class="field"><label>Email</label><input type="email" id="login-email" placeholder="you@email.com"></div>
+      <div class="field"><label>Password</label><input type="password" id="login-password" placeholder="••••••••"></div>
+      <button class="btn-primary" onclick="handleLogin()">Sign In</button>
+      <div class="auth-toggle">No account? <a onclick="showSignup()">Join free</a></div>
+    </div>
+
+    <div id="signup-form" style="display:none">
+      <h2 class="auth-title">Join as Event Staff.</h2>
+      <p class="auth-sub">Get discovered by Columbus venues, planners, and event organizers looking to hire.</p>
+      <div class="two-col">
+        <div class="field"><label>First Name</label><input type="text" id="su-first" placeholder="First"></div>
+        <div class="field"><label>Last Name</label><input type="text" id="su-last" placeholder="Last"></div>
+      </div>
+      <div class="field">
+        <label>Primary Staff Role</label>
+        <select id="su-role">
+          <option value="">Select your role...</option>
+          <option value="bartender">Bartender</option>
+          <option value="barback">Bar Back</option>
+          <option value="server">Server / Waitstaff</option>
+          <option value="security">Security / Bouncer</option>
+          <option value="host">Host / Greeter</option>
+          <option value="coat_check">Coat Check</option>
+          <option value="event_coordinator">On-Site Coordinator</option>
+          <option value="other">Other</option>
+        </select>
+      </div>
+      <div class="field"><label>Email</label><input type="email" id="su-email" placeholder="you@email.com"></div>
+      <div class="field"><label>Password</label><input type="password" id="su-password" placeholder="Min 8 characters"></div>
+      <button class="btn-primary" onclick="handleSignup()">Create Free Account</button>
+      <div class="auth-toggle">Already have an account? <a onclick="showLogin()">Sign in</a></div>
+    </div>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app">
+
+  <nav class="top-nav">
+    <div class="nav-brand"><span>CBUS</span>EVENTS / Staff</div>
+    <div class="nav-right">
+      <span class="tier-badge" id="tier-label">FREE</span>
+      <div class="nav-avatar" onclick="toggleNavMenu()">
+        👤
+        <div class="nav-menu" id="nav-menu">
+          <a onclick="showPanel('profile')">👤 My Profile</a>
+          <a onclick="showPanel('settings')">⚙️ Settings</a>
+          <a class="danger" onclick="handleLogout()">Sign Out</a>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <div class="main-layout">
+
+    <aside class="sidebar">
+      <div class="sidebar-section">Main</div>
+      <div class="sidebar-item active" onclick="showPanel('dashboard')" data-panel="dashboard"><span class="ic">🏠</span> Dashboard</div>
+      <div class="sidebar-item" onclick="showPanel('bookings')" data-panel="bookings"><span class="ic">📅</span> Bookings</div>
+
+      <div class="sidebar-section">My Profile</div>
+      <div class="sidebar-item" onclick="showPanel('availability')" data-panel="availability"><span class="ic">🟢</span> Availability</div>
+      <div class="sidebar-item" onclick="showPanel('credentials')" data-panel="credentials"><span class="ic">🪪</span> Credentials</div>
+      <div class="sidebar-item" onclick="showPanel('profile')" data-panel="profile"><span class="ic">👤</span> Profile</div>
+
+      <div class="sidebar-section">Account</div>
+      <div class="sidebar-item" onclick="showPanel('settings')" data-panel="settings"><span class="ic">⚙️</span> Settings</div>
+    </aside>
+
+    <main class="content">
+
+      <!-- DASHBOARD -->
+      <div class="panel active" id="panel-dashboard">
+        <div class="page-header">
+          <h1 id="dash-greeting">Good morning 👋</h1>
+          <p id="dash-name">Here's your activity overview.</p>
+        </div>
+
+        <div class="stats-row">
+          <div class="stat-card">
+            <div class="stat-label">Upcoming</div>
+            <div class="stat-value" id="stat-upcoming">0</div>
+            <div class="stat-sub">confirmed bookings</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Pending</div>
+            <div class="stat-value" id="stat-pending">0</div>
+            <div class="stat-sub">awaiting response</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Completed</div>
+            <div class="stat-value" id="stat-completed">0</div>
+            <div class="stat-sub">events worked</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Profile Views</div>
+            <div class="stat-value">-</div>
+            <div class="stat-sub">upgrade to track</div>
+          </div>
+        </div>
+
+        <div class="quick-grid">
+          <div class="quick-card" onclick="showPanel('availability')">
+            <div class="quick-icon">🟢</div>
+            <div>
+              <div class="quick-label">Set Availability</div>
+              <div class="quick-sub">Mark your open dates</div>
+            </div>
+          </div>
+          <div class="quick-card" onclick="showPanel('credentials')">
+            <div class="quick-icon">🪪</div>
+            <div>
+              <div class="quick-label">Add Credentials</div>
+              <div class="quick-sub">Certs, licenses, training</div>
+            </div>
+          </div>
+          <div class="quick-card" onclick="showPanel('bookings')">
+            <div class="quick-icon">📅</div>
+            <div>
+              <div class="quick-label">View Bookings</div>
+              <div class="quick-sub">Upcoming & past</div>
+            </div>
+          </div>
+          <div class="quick-card" onclick="showPanel('profile')">
+            <div class="quick-icon">👤</div>
+            <div>
+              <div class="quick-label">Edit Profile</div>
+              <div class="quick-sub">How planners see you</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">Upcoming Bookings</div>
+            <button class="btn-secondary" onclick="showPanel('bookings')">View All</button>
+          </div>
+          <div id="dash-bookings">
+            <div class="empty-state">
+              <div class="ei">📭</div>
+              <h3>No bookings yet</h3>
+              <p>Complete your profile and set your availability<br>to start getting discovered by event planners.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- BOOKINGS -->
+      <div class="panel" id="panel-bookings">
+        <div class="page-header">
+          <h1>Bookings</h1>
+          <p>View and manage your event booking requests.</p>
+        </div>
+
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px">
+          <button class="btn-primary" style="width:auto;padding:8px 16px;font-size:13px" onclick="filterBookings('all')">All</button>
+          <button class="btn-secondary" onclick="filterBookings('pending')">Pending</button>
+          <button class="btn-secondary" onclick="filterBookings('confirmed')">Confirmed</button>
+          <button class="btn-secondary" onclick="filterBookings('completed')">Completed</button>
+        </div>
+
+        <div class="booking-list" id="bookings-list">
+          <div class="empty-state">
+            <div class="ei">📅</div>
+            <h3>No bookings yet</h3>
+            <p>Once venues or planners send you a booking request, it will appear here.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- AVAILABILITY -->
+      <div class="panel" id="panel-availability">
+        <div class="page-header">
+          <h1>Availability</h1>
+          <p>Mark the dates you're available to work. Planners and venues filter by this.</p>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title" id="cal-month-label">April 2026</div>
+            <div style="display:flex;gap:8px">
+              <button class="btn-secondary" onclick="prevMonth()">‹</button>
+              <button class="btn-secondary" onclick="nextMonth()">›</button>
+            </div>
+          </div>
+
+          <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:8px;text-align:center">
+            <div style="font-family:var(--mono);font-size:9px;color:var(--muted);letter-spacing:0.1em;padding:4px">SUN</div>
+            <div style="font-family:var(--mono);font-size:9px;color:var(--muted);letter-spacing:0.1em;padding:4px">MON</div>
+            <div style="font-family:var(--mono);font-size:9px;color:var(--muted);letter-spacing:0.1em;padding:4px">TUE</div>
+            <div style="font-family:var(--mono);font-size:9px;color:var(--muted);letter-spacing:0.1em;padding:4px">WED</div>
+            <div style="font-family:var(--mono);font-size:9px;color:var(--muted);letter-spacing:0.1em;padding:4px">THU</div>
+            <div style="font-family:var(--mono);font-size:9px;color:var(--muted);letter-spacing:0.1em;padding:4px">FRI</div>
+            <div style="font-family:var(--mono);font-size:9px;color:var(--muted);letter-spacing:0.1em;padding:4px">SAT</div>
+          </div>
+
+          <div class="avail-grid" id="avail-grid"></div>
+
+          <div class="avail-legend">
+            <div><span class="avail-legend-dot" style="background:var(--green)"></span> Available</div>
+            <div><span class="avail-legend-dot" style="background:var(--orange)"></span> Today</div>
+            <div><span class="avail-legend-dot" style="background:var(--muted)"></span> Not set</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header"><div class="card-title">Availability Preferences</div></div>
+          <div class="toggle-row">
+            <div>
+              <div class="toggle-label">Available for last-minute bookings</div>
+              <div class="toggle-sub">Planners can book you within 48 hours</div>
+            </div>
+            <button class="toggle on" onclick="toggleSwitch(this)"></button>
+          </div>
+          <div class="toggle-row">
+            <div>
+              <div class="toggle-label">Available for multi-day events</div>
+              <div class="toggle-sub">Festivals, conferences, weekend events</div>
+            </div>
+            <button class="toggle" onclick="toggleSwitch(this)"></button>
+          </div>
+          <div class="toggle-row">
+            <div>
+              <div class="toggle-label">Open to travel outside Columbus</div>
+              <div class="toggle-sub">Regional events within Ohio</div>
+            </div>
+            <button class="toggle" onclick="toggleSwitch(this)"></button>
+          </div>
+          <div class="toggle-row">
+            <div>
+              <div class="toggle-label">Currently accepting new bookings</div>
+              <div class="toggle-sub">Toggle off to pause your listing</div>
+            </div>
+            <button class="toggle on" id="toggle-accepting" onclick="toggleSwitch(this)"></button>
+          </div>
+          <button class="btn-primary" style="margin-top:16px" onclick="saveAvailPrefs()">Save Preferences</button>
+        </div>
+      </div>
+
+      <!-- CREDENTIALS -->
+      <div class="panel" id="panel-credentials">
+        <div class="page-header">
+          <div style="display:flex;align-items:center;justify-content:space-between">
+            <div>
+              <h1>Credentials</h1>
+              <p>Licenses, certifications, and training that appear on your profile.</p>
+            </div>
+            <button class="btn-primary" style="width:auto;padding:10px 18px;font-size:13px" onclick="openAddCred()">+ Add</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header"><div class="card-title">Why credentials matter</div></div>
+          <p style="font-size:13px;color:var(--sub);line-height:1.6">Verified credentials move you to the top of search results when planners and venues filter for licensed staff. A bartender with a visible TIPS certification or liquor license gets booked first.</p>
+        </div>
+
+        <div class="cred-list" id="cred-list">
+          <div class="empty-state">
+            <div class="ei">🪪</div>
+            <h3>No credentials yet</h3>
+            <p>Add your certifications, licenses, and training to stand out when planners are searching.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- PROFILE -->
+      <div class="panel" id="panel-profile">
+        <div class="page-header">
+          <h1>My Profile</h1>
+          <p>How you appear to venues and planners searching for staff.</p>
+        </div>
+
+        <div class="card">
+          <div class="profile-cover-wrap">
+            <span class="cover-emoji">🎯</span>
+            <button class="cover-change-btn">Change Cover</button>
+          </div>
+          <div style="padding:0 4px">
+            <div class="profile-avatar-row">
+              <div class="profile-avatar" title="Tap to change photo">
+                👤
+                <input type="file" accept="image/*" onchange="handleAvatarUpload(this)">
+              </div>
+              <div>
+                <div class="profile-name" id="preview-name">Your Name</div>
+                <div class="profile-role-tag" id="preview-role">EVENT STAFF</div>
+              </div>
+            </div>
+            <div id="preview-bio" style="font-size:13px;color:var(--sub);line-height:1.5;margin-bottom:12px">Add a bio so planners know what you bring to the table.</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header"><div class="card-title">Staff Type</div></div>
+          <p style="font-size:12px;color:var(--sub);margin-bottom:14px">Select all roles you're available for.</p>
+          <div class="staff-type-grid" id="staff-type-grid">
+            <div class="staff-type-card" data-type="bartender" onclick="toggleStaffType(this)"><div class="st-icon">🍹</div><div class="st-name">Bartender</div></div>
+            <div class="staff-type-card" data-type="barback" onclick="toggleStaffType(this)"><div class="st-icon">🧊</div><div class="st-name">Bar Back</div></div>
+            <div class="staff-type-card" data-type="server" onclick="toggleStaffType(this)"><div class="st-icon">🍽️</div><div class="st-name">Server</div></div>
+            <div class="staff-type-card" data-type="security" onclick="toggleStaffType(this)"><div class="st-icon">🛡️</div><div class="st-name">Security</div></div>
+            <div class="staff-type-card" data-type="host" onclick="toggleStaffType(this)"><div class="st-icon">🤝</div><div class="st-name">Host</div></div>
+            <div class="staff-type-card" data-type="coat_check" onclick="toggleStaffType(this)"><div class="st-icon">🧥</div><div class="st-name">Coat Check</div></div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header"><div class="card-title">Profile Info</div></div>
+          <div class="two-col">
+            <div class="field">
+              <label>Display Name</label>
+              <input type="text" id="profile-name" placeholder="Your name" oninput="document.getElementById('preview-name').textContent=this.value||'Your Name'">
+            </div>
+            <div class="field">
+              <label>City / Area</label>
+              <input type="text" id="profile-city" value="Columbus, OH">
+            </div>
+          </div>
+          <div class="field">
+            <label>Bio</label>
+            <textarea id="profile-bio" rows="4" placeholder="Years of experience, types of events you've worked, what makes you reliable..." oninput="document.getElementById('preview-bio').textContent=this.value||'Add a bio so planners know what you bring to the table.'"></textarea>
+          </div>
+          <div class="two-col">
+            <div class="field">
+              <label>Years Experience</label>
+              <input type="number" id="profile-exp" placeholder="e.g. 5">
+            </div>
+            <div class="field">
+              <label>Instagram</label>
+              <input type="text" id="profile-ig" placeholder="@yourhandle">
+            </div>
+          </div>
+          <button class="btn-primary" style="margin-top:4px" onclick="saveProfile()">Save Profile</button>
+        </div>
+      </div>
+
+      <!-- SETTINGS -->
+      <div class="panel" id="panel-settings">
+        <div class="page-header">
+          <h1>Settings</h1>
+          <p>Manage your account preferences.</p>
+        </div>
+
+        <div class="card">
+          <div class="settings-label">Account</div>
+          <div class="field"><label>Email</label><input type="email" id="settings-email"></div>
+          <div class="field"><label>Phone</label><input type="tel" id="settings-phone" placeholder="(614) 000-0000"></div>
+          <button class="btn-secondary" onclick="showToast('Settings updated','success')">Save Changes</button>
+        </div>
+
+        <div class="card">
+          <div class="settings-label">Notifications</div>
+          <div class="toggle-row">
+            <div><div class="toggle-label">New booking requests</div><div class="toggle-sub">Get notified when someone wants to book you</div></div>
+            <button class="toggle on" onclick="toggleSwitch(this)"></button>
+          </div>
+          <div class="toggle-row">
+            <div><div class="toggle-label">Booking reminders</div><div class="toggle-sub">24hr reminder before confirmed events</div></div>
+            <button class="toggle on" onclick="toggleSwitch(this)"></button>
+          </div>
+          <div class="toggle-row">
+            <div><div class="toggle-label">Platform updates</div><div class="toggle-sub">New features and announcements</div></div>
+            <button class="toggle" onclick="toggleSwitch(this)"></button>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="settings-label">Plan</div>
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:14px;background:var(--bg2);border-radius:10px;border:1px solid var(--border)">
+            <div>
+              <div style="font-weight:600;font-size:14px;margin-bottom:3px">Free Plan</div>
+              <div style="font-size:12px;color:var(--sub)">Basic profile + directory listing</div>
+            </div>
+            <button class="btn-primary" style="width:auto;padding:9px 18px;font-size:13px">Upgrade</button>
+          </div>
+        </div>
+
+        <div class="card" style="border-color:rgba(248,113,113,0.15)">
+          <div class="settings-label" style="color:var(--red)">Danger Zone</div>
+          <button class="btn-danger" onclick="handleLogout()">Sign Out</button>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <!-- BOTTOM NAV -->
+  <nav class="bottom-nav">
+    <div class="bn-inner">
+      <div class="bn-item active" onclick="showPanel('dashboard')" data-panel="dashboard"><span class="ic">🏠</span><span class="lbl">Home</span></div>
+      <div class="bn-item" onclick="showPanel('bookings')" data-panel="bookings"><span class="ic">📅</span><span class="lbl">Bookings</span></div>
+      <div class="bn-item" onclick="showPanel('availability')" data-panel="availability"><span class="ic">🟢</span><span class="lbl">Avail</span></div>
+      <div class="bn-item" onclick="showPanel('credentials')" data-panel="credentials"><span class="ic">🪪</span><span class="lbl">Creds</span></div>
+      <div class="bn-item" onclick="showPanel('profile')" data-panel="profile"><span class="ic">👤</span><span class="lbl">Profile</span></div>
+    </div>
+  </nav>
+</div>
+
+<!-- ADD CREDENTIAL MODAL -->
+<div class="modal-overlay" id="modal-cred">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">Add Credential</div>
+      <button class="modal-close" onclick="closeModal('modal-cred')">✕</button>
+    </div>
+
+    <div class="img-upload" id="cred-img-wrap">
+      <div class="upload-ico">📎</div>
+      <div class="upload-txt">Upload photo of certificate or license (optional)</div>
+      <input type="file" id="cred-img-input" accept="image/*,application/pdf" onchange="handleCredImg(this)">
+    </div>
+
+    <div class="field">
+      <label>Credential Type</label>
+      <select id="cred-type">
+        <option value="">Select type...</option>
+        <option value="liquor_license">Liquor License</option>
+        <option value="tips">TIPS Certification</option>
+        <option value="servsafe">ServSafe</option>
+        <option value="food_handler">Food Handler Permit</option>
+        <option value="security_license">Security License</option>
+        <option value="cpr_first_aid">CPR / First Aid</option>
+        <option value="bartending_school">Bartending School Cert</option>
+        <option value="background_check">Background Check</option>
+        <option value="other">Other</option>
+      </select>
+    </div>
+    <div class="field"><label>Credential Name</label><input type="text" id="cred-name" placeholder="e.g. Ohio Liquor Control License"></div>
+    <div class="two-col">
+      <div class="field"><label>Issued By</label><input type="text" id="cred-issuer" placeholder="e.g. Ohio Dept. of Commerce"></div>
+      <div class="field"><label>Expiration Date</label><input type="date" id="cred-expiry"></div>
+    </div>
+    <div class="field"><label>License / Certificate Number (optional)</label><input type="text" id="cred-number" placeholder="e.g. OH-2024-XXXXX"></div>
+    <button class="btn-primary" onclick="saveCredential()">Add Credential</button>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+const SUPABASE_URL = 'https://toblgvatvsjljbqogzsv.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRvYmxndmF0dnNqbGpicW9nenN2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MDQ4MjkwNjMsImV4cCI6MjAyMDQwNTA2M30.tC4qRmC5YkrBpLYb1lZlv-CSHB_tGAjSWTAEfg_K3FU';
+const { createClient } = supabase;
+const db = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+let currentUser = null;
+let currentProfile = null;
+let credentials = [];
+let bookings = [];
+let availableDates = new Set();
+let selectedStaffTypes = new Set();
+let calYear = new Date().getFullYear();
+let calMonth = new Date().getMonth();
+
+// ── AUTH ──
+async function handleLogin() {
+  const email = document.getElementById('login-email').value.trim();
+  const password = document.getElementById('login-password').value;
+  if (!email || !password) return showToast('Enter email and password', 'error');
+  const btn = document.querySelector('#login-form .btn-primary');
+  btn.disabled = true; btn.innerHTML = '<span class="spinner"></span>Signing in...';
+  const { data, error } = await db.auth.signInWithPassword({ email, password });
+  btn.disabled = false; btn.textContent = 'Sign In';
+  if (error) return showToast(error.message, 'error');
+  currentUser = data.user;
+  await loadApp();
+}
+
+async function handleSignup() {
+  const first = document.getElementById('su-first').value.trim();
+  const last = document.getElementById('su-last').value.trim();
+  const role = document.getElementById('su-role').value;
+  const email = document.getElementById('su-email').value.trim();
+  const password = document.getElementById('su-password').value;
+  if (!first || !email || !password || !role) return showToast('Please fill all required fields', 'error');
+  if (password.length < 8) return showToast('Password must be at least 8 characters', 'error');
+  const btn = document.querySelector('#signup-form .btn-primary');
+  btn.disabled = true; btn.innerHTML = '<span class="spinner"></span>Creating account...';
+  const { data, error } = await db.auth.signUp({
+    email, password,
+    options: { data: { first_name: first, last_name: last, primary_role: role, portal: 'event_staff' } }
+  });
+  btn.disabled = false; btn.textContent = 'Create Free Account';
+  if (error) return showToast(error.message, 'error');
+  currentUser = data.user;
+  if (currentUser) {
+    await db.from('event_staff').upsert({
+      user_id: currentUser.id,
+      display_name: `${first} ${last}`,
+      primary_role: role,
+      email,
+      city: 'Columbus, OH',
+      tier: 'free',
+      is_accepting: true
+    }, { onConflict: 'user_id' });
+  }
+  await loadApp();
+}
+
+async function handleLogout() {
+  await db.auth.signOut();
+  currentUser = null; currentProfile = null;
+  document.getElementById('app').style.display = 'none';
+  document.getElementById('auth-screen').style.display = 'flex';
+}
+
+function showLogin() {
+  document.getElementById('login-form').style.display = 'block';
+  document.getElementById('signup-form').style.display = 'none';
+}
+
+function showSignup() {
+  document.getElementById('login-form').style.display = 'none';
+  document.getElementById('signup-form').style.display = 'block';
+}
+
+// ── APP LOAD ──
+async function loadApp() {
+  document.getElementById('auth-screen').style.display = 'none';
+  document.getElementById('app').style.display = 'block';
+
+  const { data: prof } = await db.from('event_staff').select('*').eq('user_id', currentUser.id).single();
+  currentProfile = prof;
+
+  if (prof) {
+    document.getElementById('tier-label').textContent = (prof.tier || 'free').toUpperCase();
+    document.getElementById('preview-name').textContent = prof.display_name || 'Your Name';
+    document.getElementById('profile-name').value = prof.display_name || '';
+    document.getElementById('profile-city').value = prof.city || 'Columbus, OH';
+    document.getElementById('profile-bio').value = prof.bio || '';
+    document.getElementById('profile-exp').value = prof.years_experience || '';
+    document.getElementById('profile-ig').value = prof.instagram || '';
+    if (prof.bio) document.getElementById('preview-bio').textContent = prof.bio;
+    if (prof.staff_types) {
+      const types = typeof prof.staff_types === 'string' ? JSON.parse(prof.staff_types) : prof.staff_types;
+      types.forEach(t => {
+        selectedStaffTypes.add(t);
+        const card = document.querySelector(`[data-type="${t}"]`);
+        if (card) card.classList.add('selected');
+      });
+    }
+    const roleLabels = {
+      bartender: 'BARTENDER', barback: 'BAR BACK', server: 'SERVER',
+      security: 'SECURITY', host: 'HOST', coat_check: 'COAT CHECK',
+      event_coordinator: 'ON-SITE COORDINATOR', other: 'EVENT STAFF'
+    };
+    document.getElementById('preview-role').textContent = roleLabels[prof.primary_role] || 'EVENT STAFF';
+    document.getElementById('settings-email').value = prof.email || '';
+    document.getElementById('settings-phone').value = prof.phone || '';
+  }
+
+  const hr = new Date().getHours();
+  const greet = hr < 12 ? 'Good morning' : hr < 17 ? 'Good afternoon' : 'Good evening';
+  document.getElementById('dash-greeting').textContent = `${greet} 👋`;
+  if (prof) document.getElementById('dash-name').textContent = `Welcome back, ${prof.display_name?.split(' ')[0] || 'there'}.`;
+
+  await loadCredentials();
+  await loadBookings();
+  await loadAvailability();
+  renderCalendar();
+}
+
+// ── CREDENTIALS ──
+async function loadCredentials() {
+  const { data } = await db.from('event_staff_credentials').select('*').eq('user_id', currentUser.id).order('created_at', { ascending: false });
+  credentials = data || [];
+  renderCredentials();
+}
+
+function renderCredentials() {
+  const list = document.getElementById('cred-list');
+  if (!credentials.length) {
+    list.innerHTML = `<div class="empty-state"><div class="ei">🪪</div><h3>No credentials yet</h3><p>Add your certifications, licenses, and training to stand out when planners are searching.</p></div>`;
+    return;
+  }
+  const typeLabels = {
+    liquor_license: 'Liquor License', tips: 'TIPS Certification', servsafe: 'ServSafe',
+    food_handler: 'Food Handler Permit', security_license: 'Security License',
+    cpr_first_aid: 'CPR / First Aid', bartending_school: 'Bartending School',
+    background_check: 'Background Check', other: 'Other'
+  };
+  list.innerHTML = credentials.map(c => {
+    const now = new Date();
+    const expiry = c.expiration_date ? new Date(c.expiration_date) : null;
+    const isExpired = expiry && expiry < now;
+    const statusClass = isExpired ? 'cred-expired' : 'cred-verified';
+    const statusLabel = isExpired ? 'Expired' : 'Active';
+    return `
+      <div class="cred-item">
+        <div class="cred-info">
+          <div class="cred-name">${c.credential_name || typeLabels[c.credential_type] || 'Credential'}</div>
+          <div class="cred-detail">${c.issued_by || ''}${c.expiration_date ? ` - Expires ${new Date(c.expiration_date).toLocaleDateString('en-US',{month:'short',year:'numeric'})}` : ''}</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <span class="cred-badge ${statusClass}">${statusLabel}</span>
+          <button class="btn-secondary" style="padding:5px 10px;font-size:11px" onclick="deleteCred('${c.id}')">✕</button>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+function openAddCred() {
+  document.getElementById('cred-type').value = '';
+  document.getElementById('cred-name').value = '';
+  document.getElementById('cred-issuer').value = '';
+  document.getElementById('cred-expiry').value = '';
+  document.getElementById('cred-number').value = '';
+  openModal('modal-cred');
+}
+
+async function saveCredential() {
+  const type = document.getElementById('cred-type').value;
+  const name = document.getElementById('cred-name').value.trim();
+  if (!name) return showToast('Credential name is required', 'error');
+  const btn = document.querySelector('#modal-cred .btn-primary');
+  btn.disabled = true; btn.innerHTML = '<span class="spinner"></span>Saving...';
+  const { error } = await db.from('event_staff_credentials').insert({
+    user_id: currentUser.id,
+    credential_type: type || 'other',
+    credential_name: name,
+    issued_by: document.getElementById('cred-issuer').value.trim() || null,
+    expiration_date: document.getElementById('cred-expiry').value || null,
+    license_number: document.getElementById('cred-number').value.trim() || null,
+  });
+  btn.disabled = false; btn.textContent = 'Add Credential';
+  if (error) return showToast(error.message, 'error');
+  showToast('Credential added!', 'success');
+  closeModal('modal-cred');
+  await loadCredentials();
+}
+
+async function deleteCred(id) {
+  if (!confirm('Remove this credential?')) return;
+  await db.from('event_staff_credentials').delete().eq('id', id);
+  showToast('Credential removed', 'success');
+  await loadCredentials();
+}
+
+// ── BOOKINGS ──
+async function loadBookings() {
+  const { data } = await db.from('event_staff_bookings').select('*').eq('staff_id', currentUser.id).order('event_date', { ascending: true });
+  bookings = data || [];
+  renderBookings(bookings);
+  updateBookingStats();
+}
+
+function renderBookings(list) {
+  const el = document.getElementById('bookings-list');
+  if (!list.length) {
+    el.innerHTML = `<div class="empty-state"><div class="ei">📅</div><h3>No bookings yet</h3><p>Once venues or planners send you a booking request, it will appear here.</p></div>`;
+    return;
+  }
+  el.innerHTML = list.map(b => {
+    const d = b.event_date ? new Date(b.event_date) : null;
+    const month = d ? d.toLocaleDateString('en-US',{month:'short'}).toUpperCase() : '--';
+    const day = d ? d.getDate() : '--';
+    const statusClass = { confirmed: 'status-confirmed', pending: 'status-pending', declined: 'status-declined', completed: 'status-completed' }[b.status] || 'status-pending';
+    return `
+      <div class="booking-card">
+        <div class="booking-date-box">
+          <div class="booking-month">${month}</div>
+          <div class="booking-day">${day}</div>
+        </div>
+        <div class="booking-info">
+          <div class="booking-event">${b.event_name || 'Event'}</div>
+          <div class="booking-venue">${b.venue_name || ''} ${b.start_time ? '- ' + b.start_time : ''}</div>
+          <div class="booking-tags">
+            ${b.role_needed ? `<span class="booking-tag">${b.role_needed}</span>` : ''}
+            ${b.duration_hours ? `<span class="booking-tag">${b.duration_hours}hrs</span>` : ''}
+          </div>
+        </div>
+        <div class="booking-actions">
+          <span class="booking-status ${statusClass}">${b.status || 'pending'}</span>
+          ${b.status === 'pending' ? `
+            <button class="btn-secondary" style="padding:5px 10px;font-size:11px" onclick="respondBooking('${b.id}','confirmed')">Accept</button>
+            <button class="btn-danger" style="padding:5px 10px;font-size:11px" onclick="respondBooking('${b.id}','declined')">Decline</button>
+          ` : ''}
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+function updateBookingStats() {
+  const now = new Date();
+  document.getElementById('stat-upcoming').textContent = bookings.filter(b => b.status === 'confirmed' && new Date(b.event_date) >= now).length;
+  document.getElementById('stat-pending').textContent = bookings.filter(b => b.status === 'pending').length;
+  document.getElementById('stat-completed').textContent = bookings.filter(b => b.status === 'completed').length;
+
+  // Dashboard preview - show next 2 upcoming
+  const upcoming = bookings.filter(b => b.status === 'confirmed' && new Date(b.event_date) >= now).slice(0, 2);
+  const dashEl = document.getElementById('dash-bookings');
+  if (upcoming.length) {
+    const tmpEl = document.createElement('div');
+    tmpEl.className = 'booking-list';
+    document.getElementById('bookings-list').innerHTML;
+    renderBookings(upcoming);
+    dashEl.innerHTML = document.getElementById('bookings-list').innerHTML;
+    renderBookings(bookings);
+  }
+}
+
+async function respondBooking(id, status) {
+  await db.from('event_staff_bookings').update({ status }).eq('id', id);
+  showToast(status === 'confirmed' ? 'Booking accepted!' : 'Booking declined', status === 'confirmed' ? 'success' : 'error');
+  await loadBookings();
+}
+
+function filterBookings(status) {
+  if (status === 'all') return renderBookings(bookings);
+  renderBookings(bookings.filter(b => b.status === status));
+}
+
+// ── AVAILABILITY ──
+async function loadAvailability() {
+  const { data } = await db.from('event_staff_availability').select('available_date').eq('user_id', currentUser.id);
+  availableDates = new Set((data || []).map(r => r.available_date));
+}
+
+function renderCalendar() {
+  const grid = document.getElementById('avail-grid');
+  const label = document.getElementById('cal-month-label');
+  const today = new Date();
+  const firstDay = new Date(calYear, calMonth, 1);
+  const daysInMonth = new Date(calYear, calMonth + 1, 0).getDate();
+  const startDow = firstDay.getDay();
+
+  label.textContent = firstDay.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+
+  let html = '';
+  for (let i = 0; i < startDow; i++) html += '<div></div>';
+
+  for (let d = 1; d <= daysInMonth; d++) {
+    const dateStr = `${calYear}-${String(calMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const isToday = today.getFullYear() === calYear && today.getMonth() === calMonth && today.getDate() === d;
+    const isAvail = availableDates.has(dateStr);
+    const isPast = new Date(calYear, calMonth, d) < new Date(today.getFullYear(), today.getMonth(), today.getDate());
+    let cls = 'avail-day';
+    if (isAvail) cls += ' available';
+    if (isToday) cls += ' today';
+    if (isPast) cls += ' unavailable';
+    html += `<div class="${cls}" onclick="toggleDate('${dateStr}',this)">${d}</div>`;
+  }
+
+  grid.innerHTML = html;
+}
+
+async function toggleDate(dateStr, el) {
+  if (el.classList.contains('unavailable')) return;
+  if (availableDates.has(dateStr)) {
+    availableDates.delete(dateStr);
+    el.classList.remove('available');
+    await db.from('event_staff_availability').delete().eq('user_id', currentUser.id).eq('available_date', dateStr);
+  } else {
+    availableDates.add(dateStr);
+    el.classList.add('available');
+    await db.from('event_staff_availability').upsert({ user_id: currentUser.id, available_date: dateStr }, { onConflict: 'user_id,available_date' });
+  }
+}
+
+function prevMonth() { calMonth--; if (calMonth < 0) { calMonth = 11; calYear--; } renderCalendar(); }
+function nextMonth() { calMonth++; if (calMonth > 11) { calMonth = 0; calYear++; } renderCalendar(); }
+
+async function saveAvailPrefs() {
+  showToast('Preferences saved!', 'success');
+}
+
+// ── PROFILE ──
+function toggleStaffType(card) {
+  const type = card.dataset.type;
+  if (selectedStaffTypes.has(type)) {
+    selectedStaffTypes.delete(type);
+    card.classList.remove('selected');
+  } else {
+    selectedStaffTypes.add(type);
+    card.classList.add('selected');
+  }
+}
+
+async function saveProfile() {
+  const payload = {
+    display_name: document.getElementById('profile-name').value.trim(),
+    city: document.getElementById('profile-city').value.trim(),
+    bio: document.getElementById('profile-bio').value.trim(),
+    years_experience: document.getElementById('profile-exp').value ? parseInt(document.getElementById('profile-exp').value) : null,
+    instagram: document.getElementById('profile-ig').value.trim(),
+    staff_types: JSON.stringify([...selectedStaffTypes]),
+  };
+  const { error } = await db.from('event_staff').update(payload).eq('user_id', currentUser.id);
+  if (error) return showToast(error.message, 'error');
+  showToast('Profile saved!', 'success');
+}
+
+async function handleAvatarUpload(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const path = `avatars/${currentUser.id}/${Date.now()}.${file.name.split('.').pop()}`;
+  const { error } = await db.storage.from('event-staff-assets').upload(path, file, { upsert: true });
+  if (!error) {
+    const { data } = db.storage.from('event-staff-assets').getPublicUrl(path);
+    await db.from('event_staff').update({ avatar_url: data.publicUrl }).eq('user_id', currentUser.id);
+    const av = document.querySelector('.profile-avatar');
+    av.innerHTML = `<img src="${data.publicUrl}" style="width:100%;height:100%;object-fit:cover;border-radius:50%"><input type="file" accept="image/*" onchange="handleAvatarUpload(this)">`;
+    showToast('Photo updated!', 'success');
+  }
+}
+
+// ── UI ──
+function showPanel(name) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.sidebar-item, .bn-item').forEach(i => i.classList.remove('active'));
+  document.getElementById(`panel-${name}`).classList.add('active');
+  document.querySelectorAll(`[data-panel="${name}"]`).forEach(el => el.classList.add('active'));
+}
+
+function openModal(id) { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+function toggleSwitch(btn) { btn.classList.toggle('on'); }
+
+function toggleNavMenu() { document.getElementById('nav-menu').classList.toggle('open'); }
+
+document.addEventListener('click', e => {
+  if (!e.target.closest('.nav-avatar')) document.getElementById('nav-menu').classList.remove('open');
+});
+
+function showToast(msg, type = 'success') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = `toast ${type} show`;
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+function handleCredImg(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const wrap = document.getElementById('cred-img-wrap');
+  const reader = new FileReader();
+  reader.onload = e => {
+    wrap.innerHTML = `<img src="${e.target.result}"><input type="file" id="cred-img-input" accept="image/*,application/pdf" onchange="handleCredImg(this)">`;
+  };
+  reader.readAsDataURL(file);
+}
+
+// ── INIT ──
+(async () => {
+  const { data: { session } } = await db.auth.getSession();
+  if (session?.user) {
+    currentUser = session.user;
+    await loadApp();
+  }
+})();
+</script>
+</body>
+</html>

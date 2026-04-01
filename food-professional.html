@@ -1,0 +1,1974 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Food Professional Portal | CBUSEVENTS</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+  :root {
+    --bg: #080810;
+    --bg2: #0f0f1a;
+    --bg3: #16162a;
+    --orange: #FF6B35;
+    --orange-dim: rgba(255,107,53,0.12);
+    --orange-border: rgba(255,107,53,0.25);
+    --white: #ffffff;
+    --gray: #8888a0;
+    --gray2: #444460;
+    --green: #2ecc71;
+    --red: #e74c3c;
+    --card: #12121f;
+    --border: rgba(255,255,255,0.06);
+    --font-display: 'Syne', sans-serif;
+    --font-body: 'DM Sans', sans-serif;
+    --font-mono: 'DM Mono', monospace;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--white);
+    font-family: var(--font-body);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ── AUTH SCREEN ── */
+  #auth-screen {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    background: radial-gradient(ellipse at 60% 0%, rgba(255,107,53,0.08) 0%, transparent 60%),
+                radial-gradient(ellipse at 0% 80%, rgba(255,107,53,0.04) 0%, transparent 50%),
+                var(--bg);
+  }
+
+  .auth-card {
+    width: 100%;
+    max-width: 420px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 40px 32px;
+    animation: fadeUp 0.5s ease;
+  }
+
+  .auth-logo {
+    font-family: var(--font-display);
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    color: var(--orange);
+    margin-bottom: 32px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .auth-logo span {
+    color: var(--gray);
+    font-weight: 400;
+  }
+
+  .auth-title {
+    font-family: var(--font-display);
+    font-size: 26px;
+    font-weight: 800;
+    line-height: 1.2;
+    margin-bottom: 8px;
+  }
+
+  .auth-sub {
+    color: var(--gray);
+    font-size: 14px;
+    margin-bottom: 32px;
+    line-height: 1.5;
+  }
+
+  .form-group {
+    margin-bottom: 16px;
+  }
+
+  .form-group label {
+    display: block;
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    color: var(--gray);
+    margin-bottom: 8px;
+    text-transform: uppercase;
+  }
+
+  .form-group input, .form-group select, .form-group textarea {
+    width: 100%;
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px 16px;
+    color: var(--white);
+    font-family: var(--font-body);
+    font-size: 15px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+    border-color: var(--orange);
+  }
+
+  .form-group select option { background: var(--bg2); }
+
+  .btn-primary {
+    width: 100%;
+    background: var(--orange);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    padding: 14px;
+    font-family: var(--font-display);
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: opacity 0.2s, transform 0.1s;
+    letter-spacing: 0.03em;
+  }
+
+  .btn-primary:hover { opacity: 0.9; }
+  .btn-primary:active { transform: scale(0.98); }
+  .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  .auth-toggle {
+    text-align: center;
+    margin-top: 20px;
+    font-size: 14px;
+    color: var(--gray);
+  }
+
+  .auth-toggle a {
+    color: var(--orange);
+    cursor: pointer;
+    text-decoration: none;
+    font-weight: 500;
+  }
+
+  /* ── MAIN APP ── */
+  #app { display: none; min-height: 100vh; }
+
+  /* TOP NAV */
+  .top-nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    height: 60px;
+    background: rgba(8,8,16,0.95);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 20px;
+    z-index: 100;
+  }
+
+  .nav-brand {
+    font-family: var(--font-display);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    color: var(--orange);
+  }
+
+  .nav-brand span { color: var(--gray); font-weight: 400; }
+
+  .nav-right { display: flex; align-items: center; gap: 12px; }
+
+  .tier-badge {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 500;
+    padding: 4px 10px;
+    border-radius: 20px;
+    background: var(--orange-dim);
+    border: 1px solid var(--orange-border);
+    color: var(--orange);
+    letter-spacing: 0.05em;
+  }
+
+  .nav-avatar {
+    width: 34px; height: 34px;
+    border-radius: 50%;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px; cursor: pointer;
+    position: relative;
+  }
+
+  .nav-menu {
+    position: absolute;
+    top: 44px; right: 0;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    min-width: 160px;
+    display: none;
+  }
+
+  .nav-menu.open { display: block; }
+
+  .nav-menu a {
+    display: block;
+    padding: 12px 16px;
+    font-size: 14px;
+    color: var(--white);
+    text-decoration: none;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+
+  .nav-menu a:hover { background: var(--bg3); }
+  .nav-menu a.danger { color: var(--red); }
+
+  /* MAIN LAYOUT */
+  .main-layout {
+    padding-top: 60px;
+    display: flex;
+    min-height: 100vh;
+  }
+
+  /* SIDEBAR */
+  .sidebar {
+    width: 220px;
+    position: fixed;
+    top: 60px; left: 0; bottom: 0;
+    background: var(--bg);
+    border-right: 1px solid var(--border);
+    padding: 24px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    overflow-y: auto;
+    z-index: 50;
+  }
+
+  .sidebar-label {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    color: var(--gray2);
+    padding: 8px 12px 4px;
+    text-transform: uppercase;
+    margin-top: 8px;
+  }
+
+  .sidebar-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 14px;
+    color: var(--gray);
+    transition: all 0.15s;
+    font-weight: 500;
+  }
+
+  .sidebar-item:hover { background: var(--bg3); color: var(--white); }
+  .sidebar-item.active { background: var(--orange-dim); color: var(--orange); border: 1px solid var(--orange-border); }
+  .sidebar-item .icon { font-size: 16px; width: 20px; text-align: center; }
+
+  /* CONTENT */
+  .content {
+    margin-left: 220px;
+    flex: 1;
+    padding: 28px 24px;
+    max-width: calc(100vw - 220px);
+  }
+
+  /* PANELS */
+  .panel { display: none; }
+  .panel.active { display: block; animation: fadeUp 0.3s ease; }
+
+  /* PAGE HEADER */
+  .page-header {
+    margin-bottom: 28px;
+  }
+
+  .page-header h1 {
+    font-family: var(--font-display);
+    font-size: 24px;
+    font-weight: 800;
+    margin-bottom: 4px;
+  }
+
+  .page-header p { color: var(--gray); font-size: 14px; }
+
+  /* STATS ROW */
+  .stats-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-bottom: 28px;
+  }
+
+  .stat-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 20px;
+    transition: border-color 0.2s;
+  }
+
+  .stat-card:hover { border-color: var(--orange-border); }
+
+  .stat-label {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    color: var(--gray);
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+
+  .stat-value {
+    font-family: var(--font-display);
+    font-size: 28px;
+    font-weight: 800;
+    color: var(--white);
+    line-height: 1;
+  }
+
+  .stat-sub {
+    font-size: 12px;
+    color: var(--gray);
+    margin-top: 4px;
+  }
+
+  /* CARDS */
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 24px;
+    margin-bottom: 20px;
+  }
+
+  .card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+  }
+
+  .card-title {
+    font-family: var(--font-display);
+    font-size: 16px;
+    font-weight: 700;
+  }
+
+  /* MENU BUILDER */
+  .menu-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 16px;
+    margin-bottom: 20px;
+  }
+
+  .menu-item-card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    transition: border-color 0.2s;
+  }
+
+  .menu-item-card:hover { border-color: var(--orange-border); }
+
+  .menu-item-img {
+    width: 100%;
+    height: 140px;
+    object-fit: cover;
+    background: var(--bg3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 32px;
+    color: var(--gray2);
+  }
+
+  .menu-item-img img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .menu-item-body { padding: 14px; }
+
+  .menu-item-name {
+    font-family: var(--font-display);
+    font-size: 15px;
+    font-weight: 700;
+    margin-bottom: 4px;
+  }
+
+  .menu-item-desc {
+    font-size: 12px;
+    color: var(--gray);
+    margin-bottom: 10px;
+    line-height: 1.4;
+  }
+
+  .menu-item-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .menu-item-price {
+    font-family: var(--font-mono);
+    font-size: 16px;
+    font-weight: 500;
+    color: var(--orange);
+  }
+
+  .menu-item-actions { display: flex; gap: 8px; }
+
+  .btn-icon {
+    width: 30px; height: 30px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--gray);
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px;
+    transition: all 0.15s;
+  }
+
+  .btn-icon:hover { border-color: var(--orange); color: var(--orange); }
+  .btn-icon.danger:hover { border-color: var(--red); color: var(--red); }
+
+  .capacity-bar {
+    margin-top: 8px;
+  }
+
+  .capacity-label {
+    display: flex;
+    justify-content: space-between;
+    font-size: 11px;
+    color: var(--gray);
+    margin-bottom: 4px;
+  }
+
+  .capacity-track {
+    height: 4px;
+    background: var(--bg3);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+
+  .capacity-fill {
+    height: 100%;
+    background: var(--orange);
+    border-radius: 2px;
+    transition: width 0.3s;
+  }
+
+  /* MODAL */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.8);
+    backdrop-filter: blur(4px);
+    z-index: 200;
+    display: none;
+    align-items: flex-end;
+    justify-content: center;
+    padding: 0;
+  }
+
+  .modal-overlay.open {
+    display: flex;
+  }
+
+  .modal {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 20px 20px 0 0;
+    width: 100%;
+    max-width: 560px;
+    max-height: 90vh;
+    overflow-y: auto;
+    padding: 28px 24px 40px;
+    animation: slideUp 0.3s ease;
+  }
+
+  .modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 24px;
+  }
+
+  .modal-title {
+    font-family: var(--font-display);
+    font-size: 18px;
+    font-weight: 800;
+  }
+
+  .modal-close {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--gray);
+    cursor: pointer;
+    font-size: 16px;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.15s;
+  }
+
+  .modal-close:hover { border-color: var(--red); color: var(--red); }
+
+  /* IMAGE UPLOAD */
+  .img-upload-area {
+    width: 100%;
+    height: 140px;
+    border: 2px dashed var(--border);
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: border-color 0.2s;
+    background: var(--bg2);
+    overflow: hidden;
+    position: relative;
+    margin-bottom: 16px;
+  }
+
+  .img-upload-area:hover { border-color: var(--orange); }
+  .img-upload-area .upload-icon { font-size: 28px; margin-bottom: 8px; }
+  .img-upload-area .upload-text { font-size: 13px; color: var(--gray); }
+  .img-upload-area input[type=file] { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+
+  .img-upload-area img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  /* ORDERS */
+  .orders-list { display: flex; flex-direction: column; gap: 12px; }
+
+  .order-card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  .order-info { flex: 1; }
+
+  .order-name {
+    font-weight: 600;
+    font-size: 14px;
+    margin-bottom: 2px;
+  }
+
+  .order-items { font-size: 12px; color: var(--gray); }
+
+  .order-meta {
+    text-align: right;
+    flex-shrink: 0;
+  }
+
+  .order-total {
+    font-family: var(--font-mono);
+    font-size: 15px;
+    color: var(--orange);
+    font-weight: 500;
+  }
+
+  .order-time { font-size: 11px; color: var(--gray); margin-top: 2px; }
+
+  .order-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 11px;
+    font-weight: 500;
+    padding: 3px 8px;
+    border-radius: 20px;
+    margin-top: 4px;
+  }
+
+  .status-pending { background: rgba(255,193,7,0.12); color: #ffc107; border: 1px solid rgba(255,193,7,0.25); }
+  .status-confirmed { background: rgba(46,204,113,0.12); color: var(--green); border: 1px solid rgba(46,204,113,0.25); }
+  .status-ready { background: rgba(255,107,53,0.12); color: var(--orange); border: 1px solid var(--orange-border); }
+  .status-completed { background: var(--bg3); color: var(--gray); border: 1px solid var(--border); }
+
+  /* EVENT SETUP */
+  .event-setup-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+
+  .toggle-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .toggle-row:last-child { border-bottom: none; }
+
+  .toggle-label { font-size: 14px; }
+  .toggle-sub { font-size: 12px; color: var(--gray); margin-top: 2px; }
+
+  .toggle {
+    width: 44px; height: 24px;
+    background: var(--bg3);
+    border-radius: 12px;
+    cursor: pointer;
+    position: relative;
+    transition: background 0.2s;
+    border: none;
+    flex-shrink: 0;
+  }
+
+  .toggle::after {
+    content: '';
+    position: absolute;
+    top: 3px; left: 3px;
+    width: 18px; height: 18px;
+    background: var(--gray);
+    border-radius: 50%;
+    transition: all 0.2s;
+  }
+
+  .toggle.on { background: var(--orange); }
+  .toggle.on::after { left: 23px; background: white; }
+
+  /* PROFILE PREVIEW */
+  .profile-preview {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    overflow: hidden;
+  }
+
+  .profile-cover {
+    height: 140px;
+    background: linear-gradient(135deg, #1a0a05, #2d1008);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 40px;
+    position: relative;
+  }
+
+  .profile-cover-btn {
+    position: absolute;
+    bottom: 10px; right: 10px;
+    background: rgba(0,0,0,0.6);
+    border: 1px solid var(--border);
+    color: white;
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-size: 12px;
+    cursor: pointer;
+  }
+
+  .profile-body { padding: 20px; }
+
+  .profile-avatar-row {
+    display: flex;
+    align-items: flex-end;
+    gap: 16px;
+    margin-top: -40px;
+    margin-bottom: 16px;
+  }
+
+  .profile-avatar {
+    width: 72px; height: 72px;
+    border-radius: 50%;
+    background: var(--bg3);
+    border: 3px solid var(--card);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 28px;
+    flex-shrink: 0;
+    overflow: hidden;
+  }
+
+  .profile-name {
+    font-family: var(--font-display);
+    font-size: 20px;
+    font-weight: 800;
+    margin-bottom: 2px;
+  }
+
+  .profile-type {
+    font-size: 12px;
+    color: var(--gray);
+    font-family: var(--font-mono);
+    letter-spacing: 0.08em;
+  }
+
+  .profile-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 12px;
+  }
+
+  .profile-tag {
+    font-size: 12px;
+    padding: 4px 12px;
+    border-radius: 20px;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    color: var(--gray);
+  }
+
+  /* SETTINGS */
+  .settings-section { margin-bottom: 32px; }
+
+  .settings-section-title {
+    font-family: var(--font-display);
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--orange);
+    letter-spacing: 0.05em;
+    margin-bottom: 16px;
+    text-transform: uppercase;
+    font-size: 12px;
+  }
+
+  /* BOTTOM NAV (mobile) */
+  .bottom-nav {
+    display: none;
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    background: rgba(8,8,16,0.97);
+    border-top: 1px solid var(--border);
+    padding: 8px 0 20px;
+    z-index: 100;
+  }
+
+  .bottom-nav-inner {
+    display: flex;
+    justify-content: space-around;
+  }
+
+  .bottom-nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    padding: 6px 12px;
+    cursor: pointer;
+    color: var(--gray);
+    transition: color 0.15s;
+  }
+
+  .bottom-nav-item.active { color: var(--orange); }
+  .bottom-nav-item .icon { font-size: 20px; }
+  .bottom-nav-item .label { font-size: 10px; font-weight: 500; }
+
+  /* NOTIFICATION TOAST */
+  .toast {
+    position: fixed;
+    bottom: 100px; left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 12px 20px;
+    font-size: 14px;
+    font-weight: 500;
+    opacity: 0;
+    transition: all 0.3s;
+    z-index: 300;
+    white-space: nowrap;
+  }
+
+  .toast.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+
+  .toast.success { border-color: rgba(46,204,113,0.4); color: var(--green); }
+  .toast.error { border-color: rgba(231,76,60,0.4); color: var(--red); }
+
+  /* EMPTY STATE */
+  .empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--gray);
+  }
+
+  .empty-state .empty-icon { font-size: 48px; margin-bottom: 16px; }
+  .empty-state h3 { font-family: var(--font-display); font-size: 18px; font-weight: 700; color: var(--white); margin-bottom: 8px; }
+  .empty-state p { font-size: 14px; line-height: 1.5; }
+
+  /* CUTOFF BANNER */
+  .cutoff-banner {
+    background: var(--orange-dim);
+    border: 1px solid var(--orange-border);
+    border-radius: 12px;
+    padding: 14px 18px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+    gap: 12px;
+  }
+
+  .cutoff-text { font-size: 14px; }
+  .cutoff-text strong { color: var(--orange); }
+  .cutoff-countdown {
+    font-family: var(--font-mono);
+    font-size: 20px;
+    font-weight: 500;
+    color: var(--orange);
+    flex-shrink: 0;
+  }
+
+  /* BTN SECONDARY */
+  .btn-secondary {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--white);
+    border-radius: 10px;
+    padding: 10px 18px;
+    font-family: var(--font-body);
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .btn-secondary:hover { border-color: var(--orange); color: var(--orange); }
+
+  .btn-orange-outline {
+    background: transparent;
+    border: 1px solid var(--orange);
+    color: var(--orange);
+    border-radius: 10px;
+    padding: 10px 18px;
+    font-family: var(--font-body);
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .btn-orange-outline:hover { background: var(--orange); color: white; }
+
+  /* QUICK ACTIONS */
+  .quick-actions {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+
+  .quick-action {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 18px;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+
+  .quick-action:hover { border-color: var(--orange-border); background: var(--orange-dim); }
+
+  .qa-icon {
+    width: 44px; height: 44px;
+    border-radius: 12px;
+    background: var(--orange-dim);
+    border: 1px solid var(--orange-border);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px;
+    flex-shrink: 0;
+  }
+
+  .qa-label { font-family: var(--font-display); font-size: 14px; font-weight: 700; }
+  .qa-sub { font-size: 12px; color: var(--gray); margin-top: 2px; }
+
+  /* INLINE GRID */
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .three-col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes slideUp {
+    from { transform: translateY(100%); }
+    to { transform: translateY(0); }
+  }
+
+  /* RESPONSIVE */
+  @media (max-width: 768px) {
+    .sidebar { display: none; }
+    .content { margin-left: 0; padding: 20px 16px 100px; max-width: 100%; }
+    .stats-row { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+    .bottom-nav { display: block; }
+    .event-setup-grid { grid-template-columns: 1fr; }
+    .two-col { grid-template-columns: 1fr; }
+    .three-col { grid-template-columns: 1fr 1fr; }
+    .quick-actions { grid-template-columns: 1fr 1fr; }
+  }
+
+  @media (max-width: 480px) {
+    .stats-row { grid-template-columns: repeat(2, 1fr); }
+    .three-col { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- AUTH SCREEN -->
+<div id="auth-screen">
+  <div class="auth-card">
+    <div class="auth-logo">CBUSEVENTS <span>/ Food Professional</span></div>
+
+    <!-- LOGIN -->
+    <div id="login-form">
+      <h2 class="auth-title">Welcome back, Chef.</h2>
+      <p class="auth-sub">Sign in to manage your storefront, orders, and events.</p>
+      <div class="form-group">
+        <label>Email</label>
+        <input type="email" id="login-email" placeholder="you@email.com">
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" id="login-password" placeholder="••••••••">
+      </div>
+      <button class="btn-primary" onclick="handleLogin()">Sign In</button>
+      <div class="auth-toggle">
+        No account? <a onclick="showSignup()">Create one free</a>
+      </div>
+    </div>
+
+    <!-- SIGNUP -->
+    <div id="signup-form" style="display:none">
+      <h2 class="auth-title">Join as a Food Professional.</h2>
+      <p class="auth-sub">Chefs, food trucks, caterers, and pop-up operators - this is your home base.</p>
+      <div class="two-col">
+        <div class="form-group">
+          <label>First Name</label>
+          <input type="text" id="signup-first" placeholder="First">
+        </div>
+        <div class="form-group">
+          <label>Last Name</label>
+          <input type="text" id="signup-last" placeholder="Last">
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Business / Brand Name</label>
+        <input type="text" id="signup-business" placeholder="Chef Nem's Kitchen">
+      </div>
+      <div class="form-group">
+        <label>Professional Type</label>
+        <select id="signup-type">
+          <option value="">Select your type...</option>
+          <option value="chef">Private Chef</option>
+          <option value="food_truck">Food Truck</option>
+          <option value="caterer">Caterer</option>
+          <option value="popup">Pop-Up Operator</option>
+          <option value="personal_chef">Personal Chef</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Email</label>
+        <input type="email" id="signup-email" placeholder="you@email.com">
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" id="signup-password" placeholder="Min 8 characters">
+      </div>
+      <button class="btn-primary" onclick="handleSignup()">Create Account - Free</button>
+      <div class="auth-toggle">
+        Already have an account? <a onclick="showLogin()">Sign in</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN APP -->
+<div id="app">
+
+  <!-- TOP NAV -->
+  <nav class="top-nav">
+    <div class="nav-brand">CBUSEVENTS <span>/ Food Pro</span></div>
+    <div class="nav-right">
+      <span class="tier-badge" id="tier-label">FREE</span>
+      <div class="nav-avatar" onclick="toggleNavMenu()">
+        👤
+        <div class="nav-menu" id="nav-menu">
+          <a onclick="showPanel('settings')">⚙️ Settings</a>
+          <a onclick="viewPublicProfile()">👁 View Public Profile</a>
+          <a class="danger" onclick="handleLogout()">Sign Out</a>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <div class="main-layout">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      <div class="sidebar-label">Main</div>
+      <div class="sidebar-item active" onclick="showPanel('dashboard')" data-panel="dashboard">
+        <span class="icon">🏠</span> Dashboard
+      </div>
+      <div class="sidebar-item" onclick="showPanel('orders')" data-panel="orders">
+        <span class="icon">📋</span> Orders
+      </div>
+
+      <div class="sidebar-label">Storefront</div>
+      <div class="sidebar-item" onclick="showPanel('menu')" data-panel="menu">
+        <span class="icon">🍽️</span> Menu Builder
+      </div>
+      <div class="sidebar-item" onclick="showPanel('event-setup')" data-panel="event-setup">
+        <span class="icon">⚡</span> Event Setup
+      </div>
+
+      <div class="sidebar-label">Profile</div>
+      <div class="sidebar-item" onclick="showPanel('profile')" data-panel="profile">
+        <span class="icon">👤</span> My Profile
+      </div>
+      <div class="sidebar-item" onclick="showPanel('settings')" data-panel="settings">
+        <span class="icon">⚙️</span> Settings
+      </div>
+    </aside>
+
+    <!-- CONTENT -->
+    <main class="content">
+
+      <!-- DASHBOARD -->
+      <div class="panel active" id="panel-dashboard">
+        <div class="page-header">
+          <h1 id="dash-greeting">Good morning 👋</h1>
+          <p id="dash-sub">Here's what's happening with your storefront today.</p>
+        </div>
+
+        <div id="cutoff-banner-wrap"></div>
+
+        <div class="stats-row">
+          <div class="stat-card">
+            <div class="stat-label">Today's Orders</div>
+            <div class="stat-value" id="stat-orders">0</div>
+            <div class="stat-sub">pending pickup</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Revenue Today</div>
+            <div class="stat-value" id="stat-revenue">$0</div>
+            <div class="stat-sub">via CBUSEVENTS</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Menu Items</div>
+            <div class="stat-value" id="stat-items">0</div>
+            <div class="stat-sub">active listings</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Profile Views</div>
+            <div class="stat-value">-</div>
+            <div class="stat-sub">upgrade to track</div>
+          </div>
+        </div>
+
+        <div class="quick-actions">
+          <div class="quick-action" onclick="showPanel('menu')">
+            <div class="qa-icon">🍽️</div>
+            <div>
+              <div class="qa-label">Add Menu Item</div>
+              <div class="qa-sub">Build your storefront</div>
+            </div>
+          </div>
+          <div class="quick-action" onclick="showPanel('event-setup')">
+            <div class="qa-icon">⚡</div>
+            <div>
+              <div class="qa-label">Set Up Event</div>
+              <div class="qa-sub">Preorders + capacity</div>
+            </div>
+          </div>
+          <div class="quick-action" onclick="showPanel('orders')">
+            <div class="qa-icon">📋</div>
+            <div>
+              <div class="qa-label">View Orders</div>
+              <div class="qa-sub">Manage queue</div>
+            </div>
+          </div>
+          <div class="quick-action" onclick="showPanel('profile')">
+            <div class="qa-icon">👤</div>
+            <div>
+              <div class="qa-label">Edit Profile</div>
+              <div class="qa-sub">Public storefront</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">Recent Orders</div>
+            <button class="btn-secondary" onclick="showPanel('orders')">View All</button>
+          </div>
+          <div id="dash-recent-orders">
+            <div class="empty-state">
+              <div class="empty-icon">📭</div>
+              <h3>No orders yet</h3>
+              <p>Once you set up your menu and go live,<br>orders will appear here in real time.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ORDERS -->
+      <div class="panel" id="panel-orders">
+        <div class="page-header">
+          <h1>Orders</h1>
+          <p>Manage your preorder queue and update order status.</p>
+        </div>
+
+        <div style="display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap;">
+          <button class="btn-primary" style="width:auto;padding:10px 20px" onclick="filterOrders('all')">All</button>
+          <button class="btn-secondary" onclick="filterOrders('pending')">Pending</button>
+          <button class="btn-secondary" onclick="filterOrders('confirmed')">Confirmed</button>
+          <button class="btn-secondary" onclick="filterOrders('ready')">Ready</button>
+          <button class="btn-secondary" onclick="filterOrders('completed')">Completed</button>
+        </div>
+
+        <div class="orders-list" id="orders-list">
+          <div class="empty-state">
+            <div class="empty-icon">📋</div>
+            <h3>No orders yet</h3>
+            <p>Set up your menu and share your storefront link to start taking preorders.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- MENU BUILDER -->
+      <div class="panel" id="panel-menu">
+        <div class="page-header">
+          <div style="display:flex;align-items:center;justify-content:space-between;">
+            <div>
+              <h1>Menu Builder</h1>
+              <p>Add dishes, set prices, and control portions for your next event.</p>
+            </div>
+            <button class="btn-primary" style="width:auto;padding:12px 20px" onclick="openAddItem()">+ Add Item</button>
+          </div>
+        </div>
+
+        <div class="menu-grid" id="menu-grid">
+          <div class="empty-state" style="grid-column:1/-1">
+            <div class="empty-icon">🍽️</div>
+            <h3>Your menu is empty</h3>
+            <p>Add your first dish to start building your storefront.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- EVENT SETUP -->
+      <div class="panel" id="panel-event-setup">
+        <div class="page-header">
+          <h1>Event Setup</h1>
+          <p>Configure your preorder window, capacity limits, and pickup details.</p>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">Preorder Window</div>
+          </div>
+          <div class="event-setup-grid">
+            <div class="form-group">
+              <label>Event Date</label>
+              <input type="date" id="event-date">
+            </div>
+            <div class="form-group">
+              <label>Event Start Time</label>
+              <input type="time" id="event-start">
+            </div>
+            <div class="form-group">
+              <label>Preorder Opens</label>
+              <input type="datetime-local" id="preorder-open">
+            </div>
+            <div class="form-group">
+              <label>Preorder Cutoff</label>
+              <input type="datetime-local" id="preorder-cutoff">
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">Capacity & Limits</div>
+          </div>
+          <div class="event-setup-grid">
+            <div class="form-group">
+              <label>Total Order Limit</label>
+              <input type="number" id="total-capacity" placeholder="e.g. 100">
+            </div>
+            <div class="form-group">
+              <label>Max Orders Per Person</label>
+              <input type="number" id="per-person-limit" placeholder="e.g. 2" value="2">
+            </div>
+          </div>
+          <div class="toggle-row">
+            <div>
+              <div class="toggle-label">Auto-close when capacity hits</div>
+              <div class="toggle-sub">Preorders stop automatically at your limit</div>
+            </div>
+            <button class="toggle on" id="toggle-autoclose" onclick="toggleSwitch(this)"></button>
+          </div>
+          <div class="toggle-row">
+            <div>
+              <div class="toggle-label">Allow walk-in orders</div>
+              <div class="toggle-sub">Let people order on-site (not just preorder)</div>
+            </div>
+            <button class="toggle" id="toggle-walkin" onclick="toggleSwitch(this)"></button>
+          </div>
+          <div class="toggle-row">
+            <div>
+              <div class="toggle-label">Require payment at preorder</div>
+              <div class="toggle-sub">Collect payment upfront, not at pickup</div>
+            </div>
+            <button class="toggle on" id="toggle-prepay" onclick="toggleSwitch(this)"></button>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">Pickup Details</div>
+          </div>
+          <div class="form-group">
+            <label>Pickup Address</label>
+            <input type="text" id="pickup-address" placeholder="2864 N High St, Columbus OH 43202">
+          </div>
+          <div class="event-setup-grid">
+            <div class="form-group">
+              <label>Pickup Window Start</label>
+              <input type="time" id="pickup-start">
+            </div>
+            <div class="form-group">
+              <label>Pickup Window End</label>
+              <input type="time" id="pickup-end">
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Pickup Instructions</label>
+            <textarea id="pickup-notes" rows="3" placeholder="Look for the red truck on the north side of the lot..."></textarea>
+          </div>
+        </div>
+
+        <button class="btn-primary" onclick="saveEventSetup()">Save Event Setup</button>
+      </div>
+
+      <!-- PROFILE -->
+      <div class="panel" id="panel-profile">
+        <div class="page-header">
+          <h1>My Profile</h1>
+          <p>This is how you appear to planners, venues, and attendees on CBUSEVENTS.</p>
+        </div>
+
+        <div class="card" style="margin-bottom:20px">
+          <div class="card-header">
+            <div class="card-title">Public Profile Preview</div>
+            <button class="btn-orange-outline" onclick="viewPublicProfile()">Share Link ↗</button>
+          </div>
+          <div class="profile-preview">
+            <div class="profile-cover">
+              🍳
+              <button class="profile-cover-btn">Change Cover</button>
+            </div>
+            <div class="profile-body">
+              <div class="profile-avatar-row">
+                <div class="profile-avatar">👨‍🍳</div>
+                <div>
+                  <div class="profile-name" id="preview-name">Your Name</div>
+                  <div class="profile-type" id="preview-type">FOOD PROFESSIONAL</div>
+                </div>
+              </div>
+              <div id="preview-bio" style="font-size:14px;color:var(--gray);line-height:1.5;margin-bottom:12px">
+                Add a bio to tell people about your food and style.
+              </div>
+              <div class="profile-tags" id="preview-tags">
+                <span class="profile-tag">Columbus, OH</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header"><div class="card-title">Edit Profile Info</div></div>
+          <div class="two-col">
+            <div class="form-group">
+              <label>Display Name</label>
+              <input type="text" id="profile-name" placeholder="Chef Nem's Kitchen" oninput="updatePreviewName(this.value)">
+            </div>
+            <div class="form-group">
+              <label>Professional Type</label>
+              <select id="profile-type" onchange="updatePreviewType(this.value)">
+                <option value="chef">Private Chef</option>
+                <option value="food_truck">Food Truck</option>
+                <option value="caterer">Caterer</option>
+                <option value="popup">Pop-Up Operator</option>
+                <option value="personal_chef">Personal Chef</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Bio</label>
+            <textarea id="profile-bio" rows="4" placeholder="Tell people about your food, your style, and what makes your experience worth showing up for..." oninput="updatePreviewBio(this.value)"></textarea>
+          </div>
+          <div class="two-col">
+            <div class="form-group">
+              <label>Cuisine Types</label>
+              <input type="text" id="profile-cuisine" placeholder="Soul Food, Caribbean, BBQ">
+            </div>
+            <div class="form-group">
+              <label>City / Area</label>
+              <input type="text" id="profile-city" value="Columbus, OH">
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Instagram Handle</label>
+            <input type="text" id="profile-ig" placeholder="@chefnemkitchen">
+          </div>
+          <button class="btn-primary" style="margin-top:8px" onclick="saveProfile()">Save Profile</button>
+        </div>
+      </div>
+
+      <!-- SETTINGS -->
+      <div class="panel" id="panel-settings">
+        <div class="page-header">
+          <h1>Settings</h1>
+          <p>Manage your account and notification preferences.</p>
+        </div>
+
+        <div class="card">
+          <div class="settings-section">
+            <div class="settings-section-title">Account</div>
+            <div class="form-group">
+              <label>Email Address</label>
+              <input type="email" id="settings-email" placeholder="you@email.com">
+            </div>
+            <div class="form-group">
+              <label>Phone Number</label>
+              <input type="tel" id="settings-phone" placeholder="(614) 000-0000">
+            </div>
+            <button class="btn-secondary" onclick="saveSettings()">Update Account</button>
+          </div>
+
+          <div class="settings-section">
+            <div class="settings-section-title">Notifications</div>
+            <div class="toggle-row">
+              <div>
+                <div class="toggle-label">New order alerts</div>
+                <div class="toggle-sub">Get notified when a preorder comes in</div>
+              </div>
+              <button class="toggle on" onclick="toggleSwitch(this)"></button>
+            </div>
+            <div class="toggle-row">
+              <div>
+                <div class="toggle-label">Cutoff reminders</div>
+                <div class="toggle-sub">30-min warning before preorders close</div>
+              </div>
+              <button class="toggle on" onclick="toggleSwitch(this)"></button>
+            </div>
+            <div class="toggle-row">
+              <div>
+                <div class="toggle-label">Platform updates</div>
+                <div class="toggle-sub">New features and announcements</div>
+              </div>
+              <button class="toggle" onclick="toggleSwitch(this)"></button>
+            </div>
+          </div>
+
+          <div class="settings-section">
+            <div class="settings-section-title">Plan</div>
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:16px;background:var(--bg2);border-radius:12px;border:1px solid var(--border)">
+              <div>
+                <div style="font-weight:600;margin-bottom:4px">Free Plan</div>
+                <div style="font-size:13px;color:var(--gray)">Basic profile + directory listing</div>
+              </div>
+              <button class="btn-primary" style="width:auto;padding:10px 20px">Upgrade</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="card" style="border-color:rgba(231,76,60,0.2)">
+          <div class="card-title" style="color:var(--red);margin-bottom:16px">Danger Zone</div>
+          <button class="btn-secondary" style="border-color:rgba(231,76,60,0.4);color:var(--red)" onclick="handleLogout()">Sign Out</button>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <!-- BOTTOM NAV -->
+  <nav class="bottom-nav">
+    <div class="bottom-nav-inner">
+      <div class="bottom-nav-item active" onclick="showPanel('dashboard')" data-panel="dashboard">
+        <span class="icon">🏠</span>
+        <span class="label">Home</span>
+      </div>
+      <div class="bottom-nav-item" onclick="showPanel('orders')" data-panel="orders">
+        <span class="icon">📋</span>
+        <span class="label">Orders</span>
+      </div>
+      <div class="bottom-nav-item" onclick="showPanel('menu')" data-panel="menu">
+        <span class="icon">🍽️</span>
+        <span class="label">Menu</span>
+      </div>
+      <div class="bottom-nav-item" onclick="showPanel('event-setup')" data-panel="event-setup">
+        <span class="icon">⚡</span>
+        <span class="label">Event</span>
+      </div>
+      <div class="bottom-nav-item" onclick="showPanel('profile')" data-panel="profile">
+        <span class="icon">👤</span>
+        <span class="label">Profile</span>
+      </div>
+    </div>
+  </nav>
+</div>
+
+<!-- ADD MENU ITEM MODAL -->
+<div class="modal-overlay" id="modal-add-item">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="modal-item-title">Add Menu Item</div>
+      <button class="modal-close" onclick="closeModal('modal-add-item')">✕</button>
+    </div>
+
+    <div class="img-upload-area" id="item-img-upload" onclick="triggerImgUpload()">
+      <div class="upload-icon">📷</div>
+      <div class="upload-text">Tap to add a photo</div>
+      <input type="file" id="item-img-input" accept="image/*" onchange="handleImgUpload(this)">
+    </div>
+
+    <div class="form-group">
+      <label>Item Name</label>
+      <input type="text" id="item-name" placeholder="e.g. Oxtails with Rice">
+    </div>
+    <div class="form-group">
+      <label>Description</label>
+      <textarea id="item-desc" rows="2" placeholder="What makes this dish special..."></textarea>
+    </div>
+    <div class="two-col">
+      <div class="form-group">
+        <label>Price</label>
+        <input type="number" id="item-price" placeholder="0.00" step="0.01">
+      </div>
+      <div class="form-group">
+        <label>Category</label>
+        <select id="item-category">
+          <option value="entree">Entree</option>
+          <option value="side">Side</option>
+          <option value="appetizer">Appetizer</option>
+          <option value="dessert">Dessert</option>
+          <option value="drink">Drink</option>
+          <option value="combo">Combo / Plate</option>
+        </select>
+      </div>
+    </div>
+    <div class="two-col">
+      <div class="form-group">
+        <label>Portion Limit</label>
+        <input type="number" id="item-capacity" placeholder="Leave blank = unlimited">
+      </div>
+      <div class="form-group">
+        <label>Prep Time (min)</label>
+        <input type="number" id="item-prep" placeholder="e.g. 15">
+      </div>
+    </div>
+    <div class="toggle-row" style="margin-bottom:20px">
+      <div>
+        <div class="toggle-label">Available for preorder</div>
+      </div>
+      <button class="toggle on" id="item-available" onclick="toggleSwitch(this)"></button>
+    </div>
+    <button class="btn-primary" id="save-item-btn" onclick="saveMenuItem()">Add to Menu</button>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+const SUPABASE_URL = 'https://toblgvatvsjljbqogzsv.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRvYmxndmF0dnNqbGpicW9nenN2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MDQ4MjkwNjMsImV4cCI6MjAyMDQwNTA2M30.tC4qRmC5YkrBpLYb1lZlv-CSHB_tGAjSWTAEfg_K3FU';
+
+const { createClient } = supabase;
+const db = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+let currentUser = null;
+let currentProfile = null;
+let menuItems = [];
+let editingItemId = null;
+let itemImageFile = null;
+let itemImagePreview = null;
+
+// ── AUTH ──
+async function handleLogin() {
+  const email = document.getElementById('login-email').value.trim();
+  const password = document.getElementById('login-password').value;
+  if (!email || !password) return showToast('Enter email and password', 'error');
+  const btn = document.querySelector('#login-form .btn-primary');
+  btn.disabled = true; btn.textContent = 'Signing in...';
+  const { data, error } = await db.auth.signInWithPassword({ email, password });
+  btn.disabled = false; btn.textContent = 'Sign In';
+  if (error) return showToast(error.message, 'error');
+  currentUser = data.user;
+  await loadApp();
+}
+
+async function handleSignup() {
+  const first = document.getElementById('signup-first').value.trim();
+  const last = document.getElementById('signup-last').value.trim();
+  const business = document.getElementById('signup-business').value.trim();
+  const type = document.getElementById('signup-type').value;
+  const email = document.getElementById('signup-email').value.trim();
+  const password = document.getElementById('signup-password').value;
+  if (!first || !email || !password || !type) return showToast('Please fill all required fields', 'error');
+  if (password.length < 8) return showToast('Password must be at least 8 characters', 'error');
+  const btn = document.querySelector('#signup-form .btn-primary');
+  btn.disabled = true; btn.textContent = 'Creating account...';
+  const { data, error } = await db.auth.signUp({ email, password, options: { data: { first_name: first, last_name: last, business_name: business, professional_type: type, portal: 'food_professional' }}});
+  btn.disabled = false; btn.textContent = 'Create Account - Free';
+  if (error) return showToast(error.message, 'error');
+  currentUser = data.user;
+  await ensureProfile({ first, last, business, type, email });
+  await loadApp();
+}
+
+async function ensureProfile(data) {
+  const { data: existing } = await db.from('food_professionals').select('id').eq('user_id', currentUser.id).single();
+  if (!existing) {
+    await db.from('food_professionals').insert({
+      user_id: currentUser.id,
+      display_name: data.business || `${data.first} ${data.last}`,
+      professional_type: data.type,
+      email: data.email,
+      city: 'Columbus, OH',
+      tier: 'free'
+    });
+  }
+}
+
+async function handleLogout() {
+  await db.auth.signOut();
+  currentUser = null; currentProfile = null;
+  document.getElementById('app').style.display = 'none';
+  document.getElementById('auth-screen').style.display = 'flex';
+}
+
+function showLogin() {
+  document.getElementById('login-form').style.display = 'block';
+  document.getElementById('signup-form').style.display = 'none';
+}
+
+function showSignup() {
+  document.getElementById('login-form').style.display = 'none';
+  document.getElementById('signup-form').style.display = 'block';
+}
+
+// ── APP LOAD ──
+async function loadApp() {
+  document.getElementById('auth-screen').style.display = 'none';
+  document.getElementById('app').style.display = 'block';
+
+  // Load profile
+  const { data: prof } = await db.from('food_professionals').select('*').eq('user_id', currentUser.id).single();
+  currentProfile = prof;
+
+  if (prof) {
+    document.getElementById('tier-label').textContent = (prof.tier || 'free').toUpperCase();
+    document.getElementById('preview-name').textContent = prof.display_name || 'Your Name';
+    const typeLabels = { chef: 'PRIVATE CHEF', food_truck: 'FOOD TRUCK', caterer: 'CATERER', popup: 'POP-UP OPERATOR', personal_chef: 'PERSONAL CHEF' };
+    document.getElementById('preview-type').textContent = typeLabels[prof.professional_type] || 'FOOD PROFESSIONAL';
+    if (prof.bio) document.getElementById('preview-bio').textContent = prof.bio;
+    document.getElementById('profile-name').value = prof.display_name || '';
+    document.getElementById('profile-type').value = prof.professional_type || 'chef';
+    document.getElementById('profile-bio').value = prof.bio || '';
+    document.getElementById('profile-city').value = prof.city || 'Columbus, OH';
+    document.getElementById('profile-ig').value = prof.instagram || '';
+  }
+
+  // Greeting
+  const hr = new Date().getHours();
+  const greet = hr < 12 ? 'Good morning' : hr < 17 ? 'Good afternoon' : 'Good evening';
+  document.getElementById('dash-greeting').textContent = `${greet} 👋`;
+  if (prof) document.getElementById('dash-sub').textContent = `Welcome back, ${prof.display_name || 'Chef'}.`;
+
+  await loadMenuItems();
+  await loadOrders();
+  updateDashStats();
+}
+
+// ── MENU ──
+async function loadMenuItems() {
+  if (!currentUser) return;
+  const { data } = await db.from('food_professional_menu_items').select('*').eq('user_id', currentUser.id).order('created_at', { ascending: false });
+  menuItems = data || [];
+  renderMenuGrid();
+  document.getElementById('stat-items').textContent = menuItems.length;
+}
+
+function renderMenuGrid() {
+  const grid = document.getElementById('menu-grid');
+  if (!menuItems.length) {
+    grid.innerHTML = `<div class="empty-state" style="grid-column:1/-1"><div class="empty-icon">🍽️</div><h3>Your menu is empty</h3><p>Add your first dish to start building your storefront.</p></div>`;
+    return;
+  }
+  grid.innerHTML = menuItems.map(item => `
+    <div class="menu-item-card">
+      <div class="menu-item-img">
+        ${item.image_url ? `<img src="${item.image_url}" alt="${item.name}">` : '🍽️'}
+      </div>
+      <div class="menu-item-body">
+        <div class="menu-item-name">${item.name}</div>
+        <div class="menu-item-desc">${item.description || ''}</div>
+        <div class="menu-item-footer">
+          <div class="menu-item-price">$${parseFloat(item.price).toFixed(2)}</div>
+          <div class="menu-item-actions">
+            <button class="btn-icon" onclick="editMenuItem('${item.id}')">✏️</button>
+            <button class="btn-icon danger" onclick="deleteMenuItem('${item.id}')">🗑️</button>
+          </div>
+        </div>
+        ${item.portion_limit ? `
+          <div class="capacity-bar">
+            <div class="capacity-label">
+              <span>Portions</span>
+              <span>${item.orders_count || 0}/${item.portion_limit}</span>
+            </div>
+            <div class="capacity-track">
+              <div class="capacity-fill" style="width:${Math.min(100, ((item.orders_count||0)/item.portion_limit)*100)}%"></div>
+            </div>
+          </div>
+        ` : ''}
+      </div>
+    </div>
+  `).join('');
+}
+
+function openAddItem() {
+  editingItemId = null;
+  itemImageFile = null;
+  itemImagePreview = null;
+  document.getElementById('modal-item-title').textContent = 'Add Menu Item';
+  document.getElementById('save-item-btn').textContent = 'Add to Menu';
+  document.getElementById('item-name').value = '';
+  document.getElementById('item-desc').value = '';
+  document.getElementById('item-price').value = '';
+  document.getElementById('item-capacity').value = '';
+  document.getElementById('item-prep').value = '';
+  document.getElementById('item-category').value = 'entree';
+  resetImgUpload();
+  openModal('modal-add-item');
+}
+
+function editMenuItem(id) {
+  const item = menuItems.find(m => m.id === id);
+  if (!item) return;
+  editingItemId = id;
+  document.getElementById('modal-item-title').textContent = 'Edit Menu Item';
+  document.getElementById('save-item-btn').textContent = 'Save Changes';
+  document.getElementById('item-name').value = item.name || '';
+  document.getElementById('item-desc').value = item.description || '';
+  document.getElementById('item-price').value = item.price || '';
+  document.getElementById('item-capacity').value = item.portion_limit || '';
+  document.getElementById('item-prep').value = item.prep_time || '';
+  document.getElementById('item-category').value = item.category || 'entree';
+  if (item.image_url) {
+    const area = document.getElementById('item-img-upload');
+    area.innerHTML = `<img src="${item.image_url}"><input type="file" id="item-img-input" accept="image/*" onchange="handleImgUpload(this)">`;
+  } else {
+    resetImgUpload();
+  }
+  openModal('modal-add-item');
+}
+
+async function saveMenuItem() {
+  const name = document.getElementById('item-name').value.trim();
+  const price = document.getElementById('item-price').value;
+  if (!name || !price) return showToast('Name and price are required', 'error');
+
+  const btn = document.getElementById('save-item-btn');
+  btn.disabled = true; btn.textContent = 'Saving...';
+
+  let imageUrl = null;
+  if (itemImageFile) {
+    const ext = itemImageFile.name.split('.').pop();
+    const path = `menu/${currentUser.id}/${Date.now()}.${ext}`;
+    const { error: upErr } = await db.storage.from('food-professional-menu').upload(path, itemImageFile, { upsert: true });
+    if (!upErr) {
+      const { data: urlData } = db.storage.from('food-professional-menu').getPublicUrl(path);
+      imageUrl = urlData.publicUrl;
+    }
+  }
+
+  const payload = {
+    user_id: currentUser.id,
+    name,
+    description: document.getElementById('item-desc').value.trim(),
+    price: parseFloat(price),
+    category: document.getElementById('item-category').value,
+    portion_limit: document.getElementById('item-capacity').value ? parseInt(document.getElementById('item-capacity').value) : null,
+    prep_time: document.getElementById('item-prep').value ? parseInt(document.getElementById('item-prep').value) : null,
+    is_available: document.getElementById('item-available').classList.contains('on'),
+    ...(imageUrl ? { image_url: imageUrl } : {})
+  };
+
+  let error;
+  if (editingItemId) {
+    ({ error } = await db.from('food_professional_menu_items').update(payload).eq('id', editingItemId));
+  } else {
+    ({ error } = await db.from('food_professional_menu_items').insert(payload));
+  }
+
+  btn.disabled = false; btn.textContent = editingItemId ? 'Save Changes' : 'Add to Menu';
+
+  if (error) return showToast(error.message, 'error');
+  showToast(editingItemId ? 'Item updated!' : 'Item added to menu!', 'success');
+  closeModal('modal-add-item');
+  await loadMenuItems();
+}
+
+async function deleteMenuItem(id) {
+  if (!confirm('Remove this item from your menu?')) return;
+  await db.from('food_professional_menu_items').delete().eq('id', id);
+  showToast('Item removed', 'success');
+  await loadMenuItems();
+}
+
+// ── ORDERS ──
+async function loadOrders() {
+  if (!currentUser) return;
+  const { data } = await db.from('food_professional_orders').select('*').eq('vendor_id', currentUser.id).order('created_at', { ascending: false });
+  renderOrders(data || []);
+  if (data) {
+    const today = new Date().toDateString();
+    const todayOrders = data.filter(o => new Date(o.created_at).toDateString() === today);
+    document.getElementById('stat-orders').textContent = todayOrders.filter(o => o.status === 'pending').length;
+    const rev = todayOrders.reduce((s, o) => s + (o.total || 0), 0);
+    document.getElementById('stat-revenue').textContent = `$${rev.toFixed(0)}`;
+  }
+}
+
+function renderOrders(orders) {
+  const list = document.getElementById('orders-list');
+  if (!orders.length) {
+    list.innerHTML = `<div class="empty-state"><div class="empty-icon">📋</div><h3>No orders yet</h3><p>Set up your menu and share your storefront link to start taking preorders.</p></div>`;
+    return;
+  }
+  const statusMap = { pending: 'status-pending', confirmed: 'status-confirmed', ready: 'status-ready', completed: 'status-completed' };
+  list.innerHTML = orders.map(o => `
+    <div class="order-card">
+      <div class="order-info">
+        <div class="order-name">${o.customer_name || 'Customer'}</div>
+        <div class="order-items">${o.items_summary || 'Order details'}</div>
+        <div class="order-status ${statusMap[o.status] || 'status-pending'}">${o.status || 'pending'}</div>
+      </div>
+      <div class="order-meta">
+        <div class="order-total">$${(o.total || 0).toFixed(2)}</div>
+        <div class="order-time">${formatTime(o.created_at)}</div>
+        ${o.status === 'pending' ? `<button class="btn-icon" style="margin-top:6px;width:auto;padding:0 8px" onclick="updateOrderStatus('${o.id}','confirmed')">✓ Confirm</button>` : ''}
+        ${o.status === 'confirmed' ? `<button class="btn-icon" style="margin-top:6px;width:auto;padding:0 8px" onclick="updateOrderStatus('${o.id}','ready')">Ready</button>` : ''}
+      </div>
+    </div>
+  `).join('');
+}
+
+async function updateOrderStatus(id, status) {
+  await db.from('food_professional_orders').update({ status }).eq('id', id);
+  showToast(`Order marked as ${status}`, 'success');
+  await loadOrders();
+}
+
+function filterOrders(status) {
+  // Would filter from loaded orders in a full impl
+  loadOrders();
+}
+
+function updateDashStats() {
+  // Stats already updated in loadOrders
+}
+
+// ── PROFILE ──
+async function saveProfile() {
+  const payload = {
+    display_name: document.getElementById('profile-name').value.trim(),
+    professional_type: document.getElementById('profile-type').value,
+    bio: document.getElementById('profile-bio').value.trim(),
+    city: document.getElementById('profile-city').value.trim(),
+    instagram: document.getElementById('profile-ig').value.trim(),
+    cuisine_tags: document.getElementById('profile-cuisine').value.trim(),
+  };
+  const { error } = await db.from('food_professionals').update(payload).eq('user_id', currentUser.id);
+  if (error) return showToast(error.message, 'error');
+  showToast('Profile saved!', 'success');
+}
+
+function updatePreviewName(v) { document.getElementById('preview-name').textContent = v || 'Your Name'; }
+function updatePreviewBio(v) { document.getElementById('preview-bio').textContent = v || 'Add a bio to tell people about your food and style.'; }
+function updatePreviewType(v) {
+  const m = { chef: 'PRIVATE CHEF', food_truck: 'FOOD TRUCK', caterer: 'CATERER', popup: 'POP-UP OPERATOR', personal_chef: 'PERSONAL CHEF' };
+  document.getElementById('preview-type').textContent = m[v] || 'FOOD PROFESSIONAL';
+}
+
+// ── EVENT SETUP ──
+async function saveEventSetup() {
+  const payload = {
+    user_id: currentUser.id,
+    event_date: document.getElementById('event-date').value,
+    event_start: document.getElementById('event-start').value,
+    preorder_open: document.getElementById('preorder-open').value,
+    preorder_cutoff: document.getElementById('preorder-cutoff').value,
+    total_capacity: document.getElementById('total-capacity').value || null,
+    per_person_limit: document.getElementById('per-person-limit').value || 2,
+    auto_close: document.getElementById('toggle-autoclose').classList.contains('on'),
+    allow_walkin: document.getElementById('toggle-walkin').classList.contains('on'),
+    require_prepay: document.getElementById('toggle-prepay').classList.contains('on'),
+    pickup_address: document.getElementById('pickup-address').value.trim(),
+    pickup_start: document.getElementById('pickup-start').value,
+    pickup_end: document.getElementById('pickup-end').value,
+    pickup_notes: document.getElementById('pickup-notes').value.trim(),
+  };
+  const { error } = await db.from('food_professional_events').upsert(payload, { onConflict: 'user_id' });
+  if (error) return showToast(error.message, 'error');
+  showToast('Event setup saved!', 'success');
+  renderCutoffBanner(payload.preorder_cutoff);
+}
+
+function renderCutoffBanner(cutoff) {
+  if (!cutoff) return;
+  const wrap = document.getElementById('cutoff-banner-wrap');
+  wrap.innerHTML = `
+    <div class="cutoff-banner">
+      <div class="cutoff-text">Preorders close <strong>${new Date(cutoff).toLocaleString('en-US',{weekday:'short',month:'short',day:'numeric',hour:'numeric',minute:'2-digit'})}</strong></div>
+      <div class="cutoff-countdown" id="countdown">--:--:--</div>
+    </div>`;
+  updateCountdown(new Date(cutoff));
+}
+
+function updateCountdown(target) {
+  const tick = () => {
+    const diff = target - new Date();
+    if (diff <= 0) { document.getElementById('countdown') && (document.getElementById('countdown').textContent = 'CLOSED'); return; }
+    const h = Math.floor(diff/3600000);
+    const m = Math.floor((diff%3600000)/60000);
+    const s = Math.floor((diff%60000)/1000);
+    const el = document.getElementById('countdown');
+    if (el) el.textContent = `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+    setTimeout(tick, 1000);
+  };
+  tick();
+}
+
+// ── SETTINGS ──
+async function saveSettings() {
+  showToast('Settings updated!', 'success');
+}
+
+// ── UI HELPERS ──
+function showPanel(name) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.sidebar-item').forEach(i => i.classList.remove('active'));
+  document.querySelectorAll('.bottom-nav-item').forEach(i => i.classList.remove('active'));
+  document.getElementById(`panel-${name}`).classList.add('active');
+  document.querySelectorAll(`[data-panel="${name}"]`).forEach(el => el.classList.add('active'));
+}
+
+function openModal(id) { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+function toggleSwitch(btn) { btn.classList.toggle('on'); }
+
+function toggleNavMenu() {
+  document.getElementById('nav-menu').classList.toggle('open');
+}
+
+document.addEventListener('click', (e) => {
+  if (!e.target.closest('.nav-avatar')) {
+    document.getElementById('nav-menu').classList.remove('open');
+  }
+});
+
+function viewPublicProfile() {
+  if (!currentProfile) return showToast('Save your profile first', 'error');
+  showToast('Public profile link coming soon', 'success');
+}
+
+function showToast(msg, type = 'success') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = `toast ${type} show`;
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+function formatTime(ts) {
+  if (!ts) return '';
+  const d = new Date(ts);
+  return d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+}
+
+// ── IMAGE UPLOAD ──
+function triggerImgUpload() {}
+
+function handleImgUpload(input) {
+  const file = input.files[0];
+  if (!file) return;
+  itemImageFile = file;
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    const area = document.getElementById('item-img-upload');
+    const existing = area.querySelector('img');
+    if (existing) { existing.src = e.target.result; }
+    else {
+      area.innerHTML = `<img src="${e.target.result}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover"><input type="file" id="item-img-input" accept="image/*" onchange="handleImgUpload(this)">`;
+    }
+  };
+  reader.readAsDataURL(file);
+}
+
+function resetImgUpload() {
+  document.getElementById('item-img-upload').innerHTML = `
+    <div class="upload-icon">📷</div>
+    <div class="upload-text">Tap to add a photo</div>
+    <input type="file" id="item-img-input" accept="image/*" onchange="handleImgUpload(this)">
+  `;
+}
+
+// ── INIT ──
+(async () => {
+  const { data: { session } } = await db.auth.getSession();
+  if (session?.user) {
+    currentUser = session.user;
+    await loadApp();
+  }
+})();
+</script>
+</body>
+</html>
