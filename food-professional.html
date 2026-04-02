@@ -1309,13 +1309,17 @@
             <button class="btn-orange-outline" onclick="viewPublicProfile()">Share Link ↗</button>
           </div>
           <div class="profile-preview">
-            <div class="profile-cover">
+            <div class="profile-cover" id="profile-cover-wrap">
               🍳
-              <button class="profile-cover-btn">Change Cover</button>
+              <button class="profile-cover-btn" onclick="document.getElementById('cover-file-input').click()">Change Cover</button>
+              <input type="file" id="cover-file-input" accept="image/*" style="display:none" onchange="uploadCoverImage(this)">
             </div>
             <div class="profile-body">
               <div class="profile-avatar-row">
-                <div class="profile-avatar">👨‍🍳</div>
+                <div class="profile-avatar" id="profile-avatar-wrap" onclick="document.getElementById('avatar-file-input').click()" style="cursor:pointer" title="Change photo">
+                  👨‍🍳
+                  <input type="file" id="avatar-file-input" accept="image/*" style="display:none;position:absolute" onchange="uploadAvatarImage(this)">
+                </div>
                 <div>
                   <div class="profile-name" id="preview-name">Your Name</div>
                   <div class="profile-type" id="preview-type">FOOD PROFESSIONAL</div>
@@ -1625,6 +1629,23 @@ async function loadApp() {
     document.getElementById('profile-bio').value = prof.bio || '';
     document.getElementById('profile-city').value = prof.city || 'Columbus, OH';
     document.getElementById('profile-ig').value = prof.instagram || '';
+    // Load existing cover image
+    if (prof.cover_image_url) {
+      const coverWrap = document.getElementById('profile-cover-wrap');
+      if (coverWrap) {
+        const img = document.createElement('img');
+        img.src = prof.cover_image_url;
+        img.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;object-fit:cover';
+        coverWrap.insertBefore(img, coverWrap.firstChild);
+      }
+    }
+    // Load existing avatar
+    if (prof.avatar_url) {
+      const avWrap = document.getElementById('profile-avatar-wrap');
+      if (avWrap) {
+        avWrap.innerHTML = `<img src="${prof.avatar_url}" style="width:100%;height:100%;object-fit:cover;border-radius:50%"><input type="file" id="avatar-file-input" accept="image/*" style="display:none;position:absolute" onchange="uploadAvatarImage(this)">`;
+      }
+    }
   }
 
   // Greeting
@@ -1848,6 +1869,49 @@ async function saveProfile() {
   const { error } = await db.from('food_professionals').update(payload).eq('user_id', currentUser.id);
   if (error) return showToast(error.message, 'error');
   showToast('Profile saved!', 'success');
+}
+
+// ── IMAGE UPLOADS ──
+async function uploadCoverImage(input) {
+  const file = input.files[0];
+  if (!file) return;
+  showToast('Uploading cover...', 'success');
+  const ext = file.name.split('.').pop();
+  const path = `covers/${currentUser.id}/cover.${ext}`;
+  const { error: upErr } = await db.storage.from('food-professional-menu').upload(path, file, { upsert: true });
+  if (upErr) { showToast('Upload failed: ' + upErr.message, 'error'); return; }
+  const { data: urlData } = db.storage.from('food-professional-menu').getPublicUrl(path);
+  const url = urlData.publicUrl;
+  await db.from('food_professionals').update({ cover_image_url: url }).eq('user_id', currentUser.id);
+  // Update preview
+  const wrap = document.getElementById('profile-cover-wrap');
+  const existing = wrap.querySelector('img');
+  if (existing) { existing.src = url; }
+  else {
+    const emoji = wrap.querySelector('span') || wrap.firstChild;
+    const img = document.createElement('img');
+    img.src = url;
+    img.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;object-fit:cover';
+    wrap.insertBefore(img, wrap.firstChild);
+  }
+  showToast('Cover photo updated!', 'success');
+}
+
+async function uploadAvatarImage(input) {
+  const file = input.files[0];
+  if (!file) return;
+  showToast('Uploading photo...', 'success');
+  const ext = file.name.split('.').pop();
+  const path = `avatars/${currentUser.id}/avatar.${ext}`;
+  const { error: upErr } = await db.storage.from('food-professional-menu').upload(path, file, { upsert: true });
+  if (upErr) { showToast('Upload failed: ' + upErr.message, 'error'); return; }
+  const { data: urlData } = db.storage.from('food-professional-menu').getPublicUrl(path);
+  const url = urlData.publicUrl;
+  await db.from('food_professionals').update({ avatar_url: url }).eq('user_id', currentUser.id);
+  // Update preview
+  const wrap = document.getElementById('profile-avatar-wrap');
+  wrap.innerHTML = `<img src="${url}" style="width:100%;height:100%;object-fit:cover;border-radius:50%"><input type="file" id="avatar-file-input" accept="image/*" style="display:none;position:absolute" onchange="uploadAvatarImage(this)">`;
+  showToast('Profile photo updated!', 'success');
 }
 
 function updatePreviewName(v) { document.getElementById('preview-name').textContent = v || 'Your Name'; }
