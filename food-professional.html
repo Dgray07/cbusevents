@@ -1076,7 +1076,7 @@
 
         <div id="cutoff-banner-wrap"></div>
 
-        <div id="storefront-link-banner" style="display:none;background:var(--orange-dim);border:1px solid var(--orange-border);border-radius:12px;padding:14px 18px;margin-bottom:20px;display:flex;align-items:center;justify-content:space-between;gap:12px">
+        <div id="storefront-link-banner" style="display:none;background:var(--orange-dim);border:1px solid var(--orange-border);border-radius:12px;padding:14px 18px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;gap:12px">
           <div>
             <div style="font-size:14px;font-weight:600;color:var(--orange)">Your storefront is live</div>
             <div style="font-size:12px;color:var(--gray);margin-top:2px" id="storefront-url-preview">Share your link to start taking preorders</div>
@@ -1084,6 +1084,17 @@
           <div style="display:flex;gap:8px;flex-shrink:0">
             <button class="btn-secondary" style="padding:8px 14px;font-size:12px" onclick="viewPublicProfile()">Copy Link</button>
             <button class="btn-primary" style="width:auto;padding:8px 14px;font-size:12px" onclick="openStorefront()">View ↗</button>
+          </div>
+        </div>
+
+        <div id="stripe-onboarding-banner" style="display:none;background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:14px 18px;margin-bottom:20px">
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px">
+            <div style="flex:1">
+              <div style="font-size:14px;font-weight:600;margin-bottom:4px">💳 Set Up Payouts to Get Paid</div>
+              <div style="font-size:12px;color:var(--gray);line-height:1.5">Complete your Stripe account to receive order payments directly to your bank. You'll need your SSN, a bank account or debit card, and about 5 minutes. Once verified, funds transfer automatically after each order. Your payment history can also help you qualify for business funding.</div>
+              <div style="font-size:11px;color:var(--gray);margin-top:8px;font-family:var(--font-mono)">STEP 1 of 3 · Create Stripe Account → STEP 2 · Verify Identity → STEP 3 · Add Bank or Debit Card</div>
+            </div>
+            <button class="btn-primary" style="width:auto;padding:10px 16px;font-size:13px;flex-shrink:0;white-space:nowrap" onclick="startStripeOnboarding()">Set Up Payouts →</button>
           </div>
         </div>
 
@@ -1665,6 +1676,12 @@ async function loadApp() {
     const urlPrev = document.getElementById('storefront-url-preview');
     if (urlPrev) urlPrev.textContent = `cbusevents.com/fp-storefront.html?u=${currentUser.id.slice(0,8)}...`;
   }
+  // Show Stripe onboarding banner if not yet connected
+  const stripeBanner = document.getElementById('stripe-onboarding-banner');
+  if (stripeBanner) {
+    const hasStripe = currentProfile?.stripe_account_id;
+    stripeBanner.style.display = hasStripe ? 'none' : 'block';
+  }
 }
 
 // ── MENU ──
@@ -2012,6 +2029,28 @@ function viewPublicProfile() {
 function openStorefront() {
   if (!currentUser) return;
   window.open(`https://cbusevents.com/fp-storefront.html?u=${currentUser.id}`, '_blank');
+}
+
+async function startStripeOnboarding() {
+  const btn = document.querySelector('#stripe-onboarding-banner .btn-primary');
+  btn.disabled = true; btn.textContent = 'Loading...';
+  try {
+    const res = await fetch('https://toblgvatvsjljbqogzsv.supabase.co/functions/v1/fp-connect-onboard', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRvYmxndmF0dnNqbGpicW9nenN2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMDgwNTAsImV4cCI6MjA4NzY4NDA1MH0._WJEQPizNDiQfDXQB_DHPaQhixPGpMdmYQSmyWmm_FQ',
+        'Authorization': `Bearer ${(await db.auth.getSession()).data.session?.access_token}`
+      },
+      body: JSON.stringify({ user_id: currentUser.id, email: currentUser.email })
+    });
+    const data = await res.json();
+    if (data.url) window.location.href = data.url;
+    else { showToast(data.error || 'Something went wrong', 'error'); btn.disabled = false; btn.textContent = 'Set Up Payouts →'; }
+  } catch(e) {
+    showToast('Could not connect to Stripe', 'error');
+    btn.disabled = false; btn.textContent = 'Set Up Payouts →';
+  }
 }
 
 function showToast(msg, type = 'success') {

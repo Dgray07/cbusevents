@@ -230,6 +230,39 @@ let profile=null,evtCfg=null,items=[],cart={},activeTab='all',cdTimer=null;
   }catch(e){console.error(e);notFound();}
 })();
 
+// Handle Stripe success/cancel redirect
+(()=>{
+  const p=new URLSearchParams(window.location.search);
+  if(p.get('success')==='1'&&p.get('order')){
+    // Show success screen after Stripe redirect
+    document.addEventListener('DOMContentLoaded',async()=>{
+      const orderId=p.get('order');
+      const{data:order}=await db.from('food_professional_orders').select('*').eq('id',orderId).maybeSingle();
+      if(order){
+        document.getElementById('loading').style.display='none';
+        document.getElementById('success-screen').style.display='flex';
+        document.getElementById('succ-msg').textContent=`Your order is confirmed! Check ${order.customer_email} for your receipt.`;
+        document.getElementById('order-pill').textContent=`ORDER #${orderId.slice(-8).toUpperCase()} · $${order.total?.toFixed(2)}`;
+        if(order.special_instructions||evtCfg?.pickup_address){
+          const pc=document.getElementById('pickup-confirm');
+          if(pc&&evtCfg?.pickup_address){
+            pc.style.display='block';
+            let v=evtCfg.pickup_address;
+            if(evtCfg.pickup_start&&evtCfg.pickup_end)v+=`\nPickup: ${fmt12(evtCfg.pickup_start)} – ${fmt12(evtCfg.pickup_end)}`;
+            document.getElementById('pc-val').textContent=v;
+          }
+        }
+      }
+    });
+  }
+  if(p.get('canceled')==='1'){
+    // Show canceled toast after redirect
+    document.addEventListener('DOMContentLoaded',()=>{
+      setTimeout(()=>toast('Payment canceled. Your cart is still saved.','error'),1000);
+    });
+  }
+})();
+
 function render(){
   document.getElementById('loading').style.display='none';
   document.getElementById('storefront').style.display='block';
@@ -387,28 +420,42 @@ async function placeOrder(mob){
   if(!email||!email.includes('@'))return toast('Valid email required','error');
   if(!phone)return toast('Phone required','error');
   const btn=document.getElementById(mob?'m-btn':'d-btn');
-  btn.disabled=true;btn.textContent='Placing order...';
+  btn.disabled=true;btn.textContent='Redirecting to payment...';
   const ents=Object.values(cart);
   const sub=ents.reduce((s,i)=>s+i.item.price*i.qty,0);
   const fee=parseFloat((sub*FEE+FLAT).toFixed(2));
   const grand=parseFloat((sub+fee).toFixed(2));
-  const{data:order,error}=await db.from('food_professional_orders').insert({
-    vendor_id:profile.user_id,
-    customer_name:`${first} ${last}`,
-    customer_email:email,
-    customer_phone:phone,
-    items:ents.map(({item,qty})=>({item_id:item.id,name:item.name,price:item.price,quantity:qty,subtotal:parseFloat((item.price*qty).toFixed(2))})),
-    items_summary:ents.map(({item,qty})=>`${qty}x ${item.name}`).join(', '),
-    subtotal:parseFloat(sub.toFixed(2)),
-    platform_fee:fee,
-    total:grand,
-    special_instructions:notes||null,
-    status:'pending',
-    payment_status:'paid',
-  }).select().single();
-  btn.disabled=false;
-  if(error){btn.textContent=`Place Order · $${grand.toFixed(2)}`;toast('Something went wrong. Try again.','error');console.error(error);return;}
-  showSuccess(order,first,email,grand);
+  // Build pickup info for email
+  let pickupAddress='',pickupWindow='';
+  if(evtCfg){
+    pickupAddress=evtCfg.pickup_address||'';
+    if(evtCfg.pickup_start&&evtCfg.pickup_end)pickupWindow=`${fmt12(evtCfg.pickup_start)} - ${fmt12(evtCfg.pickup_end)}`;
+  }
+  try{
+    const res=await fetch('https://toblgvatvsjljbqogzsv.supabase.co/functions/v1/fp-checkout',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','apikey':'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRvYmxndmF0dnNqbGpicW9nenN2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMDgwNTAsImV4cCI6MjA4NzY4NDA1MH0._WJEQPizNDiQfDXQB_DHPaQhixPGpMdmYQSmyWmm_FQ'},
+      body:JSON.stringify({
+        vendor_id:profile.user_id,
+        cart:ents.map(({item,qty})=>({item_id:item.id,name:item.name,description:item.description||'',price:item.price,quantity:qty,image_url:item.image_url||null})),
+        customer_name:`${first} ${last}`,
+        customer_email:email,
+        customer_phone:phone,
+        special_instructions:notes||null,
+        pickup_address:pickupAddress,
+        pickup_window:pickupWindow,
+      })
+    });
+    const data=await res.json();
+    if(data.error){throw new Error(data.error);}
+    // Redirect to Stripe checkout
+    window.location.href=data.url;
+  }catch(err){
+    btn.disabled=false;
+    btn.textContent=`Place Order · $${grand.toFixed(2)}`;
+    toast(err.message||'Something went wrong. Try again.','error');
+    console.error(err);
+  }
 }
 
 function showSuccess(order,first,email,total){
