@@ -7,8 +7,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Install Deps
-        run: npm install @supabase/supabase-js @mendable/firecrawl-js openai
+      - name: Install Dependencies
+        run: |
+          npm init -y
+          npm install @supabase/supabase-js @mendable/firecrawl-js openai
+
       - name: Run Engine
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
