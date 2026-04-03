@@ -1581,8 +1581,8 @@ function renderVendorCards(vendors){
    var cat=v.category||null;
    var catPill=cat?('<span style="display:inline-block;background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:20px;padding:3px 11px;font-size:11px;font-weight:500;color:var(--sub);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:140px;">'+cat+'</span>'):'<span style="color:var(--muted);font-size:12px;">&mdash;</span>';
    var subBadge=v.subscription_status?('<span class="badge '+subClass+'">'+v.subscription_status+'</span>'):'';
-   var promoBtn='<button class="btn '+(v.admin_promoted?'btn-ghost':'btn-success')+' btn-sm" onclick="toggleVendorPromo(\''+v.id+'\','+(!v.admin_promoted)+')">'+(v.admin_promoted?'Unpromo':'&#9733;
-   var featureBtn='<button class="btn '+(v.is_featured?'btn-ghost':'btn-success')+' btn-sm" onclick="toggleVendorFeature(\''+v.id+'\','+(!v.is_featured)+')">'+(v.is_featured?'Unfeature':'⭐ Feature')+'</button>'; Promo')+'</button>';
+   var promoBtn='<button class="btn '+(v.admin_promoted?'btn-ghost':'btn-success')+' btn-sm" onclick="toggleVendorPromo(\''+v.id+'\','+(!v.admin_promoted)+')">'+(v.admin_promoted?'Unpromo':'&#9733; Promo')+'</button>';
+   var featureBtn='<button class="btn '+(v.is_featured?'btn-ghost':'btn-success')+' btn-sm" onclick="toggleVendorFeature(\''+v.id+'\','+(!v.is_featured)+')">'+(v.is_featured?'Unfeature':'⭐ Feature')+'</button>';
    var safeName=(v.business_name||v.name||'this vendor').replace(/'/g,"\\'");
    return '<div style="background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:16px 20px;display:flex;align-items:center;gap:16px;transition:border-color 0.18s;" onmouseover="this.style.borderColor=\'rgba(255,255,255,0.08)\'" onmouseout="this.style.borderColor=\'var(--border)\'">'
      +'<div style="width:40px;height:40px;border-radius:10px;background:linear-gradient(135deg,rgba(255,107,53,0.2),rgba(255,107,53,0.06));border:1px solid rgba(255,107,53,0.2);display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:800;color:var(--orange);flex-shrink:0;">'+name.charAt(0).toUpperCase()+'</div>'
@@ -2197,31 +2197,19 @@ async function rejectClaim(venueId, venueName){
 // ── MARKETING INTELLIGENCE ────────────────────────────────────
 
 function copyToClipboard(btn, text){
- const content = text !== undefined ? text : btn.getAttribute('data-copy');
+ const content=(text!==undefined)?text:btn.getAttribute('data-copy');
  navigator.clipboard.writeText(content).then(()=>{
    const orig=btn.textContent;
    btn.textContent='Copied!';
    btn.style.background='var(--green)';
    btn.style.color='#000';
-   setTimeout(()=>{
-     btn.textContent=orig;
-     btn.style.background='';
-     btn.style.color='';
-   },2000);
+   setTimeout(()=>{btn.textContent=orig;btn.style.background='';btn.style.color='';},2000);
  }).catch(()=>{
-   // Fallback for older browsers
    const ta=document.createElement('textarea');
-   ta.value=content;
-   ta.style.position='fixed';
-   ta.style.opacity='0';
-   document.body.appendChild(ta);
-   ta.select();
-   document.execCommand('copy');
-   document.body.removeChild(ta);
+   ta.value=content;ta.style.position='fixed';ta.style.opacity='0';
+   document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);
    const orig=btn.textContent;
-   btn.textContent='Copied!';
-   btn.style.background='var(--green)';
-   btn.style.color='#000';
+   btn.textContent='Copied!';btn.style.background='var(--green)';btn.style.color='#000';
    setTimeout(()=>{btn.textContent=orig;btn.style.background='';btn.style.color='';},2000);
  });
 }
@@ -2268,14 +2256,14 @@ async function renderMarketing(){
          <div>
            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
              <div style="font-size:10px;font-weight:700;color:var(--muted);letter-spacing:0.1em;text-transform:uppercase">Instagram Caption</div>
-             <button class="btn btn-ghost btn-sm" data-copy="${caption.replace(/"/g,'&quot;').replace(/`/g,'&#96;')}" onclick="copyToClipboard(this)">Copy</button>
+             <button class="btn btn-ghost btn-sm" data-copy="${caption.replace(/&/g,'&amp;').replace(/"/g,'&quot;')}" onclick="copyToClipboard(this)">Copy</button>
            </div>
            <div style="background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:14px;font-size:13px;color:var(--text);line-height:1.6;white-space:pre-wrap;font-family:var(--font);min-height:60px">${caption||'<span style="color:var(--muted)">No caption available</span>'}</div>
          </div>
          <div>
            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
              <div style="font-size:10px;font-weight:700;color:var(--muted);letter-spacing:0.1em;text-transform:uppercase">Newsletter Copy</div>
-             <button class="btn btn-ghost btn-sm" data-copy="${newsletter.replace(/"/g,'&quot;').replace(/`/g,'&#96;')}" onclick="copyToClipboard(this)">Copy</button>
+             <button class="btn btn-ghost btn-sm" data-copy="${newsletter.replace(/&/g,'&amp;').replace(/"/g,'&quot;')}" onclick="copyToClipboard(this)">Copy</button>
            </div>
            <div style="background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:14px;font-size:13px;color:var(--text);line-height:1.6;white-space:pre-wrap;font-family:var(--font);min-height:60px">${newsletter||'<span style="color:var(--muted)">No newsletter copy available</span>'}</div>
          </div>
