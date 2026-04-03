@@ -366,8 +366,8 @@ tr:hover td{ background:rgba(255,255,255,0.02) !important; }
 .pmn-more-divider{height:1px;background:var(--border);margin:6px 0;}
 </style>
 </head>
-<body> <nav id="topNav"> <div class="nav-logo" onclick="currentUser?nav('dashboard'):showAuth('login')"> CBUS<span>EVENTS</span> <span class="nav-logo-sub">Planner</span> </div> <div class="nav-links" id="navLinks" style="display:none"> <button class="nav-btn" onclick="window.location.href='https://cbusevents.com'"> Home</button> <button class="nav-btn" id="nav-dashboard" onclick="nav('dashboard')">Dashboard</button> <button class="nav-btn" id="nav-venues" onclick="nav('venues')">Find Venues</button> <button class="nav-btn" id="nav-inquiries" onclick="nav('inquiries')">My Inquiries</button> <button class="nav-btn" id="nav-events" onclick="nav('events')">My Events</button> <button class="nav-btn" id="nav-payouts" onclick="nav('payouts')">Payouts</button> <button class="nav-btn" id="nav-profile" onclick="nav('profile')">My Profile</button> <button class="nav-btn" id="nav-billing" onclick="nav('billing')">Plan & Billing</button> <button class="nav-btn" id="nav-inbox" onclick="nav('inbox')">Inbox <span id="inboxNavBadge" style="display:none;background:#FF6B35;color:#fff;border-radius:99px;font-size:10px;font-weight:700;padding:1px 7px;margin-left:4px"></span></button> </div> <div class="nav-right" id="navRight"> <button class="nav-outline" onclick="showAuth('login')">Sign In</button> <button class="nav-cta" onclick="showAuth('signup')">Get Started Free →</button> </div>
-</nav> <div id="app" id="main-content"></div>
+<body> <nav id="topNav"> <div class="nav-logo" onclick="currentUser?nav('dashboard'):showAuth('login')"> CBUS<span>EVENTS</span> <span class="nav-logo-sub">Planner</span> </div> <div class="nav-links" id="navLinks" style="display:none"> <button class="nav-btn" onclick="window.location.href='https://cbusevents.com'"> Home</button> <button class="nav-btn" id="nav-dashboard" onclick="nav('dashboard')">Dashboard</button> <button class="nav-btn" id="nav-venues" onclick="nav('venues')">Find Venues</button> <button class="nav-btn" id="nav-vendors" onclick="nav('vendors')">Find Vendors</button><button class="nav-btn" id="nav-inquiries" onclick="nav('inquiries')">My Inquiries</button> <button class="nav-btn" id="nav-events" onclick="nav('events')">My Events</button> <button class="nav-btn" id="nav-payouts" onclick="nav('payouts')">Payouts</button> <button class="nav-btn" id="nav-profile" onclick="nav('profile')">My Profile</button> <button class="nav-btn" id="nav-billing" onclick="nav('billing')">Plan & Billing</button> <button class="nav-btn" id="nav-inbox" onclick="nav('inbox')">Inbox <span id="inboxNavBadge" style="display:none;background:#FF6B35;color:#fff;border-radius:99px;font-size:10px;font-weight:700;padding:1px 7px;margin-left:4px"></span></button> </div> <div class="nav-right" id="navRight"> <button class="nav-outline" onclick="showAuth('login')">Sign In</button> <button class="nav-cta" onclick="showAuth('signup')">Get Started Free →</button> </div>
+</nav> <div id="app" id="main-content"></div><div id="modalContainer"></div>
 <div id="modal"></div>
 <div id="toast" class="toast"></div> <script src="https://unpkg.com/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <script>
@@ -389,7 +389,7 @@ const VENUE_IMGS={
 };
 
 let currentUser=null,currentPage='home';
-let allVenues=[],myInquiries=[],myEvents=[];
+let allVenues=[],myInquiries=[],myEvents=[],allVendors=[];
 let _initDone=false; // guard against onAuthStateChange double-fire on page load
 
 // ── HELPERS ───────────────────────────────────────────────────
@@ -683,15 +683,16 @@ async function submitPendingVendorBooking(vendorId){
 }
 
 async function loadData(){
- const[vRes,iRes,eRes]=await Promise.all([
+ const[vRes,iRes,eRes,vendRes]=await Promise.all([
  sb.from('venues').select('*').eq('status','approved').order('tier',{ascending:false}),
  sb.from('inquiries').select('*,venues(name,venue_type,neighborhood)').eq('email',currentUser.email).order('created_at',{ascending:false}),
  sb.from('events').select('*,venues(name)').eq('status','published').gte('start_time',new Date().toISOString()).order('start_time',{ascending:true}),
+ sb.from('vendors').select('id,business_name,description,services,portfolio_photos,subscription_tier,instagram,email,city').in('subscription_tier',['STANDARD','PREMIUM']).order('subscription_tier',{ascending:false}),
  ]);
  allVenues=vRes.data||[];
  myInquiries=iRes.data||[];
- // Filter events "added by this planner" — using a planner_email field if exists
  myEvents=eRes.data?.filter(e=>e.planner_email===currentUser.email)||[];
+ allVendors=vendRes.data||[];
 }
 
 // ── HERO ──────────────────────────────────────────────────────
@@ -782,12 +783,176 @@ function nav(page){
  window.scrollTo({top:0,behavior:'smooth'});
  if(page==='dashboard')renderDashboard();
  else if(page==='venues')renderVenues();
+ else if(page==='vendors')renderVendors();
  else if(page==='inquiries')renderInquiries();
  else if(page==='events')renderEvents();
  else if(page==='profile')renderProfile();
  else if(page==='billing')renderBilling();
   else if(page==='payouts')renderPayouts();
   else if(page==='inbox')renderInboxPage();
+}
+
+// ── VENDORS ──────────────────────────────────────────────────
+const VENDOR_CATEGORIES=[
+ {key:'all',label:'All'},
+ {key:'catering',label:'Catering'},
+ {key:'food_truck',label:'Food Trucks'},
+ {key:'dj',label:'DJ'},
+ {key:'live_music',label:'Live Music'},
+ {key:'photography',label:'Photography'},
+ {key:'videography',label:'Videography'},
+ {key:'bartending',label:'Bartending'},
+ {key:'lighting',label:'Lighting & AV'},
+ {key:'event_staffing',label:'Staffing'},
+ {key:'florist',label:'Florist'},
+ {key:'photo_booth',label:'Photo Booth'},
+ {key:'security',label:'Security'},
+ {key:'rentals',label:'Rentals'},
+ {key:'planning',label:'Planning'},
+];
+
+let vendorSearchQ='',vendorCatFilter='all';
+
+function renderVendors(){
+ const tier=(plannerProfile?.plan_tier||'free').toLowerCase();
+ const isLocked=tier==='free';
+ document.getElementById('app').innerHTML=`
+ <div class="page">
+   <div style="margin-bottom:20px">
+     <div class="section-title">Find Vendors</div>
+     <div class="section-sub">${allVendors.length} vendors listed in Columbus</div>
+   </div>
+   ${isLocked?`<div style="background:linear-gradient(135deg,rgba(255,107,53,0.08),rgba(255,107,53,0.03));border:1px solid rgba(255,107,53,0.2);border-radius:12px;padding:14px 18px;margin-bottom:20px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap">
+     <div style="font-size:13px;color:var(--sub)"><strong style="color:var(--text)">Standard plan</strong> surfaces verified vendors first and unlocks direct messaging.</div>
+     <button class="btn btn-primary btn-sm" onclick="nav('billing')">Upgrade &#8594;</button>
+   </div>`:''}
+   <div style="margin-bottom:16px">
+     <input class="search-input" style="width:100%;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:11px 14px;color:var(--text);font-size:14px;outline:none;margin-bottom:10px" placeholder="Search by name or service..." oninput="vendorSearchQ=this.value;renderVendorGrid()">
+     <div style="display:flex;gap:8px;flex-wrap:wrap">
+       ${VENDOR_CATEGORIES.map(c=>`<button onclick="vendorCatFilter='${c.key}';renderVendorGrid();document.querySelectorAll('.vcat-btn').forEach(b=>b.classList.remove('active'));this.classList.add('active')" class="vcat-btn btn btn-sm ${c.key==='all'?'btn-primary':'btn-ghost'}" style="border-radius:99px;padding:5px 14px;font-size:12px">${c.label}</button>`).join('')}
+     </div>
+   </div>
+   <div id="vendorGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px"></div>
+ </div>`;
+ renderVendorGrid();
+}
+
+function renderVendorGrid(){
+ const q=vendorSearchQ.toLowerCase();
+ let filtered=allVendors.filter(v=>{
+   const name=(v.business_name||'').toLowerCase();
+   const desc=(v.description||'').toLowerCase();
+   const svcs=(v.services||[]).join(' ').toLowerCase();
+   const matchQ=!q||name.includes(q)||desc.includes(q)||svcs.includes(q);
+   const matchCat=vendorCatFilter==='all'||(v.services||[]).includes(vendorCatFilter);
+   return matchQ&&matchCat;
+ });
+ const grid=document.getElementById('vendorGrid');
+ if(!grid)return;
+ if(!filtered.length){
+   grid.innerHTML=`<div class="empty" style="grid-column:1/-1;border:1px solid var(--border);border-radius:14px"><h3>No vendors found</h3><p style="font-size:13px">Try a different category or search term</p></div>`;
+   return;
+ }
+ grid.innerHTML=filtered.map(v=>{
+   const photo=(v.portfolio_photos||[])[0]||'';
+   const svcs=(v.services||[]).slice(0,3).map(s=>VENDOR_CATEGORIES.find(c=>c.key===s)?.label||s).join(', ');
+   const isPrem=v.subscription_tier==='PREMIUM';
+   return`<div style="background:var(--card);border:1px solid var(--border);border-radius:14px;overflow:hidden;transition:all 0.2s;cursor:pointer" onmouseenter="this.style.borderColor='var(--orange)';this.style.transform='translateY(-2px)'" onmouseleave="this.style.borderColor='var(--border)';this.style.transform=''"  onclick="openVendorModal('${v.id}')">
+     <div style="height:130px;background:var(--surface);display:flex;align-items:center;justify-content:center;overflow:hidden;position:relative">
+       ${photo?`<img src="${photo}" style="width:100%;height:100%;object-fit:cover" onerror="this.parentNode.innerHTML='<span style=\'font-size:36px\'>🏪</span>'">`:'<span style="font-size:36px">🏪</span>'}
+       ${isPrem?`<div style="position:absolute;top:8px;right:8px;background:rgba(251,191,36,0.15);border:1px solid rgba(251,191,36,0.3);color:#fbbf24;border-radius:20px;padding:2px 8px;font-size:10px;font-weight:700;font-family:'DM Mono',monospace">PREMIUM</div>`:''}
+     </div>
+     <div style="padding:14px 16px">
+       <div style="font-weight:700;font-size:15px;margin-bottom:4px">${v.business_name||'Unnamed Vendor'}</div>
+       ${svcs?`<div style="font-size:11px;color:var(--orange);font-weight:600;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px">${svcs}</div>`:''}
+       <div style="font-size:12px;color:var(--sub);line-height:1.5;margin-bottom:12px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">${v.description||'Columbus vendor available for events.'}</div>
+       <button class="btn btn-primary btn-sm" style="width:100%" onclick="event.stopPropagation();openVendorInquiryModal('${v.id}')">Contact Vendor &#8594;</button>
+     </div>
+   </div>`;
+ }).join('');
+}
+
+function openVendorModal(vendorId){
+ const v=allVendors.find(x=>x.id===vendorId);
+ if(!v)return;
+ const svcs=(v.services||[]).map(s=>VENDOR_CATEGORIES.find(c=>c.key===s)?.label||s);
+ const photos=(v.portfolio_photos||[]).slice(0,4);
+ document.getElementById('modalContainer').innerHTML=`
+ <div class="modal-overlay" onclick="if(event.target===this)closeModal()">
+   <div class="modal" style="max-width:560px">
+     <div class="modal-header">
+       <div class="modal-title">${v.business_name||'Vendor'}</div>
+       <button onclick="closeModal()" style="background:none;border:none;color:var(--muted);font-size:20px;cursor:pointer;line-height:1">&times;</button>
+     </div>
+     <div class="modal-body">
+       ${photos.length?`<div style="display:grid;grid-template-columns:repeat(${Math.min(photos.length,3)},1fr);gap:8px;margin-bottom:16px">${photos.map(p=>`<img src="${p}" style="width:100%;height:100px;object-fit:cover;border-radius:8px" onerror="this.remove()">`).join('')}</div>`:''}
+       ${svcs.length?`<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px">${svcs.map(s=>`<span class="badge badge-orange">${s}</span>`).join('')}</div>`:''}
+       <p style="font-size:14px;color:var(--sub);line-height:1.6;margin-bottom:16px">${v.description||'Available for Columbus events.'}</p>
+       ${v.instagram?`<div style="font-size:13px;color:var(--muted);margin-bottom:16px">Instagram: <a href="https://instagram.com/${v.instagram.replace('@','')}" target="_blank" style="color:var(--orange)">${v.instagram}</a></div>`:''}
+     </div>
+     <div class="modal-footer">
+       <button class="btn btn-outline" onclick="closeModal()">Close</button>
+       <button class="btn btn-primary" onclick="closeModal();openVendorInquiryModal('${v.id}')">Contact Vendor &#8594;</button>
+     </div>
+   </div>
+ </div>`;
+}
+
+function openVendorInquiryModal(vendorId){
+ const v=allVendors.find(x=>x.id===vendorId);
+ if(!v)return;
+ document.getElementById('modalContainer').innerHTML=`
+ <div class="modal-overlay" onclick="if(event.target===this)closeModal()">
+   <div class="modal">
+     <div class="modal-header">
+       <div class="modal-title">Contact ${v.business_name||'Vendor'}</div>
+       <button onclick="closeModal()" style="background:none;border:none;color:var(--muted);font-size:20px;cursor:pointer;line-height:1">&times;</button>
+     </div>
+     <div class="modal-body" style="display:flex;flex-direction:column;gap:12px">
+       <div class="field"><label>Event Name</label><input id="vinqEvent" placeholder="e.g. Short North Food Truck Fest"></div>
+       <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+         <div class="field"><label>Event Date</label><input type="date" id="vinqDate"></div>
+         <div class="field"><label>Expected Attendance</label><input id="vinqAttendance" placeholder="e.g. 200"></div>
+       </div>
+       <div class="field"><label>Message</label><textarea id="vinqMsg" style="min-height:100px" placeholder="Tell them about your event, what you need, and any budget details..."></textarea></div>
+       <div id="vinqErr" style="color:var(--red);font-size:12px;display:none"></div>
+     </div>
+     <div class="modal-footer">
+       <button class="btn btn-outline" onclick="closeModal()">Cancel</button>
+       <button class="btn btn-primary" id="vinqSubmit" onclick="submitVendorInquiry('${v.id}','${(v.email||'').replace(/'/g,"\'")}')">Send Inquiry &#8594;</button>
+     </div>
+   </div>
+ </div>`;
+}
+
+async function submitVendorInquiry(vendorId, vendorEmail){
+ const eventName=document.getElementById('vinqEvent').value.trim();
+ const msg=document.getElementById('vinqMsg').value.trim();
+ const errEl=document.getElementById('vinqErr');
+ if(!eventName){errEl.textContent='Please enter an event name.';errEl.style.display='block';return;}
+ if(!msg){errEl.textContent='Please add a message.';errEl.style.display='block';return;}
+ const btn=document.getElementById('vinqSubmit');
+ btn.disabled=true;btn.textContent='Sending...';
+ const payload={
+   vendor_id:vendorId,
+   planner_id:currentUser.id,
+   planner_name:currentUser.user_metadata?.full_name||currentUser.email.split('@')[0],
+   planner_email:currentUser.email,
+   event_name:eventName,
+   event_date:document.getElementById('vinqDate').value||null,
+   expected_attendance:document.getElementById('vinqAttendance').value||null,
+   message:msg,
+   status:'new',
+ };
+ const{error}=await sb.from('vendor_inquiries').insert(payload);
+ if(error){
+   errEl.textContent='Something went wrong. Please try again.';
+   errEl.style.display='block';
+   btn.disabled=false;btn.textContent='Send Inquiry →';
+   return;
+ }
+ closeModal();
+ toast('Inquiry sent to '+( allVendors.find(v=>v.id===vendorId)?.business_name||'vendor')+'!');
 }
 
 // ── BILLING ───────────────────────────────────────────────────
@@ -1253,7 +1418,7 @@ function renderDashboard(){
    {label:'Complete your profile',desc:'Add your name, phone, and specialty so venues know who you are.',done:profileDone,action:"nav('profile')",cta:'Set up profile'},
    {label:'Find a venue',desc:`Browse ${allVenues.length} Columbus venues and send a booking inquiry.`,done:hasVenue,action:"nav('venues')",cta:'Browse venues'},
    {label:'Name your event',desc:'Give your event a title, date, and description so people can find it.',done:hasEvent,action:'openAddEventModal()',cta:'Create event'},
-   {label:'Find vendors',desc:'Search for caterers, DJs, photographers, and more to complete your lineup.',done:false,action:"nav('venues')",cta:'Browse vendors'},
+   {label:'Find vendors',desc:'Search for caterers, DJs, photographers, and more to complete your lineup.',done:false,action:"nav('vendors')",cta:'Browse vendors'},
    {label:'Publish and promote',desc:'List your event publicly on the Columbus directory to sell tickets and drive RSVPs.',done:hasEvent,action:"nav('events')",cta:'View my events'},
  ];
  const doneCount=steps.filter(s=>s.done).length;
@@ -1639,6 +1804,10 @@ init();
   <button class="pmn-btn" id="pmn-venues" onclick="nav('venues')">
     <div class="pmn-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg></div>
     <span>Venues</span>
+  </button>
+  <button class="pmn-btn" id="pmn-vendors" onclick="nav('vendors')">
+    <div class="pmn-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg></div>
+    <span>Vendors</span>
   </button>
   <button class="pmn-btn" id="pmn-events" onclick="nav('events')">
     <div class="pmn-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div>
