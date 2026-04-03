@@ -1244,17 +1244,71 @@ async function renderBilling(){
 function renderDashboard(){
  const name=currentUser.user_metadata?.full_name||currentUser.email.split('@')[0];
  const newInq=myInquiries.filter(i=>i.status==='new').length;
- const readInq=myInquiries.filter(i=>i.status==='read').length;
+ const hasVenue=myInquiries.length>0;
+ const hasEvent=myEvents.length>0;
+ const isReturning=myInquiries.length>0||myEvents.length>0;
+ const profileDone=!!(currentUser.user_metadata?.full_name);
+
+ const steps=[
+   {label:'Complete your profile',desc:'Add your name, phone, and specialty so venues know who you are.',done:profileDone,action:"nav('profile')",cta:'Set up profile'},
+   {label:'Find a venue',desc:`Browse ${allVenues.length} Columbus venues and send a booking inquiry.`,done:hasVenue,action:"nav('venues')",cta:'Browse venues'},
+   {label:'Name your event',desc:'Give your event a title, date, and description so people can find it.',done:hasEvent,action:'openAddEventModal()',cta:'Create event'},
+   {label:'Find vendors',desc:'Search for caterers, DJs, photographers, and more to complete your lineup.',done:false,action:"nav('venues')",cta:'Browse vendors'},
+   {label:'Publish and promote',desc:'List your event publicly on the Columbus directory to sell tickets and drive RSVPs.',done:hasEvent,action:"nav('events')",cta:'View my events'},
+ ];
+ const doneCount=steps.filter(s=>s.done).length;
+ const pct=Math.round((doneCount/steps.length)*100);
 
  document.getElementById('app').innerHTML=`
- <div class="page"> <div style="margin-bottom:28px"> <h1 style="font-family:'DM Sans',sans-serif;font-size:26px;font-weight:800;margin-bottom:4px">Welcome back, ${name.split(' ')[0]}! </h1> <p style="color:var(--sub);font-size:14px">Here's your event planning dashboard</p> </div> <div class="stat-row"> <div class="stat-card"> <div class="stat-num">${myInquiries.length}</div> <div class="stat-label">Total Inquiries Sent</div> </div> <div class="stat-card"> <div class="stat-num" style="color:${newInq?'var(--orange)':'var(--text)'}">${newInq}</div> <div class="stat-label">Awaiting Response</div> </div> <div class="stat-card"> <div class="stat-num">${myEvents.length}</div> <div class="stat-label">Events Listed</div> </div> </div> <!-- Quick actions --> <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:28px"> <div style="background:linear-gradient(135deg,#1a0f00,#250e00);border:1px solid #FF6B3330;border-radius:14px;padding:24px;cursor:pointer" onclick="nav('venues')"> <div style="
- <div style="font-family:'DM Sans',sans-serif;font-weight:700;font-size:16px;margin-bottom:4px">Find a Venue</div> <div style="color:var(--sub);font-size:13px">${allVenues.length} venues available in Columbus</div> </div> <div style="background:linear-gradient(135deg,#0a1a2a,#0a1520);border:1px solid #60a5fa30;border-radius:14px;padding:24px;cursor:pointer" onclick="openAddEventModal()"> <div style="
- <div style="font-family:'DM Sans',sans-serif;font-weight:700;font-size:16px;margin-bottom:4px">List an Event</div> <div style="color:var(--sub);font-size:13px">Publish your event to the Columbus directory</div> </div> </div> <!-- Recent inquiries --> <div class="card"> <div class="card-header"> <div class="card-title">Recent Inquiries</div> <button class="btn btn-ghost btn-sm" onclick="nav('inquiries')">View All →</button> </div> <div class="card-body"> ${myInquiries.length?myInquiries.slice(0,3).map(i=>inquiryItemHTML(i)).join(''):`
- <div class="empty"> <h3>No inquiries yet</h3> <p style="font-size:13px;margin-bottom:16px">Browse venues and send your first booking request</p> <button class="btn btn-primary" onclick="nav('venues')">Browse Venues →</button> </div>`}
- </div> </div> ${myEvents.length?`
- <div class="card" style="margin-top:16px"> <div class="card-header"> <div class="card-title">My Events</div> <button class="btn btn-ghost btn-sm" onclick="nav('events')">View All →</button> </div> <div class="card-body"> ${myEvents.slice(0,3).map(e=>eventItemHTML(e)).join('')}
- </div> </div>`:''}
- </div> `;
+ <div class="page">
+   <div style="margin-bottom:28px">
+     <h1 style="font-size:26px;font-weight:800;margin-bottom:4px">${isReturning?`Welcome back, ${name.split(' ')[0]}!`:`Let's plan your event, ${name.split(' ')[0]}.`}</h1>
+     <p style="color:var(--sub);font-size:14px">${isReturning?"Here's where you left off.":'Follow these steps to plan and launch your first Columbus event.'}</p>
+   </div>
+
+   <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:20px 24px;margin-bottom:20px">
+     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+       <div style="font-weight:700;font-size:14px">Event Planner Checklist</div>
+       <div style="font-family:'DM Mono',monospace;font-size:12px;color:var(--sub)">${doneCount}/${steps.length} complete</div>
+     </div>
+     <div style="height:6px;background:var(--border);border-radius:99px;overflow:hidden">
+       <div style="height:100%;width:${pct}%;background:var(--orange);border-radius:99px;transition:width 0.6s ease"></div>
+     </div>
+   </div>
+
+   <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:28px">
+     ${steps.map((s,i)=>`
+     <div onclick="${s.done?'':s.action}" style="background:var(--card);border:1px solid ${s.done?'rgba(52,211,153,0.2)':'var(--border)'};border-radius:14px;padding:18px 20px;display:flex;align-items:center;gap:16px;cursor:${s.done?'default':'pointer'};transition:border-color 0.2s;${s.done?'opacity:0.6':''}">
+       <div style="width:32px;height:32px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-family:'DM Mono',monospace;font-size:12px;font-weight:600;${s.done?'background:rgba(52,211,153,0.12);border:1.5px solid rgba(52,211,153,0.3);color:var(--green)':'background:var(--surface);border:1.5px solid var(--border);color:var(--muted)'}">
+         ${s.done?'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>':`${i+1}`}
+       </div>
+       <div style="flex:1;min-width:0">
+         <div style="font-weight:700;font-size:14px;margin-bottom:2px;${s.done?'text-decoration:line-through;color:var(--sub)':''}">${s.label}</div>
+         <div style="font-size:12px;color:var(--muted);line-height:1.5">${s.desc}</div>
+       </div>
+       ${s.done?'':`<button class="btn btn-primary btn-sm" onclick="event.stopPropagation();${s.action}" style="white-space:nowrap;flex-shrink:0">${s.cta} &#8594;</button>`}
+     </div>`).join('')}
+   </div>
+
+   ${isReturning?`
+   <div class="stat-row" style="margin-bottom:28px">
+     <div class="stat-card"><div class="stat-num">${myInquiries.length}</div><div class="stat-label">Inquiries Sent</div></div>
+     <div class="stat-card"><div class="stat-num" style="color:${newInq?'var(--orange)':'var(--text)'}">${newInq}</div><div class="stat-label">Awaiting Response</div></div>
+     <div class="stat-card"><div class="stat-num">${myEvents.length}</div><div class="stat-label">Events Listed</div></div>
+   </div>`:''}
+
+   ${myInquiries.length?`
+   <div class="card">
+     <div class="card-header"><div class="card-title">Recent Inquiries</div><button class="btn btn-ghost btn-sm" onclick="nav('inquiries')">View All &#8594;</button></div>
+     <div class="card-body">${myInquiries.slice(0,3).map(i=>inquiryItemHTML(i)).join('')}</div>
+   </div>`:''}
+
+   ${myEvents.length?`
+   <div class="card" style="margin-top:16px">
+     <div class="card-header"><div class="card-title">My Events</div><button class="btn btn-ghost btn-sm" onclick="nav('events')">View All &#8594;</button></div>
+     <div class="card-body">${myEvents.slice(0,3).map(e=>eventItemHTML(e)).join('')}</div>
+   </div>`:''}
+ </div>`;
 }
 
 // ── VENUES ────────────────────────────────────────────────────
