@@ -1,20 +1,33 @@
 name: Cbus Marketing Engine
+
 on:
-  workflow_dispatch: # This adds a "Run Now" button in GitHub Actions
+  workflow_dispatch: # Allows you to run it manually with the "Run workflow" button
+  schedule:
+    - cron: '0 9 * * 1' # Runs automatically every Monday at 9:00 AM
 
 jobs:
   scrape-and-generate:
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
       - name: Install Dependencies
         run: |
           npm init -y
           npm install @supabase/supabase-js @mendable/firecrawl-js @google/generative-ai
+
       - name: Run Engine
         env:
+          # This section "maps" your GitHub Secrets to the script
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
           FIRECRAWL_API_KEY: ${{ secrets.FIRECRAWL_API_KEY }}
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
         run: node scanner.js
