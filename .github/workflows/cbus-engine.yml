@@ -10,8 +10,7 @@ jobs:
       - name: Install Dependencies
         run: |
           npm init -y
-          npm install @supabase/supabase-js @mendable/firecrawl-js openai
-
+          npm install @supabase/supabase-js @mendable/firecrawl-js @google/generative-ai
       - name: Run Engine
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
