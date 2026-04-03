@@ -2,15 +2,15 @@ const { createClient } = require('@supabase/supabase-js');
 const FirecrawlApp = require('@mendable/firecrawl-js').default;
 const { GoogleGenerativeAI } = require("@google/generative-ai");
 
-// Initialize Clients
+// Connect to your tools
 const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY);
 const firecrawl = new FirecrawlApp({ apiKey: process.env.FIRECRAWL_API_KEY });
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
 async function run() {
-  console.log("🚀 STARTING GEMINI-POWERED CBUS ENGINE...");
+  console.log("🚀 ENGINE STARTING...");
 
-  // 1. Fetch profiles with URLs
+  // 1. Get the website URL from Supabase
   const { data: vendors, error } = await supabase
     .from('profiles')
     .select('id, website_url')
@@ -22,56 +22,39 @@ async function run() {
     return;
   }
 
-  console.log(`📡 Found ${vendors?.length || 0} vendors to scan.`);
-
-  // 2. Initialize Gemini Model (Stable Version)
-  const model = genAI.getGenerativeModel({ 
-    model: "gemini-1.5-flash" 
-  });
+  // 2. Setup the "Brain" (Gemini)
+  // We use "gemini-1.5-flash" as the standard model name
+  const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
   for (const vendor of vendors) {
     try {
       console.log(`🔍 SCRAPING: ${vendor.website_url}`);
       const scrape = await firecrawl.scrapeUrl(vendor.website_url, { formats: ['markdown'] });
 
-      if (!scrape.success) {
-        console.log(`⚠️ Skip ${vendor.website_url}: Scrape failed.`);
-        continue;
-      }
-
-      console.log(`🤖 GEMINI GENERATING FOR: ${vendor.id}`);
-      
-      const prompt = `You are the CBUSEVENTS marketing lead. Based on this website content, write 1 Instagram caption and 1 newsletter blurb in a premium, high-contrast orange branding tone for a Columbus, Ohio audience. 
-      Return ONLY a raw JSON object with these exact keys: {"social": "caption here", "newsletter": "blurb here"}
-      
-      Content: ${scrape.markdown.substring(0, 8000)}`;
+      console.log(`🤖 ASKING GEMINI...`);
+      const prompt = `You are a marketing expert. Based on this website text: ${scrape.markdown.substring(0, 4000)}, 
+      create 1 Instagram caption and 1 newsletter blurb. 
+      Return as JSON: {"social": "...", "newsletter": "..."}`;
 
       const result = await model.generateContent(prompt);
       const response = await result.response;
-      let text = response.text();
-      
-      // Clean up the response in case Gemini adds markdown code blocks
-      text = text.replace(/```json|```/g, "").trim();
+      const text = response.text().replace(/```json|```/g, "").trim();
       const res = JSON.parse(text);
 
-      console.log(`💾 SAVING TO SUPABASE...`);
-      const { error: upsertError } = await supabase.from('marketing_intelligence').upsert({
+      console.log(`💾 SAVING TO DATABASE...`);
+      await supabase.from('marketing_intelligence').upsert({
         vendor_id: vendor.id,
         url: vendor.website_url,
         social_caption: res.social,
-        newsletter_copy: res.newsletter,
-        last_scanned: new Date().toISOString()
+        newsletter_copy: res.newsletter
       });
 
-      if (upsertError) console.error("❌ UPSERT ERROR:", upsertError.message);
-      else console.log(`✅ SUCCESS: ${vendor.website_url}`);
+      console.log(`✅ ALL DONE FOR: ${vendor.website_url}`);
 
     } catch (e) {
-      console.error(`❌ ERROR:`, e.message);
+      console.error(`❌ ENGINE STALLED:`, e.message);
     }
   }
-  console.log("🏁 ENGINE RUN COMPLETE.");
 }
 
-// Ignition
 run();
