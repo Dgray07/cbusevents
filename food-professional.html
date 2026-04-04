@@ -2188,8 +2188,6 @@ db.auth.onAuthStateChange(async (event, session) => {
 
 
 // ── ORDERS ──
-let allOrders = [], orderFilter = 'all', ordersChannel = null;
-
 async function loadOrders() {
   if (!currentUser) return;
   const { data } = await db
