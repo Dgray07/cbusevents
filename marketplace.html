@@ -300,7 +300,7 @@ nav.site-nav{display:flex;align-items:center;justify-content:space-between;paddi
 const SB_URL = "https://toblgvatvsjljbqogzsv.supabase.co";
 const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRvYmxndmF0dnNqbGpicW9nenN2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMDgwNTAsImV4cCI6MjA4NzY4NDA1MH0._WJEQPizNDiQfDXQB_DHPaQhixPGpMdmYQSmyWmm_FQ";
 const sb = supabase.createClient(SB_URL, SB_KEY);
-const EDGE_URL = `${SB_URL}/functions/v1/create-checkout`;
+const EDGE_URL = `${SB_URL}/functions/v1/create-checkout-session`;
 
 const CATEGORIES = [
   'Photography','Videography','DJ Services','Live Music','Catering',

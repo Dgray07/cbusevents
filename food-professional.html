@@ -1640,6 +1640,11 @@ async function ensureProfile(data) {
       tier: 'free'
     });
   }
+  // Always ensure role row exists so auth.html redirects correctly on future logins
+  await db.from('user_roles').upsert(
+    { user_id: currentUser.id, role: 'food_professional' },
+    { onConflict: 'user_id' }
+  ).catch(() => {});
 }
 
 async function handleLogout() {
