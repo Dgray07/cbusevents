@@ -1174,12 +1174,15 @@
           <p>Manage your preorder queue and update order status.</p>
         </div>
 
-        <div style="display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap;">
-          <button class="btn-primary" style="width:auto;padding:10px 20px" onclick="filterOrders('all')">All</button>
-          <button class="btn-secondary" onclick="filterOrders('pending')">Pending</button>
-          <button class="btn-secondary" onclick="filterOrders('confirmed')">Confirmed</button>
-          <button class="btn-secondary" onclick="filterOrders('ready')">Ready</button>
-          <button class="btn-secondary" onclick="filterOrders('completed')">Completed</button>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:10px">
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <button class="btn-primary" style="width:auto;padding:10px 20px" onclick="filterOrders('all')">All</button>
+            <button class="btn-secondary" onclick="filterOrders('pending')" style="width:auto;padding:10px 16px">Pending</button>
+            <button class="btn-secondary" onclick="filterOrders('confirmed')" style="width:auto;padding:10px 16px">Confirmed</button>
+            <button class="btn-secondary" onclick="filterOrders('ready')" style="width:auto;padding:10px 16px">Ready</button>
+            <button class="btn-secondary" onclick="filterOrders('completed')" style="width:auto;padding:10px 16px">Completed</button>
+          </div>
+          <button class="btn-primary" style="width:auto;padding:10px 18px;background:rgba(52,211,153,0.15);color:#34d399;border:1px solid rgba(52,211,153,0.3)" onclick="openWalkInModal()">+ Walk-in Order</button>
         </div>
 
         <div class="orders-list" id="orders-list">
@@ -1667,6 +1670,7 @@ async function loadApp() {
 
   await loadMenuItems();
   await loadOrders();
+  await loadEventSetup();
   updateDashStats();
 
   // Show storefront link banner
@@ -1693,6 +1697,12 @@ async function loadMenuItems() {
   document.getElementById('stat-items').textContent = menuItems.length;
 }
 
+async function toggleItemAvailability(id, available) {
+  await db.from('food_professional_menu_items').update({ is_available: available }).eq('id', id);
+  await loadMenuItems();
+  showToast(available ? 'Item set to live' : 'Item turned off', 'success');
+}
+
 function renderMenuGrid() {
   const grid = document.getElementById('menu-grid');
   if (!menuItems.length) {
@@ -1710,6 +1720,7 @@ function renderMenuGrid() {
         <div class="menu-item-footer">
           <div class="menu-item-price">$${parseFloat(item.price).toFixed(2)}</div>
           <div class="menu-item-actions">
+            <button class="btn-icon" onclick="toggleItemAvailability('${item.id}',${item.is_available===false})" style="font-size:11px;padding:4px 8px">${item.is_available===false?'86\'d':'Live'}</button>
             <button class="btn-icon" onclick="editMenuItem('${item.id}')">✏️</button>
             <button class="btn-icon danger" onclick="deleteMenuItem('${item.id}')">🗑️</button>
           </div>
@@ -1821,56 +1832,545 @@ async function deleteMenuItem(id) {
 }
 
 // ── ORDERS ──
-async function loadOrders() {
-  if (!currentUser) return;
-  const { data } = await db.from('food_professional_orders').select('*').eq('vendor_id', currentUser.id).order('created_at', { ascending: false });
-  renderOrders(data || []);
-  if (data) {
-    const today = new Date().toDateString();
-    const todayOrders = data.filter(o => new Date(o.created_at).toDateString() === today);
-    document.getElementById('stat-orders').textContent = todayOrders.filter(o => o.status === 'pending').length;
-    const rev = todayOrders.reduce((s, o) => s + (o.total || 0), 0);
-    document.getElementById('stat-revenue').textContent = `$${rev.toFixed(0)}`;
-  }
-}
+let allOrders = [], orderFilter = 'all', ordersChannel = null;
 
-function renderOrders(orders) {
-  const list = document.getElementById('orders-list');
-  if (!orders.length) {
-    list.innerHTML = `<div class="empty-state"><div class="empty-icon">📋</div><h3>No orders yet</h3><p>Set up your menu and share your storefront link to start taking preorders.</p></div>`;
-    return;
-  }
-  const statusMap = { pending: 'status-pending', confirmed: 'status-confirmed', ready: 'status-ready', completed: 'status-completed' };
-  list.innerHTML = orders.map(o => `
-    <div class="order-card">
-      <div class="order-info">
-        <div class="order-name">${o.customer_name || 'Customer'}</div>
-        <div class="order-items">${o.items_summary || 'Order details'}</div>
-        <div class="order-status ${statusMap[o.status] || 'status-pending'}">${o.status || 'pending'}</div>
-      </div>
-      <div class="order-meta">
-        <div class="order-total">$${(o.total || 0).toFixed(2)}</div>
-        <div class="order-time">${formatTime(o.created_at)}</div>
-        ${o.status === 'pending' ? `<button class="btn-icon" style="margin-top:6px;width:auto;padding:0 8px" onclick="updateOrderStatus('${o.id}','confirmed')">✓ Confirm</button>` : ''}
-        ${o.status === 'confirmed' ? `<button class="btn-icon" style="margin-top:6px;width:auto;padding:0 8px" onclick="updateOrderStatus('${o.id}','ready')">Ready</button>` : ''}
-      </div>
-    </div>
-  `).join('');
-}
 
-async function updateOrderStatus(id, status) {
-  await db.from('food_professional_orders').update({ status }).eq('id', id);
-  showToast(`Order marked as ${status}`, 'success');
-  await loadOrders();
-}
-
-function filterOrders(status) {
-  // Would filter from loaded orders in a full impl
-  loadOrders();
-}
 
 function updateDashStats() {
   // Stats already updated in loadOrders
+}
+
+// ── PROFILE ──
+async function saveProfile() {
+  const payload = {
+    display_name: document.getElementById('profile-name').value.trim(),
+    professional_type: document.getElementById('profile-type').value,
+    bio: document.getElementById('profile-bio').value.trim(),
+    city: document.getElementById('profile-city').value.trim(),
+    instagram: document.getElementById('profile-ig').value.trim(),
+    cuisine_tags: document.getElementById('profile-cuisine').value.trim(),
+  };
+  const { error } = await db.from('food_professionals').update(payload).eq('user_id', currentUser.id);
+  if (error) return showToast(error.message, 'error');
+  showToast('Profile saved!', 'success');
+}
+
+// ── IMAGE UPLOADS ──
+async function uploadCoverImage(input) {
+  const file = input.files[0];
+  if (!file) return;
+  showToast('Uploading cover...', 'success');
+  const ext = file.name.split('.').pop();
+  const path = `covers/${currentUser.id}/cover.${ext}`;
+  const { error: upErr } = await db.storage.from('food-professional-menu').upload(path, file, { upsert: true });
+  if (upErr) { showToast('Upload failed: ' + upErr.message, 'error'); return; }
+  const { data: urlData } = db.storage.from('food-professional-menu').getPublicUrl(path);
+  const url = urlData.publicUrl;
+  await db.from('food_professionals').update({ cover_image_url: url }).eq('user_id', currentUser.id);
+  // Update preview
+  const wrap = document.getElementById('profile-cover-wrap');
+  const existing = wrap.querySelector('img');
+  if (existing) { existing.src = url; }
+  else {
+    const emoji = wrap.querySelector('span') || wrap.firstChild;
+    const img = document.createElement('img');
+    img.src = url;
+    img.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;object-fit:cover';
+    wrap.insertBefore(img, wrap.firstChild);
+  }
+  showToast('Cover photo updated!', 'success');
+}
+
+async function uploadAvatarImage(input) {
+  const file = input.files[0];
+  if (!file) return;
+  showToast('Uploading photo...', 'success');
+  const ext = file.name.split('.').pop();
+  const path = `avatars/${currentUser.id}/avatar.${ext}`;
+  const { error: upErr } = await db.storage.from('food-professional-menu').upload(path, file, { upsert: true });
+  if (upErr) { showToast('Upload failed: ' + upErr.message, 'error'); return; }
+  const { data: urlData } = db.storage.from('food-professional-menu').getPublicUrl(path);
+  const url = urlData.publicUrl;
+  await db.from('food_professionals').update({ avatar_url: url }).eq('user_id', currentUser.id);
+  // Update preview
+  const wrap = document.getElementById('profile-avatar-wrap');
+  wrap.innerHTML = `<img src="${url}" style="width:100%;height:100%;object-fit:cover;border-radius:50%"><input type="file" id="avatar-file-input" accept="image/*" style="display:none;position:absolute" onchange="uploadAvatarImage(this)">`;
+  showToast('Profile photo updated!', 'success');
+}
+
+function updatePreviewName(v) { document.getElementById('preview-name').textContent = v || 'Your Name'; }
+function updatePreviewBio(v) { document.getElementById('preview-bio').textContent = v || 'Add a bio to tell people about your food and style.'; }
+function updatePreviewType(v) {
+  const m = { chef: 'PRIVATE CHEF', food_truck: 'FOOD TRUCK', caterer: 'CATERER', popup: 'POP-UP OPERATOR', personal_chef: 'PERSONAL CHEF' };
+  document.getElementById('preview-type').textContent = m[v] || 'FOOD PROFESSIONAL';
+}
+
+// ── EVENT SETUP ──
+async function loadEventSetup() {
+  if (!currentUser) return;
+  const { data } = await db.from('food_professional_events').select('*').eq('user_id', currentUser.id).maybeSingle();
+  if (!data) return;
+  const set = (id, val) => { const el = document.getElementById(id); if (el && val) el.value = val; };
+  set('event-date', data.event_date);
+  set('event-start', data.event_start);
+  set('preorder-open', data.preorder_open);
+  set('preorder-cutoff', data.preorder_cutoff);
+  set('total-capacity', data.total_capacity);
+  set('per-person-limit', data.per_person_limit);
+  set('pickup-address', data.pickup_address);
+  set('pickup-start', data.pickup_start);
+  set('pickup-end', data.pickup_end);
+  set('pickup-notes', data.pickup_notes);
+  const tog = (id, val) => { const el = document.getElementById(id); if (el && val) el.classList.add('on'); else if (el) el.classList.remove('on'); };
+  tog('toggle-autoclose', data.auto_close);
+  tog('toggle-walkin', data.allow_walkin);
+  tog('toggle-prepay', data.require_prepay);
+  if (data.preorder_cutoff) renderCutoffBanner(data.preorder_cutoff);
+}
+
+async function saveEventSetup() {
+  const payload = {
+    user_id: currentUser.id,
+    event_date: document.getElementById('event-date').value,
+    event_start: document.getElementById('event-start').value,
+    preorder_open: document.getElementById('preorder-open').value,
+    preorder_cutoff: document.getElementById('preorder-cutoff').value,
+    total_capacity: document.getElementById('total-capacity').value || null,
+    per_person_limit: document.getElementById('per-person-limit').value || 2,
+    auto_close: document.getElementById('toggle-autoclose').classList.contains('on'),
+    allow_walkin: document.getElementById('toggle-walkin').classList.contains('on'),
+    require_prepay: document.getElementById('toggle-prepay').classList.contains('on'),
+    pickup_address: document.getElementById('pickup-address').value.trim(),
+    pickup_start: document.getElementById('pickup-start').value,
+    pickup_end: document.getElementById('pickup-end').value,
+    pickup_notes: document.getElementById('pickup-notes').value.trim(),
+  };
+  const { error } = await db.from('food_professional_events').upsert(payload, { onConflict: 'user_id' });
+  if (error) return showToast(error.message, 'error');
+  showToast('Event setup saved!', 'success');
+  renderCutoffBanner(payload.preorder_cutoff);
+}
+
+function renderCutoffBanner(cutoff) {
+  if (!cutoff) return;
+  const wrap = document.getElementById('cutoff-banner-wrap');
+  wrap.innerHTML = `
+    <div class="cutoff-banner">
+      <div class="cutoff-text">Preorders close <strong>${new Date(cutoff).toLocaleString('en-US',{weekday:'short',month:'short',day:'numeric',hour:'numeric',minute:'2-digit'})}</strong></div>
+      <div class="cutoff-countdown" id="countdown">--:--:--</div>
+    </div>`;
+  updateCountdown(new Date(cutoff));
+}
+
+function updateCountdown(target) {
+  const tick = () => {
+    const diff = target - new Date();
+    if (diff <= 0) { document.getElementById('countdown') && (document.getElementById('countdown').textContent = 'CLOSED'); return; }
+    const h = Math.floor(diff/3600000);
+    const m = Math.floor((diff%3600000)/60000);
+    const s = Math.floor((diff%60000)/1000);
+    const el = document.getElementById('countdown');
+    if (el) el.textContent = `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+    setTimeout(tick, 1000);
+  };
+  tick();
+}
+
+// ── SETTINGS ──
+async function saveSettings() {
+  showToast('Settings updated!', 'success');
+}
+
+// ── UI HELPERS ──
+function showPanel(name) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.sidebar-item').forEach(i => i.classList.remove('active'));
+  document.querySelectorAll('.bottom-nav-item').forEach(i => i.classList.remove('active'));
+  document.getElementById(`panel-${name}`).classList.add('active');
+  document.querySelectorAll(`[data-panel="${name}"]`).forEach(el => el.classList.add('active'));
+}
+
+function openModal(id) { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+function toggleSwitch(btn) { btn.classList.toggle('on'); }
+
+function toggleNavMenu() {
+  document.getElementById('nav-menu').classList.toggle('open');
+}
+
+document.addEventListener('click', (e) => {
+  if (!e.target.closest('.nav-avatar')) {
+    document.getElementById('nav-menu').classList.remove('open');
+  }
+});
+
+function viewPublicProfile() {
+  if (!currentProfile) return showToast('Save your profile first', 'error');
+  const url = `https://cbusevents.com/fp-storefront.html?u=${currentUser.id}`;
+  navigator.clipboard.writeText(url).then(() => {
+    showToast('Storefront link copied!', 'success');
+  }).catch(() => {
+    window.open(url, '_blank');
+  });
+}
+
+function openStorefront() {
+  if (!currentUser) return;
+  window.open(`https://cbusevents.com/fp-storefront.html?u=${currentUser.id}`, '_blank');
+}
+
+async function startStripeOnboarding() {
+  const btn = document.querySelector('#stripe-onboarding-banner .btn-primary');
+  if (!btn) return;
+  btn.disabled = true; btn.textContent = 'Loading...';
+  try {
+    const session = (await db.auth.getSession()).data.session;
+    if (!session) { showToast('Please sign in first', 'error'); btn.disabled = false; btn.textContent = 'Set Up Payouts →'; return; }
+    const returnUrl = window.location.href.split('?')[0] + '?stripe=return';
+    const res = await fetch('https://toblgvatvsjljbqogzsv.supabase.co/functions/v1/stripe-connect-onboard', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRvYmxndmF0dnNqbGpicW9nenN2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMDgwNTAsImV4cCI6MjA4NzY4NDA1MH0._WJEQPizNDiQfDXQB_DHPaQhixPGpMdmYQSmyWmm_FQ',
+        'Authorization': `Bearer ${session.access_token}`
+      },
+      body: JSON.stringify({ user_id: currentUser.id, email: currentUser.email, return_url: returnUrl, refresh_url: returnUrl })
+    });
+    const data = await res.json();
+    if (data.url) {
+      window.location.href = data.url;
+    } else {
+      showToast(data.error || 'Something went wrong. Try again.', 'error');
+      btn.disabled = false; btn.textContent = 'Set Up Payouts →';
+    }
+  } catch(e) {
+    showToast('Could not connect to Stripe. Check your connection.', 'error');
+    btn.disabled = false; btn.textContent = 'Set Up Payouts →';
+  }
+}
+
+async function checkStripeReturn() {
+  const params = new URLSearchParams(window.location.search);
+  if (params.get('stripe') !== 'return') return;
+  // Clean URL
+  window.history.replaceState({}, '', window.location.pathname);
+  showToast('Checking your Stripe account...', 'success');
+  // Re-fetch profile to get updated stripe_account_id
+  const { data: prof } = await db.from('food_professionals').select('stripe_account_id').eq('user_id', currentUser.id).single();
+  if (prof?.stripe_account_id) {
+    const banner = document.getElementById('stripe-onboarding-banner');
+    if (banner) banner.style.display = 'none';
+    showToast('Stripe connected! Payouts are active.', 'success');
+  } else {
+    showToast('Stripe setup incomplete. Please try again or contact support.', 'error');
+  }
+}
+
+function showToast(msg, type = 'success') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = `toast ${type} show`;
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+function formatTime(ts) {
+  if (!ts) return '';
+  const d = new Date(ts);
+  return d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+}
+
+// ── IMAGE UPLOAD ──
+function triggerImgUpload() {}
+
+function handleImgUpload(input) {
+  const file = input.files[0];
+  if (!file) return;
+  itemImageFile = file;
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    const area = document.getElementById('item-img-upload');
+    const existing = area.querySelector('img');
+    if (existing) { existing.src = e.target.result; }
+    else {
+      area.innerHTML = `<img src="${e.target.result}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover"><input type="file" id="item-img-input" accept="image/*" onchange="handleImgUpload(this)">`;
+    }
+  };
+  reader.readAsDataURL(file);
+}
+
+function resetImgUpload() {
+  document.getElementById('item-img-upload').innerHTML = `
+    <div class="upload-icon">📷</div>
+    <div class="upload-text">Tap to add a photo</div>
+    <input type="file" id="item-img-input" accept="image/*" onchange="handleImgUpload(this)">
+  `;
+}
+
+// ── INIT ──
+let _initDone = false;
+
+db.auth.onAuthStateChange(async (event, session) => {
+  if (event === 'SIGNED_IN' && session?.user && !currentUser && _initDone) {
+    currentUser = session.user;
+    await loadApp();
+  } else if (event === 'SIGNED_OUT') {
+    currentUser = null;
+    document.getElementById('app').style.display = 'none';
+    document.getElementById('auth-screen').style.display = 'flex';
+  }
+});
+
+(async () => {
+  const { data: { session } } = await db.auth.getSession();
+  if (session?.user) {
+    currentUser = session.user;
+    const { data: roleRows } = await db.from('user_roles').select('role').eq('user_id', currentUser.id);
+    const roles = (roleRows || []).map(r => r.role);
+    const PORTAL_MAP = {
+      venue_owner:  'https://cbusevents.com/cbus-venue-portal.html',
+      vendor:       'https://cbusevents.com/cbus-vendor-portal.html',
+      planner:      'https://cbusevents.com/cbus-planner-portal.html',
+      customer:     'https://cbusevents.com/customer-portal.html',
+      event_staff:  'https://cbusevents.com/event-staff.html',
+    };
+    if (!roles.includes('food_professional')) {
+      for (const role of roles) {
+        if (PORTAL_MAP[role]) { window.location.href = PORTAL_MAP[role]; return; }
+      }
+    }
+    await loadApp();
+  await checkStripeReturn();
+  }
+  _initDone = true;
+})();
+</script>
+</body>
+</html>// ── ORDERS ──
+let allOrders = [], orderFilter = 'all', ordersChannel = null;
+
+async function loadOrders() {
+  if (!currentUser) return;
+  const { data } = await db
+    .from('food_professional_orders')
+    .select('*')
+    .eq('vendor_id', currentUser.id)
+    .order('created_at', { ascending: false });
+  allOrders = data || [];
+  renderOrders();
+  updateDashStats();
+  subscribeToOrders();
+}
+
+function subscribeToOrders() {
+  if (ordersChannel) return; // already subscribed
+  ordersChannel = db
+    .channel('fp-orders-' + currentUser.id)
+    .on('postgres_changes', {
+      event: '*',
+      schema: 'public',
+      table: 'food_professional_orders',
+      filter: `vendor_id=eq.${currentUser.id}`
+    }, payload => {
+      if (payload.eventType === 'INSERT') {
+        allOrders.unshift(payload.new);
+        showToast('New order received!', 'success');
+        playOrderChime();
+      } else if (payload.eventType === 'UPDATE') {
+        const idx = allOrders.findIndex(o => o.id === payload.new.id);
+        if (idx > -1) allOrders[idx] = payload.new;
+      } else if (payload.eventType === 'DELETE') {
+        allOrders = allOrders.filter(o => o.id !== payload.old.id);
+      }
+      renderOrders();
+      updateDashStats();
+    })
+    .subscribe();
+}
+
+function playOrderChime() {
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.connect(gain); gain.connect(ctx.destination);
+    osc.frequency.setValueAtTime(880, ctx.currentTime);
+    osc.frequency.setValueAtTime(1100, ctx.currentTime + 0.1);
+    gain.gain.setValueAtTime(0.3, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.4);
+    osc.start(); osc.stop(ctx.currentTime + 0.4);
+  } catch(e) {}
+}
+
+function renderOrders() {
+  const list = document.getElementById('orders-list');
+  if (!list) return;
+  const filtered = orderFilter === 'all' ? allOrders : allOrders.filter(o => o.status === orderFilter);
+
+  // Update filter button states
+  document.querySelectorAll('#panel-orders .btn-primary, #panel-orders .btn-secondary').forEach(btn => {
+    const f = btn.getAttribute('onclick')?.match(/filterOrders\('(.+?)'\)/)?.[1];
+    if (f) {
+      btn.className = f === orderFilter ? 'btn-primary' : 'btn-secondary';
+      btn.style.width = 'auto'; btn.style.padding = '10px 20px';
+    }
+  });
+
+  if (!filtered.length) {
+    list.innerHTML = `<div class="empty-state"><div class="empty-icon">📋</div><h3>${orderFilter === 'all' ? 'No orders yet' : 'No ' + orderFilter + ' orders'}</h3><p>${orderFilter === 'all' ? 'Set up your menu and share your storefront link to start taking preorders.' : 'Orders will appear here when their status updates.'}</p></div>`;
+    return;
+  }
+
+  const statusColors = { pending: '#f59e0b', confirmed: '#818cf8', ready: '#34d399', completed: '#6b7280' };
+  list.innerHTML = filtered.map(o => {
+    const statusColor = statusColors[o.status] || '#f59e0b';
+    const items = (() => { try { return Array.isArray(o.items) ? o.items.map(i => `${i.qty}x ${i.name}`).join(', ') : o.items_summary || 'Order details'; } catch(e) { return o.items_summary || 'Order details'; } })();
+    return `
+    <div class="order-card" style="border-left:3px solid ${statusColor}">
+      <div class="order-info" style="flex:1;min-width:0">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px">
+          <div class="order-name" style="font-size:15px;font-weight:700">${o.customer_name || 'Walk-in'}</div>
+          <span style="background:${statusColor}20;color:${statusColor};border:1px solid ${statusColor}40;border-radius:20px;padding:2px 8px;font-size:10px;font-weight:700;text-transform:uppercase">${o.status || 'pending'}</span>
+        </div>
+        <div class="order-items" style="font-size:13px;color:var(--gray);margin-bottom:6px">${items}</div>
+        ${o.notes ? `<div style="font-size:12px;color:var(--orange);font-style:italic">Note: ${o.notes}</div>` : ''}
+        ${o.customer_phone ? `<div style="font-size:11px;color:var(--gray);margin-top:4px">📱 ${o.customer_phone}</div>` : ''}
+      </div>
+      <div class="order-meta" style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex-shrink:0">
+        <div class="order-total" style="font-size:18px;font-weight:800">$${(o.total || 0).toFixed(2)}</div>
+        <div class="order-time" style="font-size:11px;color:var(--gray)">${formatTime(o.created_at)}</div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end">
+          ${o.status === 'pending' ? `<button class="btn-icon" style="width:auto;padding:6px 12px;font-size:12px;background:rgba(129,140,248,0.15);color:#818cf8;border:1px solid rgba(129,140,248,0.3)" onclick="updateOrderStatus('${o.id}','confirmed')">✓ Confirm</button>` : ''}
+          ${o.status === 'confirmed' ? `<button class="btn-icon" style="width:auto;padding:6px 12px;font-size:12px;background:rgba(52,211,153,0.15);color:#34d399;border:1px solid rgba(52,211,153,0.3)" onclick="updateOrderStatus('${o.id}','ready')">🔔 Mark Ready</button>` : ''}
+          ${o.status === 'ready' ? `<button class="btn-icon" style="width:auto;padding:6px 12px;font-size:12px;background:rgba(107,114,128,0.15);color:#9ca3af;border:1px solid rgba(107,114,128,0.3)" onclick="updateOrderStatus('${o.id}','completed')">✓ Picked Up</button>` : ''}
+          ${o.status !== 'completed' ? `<button class="btn-icon" style="width:auto;padding:6px 10px;font-size:11px;background:rgba(239,68,68,0.1);color:#ef4444;border:1px solid rgba(239,68,68,0.2)" onclick="updateOrderStatus('${o.id}','cancelled')">✕</button>` : ''}
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+async function updateOrderStatus(id, status) {
+  const { error } = await db.from('food_professional_orders').update({ status, updated_at: new Date().toISOString() }).eq('id', id);
+  if (error) { showToast('Error updating order', 'error'); return; }
+  // If marking ready - queue an alert
+  if (status === 'ready') {
+    const order = allOrders.find(o => o.id === id);
+    if (order) {
+      await db.from('event_alerts').insert({
+        event_id: order.event_id || null,
+        planner_id: currentUser.id,
+        title: 'Your order is ready!',
+        message: `Hey ${order.customer_name || 'there'}, your order is ready for pickup!`,
+        recipient_type: 'customer',
+        status: 'queued',
+        customer_phone: order.customer_phone || null,
+      }).catch(() => {});
+    }
+    showToast('Order marked ready - customer alert queued!', 'success');
+  } else {
+    showToast(`Order ${status}`, 'success');
+  }
+  // Update local state
+  const idx = allOrders.findIndex(o => o.id === id);
+  if (idx > -1) allOrders[idx] = { ...allOrders[idx], status };
+  renderOrders();
+  updateDashStats();
+}
+
+function filterOrders(status) {
+  orderFilter = status;
+  renderOrders();
+}
+
+function updateDashStats() {
+  const today = new Date().toDateString();
+  const todayOrders = allOrders.filter(o => new Date(o.created_at).toDateString() === today);
+  const pendingEl = document.getElementById('stat-orders');
+  const revEl = document.getElementById('stat-revenue');
+  if (pendingEl) pendingEl.textContent = allOrders.filter(o => o.status === 'pending').length;
+  if (revEl) {
+    const rev = todayOrders.reduce((s, o) => s + (parseFloat(o.total) || 0), 0);
+    revEl.textContent = `$${rev.toFixed(0)}`;
+  }
+}
+
+function openWalkInModal() {
+  const itemOpts = menuItems.map(i => `<option value="${i.id}" data-price="${i.price}">${i.name} - $${parseFloat(i.price).toFixed(2)}</option>`).join('');
+  const modalHtml = `
+  <div id="walkin-modal" class="modal-overlay open" onclick="if(event.target.id==='walkin-modal')closeModal('walkin-modal')">
+    <div class="modal-box" style="max-width:480px">
+      <div class="modal-header"><div class="modal-title">Walk-in Order</div><button onclick="closeModal('walkin-modal')" style="background:none;border:none;color:var(--gray);font-size:20px;cursor:pointer">&times;</button></div>
+      <div class="modal-body" style="display:flex;flex-direction:column;gap:12px;padding:20px">
+        <div class="form-group"><label>Customer Name</label><input id="wi-name" placeholder="Optional"></div>
+        <div class="form-group"><label>Phone (for ready alert)</label><input id="wi-phone" placeholder="(614) 555-0000"></div>
+        <div class="form-group"><label>Items</label><select id="wi-item" style="margin-bottom:8px">${itemOpts || '<option>No menu items yet</option>'}</select>
+          <div style="display:flex;gap:8px;align-items:center">
+            <input type="number" id="wi-qty" value="1" min="1" style="width:70px">
+            <button class="btn-secondary" style="width:auto;padding:8px 14px" onclick="addWalkInItem()">+ Add</button>
+          </div>
+        </div>
+        <div id="wi-items-list" style="display:flex;flex-direction:column;gap:6px"></div>
+        <div class="form-group"><label>Notes</label><input id="wi-notes" placeholder="Allergies, customizations..."></div>
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <div style="font-weight:700;font-size:16px">Total: <span id="wi-total">$0.00</span></div>
+          <button class="btn-primary" style="width:auto;padding:10px 20px" onclick="submitWalkInOrder()">Place Order</button>
+        </div>
+      </div>
+    </div>
+  </div>`;
+  document.body.insertAdjacentHTML('beforeend', modalHtml);
+  window._wiItems = [];
+}
+
+function addWalkInItem() {
+  const sel = document.getElementById('wi-item');
+  const qty = parseInt(document.getElementById('wi-qty').value) || 1;
+  if (!sel.value) return;
+  const price = parseFloat(sel.options[sel.selectedIndex].dataset.price) || 0;
+  const name = sel.options[sel.selectedIndex].text.split(' - ')[0];
+  window._wiItems = window._wiItems || [];
+  const existing = window._wiItems.find(i => i.id === sel.value);
+  if (existing) { existing.qty += qty; }
+  else { window._wiItems.push({ id: sel.value, name, price, qty }); }
+  renderWalkInItems();
+}
+
+function renderWalkInItems() {
+  const list = document.getElementById('wi-items-list');
+  const total = (window._wiItems || []).reduce((s, i) => s + i.price * i.qty, 0);
+  if (list) list.innerHTML = (window._wiItems || []).map((i, idx) => `
+    <div style="display:flex;justify-content:space-between;align-items:center;background:var(--bg3);border-radius:8px;padding:8px 12px">
+      <span style="font-size:13px">${i.qty}x ${i.name}</span>
+      <div style="display:flex;align-items:center;gap:8px">
+        <span style="font-size:13px;font-weight:600">$${(i.price * i.qty).toFixed(2)}</span>
+        <button onclick="window._wiItems.splice(${idx},1);renderWalkInItems()" style="background:none;border:none;color:var(--red);cursor:pointer;font-size:14px">&times;</button>
+      </div>
+    </div>`).join('');
+  const totalEl = document.getElementById('wi-total');
+  if (totalEl) totalEl.textContent = `$${total.toFixed(2)}`;
+}
+
+async function submitWalkInOrder() {
+  const items = window._wiItems || [];
+  if (!items.length) { showToast('Add at least one item', 'error'); return; }
+  const total = items.reduce((s, i) => s + i.price * i.qty, 0);
+  const payload = {
+    vendor_id: currentUser.id,
+    customer_name: document.getElementById('wi-name').value.trim() || 'Walk-in',
+    customer_phone: document.getElementById('wi-phone').value.trim() || null,
+    items: items,
+    items_summary: items.map(i => `${i.qty}x ${i.name}`).join(', '),
+    notes: document.getElementById('wi-notes').value.trim() || null,
+    total,
+    status: 'confirmed',
+    order_type: 'walkin',
+  };
+  const { error } = await db.from('food_professional_orders').insert(payload);
+  if (error) { showToast('Error placing order: ' + error.message, 'error'); return; }
+  closeModal('walkin-modal');
+  document.getElementById('walkin-modal')?.remove();
+  showToast('Walk-in order placed!', 'success');
 }
 
 // ── PROFILE ──
@@ -2031,27 +2531,6 @@ function openStorefront() {
   window.open(`https://cbusevents.com/fp-storefront.html?u=${currentUser.id}`, '_blank');
 }
 
-async function startStripeOnboarding() {
-  const btn = document.querySelector('#stripe-onboarding-banner .btn-primary');
-  btn.disabled = true; btn.textContent = 'Loading...';
-  try {
-    const res = await fetch('https://toblgvatvsjljbqogzsv.supabase.co/functions/v1/fp-connect-onboard', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRvYmxndmF0dnNqbGpicW9nenN2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMDgwNTAsImV4cCI6MjA4NzY4NDA1MH0._WJEQPizNDiQfDXQB_DHPaQhixPGpMdmYQSmyWmm_FQ',
-        'Authorization': `Bearer ${(await db.auth.getSession()).data.session?.access_token}`
-      },
-      body: JSON.stringify({ user_id: currentUser.id, email: currentUser.email })
-    });
-    const data = await res.json();
-    if (data.url) window.location.href = data.url;
-    else { showToast(data.error || 'Something went wrong', 'error'); btn.disabled = false; btn.textContent = 'Set Up Payouts →'; }
-  } catch(e) {
-    showToast('Could not connect to Stripe', 'error');
-    btn.disabled = false; btn.textContent = 'Set Up Payouts →';
-  }
-}
 
 function showToast(msg, type = 'success') {
   const t = document.getElementById('toast');
@@ -2126,6 +2605,7 @@ db.auth.onAuthStateChange(async (event, session) => {
       }
     }
     await loadApp();
+  
   }
   _initDone = true;
 })();
