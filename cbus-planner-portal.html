@@ -687,12 +687,12 @@ async function loadData(){
  const[vRes,iRes,eRes,vendRes]=await Promise.all([
  sb.from('venues').select('*').eq('status','approved').order('tier',{ascending:false}),
  sb.from('inquiries').select('*,venues(name,venue_type,neighborhood)').eq('email',currentUser.email).order('created_at',{ascending:false}),
- sb.from('events').select('*,venues(name)').eq('status','published').gte('start_time',new Date().toISOString()).order('start_time',{ascending:true}),
+ sb.from('events').select('*,venues(name)').eq('owner_id',currentUser.id).order('start_time',{ascending:true}),
  sb.from('vendors').select('id,business_name,description,services,portfolio_photos,subscription_tier,instagram,email,city').order('subscription_tier',{ascending:false}),
  ]);
  allVenues=vRes.data||[];
  myInquiries=iRes.data||[];
- myEvents=eRes.data?.filter(e=>e.planner_email===currentUser.email)||[];
+ myEvents=eRes.data||[];
  allVendors=vendRes.data||[];
 }
 
@@ -795,6 +795,15 @@ function nav(page){
 }
 
 // ── EVENT DETAIL / MANAGEMENT ────────────────────────────────
+async function publishEvent(id){
+ if(!confirm('Publish this event to the Columbus directory?'))return;
+ const{error}=await sb.from('events').update({status:'published'}).eq('id',id);
+ if(error){toast('Error publishing. Try again.','error');return;}
+ toast('Event published to Columbus directory!');
+ await loadData();
+ nav('events');
+}
+
 function navEventDetail(id){
  currentEventId=id;
  eventDetailTab='overview';
@@ -839,8 +848,9 @@ async function renderEventDetail(){
        <div style="color:var(--sub);font-size:13px">${fmt(e.start_time)} · ${e.venues?.name||'Columbus'} · <span class="badge ${e.status==='published'?'badge-green':'badge-muted'}">${e.status}</span></div>
      </div>
      <div style="display:flex;gap:8px;flex-wrap:wrap">
-       <a href="${publicUrl}" target="_blank" class="btn btn-ghost btn-sm">View Public Page &#8599;</a>
-       <button class="btn btn-primary btn-sm" onclick="editEvent('${e.id}')">Edit Event</button>
+       ${e.status==='published'?`<a href="${publicUrl}" target="_blank" class="btn btn-ghost btn-sm">View Public Page &#8599;</a>`:''}
+       <button class="btn btn-ghost btn-sm" onclick="editEvent('${e.id}')">Edit</button>
+       ${e.status==='draft'?`<button class="btn btn-primary btn-sm" onclick="publishEvent('${e.id}')">Publish to Directory &#8594;</button>`:''}
      </div>
    </div>
 
@@ -1840,9 +1850,9 @@ function renderDashboard(){
  const steps=[
    {label:'Complete your profile',desc:'Add your name, phone, and specialty so venues know who you are.',done:profileDone,action:"nav('profile')",cta:'Set up profile'},
    {label:'Find a venue',desc:`Browse ${allVenues.length} Columbus venues and send a booking inquiry.`,done:hasVenue,action:"nav('venues')",cta:'Browse venues'},
-   {label:'Name your event',desc:'Give your event a title, date, and description so people can find it.',done:hasEvent,action:'openAddEventModal()',cta:'Create event'},
+   {label:'Start planning your event',desc:'Give your event a name and date. You can publish to the directory when ready.',done:hasEvent,action:'openAddEventModal()',cta:'Start planning'},
    {label:'Find vendors',desc:'Search for caterers, DJs, photographers, and more to complete your lineup.',done:false,action:"nav('vendors')",cta:'Browse vendors'},
-   {label:'Publish and promote',desc:'List your event publicly on the Columbus directory to sell tickets and drive RSVPs.',done:hasEvent,action:"nav('events')",cta:'View my events'},
+   {label:'Publish and promote',desc:'List your event publicly on the Columbus directory to drive RSVPs.',done:myEvents.some(e=>e.status==="published"),action:"nav('events')",cta:'View my events'},
  ];
  const doneCount=steps.filter(s=>s.done).length;
  const pct=Math.round((doneCount/steps.length)*100);
@@ -1982,8 +1992,8 @@ function boostLabel(e){
 function renderEvents(){
  const boosted=myEvents.filter(e=>isPromoted(e));
  document.getElementById('app').innerHTML=`
- <div class="page"> <div style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:6px"> <div class="section-title">My Events</div> <button class="btn btn-primary btn-sm" onclick="openAddEventModal()">+ List an Event</button> </div> <div class="section-sub">${myEvents.length} events · ${boosted.length} currently boosted</div> <div style="background:linear-gradient(135deg,#1a1000,#251500);border:1px solid #f59e0b30;border-radius:14px;padding:20px 24px;margin-bottom:20px;display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap"> <div> <div style="font-family:'DM Sans',sans-serif;font-weight:700;font-size:16px;margin-bottom:4px"> Boost Your Event</div> <div style="color:var(--sub);font-size:13px">Pin to top · Hero slider · Highlighted in categories</div> </div> <div style="display:flex;gap:8px;flex-shrink:0"> <div style="background:var(--card);border:1px solid #f59e0b40;border-radius:10px;padding:10px 16px;text-align:center"> <div style="font-family:'DM Sans',sans-serif;font-size:18px;font-weight:800;color:#f59e0b">$10</div> <div style="color:var(--muted);font-size:11px">7 days</div> </div> <div style="background:var(--card);border:1px solid #f59e0b40;border-radius:10px;padding:10px 16px;text-align:center"> <div style="font-family:'DM Sans',sans-serif;font-size:18px;font-weight:800;color:#f59e0b">$20</div> <div style="color:var(--muted);font-size:11px">30 days</div> </div> </div> </div> ${myEvents.length?myEvents.map(e=>eventItemHTML(e)).join(''):`
- <div class="empty" style="border:1px solid var(--border);border-radius:14px"> <h3>No events listed yet</h3> <p style="font-size:13px;margin-bottom:16px">List your event on CBUSEVENTS to reach Columbus</p> <button class="btn btn-primary" onclick="openAddEventModal()">List Your First Event →</button> </div>`}
+ <div class="page"> <div style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:6px"> <div class="section-title">My Events</div> <button class="btn btn-primary btn-sm" onclick="openAddEventModal()">+ Plan an Event</button> </div> <div class="section-sub">${myEvents.length} events · ${boosted.length} currently boosted</div> <div style="background:linear-gradient(135deg,#1a1000,#251500);border:1px solid #f59e0b30;border-radius:14px;padding:20px 24px;margin-bottom:20px;display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap"> <div> <div style="font-family:'DM Sans',sans-serif;font-weight:700;font-size:16px;margin-bottom:4px"> Boost Your Event</div> <div style="color:var(--sub);font-size:13px">Pin to top · Hero slider · Highlighted in categories</div> </div> <div style="display:flex;gap:8px;flex-shrink:0"> <div style="background:var(--card);border:1px solid #f59e0b40;border-radius:10px;padding:10px 16px;text-align:center"> <div style="font-family:'DM Sans',sans-serif;font-size:18px;font-weight:800;color:#f59e0b">$10</div> <div style="color:var(--muted);font-size:11px">7 days</div> </div> <div style="background:var(--card);border:1px solid #f59e0b40;border-radius:10px;padding:10px 16px;text-align:center"> <div style="font-family:'DM Sans',sans-serif;font-size:18px;font-weight:800;color:#f59e0b">$20</div> <div style="color:var(--muted);font-size:11px">30 days</div> </div> </div> </div> ${myEvents.length?myEvents.map(e=>eventItemHTML(e)).join(''):`
+ <div class="empty" style="border:1px solid var(--border);border-radius:14px"> <h3>No events listed yet</h3> <p style="font-size:13px;margin-bottom:16px">List your event on CBUSEVENTS to reach Columbus</p> <button class="btn btn-primary" onclick="openAddEventModal()">Start Planning Your First Event →</button> </div>`}
  </div>`;
 }
 
@@ -1996,9 +2006,10 @@ function eventItemHTML(e){
    +(promoted?'<div style="font-size:11px;color:#f59e0b;margin-top:3px">Boost active until '+new Date(e.promoted_until).toLocaleDateString()+'</div>':'')
    +'</div>'
    +'<div style="display:flex;flex-direction:column;gap:6px;align-items:flex-end;flex-shrink:0">'
-   +'<span class="badge '+(e.status==='published'?'badge-green':'badge-muted')+'">'+e.status+'</span>'
+   +'<span class="badge '+(e.status==='published'?'badge-green':e.status==='draft'?'badge-orange':'badge-muted')+'">'+( e.status==='draft'?'Draft':e.status)+'</span>'
    +'<button class="btn btn-sm" style="background:#1a1a24;color:#e8e8f0;border:1px solid #25252f;white-space:nowrap" data-action="edit" data-id="'+e.id+'">Edit</button>'
-   +'<button class="btn btn-sm btn-primary" style="white-space:nowrap" data-action="manage" data-id="'+e.id+'">Manage &#8594;</button>'
+   +'<button class="btn btn-sm btn-primary" style="white-space:nowrap" data-action="manage" data-id="'+e.id+'">'+( e.status==='draft'?'Plan &#8594;':'Manage &#8594;')+'</button>'
+   +(e.status==='draft'?'<button class="btn btn-sm" style="background:rgba(52,211,153,0.1);color:var(--green);border:1px solid rgba(52,211,153,0.2);white-space:nowrap" data-action="publish" data-id="'+e.id+'">Publish &#8599;</button>':'')
    +(e.status==='published'?'<button class="btn btn-sm" style="background:#FF6B3520;color:#FF6B35;border:1px solid #FF6B3540;white-space:nowrap" data-action="share" data-id="'+e.id+'">Share</button>':'')
    +(!promoted?'<button class="btn btn-sm" style="background:#f59e0b20;color:#f59e0b;border:1px solid #f59e0b40;white-space:nowrap" data-action="boost" data-id="'+e.id+'">Boost</button>':'')
    +'<button class="btn btn-sm" style="background:#2a0a0a;color:#ef4444;border:1px solid #4a1010;white-space:nowrap" data-action="delete" data-id="'+e.id+'">× Delete</button>'
@@ -2074,7 +2085,7 @@ function openAddEventModal(editEvent){
  '<div class="modal-overlay" onclick="if(event.target===this)closeModal()">'+
  '<div class="modal" style="max-width:600px;width:100%">'+
    '<div class="modal-header">'+
-     '<div class="modal-title">'+(ev?'Edit Event':'List Your Event')+'</div>'+
+     '<div class="modal-title">'+(ev?'Edit Event':'Plan Your Event')+'</div>'+
      '<button onclick="closeModal()" style="background:none;border:none;color:var(--sub);font-size:20px;cursor:pointer">&times;</button>'+
    '</div>'+
    '<div class="modal-body" style="max-height:72vh;overflow-y:auto">'+
@@ -2102,9 +2113,13 @@ function openAddEventModal(editEvent){
      '<div id="tiersList" style="margin-bottom:8px">'+(tiersHtml||'<div id="noTiers" style="background:var(--surface);border:1px dashed var(--border);border-radius:8px;padding:12px;text-align:center;color:var(--muted);font-size:13px">No ticket tiers \u2014 add GA, VIP, etc. or leave blank for a free event</div>')+'</div>'+
      '<div id="evErr" style="color:#ef4444;font-size:13px;margin-bottom:8px;display:none"></div>'+
    '</div>'+
-   '<div class="modal-footer">'+
-     '<button class="btn btn-primary" onclick="submitEvent(\''+(ev?ev.id:'')+'\')">'+( ev?'Save Changes':'Publish Event \u2192')+'</button>'+
+   '<div class="modal-footer" style="display:flex;gap:8px;justify-content:flex-end">'+
      '<button class="btn btn-ghost" onclick="closeModal()">Cancel</button>'+
+     (ev&&ev.status==='published'
+       ? '<button class="btn btn-primary" onclick="window._eventSaveStatus=\'published\';submitEvent(\''+ev.id+'\')" >Save Changes</button>'
+       : '<button class="btn btn-outline" onclick="window._eventSaveStatus=\'draft\';submitEvent(\'"+(ev?ev.id:'')+"\')" >Save as Draft</button>'+
+         '<button class="btn btn-primary" onclick="window._eventSaveStatus=\'published\';submitEvent(\'"+(ev?ev.id:'')+"\')" >Publish to Directory &#8594;</button>'
+     )+
    '</div>'+
  '</div></div>';
 }
@@ -2173,7 +2188,7 @@ async function submitEvent(editId){
    price_min:isFree?null:(priceVals.length?Math.min.apply(null,priceVals):null),
    price_max:isFree?null:(priceVals.length?Math.max.apply(null,priceVals):null),
    is_free:isFree,
-   status:'published',
+   status:window._eventSaveStatus||'draft',
    owner_id:currentUser.id,
    planner_email:currentUser.email,
  };
@@ -2199,8 +2214,15 @@ async function submitEvent(editId){
 
  closeModal();
  await loadData();
- toast(editId?'Event updated!':'\uD83C\uDF89 Event published to CBUSEVENTS!');
- nav('events');
+ const savedEvent=myEvents.find(x=>x.id===eventId)||myEvents[myEvents.length-1];
+ if(savedEvent){
+   toast(window._eventSaveStatus==='published'?'\uD83C\uDF89 Event published!':'Draft saved!');
+   navEventDetail(savedEvent.id);
+ } else {
+   toast('Event saved!');
+   nav('events');
+ }
+ window._eventSaveStatus=null;
 }
 
 // ── DELEGATED EVENT ACTIONS ──────────────────────────────────
@@ -2211,6 +2233,7 @@ document.addEventListener('click', function(e){
   const id = btn.dataset.id;
   if(action==='edit') editEvent(id);
   else if(action==='manage') navEventDetail(id);
+  else if(action==='publish') publishEvent(id);
   else if(action==='share') openShareModal(id);
   else if(action==='boost') openBoostModal(id);
   else if(action==='delete') deleteEvent(id);
