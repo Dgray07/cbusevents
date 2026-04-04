@@ -390,6 +390,7 @@ const VENUE_IMGS={
 
 let currentUser=null,currentPage='home';
 let allVenues=[],myInquiries=[],myEvents=[],allVendors=[];
+let currentEventId=null,eventDetailTab='overview';
 let _initDone=false; // guard against onAuthStateChange double-fire on page load
 
 // ── HELPERS ───────────────────────────────────────────────────
@@ -784,12 +785,434 @@ function nav(page){
  if(page==='dashboard')renderDashboard();
  else if(page==='venues')renderVenues();
  else if(page==='vendors')renderVendors();
+ else if(page==='event-detail')renderEventDetail();
  else if(page==='inquiries')renderInquiries();
  else if(page==='events')renderEvents();
  else if(page==='profile')renderProfile();
  else if(page==='billing')renderBilling();
   else if(page==='payouts')renderPayouts();
   else if(page==='inbox')renderInboxPage();
+}
+
+// ── EVENT DETAIL / MANAGEMENT ────────────────────────────────
+function navEventDetail(id){
+ currentEventId=id;
+ eventDetailTab='overview';
+ nav('event-detail');
+}
+
+async function renderEventDetail(){
+ const e=myEvents.find(x=>x.id===currentEventId);
+ if(!e){nav('events');return;}
+ const publicUrl=`https://cbusevents.com/event.html?id=${e.id}`;
+ const fmt=d=>d?new Date(d).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}):'TBD';
+
+ // Load supporting data in parallel
+ const[{data:budgetRows},{data:guestRows},{data:vendorReqs},{data:alertRows}]=await Promise.all([
+   sb.from('event_budget').select('*').eq('event_id',e.id).order('created_at',{ascending:true}),
+   sb.from('event_rsvps').select('*').eq('event_id',e.id).order('created_at',{ascending:false}),
+   sb.from('vendor_inquiries').select('*').eq('event_id',e.id).order('created_at',{ascending:false}),
+   sb.from('event_alerts').select('*').eq('event_id',e.id).order('created_at',{ascending:false}),
+ ]);
+
+ const budget=budgetRows||[];
+ const guests=guestRows||[];
+ const vendors=vendorReqs||[];
+ const alerts=alertRows||[];
+
+ const totalBudget=budget.reduce((s,r)=>s+(parseFloat(r.estimated)||0),0);
+ const totalActual=budget.reduce((s,r)=>s+(parseFloat(r.actual)||0),0);
+
+ const tabs=['overview','vendors','budget','guests','marketing','alerts'];
+ const tabLabels={overview:'Overview',vendors:`Vendors (${vendors.length})`,budget:'Budget',guests:`Guests (${guests.length})`,marketing:'Marketing',alerts:'Alerts'};
+
+ document.getElementById('app').innerHTML=`
+ <div class="page" style="max-width:900px">
+   <div style="display:flex;align-items:center;gap:12px;margin-bottom:6px">
+     <button onclick="nav('events')" style="background:none;border:none;color:var(--muted);font-size:13px;cursor:pointer;display:flex;align-items:center;gap:4px">
+       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 5l-7 7 7 7"/></svg> My Events
+     </button>
+   </div>
+   <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:20px;flex-wrap:wrap;gap:12px">
+     <div>
+       <h1 style="font-size:24px;font-weight:800;margin-bottom:4px">${e.title}</h1>
+       <div style="color:var(--sub);font-size:13px">${fmt(e.start_time)} · ${e.venues?.name||'Columbus'} · <span class="badge ${e.status==='published'?'badge-green':'badge-muted'}">${e.status}</span></div>
+     </div>
+     <div style="display:flex;gap:8px;flex-wrap:wrap">
+       <a href="${publicUrl}" target="_blank" class="btn btn-ghost btn-sm">View Public Page &#8599;</a>
+       <button class="btn btn-primary btn-sm" onclick="editEvent('${e.id}')">Edit Event</button>
+     </div>
+   </div>
+
+   <!-- Tabs -->
+   <div style="display:flex;gap:2px;border-bottom:1px solid var(--border);margin-bottom:24px;overflow-x:auto;-webkit-overflow-scrolling:touch">
+     ${tabs.map(t=>`<button onclick="eventDetailTab='${t}';renderEventDetailTab('${e.id}')" id="edt-${t}" style="background:none;border:none;border-bottom:2px solid ${t===eventDetailTab?'var(--orange)':'transparent'};color:${t===eventDetailTab?'var(--text)':'var(--sub)'};padding:10px 16px;font-size:13px;font-weight:${t===eventDetailTab?'700':'500'};cursor:pointer;white-space:nowrap;font-family:'DM Sans',sans-serif;transition:all 0.15s">${tabLabels[t]}</button>`).join('')}
+   </div>
+
+   <div id="edtContent"></div>
+ </div>`;
+
+ // Store data on window for tab renders
+ window._edtData={e,budget,guests,vendors,alerts,totalBudget,totalActual,publicUrl};
+ renderEventDetailTab(e.id);
+}
+
+function renderEventDetailTab(eventId){
+ const{e,budget,guests,vendors,alerts,totalBudget,totalActual,publicUrl}=window._edtData;
+ const el=document.getElementById('edtContent');
+ if(!el)return;
+
+ // Update tab styles
+ ['overview','vendors','budget','guests','marketing','alerts'].forEach(t=>{
+   const btn=document.getElementById('edt-'+t);
+   if(!btn)return;
+   btn.style.borderBottomColor=t===eventDetailTab?'var(--orange)':'transparent';
+   btn.style.color=t===eventDetailTab?'var(--text)':'var(--sub)';
+   btn.style.fontWeight=t===eventDetailTab?'700':'500';
+ });
+
+ if(eventDetailTab==='overview') el.innerHTML=renderEdtOverview(e,publicUrl);
+ else if(eventDetailTab==='vendors') el.innerHTML=renderEdtVendors(vendors,eventId);
+ else if(eventDetailTab==='budget') el.innerHTML=renderEdtBudget(budget,totalBudget,totalActual,eventId);
+ else if(eventDetailTab==='guests') el.innerHTML=renderEdtGuests(guests,e);
+ else if(eventDetailTab==='marketing') el.innerHTML=renderEdtMarketing(e,publicUrl);
+ else if(eventDetailTab==='alerts') el.innerHTML=renderEdtAlerts(alerts,eventId);
+}
+
+function renderEdtOverview(e,publicUrl){
+ const fmt=d=>d?new Date(d).toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric'}):'TBD';
+ const fmtT=d=>d?new Date(d).toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'}):'';
+ return`
+ <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px">
+   <div class="card" style="padding:20px">
+     <div style="font-size:11px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:12px">Event Details</div>
+     <div style="display:flex;flex-direction:column;gap:10px">
+       <div><div style="font-size:11px;color:var(--muted)">Date</div><div style="font-weight:600;font-size:14px">${fmt(e.start_time)}</div></div>
+       <div><div style="font-size:11px;color:var(--muted)">Time</div><div style="font-weight:600;font-size:14px">${fmtT(e.start_time)}${e.end_time?' - '+fmtT(e.end_time):''}</div></div>
+       <div><div style="font-size:11px;color:var(--muted)">Venue</div><div style="font-weight:600;font-size:14px">${e.venues?.name||e.venue_name_override||'TBD'}</div></div>
+       <div><div style="font-size:11px;color:var(--muted)">Category</div><div style="font-weight:600;font-size:14px">${e.category||'—'}</div></div>
+       <div><div style="font-size:11px;color:var(--muted)">Entry</div><div style="font-weight:600;font-size:14px">${e.is_free?'Free':'Paid'}</div></div>
+     </div>
+   </div>
+   <div class="card" style="padding:20px">
+     <div style="font-size:11px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:12px">Public Link</div>
+     <div style="background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:10px 12px;font-size:12px;color:var(--sub);word-break:break-all;margin-bottom:12px">${publicUrl}</div>
+     <button class="btn btn-primary btn-sm" style="width:100%;margin-bottom:8px" onclick="navigator.clipboard.writeText('${publicUrl}');toast('Link copied!')">Copy Link</button>
+     <a href="${publicUrl}" target="_blank" class="btn btn-ghost btn-sm" style="width:100%;text-align:center;display:block">Open Public Page &#8599;</a>
+   </div>
+ </div>
+ ${e.description?`<div class="card" style="padding:20px;margin-bottom:16px"><div style="font-size:11px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:10px">Description</div><p style="font-size:14px;color:var(--sub);line-height:1.7">${e.description}</p></div>`:''}
+ <div style="display:flex;gap:10px;flex-wrap:wrap">
+   <button class="btn btn-ghost btn-sm" onclick="eventDetailTab='vendors';renderEventDetailTab('${e.id}')">Manage Vendors</button>
+   <button class="btn btn-ghost btn-sm" onclick="eventDetailTab='budget';renderEventDetailTab('${e.id}')">Track Budget</button>
+   <button class="btn btn-ghost btn-sm" onclick="eventDetailTab='guests';renderEventDetailTab('${e.id}')">View Guests</button>
+   <button class="btn btn-primary btn-sm" onclick="eventDetailTab='marketing';renderEventDetailTab('${e.id}')">Marketing Tools</button>
+ </div>`;
+}
+
+function renderEdtVendors(vendors,eventId){
+ const statusColor={confirmed:'badge-green',pending:'badge-orange',declined:'badge-muted'};
+ return`
+ <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+   <div style="font-size:14px;color:var(--sub)">${vendors.length} vendor${vendors.length!==1?'s':''} contacted</div>
+   <button class="btn btn-primary btn-sm" onclick="nav('vendors')">+ Find Vendors</button>
+ </div>
+ ${vendors.length?vendors.map(v=>`
+ <div class="card" style="padding:16px 20px;margin-bottom:10px;display:flex;align-items:center;gap:16px;flex-wrap:wrap">
+   <div style="flex:1;min-width:0">
+     <div style="font-weight:700;font-size:14px;margin-bottom:3px">${v.vendor_name||'Vendor'}</div>
+     <div style="font-size:12px;color:var(--sub)">${v.event_name||''} · Sent ${new Date(v.created_at).toLocaleDateString()}</div>
+     ${v.message?`<div style="font-size:12px;color:var(--muted);margin-top:4px;display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;overflow:hidden">${v.message}</div>`:''}
+   </div>
+   <div style="display:flex;align-items:center;gap:8px;flex-shrink:0">
+     <span class="badge ${statusColor[v.status]||'badge-orange'}">${v.status||'pending'}</span>
+     <select onchange="updateVendorInquiryStatus('${v.id}',this.value)" style="background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:4px 8px;color:var(--text);font-size:12px;font-family:'DM Sans',sans-serif">
+       <option ${v.status==='pending'?'selected':''}>pending</option>
+       <option ${v.status==='confirmed'?'selected':''}>confirmed</option>
+       <option ${v.status==='declined'?'selected':''}>declined</option>
+     </select>
+   </div>
+ </div>`).join(''):`
+ <div class="empty" style="border:1px solid var(--border);border-radius:14px">
+   <div class="empty-icon">🤝</div>
+   <h3>No vendors contacted yet</h3>
+   <p style="font-size:13px;margin-bottom:16px">Browse the vendor directory and send inquiries</p>
+   <button class="btn btn-primary" onclick="nav('vendors')">Find Vendors &#8594;</button>
+ </div>`}`;
+}
+
+function renderEdtBudget(budget,totalBudget,totalActual,eventId){
+ const diff=totalActual-totalBudget;
+ return`
+ <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px">
+   <div class="stat-card"><div class="stat-num">$${totalBudget.toFixed(0)}</div><div class="stat-label">Estimated</div></div>
+   <div class="stat-card"><div class="stat-num">$${totalActual.toFixed(0)}</div><div class="stat-label">Actual Spent</div></div>
+   <div class="stat-card"><div class="stat-num" style="color:${diff>0?'var(--red)':'var(--green)'}">${diff>0?'+':'-'}$${Math.abs(diff).toFixed(0)}</div><div class="stat-label">${diff>0?'Over Budget':'Under Budget'}</div></div>
+ </div>
+ <div class="card" style="margin-bottom:16px">
+   <div class="card-header">
+     <div class="card-title">Budget Line Items</div>
+     <button class="btn btn-primary btn-sm" onclick="openBudgetModal('${eventId}')">+ Add Item</button>
+   </div>
+   <div style="overflow-x:auto">
+     <table style="width:100%;border-collapse:collapse">
+       <thead><tr style="border-bottom:1px solid var(--border)">
+         <th style="text-align:left;padding:10px 16px;font-size:11px;color:var(--muted);font-weight:600;text-transform:uppercase">Item</th>
+         <th style="text-align:left;padding:10px 16px;font-size:11px;color:var(--muted);font-weight:600;text-transform:uppercase">Category</th>
+         <th style="text-align:right;padding:10px 16px;font-size:11px;color:var(--muted);font-weight:600;text-transform:uppercase">Estimated</th>
+         <th style="text-align:right;padding:10px 16px;font-size:11px;color:var(--muted);font-weight:600;text-transform:uppercase">Actual</th>
+         <th style="padding:10px 16px"></th>
+       </tr></thead>
+       <tbody>
+         ${budget.map(r=>`<tr style="border-bottom:1px solid var(--border-sub)">
+           <td style="padding:12px 16px;font-size:14px;font-weight:500">${r.item}</td>
+           <td style="padding:12px 16px;font-size:12px;color:var(--sub)">${r.category||'—'}</td>
+           <td style="padding:12px 16px;text-align:right;font-size:14px">$${parseFloat(r.estimated||0).toFixed(0)}</td>
+           <td style="padding:12px 16px;text-align:right;font-size:14px;color:${parseFloat(r.actual||0)>parseFloat(r.estimated||0)?'var(--red)':'var(--text)'}">$${parseFloat(r.actual||0).toFixed(0)}</td>
+           <td style="padding:12px 16px;text-align:right"><button onclick="deleteBudgetItem('${r.id}')" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:16px">&times;</button></td>
+         </tr>`).join('')}
+         ${!budget.length?`<tr><td colspan="5" style="padding:32px;text-align:center;color:var(--muted);font-size:13px">No budget items yet. Add your first line item.</td></tr>`:''}
+       </tbody>
+     </table>
+   </div>
+ </div>`;
+}
+
+function renderEdtGuests(guests,e){
+ const confirmed=guests.filter(g=>g.status==='confirmed').length;
+ const publicUrl=`https://cbusevents.com/event.html?id=${e.id}`;
+ return`
+ <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px">
+   <div class="stat-card"><div class="stat-num">${guests.length}</div><div class="stat-label">Total RSVPs</div></div>
+   <div class="stat-card"><div class="stat-num" style="color:var(--green)">${confirmed}</div><div class="stat-label">Confirmed</div></div>
+   <div class="stat-card"><div class="stat-num">${guests.length-confirmed}</div><div class="stat-label">Pending</div></div>
+ </div>
+ <div class="card" style="margin-bottom:16px">
+   <div class="card-header">
+     <div class="card-title">Guest List</div>
+     <button class="btn btn-ghost btn-sm" onclick="exportGuests()">Export CSV</button>
+   </div>
+   ${guests.length?`<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse">
+     <thead><tr style="border-bottom:1px solid var(--border)">
+       <th style="text-align:left;padding:10px 16px;font-size:11px;color:var(--muted);font-weight:600;text-transform:uppercase">Name</th>
+       <th style="text-align:left;padding:10px 16px;font-size:11px;color:var(--muted);font-weight:600;text-transform:uppercase">Email</th>
+       <th style="text-align:left;padding:10px 16px;font-size:11px;color:var(--muted);font-weight:600;text-transform:uppercase">Phone</th>
+       <th style="text-align:left;padding:10px 16px;font-size:11px;color:var(--muted);font-weight:600;text-transform:uppercase">Status</th>
+       <th style="text-align:left;padding:10px 16px;font-size:11px;color:var(--muted);font-weight:600;text-transform:uppercase">RSVP'd</th>
+     </tr></thead>
+     <tbody>${guests.map(g=>`<tr style="border-bottom:1px solid var(--border-sub)">
+       <td style="padding:12px 16px;font-size:14px;font-weight:500">${g.name||'—'}</td>
+       <td style="padding:12px 16px;font-size:13px;color:var(--sub)">${g.email||'—'}</td>
+       <td style="padding:12px 16px;font-size:13px;color:var(--sub)">${g.phone||'—'}</td>
+       <td style="padding:12px 16px"><span class="badge ${g.status==='confirmed'?'badge-green':'badge-orange'}">${g.status||'pending'}</span></td>
+       <td style="padding:12px 16px;font-size:12px;color:var(--muted)">${new Date(g.created_at).toLocaleDateString()}</td>
+     </tr>`).join('')}</tbody>
+   </table></div>`:`
+   <div class="empty">
+     <div class="empty-icon">👥</div>
+     <h3>No RSVPs yet</h3>
+     <p style="font-size:13px;margin-bottom:16px">Share your event link to start collecting RSVPs</p>
+     <button class="btn btn-primary" onclick="navigator.clipboard.writeText('${publicUrl}');toast('Link copied!')">Copy Event Link</button>
+   </div>`}
+ </div>`;
+}
+
+function renderEdtMarketing(e,publicUrl){
+ const caption=`🎉 ${e.title} is happening in Columbus!\n\n📅 ${e.start_time?new Date(e.start_time).toLocaleDateString('en-US',{month:'long',day:'numeric'}):'Coming soon'}\n📍 ${e.venues?.name||'Columbus, OH'}\n${e.is_free?'✅ Free entry!':'🎟️ Get your tickets!'}\n\n👉 RSVP & details: ${publicUrl}\n\n#Columbus #ColumbusEvents #CBUSEvents #Ohio`;
+ const inviteMsg=`You're invited to ${e.title}!\n\n📅 ${e.start_time?new Date(e.start_time).toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'}):'Date TBD'}\n📍 ${e.venues?.name||'Columbus, OH'}\n${e.description?'\n'+e.description.substring(0,200)+'...\n':''}\n${e.is_free?'Free to attend!':'Tickets available online.'}\n\nRSVP here: ${publicUrl}`;
+ return`
+ <div style="display:flex;flex-direction:column;gap:16px">
+   <div class="card" style="padding:20px">
+     <div style="font-weight:700;font-size:15px;margin-bottom:4px">Event Link</div>
+     <div style="color:var(--sub);font-size:12px;margin-bottom:12px">Share this link anywhere to drive RSVPs and ticket sales</div>
+     <div style="background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:10px 14px;font-size:13px;color:var(--sub);word-break:break-all;margin-bottom:10px">${publicUrl}</div>
+     <div style="display:flex;gap:8px;flex-wrap:wrap">
+       <button class="btn btn-primary btn-sm" onclick="navigator.clipboard.writeText('${publicUrl}');toast('Copied!')">Copy Link</button>
+       <a href="https://twitter.com/intent/tweet?text=${encodeURIComponent(e.title+' - Columbus event! '+publicUrl)}" target="_blank" class="btn btn-ghost btn-sm">Share on X</a>
+       <a href="https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(publicUrl)}" target="_blank" class="btn btn-ghost btn-sm">Share on Facebook</a>
+     </div>
+   </div>
+
+   <div class="card" style="padding:20px">
+     <div style="font-weight:700;font-size:15px;margin-bottom:4px">Instagram / Social Caption</div>
+     <div style="color:var(--sub);font-size:12px;margin-bottom:12px">Ready-to-post caption with hashtags</div>
+     <textarea id="mktCaption" style="width:100%;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:12px;color:var(--text);font-size:13px;line-height:1.6;min-height:160px;resize:vertical;font-family:'DM Sans',sans-serif">${caption}</textarea>
+     <button class="btn btn-primary btn-sm" style="margin-top:10px" onclick="navigator.clipboard.writeText(document.getElementById('mktCaption').value);toast('Caption copied!')">Copy Caption</button>
+   </div>
+
+   <div class="card" style="padding:20px">
+     <div style="font-weight:700;font-size:15px;margin-bottom:4px">Invitation Message</div>
+     <div style="color:var(--sub);font-size:12px;margin-bottom:12px">Send via text, email, or DM</div>
+     <textarea id="mktInvite" style="width:100%;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:12px;color:var(--text);font-size:13px;line-height:1.6;min-height:160px;resize:vertical;font-family:'DM Sans',sans-serif">${inviteMsg}</textarea>
+     <button class="btn btn-primary btn-sm" style="margin-top:10px" onclick="navigator.clipboard.writeText(document.getElementById('mktInvite').value);toast('Message copied!')">Copy Message</button>
+   </div>
+
+   <div class="card" style="padding:20px;border-color:rgba(255,107,53,0.2)">
+     <div style="display:flex;justify-content:space-between;align-items:center">
+       <div>
+         <div style="font-weight:700;font-size:15px;margin-bottom:4px">Custom Invitation Page <span class="badge badge-orange" style="margin-left:8px">Standard</span></div>
+         <div style="color:var(--sub);font-size:12px">A branded landing page with RSVP form, your event photo, and lineup. Shareable link, SEO-indexed.</div>
+       </div>
+       <button class="btn btn-primary btn-sm" onclick="nav('billing')">Upgrade</button>
+     </div>
+   </div>
+ </div>`;
+}
+
+function renderEdtAlerts(alerts,eventId){
+ return`
+ <div style="display:flex;flex-direction:column;gap:16px">
+   <div class="card" style="padding:20px">
+     <div style="font-weight:700;font-size:15px;margin-bottom:4px">Event Alerts</div>
+     <div style="color:var(--sub);font-size:13px;margin-bottom:16px">Set up text alerts to send attendees for reminders, updates, or day-of info. SMS delivery coming soon.</div>
+     <button class="btn btn-primary btn-sm" onclick="openAlertModal('${eventId}')">+ Create Alert</button>
+   </div>
+
+   ${alerts.length?alerts.map(a=>`
+   <div class="card" style="padding:16px 20px;display:flex;align-items:center;gap:16px">
+     <div style="flex:1;min-width:0">
+       <div style="font-weight:600;font-size:14px;margin-bottom:3px">${a.title||'Alert'}</div>
+       <div style="font-size:12px;color:var(--sub);margin-bottom:4px">${a.message||''}</div>
+       <div style="font-size:11px;color:var(--muted)">Scheduled: ${a.send_at?new Date(a.send_at).toLocaleString():'Manual send'} · ${a.recipient_type||'all attendees'}</div>
+     </div>
+     <span class="badge ${a.status==='sent'?'badge-green':a.status==='scheduled'?'badge-blue':'badge-muted'}">${a.status||'draft'}</span>
+   </div>`).join(''):`
+   <div class="empty" style="border:1px solid var(--border);border-radius:14px">
+     <div class="empty-icon">🔔</div>
+     <h3>No alerts set up</h3>
+     <p style="font-size:13px">Create a reminder or day-of update alert for your attendees</p>
+   </div>`}
+ </div>`;
+}
+
+// ── BUDGET ACTIONS ────────────────────────────────────────────
+function openBudgetModal(eventId){
+ const cats=['Venue','Food & Beverage','Entertainment','Marketing','Staffing','Equipment','Permits','Miscellaneous'];
+ document.getElementById('modalContainer').innerHTML=`
+ <div class="modal-overlay" onclick="if(event.target===this)closeModal()">
+   <div class="modal">
+     <div class="modal-header">
+       <div class="modal-title">Add Budget Item</div>
+       <button onclick="closeModal()" style="background:none;border:none;color:var(--muted);font-size:20px;cursor:pointer">&times;</button>
+     </div>
+     <div class="modal-body" style="display:flex;flex-direction:column;gap:12px">
+       <div class="field"><label>Item Name *</label><input id="bItem" placeholder="e.g. Venue deposit, DJ fee, Flyers..."></div>
+       <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+         <div class="field"><label>Category</label>
+           <select id="bCat">${cats.map(c=>`<option>${c}</option>`).join('')}</select>
+         </div>
+         <div class="field"><label>Estimated Cost</label><input id="bEst" type="number" placeholder="0.00"></div>
+       </div>
+       <div class="field"><label>Actual Cost (if paid)</label><input id="bActual" type="number" placeholder="0.00"></div>
+       <div class="field"><label>Notes</label><input id="bNotes" placeholder="Optional notes"></div>
+       <div id="bErr" style="color:var(--red);font-size:12px;display:none"></div>
+     </div>
+     <div class="modal-footer">
+       <button class="btn btn-outline" onclick="closeModal()">Cancel</button>
+       <button class="btn btn-primary" onclick="saveBudgetItem('${eventId}')">Add Item</button>
+     </div>
+   </div>
+ </div>`;
+}
+
+async function saveBudgetItem(eventId){
+ const item=document.getElementById('bItem').value.trim();
+ if(!item){document.getElementById('bErr').textContent='Item name required';document.getElementById('bErr').style.display='block';return;}
+ const{error}=await sb.from('event_budget').insert({
+   event_id:eventId,
+   planner_id:currentUser.id,
+   item,
+   category:document.getElementById('bCat').value,
+   estimated:parseFloat(document.getElementById('bEst').value)||0,
+   actual:parseFloat(document.getElementById('bActual').value)||0,
+   notes:document.getElementById('bNotes').value.trim()||null,
+ });
+ if(error){document.getElementById('bErr').textContent='Error saving. Try again.';document.getElementById('bErr').style.display='block';return;}
+ closeModal();
+ toast('Budget item added!');
+ renderEventDetail();
+}
+
+async function deleteBudgetItem(id){
+ if(!confirm('Remove this budget item?'))return;
+ await sb.from('event_budget').delete().eq('id',id);
+ toast('Item removed');
+ renderEventDetail();
+}
+
+// ── ALERT MODAL ───────────────────────────────────────────────
+function openAlertModal(eventId){
+ document.getElementById('modalContainer').innerHTML=`
+ <div class="modal-overlay" onclick="if(event.target===this)closeModal()">
+   <div class="modal">
+     <div class="modal-header">
+       <div class="modal-title">Create Event Alert</div>
+       <button onclick="closeModal()" style="background:none;border:none;color:var(--muted);font-size:20px;cursor:pointer">&times;</button>
+     </div>
+     <div class="modal-body" style="display:flex;flex-direction:column;gap:12px">
+       <div class="field"><label>Alert Title *</label><input id="altTitle" placeholder="e.g. Event starts in 1 hour!"></div>
+       <div class="field"><label>Message *</label><textarea id="altMsg" style="min-height:80px" placeholder="What do you want to tell your attendees?"></textarea></div>
+       <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+         <div class="field"><label>Send To</label>
+           <select id="altRecip">
+             <option value="all">All attendees</option>
+             <option value="confirmed">Confirmed only</option>
+             <option value="vendors">Vendors only</option>
+           </select>
+         </div>
+         <div class="field"><label>Schedule (optional)</label><input type="datetime-local" id="altTime"></div>
+       </div>
+       <div style="background:rgba(255,107,53,0.06);border:1px solid rgba(255,107,53,0.15);border-radius:8px;padding:12px;font-size:12px;color:var(--sub)">
+         SMS delivery is coming soon. Alerts are saved and queued now - attendees will be notified once connected.
+       </div>
+       <div id="altErr" style="color:var(--red);font-size:12px;display:none"></div>
+     </div>
+     <div class="modal-footer">
+       <button class="btn btn-outline" onclick="closeModal()">Cancel</button>
+       <button class="btn btn-primary" onclick="saveAlert('${eventId}')">Save Alert</button>
+     </div>
+   </div>
+ </div>`;
+}
+
+async function saveAlert(eventId){
+ const title=document.getElementById('altTitle').value.trim();
+ const msg=document.getElementById('altMsg').value.trim();
+ if(!title||!msg){document.getElementById('altErr').textContent='Title and message required';document.getElementById('altErr').style.display='block';return;}
+ const{error}=await sb.from('event_alerts').insert({
+   event_id:eventId,
+   planner_id:currentUser.id,
+   title,
+   message:msg,
+   recipient_type:document.getElementById('altRecip').value,
+   send_at:document.getElementById('altTime').value||null,
+   status:'draft',
+ });
+ if(error){document.getElementById('altErr').textContent='Error saving.';document.getElementById('altErr').style.display='block';return;}
+ closeModal();
+ toast('Alert saved!');
+ renderEventDetail();
+}
+
+// ── VENDOR STATUS UPDATE ──────────────────────────────────────
+async function updateVendorInquiryStatus(inquiryId,status){
+ await sb.from('vendor_inquiries').update({status}).eq('id',inquiryId);
+ toast('Status updated');
+ // Refresh vendor data in window._edtData
+ const{data}=await sb.from('vendor_inquiries').select('*').eq('event_id',currentEventId).order('created_at',{ascending:false});
+ if(window._edtData)window._edtData.vendors=data||[];
+}
+
+// ── GUEST EXPORT ──────────────────────────────────────────────
+function exportGuests(){
+ const guests=window._edtData?.guests||[];
+ if(!guests.length){toast('No guests to export','error');return;}
+ const rows=[['Name','Email','Phone','Status','RSVP Date'],...guests.map(g=>[g.name||'',g.email||'',g.phone||'',g.status||'',new Date(g.created_at).toLocaleDateString()])];
+ const csv=rows.map(r=>r.map(v=>`"${v}"`).join(',')).join('\n');
+ const a=document.createElement('a');
+ a.href='data:text/csv;charset=utf-8,'+encodeURIComponent(csv);
+ a.download=`guests-${window._edtData?.e?.title||'event'}.csv`;
+ a.click();
 }
 
 // ── VENDORS ──────────────────────────────────────────────────
@@ -1575,6 +1998,7 @@ function eventItemHTML(e){
    +'<div style="display:flex;flex-direction:column;gap:6px;align-items:flex-end;flex-shrink:0">'
    +'<span class="badge '+(e.status==='published'?'badge-green':'badge-muted')+'">'+e.status+'</span>'
    +'<button class="btn btn-sm" style="background:#1a1a24;color:#e8e8f0;border:1px solid #25252f;white-space:nowrap" data-action="edit" data-id="'+e.id+'">Edit</button>'
+   +'<button class="btn btn-sm btn-primary" style="white-space:nowrap" data-action="manage" data-id="'+e.id+'">Manage &#8594;</button>'
    +(e.status==='published'?'<button class="btn btn-sm" style="background:#FF6B3520;color:#FF6B35;border:1px solid #FF6B3540;white-space:nowrap" data-action="share" data-id="'+e.id+'">Share</button>':'')
    +(!promoted?'<button class="btn btn-sm" style="background:#f59e0b20;color:#f59e0b;border:1px solid #f59e0b40;white-space:nowrap" data-action="boost" data-id="'+e.id+'">Boost</button>':'')
    +'<button class="btn btn-sm" style="background:#2a0a0a;color:#ef4444;border:1px solid #4a1010;white-space:nowrap" data-action="delete" data-id="'+e.id+'">× Delete</button>'
@@ -1786,6 +2210,7 @@ document.addEventListener('click', function(e){
   const action = btn.dataset.action;
   const id = btn.dataset.id;
   if(action==='edit') editEvent(id);
+  else if(action==='manage') navEventDetail(id);
   else if(action==='share') openShareModal(id);
   else if(action==='boost') openBoostModal(id);
   else if(action==='delete') deleteEvent(id);
