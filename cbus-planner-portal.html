@@ -688,7 +688,7 @@ async function loadData(){
  sb.from('venues').select('*').eq('status','approved').order('tier',{ascending:false}),
  sb.from('inquiries').select('*,venues(name,venue_type,neighborhood)').eq('email',currentUser.email).order('created_at',{ascending:false}),
  sb.from('events').select('*,venues(name)').eq('status','published').gte('start_time',new Date().toISOString()).order('start_time',{ascending:true}),
- sb.from('vendors').select('id,business_name,description,services,portfolio_photos,subscription_tier,instagram,email,city').in('subscription_tier',['STANDARD','PREMIUM']).order('subscription_tier',{ascending:false}),
+ sb.from('vendors').select('id,business_name,description,services,portfolio_photos,subscription_tier,instagram,email,city').order('subscription_tier',{ascending:false}),
  ]);
  allVenues=vRes.data||[];
  myInquiries=iRes.data||[];
