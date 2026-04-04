@@ -2117,8 +2117,8 @@ function openAddEventModal(editEvent){
      '<button class="btn btn-ghost" onclick="closeModal()">Cancel</button>'+
      (ev&&ev.status==='published'
        ? '<button class="btn btn-primary" onclick="window._eventSaveStatus=\'published\';submitEvent(\''+ev.id+'\')" >Save Changes</button>'
-       : '<button class="btn btn-outline" onclick="window._eventSaveStatus=\'draft\';submitEvent(\'"+(ev?ev.id:'')+"\')" >Save as Draft</button>'+
-         '<button class="btn btn-primary" onclick="window._eventSaveStatus=\'published\';submitEvent(\'"+(ev?ev.id:'')+"\')" >Publish to Directory &#8594;</button>'
+       : '<button class="btn btn-outline" onclick="window._eventSaveStatus=\'draft\';submitEvent(\''+( ev?ev.id:'')+'\')">Save as Draft</button>'+
+         '<button class="btn btn-primary" onclick="window._eventSaveStatus=\'published\';submitEvent(\''+( ev?ev.id:'')+'\')">Publish to Directory &#8594;</button>'
      )+
    '</div>'+
  '</div></div>';
