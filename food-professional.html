@@ -1721,12 +1721,8 @@ async function loadApp() {
     const urlPrev = document.getElementById('storefront-url-preview');
     if (urlPrev) urlPrev.textContent = `cbusevents.com/fp-storefront.html?u=${currentUser.id.slice(0,8)}...`;
   }
-  // Show Stripe onboarding banner if not yet connected
-  const stripeBanner = document.getElementById('stripe-onboarding-banner');
-  if (stripeBanner) {
-    const hasStripe = currentProfile?.stripe_account_id;
-    stripeBanner.style.display = hasStripe ? 'none' : 'block';
-  }
+  // Show Stripe onboarding banner — check live status from stripe_connect_accounts
+  await refreshStripeStatus();
 }
 
 // ── MENU ──
@@ -2090,20 +2086,44 @@ async function startStripeOnboarding() {
   }
 }
 
+async function refreshStripeStatus() {
+  const banner = document.getElementById('stripe-onboarding-banner');
+  if (!banner || !currentUser) return;
+  try {
+    const session = (await db.auth.getSession()).data.session;
+    if (!session) return;
+    const res = await fetch('https://toblgvatvsjljbqogzsv.supabase.co/functions/v1/stripe-connect-onboard', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRvYmxndmF0dnNqbGpicW9nenN2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMDgwNTAsImV4cCI6MjA4NzY4NDA1MH0._WJEQPizNDiQfDXQB_DHPaQhixPGpMdmYQSmyWmm_FQ',
+        'Authorization': `Bearer ${session.access_token}`
+      },
+      body: JSON.stringify({ action: 'status', role: 'food_professional' })
+    });
+    const data = await res.json();
+    banner.style.display = data.connected ? 'none' : 'block';
+  } catch(e) {
+    banner.style.display = 'block'; // safe default — show setup prompt
+  }
+}
+
 async function checkStripeReturn() {
   const params = new URLSearchParams(window.location.search);
-  if (params.get('stripe') !== 'return') return;
-  // Clean URL
+  const stripeParam = params.get('stripe');
+  if (!stripeParam) return;
   window.history.replaceState({}, '', window.location.pathname);
+  if (stripeParam === 'refresh') {
+    showToast('Please complete your Stripe setup.', 'error');
+    return;
+  }
   showToast('Checking your Stripe account...', 'success');
-  // Re-fetch profile to get updated stripe_account_id
-  const { data: prof } = await db.from('food_professionals').select('stripe_account_id').eq('user_id', currentUser.id).single();
-  if (prof?.stripe_account_id) {
-    const banner = document.getElementById('stripe-onboarding-banner');
-    if (banner) banner.style.display = 'none';
+  await refreshStripeStatus();
+  const banner = document.getElementById('stripe-onboarding-banner');
+  if (banner && banner.style.display === 'none') {
     showToast('Stripe connected! Payouts are active.', 'success');
   } else {
-    showToast('Stripe setup incomplete. Please try again or contact support.', 'error');
+    showToast('Stripe setup incomplete. Please try again.', 'error');
   }
 }
 
