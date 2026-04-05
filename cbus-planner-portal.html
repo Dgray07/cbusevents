@@ -1390,7 +1390,7 @@ async function submitVendorInquiry(vendorId, vendorEmail){
 
 // ── BILLING ───────────────────────────────────────────────────
 const SB_FUNCTIONS_URL='https://toblgvatvsjljbqogzsv.supabase.co/functions/v1';
-const CONNECT_FN=SB_FUNCTIONS_URL+'/stripe-connect-onboard';
+const CONNECT_FN=SB_FUNCTIONS_URL+'/stripeconnectonboard';
 
 async function getAuthToken(){
   const s=await sb.auth.getSession();

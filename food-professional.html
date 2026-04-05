@@ -1721,8 +1721,9 @@ async function loadApp() {
     const urlPrev = document.getElementById('storefront-url-preview');
     if (urlPrev) urlPrev.textContent = `cbusevents.com/fp-storefront.html?u=${currentUser.id.slice(0,8)}...`;
   }
-  // Show Stripe onboarding banner — check live status from stripe_connect_accounts
-  await refreshStripeStatus();
+  // Show Stripe onboarding banner — deferred so it doesn't block page load
+  // or poison the CORS preflight cache on session start
+  setTimeout(() => refreshStripeStatus(), 2000);
 }
 
 // ── MENU ──
@@ -2064,7 +2065,7 @@ async function startStripeOnboarding() {
   try {
     const session = (await db.auth.getSession()).data.session;
     if (!session) { showToast('Please sign in first', 'error'); btn.disabled = false; btn.textContent = 'Set Up Payouts →'; return; }
-    const res = await fetch('https://toblgvatvsjljbqogzsv.supabase.co/functions/v1/stripe-connect-onboard', {
+    const res = await fetch('https://toblgvatvsjljbqogzsv.supabase.co/functions/v1/stripeconnectonboard', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -2093,7 +2094,7 @@ async function refreshStripeStatus() {
   try {
     const session = (await db.auth.getSession()).data.session;
     if (!session) return;
-    const res = await fetch('https://toblgvatvsjljbqogzsv.supabase.co/functions/v1/stripe-connect-onboard', {
+    const res = await fetch('https://toblgvatvsjljbqogzsv.supabase.co/functions/v1/stripeconnectonboard', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
