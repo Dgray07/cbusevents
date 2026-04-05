@@ -2081,7 +2081,8 @@ async function startStripeOnboarding() {
       btn.disabled = false; btn.textContent = 'Set Up Payouts →';
     }
   } catch(e) {
-    showToast('Could not connect to Stripe. Check your connection.', 'error');
+    console.error('Stripe onboard error:', e);
+    showToast('Error: ' + (e?.message || String(e)), 'error');
     btn.disabled = false; btn.textContent = 'Set Up Payouts →';
   }
 }
