@@ -385,8 +385,22 @@ async function loadEvent() {
   // ── HERO ──
   const hero = document.getElementById('eventHero');
   if (event.cover_image_url) {
-    hero.innerHTML = `<img class="event-hero-img" src="${event.cover_image_url}" alt="${event.title}" onerror="this.parentNode.innerHTML='<div class=event-hero-fallback></div>'">
+    hero.innerHTML = `<img class="event-hero-img" id="heroImg" src="${event.cover_image_url}" alt="${event.title}" onerror="this.parentNode.innerHTML='<div class=event-hero-fallback></div>'">
       <div class="event-hero-overlay"></div>`;
+    // Adjust layout for portrait flyers — show full image instead of cropping
+    const heroImg = document.getElementById('heroImg');
+    if (heroImg) {
+      heroImg.onload = function() {
+        const ratio = this.naturalWidth / this.naturalHeight;
+        if (ratio < 0.85) {
+          // Portrait image — show full flyer, no crop
+          hero.style.height = 'auto';
+          hero.style.maxHeight = '80vh';
+          this.style.objectFit = 'contain';
+          this.style.background = '#080810';
+        }
+      };
+    }
   }
   if (isThisWeek(event.start_time)) {
     const badge = document.createElement('div');
