@@ -1313,11 +1313,11 @@ function renderAdminTiers() {
   }
   list.innerHTML = adminTiers.map((t, i) => `
     <div style="display:grid;grid-template-columns:1fr 80px 80px 32px;gap:8px;align-items:center;background:#1a1a2a;border:1px solid #25252f;border-radius:8px;padding:10px 12px;">
-      <input value="${t.name}" placeholder="Tier name (e.g. General)" onchange="adminTiers[${i}].name=this.value"
+      <input value="${t.name}" placeholder="Tier name (e.g. General)" oninput="adminTiers[${i}].name=this.value"
         style="background:#0d0d18;border:1px solid #25252f;border-radius:6px;padding:6px 8px;color:#f0f0fa;font-size:13px;font-family:'DM Sans',sans-serif;outline:none;"/>
-      <input value="${t.price}" placeholder="Price" type="number" min="0" step="0.01" onchange="adminTiers[${i}].price=this.value"
+      <input value="${t.price}" placeholder="Price" type="number" min="0" step="0.01" oninput="adminTiers[${i}].price=this.value"
         style="background:#0d0d18;border:1px solid #25252f;border-radius:6px;padding:6px 8px;color:#f0f0fa;font-size:13px;font-family:'DM Sans',sans-serif;outline:none;"/>
-      <input value="${t.capacity}" placeholder="Cap" type="number" min="1" onchange="adminTiers[${i}].capacity=this.value"
+      <input value="${t.capacity}" placeholder="Cap" type="number" min="1" oninput="adminTiers[${i}].capacity=this.value"
         style="background:#0d0d18;border:1px solid #25252f;border-radius:6px;padding:6px 8px;color:#f0f0fa;font-size:13px;font-family:'DM Sans',sans-serif;outline:none;"/>
       <button onclick="adminTiers.splice(${i},1);renderAdminTiers()"
         style="background:rgba(239,68,68,0.1);color:#ef4444;border:1px solid rgba(239,68,68,0.2);border-radius:6px;padding:4px 8px;cursor:pointer;font-size:14px;font-weight:700;">×</button>
@@ -1378,20 +1378,36 @@ async function saveEventEdit(){
   }
   if(error){msg.style.color='#ef4444';msg.textContent='Error: '+error.message;return;}
 
-  // Save ticket tiers
+  // Save ticket tiers — read directly from DOM to catch any unfired oninput events
   const savedEventId = editingEventId || (await sb.from('events').select('id').eq('title', title).order('created_at', {ascending:false}).limit(1).maybeSingle()).data?.id;
-  if (savedEventId && adminTiers.length > 0) {
+  if (savedEventId) {
+    // Sync DOM values into adminTiers before saving
+    const tierDivs = document.querySelectorAll('#ee-tiers-list > div');
+    tierDivs.forEach((div, i) => {
+      const inputs = div.querySelectorAll('input');
+      if (inputs[0]) adminTiers[i].name = inputs[0].value.trim();
+      if (inputs[1]) adminTiers[i].price = inputs[1].value;
+      if (inputs[2]) adminTiers[i].capacity = inputs[2].value;
+    });
+    const validTiers = adminTiers.filter(t => t.name && t.price !== '');
     await sb.from('ticket_tiers').delete().eq('event_id', savedEventId);
-    const tierRows = adminTiers.map(t => ({
-      event_id: savedEventId,
-      name: t.name,
-      price: parseFloat(t.price) || 0,
-      capacity: t.capacity ? parseInt(t.capacity) : null,
-    }));
-    await sb.from('ticket_tiers').insert(tierRows);
-  } else if (savedEventId && adminTiers.length === 0) {
-    // If all tiers removed, delete existing ones
-    await sb.from('ticket_tiers').delete().eq('event_id', savedEventId);
+    if (validTiers.length > 0) {
+      const tierRows = validTiers.map(t => ({
+        event_id: savedEventId,
+        name: t.name,
+        price: parseFloat(t.price) || 0,
+        capacity: t.capacity ? parseInt(t.capacity) : null,
+      }));
+      const { error: tierErr } = await sb.from('ticket_tiers').insert(tierRows);
+      if (tierErr) { msg.style.color='#ef4444'; msg.textContent='Tiers error: '+tierErr.message; return; }
+      // Update event is_free and price_min to match tiers
+      const minTierPrice = Math.min(...validTiers.map(t => parseFloat(t.price) || 0));
+      await sb.from('events').update({
+        is_free: minTierPrice === 0,
+        price_min: minTierPrice,
+        price_max: Math.max(...validTiers.map(t => parseFloat(t.price) || 0)),
+      }).eq('id', savedEventId);
+    }
   }
 
   msg.style.color='var(--green)';msg.textContent='✓ Saved!';
