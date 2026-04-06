@@ -1269,6 +1269,8 @@ async function openAddEvent(){
   // Populate venue dropdown
   const sel=document.getElementById('ee-venue');
   sel.innerHTML=allVenues.map(v=>`<option value="${v.id}">${v.name}</option>`).join('');
+  adminTiers = [];
+  renderAdminTiers();
   document.getElementById('eventEditModal').style.display='block';
 }
 
@@ -1292,12 +1294,48 @@ async function openEditEvent(id){
   else{prev.style.display='none';}
   const sel=document.getElementById('ee-venue');
   sel.innerHTML=allVenues.map(v=>`<option value="${v.id}" ${v.id===e.venue_id?'selected':''}>${v.name}</option>`).join('');
+  // Load existing ticket tiers
+  adminTiers = [];
+  const { data: existingTiers } = await sb.from('ticket_tiers').select('*').eq('event_id', id).order('price', { ascending: true });
+  adminTiers = (existingTiers || []).map(t => ({ id: t.id, name: t.name, price: t.price, capacity: t.capacity || '' }));
+  renderAdminTiers();
   document.getElementById('eventEditModal').style.display='block';
+}
+
+let adminTiers = [];
+
+function renderAdminTiers() {
+  const list = document.getElementById('ee-tiers-list');
+  if (!list) return;
+  if (adminTiers.length === 0) {
+    list.innerHTML = '<div style="font-size:12px;color:#555570;text-align:center;padding:8px 0">No ticket tiers — event shows as "Contact venue"</div>';
+    return;
+  }
+  list.innerHTML = adminTiers.map((t, i) => `
+    <div style="display:grid;grid-template-columns:1fr 80px 80px 32px;gap:8px;align-items:center;background:#1a1a2a;border:1px solid #25252f;border-radius:8px;padding:10px 12px;">
+      <input value="${t.name}" placeholder="Tier name (e.g. General)" onchange="adminTiers[${i}].name=this.value"
+        style="background:#0d0d18;border:1px solid #25252f;border-radius:6px;padding:6px 8px;color:#f0f0fa;font-size:13px;font-family:'DM Sans',sans-serif;outline:none;"/>
+      <input value="${t.price}" placeholder="Price" type="number" min="0" step="0.01" onchange="adminTiers[${i}].price=this.value"
+        style="background:#0d0d18;border:1px solid #25252f;border-radius:6px;padding:6px 8px;color:#f0f0fa;font-size:13px;font-family:'DM Sans',sans-serif;outline:none;"/>
+      <input value="${t.capacity}" placeholder="Cap" type="number" min="1" onchange="adminTiers[${i}].capacity=this.value"
+        style="background:#0d0d18;border:1px solid #25252f;border-radius:6px;padding:6px 8px;color:#f0f0fa;font-size:13px;font-family:'DM Sans',sans-serif;outline:none;"/>
+      <button onclick="adminTiers.splice(${i},1);renderAdminTiers()"
+        style="background:rgba(239,68,68,0.1);color:#ef4444;border:1px solid rgba(239,68,68,0.2);border-radius:6px;padding:4px 8px;cursor:pointer;font-size:14px;font-weight:700;">×</button>
+    </div>`).join('');
+}
+
+function addAdminTier() {
+  adminTiers.push({ name: '', price: '', capacity: '' });
+  renderAdminTiers();
+  // Focus the new name input
+  const inputs = document.querySelectorAll('#ee-tiers-list input');
+  if (inputs.length) inputs[inputs.length - 3].focus();
 }
 
 function closeEventModal(){
   document.getElementById('eventEditModal').style.display='none';
   editingEventId=null;
+  adminTiers=[];
 }
 
 async function handleAdminEventPhoto(e){
@@ -1339,6 +1377,23 @@ async function saveEventEdit(){
     ({error}=await sb.from('events').insert(updates));
   }
   if(error){msg.style.color='#ef4444';msg.textContent='Error: '+error.message;return;}
+
+  // Save ticket tiers
+  const savedEventId = editingEventId || (await sb.from('events').select('id').eq('title', title).order('created_at', {ascending:false}).limit(1).maybeSingle()).data?.id;
+  if (savedEventId && adminTiers.length > 0) {
+    await sb.from('ticket_tiers').delete().eq('event_id', savedEventId);
+    const tierRows = adminTiers.map(t => ({
+      event_id: savedEventId,
+      name: t.name,
+      price: parseFloat(t.price) || 0,
+      capacity: t.capacity ? parseInt(t.capacity) : null,
+    }));
+    await sb.from('ticket_tiers').insert(tierRows);
+  } else if (savedEventId && adminTiers.length === 0) {
+    // If all tiers removed, delete existing ones
+    await sb.from('ticket_tiers').delete().eq('event_id', savedEventId);
+  }
+
   msg.style.color='var(--green)';msg.textContent='✓ Saved!';
   await loadData();renderEvents();
   setTimeout(()=>closeEventModal(),1200);
@@ -2343,6 +2398,12 @@ async function renderMarketing(){
       </div>
       <div class="field"><label for="ee-status">Status</label>
         <select id="ee-status" class="form-input"><option value="published">Published</option><option value="draft">Draft</option></select>
+      </div>
+      <!-- TICKET TIERS -->
+      <div class="field">
+        <label>Ticket Tiers</label>
+        <div id="ee-tiers-list" style="display:flex;flex-direction:column;gap:8px;margin-bottom:8px;"></div>
+        <button type="button" onclick="addAdminTier()" style="background:rgba(255,107,53,0.1);color:#FF6B35;border:1px solid rgba(255,107,53,0.3);border-radius:8px;padding:8px 14px;cursor:pointer;font-size:12px;font-weight:600;width:100%;">+ Add Ticket Tier</button>
       </div>
       <div id="ee-msg" style="font-size:13px;min-height:16px;"></div>
       <button onclick="saveEventEdit()" class="btn btn-primary" style="padding:12px;">Save Event →</button>
