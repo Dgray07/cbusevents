@@ -2345,6 +2345,58 @@ async function renderMarketing(){
 }
 
 </script>
+<style>
+@keyframes eesiPulse{0%,100%{border-color:#25252f;box-shadow:none;}50%{border-color:#FF6B35;box-shadow:0 0 0 3px rgba(255,107,53,0.12);}}
+.ee-si-pulse{animation:eesiPulse 1.4s ease-in-out infinite!important;}
+</style>
+<script>
+async function runAdminSmartImport(){
+  const urlInput=document.getElementById('ee-smart-url');
+  const btn=document.getElementById('ee-smart-btn');
+  const targetUrl=urlInput?urlInput.value.trim():'';
+  if(!targetUrl){if(urlInput){urlInput.style.borderColor='#e24b4a';setTimeout(()=>urlInput.style.borderColor='#25252f',1800);}return;}
+  const FIELDS=['ee-title','ee-description','ee-start','ee-cover'];
+  btn.textContent='Analyzing...';btn.disabled=true;btn.style.opacity='0.6';
+  FIELDS.forEach(id=>{const el=document.getElementById(id);if(el)el.classList.add('ee-si-pulse');});
+  try{
+    const res=await fetch('https://toblgvatvsjljbqogzsv.supabase.co/functions/v1/smart-import',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({url:targetUrl})});
+    if(!res.ok)throw new Error('API '+res.status);
+    const data=await res.json();
+    adminPopulateEvent({
+      event_name: data.event_name||data.name||data.title||'',
+      event_date: data.event_date||data.date||data.start_date||'',
+      description: data.description||data.summary||'',
+      cover_image: data.image_url||data.cover_image||data.image||''
+    });
+    urlInput.style.borderColor='#1d9e75';
+    setTimeout(()=>{urlInput.style.borderColor='#25252f';},2500);
+    btn.textContent='Filled!';
+    setTimeout(()=>{btn.textContent='Magic Fill';},2500);
+  }catch(e){
+    console.error('[Smart Import Admin]',e);
+    btn.textContent='Try Again';
+    urlInput.style.borderColor='#e24b4a';
+    setTimeout(()=>{btn.textContent='Magic Fill';urlInput.style.borderColor='#25252f';},2500);
+  }finally{
+    btn.disabled=false;btn.style.opacity='1';
+    FIELDS.forEach(id=>{const el=document.getElementById(id);if(el)el.classList.remove('ee-si-pulse');});
+  }
+}
+function adminPopulateEvent({event_name,event_date,description,cover_image}){
+  const set=(id,val)=>{if(!val)return;const el=document.getElementById(id);if(!el)return;el.value=val;el.dispatchEvent(new Event('input',{bubbles:true}));el.dispatchEvent(new Event('change',{bubbles:true}));};
+  set('ee-title',event_name);
+  set('ee-description',description);
+  if(event_date){
+    const p=new Date(event_date);
+    if(!isNaN(p))set('ee-start',p.toISOString().slice(0,16));
+  }
+  if(cover_image){
+    set('ee-cover',cover_image);
+    const prev=document.getElementById('ee-cover-preview');
+    if(prev){prev.src=cover_image;prev.style.display='block';}
+  }
+}
+</script>
 
 <!-- VENUE EDIT MODAL -->
 <div id="venueEditModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:1000;overflow-y:auto;padding:20px;">
@@ -2387,6 +2439,13 @@ async function renderMarketing(){
       <button onclick="closeEventModal()" style="background:none;border:none;color:#888;font-size:22px;cursor:pointer;">×</button>
     </div>
     <div style="display:flex;flex-direction:column;gap:14px;">
+      <div style="display:flex;gap:10px;align-items:flex-end;padding-bottom:16px;border-bottom:1px solid #25252f;">
+        <div style="flex:1;">
+          <label style="display:block;font-family:'DM Mono',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:#FF6B35;margin-bottom:6px;">Import from URL</label>
+          <input id="ee-smart-url" type="url" placeholder="Paste Facebook, Eventbrite, or Website link..." style="width:100%;background:#0d0d18;border:1px solid #25252f;border-radius:8px;padding:9px 12px;font-family:'DM Sans',sans-serif;font-size:13px;color:#f0f0fa;outline:none;box-sizing:border-box;transition:border-color 0.2s;">
+        </div>
+        <button id="ee-smart-btn" onclick="runAdminSmartImport()" style="background:#FF6B35;color:#fff;border:none;border-radius:8px;padding:9px 18px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap;flex-shrink:0;" onmouseover="this.style.opacity='0.85'" onmouseout="this.style.opacity='1'">Magic Fill</button>
+      </div>
       <div class="field"><label for="ee-title">Event Title *</label><input id="ee-title" class="form-input"/></div>
       <div class="field"><label for="ee-venue">Venue</label>
         <select id="ee-venue" class="form-input"></select>

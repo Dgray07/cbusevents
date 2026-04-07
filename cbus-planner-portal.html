@@ -2089,6 +2089,13 @@ function openAddEventModal(editEvent){
      '<button onclick="closeModal()" style="background:none;border:none;color:var(--sub);font-size:20px;cursor:pointer">&times;</button>'+
    '</div>'+
    '<div class="modal-body" style="max-height:72vh;overflow-y:auto">'+
+     '<div id="smart-import-wrapper" style="display:flex;gap:10px;align-items:flex-end;margin-bottom:20px;padding-bottom:18px;border-bottom:1px solid var(--border);">'+
+       '<div style="flex:1;">'+
+         '<label style="display:block;font-family:\'DM Mono\',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:#FF6B35;margin-bottom:6px;">Import from URL</label>'+
+         '<input id="smart-import-url" type="url" placeholder="Paste Facebook, Eventbrite, or Website link..." style="width:100%;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:9px 12px;font-family:\'DM Sans\',sans-serif;font-size:13px;color:var(--text);outline:none;box-sizing:border-box;transition:border-color 0.2s;">'+
+       '</div>'+
+       '<button id="smart-import-btn" onclick="runPlannerSmartImport()" style="background:#FF6B35;color:#fff;border:none;border-radius:8px;padding:9px 18px;font-family:\'DM Sans\',sans-serif;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap;flex-shrink:0;" onmouseover="this.style.opacity=\'0.85\'" onmouseout="this.style.opacity=\'1\'">Magic Fill</button>'+
+     '</div>'+
      '<div class="field"><label>Event Title *</label><input id="evTitle" placeholder="e.g. Columbus Tech Mixer 2026" value="'+(ev?ev.title:'')+'"></div>'+
      '<div class="field"><label>Description</label><textarea id="evDesc" placeholder="Tell people what to expect..." style="min-height:80px">'+(ev?ev.description||'':'')+'</textarea></div>'+
      '<div class="field-row">'+
@@ -2335,6 +2342,57 @@ document.addEventListener('DOMContentLoaded',function(){
     closePmnMore();
   });
 });
+</script>
+<style>
+@keyframes siPulse{0%,100%{border-color:var(--border);box-shadow:none;}50%{border-color:#FF6B35;box-shadow:0 0 0 3px rgba(255,107,53,0.12);}}
+.si-pulse{animation:siPulse 1.4s ease-in-out infinite!important;}
+</style>
+<script>
+async function runPlannerSmartImport(){
+  const urlInput=document.getElementById('smart-import-url');
+  const btn=document.getElementById('smart-import-btn');
+  const targetUrl=urlInput?urlInput.value.trim():'';
+  if(!targetUrl){if(urlInput){urlInput.style.borderColor='#e24b4a';setTimeout(()=>urlInput.style.borderColor='',1800);}return;}
+  const FIELDS=['evTitle','evDesc','evDate','evTime','evCover'];
+  btn.textContent='Analyzing...';btn.disabled=true;btn.style.opacity='0.6';
+  FIELDS.forEach(id=>{const el=document.getElementById(id);if(el)el.classList.add('si-pulse');});
+  try{
+    const res=await fetch('https://toblgvatvsjljbqogzsv.supabase.co/functions/v1/smart-import',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({url:targetUrl})});
+    if(!res.ok)throw new Error('API '+res.status);
+    const data=await res.json();
+    plannerPopulateEvent({
+      event_name: data.event_name||data.name||data.title||'',
+      event_date: data.event_date||data.date||data.start_date||'',
+      description: data.description||data.summary||'',
+      cover_image: data.image_url||data.cover_image||data.image||''
+    });
+    urlInput.style.borderColor='#1d9e75';
+    setTimeout(()=>{urlInput.style.borderColor='';},2500);
+    btn.textContent='Filled!';
+    setTimeout(()=>{btn.textContent='Magic Fill';},2500);
+  }catch(e){
+    console.error('[Smart Import]',e);
+    btn.textContent='Try Again';
+    urlInput.style.borderColor='#e24b4a';
+    setTimeout(()=>{btn.textContent='Magic Fill';urlInput.style.borderColor='';},2500);
+  }finally{
+    btn.disabled=false;btn.style.opacity='1';
+    FIELDS.forEach(id=>{const el=document.getElementById(id);if(el)el.classList.remove('si-pulse');});
+  }
+}
+function plannerPopulateEvent({event_name,event_date,description,cover_image}){
+  const set=(id,val)=>{if(!val)return;const el=document.getElementById(id);if(!el)return;el.value=val;el.dispatchEvent(new Event('input',{bubbles:true}));el.dispatchEvent(new Event('change',{bubbles:true}));};
+  set('evTitle',event_name);
+  set('evDesc',description);
+  set('evCover',cover_image);
+  if(event_date){
+    const p=new Date(event_date);
+    if(!isNaN(p)){
+      set('evDate',p.toISOString().split('T')[0]);
+      set('evTime',p.toTimeString().slice(0,5));
+    }
+  }
+}
 </script>
 </body>
 </html>
