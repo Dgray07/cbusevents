@@ -103,7 +103,7 @@ nav{
 
 /* ── TICKET TIERS ── */
 .tier-row{display:flex;align-items:center;justify-content:space-between;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-md);padding:14px 16px;margin-bottom:8px;}
-.tier-name{font-weight:700;font-size:14px;color:var(--text);margin-bottom:2px;}
+.tier-name{font-weight:700;font-size:14px;color:var(--text);margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:140px;}
 .tier-desc{font-size:11px;color:var(--sub);}
 .tier-remaining{font-size:10px;margin-top:3px;}
 .tier-remaining.low{color:var(--red);}
