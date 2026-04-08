@@ -716,7 +716,23 @@ function EventModal({event,venueId,venueTier,currentEventCount,onClose,onSave}) 
  const [tiers,setTiers]=useState([]);
  const [busy,setBusy]=useState(false);
  const [err,setErr]=useState("");
+ const [coverUploading,setCoverUploading]=useState(false);
  const set=k=>e=>setF(p=>({...p,[k]:e.target.type==="checkbox"?e.target.checked:e.target.value}));
+ const handleEventCover=async(e)=>{
+   const file=e.target.files[0];
+   if(!file)return;
+   setCoverUploading(true);
+   try{
+     const path=`event-covers/${user.id}/cover_${Date.now()}.jpg`;
+     const url=await uploadImageToStorage(file,'event-covers',path);
+     setF(p=>({...p,cover_image_url:url}));
+   }catch(ex){
+     setErr('Cover upload failed: '+ex.message);
+   }finally{
+     setCoverUploading(false);
+     e.target.value='';
+   }
+ };
 
  // Load existing tiers when editing
  useEffect(()=>{
@@ -780,8 +796,14 @@ function EventModal({event,venueId,venueTier,currentEventCount,onClose,onSave}) 
    <label htmlFor="fc" style={{marginBottom:0,cursor:"pointer"}}>Free event (no tickets needed)</label>
  </div>
  <TicketTierBuilder tiers={tiers} setTiers={setTiers} isFree={f.is_free}/>
- <Field label="Cover Image URL"><input value={f.cover_image_url} onChange={set("cover_image_url")} placeholder="https://..."/></Field>
- {f.cover_image_url&&<img src={f.cover_image_url} alt="" style={{width:"100%",height:100,objectFit:"cover",borderRadius:10,marginBottom:14,border:"1px solid var(--border)"}} onError={e=>e.target.style.display="none"}/>}
+ <Field label="Cover Image">
+   {f.cover_image_url&&<img src={f.cover_image_url} alt="" style={{width:"100%",height:140,objectFit:"cover",borderRadius:8,marginBottom:10,border:"1px solid var(--border)"}} onError={e=>e.target.style.display="none"}/>}
+   <label style={{display:"flex",alignItems:"center",gap:8,cursor:coverUploading?"default":"pointer",background:"var(--surface)",border:"1px dashed var(--border)",borderRadius:8,padding:"10px 14px",fontSize:13,color:"var(--sub)"}}>
+     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+     <span>{coverUploading?"Uploading...":f.cover_image_url?"Replace cover image":"Upload cover image"}</span>
+     <input type="file" accept="image/*" style={{display:"none"}} onChange={handleEventCover} disabled={coverUploading}/>
+   </label>
+ </Field>
  <div style={{display:"flex",gap:10,marginTop:8}}>
    <Btn onClick={save} disabled={busy}>{busy?"Saving...":event?"Save Changes":"Create Event"}</Btn>
    <Btn variant="ghost" onClick={onClose}>Cancel</Btn>

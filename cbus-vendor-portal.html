@@ -1970,7 +1970,17 @@ async function loadProductForm(productId){
    <div class="form-field"><label>Inventory Count</label><input id="pInventory" type="number" min="0" placeholder="Leave blank for unlimited" value="${p?.inventory_count??''}"></div>
  </div>
  <div class="form-field"><label>Description</label><textarea id="pDesc" placeholder="Describe your product...">${p?.description||''}</textarea></div>
- <div class="form-field"><label>Image URL</label><input id="pImage" placeholder="https://... (shown in marketplace)" value="${p?.images?.[0]||''}"></div>
+ <div class="form-field"><label>Product Image</label>
+   <div id="pImagePreviewWrap" style="${p?.images?.[0]?'':'display:none;'}margin-bottom:8px">
+     <img id="pImagePreviewImg" src="${p?.images?.[0]||''}" alt="" style="width:100%;height:140px;object-fit:cover;border-radius:8px;border:1px solid var(--border)">
+   </div>
+   <input type="hidden" id="pImage" value="${p?.images?.[0]||''}">
+   <input type="file" id="pImageFile" accept="image/*" onchange="previewVendorProductImage(this)" style="display:none">
+   <label for="pImageFile" style="display:flex;align-items:center;gap:8px;cursor:pointer;background:var(--surface);border:1px dashed var(--border);border-radius:8px;padding:10px 14px;font-size:13px;color:var(--muted)">
+     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+     <span id="pImageLabel">${p?.images?.[0]?'Replace product image':'Upload product image'}</span>
+   </label>
+ </div>
  <div class="form-field"><label>Digital File URL</label><input id="pDigitalUrl" placeholder="Link to file (digital products only)" value="${p?.digital_file_url||''}"></div>
  <div class="form-field"><label>Status</label><select id="pStatus"><option value="active"${(!p||p.status==='active')?' selected':''}>Active - visible on marketplace</option><option value="paused"${p?.status==='paused'?' selected':''}>Paused - hidden from marketplace</option><option value="sold_out"${p?.status==='sold_out'?' selected':''}>Sold Out</option></select></div>
  <div style="display:flex;gap:10px;margin-top:8px">
@@ -1980,13 +1990,60 @@ async function loadProductForm(productId){
  <div class="form-msg" id="productMsg" style="margin-top:8px"></div>`;
 }
 
+async function uploadVendorProductImage(file){
+  let blob=file;
+  try{
+    const bitmap=await createImageBitmap(file);
+    const canvas=document.createElement('canvas');
+    let w=bitmap.width,h=bitmap.height;
+    const maxW=1200;
+    if(w>maxW){h=Math.round(h*(maxW/w));w=maxW;}
+    canvas.width=w;canvas.height=h;
+    canvas.getContext('2d').drawImage(bitmap,0,0,w,h);
+    blob=await new Promise(res=>canvas.toBlob(res,'image/jpeg',0.85));
+    bitmap.close();
+  }catch(e){console.warn('createImageBitmap failed, using original',e);}
+  const userId=vendorProfile?.user_id||'unknown';
+  const path=`vendor-products/${userId}/product_${Date.now()}.jpg`;
+  const {error}=await sb.storage.from('vendor-products').upload(path,blob,{upsert:true,contentType:'image/jpeg'});
+  if(error)throw error;
+  const {data:urlData}=sb.storage.from('vendor-products').getPublicUrl(path);
+  // Update the hidden input with the final URL
+  const hiddenInput=document.getElementById('pImage');
+  if(hiddenInput)hiddenInput.value=urlData.publicUrl;
+  return urlData.publicUrl;
+}
+
+function previewVendorProductImage(input){
+  const file=input.files?.[0];
+  if(!file)return;
+  const reader=new FileReader();
+  reader.onload=function(e){
+    const previewImg=document.getElementById('pImagePreviewImg');
+    if(previewImg)previewImg.src=e.target.result;
+    const previewWrap=document.getElementById('pImagePreviewWrap');
+    if(previewWrap)previewWrap.style.display='';
+    const label=document.getElementById('pImageLabel');
+    if(label)label.textContent=file.name;
+  };
+  reader.readAsDataURL(file);
+}
+
 async function saveProduct(productId){
  const msg=document.getElementById('productMsg');
  const name=document.getElementById('pName').value.trim();
  const price=parseFloat(document.getElementById('pPrice').value);
  if(!name){msg.style.color='var(--red)';msg.textContent='Product name is required';return;}
  if(isNaN(price)||price<0){msg.style.color='var(--red)';msg.textContent='Valid price is required';return;}
- const imageUrl=document.getElementById('pImage').value.trim();
+ // Upload product image if file selected
+ let imageUrl=document.getElementById('pImage').value.trim();
+ const imgFile=document.getElementById('pImageFile')?.files?.[0];
+ if(imgFile){
+   try{
+     const uploaded=await uploadVendorProductImage(imgFile);
+     if(uploaded)imageUrl=uploaded;
+   }catch(e){msg.style.color='var(--red)';msg.textContent='Image upload failed: '+e.message;return;}
+ }
  const inventoryVal=document.getElementById('pInventory').value.trim();
  const payload={
    vendor_id:vendorProfile.id,
