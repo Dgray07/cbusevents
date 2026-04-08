@@ -2110,17 +2110,7 @@ function openAddEventModal(editEvent){
        '<div class="field"><label>End Date</label><input id="evEndDate" type="date" value="'+(ev&&ev.end_time?ev.end_time.slice(0,10):'')+'"></div>'+
        '<div class="field"><label>End Time</label><input id="evEndTime" type="time" value="'+(ev&&ev.end_time?ev.end_time.slice(11,16):'')+'"></div>'+
      '</div>'+
-     '<div class="field"><label>Cover Image</label>'+
-       '<div id="evCoverPreviewWrap" style="'+(ev&&ev.cover_image_url?'':'display:none;')+'margin-bottom:8px">'+
-         '<img id="evCoverPreviewImg" src="'+(ev?ev.cover_image_url||'':'')+'" alt="" style="width:100%;height:140px;object-fit:cover;border-radius:8px;border:1px solid var(--border)">'+
-       '</div>'+
-       '<input type="file" id="evCoverFile" accept="image/*" onchange="plannerPreviewCover(this)" style="display:none">'+
-       '<input type="hidden" id="evCover" value="'+(ev?ev.cover_image_url||'':'')+'">'+
-       '<label for="evCoverFile" style="display:flex;align-items:center;gap:8px;cursor:pointer;background:var(--surface);border:1px dashed var(--border);border-radius:8px;padding:10px 14px;font-size:13px;color:var(--muted)">'+
-         '<svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"><path d=\"M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4\"/><polyline points=\"17 8 12 3 7 8\"/><line x1=\"12\" y1=\"3\" x2=\"12\" y2=\"15\"/></svg>'+
-         '<span id="evCoverLabel">'+(ev&&ev.cover_image_url?'Replace cover image':'Upload cover image')+'</span>'+
-       '</label>'+
-     '</div>'+
+     '<div class="field"><label>Cover Image URL</label><input id="evCover" placeholder="https://... paste an image link" value="'+(ev?ev.cover_image_url||'':'')+'"></div>'+
      '<div style="height:1px;background:var(--border);margin:16px 0"></div>'+
      '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">'+
        '<div><div style="font-family:\'Inter\',sans-serif;font-weight:700;font-size:13px">Ticket Tiers</div>'+
@@ -2177,15 +2167,7 @@ async function submitEvent(editId){
  const endTime=document.getElementById('evEndTime')?.value;
  const endDateTime=(endDate&&endTime)?new Date(endDate+'T'+endTime+':00').toISOString():null;
  const venueId=document.getElementById('evVenue')?.value||null;
- // Upload cover image file if one was selected
- let cover=document.getElementById('evCover')?.value||null;
- const coverFile=document.getElementById('evCoverFile')?.files?.[0];
- if(coverFile){
-   try{
-     const uploaded=await uploadEventCover(coverFile,currentUser.id);
-     if(uploaded)cover=uploaded;
-   }catch(e){console.error('Cover upload failed',e);}
- }
+ const cover=document.getElementById('evCover')?.value||null;
 
  // Collect tiers
  const tierRows=document.querySelectorAll('.tier-row');
@@ -2366,41 +2348,6 @@ document.addEventListener('DOMContentLoaded',function(){
 .si-pulse{animation:siPulse 1.4s ease-in-out infinite!important;}
 </style>
 <script>
-async function uploadEventCover(file, userId){
-  let blob=file;
-  try{
-    const bitmap=await createImageBitmap(file);
-    const canvas=document.createElement('canvas');
-    let w=bitmap.width,h=bitmap.height;
-    const maxW=1400;
-    if(w>maxW){h=Math.round(h*(maxW/w));w=maxW;}
-    canvas.width=w;canvas.height=h;
-    canvas.getContext('2d').drawImage(bitmap,0,0,w,h);
-    blob=await new Promise(res=>canvas.toBlob(res,'image/jpeg',0.85));
-    bitmap.close();
-  }catch(e){console.warn('createImageBitmap failed, using original',e);}
-  const path=`event-covers/${userId}/cover_${Date.now()}.jpg`;
-  const {error}=await sb.storage.from('event-covers').upload(path,blob,{upsert:true,contentType:'image/jpeg'});
-  if(error)throw error;
-  const {data:urlData}=sb.storage.from('event-covers').getPublicUrl(path);
-  return urlData.publicUrl;
-}
-
-function plannerPreviewCover(input){
-  const file=input.files?.[0];
-  if(!file)return;
-  const reader=new FileReader();
-  reader.onload=function(e){
-    const previewImg=document.getElementById('evCoverPreviewImg');
-    if(previewImg)previewImg.src=e.target.result;
-    const previewWrap=document.getElementById('evCoverPreviewWrap');
-    if(previewWrap)previewWrap.style.display='';
-    const label=document.getElementById('evCoverLabel');
-    if(label)label.textContent=file.name;
-  };
-  reader.readAsDataURL(file);
-}
-
 async function runPlannerSmartImport(){
   const urlInput=document.getElementById('smart-import-url');
   const btn=document.getElementById('smart-import-btn');
@@ -2410,7 +2357,8 @@ async function runPlannerSmartImport(){
   btn.textContent='Analyzing...';btn.disabled=true;btn.style.opacity='0.6';
   FIELDS.forEach(id=>{const el=document.getElementById(id);if(el)el.classList.add('si-pulse');});
   try{
-    const res=await fetch('https://toblgvatvsjljbqogzsv.supabase.co/functions/v1/smart-import',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({url:targetUrl})});
+    const {data:{session}}=await sb.auth.getSession();
+    const res=await fetch('https://toblgvatvsjljbqogzsv.supabase.co/functions/v1/smart-import',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+(session?.access_token||'')},body:JSON.stringify({url:targetUrl})});
     if(!res.ok)throw new Error('API '+res.status);
     const data=await res.json();
     plannerPopulateEvent({
@@ -2437,17 +2385,7 @@ function plannerPopulateEvent({event_name,event_date,description,cover_image}){
   const set=(id,val)=>{if(!val)return;const el=document.getElementById(id);if(!el)return;el.value=val;el.dispatchEvent(new Event('input',{bubbles:true}));el.dispatchEvent(new Event('change',{bubbles:true}));};
   set('evTitle',event_name);
   set('evDesc',description);
-  // For smart import: set hidden input and show preview
-  if(cover_image){
-    const hiddenInput=document.getElementById('evCover');
-    if(hiddenInput)hiddenInput.value=cover_image;
-    const previewImg=document.getElementById('evCoverPreviewImg');
-    if(previewImg)previewImg.src=cover_image;
-    const previewWrap=document.getElementById('evCoverPreviewWrap');
-    if(previewWrap)previewWrap.style.display='';
-    const label=document.getElementById('evCoverLabel');
-    if(label)label.textContent='Replace cover image';
-  }
+  set('evCover',cover_image);
   if(event_date){
     const p=new Date(event_date);
     if(!isNaN(p)){
