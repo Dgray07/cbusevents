@@ -104,42 +104,7 @@
     <priority>0.5</priority>
   </url>
 
-  <!-- Event pages (18 events) — auto-generated 2026-04-07 -->
-  <url>
-    <loc>https://cbusevents.com/event.html?id=349107b4-54c8-4cb4-8623-9a33967ffc7e</loc>
-    <lastmod>2026-03-20</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.9</priority>
-  </url>
-
-  <url>
-    <loc>https://cbusevents.com/event.html?id=6e6f7572-b9f5-4592-aefd-e43b5204f9ee</loc>
-    <lastmod>2026-03-23</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.9</priority>
-  </url>
-
-  <url>
-    <loc>https://cbusevents.com/event.html?id=6196448e-8cf5-47ab-bb5d-4e5b34f73d5c</loc>
-    <lastmod>2026-03-20</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.9</priority>
-  </url>
-
-  <url>
-    <loc>https://cbusevents.com/event.html?id=179ca762-228c-4d27-8644-2f7d36429e26</loc>
-    <lastmod>2026-03-23</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.9</priority>
-  </url>
-
-  <url>
-    <loc>https://cbusevents.com/event.html?id=f4fd842b-f98a-487b-80ed-fb1b9afa2cba</loc>
-    <lastmod>2026-03-20</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.9</priority>
-  </url>
-
+  <!-- Event pages (12 events) — auto-generated 2026-04-08 -->
   <url>
     <loc>https://cbusevents.com/event.html?id=847b8837-ddc4-4a17-91c5-222cd825ce60</loc>
     <lastmod>2026-03-23</lastmod>
@@ -198,13 +163,6 @@
 
   <url>
     <loc>https://cbusevents.com/event.html?id=dbc6526b-88be-4551-8d8f-d67e1fd63834</loc>
-    <lastmod>2026-03-23</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.9</priority>
-  </url>
-
-  <url>
-    <loc>https://cbusevents.com/event.html?id=f1132f78-0e2f-4cd4-90d4-98c380c0ea51</loc>
     <lastmod>2026-03-23</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
