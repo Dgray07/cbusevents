@@ -729,7 +729,7 @@
   // LOAD RSVP COUNT
   async function loadRsvpCount() {
     try {
-      const { count } = await sb.from('event_rsvps').select('*', { count: 'exact', head: true }).eq('event', '1313_festival');
+      const { count } = await sb.from('event_rsvps').select('*', { count: 'exact', head: true }).eq('event_name', '1313_festival');
       if (count > 0) {
         document.getElementById('rsvpCount').textContent = count + ' people are going - join them!';
       }
@@ -762,7 +762,7 @@
 
     try {
       const { error } = await sb.from('event_rsvps').insert({
-        event: '1313_festival',
+        event_name: '1313_festival',
         name,
         email,
         phone,
@@ -800,7 +800,7 @@
       const { data, error } = await sb
         .from('festival_applications')
         .select('business_name, applicant_type, category, description, first_name')
-        .eq('event', '1313_festival')
+        .eq('event_name', '1313_festival')
         .eq('status', 'approved')
         .order('created_at', { ascending: true });
 

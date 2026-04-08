@@ -1201,7 +1201,7 @@
     const { data, error } = await sb
       .from('festival_applications')
       .select('*')
-      .eq('event', '1313_festival')
+      .eq('event_name', '1313_festival')
       .order('created_at', { ascending: false });
     allApps = data || [];
     updateBadges();
@@ -1212,7 +1212,7 @@
     const { data } = await sb
       .from('event_rsvps')
       .select('*')
-      .eq('event', '1313_festival')
+      .eq('event_name', '1313_festival')
       .order('created_at', { ascending: false });
     allRsvps = data || [];
     document.getElementById('badge-rsvps').textContent = allRsvps.length;

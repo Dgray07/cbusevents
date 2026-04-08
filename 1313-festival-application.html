@@ -486,7 +486,7 @@
       license_number: isTruck ? document.getElementById('license_number').value.trim() : null,
       licenseFile: isTruck ? document.getElementById('license_file').files[0] : null,
       status: 'pending',
-      event: '1313_festival',
+      event_name: '1313_festival',
       fee: isTruck ? 175 : 75,
     };
     // Pre-fill email display in modal from form - no re-entry needed
@@ -527,7 +527,7 @@
     // Save to festival_applications
     const { error: insertError } = await sb.from('festival_applications').insert({
       user_id: userId,
-      event: pendingFormData.event,
+      event_name: pendingFormData.event,
       applicant_type: pendingFormData.applicant_type,
       business_name: pendingFormData.business_name,
       first_name: pendingFormData.first_name,
