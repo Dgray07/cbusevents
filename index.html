@@ -1679,7 +1679,9 @@ function renderHome(){
        const img = e.cover_image_url;
        const tw = isThisWeek(e.start_time);
        return `
-         <div onclick="e._festival_url ? (window.location.href=e._festival_url) : openEventModal('${e.id}')"
+         <div onclick="this.dataset.festivalUrl ? window.location.href=this.dataset.festivalUrl : openEventModal(this.dataset.id)"
+           data-id="${e.id}"
+           data-festival-url="${e._festival_url||''}"
            style="cursor:pointer;transition:transform 0.2s"
            onmouseover="this.style.transform='translateY(-3px)'"
            onmouseout="this.style.transform='translateY(0)'" role="button" tabindex="0">
