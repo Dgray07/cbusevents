@@ -1486,9 +1486,25 @@ function initHeroParticles(){
 
 // ── HOME ──────────────────────────────────────────────────────
 function renderHome(){
- const thisWeek = allEvents.filter(e=>isThisWeek(e.start_time)).slice(0,8);
- const upcoming = allEvents.filter(e=>!isThisWeek(e.start_time)).slice(0,8);
- const allUpcoming = [...thisWeek,...upcoming].slice(0,8);
+ // 1313 Festival - pinned featured event card
+ const festival1313 = {
+   id: '1313-festival',
+   title: '1313 Festival',
+   category: 'Festival',
+   start_time: '2026-06-13T11:00:00',
+   end_time: '2026-06-13T20:00:00',
+   venue_name_override: '1313 E Broad St, Columbus OH',
+   is_free: true,
+   is_boosted: true,
+   cover_image_url: null,
+   _is_festival: true,
+   _festival_url: '1313-festival-event.html'
+ };
+
+ // Sort: ticketed events first, then free, 1313 festival always pinned at front
+ const ticketed = allEvents.filter(e=>e.ticket_url||e.price_min||(e.is_free===false)).sort((a,b)=>new Date(a.start_time)-new Date(b.start_time));
+ const freeEvts = allEvents.filter(e=>!e.ticket_url&&!e.price_min&&e.is_free!==false).sort((a,b)=>new Date(a.start_time)-new Date(b.start_time));
+ const allUpcoming = [festival1313, ...ticketed, ...freeEvts].slice(0,8);
 
  // Venue scroll — featured first
  const venueScroll = allVenues
@@ -1663,17 +1679,20 @@ function renderHome(){
        const img = e.cover_image_url;
        const tw = isThisWeek(e.start_time);
        return `
-         <div onclick="openEventModal('${e.id}')"
+         <div onclick="e._festival_url ? window.location.href=e._festival_url : openEventModal('${e.id}')"
            style="cursor:pointer;transition:transform 0.2s"
            onmouseover="this.style.transform='translateY(-3px)'"
            onmouseout="this.style.transform='translateY(0)'" role="button" tabindex="0">
            <!-- Image -->
            <div style="width:100%;aspect-ratio:1/1;border-radius:16px;overflow:hidden;background:var(--surface);margin-bottom:14px;position:relative">
-             ${img
-               ? `<img src="${img}" alt="${e.title}" alt=""  style="width:100%;height:100%;object-fit:cover">`
-               : `<div style="width:100%;height:100%;background:linear-gradient(135deg,rgba(255,107,53,0.15),rgba(129,140,248,0.1))"></div>`
+             ${e._is_festival
+               ? `<div style="width:100%;height:100%;background:linear-gradient(135deg,#87CEEB,#FFF3E0,#FF6B35);display:flex;align-items:center;justify-content:center;font-size:52px">🎪</div>`
+               : img
+                 ? `<img src="${img}" alt="${e.title}" style="width:100%;height:100%;object-fit:cover">`
+                 : `<div style="width:100%;height:100%;background:linear-gradient(135deg,rgba(255,107,53,0.15),rgba(129,140,248,0.1))"></div>`
              }
-             ${tw ? `<div style="position:absolute;top:10px;left:10px;background:var(--green);color:#000;font-family:var(--mono);font-size:8px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;padding:3px 9px;border-radius:9999px">This Week</div>` : ''}
+             ${e._is_festival ? `<div style="position:absolute;top:10px;left:10px;background:var(--orange);color:#fff;font-family:var(--mono);font-size:8px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;padding:3px 9px;border-radius:9999px">🎉 Featured</div>` : tw ? `<div style="position:absolute;top:10px;left:10px;background:var(--green);color:#000;font-family:var(--mono);font-size:8px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;padding:3px 9px;border-radius:9999px">This Week</div>` : ''}
+             ${e.ticket_url||e.price_min ? `<div style="position:absolute;top:10px;right:10px;background:rgba(8,8,16,0.85);color:#fbbf24;font-family:var(--mono);font-size:8px;font-weight:700;letter-spacing:0.08em;padding:2px 8px;border-radius:9999px;border:1px solid rgba(251,191,36,0.3)">Ticketed</div>` : ''}
              ${e.is_third_party ? `<div style="position:absolute;top:10px;right:10px;background:rgba(8,8,16,0.7);color:var(--sub);font-family:var(--mono);font-size:8px;letter-spacing:0.08em;padding:2px 8px;border-radius:9999px;border:1px solid var(--border)">Ticketmaster</div>` : ''}
            </div>
            <!-- Info -->

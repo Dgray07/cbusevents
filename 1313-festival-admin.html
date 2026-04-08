@@ -1,0 +1,1499 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>1313 Festival Admin | CBUS Events</title>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    :root {
+      --bg: #080810;
+      --surface: #0f0f1a;
+      --surface2: #14141f;
+      --border: #1e1e2e;
+      --orange: #FF6B35;
+      --orange-dim: rgba(255,107,53,0.12);
+      --text: #e8e8f0;
+      --muted: #6b6b80;
+      --green: #2dd4bf;
+      --green-dim: rgba(45,212,191,0.12);
+      --red: #f87171;
+      --red-dim: rgba(248,113,113,0.12);
+      --yellow: #fbbf24;
+      --yellow-dim: rgba(251,191,36,0.12);
+      --mono: 'DM Mono', monospace;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      min-height: 100vh;
+    }
+
+    /* GRID BG */
+    body::before {
+      content: '';
+      position: fixed; inset: 0;
+      background-image:
+        linear-gradient(rgba(255,107,53,0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,107,53,0.03) 1px, transparent 1px);
+      background-size: 40px 40px;
+      pointer-events: none; z-index: 0;
+    }
+
+    /* TOP NAV */
+    .topnav {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(8,8,16,0.95);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      padding: 0 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 56px;
+    }
+
+    .nav-brand {
+      display: flex; align-items: center; gap: 12px;
+    }
+
+    .nav-logo {
+      font-family: 'Fredoka One', cursive;
+      font-size: 18px;
+      color: var(--orange);
+    }
+
+    .nav-sep { color: var(--border); }
+
+    .nav-title {
+      font-family: var(--mono);
+      font-size: 12px;
+      color: var(--muted);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    .nav-right {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .nav-pill {
+      font-family: var(--mono);
+      font-size: 11px;
+      padding: 4px 12px;
+      border-radius: 20px;
+      letter-spacing: 0.08em;
+    }
+
+    .pill-event {
+      background: var(--orange-dim);
+      color: var(--orange);
+      border: 1px solid rgba(255,107,53,0.3);
+    }
+
+    .pill-date {
+      background: var(--surface);
+      color: var(--muted);
+      border: 1px solid var(--border);
+    }
+
+    .refresh-btn {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--muted);
+      font-family: var(--mono);
+      font-size: 11px;
+      padding: 6px 14px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.2s;
+      letter-spacing: 0.06em;
+    }
+
+    .refresh-btn:hover { border-color: var(--orange); color: var(--orange); }
+
+    /* LAYOUT */
+    .layout {
+      position: relative; z-index: 1;
+      display: grid;
+      grid-template-columns: 200px 1fr;
+      min-height: calc(100vh - 56px);
+    }
+
+    /* SIDEBAR */
+    .sidebar {
+      border-right: 1px solid var(--border);
+      padding: 24px 0;
+      position: sticky;
+      top: 56px;
+      height: calc(100vh - 56px);
+      overflow-y: auto;
+    }
+
+    .sidebar-section {
+      padding: 0 16px;
+      margin-bottom: 24px;
+    }
+
+    .sidebar-label {
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 8px;
+      padding: 0 4px;
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 9px 12px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--muted);
+      transition: all 0.15s;
+      margin-bottom: 2px;
+      border: 1px solid transparent;
+    }
+
+    .nav-item:hover { background: var(--surface); color: var(--text); }
+
+    .nav-item.active {
+      background: var(--orange-dim);
+      color: var(--orange);
+      border-color: rgba(255,107,53,0.2);
+    }
+
+    .nav-item .badge {
+      margin-left: auto;
+      font-family: var(--mono);
+      font-size: 10px;
+      background: var(--surface2);
+      color: var(--muted);
+      padding: 2px 7px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+    }
+
+    .nav-item.active .badge {
+      background: rgba(255,107,53,0.2);
+      color: var(--orange);
+      border-color: rgba(255,107,53,0.3);
+    }
+
+    /* MAIN */
+    .main {
+      padding: 28px 32px;
+      overflow-y: auto;
+    }
+
+    /* PANELS */
+    .panel { display: none; }
+    .panel.active { display: block; }
+
+    /* STAT CARDS */
+    .stat-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+      gap: 14px;
+      margin-bottom: 32px;
+    }
+
+    .stat-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 18px 16px;
+    }
+
+    .stat-label {
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+
+    .stat-value {
+      font-family: 'Fredoka One', cursive;
+      font-size: 36px;
+      color: var(--text);
+      line-height: 1;
+      margin-bottom: 4px;
+    }
+
+    .stat-value.orange { color: var(--orange); }
+    .stat-value.green { color: var(--green); }
+    .stat-value.yellow { color: var(--yellow); }
+    .stat-value.red { color: var(--red); }
+
+    .stat-sub {
+      font-size: 11px;
+      color: var(--muted);
+      font-family: var(--mono);
+    }
+
+    /* SECTION HEADER */
+    .section-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .section-head h2 {
+      font-family: 'Fredoka One', cursive;
+      font-size: 20px;
+      color: var(--text);
+    }
+
+    .section-actions { display: flex; gap: 10px; align-items: center; }
+
+    /* FILTER TABS */
+    .filter-tabs {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 16px;
+    }
+
+    .ftab {
+      font-family: var(--mono);
+      font-size: 11px;
+      padding: 5px 14px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--muted);
+      cursor: pointer;
+      letter-spacing: 0.06em;
+      transition: all 0.15s;
+    }
+
+    .ftab.active {
+      background: var(--orange-dim);
+      border-color: rgba(255,107,53,0.3);
+      color: var(--orange);
+    }
+
+    /* TABLE */
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 32px;
+    }
+
+    .data-table th {
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted);
+      padding: 10px 14px;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface);
+    }
+
+    .data-table td {
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--border);
+      font-size: 13px;
+      vertical-align: middle;
+    }
+
+    .data-table tr:hover td { background: var(--surface); }
+
+    .data-table tr:last-child td { border-bottom: none; }
+
+    /* STATUS BADGES */
+    .status {
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-weight: 500;
+    }
+
+    .status-pending { background: var(--yellow-dim); color: var(--yellow); border: 1px solid rgba(251,191,36,0.3); }
+    .status-approved { background: var(--green-dim); color: var(--green); border: 1px solid rgba(45,212,191,0.3); }
+    .status-rejected { background: var(--red-dim); color: var(--red); border: 1px solid rgba(248,113,113,0.3); }
+    .status-paid { background: var(--orange-dim); color: var(--orange); border: 1px solid rgba(255,107,53,0.3); }
+
+    /* TYPE BADGE */
+    .type-badge {
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: 0.06em;
+      padding: 3px 8px;
+      border-radius: 4px;
+    }
+
+    .type-truck { background: rgba(251,191,36,0.1); color: var(--yellow); }
+    .type-vendor { background: var(--green-dim); color: var(--green); }
+
+    /* ACTION BUTTONS */
+    .action-btn {
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: 0.06em;
+      padding: 5px 12px;
+      border-radius: 6px;
+      border: 1px solid;
+      cursor: pointer;
+      transition: all 0.15s;
+      margin-right: 4px;
+    }
+
+    .btn-approve {
+      background: var(--green-dim);
+      border-color: rgba(45,212,191,0.3);
+      color: var(--green);
+    }
+
+    .btn-approve:hover { background: rgba(45,212,191,0.25); }
+
+    .btn-reject {
+      background: var(--red-dim);
+      border-color: rgba(248,113,113,0.3);
+      color: var(--red);
+    }
+
+    .btn-reject:hover { background: rgba(248,113,113,0.25); }
+
+    .btn-primary {
+      background: var(--orange);
+      border-color: var(--orange);
+      color: #fff;
+      font-size: 12px;
+      padding: 7px 16px;
+    }
+
+    .btn-primary:hover { background: #ff7f4d; }
+
+    .btn-secondary {
+      background: var(--surface);
+      border-color: var(--border);
+      color: var(--muted);
+      font-size: 12px;
+      padding: 7px 16px;
+    }
+
+    .btn-secondary:hover { border-color: var(--orange); color: var(--orange); }
+
+    /* RSVP TABLE */
+    .rsvp-phone {
+      font-family: var(--mono);
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    /* TEXT ALERT COMPOSER */
+    .composer {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 24px;
+      margin-bottom: 32px;
+    }
+
+    .composer-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+    }
+
+    .composer-title {
+      font-family: 'Fredoka One', cursive;
+      font-size: 18px;
+      color: var(--text);
+    }
+
+    .composer-meta {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    .composer textarea {
+      width: 100%;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 14px;
+      padding: 14px;
+      border-radius: 8px;
+      outline: none;
+      resize: vertical;
+      min-height: 100px;
+      line-height: 1.6;
+      transition: border-color 0.2s;
+      margin-bottom: 12px;
+    }
+
+    .composer textarea:focus { border-color: var(--orange); }
+    .composer textarea::placeholder { color: #3a3a4a; }
+
+    .composer-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .char-count {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    .char-count.over { color: var(--red); }
+
+    .composer-actions { display: flex; gap: 10px; }
+
+    /* QUICK TEMPLATES */
+    .templates {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 14px;
+    }
+
+    .template-btn {
+      font-size: 12px;
+      font-weight: 600;
+      padding: 5px 12px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      background: var(--surface2);
+      color: var(--muted);
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .template-btn:hover { border-color: var(--orange); color: var(--orange); }
+
+    /* CONVERSION TRACKER */
+    .conversion-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      margin-bottom: 32px;
+    }
+
+    @media (max-width: 640px) { .conversion-grid { grid-template-columns: 1fr; } }
+
+    .conversion-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px;
+    }
+
+    .conversion-card h3 {
+      font-family: 'Fredoka One', cursive;
+      font-size: 16px;
+      color: var(--text);
+      margin-bottom: 14px;
+    }
+
+    .conversion-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 13px;
+    }
+
+    .conversion-row:last-child { border-bottom: none; }
+    .conversion-row .label { color: var(--muted); font-weight: 600; }
+    .conversion-row .val { font-family: var(--mono); font-size: 13px; color: var(--text); }
+    .conversion-row .val.orange { color: var(--orange); }
+    .conversion-row .val.green { color: var(--green); }
+
+    /* PROGRESS BAR */
+    .progress-wrap { margin-bottom: 16px; }
+    .progress-label {
+      display: flex;
+      justify-content: space-between;
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+    .progress-bar {
+      height: 8px;
+      background: var(--border);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%;
+      background: var(--orange);
+      border-radius: 4px;
+      transition: width 0.6s ease;
+    }
+    .progress-fill.green { background: var(--green); }
+
+    /* NOTICE */
+    .notice {
+      background: var(--yellow-dim);
+      border: 1px solid rgba(251,191,36,0.2);
+      border-radius: 8px;
+      padding: 12px 16px;
+      font-size: 13px;
+      color: var(--yellow);
+      margin-bottom: 20px;
+      font-family: var(--mono);
+    }
+
+    /* EMPTY STATE */
+    .empty-state {
+      text-align: center;
+      padding: 48px;
+      color: var(--muted);
+      font-family: var(--mono);
+      font-size: 13px;
+    }
+
+    .empty-state .icon { font-size: 36px; margin-bottom: 12px; }
+
+    /* LOADING */
+    .loading-row td {
+      text-align: center;
+      padding: 32px;
+      color: var(--muted);
+      font-family: var(--mono);
+      font-size: 12px;
+    }
+
+    /* TOAST */
+    .toast {
+      position: fixed;
+      bottom: 24px; right: 24px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 14px 20px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text);
+      box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+      z-index: 1000;
+      transform: translateY(80px);
+      opacity: 0;
+      transition: all 0.3s ease;
+    }
+
+    .toast.show { transform: translateY(0); opacity: 1; }
+    .toast.success { border-color: rgba(45,212,191,0.4); }
+    .toast.error { border-color: rgba(248,113,113,0.4); }
+
+    /* LOGIN */
+    .login-wrap {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .login-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 36px 32px;
+      width: 100%;
+      max-width: 360px;
+      text-align: center;
+    }
+
+    .login-card h2 {
+      font-family: 'Fredoka One', cursive;
+      font-size: 26px;
+      color: var(--orange);
+      margin-bottom: 6px;
+    }
+
+    .login-card p { font-size: 13px; color: var(--muted); margin-bottom: 24px; }
+
+    .login-field { display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px; text-align: left; }
+    .login-field label { font-family: var(--mono); font-size: 11px; color: var(--muted); letter-spacing: 0.08em; }
+    .login-field input {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 14px;
+      padding: 10px 14px;
+      border-radius: 8px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .login-field input:focus { border-color: var(--orange); }
+
+    .login-btn {
+      width: 100%;
+      background: var(--orange);
+      color: #fff;
+      font-family: 'Fredoka One', cursive;
+      font-size: 18px;
+      border: none;
+      padding: 12px;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: background 0.2s;
+      margin-top: 8px;
+    }
+
+    .login-btn:hover { background: #ff7f4d; }
+    .login-error { font-size: 12px; color: var(--red); margin-top: 10px; display: none; }
+    .login-error.visible { display: block; }
+
+    .revenue-highlight {
+      background: var(--orange-dim);
+      border: 1px solid rgba(255,107,53,0.25);
+      border-radius: 10px;
+      padding: 16px;
+      margin-bottom: 16px;
+    }
+
+    .revenue-highlight .label {
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 4px;
+    }
+
+    .revenue-highlight .amount {
+      font-family: 'Fredoka One', cursive;
+      font-size: 42px;
+      color: var(--orange);
+      line-height: 1;
+    }
+
+    .revenue-highlight .sub {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 4px;
+      font-family: var(--mono);
+    }
+  </style>
+</head>
+<body>
+
+<!-- LOGIN SCREEN -->
+<div id="loginScreen">
+  <div class="login-wrap">
+    <div class="login-card">
+      <h2>1313 Festival</h2>
+      <p>Admin access only. Sign in with your CBUS Events admin account.</p>
+      <div class="login-field">
+        <label>Email</label>
+        <input type="email" id="loginEmail" placeholder="admin@cbusevents.com"/>
+      </div>
+      <div class="login-field">
+        <label>Password</label>
+        <input type="password" id="loginPassword" placeholder="Password"/>
+      </div>
+      <button class="login-btn" onclick="adminLogin()">Sign In</button>
+      <div class="login-error" id="loginError"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ADMIN UI (hidden until logged in) -->
+<div id="adminUI" style="display:none">
+
+  <!-- TOP NAV -->
+  <div class="topnav">
+    <div class="nav-brand">
+      <div class="nav-logo">CBUS Events</div>
+      <div class="nav-sep">|</div>
+      <div class="nav-title">1313 Festival Admin</div>
+    </div>
+    <div class="nav-right">
+      <div class="nav-pill pill-event">📅 June 13, 2026</div>
+      <div class="nav-pill pill-date" id="liveTime"></div>
+      <button class="refresh-btn" onclick="refreshAll()">↺ Refresh</button>
+    </div>
+  </div>
+
+  <div class="layout">
+
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+      <div class="sidebar-section">
+        <div class="sidebar-label">Overview</div>
+        <div class="nav-item active" onclick="showPanel('dashboard')">
+          📊 Dashboard
+        </div>
+      </div>
+      <div class="sidebar-section">
+        <div class="sidebar-label">Applications</div>
+        <div class="nav-item" onclick="showPanel('applications')">
+          📋 All Applications
+          <span class="badge" id="badge-all">-</span>
+        </div>
+        <div class="nav-item" onclick="showPanel('pending')">
+          ⏳ Pending Review
+          <span class="badge" id="badge-pending">-</span>
+        </div>
+        <div class="nav-item" onclick="showPanel('approved')">
+          ✅ Approved
+          <span class="badge" id="badge-approved">-</span>
+        </div>
+      </div>
+      <div class="sidebar-section">
+        <div class="sidebar-label">Attendees</div>
+        <div class="nav-item" onclick="showPanel('rsvps')">
+          🎟️ RSVPs
+          <span class="badge" id="badge-rsvps">-</span>
+        </div>
+        <div class="nav-item" onclick="showPanel('alerts')">
+          📱 Text Alerts
+        </div>
+      </div>
+      <div class="sidebar-section">
+        <div class="sidebar-label">Revenue</div>
+        <div class="nav-item" onclick="showPanel('conversions')">
+          💰 Conversions
+        </div>
+      </div>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div class="main">
+
+      <!-- DASHBOARD -->
+      <div class="panel active" id="panel-dashboard">
+        <div class="section-head">
+          <h2>Dashboard</h2>
+          <span style="font-family:var(--mono);font-size:11px;color:var(--muted)">1313 Festival - Live Overview</span>
+        </div>
+
+        <div class="stat-grid" id="dashStats">
+          <div class="stat-card">
+            <div class="stat-label">Applications</div>
+            <div class="stat-value orange" id="stat-total">-</div>
+            <div class="stat-sub">Total received</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Pending</div>
+            <div class="stat-value yellow" id="stat-pending">-</div>
+            <div class="stat-sub">Awaiting review</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Approved</div>
+            <div class="stat-value green" id="stat-approved">-</div>
+            <div class="stat-sub">Confirmed vendors</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">RSVPs</div>
+            <div class="stat-value orange" id="stat-rsvps">-</div>
+            <div class="stat-sub">Attending</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">App Revenue</div>
+            <div class="stat-value green" id="stat-revenue">$-</div>
+            <div class="stat-sub">From applications</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Slots Filled</div>
+            <div class="stat-value" id="stat-slots">-/28</div>
+            <div class="stat-sub">Of 28 total</div>
+          </div>
+        </div>
+
+        <div class="section-head" style="margin-top:8px">
+          <h2>Slot Progress</h2>
+        </div>
+
+        <div class="progress-wrap">
+          <div class="progress-label">
+            <span>Food Trucks</span>
+            <span id="prog-truck-label">0 / 8</span>
+          </div>
+          <div class="progress-bar">
+            <div class="progress-fill" id="prog-truck" style="width:0%"></div>
+          </div>
+        </div>
+        <div class="progress-wrap">
+          <div class="progress-label">
+            <span>Vendor Tables</span>
+            <span id="prog-vendor-label">0 / 20</span>
+          </div>
+          <div class="progress-bar">
+            <div class="progress-fill green" id="prog-vendor" style="width:0%"></div>
+          </div>
+        </div>
+
+        <div class="section-head" style="margin-top:28px">
+          <h2>Recent Applications</h2>
+          <button class="action-btn btn-secondary" onclick="showPanel('applications')">View All</button>
+        </div>
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Business</th>
+              <th>Type</th>
+              <th>Category</th>
+              <th>Status</th>
+              <th>Applied</th>
+            </tr>
+          </thead>
+          <tbody id="recentApps">
+            <tr class="loading-row"><td colspan="5">Loading...</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- ALL APPLICATIONS -->
+      <div class="panel" id="panel-applications">
+        <div class="section-head">
+          <h2>All Applications</h2>
+          <div class="section-actions">
+            <button class="action-btn btn-secondary" onclick="exportCSV('applications')">Export CSV</button>
+          </div>
+        </div>
+        <div class="filter-tabs">
+          <div class="ftab active" onclick="filterApps('all', this)">All</div>
+          <div class="ftab" onclick="filterApps('pending', this)">Pending</div>
+          <div class="ftab" onclick="filterApps('approved', this)">Approved</div>
+          <div class="ftab" onclick="filterApps('rejected', this)">Rejected</div>
+          <div class="ftab" onclick="filterApps('food_truck', this)">Food Trucks</div>
+          <div class="ftab" onclick="filterApps('vendor', this)">Vendors</div>
+        </div>
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Business</th>
+              <th>Contact</th>
+              <th>Type</th>
+              <th>Category</th>
+              <th>Fee</th>
+              <th>Status</th>
+              <th>License</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="appsTable">
+            <tr class="loading-row"><td colspan="8">Loading...</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- PENDING -->
+      <div class="panel" id="panel-pending">
+        <div class="section-head">
+          <h2>Pending Review</h2>
+        </div>
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Business</th>
+              <th>Contact</th>
+              <th>Type</th>
+              <th>Description</th>
+              <th>License #</th>
+              <th>License File</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="pendingTable">
+            <tr class="loading-row"><td colspan="7">Loading...</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- APPROVED -->
+      <div class="panel" id="panel-approved">
+        <div class="section-head">
+          <h2>Approved Vendors</h2>
+          <span style="font-family:var(--mono);font-size:11px;color:var(--muted)">These appear live on the event page</span>
+        </div>
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Business</th>
+              <th>Type</th>
+              <th>Category</th>
+              <th>Email</th>
+              <th>Fee</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="approvedTable">
+            <tr class="loading-row"><td colspan="6">Loading...</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- RSVPs -->
+      <div class="panel" id="panel-rsvps">
+        <div class="section-head">
+          <h2>RSVPs</h2>
+          <div class="section-actions">
+            <button class="action-btn btn-secondary" onclick="exportCSV('rsvps')">Export CSV</button>
+            <button class="action-btn btn-primary" onclick="showPanel('alerts')">Send Text Alert</button>
+          </div>
+        </div>
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Email</th>
+              <th>Phone</th>
+              <th>RSVP'd</th>
+            </tr>
+          </thead>
+          <tbody id="rsvpTable">
+            <tr class="loading-row"><td colspan="4">Loading...</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- TEXT ALERTS -->
+      <div class="panel" id="panel-alerts">
+        <div class="section-head">
+          <h2>Text Alerts</h2>
+        </div>
+        <div class="notice">
+          ⚡ Twilio integration required to send live texts. Wire your Twilio Account SID, Auth Token, and From number in the config below. All RSVPs with a phone number will receive the message.
+        </div>
+
+        <div class="composer">
+          <div class="composer-header">
+            <div class="composer-title">Compose Message</div>
+            <div class="composer-meta" id="alertRecipientCount">Loading recipient count...</div>
+          </div>
+
+          <div class="templates">
+            <div class="sidebar-label" style="margin-bottom:0;align-self:center">Quick templates:</div>
+            <button class="template-btn" onclick="setTemplate('announce')">📣 Announcement</button>
+            <button class="template-btn" onclick="setTemplate('vendor')">🚚 New Vendor</button>
+            <button class="template-btn" onclick="setTemplate('preorder')">🍔 Preorder Open</button>
+            <button class="template-btn" onclick="setTemplate('dayof')">🎉 Day-Of Alert</button>
+            <button class="template-btn" onclick="setTemplate('reminder')">⏰ Day Before</button>
+          </div>
+
+          <textarea id="alertMessage" placeholder="Type your message here..." oninput="updateCharCount()"></textarea>
+
+          <div class="composer-footer">
+            <div class="char-count" id="charCount">0 / 160 characters</div>
+            <div class="composer-actions">
+              <button class="action-btn btn-secondary" onclick="previewAlert()">Preview</button>
+              <button class="action-btn btn-primary" onclick="sendAlert()">Send to All RSVPs 📱</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="section-head">
+          <h2>Twilio Config</h2>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:24px">
+          <div>
+            <div style="font-family:var(--mono);font-size:11px;color:var(--muted);margin-bottom:6px">ACCOUNT SID</div>
+            <input type="text" id="twilioSid" placeholder="ACxxxxxxxxxxxxxxxx" style="width:100%;background:var(--surface);border:1px solid var(--border);color:var(--text);font-family:var(--mono);font-size:13px;padding:10px 14px;border-radius:8px;outline:none"/>
+          </div>
+          <div>
+            <div style="font-family:var(--mono);font-size:11px;color:var(--muted);margin-bottom:6px">AUTH TOKEN</div>
+            <input type="password" id="twilioToken" placeholder="••••••••••••••••" style="width:100%;background:var(--surface);border:1px solid var(--border);color:var(--text);font-family:var(--mono);font-size:13px;padding:10px 14px;border-radius:8px;outline:none"/>
+          </div>
+          <div>
+            <div style="font-family:var(--mono);font-size:11px;color:var(--muted);margin-bottom:6px">FROM NUMBER</div>
+            <input type="text" id="twilioFrom" placeholder="+16140000000" style="width:100%;background:var(--surface);border:1px solid var(--border);color:var(--text);font-family:var(--mono);font-size:13px;padding:10px 14px;border-radius:8px;outline:none"/>
+          </div>
+          <div style="display:flex;align-items:flex-end">
+            <button class="action-btn btn-primary" style="width:100%;padding:10px" onclick="saveTwilioConfig()">Save Config</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- CONVERSIONS -->
+      <div class="panel" id="panel-conversions">
+        <div class="section-head">
+          <h2>Account Conversions</h2>
+          <span style="font-family:var(--mono);font-size:11px;color:var(--muted)">Festival-generated accounts and revenue</span>
+        </div>
+
+        <div class="revenue-highlight">
+          <div class="label">Total Application Revenue</div>
+          <div class="amount" id="conv-revenue">$0</div>
+          <div class="sub">From vendor + food truck applications</div>
+        </div>
+
+        <div class="conversion-grid">
+          <div class="conversion-card">
+            <h3>🚚 Food Truck Accounts</h3>
+            <div class="conversion-row">
+              <span class="label">Applied</span>
+              <span class="val" id="conv-ft-applied">-</span>
+            </div>
+            <div class="conversion-row">
+              <span class="label">Approved</span>
+              <span class="val green" id="conv-ft-approved">-</span>
+            </div>
+            <div class="conversion-row">
+              <span class="label">Application Revenue</span>
+              <span class="val orange" id="conv-ft-revenue">$-</span>
+            </div>
+            <div class="conversion-row">
+              <span class="label">Slots Remaining</span>
+              <span class="val" id="conv-ft-remaining">- of 8</span>
+            </div>
+          </div>
+          <div class="conversion-card">
+            <h3>⛺ Vendor Accounts</h3>
+            <div class="conversion-row">
+              <span class="label">Applied</span>
+              <span class="val" id="conv-v-applied">-</span>
+            </div>
+            <div class="conversion-row">
+              <span class="label">Approved</span>
+              <span class="val green" id="conv-v-approved">-</span>
+            </div>
+            <div class="conversion-row">
+              <span class="label">Application Revenue</span>
+              <span class="val orange" id="conv-v-revenue">$-</span>
+            </div>
+            <div class="conversion-row">
+              <span class="label">Slots Remaining</span>
+              <span class="val" id="conv-v-remaining">- of 20</span>
+            </div>
+          </div>
+          <div class="conversion-card">
+            <h3>🎟️ Attendee RSVPs</h3>
+            <div class="conversion-row">
+              <span class="label">Total RSVPs</span>
+              <span class="val orange" id="conv-rsvp-total">-</span>
+            </div>
+            <div class="conversion-row">
+              <span class="label">With Phone (SMS list)</span>
+              <span class="val green" id="conv-rsvp-phone">-</span>
+            </div>
+          </div>
+          <div class="conversion-card">
+            <h3>💳 Premium Conversions</h3>
+            <div class="conversion-row">
+              <span class="label">Venue Premium</span>
+              <span class="val">N/A - 1313 property</span>
+            </div>
+            <div class="conversion-row">
+              <span class="label">Planner Premium</span>
+              <span class="val" id="conv-planner">- (add manually)</span>
+            </div>
+            <div class="conversion-row">
+              <span class="label">Potential Monthly Recurring</span>
+              <span class="val orange" id="conv-mrr">$-</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="notice" style="margin-top:8px">
+          💡 Premium subscription conversion tracking will show here once payment data flows through Stripe. Wire Stripe webhooks to update account status in the profiles table.
+        </div>
+      </div>
+
+    </div><!-- end main -->
+  </div><!-- end layout -->
+</div><!-- end adminUI -->
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+  const { createClient } = supabase;
+  const sb = createClient(
+    'https://toblgvatvsjljbqogzsv.supabase.co',
+    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRvYmxndmF0dnNqbGpicW9nenN2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMDgwNTAsImV4cCI6MjA4NzY4NDA1MH0._WJEQPizNDiQfDXQB_DHPaQhixPGpMdmYQSmyWmm_FQ'
+  );
+
+  const ADMIN_EMAILS = ['deante90@gmail.com', 'info@cbusevents.com', 'cbusevent291@gmail.com'];
+
+  let allApps = [];
+  let allRsvps = [];
+  let currentAppFilter = 'all';
+
+  // LIVE CLOCK
+  setInterval(() => {
+    const now = new Date();
+    document.getElementById('liveTime').textContent =
+      now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+  }, 1000);
+
+  // LOGIN
+  async function adminLogin() {
+    const email = document.getElementById('loginEmail').value.trim();
+    const password = document.getElementById('loginPassword').value;
+    const errEl = document.getElementById('loginError');
+
+    const { data, error } = await sb.auth.signInWithPassword({ email, password });
+    if (error || !ADMIN_EMAILS.includes(email)) {
+      errEl.textContent = 'Access denied. Admin accounts only.';
+      errEl.classList.add('visible');
+      if (data?.session) await sb.auth.signOut();
+      return;
+    }
+
+    document.getElementById('loginScreen').style.display = 'none';
+    document.getElementById('adminUI').style.display = 'block';
+    loadAll();
+  }
+
+  // Check existing session
+  sb.auth.getSession().then(({ data: { session } }) => {
+    if (session && ADMIN_EMAILS.includes(session.user.email)) {
+      document.getElementById('loginScreen').style.display = 'none';
+      document.getElementById('adminUI').style.display = 'block';
+      loadAll();
+    }
+  });
+
+  // PANEL NAVIGATION
+  function showPanel(name) {
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    document.getElementById('panel-' + name).classList.add('active');
+    event.currentTarget && event.currentTarget.classList.add('active');
+    // Load panel-specific data
+    if (name === 'rsvps' || name === 'alerts') loadRsvps();
+    if (name === 'conversions') renderConversions();
+  }
+
+  // LOAD ALL DATA
+  async function loadAll() {
+    await Promise.all([loadApplications(), loadRsvps()]);
+    renderDashboard();
+    renderApplications();
+    renderPending();
+    renderApproved();
+    renderConversions();
+  }
+
+  async function refreshAll() {
+    showToast('Refreshing...', '');
+    await loadAll();
+    showToast('Data refreshed', 'success');
+  }
+
+  // LOAD APPLICATIONS
+  async function loadApplications() {
+    const { data, error } = await sb
+      .from('festival_applications')
+      .select('*')
+      .eq('event', '1313_festival')
+      .order('created_at', { ascending: false });
+    allApps = data || [];
+    updateBadges();
+  }
+
+  // LOAD RSVPs
+  async function loadRsvps() {
+    const { data } = await sb
+      .from('event_rsvps')
+      .select('*')
+      .eq('event', '1313_festival')
+      .order('created_at', { ascending: false });
+    allRsvps = data || [];
+    document.getElementById('badge-rsvps').textContent = allRsvps.length;
+    document.getElementById('alertRecipientCount').textContent =
+      allRsvps.length + ' recipients with phone numbers';
+    renderRsvps();
+  }
+
+  function updateBadges() {
+    const pending = allApps.filter(a => a.status === 'pending').length;
+    const approved = allApps.filter(a => a.status === 'approved').length;
+    document.getElementById('badge-all').textContent = allApps.length;
+    document.getElementById('badge-pending').textContent = pending;
+    document.getElementById('badge-approved').textContent = approved;
+  }
+
+  // RENDER DASHBOARD
+  function renderDashboard() {
+    const pending = allApps.filter(a => a.status === 'pending').length;
+    const approved = allApps.filter(a => a.status === 'approved').length;
+    const trucks = allApps.filter(a => a.applicant_type === 'food_truck' && a.status === 'approved').length;
+    const vendors = allApps.filter(a => a.applicant_type === 'vendor' && a.status === 'approved').length;
+    const revenue = allApps.filter(a => a.status === 'approved').reduce((s, a) => s + (a.fee || 0), 0);
+
+    document.getElementById('stat-total').textContent = allApps.length;
+    document.getElementById('stat-pending').textContent = pending;
+    document.getElementById('stat-approved').textContent = approved;
+    document.getElementById('stat-rsvps').textContent = allRsvps.length;
+    document.getElementById('stat-revenue').textContent = '$' + revenue.toLocaleString();
+    document.getElementById('stat-slots').textContent = approved + '/28';
+
+    // Progress bars
+    document.getElementById('prog-truck').style.width = Math.min(100, (trucks/8)*100) + '%';
+    document.getElementById('prog-truck-label').textContent = trucks + ' / 8';
+    document.getElementById('prog-vendor').style.width = Math.min(100, (vendors/20)*100) + '%';
+    document.getElementById('prog-vendor-label').textContent = vendors + ' / 20';
+
+    // Recent apps
+    const tbody = document.getElementById('recentApps');
+    const recent = allApps.slice(0, 6);
+    if (recent.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:24px;color:var(--muted);font-family:var(--mono);font-size:12px">No applications yet</td></tr>';
+      return;
+    }
+    tbody.innerHTML = recent.map(a => `
+      <tr>
+        <td><strong>${a.business_name}</strong></td>
+        <td><span class="type-badge ${a.applicant_type === 'food_truck' ? 'type-truck' : 'type-vendor'}">${a.applicant_type === 'food_truck' ? '🚚 Truck' : '⛺ Vendor'}</span></td>
+        <td style="color:var(--muted);font-size:12px">${a.category || '-'}</td>
+        <td><span class="status status-${a.status}">${a.status}</span></td>
+        <td style="color:var(--muted);font-family:var(--mono);font-size:11px">${new Date(a.created_at).toLocaleDateString()}</td>
+      </tr>
+    `).join('');
+  }
+
+  // RENDER APPLICATIONS TABLE
+  function renderApplications() {
+    const filtered = filterAppsList(allApps, currentAppFilter);
+    const tbody = document.getElementById('appsTable');
+    if (filtered.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:32px;color:var(--muted);font-family:var(--mono);font-size:12px">No applications found</td></tr>';
+      return;
+    }
+    tbody.innerHTML = filtered.map(a => `
+      <tr>
+        <td><strong>${a.business_name}</strong><br/><span style="font-size:11px;color:var(--muted)">${a.first_name} ${a.last_name}</span></td>
+        <td><span style="font-size:11px;font-family:var(--mono)">${a.email}<br/>${a.phone || ''}</span></td>
+        <td><span class="type-badge ${a.applicant_type === 'food_truck' ? 'type-truck' : 'type-vendor'}">${a.applicant_type === 'food_truck' ? '🚚 Truck' : '⛺ Vendor'}</span></td>
+        <td style="font-size:12px;color:var(--muted)">${a.category || '-'}</td>
+        <td style="font-family:var(--mono);font-size:12px;color:var(--orange)">$${a.fee || 0}</td>
+        <td><span class="status status-${a.status}">${a.status}</span></td>
+        <td>${a.license_url ? `<a href="${a.license_url}" target="_blank" style="color:var(--orange);font-size:12px;font-family:var(--mono)">View</a>` : '<span style="color:var(--muted);font-size:12px">N/A</span>'}</td>
+        <td>
+          ${a.status !== 'approved' ? `<button class="action-btn btn-approve" onclick="updateStatus('${a.id}', 'approved')">Approve</button>` : ''}
+          ${a.status !== 'rejected' ? `<button class="action-btn btn-reject" onclick="updateStatus('${a.id}', 'rejected')">Reject</button>` : ''}
+        </td>
+      </tr>
+    `).join('');
+  }
+
+  // RENDER PENDING
+  function renderPending() {
+    const pending = allApps.filter(a => a.status === 'pending');
+    const tbody = document.getElementById('pendingTable');
+    if (pending.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:32px;color:var(--muted);font-family:var(--mono);font-size:12px">No pending applications 🎉</td></tr>';
+      return;
+    }
+    tbody.innerHTML = pending.map(a => `
+      <tr>
+        <td><strong>${a.business_name}</strong><br/><span style="font-size:11px;color:var(--muted)">${a.email}</span></td>
+        <td><span style="font-size:12px;color:var(--muted)">${a.first_name} ${a.last_name}<br/>${a.phone || ''}</span></td>
+        <td><span class="type-badge ${a.applicant_type === 'food_truck' ? 'type-truck' : 'type-vendor'}">${a.applicant_type === 'food_truck' ? '🚚' : '⛺'} ${a.applicant_type === 'food_truck' ? 'Truck' : 'Vendor'}</span></td>
+        <td style="font-size:12px;color:var(--muted);max-width:180px">${(a.description || '').slice(0, 80)}${(a.description || '').length > 80 ? '...' : ''}</td>
+        <td style="font-family:var(--mono);font-size:12px">${a.license_number || '-'}</td>
+        <td>${a.license_url ? `<a href="${a.license_url}" target="_blank" style="color:var(--orange);font-size:12px">View File</a>` : '<span style="color:var(--muted);font-size:12px">None</span>'}</td>
+        <td>
+          <button class="action-btn btn-approve" onclick="updateStatus('${a.id}', 'approved')">✓ Approve</button>
+          <button class="action-btn btn-reject" onclick="updateStatus('${a.id}', 'rejected')">✗ Reject</button>
+        </td>
+      </tr>
+    `).join('');
+  }
+
+  // RENDER APPROVED
+  function renderApproved() {
+    const approved = allApps.filter(a => a.status === 'approved');
+    const tbody = document.getElementById('approvedTable');
+    if (approved.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:32px;color:var(--muted);font-family:var(--mono);font-size:12px">No approved vendors yet</td></tr>';
+      return;
+    }
+    tbody.innerHTML = approved.map(a => `
+      <tr>
+        <td><strong>${a.business_name}</strong></td>
+        <td><span class="type-badge ${a.applicant_type === 'food_truck' ? 'type-truck' : 'type-vendor'}">${a.applicant_type === 'food_truck' ? '🚚 Truck' : '⛺ Vendor'}</span></td>
+        <td style="font-size:12px;color:var(--muted)">${a.category || '-'}</td>
+        <td style="font-size:12px;color:var(--muted)">${a.email}</td>
+        <td style="font-family:var(--mono);color:var(--orange)">$${a.fee}</td>
+        <td>
+          <button class="action-btn btn-reject" onclick="updateStatus('${a.id}', 'rejected')">Remove</button>
+        </td>
+      </tr>
+    `).join('');
+  }
+
+  // RENDER RSVPs
+  function renderRsvps() {
+    const tbody = document.getElementById('rsvpTable');
+    if (allRsvps.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;padding:32px;color:var(--muted);font-family:var(--mono);font-size:12px">No RSVPs yet</td></tr>';
+      return;
+    }
+    tbody.innerHTML = allRsvps.map(r => `
+      <tr>
+        <td><strong>${r.name}</strong></td>
+        <td style="font-size:12px;color:var(--muted)">${r.email}</td>
+        <td class="rsvp-phone">${r.phone}</td>
+        <td style="font-family:var(--mono);font-size:11px;color:var(--muted)">${new Date(r.created_at).toLocaleDateString()}</td>
+      </tr>
+    `).join('');
+  }
+
+  // RENDER CONVERSIONS
+  function renderConversions() {
+    const ftApplied = allApps.filter(a => a.applicant_type === 'food_truck').length;
+    const ftApproved = allApps.filter(a => a.applicant_type === 'food_truck' && a.status === 'approved').length;
+    const ftRevenue = allApps.filter(a => a.applicant_type === 'food_truck' && a.status === 'approved').reduce((s,a) => s+(a.fee||0), 0);
+    const vApplied = allApps.filter(a => a.applicant_type === 'vendor').length;
+    const vApproved = allApps.filter(a => a.applicant_type === 'vendor' && a.status === 'approved').length;
+    const vRevenue = allApps.filter(a => a.applicant_type === 'vendor' && a.status === 'approved').reduce((s,a) => s+(a.fee||0), 0);
+    const totalRevenue = ftRevenue + vRevenue;
+    const mrr = (ftApproved * 0) + (vApproved * 0); // Update when subscription data flows
+
+    document.getElementById('conv-revenue').textContent = '$' + totalRevenue.toLocaleString();
+    document.getElementById('conv-ft-applied').textContent = ftApplied;
+    document.getElementById('conv-ft-approved').textContent = ftApproved;
+    document.getElementById('conv-ft-revenue').textContent = '$' + ftRevenue;
+    document.getElementById('conv-ft-remaining').textContent = (8 - ftApproved) + ' of 8';
+    document.getElementById('conv-v-applied').textContent = vApplied;
+    document.getElementById('conv-v-approved').textContent = vApproved;
+    document.getElementById('conv-v-revenue').textContent = '$' + vRevenue;
+    document.getElementById('conv-v-remaining').textContent = (20 - vApproved) + ' of 20';
+    document.getElementById('conv-rsvp-total').textContent = allRsvps.length;
+    document.getElementById('conv-rsvp-phone').textContent = allRsvps.filter(r => r.phone).length;
+    document.getElementById('conv-mrr').textContent = mrr > 0 ? '$' + mrr + '/mo' : 'Pending Stripe data';
+  }
+
+  // UPDATE APPLICATION STATUS
+  async function updateStatus(id, status) {
+    const { error } = await sb
+      .from('festival_applications')
+      .update({ status })
+      .eq('id', id);
+
+    if (error) { showToast('Error: ' + error.message, 'error'); return; }
+
+    showToast(status === 'approved' ? '✅ Approved - vendor now live on event page' : '✗ Application rejected', status === 'approved' ? 'success' : 'error');
+    await loadApplications();
+    renderDashboard();
+    renderApplications();
+    renderPending();
+    renderApproved();
+    renderConversions();
+  }
+
+  // FILTER APPS
+  function filterAppsList(apps, filter) {
+    if (filter === 'all') return apps;
+    if (filter === 'food_truck' || filter === 'vendor') return apps.filter(a => a.applicant_type === filter);
+    return apps.filter(a => a.status === filter);
+  }
+
+  function filterApps(filter, el) {
+    currentAppFilter = filter;
+    document.querySelectorAll('#panel-applications .ftab').forEach(t => t.classList.remove('active'));
+    el.classList.add('active');
+    renderApplications();
+  }
+
+  // TEXT ALERT TEMPLATES
+  const templates = {
+    announce: "🎪 1313 Festival is coming June 13th to 1313 E Broad St, Columbus! Free entry, 8 food trucks, 20 vendors. More details at cbusevents.com",
+    vendor: "🚚 New vendor just confirmed for 1313 Festival! Check who's coming at cbusevents.com - preorders open soon.",
+    preorder: "🍔 Preorders are LIVE for 1313 Festival food trucks! Skip the line June 13th - order ahead at cbusevents.com",
+    dayof: "🎉 TODAY is 1313 Festival! We're at 1313 E Broad St starting at 11AM. Free entry - see you there!",
+    reminder: "⏰ Tomorrow is 1313 Festival! June 13th, 11AM-8PM at 1313 E Broad St. Free entry. cbusevents.com for details."
+  };
+
+  function setTemplate(key) {
+    document.getElementById('alertMessage').value = templates[key];
+    updateCharCount();
+  }
+
+  function updateCharCount() {
+    const len = document.getElementById('alertMessage').value.length;
+    const el = document.getElementById('charCount');
+    el.textContent = len + ' / 160 characters';
+    el.classList.toggle('over', len > 160);
+  }
+
+  function previewAlert() {
+    const msg = document.getElementById('alertMessage').value.trim();
+    if (!msg) { showToast('Write a message first', 'error'); return; }
+    alert('PREVIEW - This will be sent to ' + allRsvps.length + ' people:\n\n' + msg);
+  }
+
+  async function sendAlert() {
+    const msg = document.getElementById('alertMessage').value.trim();
+    const sid = document.getElementById('twilioSid').value.trim();
+    const token = document.getElementById('twilioToken').value.trim();
+    const from = document.getElementById('twilioFrom').value.trim();
+
+    if (!msg) { showToast('Write a message first', 'error'); return; }
+    if (!sid || !token || !from) { showToast('Add Twilio config first', 'error'); return; }
+    if (allRsvps.length === 0) { showToast('No RSVPs to text yet', 'error'); return; }
+
+    const confirm = window.confirm(`Send this message to ${allRsvps.length} RSVPs?\n\n"${msg}"`);
+    if (!confirm) return;
+
+    showToast('Sending... (wire Twilio Edge Function to complete)', 'success');
+    // TODO: Call Supabase Edge Function 'send-sms-blast' with { message: msg, recipients: allRsvps.map(r=>r.phone), sid, token, from }
+  }
+
+  function saveTwilioConfig() {
+    localStorage.setItem('twilio_sid', document.getElementById('twilioSid').value);
+    localStorage.setItem('twilio_from', document.getElementById('twilioFrom').value);
+    showToast('Twilio config saved (token not stored for security)', 'success');
+  }
+
+  // On load restore Twilio config
+  document.getElementById('twilioSid').value = localStorage.getItem('twilio_sid') || '';
+  document.getElementById('twilioFrom').value = localStorage.getItem('twilio_from') || '';
+
+  // EXPORT CSV
+  function exportCSV(type) {
+    let rows, filename, headers;
+    if (type === 'applications') {
+      headers = ['Business', 'First', 'Last', 'Email', 'Phone', 'Type', 'Category', 'Description', 'License #', 'Fee', 'Status', 'Applied'];
+      rows = allApps.map(a => [a.business_name, a.first_name, a.last_name, a.email, a.phone, a.applicant_type, a.category, a.description, a.license_number, a.fee, a.status, a.created_at]);
+      filename = '1313-festival-applications.csv';
+    } else {
+      headers = ['Name', 'Email', 'Phone', 'RSVP Date'];
+      rows = allRsvps.map(r => [r.name, r.email, r.phone, r.created_at]);
+      filename = '1313-festival-rsvps.csv';
+    }
+    const csv = [headers, ...rows].map(r => r.map(v => '"' + String(v || '').replace(/"/g, '""') + '"').join(',')).join('\n');
+    const a = document.createElement('a');
+    a.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv);
+    a.download = filename;
+    a.click();
+    showToast('CSV exported', 'success');
+  }
+
+  // TOAST
+  function showToast(msg, type = '') {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.className = 'toast show ' + type;
+    setTimeout(() => t.classList.remove('show'), 3000);
+  }
+</script>
+</body>
+</html>
