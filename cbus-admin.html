@@ -2293,14 +2293,22 @@ async function renderMarketing(){
  const pageContent=document.getElementById('pageContent');
  pageContent.innerHTML=`<div style="display:flex;align-items:center;justify-content:center;padding:60px"><div style="width:28px;height:28px;border:3px solid var(--border);border-top-color:var(--orange);border-radius:50%;animation:spin 0.8s linear infinite"></div></div>`;
 
- const{data,error}=await sb.from('marketing_intelligence').select('*, profiles(business_name)').order('created_at',{ascending:false});
+ const{data:miData,error}=await sb.from('marketing_intelligence').select('*').order('created_at',{ascending:false});
 
  if(error){
    pageContent.innerHTML=`<div style="padding:40px;text-align:center;color:var(--red)">Error loading marketing data: ${error.message}</div>`;
    return;
  }
 
- const items=data||[];
+ const items=miData||[];
+
+ // Second query: fetch vendor names by vendor_id for the collected rows
+ const vendorIds=[...new Set(items.map(i=>i.vendor_id).filter(Boolean))];
+ let vendorMap={};
+ if(vendorIds.length>0){
+   const{data:vRows}=await sb.from('vendors').select('id,business_name').in('id',vendorIds);
+   (vRows||[]).forEach(v=>{vendorMap[v.id]=v.business_name;});
+ }
 
  pageContent.innerHTML=`
  <div style="margin-bottom:28px">
@@ -2310,7 +2318,7 @@ async function renderMarketing(){
  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(520px,1fr));gap:20px">
    ${items.length===0?`<div style="grid-column:1/-1;padding:60px;text-align:center;color:var(--muted);background:var(--card);border:1px solid var(--border);border-radius:16px">No marketing assets found. Add records to the <code style="font-family:var(--mono);font-size:12px;background:var(--bg);padding:2px 6px;border-radius:4px">marketing_intelligence</code> table to get started.</div>`:
    items.map(item=>{
-     const bizName=item.profiles?.business_name||'Unknown Business';
+     const bizName=vendorMap[item.vendor_id]||'Unknown Business';
      const caption=item.social_caption||'';
      const newsletter=item.newsletter_copy||'';
      const graphic=item.graphic_url||'';

@@ -377,7 +377,7 @@ async function handleSubmit() {
 
     if (userId && data.session) {
       const roleMap = { venue: 'venue_owner', vendor: 'vendor', planner: 'planner', attendee: 'customer', food_professional: 'food_professional', event_staff: 'event_staff' };
-      await sb.from('user_roles').upsert({ user_id: userId, role: roleMap[selectedRole] || selectedRole }, { onConflict: 'user_id' });
+      await sb.from('user_roles').upsert({ user_id: userId, role: roleMap[selectedRole] || selectedRole }, { onConflict: 'user_id,role' });
 
       if (selectedRole === 'venue' && meta.venue_name) {
         await sb.from('venues').insert({ owner_id: userId, name: meta.venue_name, venue_type: meta.venue_type||null, capacity: meta.capacity?parseInt(meta.capacity):null, phone: meta.phone||null, status: 'pending', tier: 'free', city: 'Columbus', state: 'OH' });

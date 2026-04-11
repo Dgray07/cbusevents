@@ -362,7 +362,13 @@ async function loadProducts() {
   const { data, error } = await query;
 
   if (error) {
-    grid.innerHTML = `<div class="empty-state"><div class="empty-icon">⚠️</div><div class="empty-title">Could not load products</div></div>`;
+    console.error('[Marketplace] vendor_products load error:', error.message);
+    const isTableMissing = error.message?.includes('does not exist') || error.code === '42P01';
+    grid.innerHTML = `<div class="empty-state">
+      <div class="empty-icon">🏪</div>
+      <div class="empty-title">${isTableMissing ? 'Marketplace Coming Soon' : 'Could not load products'}</div>
+      <div class="empty-sub">${isTableMissing ? 'Vendor products are on their way.' : 'Please try again in a moment.'}</div>
+    </div>`;
     return;
   }
 

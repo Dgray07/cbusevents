@@ -1364,7 +1364,7 @@ async function handleSignup() {
   currentUser = data.user;
   if (currentUser) {
     // Upsert user_role so redirect logic works
-    await db.from('user_roles').upsert({ user_id: currentUser.id, role: 'event_staff' }, { onConflict: 'user_id' });
+    await db.from('user_roles').upsert({ user_id: currentUser.id, role: 'event_staff' }, { onConflict: 'user_id,role' });
     await db.from('event_staff').upsert({
       user_id: currentUser.id,
       display_name: `${first} ${last}`,

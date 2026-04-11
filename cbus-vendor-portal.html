@@ -494,6 +494,13 @@ async function enterPortal(){
    toast('Plan upgraded to '+newTier.charAt(0)+newTier.slice(1).toLowerCase()+'!');
  }
 
+ // Handle return from Stripe Connect onboarding — auto-navigate to payouts and refresh status
+ if(params.get('stripe_return')==='1'||params.get('stripe_refresh')==='1'){
+   window.history.replaceState({},'',window.location.pathname);
+   // Brief delay so portal finishes rendering before navigating
+   setTimeout(()=>showPage('payouts'),400);
+ }
+
  // Load vendor profile
  const{data}=await sb.from('vendors').select('*').eq('user_id',currentUser.id).maybeSingle();
  if(!data){
@@ -2089,10 +2096,12 @@ async function getAuthToken(){
 async function startConnectOnboard(){
  toast('Redirecting to Stripe...');
  try{
+   const returnUrl=window.location.origin+window.location.pathname+'?stripe_return=1';
+   const refreshUrl=window.location.origin+window.location.pathname+'?stripe_refresh=1';
    const res=await fetch(CONNECT_FN,{
      method:'POST',
      headers:{'Content-Type':'application/json','Authorization':'Bearer '+await getAuthToken(),'apikey':SB_KEY},
-     body:JSON.stringify({action:'onboard'})
+     body:JSON.stringify({action:'onboard',return_url:returnUrl,refresh_url:refreshUrl})
    });
    const data=await res.json();
    if(data.url) window.location.href=data.url;

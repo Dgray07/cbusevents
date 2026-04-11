@@ -217,14 +217,19 @@ let profile=null,evtCfg=null,items=[],cart={},activeTab='all',cdTimer=null;
 (async()=>{
   const p=new URLSearchParams(window.location.search);
   const uid=p.get('u');
-  if(!uid){notFound();return;}
+  const slug=p.get('slug');
+  if(!uid&&!slug){notFound();return;}
   try{
-    const{data:prof}=await db.from('food_professionals').select('*').eq('user_id',uid).maybeSingle();
+    let profQuery=db.from('food_professionals').select('*');
+    if(slug) profQuery=profQuery.eq('storefront_slug',slug);
+    else profQuery=profQuery.eq('user_id',uid);
+    const{data:prof}=await profQuery.maybeSingle();
     if(!prof){notFound();return;}
     profile=prof;
-    const{data:evt}=await db.from('food_professional_events').select('*').eq('user_id',uid).maybeSingle();
+    const resolvedUid=prof.user_id;
+    const{data:evt}=await db.from('food_professional_events').select('*').eq('user_id',resolvedUid).maybeSingle();
     evtCfg=evt;
-    const{data:its}=await db.from('food_professional_menu_items').select('*').eq('user_id',uid).order('category').order('name');
+    const{data:its}=await db.from('food_professional_menu_items').select('*').eq('user_id',resolvedUid).order('category').order('name');
     items=(its||[]).filter(i=>i.is_available!==false);
     render();
   }catch(e){console.error(e);notFound();}
@@ -474,9 +479,13 @@ function showSuccess(order,first,email,total){
 }
 
 function shareStore(){
-  const url=window.location.href;
-  if(navigator.share)navigator.share({title:profile?.display_name||'Order Now',url});
-  else navigator.clipboard.writeText(url).then(()=>toast('Link copied!','success'));
+  // Prefer slug-based URL for sharing if profile has one
+  const base=window.location.origin+window.location.pathname;
+  const shareUrl=profile?.storefront_slug
+    ? base+'?slug='+profile.storefront_slug
+    : window.location.href;
+  if(navigator.share)navigator.share({title:profile?.display_name||'Order Now',url:shareUrl});
+  else navigator.clipboard.writeText(shareUrl).then(()=>toast('Link copied!','success'));
 }
 
 function openSheet(){document.getElementById('sheet-ov').classList.add('open');}
