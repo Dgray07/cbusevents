@@ -104,14 +104,7 @@
     <priority>0.5</priority>
   </url>
 
-  <!-- Event pages (11 events) — auto-generated 2026-04-11 -->
-  <url>
-    <loc>https://cbusevents.com/event.html?id=df2002a7-92af-41b1-a278-f7dd4cd95735</loc>
-    <lastmod>2026-03-23</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.9</priority>
-  </url>
-
+  <!-- Event pages (10 events) — auto-generated 2026-04-12 -->
   <url>
     <loc>https://cbusevents.com/event.html?id=1f52dac1-33f3-4506-84d1-68302b9c1d32</loc>
     <lastmod>2026-03-23</lastmod>
@@ -141,15 +134,15 @@
   </url>
 
   <url>
-    <loc>https://cbusevents.com/event.html?id=0e4d9d42-4969-4004-9a95-b2b1955f03d9</loc>
-    <lastmod>2026-03-23</lastmod>
+    <loc>https://cbusevents.com/event.html?id=544d967d-798c-4c61-a811-941123fb2862</loc>
+    <lastmod>2026-04-02</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
 
   <url>
-    <loc>https://cbusevents.com/event.html?id=544d967d-798c-4c61-a811-941123fb2862</loc>
-    <lastmod>2026-04-02</lastmod>
+    <loc>https://cbusevents.com/event.html?id=0e4d9d42-4969-4004-9a95-b2b1955f03d9</loc>
+    <lastmod>2026-03-23</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
