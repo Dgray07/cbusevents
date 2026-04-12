@@ -1046,6 +1046,10 @@
       <div class="sidebar-item" onclick="showPanel('orders')" data-panel="orders">
         <span class="icon">📋</span> Orders
       </div>
+      <div class="sidebar-item" onclick="showPanel('festival')" data-panel="festival">
+        <span class="icon">🎪</span> 1313 Festival
+        <span id="festivalSidebarBadge" style="display:none;margin-left:auto;background:#fbbf24;color:#000;border-radius:999px;padding:1px 7px;font-size:9px;font-weight:800;font-family:monospace"></span>
+      </div>
 
       <div class="sidebar-label">Storefront</div>
       <div class="sidebar-item" onclick="showPanel('menu')" data-panel="menu">
@@ -1164,6 +1168,17 @@
               <p>Once you set up your menu and go live,<br>orders will appear here in real time.</p>
             </div>
           </div>
+        </div>
+      </div>
+
+      <!-- FESTIVAL -->
+      <div class="panel" id="panel-festival">
+        <div class="page-header">
+          <h1>🎪 1313 Festival</h1>
+          <p>June 13, 2026 &nbsp;·&nbsp; 1313 E. Broad St, Columbus OH</p>
+        </div>
+        <div id="festival-panel-content" style="min-height:200px;display:flex;align-items:center;justify-content:center">
+          <div class="spinner" style="width:28px;height:28px;border:3px solid var(--bg3);border-top-color:var(--orange);border-radius:50%;animation:spin 0.8s linear infinite"></div>
         </div>
       </div>
 
@@ -1467,6 +1482,10 @@
         <span class="icon">📋</span>
         <span class="label">Orders</span>
       </div>
+      <div class="bottom-nav-item" onclick="showPanel('festival')" data-panel="festival">
+        <span class="icon">🎪</span>
+        <span class="label">Festival</span>
+      </div>
       <div class="bottom-nav-item" onclick="showPanel('menu')" data-panel="menu">
         <span class="icon">🍽️</span>
         <span class="label">Menu</span>
@@ -1724,6 +1743,13 @@ async function loadApp() {
   // Show Stripe onboarding banner — deferred so it doesn't block page load
   // or poison the CORS preflight cache on session start
   setTimeout(() => refreshStripeStatus(), 2000);
+
+  // Auto-open panel from URL param (e.g. ?panel=festival after redirect)
+  const urlPanel = new URLSearchParams(window.location.search).get('panel');
+  if (urlPanel) {
+    setTimeout(() => showPanel(urlPanel), 100);
+    window.history.replaceState({}, '', window.location.pathname);
+  }
 }
 
 // ── MENU ──
@@ -2026,6 +2052,7 @@ function showPanel(name) {
   document.querySelectorAll('.bottom-nav-item').forEach(i => i.classList.remove('active'));
   document.getElementById(`panel-${name}`).classList.add('active');
   document.querySelectorAll(`[data-panel="${name}"]`).forEach(el => el.classList.add('active'));
+  if (name === 'festival') loadFestivalPanel();
 }
 
 function openModal(id) { document.getElementById(id).classList.add('open'); }
@@ -2207,6 +2234,136 @@ db.auth.onAuthStateChange(async (event, session) => {
   _initDone = true;
 })();
 
+
+// ── FESTIVAL PANEL ──────────────────────────────────────────────
+async function loadFestivalPanel() {
+  const el = document.getElementById('festival-panel-content');
+  if (!el || !currentUser) return;
+
+  const userEmail = currentUser.email;
+  const { data: apps, error } = await db
+    .from('festival_applications')
+    .select('*')
+    .eq('email', userEmail)
+    .order('created_at', { ascending: false });
+
+  if (error || !apps || apps.length === 0) {
+    el.innerHTML = `
+      <div style="text-align:center;padding:48px 24px">
+        <div style="font-size:48px;margin-bottom:16px">🎪</div>
+        <div style="font-size:18px;font-weight:700;margin-bottom:8px">No application on file</div>
+        <div style="color:var(--gray);font-size:14px;margin-bottom:24px">Apply to vend at the 1313 Festival and your status will appear here.</div>
+        <a href="https://cbusevents.com/1313-festival-application.html" class="btn-primary" style="text-decoration:none;padding:12px 28px;font-size:14px">Apply Now</a>
+      </div>`;
+    return;
+  }
+
+  const app = apps[0];
+  const isPending = app.status === 'pending';
+  const isApproved = app.status === 'approved';
+  const isRejected = app.status === 'rejected';
+  const fee = '$' + (app.fee || 175);
+
+  // Update sidebar badge
+  const badge = document.getElementById('festivalSidebarBadge');
+  if (badge) { badge.style.display = isPending ? 'inline-flex' : 'none'; badge.textContent = isPending ? 'PENDING' : ''; }
+
+  const statusBadge = isPending
+    ? `<span style="background:rgba(251,191,36,0.12);color:#fbbf24;border:1px solid rgba(251,191,36,0.3);border-radius:999px;padding:4px 14px;font-size:11px;font-weight:700;letter-spacing:0.08em">PENDING REVIEW</span>`
+    : isApproved
+    ? `<span style="background:rgba(52,211,153,0.1);color:#34d399;border:1px solid rgba(52,211,153,0.2);border-radius:999px;padding:4px 14px;font-size:11px;font-weight:700;letter-spacing:0.08em">APPROVED</span>`
+    : `<span style="background:rgba(248,113,113,0.1);color:#f87171;border:1px solid rgba(248,113,113,0.2);border-radius:999px;padding:4px 14px;font-size:11px;font-weight:700;letter-spacing:0.08em">NOT SELECTED</span>`;
+
+  const payBlock = isPending ? `
+    <div style="background:rgba(251,191,36,0.06);border:1px solid rgba(251,191,36,0.25);border-radius:12px;padding:16px 20px;display:flex;gap:14px;align-items:flex-start">
+      <span style="font-size:22px;flex-shrink:0">⏳</span>
+      <div>
+        <div style="font-weight:700;color:#fbbf24;margin-bottom:4px">Application Under Review</div>
+        <div style="font-size:13px;color:var(--gray);line-height:1.6">We'll reach out within 48 hours. Once approved you'll pay your spot fee of <strong style="color:var(--text)">${fee}</strong> to confirm your space. Use the time below to start prepping.</div>
+      </div>
+    </div>` : isApproved ? `
+    <div style="background:rgba(52,211,153,0.06);border:1px solid rgba(52,211,153,0.2);border-radius:12px;padding:16px 20px;display:flex;gap:14px;align-items:flex-start">
+      <span style="font-size:22px;flex-shrink:0">✅</span>
+      <div style="flex:1">
+        <div style="font-weight:700;color:#34d399;margin-bottom:4px">You're Approved - Secure Your Spot</div>
+        <div style="font-size:13px;color:var(--gray);line-height:1.6;margin-bottom:12px">Pay your spot fee to lock in your space. Spots are first-paid, first-confirmed.</div>
+        <a href="https://buy.stripe.com/aFafZh7Mc9oC9pl1Rmc3m09" target="_blank" class="btn-primary" style="text-decoration:none;display:inline-block;padding:10px 22px;font-size:13px;background:#34d399;color:#000;border-radius:8px;font-weight:700">Pay ${fee} - Secure Spot</a>
+      </div>
+    </div>` : `
+    <div style="background:rgba(248,113,113,0.06);border:1px solid rgba(248,113,113,0.2);border-radius:12px;padding:16px 20px;font-size:13px;color:var(--gray)">
+      Thank you for applying. We'll keep you in mind for future events.
+    </div>`;
+
+  const checklist = [
+    { id: 'chk_menu', label: 'Finalize your menu items for the event' },
+    { id: 'chk_supplies', label: 'Confirm supplies and packaging inventory' },
+    { id: 'chk_equip', label: 'Check equipment - generator, propane, extension cords' },
+    { id: 'chk_signage', label: 'Prepare signage and display setup' },
+    { id: 'chk_pricing', label: 'Set event pricing and cash/card options' },
+    { id: 'chk_staff', label: 'Confirm staff or helpers for the day' },
+    { id: 'chk_profile', label: 'Complete your CBUSEVENTS profile and menu builder' },
+  ];
+
+  const savedChecks = JSON.parse(localStorage.getItem('festival_1313_checklist') || '{}');
+
+  const checklistHTML = checklist.map(item => {
+    const checked = savedChecks[item.id] || false;
+    return `
+      <label style="display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--bg3);cursor:pointer">
+        <input type="checkbox" id="${item.id}" ${checked ? 'checked' : ''} onchange="saveFestivalCheck('${item.id}', this.checked)"
+          style="width:18px;height:18px;accent-color:var(--orange);cursor:pointer;flex-shrink:0">
+        <span style="font-size:14px;${checked ? 'text-decoration:line-through;color:var(--gray)' : ''}">${item.label}</span>
+      </label>`;
+  }).join('');
+
+  el.innerHTML = `
+    <div style="max-width:700px">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px;flex-wrap:wrap">
+        <div style="font-size:20px;font-weight:800">${app.business_name || 'Your Business'}</div>
+        ${statusBadge}
+      </div>
+
+      ${payBlock}
+
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;margin-top:20px;margin-bottom:24px">
+        <div style="background:var(--bg2);border-radius:10px;padding:14px">
+          <div style="font-size:10px;font-weight:700;letter-spacing:0.12em;color:var(--gray);text-transform:uppercase;margin-bottom:6px">Date</div>
+          <div style="font-size:14px;font-weight:600">June 13, 2026</div>
+        </div>
+        <div style="background:var(--bg2);border-radius:10px;padding:14px">
+          <div style="font-size:10px;font-weight:700;letter-spacing:0.12em;color:var(--gray);text-transform:uppercase;margin-bottom:6px">Location</div>
+          <div style="font-size:14px;font-weight:600">1313 E. Broad St</div>
+        </div>
+        <div style="background:var(--bg2);border-radius:10px;padding:14px">
+          <div style="font-size:10px;font-weight:700;letter-spacing:0.12em;color:var(--gray);text-transform:uppercase;margin-bottom:6px">Setup Time</div>
+          <div style="font-size:14px;font-weight:600">TBA</div>
+        </div>
+        <div style="background:var(--bg2);border-radius:10px;padding:14px">
+          <div style="font-size:10px;font-weight:700;letter-spacing:0.12em;color:var(--gray);text-transform:uppercase;margin-bottom:6px">Spot Fee</div>
+          <div style="font-size:14px;font-weight:600;color:var(--orange)">${fee}</div>
+        </div>
+      </div>
+
+      <div style="margin-bottom:8px;font-size:16px;font-weight:700">Event Prep Checklist</div>
+      <div style="font-size:12px;color:var(--gray);margin-bottom:16px">Your progress saves automatically.</div>
+      <div>${checklistHTML}</div>
+
+      <div style="margin-top:28px;padding:16px 20px;background:var(--bg2);border-radius:12px">
+        <div style="font-size:13px;font-weight:700;margin-bottom:8px">Get your storefront ready</div>
+        <div style="font-size:12px;color:var(--gray);margin-bottom:14px;line-height:1.6">Attendees will be able to browse and preorder from your menu before the event. Build out your menu now so you're ready when the storefront goes live.</div>
+        <button class="btn-secondary" onclick="showPanel('menu')" style="font-size:12px;padding:8px 18px">Go to Menu Builder</button>
+      </div>
+    </div>`;
+}
+
+function saveFestivalCheck(id, checked) {
+  const saved = JSON.parse(localStorage.getItem('festival_1313_checklist') || '{}');
+  saved[id] = checked;
+  localStorage.setItem('festival_1313_checklist', JSON.stringify(saved));
+  const label = document.querySelector(`label:has(#${id}) span`);
+  if (label) label.style.textDecoration = checked ? 'line-through' : '';
+  if (label) label.style.color = checked ? 'var(--gray)' : '';
+}
 
 // ── ORDERS ──
 async function loadOrders() {

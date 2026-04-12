@@ -382,8 +382,9 @@
     <p>Your application for 1313 Festival has been received. Check your email for next steps.</p>
     <div class="next-steps">
       <div class="step-item"><div class="step-num">1</div>Application reviewed within 48 hours</div>
-      <div class="step-item"><div class="step-num">2</div>Stripe payment link sent to your email</div>
-      <div class="step-item"><div class="step-num">3</div>Spot confirmed + listing goes live on CBUS Events</div>
+      <div class="step-item"><div class="step-num">2</div>Once approved, pay your spot fee to confirm</div>
+      <div class="step-item"><div class="step-num">3</div>Spot confirmed + your listing goes live</div>
+      <div class="step-item" style="opacity:0.6;font-size:12px;padding-top:4px">Taking you to your portal...</div>
     </div>
   </div>
 
@@ -600,6 +601,13 @@
       document.getElementById('appForm').style.display = 'none';
       document.getElementById('successScreen').classList.add('visible');
       window.scrollTo({ top: 0, behavior: 'smooth' });
+      // Redirect to portal after 2.5s
+      const isTruck = pendingFormData.applicant_type === 'food_truck';
+      setTimeout(() => {
+        window.location.href = isTruck
+          ? 'https://cbusevents.com/food-professional.html?panel=festival'
+          : 'https://cbusevents.com/cbus-vendor-portal.html?panel=festivalapps';
+      }, 2500);
 
     } catch(e) {
       showAuthError(e.message || 'Something went wrong. Please try again.');
