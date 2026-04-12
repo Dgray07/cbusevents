@@ -12,6 +12,7 @@
 <meta property="og:type" content="website">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="theme-color" content="#080810">
+<script type="application/ld+json" id="eventSchema">{}</script>
 <link rel="apple-touch-icon" href="/assets/cbus-shield.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700;800;900&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -381,6 +382,60 @@ async function loadEvent() {
   document.getElementById('ogDesc').content = event.description?.substring(0, 160) || 'Columbus event on CBUSEVENTS';
   document.getElementById('ogUrl').content = window.location.href;
   if (event.cover_image_url) document.getElementById('ogImage').content = event.cover_image_url;
+
+  // ── JSON-LD SCHEMA ──
+  const schemaEl = document.getElementById('eventSchema');
+  if (schemaEl) {
+    const schema = {
+      "@context": "https://schema.org",
+      "@type": "Event",
+      "name": event.title,
+      "startDate": event.start_time || undefined,
+      "endDate": event.end_time || undefined,
+      "eventAttendanceMode": "https://schema.org/OfflineEventAttendanceMode",
+      "eventStatus": "https://schema.org/EventScheduled",
+      "description": event.description || ('Columbus event on CBUSEVENTS: ' + event.title),
+      "url": window.location.href,
+      "organizer": {
+        "@type": "Organization",
+        "name": "Cbus Events",
+        "url": "https://cbusevents.com"
+      }
+    };
+    if (event.cover_image_url) schema.image = [event.cover_image_url];
+    if (venue) {
+      schema.location = {
+        "@type": "Place",
+        "name": venue.name,
+        "address": {
+          "@type": "PostalAddress",
+          "streetAddress": venue.address || '',
+          "addressLocality": "Columbus",
+          "addressRegion": "OH",
+          "addressCountry": "US"
+        }
+      };
+      if (venue.lat && venue.lng) {
+        schema.location.geo = { "@type": "GeoCoordinates", "latitude": venue.lat, "longitude": venue.lng };
+      }
+    } else if (event.venue_name_override) {
+      schema.location = {
+        "@type": "Place",
+        "name": event.venue_name_override,
+        "address": { "@type": "PostalAddress", "addressLocality": "Columbus", "addressRegion": "OH", "addressCountry": "US" }
+      };
+    }
+    if (!event.is_free && event.price_min != null) {
+      schema.offers = {
+        "@type": "Offer",
+        "url": window.location.href,
+        "price": event.price_min,
+        "priceCurrency": "USD",
+        "availability": "https://schema.org/InStock"
+      };
+    }
+    schemaEl.textContent = JSON.stringify(schema);
+  }
 
   // ── HERO ──
   const hero = document.getElementById('eventHero');
