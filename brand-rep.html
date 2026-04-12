@@ -1,0 +1,976 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+<title>CBUSEVENTS - Brand Rep</title>
+<meta name="robots" content="noindex">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700;800;900&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-font-smoothing:antialiased;-webkit-tap-highlight-color:transparent;}
+:root{
+  --bg:#080810;--surface:#0f0f1a;--card:#141420;--card2:#18182a;
+  --border:#1e1e2e;--border-sub:#191928;
+  --text:#f0f0fa;--sub:#7070a0;--muted:#40405a;
+  --orange:#FF6B35;--green:#34d399;--red:#f87171;--blue:#818cf8;--gold:#fbbf24;
+  --orange-dim:rgba(255,107,53,0.1);--green-dim:rgba(52,211,153,0.1);
+  --gold-dim:rgba(251,191,36,0.1);--blue-dim:rgba(129,140,248,0.1);
+  --font:'DM Sans',sans-serif;--mono:'DM Mono',monospace;
+  --nav-h:64px;--top-h:56px;--safe-b:env(safe-area-inset-bottom,0px);
+}
+html,body{background:var(--bg);color:var(--text);font-family:var(--font);min-height:100vh;overscroll-behavior:none;}
+@keyframes spin{to{transform:rotate(360deg);}}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+
+/* TOPBAR */
+.topbar{position:fixed;top:0;left:0;right:0;height:var(--top-h);background:var(--surface);border-bottom:1px solid var(--border-sub);display:flex;align-items:center;justify-content:space-between;padding:0 16px;z-index:100;}
+.topbar-logo{font-size:14px;font-weight:900;letter-spacing:-0.04em;text-transform:uppercase;}
+.topbar-logo span{color:var(--orange);}
+.topbar-right{display:flex;align-items:center;gap:10px;}
+.rank-pill{background:var(--gold-dim);border:1px solid rgba(251,191,36,0.25);border-radius:99px;padding:4px 10px;font-size:10px;font-weight:700;color:var(--gold);letter-spacing:0.06em;text-transform:uppercase;}
+.avatar{width:32px;height:32px;border-radius:50%;background:var(--orange-dim);border:1.5px solid var(--orange);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:var(--orange);}
+
+/* BOTTOM NAV */
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;height:calc(var(--nav-h) + var(--safe-b));padding-bottom:var(--safe-b);background:var(--surface);border-top:1px solid var(--border-sub);display:flex;align-items:flex-start;z-index:100;}
+.nav-tab{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding-top:10px;gap:3px;cursor:pointer;color:var(--muted);transition:color 0.15s;position:relative;user-select:none;}
+.nav-tab.active{color:var(--orange);}
+.nav-tab .ni{font-size:20px;line-height:1;}
+.nav-tab .nl{font-size:9px;font-weight:700;letter-spacing:0.04em;text-transform:uppercase;}
+.nav-tab .dot{position:absolute;top:6px;right:calc(50% - 14px);width:7px;height:7px;border-radius:50%;background:var(--orange);border:1.5px solid var(--surface);}
+
+/* MAIN */
+.main{padding-top:var(--top-h);padding-bottom:calc(var(--nav-h) + var(--safe-b) + 8px);min-height:100vh;}
+.view{display:none;animation:fadeIn 0.2s ease;}
+.view.active{display:block;}
+.sec{padding:16px;}
+.sec+.sec{padding-top:0;}
+.sec-title{font-size:10px;font-weight:800;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);margin-bottom:10px;}
+.pad-top{height:8px;}
+
+/* HERO */
+.hero-card{background:linear-gradient(135deg,var(--surface) 0%,var(--card) 100%);border:1px solid var(--border-sub);border-radius:16px;padding:20px;margin-bottom:12px;position:relative;overflow:hidden;}
+.hero-card::before{content:'';position:absolute;top:-40px;right:-40px;width:130px;height:130px;border-radius:50%;background:radial-gradient(circle,rgba(255,107,53,0.18) 0%,transparent 70%);pointer-events:none;}
+.hero-greet{font-size:12px;color:var(--sub);margin-bottom:2px;}
+.hero-name{font-size:22px;font-weight:900;letter-spacing:-0.03em;margin-bottom:14px;}
+.hero-bal-label{font-size:10px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--muted);margin-bottom:4px;}
+.hero-bal{font-size:36px;font-weight:900;font-family:var(--mono);color:var(--green);line-height:1;margin-bottom:16px;}
+.hero-actions{display:flex;gap:8px;}
+
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:10px 16px;border-radius:9px;font-family:var(--font);font-size:13px;font-weight:700;cursor:pointer;border:none;transition:all 0.15s;white-space:nowrap;user-select:none;}
+.btn-primary{background:var(--orange);color:#fff;flex:1;}
+.btn-primary:active{background:#ff7d4a;transform:scale(0.97);}
+.btn-ghost{background:var(--card2);color:var(--text);border:1px solid var(--border);flex:1;}
+.btn-ghost:active{transform:scale(0.97);}
+.btn-sm{padding:7px 12px;font-size:12px;border-radius:7px;flex:none;}
+.btn-full{width:100%;flex:none;}
+
+/* STATS */
+.stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;}
+.stat-card{background:var(--surface);border:1px solid var(--border-sub);border-radius:12px;padding:14px;position:relative;overflow:hidden;}
+.stat-card::after{content:'';position:absolute;top:0;left:0;right:0;height:2px;border-radius:2px 2px 0 0;}
+.stat-card.o::after{background:var(--orange);}
+.stat-card.g::after{background:var(--gold);}
+.stat-card.gr::after{background:var(--green);}
+.stat-card.b::after{background:var(--blue);}
+.stat-label{font-size:10px;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;color:var(--muted);margin-bottom:6px;}
+.stat-val{font-size:24px;font-weight:900;font-family:var(--mono);color:var(--text);line-height:1;margin-bottom:4px;}
+.stat-sub{font-size:10px;color:var(--sub);}
+.stat-sub .up{color:var(--green);}
+.stat-sub .warn{color:var(--orange);}
+
+/* CARD */
+.card{background:var(--surface);border:1px solid var(--border-sub);border-radius:12px;overflow:hidden;margin-bottom:12px;}
+.card-head{padding:14px 16px;border-bottom:1px solid var(--border-sub);display:flex;align-items:center;justify-content:space-between;}
+.card-head h3{font-size:13px;font-weight:700;color:var(--text);}
+.card-body{padding:14px 16px;}
+
+/* PROGRESS */
+.prog{margin-bottom:12px;}
+.prog-labels{display:flex;justify-content:space-between;margin-bottom:5px;}
+.prog-name{font-size:12px;color:var(--text);font-weight:600;}
+.prog-val{font-size:11px;color:var(--sub);font-family:var(--mono);}
+.prog-bar{height:4px;background:var(--card2);border-radius:99px;overflow:hidden;}
+.prog-fill{height:100%;border-radius:99px;transition:width 0.7s ease;}
+.prog-fill.o{background:var(--orange);}
+.prog-fill.g{background:var(--green);}
+
+/* REF BOX */
+.ref-box{background:var(--card2);border:1px solid var(--border);border-radius:9px;padding:12px 14px;display:flex;align-items:center;gap:10px;margin-bottom:12px;}
+.ref-url{flex:1;font-family:var(--mono);font-size:11px;color:var(--orange);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.copy-btn{font-size:11px;font-weight:700;color:var(--text);background:var(--card2);border:1px solid var(--border);border-radius:5px;padding:5px 10px;cursor:pointer;white-space:nowrap;font-family:var(--font);transition:all 0.15s;flex-shrink:0;}
+.copy-btn.copied{border-color:var(--green);color:var(--green);}
+
+/* BADGES */
+.badge{display:inline-flex;align-items:center;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:800;letter-spacing:0.04em;text-transform:uppercase;white-space:nowrap;}
+.badge-green{background:var(--green-dim);color:var(--green);}
+.badge-orange{background:var(--orange-dim);color:var(--orange);}
+.badge-gold{background:var(--gold-dim);color:var(--gold);}
+.badge-muted{background:var(--card2);color:var(--sub);}
+.badge-blue{background:var(--blue-dim);color:var(--blue);}
+
+/* LIST ROWS */
+.list-row{display:flex;align-items:center;gap:12px;padding:13px 16px;border-bottom:1px solid var(--border-sub);cursor:pointer;transition:background 0.1s;}
+.list-row:last-child{border-bottom:none;}
+.list-row:active{background:var(--card2);}
+.list-icon{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;}
+.list-icon.venue{background:var(--blue-dim);}
+.list-icon.vendor{background:var(--orange-dim);}
+.list-icon.planner{background:var(--gold-dim);}
+.list-icon.food{background:var(--green-dim);}
+.list-info{flex:1;min-width:0;}
+.list-name{font-size:13px;font-weight:700;color:var(--text);margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.list-meta{font-size:11px;color:var(--sub);}
+.list-right{text-align:right;flex-shrink:0;}
+.list-amt{font-size:13px;font-weight:700;font-family:var(--mono);color:var(--green);margin-bottom:3px;}
+.list-amt.pending{color:var(--orange);}
+.list-amt.zero{color:var(--muted);}
+
+/* EVENT CARDS */
+.event-card{background:var(--surface);border:1px solid var(--border-sub);border-radius:12px;padding:14px 16px;margin-bottom:10px;position:relative;overflow:hidden;}
+.event-card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;}
+.event-card.venue::before{background:var(--blue);}
+.event-card.planner::before{background:var(--gold);}
+.event-card.festival::before{background:var(--orange);}
+.event-top{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:8px;}
+.event-name{font-size:14px;font-weight:800;color:var(--text);line-height:1.3;}
+.event-meta{font-size:11px;color:var(--sub);margin-top:3px;}
+.event-meta span{color:var(--text);font-weight:600;}
+.event-footer{display:flex;align-items:center;justify-content:space-between;margin-top:10px;padding-top:10px;border-top:1px solid var(--border-sub);}
+.event-comm{font-size:11px;color:var(--sub);}
+.event-comm strong{color:var(--green);font-family:var(--mono);}
+
+/* FESTIVAL */
+.fest-header{background:linear-gradient(135deg,rgba(255,107,53,0.12) 0%,rgba(8,8,16,0) 100%);border:1px solid rgba(255,107,53,0.25);border-radius:14px;padding:18px;margin-bottom:14px;position:relative;overflow:hidden;}
+.fest-header::after{content:'🎪';position:absolute;right:16px;top:50%;transform:translateY(-50%);font-size:40px;opacity:0.25;}
+.fest-title{font-size:16px;font-weight:900;color:var(--orange);margin-bottom:2px;}
+.fest-sub{font-size:11px;color:var(--sub);margin-bottom:12px;}
+.fest-stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;}
+.fest-stat{background:rgba(8,8,16,0.5);border:1px solid var(--border);border-radius:8px;padding:10px 8px;text-align:center;}
+.fest-stat-val{font-size:20px;font-weight:900;font-family:var(--mono);color:var(--text);line-height:1;margin-bottom:3px;}
+.fest-stat-label{font-size:9px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:var(--muted);}
+
+/* SIGNUP ROWS */
+.signup-row{display:flex;align-items:center;gap:12px;padding:12px 16px;border-bottom:1px solid var(--border-sub);}
+.signup-row:last-child{border-bottom:none;}
+.signup-num{width:28px;height:28px;border-radius:50%;background:var(--orange-dim);border:1px solid rgba(255,107,53,0.2);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:var(--orange);flex-shrink:0;font-family:var(--mono);}
+.signup-info{flex:1;min-width:0;}
+.signup-name{font-size:13px;font-weight:700;color:var(--text);}
+.signup-detail{font-size:11px;color:var(--sub);}
+.signup-time{font-size:10px;color:var(--muted);font-family:var(--mono);flex-shrink:0;}
+
+/* SEARCH */
+.search-wrap{padding:12px 16px 8px;position:sticky;top:var(--top-h);background:var(--bg);z-index:10;border-bottom:1px solid var(--border-sub);}
+.search-input{width:100%;background:var(--surface);border:1px solid var(--border);color:var(--text);padding:10px 14px;border-radius:9px;font-family:var(--font);font-size:14px;outline:none;}
+.search-input::placeholder{color:var(--muted);}
+.search-input:focus{border-color:var(--orange);}
+
+/* CHIPS */
+.chip-row{display:flex;gap:8px;padding:10px 16px 4px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;}
+.chip-row::-webkit-scrollbar{display:none;}
+.chip{flex-shrink:0;padding:6px 12px;border-radius:99px;background:var(--surface);border:1px solid var(--border);font-size:11px;font-weight:700;color:var(--sub);cursor:pointer;transition:all 0.15s;user-select:none;}
+.chip.active{background:var(--orange-dim);border-color:rgba(255,107,53,0.35);color:var(--orange);}
+
+/* PAYOUTS */
+.pay-card{background:linear-gradient(135deg,rgba(52,211,153,0.08) 0%,rgba(8,8,16,0) 100%);border:1px solid rgba(52,211,153,0.2);border-radius:14px;padding:18px;margin-bottom:12px;display:flex;align-items:center;justify-content:space-between;}
+.pay-card .left h4{font-size:10px;font-weight:700;color:var(--sub);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:4px;}
+.pay-card .left .amount{font-size:32px;font-weight:900;font-family:var(--mono);color:var(--green);line-height:1;}
+.pay-card .left .psub{font-size:11px;color:var(--sub);margin-top:4px;}
+.pay-row{display:flex;align-items:center;gap:12px;padding:13px 16px;border-bottom:1px solid var(--border-sub);}
+.pay-row:last-child{border-bottom:none;}
+.pay-icon{width:36px;height:36px;border-radius:10px;background:var(--green-dim);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;}
+.pay-info{flex:1;min-width:0;}
+.pay-name{font-size:13px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.pay-meta{font-size:11px;color:var(--sub);}
+.pay-amount{font-size:14px;font-weight:800;font-family:var(--mono);color:var(--green);}
+.pay-amount.pending{color:var(--orange);}
+
+/* RANK STEPS */
+.rank-step{display:flex;align-items:flex-start;gap:14px;padding:14px 16px;border-bottom:1px solid var(--border-sub);}
+.rank-step:last-child{border-bottom:none;}
+.rank-dot{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0;margin-top:1px;}
+.rank-dot.done{background:var(--green-dim);border:1.5px solid var(--green);}
+.rank-dot.current{background:var(--orange-dim);border:1.5px solid var(--orange);}
+.rank-dot.locked{background:var(--card2);border:1.5px solid var(--border);}
+.rank-info .rank-title{font-size:13px;font-weight:800;color:var(--text);margin-bottom:3px;}
+.rank-info .rank-desc{font-size:11px;color:var(--sub);line-height:1.5;margin-bottom:5px;}
+.rank-info .rank-earn{font-size:10px;font-family:var(--mono);color:var(--gold);}
+
+/* FORMS */
+.form-group{margin-bottom:14px;}
+.form-label{display:block;font-size:10px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--sub);margin-bottom:6px;}
+.form-input,.form-select{width:100%;background:var(--card2);border:1px solid var(--border);color:var(--text);padding:12px 14px;border-radius:9px;font-family:var(--font);font-size:14px;outline:none;-webkit-appearance:none;transition:border-color 0.15s;}
+.form-input:focus,.form-select:focus{border-color:var(--orange);}
+.form-input::placeholder{color:var(--muted);}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+
+/* SHEET */
+.sheet-overlay{position:fixed;inset:0;background:rgba(8,8,16,0.85);z-index:200;display:none;align-items:flex-end;backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);}
+.sheet-overlay.open{display:flex;}
+.sheet{width:100%;background:var(--surface);border-radius:20px 20px 0 0;border-top:1px solid var(--border);max-height:90vh;overflow-y:auto;-webkit-overflow-scrolling:touch;animation:slideUp 0.25s ease;}
+@keyframes slideUp{from{transform:translateY(100%);}to{transform:translateY(0);}}
+.sheet-handle{width:40px;height:4px;border-radius:2px;background:var(--border);margin:12px auto 0;}
+.sheet-head{padding:16px 20px;border-bottom:1px solid var(--border-sub);display:flex;align-items:center;justify-content:space-between;}
+.sheet-head h2{font-size:16px;font-weight:800;color:var(--text);}
+.close-btn{width:30px;height:30px;border-radius:50%;background:var(--card2);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;color:var(--sub);}
+.sheet-body{padding:20px;padding-bottom:calc(20px + var(--safe-b));}
+
+/* TOAST */
+.toast{position:fixed;bottom:calc(var(--nav-h) + var(--safe-b) + 12px);left:50%;transform:translateX(-50%) translateY(20px);background:var(--card);border:1px solid var(--border);border-left:3px solid var(--green);border-radius:10px;padding:11px 18px;font-size:13px;font-weight:600;color:var(--text);z-index:999;opacity:0;transition:all 0.25s ease;white-space:nowrap;pointer-events:none;max-width:calc(100vw - 32px);text-align:center;}
+.toast.show{transform:translateX(-50%) translateY(0);opacity:1;}
+
+/* LOADING */
+.page-loader{display:flex;align-items:center;justify-content:center;padding:60px;color:var(--sub);font-size:13px;gap:12px;}
+.spinner{width:20px;height:20px;border:2px solid var(--border);border-top-color:var(--orange);border-radius:50%;animation:spin 0.7s linear infinite;}
+
+.info-note{background:var(--card2);border:1px solid var(--border-sub);border-radius:8px;padding:12px 14px;font-size:11px;color:var(--sub);line-height:1.6;}
+.divider{height:1px;background:var(--border-sub);margin:12px 0;}
+
+/* LOGIN */
+.login-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;}
+.login-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:32px;width:100%;max-width:380px;}
+.login-card h2{font-size:20px;font-weight:900;margin-bottom:4px;}
+.login-card p{font-size:13px;color:var(--sub);margin-bottom:24px;}
+.login-error{color:var(--red);font-size:12px;margin-top:10px;display:none;}
+</style>
+</head>
+<body>
+
+<!-- LOGIN VIEW (shown before auth) -->
+<div id="loginView" style="display:none">
+  <div class="login-wrap">
+    <div class="login-card">
+      <div style="font-size:13px;font-weight:900;letter-spacing:-0.04em;text-transform:uppercase;margin-bottom:20px">CBUS<span style="color:var(--orange)">EVENTS</span></div>
+      <h2>Brand Rep Portal</h2>
+      <p>Sign in to access your dashboard.</p>
+      <div class="form-group">
+        <label class="form-label">Email</label>
+        <input class="form-input" type="email" id="loginEmail" placeholder="your@email.com" inputmode="email">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Password</label>
+        <input class="form-input" type="password" id="loginPassword" placeholder="Password">
+      </div>
+      <button class="btn btn-primary btn-full" style="margin-top:4px" onclick="doLogin()">Sign In</button>
+      <div class="login-error" id="loginError"></div>
+    </div>
+  </div>
+</div>
+
+<!-- APP (shown after auth) -->
+<div id="appView" style="display:none">
+
+  <header class="topbar">
+    <div class="topbar-logo">CBUS<span>EVENTS</span></div>
+    <div class="topbar-right">
+      <div class="rank-pill" id="rankPill">Brand Rep</div>
+      <div class="avatar" id="userAvatar">?</div>
+    </div>
+  </header>
+
+  <main class="main">
+
+    <!-- HOME -->
+    <div class="view active" id="view-home">
+      <div class="pad-top"></div>
+      <div class="sec">
+        <div class="hero-card">
+          <div class="hero-greet">Good to see you,</div>
+          <div class="hero-name" id="heroName">Loading...</div>
+          <div class="hero-bal-label">Available to Withdraw</div>
+          <div class="hero-bal" id="heroBalance">$0.00</div>
+          <div class="hero-actions">
+            <button class="btn btn-primary" onclick="showToast('Payout initiated. Arrives within minutes.')">Withdraw</button>
+            <button class="btn btn-ghost" onclick="copyRefLink()">Copy Link</button>
+          </div>
+        </div>
+
+        <div class="stats-grid">
+          <div class="stat-card o">
+            <div class="stat-label">Total Earned</div>
+            <div class="stat-val" id="statEarned">$0</div>
+            <div class="stat-sub">All time</div>
+          </div>
+          <div class="stat-card g">
+            <div class="stat-label">Active Accounts</div>
+            <div class="stat-val" id="statAccounts">0</div>
+            <div class="stat-sub"><span class="warn" id="statFree"></span></div>
+          </div>
+          <div class="stat-card gr">
+            <div class="stat-label">Venues</div>
+            <div class="stat-val" id="statVenues">0</div>
+            <div class="stat-sub">Secured on platform</div>
+          </div>
+          <div class="stat-card b">
+            <div class="stat-label">Festival Signups</div>
+            <div class="stat-val" id="statFest">0</div>
+            <div class="stat-sub">Your recruits</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="sec" style="padding-top:0">
+        <div class="sec-title">Promote to Brand Manager</div>
+        <div class="card">
+          <div class="card-body">
+            <div class="prog">
+              <div class="prog-labels"><span class="prog-name">Venue secured</span><span class="prog-val" id="progVenue">0 / 1</span></div>
+              <div class="prog-bar"><div class="prog-fill g" id="progVenueBar" style="width:0%"></div></div>
+            </div>
+            <div class="prog">
+              <div class="prog-labels"><span class="prog-name">Event at venue</span><span class="prog-val" id="progEvent">0 / 1</span></div>
+              <div class="prog-bar"><div class="prog-fill o" id="progEventBar" style="width:0%"></div></div>
+            </div>
+            <div class="prog" style="margin-bottom:0">
+              <div class="prog-labels"><span class="prog-name">Paid accounts referred</span><span class="prog-val" id="progPaid">0 active</span></div>
+              <div class="prog-bar"><div class="prog-fill g" id="progPaidBar" style="width:100%"></div></div>
+            </div>
+          </div>
+          <div style="padding:0 16px 14px">
+            <div style="background:var(--orange-dim);border:1px solid rgba(255,107,53,0.15);border-radius:8px;padding:10px 12px;font-size:11px;color:var(--sub)">
+              Secure a venue and help them run 1 event to unlock <strong style="color:var(--orange)">Brand Manager</strong>.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="sec" style="padding-top:0">
+        <div class="sec-title">Your Referral Link</div>
+        <div class="card">
+          <div class="card-body">
+            <div class="ref-box">
+              <span class="ref-url" id="refUrlDisplay">cbusevents.com/ref/...</span>
+              <button class="copy-btn" id="refCopyBtn" onclick="copyRefLink()">Copy</button>
+            </div>
+            <div style="font-size:11px;color:var(--sub)">Earn <strong style="color:var(--orange)">25% commission</strong> every month your referrals stay on a paid plan.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="sec" style="padding-top:0">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+          <button class="btn btn-ghost" style="flex:none;width:100%" onclick="switchView('accounts',document.querySelectorAll('.nav-tab')[1])">View Accounts</button>
+          <button class="btn btn-ghost" style="flex:none;width:100%" onclick="switchView('festival',document.querySelectorAll('.nav-tab')[3])">1313 Festival</button>
+          <button class="btn btn-ghost" style="flex:none;width:100%" onclick="switchView('events',document.querySelectorAll('.nav-tab')[2])">Upcoming Events</button>
+          <button class="btn btn-primary" style="flex:none;width:100%" onclick="openSheet('onboard-sheet')">+ Onboard</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ACCOUNTS -->
+    <div class="view" id="view-accounts">
+      <div class="search-wrap">
+        <input class="search-input" type="text" placeholder="Search accounts..." oninput="filterAccounts(this.value)">
+      </div>
+      <div class="chip-row">
+        <div class="chip active" onclick="setChip(this,'all')">All</div>
+        <div class="chip" onclick="setChip(this,'venue')">Venues</div>
+        <div class="chip" onclick="setChip(this,'vendor')">Vendors</div>
+        <div class="chip" onclick="setChip(this,'planner')">Planners</div>
+        <div class="chip" onclick="setChip(this,'free')">Free Tier</div>
+      </div>
+      <div id="accountsList">
+        <div class="page-loader"><div class="spinner"></div> Loading...</div>
+      </div>
+      <div class="sec" style="padding-top:12px">
+        <button class="btn btn-primary btn-full" onclick="openSheet('onboard-sheet')">+ Onboard New Account</button>
+      </div>
+    </div>
+
+    <!-- EVENTS -->
+    <div class="view" id="view-events">
+      <div class="pad-top"></div>
+      <div class="sec">
+        <div class="sec-title">Events at Your Accounts</div>
+        <div class="info-note" style="margin-bottom:14px">Events published by venues and planners you referred. Ticket revenue generates commission back to you automatically.</div>
+        <div id="eventsList">
+          <div class="page-loader"><div class="spinner"></div> Loading...</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- FESTIVAL -->
+    <div class="view" id="view-festival">
+      <div class="pad-top"></div>
+      <div class="sec">
+        <div class="fest-header">
+          <div class="fest-title">1313 Festival</div>
+          <div class="fest-sub">1313 E. Broad St. - Your Ambassador Signups</div>
+          <div class="fest-stats">
+            <div class="fest-stat">
+              <div class="fest-stat-val" id="festTotal" style="color:var(--orange)">0</div>
+              <div class="fest-stat-label">Signups</div>
+            </div>
+            <div class="fest-stat">
+              <div class="fest-stat-val" id="festConfirmed" style="color:var(--green)">0</div>
+              <div class="fest-stat-label">Confirmed</div>
+            </div>
+            <div class="fest-stat">
+              <div class="fest-stat-val" id="festFees" style="color:var(--gold)">$0</div>
+              <div class="fest-stat-label">Commission</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="sec-title">Festival Dates</div>
+        <div class="card" style="margin-bottom:14px">
+          <div class="list-row" style="cursor:default">
+            <div style="width:44px;height:44px;background:var(--orange-dim);border:1px solid rgba(255,107,53,0.25);border-radius:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;flex-shrink:0">
+              <div style="font-size:9px;font-weight:800;color:var(--orange);letter-spacing:0.06em;text-transform:uppercase">May</div>
+              <div style="font-size:18px;font-weight:900;color:var(--text);line-height:1">17</div>
+            </div>
+            <div class="list-info"><div class="list-name">Season Opener</div><div class="list-meta">1313 E. Broad St. - 12pm to 8pm</div></div>
+            <span class="badge badge-orange">Upcoming</span>
+          </div>
+          <div class="list-row" style="cursor:default">
+            <div style="width:44px;height:44px;background:var(--card2);border:1px solid var(--border);border-radius:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;flex-shrink:0">
+              <div style="font-size:9px;font-weight:800;color:var(--muted);letter-spacing:0.06em;text-transform:uppercase">Jun</div>
+              <div style="font-size:18px;font-weight:900;color:var(--sub);line-height:1">21</div>
+            </div>
+            <div class="list-info"><div class="list-name">Summer Edition</div><div class="list-meta">1313 E. Broad St. - 12pm to 8pm</div></div>
+            <span class="badge badge-muted">TBD</span>
+          </div>
+        </div>
+
+        <div class="sec-title">Vendor Signups You Brought In</div>
+        <div class="card" style="margin-bottom:14px" id="festSignupsList">
+          <div class="page-loader"><div class="spinner"></div> Loading...</div>
+        </div>
+
+        <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:16px">
+          <button class="btn btn-primary btn-full" onclick="openSheet('fest-sheet')">+ Log Festival Signup</button>
+          <button class="btn btn-ghost btn-full" onclick="showToast('Festival signup link copied.')">Copy Signup Link</button>
+        </div>
+
+        <div class="sec-title">Platform Conversion</div>
+        <div class="card">
+          <div class="card-body">
+            <div class="info-note" style="margin-bottom:12px;background:transparent;border:none;padding:0">Festival vendors who convert to a paid CBUSEVENTS account count toward your commission.</div>
+            <div class="prog" style="margin-bottom:0">
+              <div class="prog-labels"><span class="prog-name">Converted to paid</span><span class="prog-val" id="festConvVal">0 / 0</span></div>
+              <div class="prog-bar"><div class="prog-fill o" id="festConvBar" style="width:0%"></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PAYOUTS -->
+    <div class="view" id="view-payouts">
+      <div class="pad-top"></div>
+      <div class="sec">
+        <div class="pay-card">
+          <div class="left">
+            <h4>Available Balance</h4>
+            <div class="amount" id="payBalance">$0.00</div>
+            <div class="psub">Net of processing fee</div>
+          </div>
+          <button class="btn btn-primary btn-sm" onclick="showToast('Payout initiated. Arrives within minutes.')">Withdraw</button>
+        </div>
+
+        <div class="stats-grid" style="margin-bottom:16px">
+          <div class="stat-card gr">
+            <div class="stat-label">Total Earned</div>
+            <div class="stat-val" id="payTotal">$0</div>
+            <div class="stat-sub">All time</div>
+          </div>
+          <div class="stat-card g">
+            <div class="stat-label">Commission</div>
+            <div class="stat-val">25%</div>
+            <div class="stat-sub">All paid accounts</div>
+          </div>
+        </div>
+
+        <div class="sec-title">Payout History</div>
+        <div class="card" id="commissionList">
+          <div class="page-loader"><div class="spinner"></div> Loading...</div>
+        </div>
+
+        <div class="sec-title" style="margin-top:4px">Rank Path</div>
+        <div class="card">
+          <div class="rank-step">
+            <div class="rank-dot done">✓</div>
+            <div class="rank-info">
+              <div class="rank-title">Brand Rep</div>
+              <div class="rank-desc">Refer paid accounts through your unique link.</div>
+              <div class="rank-earn">Earns: 25% on all referred paid accounts</div>
+            </div>
+          </div>
+          <div class="rank-step">
+            <div class="rank-dot current">→</div>
+            <div class="rank-info">
+              <div class="rank-title">Brand Manager</div>
+              <div class="rank-desc">Secure 1 venue and help them produce 1 event. Unlocks team recruiting.</div>
+              <div class="rank-earn">Earns: Accounts + event revenue share</div>
+            </div>
+          </div>
+          <div class="rank-step">
+            <div class="rank-dot locked">▲</div>
+            <div class="rank-info">
+              <div class="rank-title">Territory Manager</div>
+              <div class="rank-desc">2 venues + 2 events + 1 active Brand Manager under you.</div>
+              <div class="rank-earn">Earns: Accounts + Events + Rep override commission</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <nav class="bottom-nav">
+    <div class="nav-tab active" onclick="switchView('home',this)"><span class="ni">◈</span><span class="nl">Home</span></div>
+    <div class="nav-tab" onclick="switchView('accounts',this)"><span class="ni">≡</span><span class="nl">Accounts</span><div class="dot" id="accountsDot" style="display:none"></div></div>
+    <div class="nav-tab" onclick="switchView('events',this)"><span class="ni">◷</span><span class="nl">Events</span></div>
+    <div class="nav-tab" onclick="switchView('festival',this)"><span class="ni">🎪</span><span class="nl">Festival</span></div>
+    <div class="nav-tab" onclick="switchView('payouts',this)"><span class="ni">$</span><span class="nl">Payouts</span></div>
+  </nav>
+</div>
+
+<!-- ONBOARD SHEET -->
+<div class="sheet-overlay" id="onboard-sheet" onclick="closeOnOverlay(event,'onboard-sheet')">
+  <div class="sheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-head"><h2>Onboard Account</h2><div class="close-btn" onclick="closeSheet('onboard-sheet')">✕</div></div>
+    <div class="sheet-body">
+      <div class="form-group">
+        <label class="form-label">Business Name</label>
+        <input class="form-input" type="text" id="ob-biz" placeholder="Business name">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Contact Name</label>
+        <input class="form-input" type="text" id="ob-contact" placeholder="First and last name">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Email</label>
+        <input class="form-input" type="email" id="ob-email" placeholder="contact@business.com" inputmode="email">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Phone (optional)</label>
+        <input class="form-input" type="tel" id="ob-phone" placeholder="(614) 000-0000" inputmode="tel">
+      </div>
+      <div class="form-row">
+        <div class="form-group" style="margin-bottom:0">
+          <label class="form-label">Account Type</label>
+          <select class="form-select" id="ob-type">
+            <option value="venue">Venue</option>
+            <option value="vendor">Vendor</option>
+            <option value="planner">Planner</option>
+            <option value="food_pro">Food Pro</option>
+            <option value="event_staff">Event Staff</option>
+          </select>
+        </div>
+        <div class="form-group" style="margin-bottom:0">
+          <label class="form-label">Target Tier</label>
+          <select class="form-select" id="ob-tier">
+            <option value="standard">Standard</option>
+            <option value="premium">Premium</option>
+            <option value="free">Free</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group" style="margin-top:14px">
+        <label class="form-label">Notes</label>
+        <input class="form-input" type="text" id="ob-notes" placeholder="How did you meet them? Any context...">
+      </div>
+      <div style="background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:12px 14px;display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
+        <div>
+          <div style="font-size:11px;font-weight:700;color:var(--text)">Referral Attribution</div>
+          <div style="font-size:10px;font-family:var(--mono);color:var(--orange);margin-top:2px" id="ob-ref-display">cbusevents.com/ref/...</div>
+        </div>
+        <span class="badge badge-green">Auto-linked</span>
+      </div>
+      <button class="btn btn-primary btn-full" onclick="submitOnboard()">Log Account + Send Invite</button>
+    </div>
+  </div>
+</div>
+
+<!-- FESTIVAL SIGNUP SHEET -->
+<div class="sheet-overlay" id="fest-sheet" onclick="closeOnOverlay(event,'fest-sheet')">
+  <div class="sheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-head"><h2>Log Festival Signup</h2><div class="close-btn" onclick="closeSheet('fest-sheet')">✕</div></div>
+    <div class="sheet-body">
+      <div style="background:var(--orange-dim);border:1px solid rgba(255,107,53,0.15);border-radius:8px;padding:10px 12px;font-size:11px;color:var(--sub);margin-bottom:16px;">
+        Log vendors signing up for a spot at <strong style="color:var(--orange)">1313 Festival</strong>. You earn <strong style="color:var(--orange)">10% of the $30 spot fee ($3)</strong> per confirmed vendor.
+      </div>
+      <div class="form-group">
+        <label class="form-label">Business / Vendor Name</label>
+        <input class="form-input" type="text" id="fs-biz" placeholder="Vendor or business name">
+      </div>
+      <div class="form-row">
+        <div class="form-group" style="margin-bottom:0">
+          <label class="form-label">Vendor Type</label>
+          <select class="form-select" id="fs-type">
+            <option value="food_truck">Food Truck</option>
+            <option value="retail">Vendor / Retail</option>
+            <option value="service">Service Provider</option>
+            <option value="entertainment">Entertainment</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+        <div class="form-group" style="margin-bottom:0">
+          <label class="form-label">Festival Date</label>
+          <select class="form-select" id="fs-date">
+            <option value="may_17">May 17 - Opener</option>
+            <option value="jun_21">Jun 21 - Summer</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group" style="margin-top:14px">
+        <label class="form-label">Contact Email</label>
+        <input class="form-input" type="email" id="fs-email" placeholder="vendor@email.com" inputmode="email">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Contact Phone (optional)</label>
+        <input class="form-input" type="tel" id="fs-phone" placeholder="(614) 000-0000" inputmode="tel">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Spot Fee Status</label>
+        <select class="form-select" id="fs-fee">
+          <option value="paid">$30 - Paid</option>
+          <option value="pending">$30 - Pending collection</option>
+          <option value="waived">Waived / Comp</option>
+        </select>
+      </div>
+      <div style="background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:12px;display:flex;align-items:center;gap:10px;margin-bottom:20px">
+        <input type="checkbox" id="fs-invite" style="width:18px;height:18px;accent-color:var(--orange);flex-shrink:0">
+        <label for="fs-invite" style="font-size:12px;color:var(--text);cursor:pointer;line-height:1.4">Also invite this vendor to create a CBUSEVENTS account</label>
+      </div>
+      <button class="btn btn-primary btn-full" onclick="submitFestSignup()">Log Signup</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="https://unpkg.com/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script>
+const SB_URL = "https://toblgvatvsjljbqogzsv.supabase.co";
+const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRvYmxndmF0dnNqbGpicW9nenN2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMDgwNTAsImV4cCI6MjA4NzY4NDA1MH0._WJEQPizNDiQfDXQB_DHPaQhixPGpMdmYQSmyWmm_FQ";
+const sb = supabase.createClient(SB_URL, SB_KEY);
+
+let currentRep = null;
+let allAccounts = [];
+let activeChip = 'all';
+
+// ---- AUTH ----
+async function init() {
+  const { data: { session } } = await sb.auth.getSession();
+  if (!session) { showLogin(); return; }
+  await loadRep(session.user.id);
+}
+
+function showLogin() {
+  document.getElementById('loginView').style.display = 'block';
+  document.getElementById('appView').style.display = 'none';
+}
+
+async function doLogin() {
+  const email = document.getElementById('loginEmail').value.trim();
+  const pass  = document.getElementById('loginPassword').value;
+  const errEl = document.getElementById('loginError');
+  errEl.style.display = 'none';
+  const { error } = await sb.auth.signInWithPassword({ email, password: pass });
+  if (error) { errEl.textContent = error.message; errEl.style.display = 'block'; return; }
+  const { data: { session } } = await sb.auth.getSession();
+  await loadRep(session.user.id);
+}
+
+async function loadRep(userId) {
+  const { data: rep, error } = await sb.from('sales_reps').select('*').eq('user_id', userId).single();
+  if (error || !rep) { showLogin(); return; }
+  currentRep = rep;
+  document.getElementById('loginView').style.display = 'none';
+  document.getElementById('appView').style.display = 'block';
+  populateUI();
+  loadAccounts();
+  loadFestivalSignups();
+  loadCommissions();
+  loadEvents();
+}
+
+// ---- POPULATE HEADER / HOME ----
+function populateUI() {
+  const r = currentRep;
+  const initials = r.name ? r.name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase() : '?';
+  document.getElementById('userAvatar').textContent = initials;
+  document.getElementById('heroName').textContent = r.name || 'Rep';
+  document.getElementById('rankPill').textContent = r.rank === 'brand_manager' ? 'Brand Manager' : r.rank === 'territory_manager' ? 'Territory Mgr' : 'Brand Rep';
+  const bal = (r.balance || 0).toFixed(2);
+  document.getElementById('heroBalance').textContent = '$' + bal;
+  document.getElementById('payBalance').textContent  = '$' + bal;
+  const total = (r.total_earned || 0);
+  document.getElementById('statEarned').textContent = '$' + total.toFixed(0);
+  document.getElementById('payTotal').textContent   = '$' + total.toFixed(0);
+  const refCode = r.referral_code || 'your-code';
+  const refUrl  = 'cbusevents.com/ref/' + refCode;
+  document.getElementById('refUrlDisplay').textContent = refUrl;
+  document.getElementById('ob-ref-display').textContent = refUrl;
+}
+
+// ---- ACCOUNTS ----
+async function loadAccounts() {
+  if (!currentRep) return;
+  const { data, error } = await sb.from('rep_accounts').select('*').eq('rep_id', currentRep.id).order('created_at', { ascending: false });
+  allAccounts = data || [];
+
+  const active = allAccounts.filter(a => a.status === 'active').length;
+  const free   = allAccounts.filter(a => a.tier === 'free').length;
+  const venues = allAccounts.filter(a => a.account_type === 'venue' && a.status === 'active').length;
+
+  document.getElementById('statAccounts').textContent = active;
+  document.getElementById('statFree').textContent = free > 0 ? free + ' free tier' : '';
+  document.getElementById('statVenues').textContent = venues;
+  document.getElementById('progVenue').textContent = venues + ' / 1';
+  document.getElementById('progVenueBar').style.width = Math.min(venues, 1) * 100 + '%';
+  document.getElementById('progPaid').textContent = active + ' active';
+  if (free > 0) document.getElementById('accountsDot').style.display = 'block';
+
+  renderAccountsList();
+}
+
+function renderAccountsList() {
+  const el = document.getElementById('accountsList');
+  const filtered = allAccounts.filter(a => {
+    const matchChip = activeChip === 'all' || a.account_type === activeChip || (activeChip === 'free' && a.tier === 'free');
+    return matchChip;
+  });
+
+  if (filtered.length === 0) {
+    el.innerHTML = `<div style="padding:40px;text-align:center;color:var(--sub);font-size:13px">No accounts yet. Tap + Onboard to get started.</div>`;
+    return;
+  }
+
+  const iconMap = { venue:'🏛', vendor:'🎛', planner:'📋', food_pro:'🍽', event_staff:'👤' };
+  const typeClass = { venue:'venue', vendor:'vendor', planner:'planner', food_pro:'food', event_staff:'vendor' };
+
+  el.innerHTML = filtered.map(a => {
+    const comm = a.tier === 'premium' ? (a.account_type === 'venue' ? 24.75 : a.account_type === 'planner' ? 18.75 : 11.25)
+               : a.tier === 'standard' ? (a.account_type === 'venue' ? 9.75 : a.account_type === 'planner' ? 5.00 : 3.75)
+               : 0;
+    const badge = a.status === 'active' ? '<span class="badge badge-green">Active</span>'
+                : a.status === 'pending' ? '<span class="badge badge-orange">Pending</span>'
+                : '<span class="badge badge-muted">Free</span>';
+    const amtClass = a.status === 'pending' ? 'pending' : comm === 0 ? 'zero' : '';
+    const amtText = comm > 0 ? ('$' + comm.toFixed(2)) : '--';
+    const tc = typeClass[a.account_type] || 'vendor';
+    const ic = iconMap[a.account_type] || '📋';
+    const date = new Date(a.created_at).toLocaleDateString('en-US',{month:'short',day:'numeric'});
+    return `<div class="list-row" data-type="${a.account_type}" data-tier="${a.tier}">
+      <div class="list-icon ${tc}">${ic}</div>
+      <div class="list-info">
+        <div class="list-name">${a.business_name || 'Unnamed'}</div>
+        <div class="list-meta">${a.account_type} - ${a.tier} - ${date}</div>
+      </div>
+      <div class="list-right">
+        <div class="list-amt ${amtClass}">${amtText}</div>
+        ${badge}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function setChip(el, val) {
+  document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  activeChip = val;
+  renderAccountsList();
+}
+
+function filterAccounts(q) {
+  document.querySelectorAll('#accountsList .list-row').forEach(row => {
+    row.style.display = row.textContent.toLowerCase().includes(q.toLowerCase()) ? '' : 'none';
+  });
+}
+
+// ---- FESTIVAL ----
+async function loadFestivalSignups() {
+  if (!currentRep) return;
+  const { data, error } = await sb.from('festival_signups').select('*').eq('rep_id', currentRep.id).order('created_at', { ascending: false });
+  const signups = data || [];
+
+  const confirmed = signups.filter(s => s.spot_fee_status === 'paid').length;
+  const commission = Math.round(confirmed * 30 * 0.10 * 100) / 100;
+  const converted = signups.filter(s => s.invite_to_platform).length;
+
+  document.getElementById('statFest').textContent = signups.length;
+  document.getElementById('festTotal').textContent = signups.length;
+  document.getElementById('festConfirmed').textContent = confirmed;
+  document.getElementById('festFees').textContent = '$' + commission.toFixed(2);
+  document.getElementById('festConvVal').textContent = converted + ' / ' + signups.length;
+  document.getElementById('festConvBar').style.width = signups.length > 0 ? (converted / signups.length * 100) + '%' : '0%';
+
+  const el = document.getElementById('festSignupsList');
+  if (signups.length === 0) {
+    el.innerHTML = `<div style="padding:32px;text-align:center;color:var(--sub);font-size:13px">No signups yet. Tap Log Festival Signup to start tracking.</div>`;
+    return;
+  }
+
+  el.innerHTML = signups.map((s, i) => {
+    const badge = s.spot_fee_status === 'paid' ? '<span class="badge badge-green">Confirmed</span>' : '<span class="badge badge-muted">Pending</span>';
+    const date = new Date(s.created_at).toLocaleDateString('en-US',{month:'short',day:'numeric'});
+    const dateLabel = s.festival_date === 'may_17' ? 'May 17' : s.festival_date === 'jun_21' ? 'Jun 21' : s.festival_date;
+    return `<div class="signup-row">
+      <div class="signup-num">${i+1}</div>
+      <div class="signup-info">
+        <div class="signup-name">${s.business_name || 'Unknown'}</div>
+        <div class="signup-detail">${s.vendor_type} - ${dateLabel} - $3 commission</div>
+      </div>
+      <div style="text-align:right">
+        <div class="signup-time">${date}</div>
+        ${badge}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ---- EVENTS ----
+async function loadEvents() {
+  if (!currentRep) return;
+  // Pull account emails this rep referred, then find events at those accounts
+  // For now we query all events and filter by account_type matching rep_accounts
+  // In production you'd join via profile_id once accounts are linked
+  const { data: events } = await sb.from('events')
+    .select('*, venues(name)')
+    .eq('status', 'published')
+    .order('event_date', { ascending: true })
+    .limit(20);
+
+  const el = document.getElementById('eventsList');
+  if (!events || events.length === 0) {
+    el.innerHTML = `<div style="padding:40px;text-align:center;color:var(--sub);font-size:13px">No published events found at your accounts yet. Once venues and planners you referred publish events they will appear here.</div>`;
+    return;
+  }
+
+  el.innerHTML = events.map(ev => {
+    const dateStr = ev.event_date ? new Date(ev.event_date).toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'}) : 'TBD';
+    const venueName = ev.venues?.name || ev.venue_name || 'Venue';
+    const statusBadge = ev.status === 'published' ? '<span class="badge badge-green">Published</span>' : '<span class="badge badge-muted">Draft</span>';
+    return `<div class="event-card venue">
+      <div class="event-top">
+        <div>
+          <div class="event-name">${ev.title || ev.name || 'Untitled Event'}</div>
+          <div class="event-meta"><span>${venueName}</span><br>${dateStr}</div>
+        </div>
+        <span class="badge badge-blue">Venue</span>
+      </div>
+      <div class="event-footer">
+        <div class="event-comm">Ticket rev share: <strong>active</strong></div>
+        ${statusBadge}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ---- COMMISSIONS ----
+async function loadCommissions() {
+  if (!currentRep) return;
+  const { data, error } = await sb.from('rep_commissions').select('*, rep_accounts(business_name)').eq('rep_id', currentRep.id).order('created_at', { ascending: false });
+  const comms = data || [];
+  const el = document.getElementById('commissionList');
+  if (comms.length === 0) {
+    el.innerHTML = `<div style="padding:32px;text-align:center;color:var(--sub);font-size:13px">No commissions logged yet.</div>`;
+    return;
+  }
+  el.innerHTML = comms.map(c => {
+    const biz = c.rep_accounts?.business_name || c.description || 'Account';
+    const date = new Date(c.created_at).toLocaleDateString('en-US',{month:'short',day:'numeric'});
+    const amtClass = c.status === 'pending' ? 'pending' : '';
+    return `<div class="pay-row">
+      <div class="pay-icon" style="${c.status==='pending'?'background:var(--orange-dim)':''}">💳</div>
+      <div class="pay-info"><div class="pay-name">${biz}</div><div class="pay-meta">${c.description||''} - ${date}</div></div>
+      <div class="pay-amount ${amtClass}">$${(c.net||0).toFixed(2)}</div>
+    </div>`;
+  }).join('');
+}
+
+// ---- SUBMIT ONBOARD ----
+async function submitOnboard() {
+  if (!currentRep) return;
+  const biz     = document.getElementById('ob-biz').value.trim();
+  const contact = document.getElementById('ob-contact').value.trim();
+  const email   = document.getElementById('ob-email').value.trim();
+  const phone   = document.getElementById('ob-phone').value.trim();
+  const type    = document.getElementById('ob-type').value;
+  const tier    = document.getElementById('ob-tier').value;
+  const notes   = document.getElementById('ob-notes').value.trim();
+
+  if (!biz || !email) { showToast('Business name and email required.'); return; }
+
+  const { error } = await sb.from('rep_accounts').insert({
+    rep_id: currentRep.id,
+    business_name: biz, contact_name: contact,
+    email, phone, account_type: type, tier, notes, status: 'pending'
+  });
+
+  if (error) { showToast('Error saving. Try again.'); return; }
+  closeSheet('onboard-sheet');
+  showToast('Account logged. Invite email sent.');
+  ['ob-biz','ob-contact','ob-email','ob-phone','ob-notes'].forEach(id => document.getElementById(id).value = '');
+  loadAccounts();
+}
+
+// ---- SUBMIT FESTIVAL SIGNUP ----
+async function submitFestSignup() {
+  if (!currentRep) return;
+  const biz    = document.getElementById('fs-biz').value.trim();
+  const type   = document.getElementById('fs-type').value;
+  const date   = document.getElementById('fs-date').value;
+  const email  = document.getElementById('fs-email').value.trim();
+  const phone  = document.getElementById('fs-phone').value.trim();
+  const fee    = document.getElementById('fs-fee').value;
+  const invite = document.getElementById('fs-invite').checked;
+
+  if (!biz) { showToast('Vendor name required.'); return; }
+
+  const { error } = await sb.from('festival_signups').insert({
+    rep_id: currentRep.id,
+    business_name: biz, vendor_type: type, festival_date: date,
+    contact_email: email, contact_phone: phone,
+    spot_fee_status: fee, invite_to_platform: invite
+  });
+
+  if (error) { showToast('Error saving. Try again.'); return; }
+  closeSheet('fest-sheet');
+  showToast('Festival signup logged.');
+  ['fs-biz','fs-email','fs-phone'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('fs-invite').checked = false;
+  loadFestivalSignups();
+}
+
+// ---- NAV ----
+function switchView(id, el) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('view-' + id).classList.add('active');
+  if (el) el.classList.add('active');
+  window.scrollTo(0, 0);
+}
+
+// ---- UTILS ----
+function copyRefLink() {
+  if (!currentRep) return;
+  const url = 'https://cbusevents.com/ref/' + (currentRep.referral_code || '');
+  navigator.clipboard.writeText(url).catch(() => {});
+  const btn = document.getElementById('refCopyBtn');
+  if (btn) { btn.textContent = 'Copied!'; btn.classList.add('copied'); setTimeout(() => { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 2000); }
+  showToast('Referral link copied.');
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(t._t);
+  t._t = setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+function openSheet(id) { document.getElementById(id).classList.add('open'); }
+function closeSheet(id) { document.getElementById(id).classList.remove('open'); }
+function closeOnOverlay(e, id) { if (e.target === document.getElementById(id)) closeSheet(id); }
+
+init();
+</script>
+</body>
+</html>

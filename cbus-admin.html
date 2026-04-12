@@ -504,7 +504,7 @@ function renderShell(){
  <div class="nav-item ${currentPage==='planners'?'active':''}" onclick="nav('planners')"> Planners</div> <div class="nav-item ${currentPage==='subscriptions'?'active':''}" onclick="nav('subscriptions')"> Subscriptions</div> <div class="nav-item ${currentPage==='users'?'active':''}" onclick="nav('users')"> Users</div> <div class="nav-item ${currentPage==='overrides'?'active':''}" onclick="nav('overrides')"> Overrides</div> <div class="nav-item ${currentPage==='claims'?'active':''}" onclick="nav('claims')"> Claims <span style='background:#ef4444;color:#fff;border-radius:20px;padding:1px 7px;font-size:10px;font-weight:700;margin-left:auto' id='claimsBadge' style='display:none'></span></div>
  <div class="sidebar-section">Festivals</div>
  <div class="nav-item ${currentPage==='festival1313'?'active':''}" onclick="window.open('1313-festival-admin.html','_blank')" style="color:${currentPage==='festival1313'?'var(--text)':'var(--orange)'}"> 🎪 1313 Festival <span class="badge" style="background:var(--orange);color:#fff">Live</span></div>
- <div class="sidebar-section">Content</div>
+ <div class="sidebar-section">Sales Team</div> <div class="nav-item ${currentPage==='brandreps'?'active':''}" onclick="nav('brandreps')"> Brand Reps <span id="repAppsBadge" style="display:none" class="badge"></span></div> <div class="sidebar-section">Content</div>
  <div class="nav-item ${currentPage==='blog'?'active':''}" onclick="nav('blog')"> Blog & SEO</div> <div class="nav-item ${currentPage==='outreach'?'active':''}" onclick="nav('outreach')" style="color:${currentPage==='outreach'?'var(--text)':'var(--orange)'}"> Outreach</div> <div class="nav-item ${currentPage==='marketing'?'active':''}" onclick="nav('marketing')"> Marketing AI</div> <div class="nav-item ${currentPage==='inbox'?'active':''}" onclick="nav('inbox')"> ✉ Inbox <span id="adminInboxBadge" style="display:none;margin-left:auto;background:#FF6B35;color:#fff;border-radius:99px;padding:1px 8px;font-size:9px;font-weight:800"></span></div> <div class="sidebar-bottom"> <div class="admin-tag">Admin Access</div> <button onclick="sb.auth.signOut().then(()=>renderLogin())" style="width:100%;margin-top:10px;background:none;border:1px solid var(--border);border-radius:9px;padding:8px;color:var(--muted);font-size:12px;font-weight:600;cursor:pointer;font-family:var(--font);letter-spacing:0.02em;transition:all 0.18s;" onmouseover="this.style.color='var(--text)';this.style.borderColor='var(--muted)'" onmouseout="this.style.color='var(--muted)';this.style.borderColor='var(--border)'">Sign Out</button> </div> </div> <div class="main" id="main-content"> <div class="topbar"> <div style="display:flex;align-items:center;gap:12px"> <button id="mobileMenuBtn" onclick="toggleMobileMenu()" style="display:none;background:none;border:none;color:var(--text);font-size:22px;cursor:pointer;padding:4px;line-height:1">☰</button> <div class="topbar-title" id="topbarTitle">Dashboard</div> </div> <div class="topbar-right"> <span class="topbar-time" id="topbarTime"></span> <button class="topbar-site-btn" onclick="window.open('https://cbusevents.com','_blank')">View Site ↗</button> <button class="topbar-site-btn" onclick="window.open('https://cbusevents.com/cbus-venue-portal.html','_blank')">Venue Portal ↗</button> </div> </div> <div id="mobileMenuOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:300;" onclick="toggleMobileMenu()" style="cursor:pointer">×</div> <div id="mobileMenuDrawer" style="display:none;position:fixed;left:0;top:0;bottom:0;width:240px;background:var(--surface);border-right:1px solid var(--border);z-index:301;overflow-y:auto;padding-bottom:32px;transform:translateX(-100%);transition:transform 0.25s ease;"> <div style="padding:20px 16px 16px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center"> <div style="font-family:'DM Sans',sans-serif;font-size:17px;font-weight:800">CBUS<span style="color:#FF6B35">EVENTS</span></div> <button onclick="toggleMobileMenu()" style="background:none;border:none;color:var(--sub);font-size:20px;cursor:pointer">✕</button> </div> <div id="mobileMenuItems"></div> </div> <div class="content" id="pageContent"></div> </div> <div id="modalContainer"></div> `;
 
  // Live clock
@@ -520,7 +520,7 @@ function nav(page){
  currentPage=page;
  document.querySelectorAll('.nav-item').forEach(el=>el.classList.remove('active'));
  document.querySelectorAll('.nav-item').forEach(el=>{if(el.textContent.trim().toLowerCase().includes(page))el.classList.add('active');});
- const title={dashboard:'Dashboard',venues:'Venues',events:'Events',inquiries:'Inquiries',revenue:'Revenue',design:'Design Requests',vendors:'Vendors',subscriptions:'Subscriptions',users:'Users',overrides:'Overrides',claims:'Listing Claims',blog:'Blog & SEO',planners:'Planners',outreach:'Venue Outreach',inbox:'Inbox',marketing:'Marketing Intelligence',festival1313:'1313 Festival Admin'};
+ const title={dashboard:'Dashboard',venues:'Venues',events:'Events',inquiries:'Inquiries',revenue:'Revenue',design:'Design Requests',vendors:'Vendors',subscriptions:'Subscriptions',users:'Users',overrides:'Overrides',claims:'Listing Claims',blog:'Blog & SEO',planners:'Planners',outreach:'Venue Outreach',inbox:'Inbox',marketing:'Marketing Intelligence',festival1313:'1313 Festival Admin',brandreps:'Brand Reps'};
  const el=document.getElementById('topbarTitle');
  if(el)el.textContent=title[page]||page;
  renderPage();
@@ -543,6 +543,7 @@ async function renderPage(){
  else if(currentPage==='outreach')renderOutreach();
  else if(currentPage==='inbox')renderAdminInboxPage();
  else if(currentPage==='marketing')renderMarketing();
+ else if(currentPage==='brandreps')renderBrandReps();
 }
 
 // ── ADMIN INBOX ───────────────────────────────────────────────
@@ -2400,6 +2401,223 @@ function adminPopulateEvent({event_name,event_date,description,cover_image}){
     const prev=document.getElementById('ee-cover-preview');
     if(prev){prev.src=cover_image;prev.style.display='block';}
   }
+}
+
+async function renderBrandReps(){
+  const pc=document.getElementById('pageContent');
+  const titleEl=document.getElementById('topbarTitle');
+  if(titleEl)titleEl.textContent='Brand Reps';
+  pc.innerHTML=`<div style="display:flex;align-items:center;justify-content:center;padding:60px"><div style="width:28px;height:28px;border:3px solid var(--border);border-top-color:var(--orange);border-radius:50%;animation:spin 0.8s linear infinite"></div></div>`;
+
+  const [{data:apps},{data:reps}]=await Promise.all([
+    sb.from('brand_rep_applications').select('*').order('created_at',{ascending:false}),
+    sb.from('sales_reps').select('*').order('created_at',{ascending:false})
+  ]);
+
+  const pendingApps=(apps||[]).filter(a=>a.status==='pending');
+  const badge=document.getElementById('repAppsBadge');
+  if(badge&&pendingApps.length){badge.textContent=pendingApps.length;badge.style.display='inline';}
+  else if(badge){badge.style.display='none';}
+
+  // Get account counts per rep
+  const repIds=(reps||[]).map(r=>r.id);
+  let acctCounts={};
+  if(repIds.length){
+    const {data:accts}=await sb.from('rep_accounts').select('rep_id, id').in('rep_id',repIds);
+    (accts||[]).forEach(a=>{ acctCounts[a.rep_id]=(acctCounts[a.rep_id]||0)+1; });
+  }
+
+  pc.innerHTML=`
+  <div style="margin-bottom:28px;display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:12px">
+    <div>
+      <div style="font-size:22px;font-weight:800;letter-spacing:-0.03em;margin-bottom:4px">Brand Reps</div>
+      <div style="font-size:13px;color:var(--sub)">${(reps||[]).length} active rep${(reps||[]).length!==1?'s':''} &nbsp;·&nbsp; ${pendingApps.length} pending application${pendingApps.length!==1?'s':''}</div>
+    </div>
+    <button class="btn btn-primary btn-sm" onclick="openCreateRepModal()">+ Create Rep</button>
+  </div>
+
+  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:14px;margin-bottom:32px">
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:18px">
+      <div style="font-size:10px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:8px">Active Reps</div>
+      <div style="font-size:30px;font-weight:900;font-family:var(--mono)">${(reps||[]).length}</div>
+    </div>
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:18px">
+      <div style="font-size:10px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:8px">Applications</div>
+      <div style="font-size:30px;font-weight:900;font-family:var(--mono);color:${pendingApps.length?'var(--orange)':'var(--text)'}">${pendingApps.length}</div>
+    </div>
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:18px">
+      <div style="font-size:10px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:8px">Total Accounts</div>
+      <div style="font-size:30px;font-weight:900;font-family:var(--mono)">${Object.values(acctCounts).reduce((s,v)=>s+v,0)}</div>
+    </div>
+  </div>
+
+  ${pendingApps.length?`
+  <div style="font-size:11px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:10px">Pending Applications</div>
+  <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:28px">
+    ${pendingApps.map(a=>`
+    <div style="display:flex;align-items:flex-start;gap:14px;padding:16px 18px;border-bottom:1px solid var(--border)">
+      <div style="flex:1;min-width:0">
+        <div style="font-size:14px;font-weight:700;margin-bottom:2px">${a.first_name||''} ${a.last_name||''}</div>
+        <div style="font-size:12px;color:var(--sub);margin-bottom:2px">${a.email}${a.phone?' &nbsp;·&nbsp; '+a.phone:''}</div>
+        ${a.why?`<div style="font-size:12px;color:var(--sub);font-style:italic;margin-top:4px">"${a.why}"</div>`:''}
+        ${a.source?`<div style="font-size:11px;color:var(--muted);margin-top:3px">Source: ${a.source}</div>`:''}
+      </div>
+      <div style="display:flex;gap:8px;flex-shrink:0;margin-top:2px">
+        <button class="btn btn-ghost btn-sm" onclick="rejectRepApp('${a.id}')">Reject</button>
+        <button class="btn btn-primary btn-sm" onclick="approveRepApp('${a.id}','${(a.first_name+' '+a.last_name).trim()}','${a.email}')">Approve</button>
+      </div>
+    </div>`).join('')}
+  </div>`:''}
+
+  <div style="font-size:11px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:10px">Active Reps</div>
+  <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden">
+    ${!(reps||[]).length?`<div style="padding:48px;text-align:center;color:var(--muted);font-size:13px">No reps yet. Approve an application or create one manually.</div>`:
+    reps.map(r=>{
+      const initials=r.name?r.name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase():'?';
+      const rankLabel=r.rank==='brand_manager'?'Brand Manager':r.rank==='territory_manager'?'Territory Mgr':'Brand Rep';
+      const rankColor=r.rank==='territory_manager'?'var(--blue)':r.rank==='brand_manager'?'var(--gold)':'var(--orange)';
+      const earned=(r.total_earned||0).toFixed(2);
+      const bal=(r.balance||0).toFixed(2);
+      const accts=acctCounts[r.id]||0;
+      const ref=r.referral_code?`cbusevents.com/ref/${r.referral_code}`:'no link yet';
+      return `<div style="display:flex;align-items:center;gap:14px;padding:14px 18px;border-bottom:1px solid var(--border);transition:background 0.15s" onmouseover="this.style.background='var(--card-hover)'" onmouseout="this.style.background=''">
+        <div style="width:40px;height:40px;border-radius:50%;background:rgba(255,107,53,0.1);border:1.5px solid var(--orange);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;color:var(--orange);flex-shrink:0">${initials}</div>
+        <div style="flex:1;min-width:0">
+          <div style="font-size:13px;font-weight:700;margin-bottom:2px">${r.name||'Unknown'}</div>
+          <div style="font-size:11px;color:var(--sub)">${r.email}</div>
+          <div style="font-size:10px;font-family:var(--mono);color:var(--muted);margin-top:2px">${ref}</div>
+        </div>
+        <div style="text-align:right;flex-shrink:0">
+          <div style="font-size:13px;font-weight:800;font-family:var(--mono);color:var(--green);margin-bottom:2px">$${earned} earned</div>
+          <div style="font-size:11px;color:var(--sub);margin-bottom:3px">${accts} account${accts!==1?'s':''} &nbsp;·&nbsp; $${bal} balance</div>
+          <span style="background:rgba(255,107,53,0.1);border:1px solid rgba(255,107,53,0.2);border-radius:4px;padding:2px 8px;font-size:10px;font-weight:700;letter-spacing:0.04em;text-transform:uppercase;color:${rankColor}">${rankLabel}</span>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:6px;flex-shrink:0;margin-left:8px">
+          <button class="btn btn-ghost btn-sm" onclick="viewRepAccounts('${r.id}','${r.name||'Rep'}')">Accounts</button>
+          <button class="btn btn-ghost btn-sm" onclick="promoteRep('${r.id}','${r.rank}','${r.name||'Rep'}')">Rank</button>
+        </div>
+      </div>`;
+    }).join('')}
+  </div>
+  <div id="repDetailPanel"></div>`;
+}
+
+async function approveRepApp(appId,name,email){
+  const refCode=name.toLowerCase().replace(/\s+/g,'-').replace(/[^a-z0-9-]/g,'').slice(0,20)+'-'+Math.random().toString(36).slice(2,6);
+  const{error}=await sb.from('sales_reps').insert({name,email,referral_code:refCode,rank:'brand_rep'});
+  if(error){toast('Error creating rep: '+error.message,'error');return;}
+  await sb.from('brand_rep_applications').update({status:'approved'}).eq('id',appId);
+  toast(name+' approved. Go to Supabase Auth > Users > Invite to send them login credentials.');
+  renderBrandReps();
+}
+
+async function rejectRepApp(appId){
+  if(!confirm('Reject this application?'))return;
+  await sb.from('brand_rep_applications').update({status:'rejected'}).eq('id',appId);
+  toast('Application rejected.');
+  renderBrandReps();
+}
+
+async function viewRepAccounts(repId,repName){
+  const panel=document.getElementById('repDetailPanel');
+  panel.innerHTML=`<div style="margin-top:24px;display:flex;align-items:center;justify-content:center;padding:40px"><div style="width:20px;height:20px;border:2px solid var(--border);border-top-color:var(--orange);border-radius:50%;animation:spin 0.7s linear infinite"></div></div>`;
+  const{data:accts}=await sb.from('rep_accounts').select('*').eq('rep_id',repId).order('created_at',{ascending:false});
+  const rows=accts||[];
+  const iconMap={venue:'🏛',vendor:'🎛',planner:'📋',food_pro:'🍽',event_staff:'👤'};
+  panel.innerHTML=`
+  <div style="margin-top:24px">
+    <div style="font-size:11px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:10px">${repName}'s Accounts (${rows.length})</div>
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden">
+      ${!rows.length?`<div style="padding:32px;text-align:center;color:var(--muted);font-size:13px">No accounts logged yet.</div>`:
+      rows.map(a=>{
+        const badge=a.status==='active'?`<span style="background:rgba(52,211,153,0.1);color:var(--green);border-radius:4px;padding:2px 8px;font-size:10px;font-weight:700">ACTIVE</span>`:a.status==='pending'?`<span style="background:rgba(255,107,53,0.1);color:var(--orange);border-radius:4px;padding:2px 8px;font-size:10px;font-weight:700">PENDING</span>`:`<span style="background:var(--card);color:var(--muted);border-radius:4px;padding:2px 8px;font-size:10px;font-weight:700;border:1px solid var(--border)">FREE</span>`;
+        const date=new Date(a.created_at).toLocaleDateString('en-US',{month:'short',day:'numeric'});
+        return `<div style="display:flex;align-items:center;gap:12px;padding:12px 16px;border-bottom:1px solid var(--border)">
+          <div style="font-size:18px">${iconMap[a.account_type]||'📋'}</div>
+          <div style="flex:1;min-width:0">
+            <div style="font-size:13px;font-weight:700">${a.business_name||'Unnamed'}</div>
+            <div style="font-size:11px;color:var(--sub)">${a.email} &nbsp;·&nbsp; ${a.account_type} - ${a.tier} &nbsp;·&nbsp; ${date}</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px">
+            ${badge}
+            ${a.status!=='active'?`<button class="btn btn-ghost btn-sm" onclick="markRepAccountActive('${a.id}')">Mark Active</button>`:''}
+          </div>
+        </div>`;
+      }).join('')}
+    </div>
+  </div>`;
+}
+
+async function markRepAccountActive(accountId){
+  await sb.from('rep_accounts').update({status:'active',tier:'standard'}).eq('id',accountId);
+  toast('Account marked active.');
+  // refresh the panel - find the rep again
+  const rows=document.querySelectorAll('[onclick*="viewRepAccounts"]');
+  if(rows.length)rows[0].click();
+}
+
+async function promoteRep(repId,currentRank,name){
+  const ranks=['brand_rep','brand_manager','territory_manager'];
+  const idx=ranks.indexOf(currentRank);
+  const nextRank=ranks[idx+1];
+  const prevRank=ranks[idx-1];
+  const mc=document.getElementById('modalContainer');
+  mc.innerHTML=`<div style="position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:500;display:flex;align-items:center;justify-content:center;padding:20px">
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:28px;width:100%;max-width:400px">
+      <h3 style="font-size:17px;font-weight:800;margin-bottom:6px">Update Rank - ${name}</h3>
+      <p style="font-size:13px;color:var(--sub);margin-bottom:20px">Current rank: <strong style="color:var(--text)">${currentRank.replace(/_/g,' ')}</strong></p>
+      <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:20px">
+        ${nextRank?`<button class="btn btn-primary" onclick="setRepRank('${repId}','${nextRank}')">Promote to ${nextRank.replace(/_/g,' ')}</button>`:'<div style="font-size:13px;color:var(--sub);padding:10px 0">Already at highest rank.</div>'}
+        ${prevRank?`<button class="btn btn-ghost" onclick="setRepRank('${repId}','${prevRank}')">Demote to ${prevRank.replace(/_/g,' ')}</button>`:''}
+      </div>
+      <button class="btn btn-ghost" style="width:100%" onclick="document.getElementById('modalContainer').innerHTML=''">Cancel</button>
+    </div>
+  </div>`;
+}
+
+async function setRepRank(repId,rank){
+  await sb.from('sales_reps').update({rank}).eq('id',repId);
+  document.getElementById('modalContainer').innerHTML='';
+  toast('Rank updated to '+rank.replace(/_/g,' ')+'.');
+  renderBrandReps();
+}
+
+function openCreateRepModal(){
+  const mc=document.getElementById('modalContainer');
+  mc.innerHTML=`<div style="position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:500;display:flex;align-items:center;justify-content:center;padding:20px">
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:28px;width:100%;max-width:420px">
+      <h3 style="font-size:17px;font-weight:800;margin-bottom:4px">Create Brand Rep</h3>
+      <p style="font-size:13px;color:var(--sub);margin-bottom:20px">Manually create a rep account. Then go to Supabase Auth and invite them by email.</p>
+      <div style="margin-bottom:12px">
+        <div style="font-size:10px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--sub);margin-bottom:6px">Full Name</div>
+        <input id="cr-name" style="width:100%;background:#0c0c18;border:1px solid var(--border);color:var(--text);padding:11px 14px;border-radius:9px;font-family:var(--font);font-size:14px;outline:none" placeholder="First and last name">
+      </div>
+      <div style="margin-bottom:12px">
+        <div style="font-size:10px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--sub);margin-bottom:6px">Email</div>
+        <input id="cr-email" type="email" style="width:100%;background:#0c0c18;border:1px solid var(--border);color:var(--text);padding:11px 14px;border-radius:9px;font-family:var(--font);font-size:14px;outline:none" placeholder="rep@email.com">
+      </div>
+      <div style="margin-bottom:20px">
+        <div style="font-size:10px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--sub);margin-bottom:6px">Referral Code</div>
+        <input id="cr-ref" style="width:100%;background:#0c0c18;border:1px solid var(--border);color:var(--text);padding:11px 14px;border-radius:9px;font-family:var(--font);font-size:14px;outline:none;font-family:var(--mono)" placeholder="e.g. marcus-t">
+      </div>
+      <div style="display:flex;gap:10px">
+        <button class="btn btn-ghost" style="flex:1" onclick="document.getElementById('modalContainer').innerHTML=''">Cancel</button>
+        <button class="btn btn-primary" style="flex:1" onclick="createRepManual()">Create Rep</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+async function createRepManual(){
+  const name=document.getElementById('cr-name').value.trim();
+  const email=document.getElementById('cr-email').value.trim();
+  const ref=document.getElementById('cr-ref').value.trim().toLowerCase().replace(/\s+/g,'-').replace(/[^a-z0-9-]/g,'');
+  if(!name||!email||!ref){toast('All fields required.','error');return;}
+  const{error}=await sb.from('sales_reps').insert({name,email,referral_code:ref,rank:'brand_rep'});
+  if(error){toast('Error: '+error.message,'error');return;}
+  document.getElementById('modalContainer').innerHTML='';
+  toast(name+' created. Invite them via Supabase Auth > Users > Invite.');
+  renderBrandReps();
 }
 </script>
 
