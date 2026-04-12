@@ -273,6 +273,11 @@ label{display:block;font-family:var(--mono);font-size:10px;font-weight:700;lette
     Inquiries
     <span id="proposalBadge" style="display:none;margin-left:auto;background:var(--orange);color:#fff;border-radius:var(--r-full);padding:1px 8px;font-size:9px;font-weight:800">0</span>
   </button>
+  <button class="nav-item" id="nav-festivalapps" onclick="showPage('festivalapps')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 9l10-7 10 7v11a2 2 0 01-2 2H4a2 2 0 01-2-2z"/><path d="M9 22V12h6v10"/><circle cx="12" cy="6" r="1" fill="currentColor"/></svg>
+    Festival Apps
+    <span id="festivalAppsBadge" style="display:none;margin-left:auto;background:var(--gold);color:#000;border-radius:var(--r-full);padding:1px 8px;font-size:9px;font-weight:800">0</span>
+  </button>
   <button class="nav-item" id="nav-events" onclick="showPage('events')">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
     Browse Events
@@ -494,13 +499,6 @@ async function enterPortal(){
    toast('Plan upgraded to '+newTier.charAt(0)+newTier.slice(1).toLowerCase()+'!');
  }
 
- // Handle return from Stripe Connect onboarding — auto-navigate to payouts and refresh status
- if(params.get('stripe_return')==='1'||params.get('stripe_refresh')==='1'){
-   window.history.replaceState({},'',window.location.pathname);
-   // Brief delay so portal finishes rendering before navigating
-   setTimeout(()=>showPage('payouts'),400);
- }
-
  // Load vendor profile
  const{data}=await sb.from('vendors').select('*').eq('user_id',currentUser.id).maybeSingle();
  if(!data){
@@ -578,6 +576,7 @@ function showPage(p){
  else if(p==='store'){renderStorePage();}
  else if(p==='bookings'){renderVendorBookingCalendar();}
  else if(p==='payouts'){renderPayoutsPage();}
+ else if(p==='festivalapps'){renderFestivalAppsPage();loadFestivalApps();}
  else if(p==='events'){loadBrowseEvents();}
  else if(p==='inbox'){renderInboxPage();}
  else if(p==='analytics'){renderAnalyticsPage();}
@@ -606,6 +605,100 @@ function renderPortfolioPage(){
  <div style="margin-bottom:24px"><div style="font-family:var(--mono);font-size:9px;letter-spacing:0.18em;text-transform:uppercase;color:var(--muted);margin-bottom:4px">Portfolio</div><div style="font-size:22px;font-weight:800;letter-spacing:-0.03em;margin-bottom:2px">Portfolio Photos</div><div style="font-size:13px;color:var(--sub)">Show planners the quality of your work.</div></div>
  <div class="card" style="margin-bottom:20px"><div class="card-header"><div class="card-title">Photos</div><button class="btn btn-primary btn-sm" onclick="document.getElementById('photoFileInput').click()">+ Upload</button></div><div style="padding:20px 24px"><div class="photo-grid" id="portfolioGrid"></div><div id="uploadProgress" style="display:none;margin-top:12px"><div style="background:var(--border);border-radius:4px;height:4px;overflow:hidden"><div id="uploadBar" style="height:100%;background:var(--orange);transition:width 0.3s;width:0%"></div></div><div id="uploadStatus" style="font-size:11px;color:var(--muted);margin-top:6px"></div></div><div style="margin-top:16px;display:flex;gap:10px"><input id="photoUrl" placeholder="Or paste an image URL..." style="flex:1"><button class="btn btn-ghost btn-sm" onclick="addPhotoByUrl()">Add URL</button></div><input type="file" id="photoFileInput" accept="image/*" multiple style="display:none" onchange="handlePhotoUpload(event)"></div></div>
  <div class="form-msg" id="portMsg"></div>`;
+}
+
+// ── FESTIVAL APPLICATIONS ──────────────────────────────────────
+function renderFestivalAppsPage(){
+  document.getElementById('pageContent').innerHTML=`
+  <div style="margin-bottom:24px">
+    <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.18em;text-transform:uppercase;color:var(--muted);margin-bottom:4px">Events</div>
+    <div style="font-size:22px;font-weight:800;letter-spacing:-0.03em;margin-bottom:2px">Festival Applications</div>
+    <div style="font-size:13px;color:var(--sub)">Track your applications for CBUSEVENTS-originated markets and festivals.</div>
+  </div>
+  <div id="festivalAppsContent"><div class="spinner" style="display:block;margin:40px auto"></div></div>`;
+}
+
+async function loadFestivalApps(){
+  const el=document.getElementById('festivalAppsContent');
+  if(!el) return;
+  const userEmail=sb.auth.getUser ? (await sb.auth.getUser())?.data?.user?.email : null;
+  if(!userEmail){el.innerHTML='<div style="padding:40px;text-align:center;color:var(--sub)">Sign in to view your applications.</div>';return;}
+  const {data:apps,error}=await sb.from('festival_applications').select('*').eq('email',userEmail).order('created_at',{ascending:false});
+  if(error||!apps||apps.length===0){
+    el.innerHTML=`
+    <div class="card" style="padding:48px 32px;text-align:center">
+      <div style="font-size:36px;margin-bottom:16px">🎪</div>
+      <div style="font-size:17px;font-weight:700;margin-bottom:8px">No applications yet</div>
+      <div style="font-size:13px;color:var(--sub);margin-bottom:24px;max-width:360px;margin-left:auto;margin-right:auto">When you apply for a CBUSEVENTS festival or market, your application status will appear here.</div>
+    </div>`;
+    return;
+  }
+  // Update badge
+  const pending=apps.filter(a=>a.status==='pending').length;
+  const badge=document.getElementById('festivalAppsBadge');
+  if(badge){badge.style.display=pending>0?'inline-flex':'none';badge.textContent=pending;}
+
+  el.innerHTML=apps.map(app=>{
+    const isPending=app.status==='pending';
+    const isApproved=app.status==='approved';
+    const isRejected=app.status==='rejected';
+    const feeFormatted='$'+(app.fee||75);
+    const appliedDate=app.created_at?new Date(app.created_at).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}):'';
+    const typeCap=(app.applicant_type||'vendor').charAt(0).toUpperCase()+(app.applicant_type||'vendor').slice(1);
+    const catCap=app.category?(app.category.charAt(0).toUpperCase()+app.category.slice(1)):'';
+
+    const statusBadge=isPending
+      ?`<span style="background:rgba(251,191,36,0.12);color:var(--gold);border:1px solid rgba(251,191,36,0.3);border-radius:var(--r-full);padding:3px 12px;font-size:10px;font-weight:700;font-family:var(--mono);letter-spacing:0.08em">PENDING</span>`
+      :isApproved
+      ?`<span style="background:var(--green-dim);color:var(--green);border:1px solid var(--green-border);border-radius:var(--r-full);padding:3px 12px;font-size:10px;font-weight:700;font-family:var(--mono);letter-spacing:0.08em">APPROVED</span>`
+      :`<span style="background:rgba(248,113,113,0.1);color:var(--red);border:1px solid rgba(248,113,113,0.2);border-radius:var(--r-full);padding:3px 12px;font-size:10px;font-weight:700;font-family:var(--mono);letter-spacing:0.08em">NOT SELECTED</span>`;
+
+    const actionBlock=isPending?`
+      <div style="margin-top:16px;padding:14px 16px;background:rgba(251,191,36,0.06);border:1px solid rgba(251,191,36,0.2);border-radius:var(--r-md);display:flex;align-items:flex-start;gap:12px">
+        <span style="font-size:18px;flex-shrink:0">⏳</span>
+        <div>
+          <div style="font-size:13px;font-weight:700;color:var(--gold);margin-bottom:3px">Payment Pending Review</div>
+          <div style="font-size:12px;color:var(--sub);line-height:1.55">Your application is under review. Once approved, you'll receive an email with payment instructions to secure your spot. Spot fee: <strong style="color:var(--text)">${feeFormatted}</strong>.</div>
+        </div>
+      </div>`
+    :isApproved?`
+      <div style="margin-top:16px;padding:14px 16px;background:var(--green-dim);border:1px solid var(--green-border);border-radius:var(--r-md);display:flex;align-items:flex-start;gap:12px">
+        <span style="font-size:18px;flex-shrink:0">✅</span>
+        <div style="flex:1">
+          <div style="font-size:13px;font-weight:700;color:var(--green);margin-bottom:3px">You're Approved - Secure Your Spot</div>
+          <div style="font-size:12px;color:var(--sub);line-height:1.55;margin-bottom:12px">Pay your spot fee to confirm your space at the event. Spots are held on a first-paid basis.</div>
+          <button class="btn btn-primary btn-sm" onclick="window.open('https://buy.stripe.com/aFafZh7Mc9oC9pl1Rmc3m09','_blank')" style="background:var(--green);font-size:12px;padding:8px 18px">Pay ${feeFormatted} - Secure Spot</button>
+        </div>
+      </div>`
+    :`<div style="margin-top:12px;font-size:12px;color:var(--sub)">Thank you for your interest. We'll keep you in mind for future events.</div>`;
+
+    return `
+    <div class="card" style="margin-bottom:16px;padding:24px">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:16px">
+        <div>
+          <div style="font-size:17px;font-weight:800;letter-spacing:-0.02em;margin-bottom:4px">${app.business_name||'Your Business'}</div>
+          <div style="font-size:12px;color:var(--sub)">Applied ${appliedDate}</div>
+        </div>
+        ${statusBadge}
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:12px;margin-bottom:4px">
+        <div style="background:var(--surface);border-radius:var(--r-md);padding:10px 14px">
+          <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);margin-bottom:4px">Event</div>
+          <div style="font-size:13px;font-weight:600">1313 Festival</div>
+        </div>
+        <div style="background:var(--surface);border-radius:var(--r-md);padding:10px 14px">
+          <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);margin-bottom:4px">Type</div>
+          <div style="font-size:13px;font-weight:600">${typeCap}</div>
+        </div>
+        ${catCap?`<div style="background:var(--surface);border-radius:var(--r-md);padding:10px 14px"><div style="font-family:var(--mono);font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);margin-bottom:4px">Category</div><div style="font-size:13px;font-weight:600">${catCap}</div></div>`:''}
+        <div style="background:var(--surface);border-radius:var(--r-md);padding:10px 14px">
+          <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);margin-bottom:4px">Spot Fee</div>
+          <div style="font-size:13px;font-weight:600;color:var(--orange)">${feeFormatted}</div>
+        </div>
+      </div>
+      ${actionBlock}
+    </div>`;
+  }).join('');
 }
 
 function renderProposalsPage(){
@@ -2096,12 +2189,10 @@ async function getAuthToken(){
 async function startConnectOnboard(){
  toast('Redirecting to Stripe...');
  try{
-   const returnUrl=window.location.origin+window.location.pathname+'?stripe_return=1';
-   const refreshUrl=window.location.origin+window.location.pathname+'?stripe_refresh=1';
    const res=await fetch(CONNECT_FN,{
      method:'POST',
      headers:{'Content-Type':'application/json','Authorization':'Bearer '+await getAuthToken(),'apikey':SB_KEY},
-     body:JSON.stringify({action:'onboard',return_url:returnUrl,refresh_url:refreshUrl})
+     body:JSON.stringify({action:'onboard'})
    });
    const data=await res.json();
    if(data.url) window.location.href=data.url;
@@ -2287,6 +2378,8 @@ window.handleCoverPhoto   = handleCoverPhoto;
 window.renderProfilePage  = renderProfilePage;
 window.renderServicesPage = renderServicesPage;
 window.renderPortfolioPage= renderPortfolioPage;
+window.renderFestivalAppsPage= renderFestivalAppsPage;
+window.loadFestivalApps      = loadFestivalApps;
 window.renderProposalsPage= renderProposalsPage;
 window.openProductModal   = openProductModal;
 window.saveProduct        = saveProduct;
@@ -2336,6 +2429,10 @@ window.openStripeDashboard= openStripeDashboard;
   <button class="pmn-more-item" onclick="showPage('analytics');closePmnMore()">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
     Analytics
+  </button>
+  <button class="pmn-more-item" onclick="showPage('festivalapps');closePmnMore()">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 9l10-7 10 7v11a2 2 0 01-2 2H4a2 2 0 01-2-2z"/><path d="M9 22V12h6v10"/><circle cx="12" cy="6" r="1" fill="currentColor"/></svg>
+    Festival Apps
   </button>
   <button class="pmn-more-item" onclick="showPage('events');closePmnMore()">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
