@@ -1830,32 +1830,32 @@ function renderHome(){
    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px">
      ${[
        {href:'https://cbusevents.com/signup.html?role=venue',
-        label:'Venue Owner',tag:'$39 / mo',
+        label:'Venue Owner',
         desc:'List your space, publish events, accept booking inquiries, sell tickets, and earn a revenue share on platform transactions.',
         features:['Event publishing + ticketing','Booking inquiry management','Venue discovery placement','Staff management (Premium)'],
         color:'rgba(255,107,53,0.08)',border:'rgba(255,107,53,0.22)',link:'List your venue →'},
        {href:'https://cbusevents.com/signup.html?role=vendor',
-        label:'Vendor',tag:'$15 / mo',
+        label:'Vendor',
         desc:'Get discovered by Columbus planners and venues actively sourcing talent. List services, set rates, and sell products in the Marketplace.',
         features:['Suggested to planners sourcing vendors','Marketplace product listings','Sitewide promo banner (Premium)','Portfolio + rate card'],
         color:'rgba(96,165,250,0.06)',border:'rgba(96,165,250,0.18)',link:'List your services →'},
        {href:'https://cbusevents.com/signup.html?role=planner',
-        label:'Event Planner',tag:'$20 / mo',
+        label:'Event Planner',
         desc:'Browse venues, send inquiries, hire vendors, manage your events, and sell tickets through the platform ticketing infrastructure.',
         features:['Venue + vendor directory access','Event publishing + ticketing','Platform marketing tools','Unlimited events (Premium)'],
         color:'rgba(168,139,250,0.06)',border:'rgba(168,139,250,0.18)',link:'Join as a planner →'},
        {href:'https://cbusevents.com/food-professional.html',
-        label:'Food Professional',tag:'$99 / mo',
+        label:'Food Professional',
         desc:'Built for food trucks, chefs, and caterers. Take preorders, manage walk-in orders, and book spots at CBUSEVENTS-produced festivals.',
         features:['Digital menu + preorder system','Walk-in order management','Festival spot booking','Spot fees waived (Premium members)'],
         color:'rgba(251,191,36,0.06)',border:'rgba(251,191,36,0.18)',link:'Set up your portal →'},
        {href:'https://cbusevents.com/event-staff.html',
-        label:'Event Staff',tag:'$25 / mo add-on',
+        label:'Event Staff',
         desc:'Get booked for shifts at Columbus events. Bartenders, security, DJs, photographers, and production crew all in one place.',
         features:['Discoverable staff profile','Shift booking + scheduling','Skill + availability listing','Direct hire by venues + planners'],
         color:'rgba(52,211,153,0.06)',border:'rgba(52,211,153,0.16)',link:'Get booked →'},
        {href:'https://cbusevents.com/signup.html?role=attendee',
-        label:'Event-Goer',tag:'Always free',
+        label:'Event-Goer',
         desc:'Discover what is happening in Columbus, buy tickets, save your favorite venues, and never miss a night worth going to.',
         features:['Full Columbus event calendar','Ticket purchasing','Saved venues + events','Weekly Columbus events digest'],
         color:'rgba(255,107,53,0.04)',border:'rgba(255,107,53,0.12)',link:'Find events →'},
@@ -1863,10 +1863,7 @@ function renderHome(){
        <a href="${p.href}" style="text-decoration:none;display:flex;flex-direction:column;background:${p.color};border:1px solid ${p.border};border-radius:var(--r-lg);padding:24px 22px;transition:all 0.2s"
          onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 8px 32px rgba(0,0,0,0.3)'"
          onmouseout="this.style.transform='translateY(0)';this.style.boxShadow='none'">
-         <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px">
-           <div style="font-family:var(--font);font-weight:800;font-size:16px;color:var(--text)">${p.label}</div>
-           <span style="font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;background:rgba(255,255,255,0.07);color:var(--sub);border:1px solid var(--border);padding:3px 9px;border-radius:9999px;white-space:nowrap;flex-shrink:0;margin-left:8px">${p.tag}</span>
-         </div>
+         <div style="font-family:var(--font);font-weight:800;font-size:16px;color:var(--text);margin-bottom:12px">${p.label}</div>
          <div style="font-size:13px;color:var(--sub);line-height:1.6;margin-bottom:16px;flex:1">${p.desc}</div>
          <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:18px">
            ${p.features.map(f=>'<div style="display:flex;align-items:center;gap:8px;font-size:12px;color:rgba(255,255,255,0.6)"><span style="width:4px;height:4px;border-radius:50%;background:var(--orange);flex-shrink:0"></span>'+f+'</div>').join('')}
