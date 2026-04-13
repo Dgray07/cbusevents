@@ -1238,27 +1238,8 @@ const sb=supabase.createClient(SB_URL,SB_KEY);
 function initMapsApi(){ mapsReady=true; }
 
 // ── STATE ─────────────────────────────────────────────────────
-let allVenues=[],allEvents=[],allVendors=[],currentPage='home',heroTimer=null,heroIdx=0;
+let allVenues=[],allEvents=[],allVendors=[],currentPage='home';
 let currentUser=null,savedVenueIds=new Set(),savedEventIds=new Set();
-
-// ── HERO SLIDES ───────────────────────────────────────────────
-// Real venue photos matched to type
-const HERO_SLIDES=[
- { bg:'https://images.unsplash.com/photo-1527224538127-2104bb71c51b?w=1400&q=80', label:'Bars & Nightlife', title:'Short North', sub:'Columbus bars & nightlife' },
- { bg:'https://images.unsplash.com/photo-1519671482749-fd09be7ccebf?w=1400&q=80', label:'Event Spaces', title:'Private Events', sub:'Find your perfect venue' },
- { bg:'https://images.unsplash.com/photo-1415201364774-f6f0bb35f28f?w=1400&q=80', label:'Live Music', title:'Jazz & Live Music', sub:"Columbus's best live music venues" },
- { bg:'https://images.unsplash.com/photo-1580809361436-42a7ec204889?w=1400&q=80', label:'Comedy', title:'Stand-Up & Improv', sub:'Comedy clubs & performance spaces' },
-];
-
-function buildHeroSlidesFromVenues(){
- // Replace default slides with real venue photos when available
- const withPhotos=allVenues.filter(v=>v.cover_image_url&&v.cover_image_url.startsWith('http')&&!v.cover_image_url.includes('drive.google')).slice(0,4);
- if(withPhotos.length>=2){
-   withPhotos.forEach((v,i)=>{
-     if(HERO_SLIDES[i]) HERO_SLIDES[i]={bg:v.cover_image_url,label:v.venue_type||'Venue',title:v.name,sub:v.neighborhood||'Columbus'};
-   });
- }
-}
 
 // Real venue image map
 const VENUE_IMGS={
@@ -1369,7 +1350,6 @@ function toSlug(name){
 
 function showPage(page,data=null,pushState=true){
  currentPage=page;
- if(heroTimer){clearInterval(heroTimer);heroTimer=null;}
  setNavActive(page==='venue'||page==='category'?'venues':page);
  window.scrollTo({top:0,behavior:'smooth'});
  if(page==='home')renderHome();
@@ -1530,13 +1510,7 @@ function renderHome(){
    .sort((a,b)=>(b.is_featured?1:0)-(a.is_featured?1:0))
    .slice(0,6);
 
- // CSS-only gradient slides - zero network fetches, instant render, no load flash
- const HERO_SLIDES = [
-   { gradient:'linear-gradient(135deg,#1a0800 0%,#0f0f1a 40%,#08080f 100%)', label:'Columbus Events' },
-   { gradient:'linear-gradient(135deg,#00101a 0%,#0a0a1a 50%,#080810 100%)', label:'Live Music' },
-   { gradient:'linear-gradient(135deg,#100a00 0%,#1a0f00 50%,#080810 100%)', label:'Nightlife' },
-   { gradient:'linear-gradient(135deg,#0a000a 0%,#0f0818 50%,#08080f 100%)', label:'Private Events' },
- ];
+
 
  const CATEGORIES = [
    { name:'Nightlife',  key:'Nightlife',  count: allEvents.filter(e=>e.category==='Nightlife').length,  img:'https://images.unsplash.com/photo-1566737236500-c8ac43014a67?w=600&q=80' },
@@ -1550,16 +1524,11 @@ function renderHome(){
  document.getElementById('app').innerHTML = `
 
  <!-- ══════════════════════════════════════════
-      HERO SLIDER
+      HERO
  ══════════════════════════════════════════ -->
  <section style="position:relative;min-height:600px;display:flex;align-items:center;overflow:hidden">
-   <div id="heroSlides" style="position:absolute;inset:0">
-     ${HERO_SLIDES.map((s,i)=>`
-       <div class="hero-slide${i===0?' active':''}"
-         style="position:absolute;inset:0;opacity:${i===0?'1':'0'};transition:opacity 1.2s ease;
-         background:${s.gradient}">
-       </div>`).join('')}
-   </div>
+   <!-- Single static gradient bg - no JS, no image fetches, instant paint -->
+   <div style="position:absolute;inset:0;background:linear-gradient(135deg,#1a0800 0%,#0f0f1a 40%,#08080f 100%)"></div>
    <div style="position:absolute;inset:0;background:linear-gradient(to right,rgba(8,8,16,0.97) 35%,rgba(8,8,16,0.5) 70%,rgba(8,8,16,0.15) 100%)"></div>
    <div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(8,8,16,0.95) 0%,transparent 40%)"></div>
 
@@ -1579,11 +1548,6 @@ function renderHome(){
      <p style="color:var(--sub);font-size:15px;line-height:1.6;margin-bottom:36px;max-width:500px;font-weight:500">
        Whether you run events, work them, or just enjoy them - CBUSEVENTS is your home base. Find your role below.
      </p>
-
-     <!-- ── ROLE NAVIGATOR GRID ── -->
-     <div id="heroDots" style="display:flex;gap:5px;margin-bottom:28px">
-       ${HERO_SLIDES.map((_,i)=>`<div class="hero-dot${i===0?' active':''}" onclick="goSlide(${i})" style="width:${i===0?'36px':'24px'};height:3px;border-radius:2px;background:${i===0?'var(--orange)':'rgba(255,255,255,0.2)'};cursor:pointer;transition:all 0.3s" role="button" tabindex="0"></div>`).join('')}
-     </div>
 
      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:10px;max-width:960px">
 
@@ -1992,40 +1956,11 @@ function renderHome(){
  ${footer()}
  `;
 
- // Init hero slider
- let heroIdx = 0;
- let heroTimer = setInterval(()=>goSlide((heroIdx+1)%HERO_SLIDES.length), 5200);
- function goSlide(idx){
-   heroIdx = idx;
-   document.querySelectorAll('.hero-slide').forEach((el,i)=>{
-     el.style.opacity = i===idx?'1':'0';
-   });
-   const dots = document.getElementById('heroDots');
-   if(dots) dots.querySelectorAll('.hero-dot').forEach((d,i)=>{
-     d.style.width    = i===idx?'36px':'24px';
-     d.style.background = i===idx?'var(--orange)':'rgba(255,255,255,0.2)';
-   });
- }
- window.goSlide = goSlide;
- window.heroTimer = heroTimer;
+
 
  buildHeroCards();
  setTimeout(()=>initHomeMap(), 300);
 }
-
-function initHero(){
- const slidesEl=document.getElementById('heroSlides');
- const dotsEl=document.getElementById('heroDots');
- if(!slidesEl)return;
- slidesEl.innerHTML=HERO_SLIDES.map((s,i)=>`
- <div class="hero-slide${i===0?' active':''}" style="background-image:url('${s.bg}')"></div> `).join('');
- dotsEl.innerHTML=HERO_SLIDES.map((_,i)=>`
- <div class="hero-dot${i===0?' active':''}" onclick="goSlide(${i})" role="button" tabindex="0"></div> `).join('');
- heroIdx=0;
- heroTimer=setInterval(()=>goSlide((heroIdx+1)%HERO_SLIDES.length),5000);
-}
-
-// goSlide defined in renderHome
 
 
 // ── HOME MAP ─────────────────────────────────────────────────
