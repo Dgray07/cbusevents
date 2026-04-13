@@ -1732,7 +1732,18 @@ function renderHome(){
      ${(venueScroll.length?venueScroll:allVenues.slice(0,6)).map(v=>{
        const img = getVenueImg(v);
        const venueEvents = allEvents.filter(e=>e.venue_id===v.id&&isThisWeek(e.start_time)).length;
-       return '<div class="rh-venue-card" onclick="showPage('venue',allVenues.find(x=>x.id===''+v.id+''))" role="button" tabindex="0"><div class="rh-venue-img">'+(img?'<img src="'+img+'" alt="'+v.name+'" onerror="this.style.display='none'">':'')+(v.is_featured?'<div class="rh-badge-featured">Featured</div>':'')+'<span class="rh-venue-tag">'+(v.venue_type||'Venue')+'</span><div style="position:absolute;top:10px;left:10px;background:rgba(52,211,153,0.9);color:#000;font-family:var(--mono);font-size:8px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;padding:3px 9px;border-radius:9999px">Available</div></div><div class="rh-venue-info"><div class="rh-venue-name">'+v.name+'</div><div class="rh-venue-meta">'+(v.neighborhood||'Columbus')+(v.capacity?' · Up to '+v.capacity:'')+'</div><div style="font-family:var(--mono);font-size:9px;letter-spacing:0.08em;color:var(--orange);margin-top:4px">'+(venueEvents>0?venueEvents+' event'+(venueEvents>1?'s':'')+'  this week · ':'')+'Send Inquiry →</div></div></div>';}).join('')}
+       return `<div class="rh-venue-card" onclick="showPage('venue',allVenues.find(x=>x.id==='${v.id}'))" role="button" tabindex="0">
+         <div class="rh-venue-img">${img?`<img src="${img}" alt="${v.name}" onerror="this.style.display='none'">`:''}
+           ${v.is_featured?'<div class="rh-badge-featured">Featured</div>':''}
+           <span class="rh-venue-tag">${v.venue_type||'Venue'}</span>
+           <div style="position:absolute;top:10px;left:10px;background:rgba(52,211,153,0.9);color:#000;font-family:var(--mono);font-size:8px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;padding:3px 9px;border-radius:9999px">Available</div>
+         </div>
+         <div class="rh-venue-info">
+           <div class="rh-venue-name">${v.name}</div>
+           <div class="rh-venue-meta">${v.neighborhood||'Columbus'}${v.capacity?` · Up to ${v.capacity}`:''}</div>
+           <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.08em;color:var(--orange);margin-top:4px">${venueEvents>0?venueEvents+' event'+(venueEvents>1?'s':'')+' this week · ':''}Send Inquiry →</div>
+         </div>
+       </div>`;}).join('')}
      <div class="rh-venue-card" onclick="window.location.href='https://cbusevents.com/signup.html?role=venue'" style="border:1px dashed rgba(255,107,53,0.3);background:rgba(255,107,53,0.03);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:24px 16px" role="button" tabindex="0">
        <div style="font-family:var(--font);font-weight:700;font-size:14px;color:var(--text);margin-bottom:5px">List Your Venue</div>
        <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:var(--orange);margin-bottom:8px">Free to start</div>
