@@ -146,6 +146,11 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
         <div class="role-desc">Bartenders, bar backs, security, servers, and hosts - get discovered by Columbus venues and planners looking to hire</div>
         <span class="role-badge">Free to join</span>
       </div>
+      <div class="role-card" onclick="selectRole('sales_rep',this)" role="button" tabindex="0" style="grid-column:1/-1">
+        <div class="role-name">Brand Rep</div>
+        <div class="role-desc">Refer venues, vendors, and planners to CBUSEVENTS. Earn 25% recurring commission on every paid account you bring in</div>
+        <span class="role-badge">25% commission</span>
+      </div>
     </div>
 
     <!-- FORM CARD -->
@@ -280,6 +285,7 @@ const PORTAL_URLS = {
   attendee:          'https://cbusevents.com/customer-portal.html',
   food_professional: 'https://cbusevents.com/food-professional.html',
   event_staff:       'https://cbusevents.com/event-staff.html',
+  sales_rep:         'https://cbusevents.com/brand-rep.html',
 };
 
 const FORM_TITLES = {
@@ -289,13 +295,14 @@ const FORM_TITLES = {
   attendee:          'Create Your Customer Account',
   food_professional: 'Create Your Food Professional Account',
   event_staff:       'Create Your Event Staff Account',
+  sales_rep:         'Create Your Brand Rep Account',
 };
 
 // Pre-select role from URL param
 const urlParams = new URLSearchParams(window.location.search);
 const roleParam = urlParams.get('role');
 if (roleParam) {
-  const roleMap = { venue_owner: 'venue', vendor: 'vendor', planner: 'planner', attendee: 'attendee', customer: 'attendee', food_professional: 'food_professional', event_staff: 'event_staff' };
+  const roleMap = { venue_owner: 'venue', vendor: 'vendor', planner: 'planner', attendee: 'attendee', customer: 'attendee', food_professional: 'food_professional', event_staff: 'event_staff', sales_rep: 'sales_rep' };
   const mapped = roleMap[roleParam] || roleParam;
   const el = document.querySelector(`.role-card:nth-child(${['venue','vendor','planner','attendee'].indexOf(mapped)+1})`);
   if (el) selectRole(mapped, el);
@@ -377,7 +384,7 @@ async function handleSubmit() {
 
     if (userId && data.session) {
       const roleMap = { venue: 'venue_owner', vendor: 'vendor', planner: 'planner', attendee: 'customer', food_professional: 'food_professional', event_staff: 'event_staff' };
-      await sb.from('user_roles').upsert({ user_id: userId, role: roleMap[selectedRole] || selectedRole }, { onConflict: 'user_id,role' });
+      await sb.from('user_roles').upsert({ user_id: userId, role: roleMap[selectedRole] || selectedRole }, { onConflict: 'user_id' });
 
       if (selectedRole === 'venue' && meta.venue_name) {
         await sb.from('venues').insert({ owner_id: userId, name: meta.venue_name, venue_type: meta.venue_type||null, capacity: meta.capacity?parseInt(meta.capacity):null, phone: meta.phone||null, status: 'pending', tier: 'free', city: 'Columbus', state: 'OH' });
@@ -393,6 +400,10 @@ async function handleSubmit() {
       }
       if (selectedRole === 'event_staff') {
         await sb.from('event_staff').upsert({ user_id: userId, email, display_name: meta.full_name||null, primary_role: meta.primary_role||null, phone: meta.phone||null, years_experience: meta.years_experience?parseInt(meta.years_experience):null, city: 'Columbus, OH', tier: 'free', is_accepting: true }, { onConflict: 'user_id' }).catch(()=>{});
+      }
+      if (selectedRole === 'sales_rep') {
+        const code = (meta.full_name||email).toLowerCase().replace(/[^a-z0-9]/g,'-').replace(/-+/g,'-').slice(0,20);
+        await sb.from('sales_reps').upsert({ user_id: userId, email, name: meta.full_name||null, phone: meta.phone||null, referral_code: code, rank: 'Brand Rep' }, { onConflict: 'user_id' }).catch(()=>{});
       }
       window.location.href = PORTAL_URLS[selectedRole] || PORTAL_URLS.attendee;
     }

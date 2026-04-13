@@ -138,6 +138,10 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
         <div class="role-btn-name">Event Staff</div>
         <div class="role-btn-sub">Staff Portal</div>
       </button>
+      <button class="role-btn" data-role="sales_rep" onclick="selectRole('sales_rep',this)">
+        <div class="role-btn-name">Brand Rep</div>
+        <div class="role-btn-sub">Rep Dashboard</div>
+      </button>
     </div>
 
     <div class="auth-divider">or sign in with email</div>
@@ -151,6 +155,16 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
       &nbsp;·&nbsp;
       <button class="auth-link" onclick="window.location.href='signup.html'">Create account</button>
     </div>
+  </div>
+
+  <!-- SET PASSWORD VIEW (invite / recovery) -->
+  <div id="setPasswordView" class="auth-card" style="display:none">
+    <div style="font-size:20px;font-weight:800;letter-spacing:-0.03em;margin-bottom:6px">Set your password</div>
+    <div style="font-size:13px;color:var(--sub);margin-bottom:24px">Choose a password to activate your CBUSEVENTS account.</div>
+    <div class="auth-field"><label>New Password</label><input type="password" id="newPass" placeholder="Min 6 characters" autocomplete="new-password" onkeydown="if(event.key==='Enter')doSetPassword()"></div>
+    <div class="auth-field"><label>Confirm Password</label><input type="password" id="newPass2" placeholder="Repeat password" autocomplete="new-password" onkeydown="if(event.key==='Enter')doSetPassword()"></div>
+    <div class="auth-err" id="setPwErr"></div>
+    <button class="btn-primary" id="setPwBtn" onclick="doSetPassword()">Set Password &amp; Sign In</button>
   </div>
 
   <!-- RESET VIEW -->
@@ -182,6 +196,7 @@ const PORTAL_URLS = {
   admin:             'https://cbusevents.com/cbus-admin.html',
   food_professional: 'https://cbusevents.com/food-professional.html',
   event_staff:       'https://cbusevents.com/event-staff.html',
+  sales_rep:         'https://cbusevents.com/brand-rep.html',
 };
 
 let selectedRole = 'venue_owner';
@@ -202,16 +217,59 @@ if (roleParam && PORTAL_URLS[roleParam]) {
   if (session?.user) await redirectByRole(session.user.id);
 })();
 
-// Password recovery
+// Handle invite links and password recovery from URL hash
+(async () => {
+  const hash = window.location.hash;
+  if (hash && hash.includes('access_token')) {
+    const params = new URLSearchParams(hash.substring(1));
+    const type = params.get('type');
+    if (type === 'invite' || type === 'recovery') {
+      // Exchange the token so the session is active
+      const { data, error } = await sb.auth.getSession();
+      if (!error && data.session) {
+        showSetPassword();
+      }
+    }
+  }
+})();
+
+// Password recovery / invite - show inline set password form
 sb.auth.onAuthStateChange(async (event, session) => {
-  if (event === 'PASSWORD_RECOVERY') {
-    const pw = prompt('Enter your new password (min 6 characters):');
-    if (!pw || pw.length < 6) return;
-    const { error } = await sb.auth.updateUser({ password: pw });
-    if (error) { alert('Error: ' + error.message); return; }
-    if (session?.user) await redirectByRole(session.user.id);
+  if (event === 'PASSWORD_RECOVERY' || event === 'SIGNED_IN') {
+    const hash = window.location.hash;
+    if (hash && (hash.includes('type=invite') || hash.includes('type=recovery'))) {
+      showSetPassword();
+    } else if (event === 'SIGNED_IN' && session?.user) {
+      await redirectByRole(session.user.id);
+    }
   }
 });
+
+function showSetPassword() {
+  document.getElementById('signinView').style.display = 'none';
+  document.getElementById('resetView').style.display = 'none';
+  document.getElementById('setPasswordView').style.display = '';
+}
+
+async function doSetPassword() {
+  const pw  = document.getElementById('newPass').value;
+  const pw2 = document.getElementById('newPass2').value;
+  const err = document.getElementById('setPwErr');
+  const btn = document.getElementById('setPwBtn');
+  err.textContent = ''; err.className = 'auth-err';
+  if (!pw || pw.length < 6) { err.textContent = 'Password must be at least 6 characters.'; err.className = 'auth-err error'; return; }
+  if (pw !== pw2) { err.textContent = 'Passwords do not match.'; err.className = 'auth-err error'; return; }
+  btn.disabled = true; btn.innerHTML = '<span class="spinner-sm"></span>Setting password...';
+  const { data, error } = await sb.auth.updateUser({ password: pw });
+  if (error) {
+    err.textContent = error.message; err.className = 'auth-err error';
+    btn.disabled = false; btn.textContent = 'Set Password & Sign In';
+    return;
+  }
+  // Clear hash from URL
+  history.replaceState(null, '', window.location.pathname);
+  await redirectByRole(data.user.id);
+}
 
 function selectRole(role, el) {
   selectedRole = role;
