@@ -325,8 +325,8 @@
     </div>
 
     <div class="submit-section">
-      <button class="submit-btn" id="submitBtn" onclick="handleSubmit()">SUBMIT MY APPLICATION 🎉</button>
-      <p class="submit-note">No payment today - Stripe link sent after review</p>
+      <button class="submit-btn" id="submitBtn" onclick="handleSubmit()">SUBMIT &amp; PAY YOUR SPOT FEE 💳</button>
+      <p class="submit-note">Secure your spot now — payment confirms your place at the festival</p>
     </div>
   </div>
 
@@ -371,20 +371,20 @@
         </div>
       </div>
 
-      <button class="modal-btn" id="authBtn" onclick="handleAuth()">Create Account &amp; Submit 🎉</button>
+      <button class="modal-btn" id="authBtn" onclick="handleAuth()">Create Account &amp; Pay 💳</button>
     </div>
   </div>
 
   <!-- SUCCESS -->
   <div class="success-screen" id="successScreen">
     <div class="success-icon">🎊</div>
-    <h2>You're In!</h2>
-    <p>Your application for 1313 Festival has been received. Check your email for next steps.</p>
+    <h2>Almost There!</h2>
+    <p>Application saved! Taking you to payment now to lock in your spot.</p>
     <div class="next-steps">
-      <div class="step-item"><div class="step-num">1</div>Application reviewed within 48 hours</div>
-      <div class="step-item"><div class="step-num">2</div>Once approved, pay your spot fee to confirm</div>
-      <div class="step-item"><div class="step-num">3</div>Spot confirmed + your listing goes live</div>
-      <div class="step-item" style="opacity:0.6;font-size:12px;padding-top:4px">Taking you to your portal...</div>
+      <div class="step-item"><div class="step-num">1</div>✅ Application submitted</div>
+      <div class="step-item"><div class="step-num">2</div>Complete payment to confirm your spot</div>
+      <div class="step-item"><div class="step-num">3</div>Spot confirmed + listing goes live</div>
+      <div class="step-item" style="opacity:0.6;font-size:12px;padding-top:4px">Redirecting to payment...</div>
     </div>
   </div>
 
@@ -502,7 +502,7 @@
     document.getElementById('tab-login').classList.toggle('active', !isSignup);
     document.getElementById('signup-fields').style.display = isSignup ? 'block' : 'none';
     document.getElementById('login-fields').style.display = isSignup ? 'none' : 'block';
-    document.getElementById('authBtn').textContent = isSignup ? 'Create Account & Submit 🎉' : 'Log In & Submit 🎉';
+    document.getElementById('authBtn').textContent = isSignup ? 'Create Account & Pay 💳' : 'Log In & Pay 💳';
     document.getElementById('authError').classList.remove('visible');
   }
 
@@ -540,7 +540,7 @@
       license_number: pendingFormData.license_number,
       license_url: licenseUrl,
       fee: pendingFormData.fee,
-      status: 'pending'
+      status: 'payment_pending'
     });
     if (insertError) throw new Error('Submission failed: ' + insertError.message);
 
@@ -601,18 +601,20 @@
       document.getElementById('appForm').style.display = 'none';
       document.getElementById('successScreen').classList.add('visible');
       window.scrollTo({ top: 0, behavior: 'smooth' });
-      // Redirect to portal after 2.5s
+
+      // Redirect to Stripe payment link after 1.5s
       const isTruck = pendingFormData.applicant_type === 'food_truck';
+      const paymentLink = isTruck
+        ? 'https://buy.stripe.com/00wbJ12rSbwK595gMgc3m0a'
+        : 'https://buy.stripe.com/aFafZh7Mc9oC9pl1Rmc3m09';
       setTimeout(() => {
-        window.location.href = isTruck
-          ? 'https://cbusevents.com/food-professional.html?panel=festival'
-          : 'https://cbusevents.com/cbus-vendor-portal.html?panel=festivalapps';
-      }, 2500);
+        window.location.href = paymentLink;
+      }, 1500);
 
     } catch(e) {
       showAuthError(e.message || 'Something went wrong. Please try again.');
       btn.classList.remove('loading');
-      btn.textContent = isSignup ? 'Create Account & Submit 🎉' : 'Log In & Submit 🎉';
+      btn.textContent = isSignup ? 'Create Account & Pay 💳' : 'Log In & Pay 💳';
     }
   }
 </script>
