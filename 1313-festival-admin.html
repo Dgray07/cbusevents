@@ -1303,7 +1303,7 @@
     }
     tbody.innerHTML = pending.map(a => `
       <tr>
-        <td><strong>${a.business_name}</strong><br/><span style="font-size:11px;color:var(--muted)">${a.email}</span></td>
+        <td><strong>${a.business_name}</strong><br/><span style="font-size:11px;color:var(--muted)">${a.email}</span>${a.payment_link_sent ? '<br/><span style="font-size:10px;color:#818cf8;font-weight:700">💳 Payment link sent</span>' : ''}</td>
         <td><span style="font-size:12px;color:var(--muted)">${a.first_name} ${a.last_name}<br/>${a.phone || ''}</span></td>
         <td><span class="type-badge ${a.applicant_type === 'food_truck' ? 'type-truck' : 'type-vendor'}">${a.applicant_type === 'food_truck' ? '🚚' : '⛺'} ${a.applicant_type === 'food_truck' ? 'Truck' : 'Vendor'}</span></td>
         <td style="font-size:12px;color:var(--muted);max-width:180px">${(a.description || '').slice(0, 80)}${(a.description || '').length > 80 ? '...' : ''}</td>
@@ -1312,6 +1312,7 @@
         <td>
           <button class="action-btn btn-approve" onclick="updateStatus('${a.id}', 'approved')">✓ Approve</button>
           <button class="action-btn btn-reject" onclick="updateStatus('${a.id}', 'rejected')">✗ Reject</button>
+          <button class="action-btn" style="background:rgba(129,140,248,0.12);color:#818cf8;border:1px solid rgba(129,140,248,0.25);margin-top:4px" onclick="sendPaymentLink('${a.id}','${a.email}','${a.business_name}','${a.applicant_type}')">💳 Send Payment Link</button>
         </td>
       </tr>
     `).join('');
@@ -1379,6 +1380,49 @@
     document.getElementById('conv-rsvp-total').textContent = allRsvps.length;
     document.getElementById('conv-rsvp-phone').textContent = allRsvps.filter(r => r.phone).length;
     document.getElementById('conv-mrr').textContent = mrr > 0 ? '$' + mrr + '/mo' : 'Pending Stripe data';
+  }
+
+  // SEND PAYMENT LINK
+  const PAYMENT_LINKS = {
+    vendor:     'https://buy.stripe.com/aFafZh7Mc9oC9pl1Rmc3m09',
+    food_truck: 'https://buy.stripe.com/00wbJ12rSbwK595gMgc3m0a',
+  };
+
+  async function sendPaymentLink(id, email, businessName, type) {
+    const fee = type === 'food_truck' ? '$175' : '$75';
+    const payLink = type === 'food_truck' ? PAYMENT_LINKS.food_truck : PAYMENT_LINKS.vendor;
+    const confirmed = window.confirm(`Send ${fee} payment link to ${email} for ${businessName}?`);
+    if (!confirmed) return;
+
+    try {
+      const res = await fetch('https://toblgvatvsjljbqogzsv.supabase.co/functions/v1/email-capture', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'send_payment_link',
+          email,
+          business_name: businessName,
+          fee,
+          payment_url: payLink,
+          event_name: '1313 Festival - June 13, 2026'
+        })
+      });
+
+      if (res.ok) {
+        // Mark payment link sent in DB
+        await sb.from('festival_applications').update({ payment_link_sent: true }).eq('id', id);
+        showToast(`💳 Payment link sent to ${email}`, 'success');
+        await loadApplications();
+        renderPending();
+      } else {
+        // Fallback - copy link to clipboard
+        navigator.clipboard.writeText(payLink).catch(()=>{});
+        showToast(`Edge fn unavailable - payment link copied to clipboard`, 'error');
+      }
+    } catch(e) {
+      navigator.clipboard.writeText(payLink).catch(()=>{});
+      showToast('Payment link copied to clipboard - send manually', 'error');
+    }
   }
 
   // UPDATE APPLICATION STATUS
