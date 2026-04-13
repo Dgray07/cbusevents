@@ -1568,8 +1568,8 @@ function renderHome(){
        The platform connecting <strong style="color:var(--text)">venues, vendors, planners, food pros, and event staff</strong> to customers across Columbus. One ecosystem for every event.
      </p>
      <div style="display:flex;gap:12px;flex-wrap:wrap">
-       <a href="https://cbusevents.com/signup.html" style="display:inline-flex;align-items:center;gap:8px;background:var(--orange);color:#fff;font-family:var(--font);font-weight:700;font-size:15px;padding:14px 32px;border-radius:var(--r-md);text-decoration:none;transition:opacity 0.15s" onmouseover="this.style.opacity=\'0.88\'" onmouseout="this.style.opacity=\'1\'">Join Free Today</a>
-       <button onclick="showPage(\'events\')" style="display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,0.06);color:var(--text);border:1px solid var(--border);font-family:var(--font);font-weight:600;font-size:15px;padding:14px 24px;border-radius:var(--r-md);cursor:pointer;transition:all 0.15s" onmouseover="this.style.background=\'rgba(255,255,255,0.1)\'" onmouseout="this.style.background=\'rgba(255,255,255,0.06)\'">Browse Events</button>
+       <a href="https://cbusevents.com/signup.html" style="display:inline-flex;align-items:center;gap:8px;background:var(--orange);color:#fff;font-family:var(--font);font-weight:700;font-size:15px;padding:14px 32px;border-radius:var(--r-md);text-decoration:none;transition:opacity 0.15s" onmouseover="this.style.opacity='0.88'" onmouseout="this.style.opacity='1'">Join Free Today</a>
+       <button onclick="showPage('events')" style="display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,0.06);color:var(--text);border:1px solid var(--border);font-family:var(--font);font-weight:600;font-size:15px;padding:14px 24px;border-radius:var(--r-md);cursor:pointer;transition:all 0.15s" onmouseover="this.style.background='rgba(255,255,255,0.1)'" onmouseout="this.style.background='rgba(255,255,255,0.06)'">Browse Events</button>
      </div>
    </div>
  </section>
@@ -1595,8 +1595,8 @@ function renderHome(){
  ══════════════════════════════════════════ -->
  <section style="padding:40px 48px 0">
    <a href="https://cbusevents.com/1313-festival-event.html" style="display:flex;align-items:center;justify-content:space-between;gap:28px;background:linear-gradient(135deg,#1a0800,#0f0a00 50%,#0a0f0a);border:1px solid rgba(255,107,53,0.35);border-radius:var(--r-lg);padding:28px 36px;text-decoration:none;transition:all 0.2s;flex-wrap:wrap;position:relative;overflow:hidden"
-     onmouseover="this.style.borderColor=\'rgba(255,107,53,0.6)\';this.style.transform=\'translateY(-1px)\'"
-     onmouseout="this.style.borderColor=\'rgba(255,107,53,0.35)\';this.style.transform=\'translateY(0)\'">
+     onmouseover="this.style.borderColor='rgba(255,107,53,0.6)';this.style.transform='translateY(-1px)'"
+     onmouseout="this.style.borderColor='rgba(255,107,53,0.35)';this.style.transform='translateY(0)'">
      <div style="position:absolute;top:-30px;right:-30px;width:160px;height:160px;border-radius:50%;background:radial-gradient(circle,rgba(255,107,53,0.12),transparent 70%);pointer-events:none"></div>
      <div style="display:flex;align-items:center;gap:20px">
        <div style="width:56px;height:56px;flex-shrink:0;background:var(--orange);border-radius:var(--r-md);display:flex;align-items:center;justify-content:center;font-size:26px">🎪</div>
@@ -1629,7 +1629,7 @@ function renderHome(){
        <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.2em;text-transform:uppercase;color:var(--orange);margin-bottom:6px">Happening in Columbus</div>
        <h2 id="eventsGridTitle" style="font-family:var(--font);font-size:22px;font-weight:800;letter-spacing:-0.03em;color:var(--text)">Upcoming Events</h2>
      </div>
-     <button onclick="showPage(\'events\')" style="font-family:var(--mono);font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:var(--orange);background:none;border:none;cursor:pointer">View All</button>
+     <button onclick="showPage('events')" style="font-family:var(--mono);font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:var(--orange);background:none;border:none;cursor:pointer">View All</button>
    </div>
    ${allUpcoming.length === 0 ? `
      <div style="text-align:center;padding:48px 20px;color:var(--sub)">
@@ -1673,18 +1673,18 @@ function renderHome(){
        <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.2em;text-transform:uppercase;color:var(--orange);margin-bottom:6px">Browse by Category</div>
        <h2 style="font-family:var(--font);font-size:22px;font-weight:800;letter-spacing:-0.03em;color:var(--text)">What are you looking for?</h2>
      </div>
-     <button onclick="showPage(\'events\')" style="font-family:var(--mono);font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:var(--orange);background:none;border:none;cursor:pointer;white-space:nowrap">View All</button>
+     <button onclick="showPage('events')" style="font-family:var(--mono);font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:var(--orange);background:none;border:none;cursor:pointer;white-space:nowrap">View All</button>
    </div>
    <div class="cat-scroll-track">
-     <div id="catAll" class="cat-card cat-card-active" onclick="filterHomeMap(\'All\',this)" role="button" tabindex="0">
+     <div id="catAll" class="cat-card cat-card-active" onclick="filterHomeMap('All',this)" role="button" tabindex="0">
        <div style="position:absolute;inset:0;background:linear-gradient(135deg,#1a0800,#0f0f1a)"></div>
        <div class="cat-card-body"><div class="cat-card-name">All Events</div><div class="cat-card-count">${allEvents.length} total</div></div>
      </div>
      ${CATEGORIES.map(cat=>`
-       <div id="cat${cat.key}" class="cat-card" onclick="filterHomeMap(\'${cat.key}\',this)" role="button" tabindex="0">
-         <img src="${cat.img}" alt="${cat.name}" class="cat-card-img" loading="lazy" onerror="this.style.display=\'none\'">
+       <div id="cat${cat.key}" class="cat-card" onclick="filterHomeMap('${cat.key}',this)" role="button" tabindex="0">
+         <img src="${cat.img}" alt="${cat.name}" class="cat-card-img" loading="lazy" onerror="this.style.display='none'">
          <div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(8,8,16,0.88) 0%,rgba(8,8,16,0.3) 60%,transparent 100%)"></div>
-         <div class="cat-card-body"><div class="cat-card-name">${cat.name}</div><div class="cat-card-count">${cat.count} event${cat.count!==1?\'s\':\'\'}</div></div>
+         <div class="cat-card-body"><div class="cat-card-name">${cat.name}</div><div class="cat-card-count">${cat.count} event${cat.count!==1?'s':''}</div></div>
        </div>`).join('')}
    </div>
  </section>
@@ -1726,14 +1726,14 @@ function renderHome(){
        <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.2em;text-transform:uppercase;color:var(--orange);margin-bottom:6px">Available for Booking</div>
        <h2 style="font-family:var(--font);font-size:22px;font-weight:800;letter-spacing:-0.03em;color:var(--text)">Columbus Venues</h2>
      </div>
-     <button onclick="window.location.href=\'https://cbusevents.com/venues.html\'" style="font-family:var(--mono);font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:var(--orange);background:none;border:none;cursor:pointer">Browse All</button>
+     <button onclick="window.location.href='https://cbusevents.com/venues.html'" style="font-family:var(--mono);font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:var(--orange);background:none;border:none;cursor:pointer">Browse All</button>
    </div>
    <div class="rh-venues-scroll">
      ${(venueScroll.length?venueScroll:allVenues.slice(0,6)).map(v=>{
        const img = getVenueImg(v);
        const venueEvents = allEvents.filter(e=>e.venue_id===v.id&&isThisWeek(e.start_time)).length;
-       return '<div class="rh-venue-card" onclick="showPage(\'venue\',allVenues.find(x=>x.id===\''+v.id+'\'))" role="button" tabindex="0"><div class="rh-venue-img">'+(img?'<img src="'+img+'" alt="'+v.name+'" onerror="this.style.display=\'none\'">':\'\')+(v.is_featured?\'<div class="rh-badge-featured">Featured</div>\':\'\')+'<span class="rh-venue-tag">'+(v.venue_type||'Venue')+'</span><div style="position:absolute;top:10px;left:10px;background:rgba(52,211,153,0.9);color:#000;font-family:var(--mono);font-size:8px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;padding:3px 9px;border-radius:9999px">Available</div></div><div class="rh-venue-info"><div class="rh-venue-name">'+v.name+'</div><div class="rh-venue-meta">'+(v.neighborhood||'Columbus')+(v.capacity?' · Up to '+v.capacity:\'\')+'</div><div style="font-family:var(--mono);font-size:9px;letter-spacing:0.08em;color:var(--orange);margin-top:4px">'+(venueEvents>0?venueEvents+' event'+(venueEvents>1?\'s\':\'\')+'  this week · \':\'\')+'Send Inquiry →</div></div></div>';}).join('')}
-     <div class="rh-venue-card" onclick="window.location.href=\'https://cbusevents.com/signup.html?role=venue\'" style="border:1px dashed rgba(255,107,53,0.3);background:rgba(255,107,53,0.03);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:24px 16px" role="button" tabindex="0">
+       return '<div class="rh-venue-card" onclick="showPage('venue',allVenues.find(x=>x.id===''+v.id+''))" role="button" tabindex="0"><div class="rh-venue-img">'+(img?'<img src="'+img+'" alt="'+v.name+'" onerror="this.style.display='none'">':'')+(v.is_featured?'<div class="rh-badge-featured">Featured</div>':'')+'<span class="rh-venue-tag">'+(v.venue_type||'Venue')+'</span><div style="position:absolute;top:10px;left:10px;background:rgba(52,211,153,0.9);color:#000;font-family:var(--mono);font-size:8px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;padding:3px 9px;border-radius:9999px">Available</div></div><div class="rh-venue-info"><div class="rh-venue-name">'+v.name+'</div><div class="rh-venue-meta">'+(v.neighborhood||'Columbus')+(v.capacity?' · Up to '+v.capacity:'')+'</div><div style="font-family:var(--mono);font-size:9px;letter-spacing:0.08em;color:var(--orange);margin-top:4px">'+(venueEvents>0?venueEvents+' event'+(venueEvents>1?'s':'')+'  this week · ':'')+'Send Inquiry →</div></div></div>';}).join('')}
+     <div class="rh-venue-card" onclick="window.location.href='https://cbusevents.com/signup.html?role=venue'" style="border:1px dashed rgba(255,107,53,0.3);background:rgba(255,107,53,0.03);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:24px 16px" role="button" tabindex="0">
        <div style="font-family:var(--font);font-weight:700;font-size:14px;color:var(--text);margin-bottom:5px">List Your Venue</div>
        <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:var(--orange);margin-bottom:8px">Free to start</div>
        <div style="font-family:var(--mono);font-size:8px;letter-spacing:0.08em;color:var(--muted)">Get discovered · Get booked</div>
@@ -1746,8 +1746,8 @@ function renderHome(){
  ══════════════════════════════════════════ -->
  <section style="padding:48px 48px 0">
    <a href="https://cbusevents.com/gallery-hop.html" style="display:flex;align-items:center;justify-content:space-between;gap:24px;background:linear-gradient(135deg,#0a0a1a,#140a00,#0a0a18);border:1px solid rgba(255,107,53,0.2);border-radius:var(--r-lg);padding:28px 32px;text-decoration:none;transition:all 0.2s;flex-wrap:wrap"
-     onmouseover="this.style.borderColor=\'rgba(255,107,53,0.45)\';this.style.transform=\'translateY(-1px)\'"
-     onmouseout="this.style.borderColor=\'rgba(255,107,53,0.2)\';this.style.transform=\'translateY(0)\'">
+     onmouseover="this.style.borderColor='rgba(255,107,53,0.45)';this.style.transform='translateY(-1px)'"
+     onmouseout="this.style.borderColor='rgba(255,107,53,0.2)';this.style.transform='translateY(0)'">
      <div style="display:flex;align-items:center;gap:20px">
        <div style="width:52px;height:52px;flex-shrink:0;background:rgba(255,107,53,0.1);border:1px solid rgba(255,107,53,0.25);border-radius:var(--r-md);display:flex;align-items:center;justify-content:center">
          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#FF6B35" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
@@ -1757,7 +1757,7 @@ function renderHome(){
            <span style="width:5px;height:5px;border-radius:50%;background:var(--orange);animation:pulse 2s infinite;display:inline-block"></span>
            Short North Arts District · Every First Friday
          </div>
-         <div style="font-family:\'Playfair Display\',serif;font-size:clamp(20px,3vw,28px);font-weight:700;color:var(--text);margin-bottom:4px">Gallery <em style="color:var(--orange);font-style:italic">Hop</em> Guide</div>
+         <div style="font-family:'Playfair Display',serif;font-size:clamp(20px,3vw,28px);font-weight:700;color:var(--text);margin-bottom:4px">Gallery <em style="color:var(--orange);font-style:italic">Hop</em> Guide</div>
          <div style="font-size:13px;color:var(--sub);line-height:1.5">Browse all participating venues, get directions, and plan your First Friday night out.</div>
        </div>
      </div>
@@ -1782,8 +1782,8 @@ function renderHome(){
        <p style="color:var(--sub);font-size:15px;line-height:1.7;margin-bottom:12px">Products, services, and digital goods from Columbus&apos;s best event vendors. Photographers, DJs, caterers, florists selling directly through the platform.</p>
        <p style="color:var(--sub);font-size:13px;line-height:1.65;margin-bottom:28px">Vendors list products free. Buyers shop local, skip the middleman.</p>
        <div style="display:flex;gap:12px;flex-wrap:wrap">
-         <a href="https://cbusevents.com/marketplace.html" style="display:inline-flex;align-items:center;gap:8px;background:var(--orange);color:#fff;font-family:var(--font);font-weight:700;font-size:14px;padding:12px 28px;border-radius:var(--r-md);text-decoration:none;transition:opacity 0.18s" onmouseover="this.style.opacity=\'0.9\'" onmouseout="this.style.opacity=\'1\'">Browse Marketplace →</a>
-         <a href="https://cbusevents.com/cbus-vendor-portal.html" style="display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,0.04);color:var(--sub);border:1px solid var(--border);font-family:var(--font);font-weight:600;font-size:14px;padding:12px 24px;border-radius:var(--r-md);text-decoration:none;transition:all 0.18s" onmouseover="this.style.borderColor=\'rgba(255,107,53,0.4)\';this.style.color=\'var(--text)\'" onmouseout="this.style.borderColor=\'var(--border)\';this.style.color=\'var(--sub)\'">Sell Your Products</a>
+         <a href="https://cbusevents.com/marketplace.html" style="display:inline-flex;align-items:center;gap:8px;background:var(--orange);color:#fff;font-family:var(--font);font-weight:700;font-size:14px;padding:12px 28px;border-radius:var(--r-md);text-decoration:none;transition:opacity 0.18s" onmouseover="this.style.opacity='0.9'" onmouseout="this.style.opacity='1'">Browse Marketplace →</a>
+         <a href="https://cbusevents.com/cbus-vendor-portal.html" style="display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,0.04);color:var(--sub);border:1px solid var(--border);font-family:var(--font);font-weight:600;font-size:14px;padding:12px 24px;border-radius:var(--r-md);text-decoration:none;transition:all 0.18s" onmouseover="this.style.borderColor='rgba(255,107,53,0.4)';this.style.color='var(--text)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--sub)'">Sell Your Products</a>
        </div>
      </div>
      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
@@ -1796,9 +1796,9 @@ function renderHome(){
          {icon:'💡', label:'Lighting & AV',  desc:'Equipment, production'},
        ].map(c=>`
          <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--r-lg);padding:16px;transition:all 0.18s;cursor:pointer"
-           onclick="window.location.href=\'https://cbusevents.com/marketplace.html\'"
-           onmouseover="this.style.borderColor=\'rgba(255,107,53,0.3)\';this.style.transform=\'translateY(-2px)\'"
-           onmouseout="this.style.borderColor=\'var(--border)\';this.style.transform=\'translateY(0)\'">
+           onclick="window.location.href='https://cbusevents.com/marketplace.html'"
+           onmouseover="this.style.borderColor='rgba(255,107,53,0.3)';this.style.transform='translateY(-2px)'"
+           onmouseout="this.style.borderColor='var(--border)';this.style.transform='translateY(0)'">
            <div style="font-size:22px;margin-bottom:8px">${c.icon}</div>
            <div style="font-weight:700;font-size:13px;margin-bottom:3px">${c.label}</div>
            <div style="font-size:11px;color:var(--muted)">${c.desc}</div>
@@ -1850,15 +1850,15 @@ function renderHome(){
         color:'rgba(255,107,53,0.04)',border:'rgba(255,107,53,0.12)',link:'Find events →'},
      ].map(p=>`
        <a href="${p.href}" style="text-decoration:none;display:flex;flex-direction:column;background:${p.color};border:1px solid ${p.border};border-radius:var(--r-lg);padding:24px 22px;transition:all 0.2s"
-         onmouseover="this.style.transform=\'translateY(-2px)\';this.style.boxShadow=\'0 8px 32px rgba(0,0,0,0.3)\'"
-         onmouseout="this.style.transform=\'translateY(0)\';this.style.boxShadow=\'none\'">
+         onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 8px 32px rgba(0,0,0,0.3)'"
+         onmouseout="this.style.transform='translateY(0)';this.style.boxShadow='none'">
          <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px">
            <div style="font-family:var(--font);font-weight:800;font-size:16px;color:var(--text)">${p.label}</div>
            <span style="font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;background:rgba(255,255,255,0.07);color:var(--sub);border:1px solid var(--border);padding:3px 9px;border-radius:9999px;white-space:nowrap;flex-shrink:0;margin-left:8px">${p.tag}</span>
          </div>
          <div style="font-size:13px;color:var(--sub);line-height:1.6;margin-bottom:16px;flex:1">${p.desc}</div>
          <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:18px">
-           ${p.features.map(f=>\'<div style="display:flex;align-items:center;gap:8px;font-size:12px;color:rgba(255,255,255,0.6)"><span style="width:4px;height:4px;border-radius:50%;background:var(--orange);flex-shrink:0"></span>\'+f+\'</div>\').join(\'\')}
+           ${p.features.map(f=>'<div style="display:flex;align-items:center;gap:8px;font-size:12px;color:rgba(255,255,255,0.6)"><span style="width:4px;height:4px;border-radius:50%;background:var(--orange);flex-shrink:0"></span>'+f+'</div>').join('')}
          </div>
          <div style="font-family:var(--mono);font-size:10px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--orange)">${p.link}</div>
        </a>`).join('')}
@@ -1874,7 +1874,7 @@ function renderHome(){
        <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.2em;text-transform:uppercase;color:var(--orange);margin-bottom:12px">1099 Brand Ambassador Program</div>
        <h2 style="font-family:var(--font);font-size:clamp(24px,3vw,38px);font-weight:900;letter-spacing:-0.04em;line-height:1.05;margin-bottom:16px">Know Columbus events?<br><span style="color:var(--orange)">Get paid for it.</span></h2>
        <p style="color:var(--sub);font-size:15px;line-height:1.7;margin-bottom:28px">Earn recurring commission every month for every venue, vendor, or planner you bring onto the platform. No cap. No fixed hours. Just your network working for you.</p>
-       <a href="https://cbusevents.com/ambassador.html" style="display:inline-flex;align-items:center;gap:8px;background:var(--orange);color:#fff;font-family:var(--font);font-weight:700;font-size:14px;padding:12px 28px;border-radius:var(--r-md);text-decoration:none;transition:opacity 0.18s" onmouseover="this.style.opacity=\'0.9\'" onmouseout="this.style.opacity=\'1\'">Become an Ambassador →</a>
+       <a href="https://cbusevents.com/ambassador.html" style="display:inline-flex;align-items:center;gap:8px;background:var(--orange);color:#fff;font-family:var(--font);font-weight:700;font-size:14px;padding:12px 28px;border-radius:var(--r-md);text-decoration:none;transition:opacity 0.18s" onmouseover="this.style.opacity='0.9'" onmouseout="this.style.opacity='1'">Become an Ambassador →</a>
      </div>
      <div style="display:flex;flex-direction:column;gap:12px">
        ${[
@@ -1926,8 +1926,8 @@ function renderHome(){
      </div>
      <div id="emailCaptureForm">
        <div style="display:flex;gap:10px;flex-wrap:wrap">
-         <input id="captureEmail" type="email" placeholder="your@email.com" style="flex:1;min-width:180px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.12);border-radius:10px;padding:13px 16px;font-size:15px;color:var(--text);font-family:var(--font);outline:none" onfocus="this.style.borderColor=\'rgba(255,107,53,0.5)\'" onblur="this.style.borderColor=\'rgba(255,255,255,0.12)\'" onkeydown="if(event.key===\'Enter\')submitCapture(\'homepage\')">
-         <button onclick="submitCapture(\'homepage\')" style="background:var(--orange);color:#fff;border:none;border-radius:10px;padding:13px 22px;font-size:15px;font-weight:700;cursor:pointer;font-family:var(--font);white-space:nowrap;transition:opacity 0.15s" onmouseover="this.style.opacity=\'0.85\'" onmouseout="this.style.opacity=\'1\'">Get the list</button>
+         <input id="captureEmail" type="email" placeholder="your@email.com" style="flex:1;min-width:180px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.12);border-radius:10px;padding:13px 16px;font-size:15px;color:var(--text);font-family:var(--font);outline:none" onfocus="this.style.borderColor='rgba(255,107,53,0.5)'" onblur="this.style.borderColor='rgba(255,255,255,0.12)'" onkeydown="if(event.key==='Enter')submitCapture('homepage')">
+         <button onclick="submitCapture('homepage')" style="background:var(--orange);color:#fff;border:none;border-radius:10px;padding:13px 22px;font-size:15px;font-weight:700;cursor:pointer;font-family:var(--font);white-space:nowrap;transition:opacity 0.15s" onmouseover="this.style.opacity='0.85'" onmouseout="this.style.opacity='1'">Get the list</button>
        </div>
        <div id="captureStatus" style="margin-top:10px;font-size:13px;min-height:18px"></div>
        <div style="margin-top:8px;font-size:12px;color:#44445a">Free. Unsubscribe anytime.</div>
