@@ -193,8 +193,12 @@ async function submitApplication() {
   btn.disabled = true;
 
   const { error } = await sb.from('brand_rep_applications').insert({
-    first_name: firstName, last_name: lastName,
-    email, phone, why, source, status: 'pending'
+    first_name: firstName,
+    last_name: lastName,
+    email,
+    phone,
+    why_brand_rep: why,
+    how_heard: source
   });
 
   if (error) {

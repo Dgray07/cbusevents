@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Partner With CBUSEVENTS — Reach Columbus Event Audiences</title>
+<meta name="description" content="Brands, sponsors, and sales teams — reach thousands of Columbus event-goers through CBUSEVENTS. List your brand, run promotions, and get discovered.">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://cbusevents.com/sales-landing.html">
+<meta property="og:title" content="Partner With CBUSEVENTS — Reach Columbus Events">
+<meta property="og:description" content="Brands and sponsors: reach the Columbus event economy through CBUSEVENTS.">
+<meta property="og:image" content="https://cbusevents.com/assets/cbus-shield.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700;800;900&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --bg:#080810;
+  --surface:#0f0f1a;
+  --card:#141420;
+  --border:#1e1e2e;
+  --text:#f0f0fa;
+  --sub:#7070a0;
+  --muted:#40405a;
+  --orange:#FF6B35;
+  --orange-dim:rgba(255,107,53,0.1);
+  --orange-border:rgba(255,107,53,0.25);
+  --green:#34d399;
+  --blue:#818cf8;
+  --font:'DM Sans',sans-serif;
+  --mono:'DM Mono',monospace;
+  --r-sm:8px;
+  --r-md:10px;
+  --r-lg:14px;
+  --r-full:9999px;
+}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--text);font-family:var(--font);-webkit-font-smoothing:antialiased;}
+a{text-decoration:none;color:inherit;}
+button{cursor:pointer;font-family:var(--font);border:none;}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);}}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.4;}}
+@keyframes shimmer{0%{transform:translateX(-100%);}100%{transform:translateX(100%);}}
+
+/* ── NAV ── */
+nav{
+  position:sticky;top:0;z-index:100;
+  background:rgba(8,8,16,0.92);backdrop-filter:blur(20px);
+  border-bottom:1px solid rgba(255,255,255,0.07);
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 48px;height:62px;
+}
+.nav-logo{font-family:var(--font);font-weight:800;font-size:20px;color:#fff;text-decoration:none;}
+.nav-logo span{color:var(--orange);}
+.nav-back{font-size:13px;font-weight:600;color:var(--sub);display:flex;align-items:center;gap:6px;transition:color 0.15s;}
+.nav-back:hover{color:var(--text);}
+.nav-cta{background:var(--orange);color:#fff;padding:8px 20px;border-radius:8px;font-size:13px;font-weight:700;transition:opacity 0.15s;text-decoration:none;}
+.nav-cta:hover{opacity:0.85;}
+
+/* ── HERO ── */
+.hero{
+  min-height:72vh;display:flex;align-items:center;
+  padding:80px 48px 64px;
+  background:linear-gradient(135deg,#0f0a00 0%,#1a0f00 30%,#080810 70%,#08080f 100%);
+  border-bottom:1px solid rgba(255,107,53,0.15);
+  position:relative;overflow:hidden;
+}
+.hero::before{
+  content:'';position:absolute;inset:0;
+  background:radial-gradient(ellipse 80% 60% at 60% 50%,rgba(255,107,53,0.06) 0%,transparent 70%);
+  pointer-events:none;
+}
+.hero-inner{max-width:1100px;margin:0 auto;width:100%;display:grid;grid-template-columns:1fr 420px;gap:64px;align-items:center;}
+.hero-content{animation:fadeUp 0.6s ease both;}
+.hero-eyebrow{
+  display:inline-flex;align-items:center;gap:7px;
+  background:var(--orange-dim);border:1px solid var(--orange-border);
+  border-radius:var(--r-full);padding:5px 16px;
+  font-family:var(--mono);font-size:10px;font-weight:700;
+  letter-spacing:0.18em;text-transform:uppercase;color:var(--orange);
+  margin-bottom:24px;
+}
+.hero-dot{width:6px;height:6px;border-radius:50%;background:var(--orange);animation:pulse 2s infinite;}
+.hero-title{
+  font-family:var(--font);font-weight:900;
+  font-size:clamp(38px,5.5vw,64px);line-height:0.95;
+  letter-spacing:-0.04em;text-transform:uppercase;
+  color:var(--text);margin-bottom:20px;
+}
+.hero-title .accent{color:var(--orange);}
+.hero-sub{font-size:16px;color:var(--sub);line-height:1.65;margin-bottom:32px;max-width:460px;font-weight:500;}
+.hero-sub strong{color:var(--text);font-weight:700;}
+.hero-actions{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:28px;}
+.btn-primary{
+  display:inline-flex;align-items:center;gap:8px;
+  background:var(--orange);color:#fff;
+  font-family:var(--font);font-weight:700;font-size:15px;
+  padding:14px 32px;border-radius:var(--r-md);
+  text-decoration:none;transition:all 0.2s;
+}
+.btn-primary:hover{opacity:0.88;transform:translateY(-1px);}
+.btn-secondary{
+  display:inline-flex;align-items:center;gap:8px;
+  background:rgba(255,255,255,0.05);color:var(--text);
+  border:1.5px solid rgba(255,255,255,0.12);
+  font-family:var(--font);font-weight:600;font-size:15px;
+  padding:14px 24px;border-radius:var(--r-md);
+  text-decoration:none;transition:all 0.2s;
+}
+.btn-secondary:hover{background:rgba(255,255,255,0.09);border-color:rgba(255,255,255,0.2);}
+.hero-trust{display:flex;flex-wrap:wrap;gap:20px;align-items:center;}
+.trust-item{font-family:var(--mono);font-size:10px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);display:flex;align-items:center;gap:6px;}
+.trust-check{width:14px;height:14px;border-radius:50%;background:var(--orange);display:flex;align-items:center;justify-content:center;font-size:8px;color:#fff;font-weight:900;flex-shrink:0;}
+
+/* Hero form card */
+.hero-form-card{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:18px;padding:32px;
+  animation:fadeUp 0.6s 0.12s ease both;
+}
+.hero-form-title{font-family:var(--font);font-weight:800;font-size:18px;letter-spacing:-0.02em;margin-bottom:6px;}
+.hero-form-sub{font-size:13px;color:var(--sub);margin-bottom:24px;line-height:1.5;}
+.field{margin-bottom:14px;}
+.field label{display:block;font-size:11px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--muted);margin-bottom:6px;}
+.field input,.field select,.field textarea{
+  width:100%;background:var(--card);border:1px solid var(--border);
+  border-radius:var(--r-md);padding:11px 14px;
+  color:var(--text);font-family:var(--font);font-size:14px;outline:none;
+  transition:border-color 0.2s;
+}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--orange);}
+.field select{appearance:none;cursor:pointer;}
+.field textarea{min-height:80px;resize:vertical;}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.form-submit{
+  width:100%;background:var(--orange);color:#fff;border:none;
+  border-radius:var(--r-md);padding:14px;font-family:var(--font);
+  font-weight:700;font-size:15px;cursor:pointer;transition:all 0.2s;
+  margin-top:4px;
+}
+.form-submit:hover{opacity:0.88;transform:translateY(-1px);}
+.form-note{font-size:11px;color:var(--muted);text-align:center;margin-top:10px;}
+
+/* ── STATS BAR ── */
+.stats-bar{
+  display:flex;border-top:1px solid var(--border);border-bottom:1px solid var(--border);
+  background:rgba(8,8,16,0.9);
+}
+.stat-item{flex:1;padding:18px 20px;border-right:1px solid var(--border);text-align:center;}
+.stat-item:last-child{border-right:none;}
+.stat-num{font-family:var(--mono);font-size:22px;font-weight:500;color:var(--orange);letter-spacing:-0.02em;}
+.stat-label{font-family:var(--mono);font-size:9px;color:var(--muted);letter-spacing:0.12em;text-transform:uppercase;margin-top:3px;}
+
+/* ── SECTIONS ── */
+.section{padding:64px 48px;}
+.section.dark{background:var(--surface);border-top:1px solid var(--border);border-bottom:1px solid var(--border);}
+.section-inner{max-width:1100px;margin:0 auto;}
+.section-label{font-family:var(--mono);font-size:10px;font-weight:700;letter-spacing:0.2em;text-transform:uppercase;color:var(--orange);margin-bottom:10px;}
+.section-title{font-family:var(--font);font-size:clamp(28px,4vw,44px);font-weight:800;letter-spacing:-0.04em;line-height:1.05;margin-bottom:12px;}
+.section-sub{font-size:15px;color:var(--sub);line-height:1.65;max-width:540px;margin-bottom:40px;}
+
+/* ── OPPORTUNITY CARDS ── */
+.opp-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;}
+.opp-card{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:var(--r-lg);padding:24px;
+  transition:all 0.2s;
+}
+.opp-card:hover{border-color:rgba(255,107,53,0.35);transform:translateY(-2px);box-shadow:0 12px 36px rgba(0,0,0,0.4);}
+.opp-icon{font-size:28px;margin-bottom:14px;}
+.opp-label{font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:0.16em;text-transform:uppercase;color:var(--orange);margin-bottom:6px;}
+.opp-title{font-family:var(--font);font-weight:700;font-size:17px;letter-spacing:-0.02em;margin-bottom:8px;}
+.opp-desc{font-size:13px;color:var(--sub);line-height:1.6;}
+.opp-tag{
+  display:inline-flex;margin-top:12px;
+  background:rgba(255,107,53,0.1);color:var(--orange);
+  border:1px solid rgba(255,107,53,0.2);border-radius:var(--r-full);
+  font-size:10px;font-weight:700;letter-spacing:0.5px;text-transform:uppercase;padding:3px 10px;
+}
+
+/* ── HOW IT WORKS ── */
+.steps-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:24px;}
+.step{text-align:center;padding:8px;}
+.step-num{
+  width:44px;height:44px;border-radius:50%;
+  background:rgba(255,107,53,0.1);border:1px solid rgba(255,107,53,0.25);
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--mono);font-size:15px;font-weight:700;color:var(--orange);
+  margin:0 auto 16px;
+}
+.step-title{font-family:var(--font);font-weight:700;font-size:15px;margin-bottom:6px;}
+.step-desc{font-size:13px;color:var(--sub);line-height:1.55;}
+
+/* ── AUDIENCES ── */
+.audience-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;}
+.audience-card{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:var(--r-lg);padding:20px 18px;
+  transition:border-color 0.2s;
+}
+.audience-card:hover{border-color:rgba(255,255,255,0.14);}
+.audience-icon{font-size:24px;margin-bottom:10px;}
+.audience-name{font-family:var(--font);font-weight:700;font-size:14px;margin-bottom:4px;}
+.audience-desc{font-size:12px;color:var(--sub);line-height:1.5;}
+
+/* ── PRICING TABLE ── */
+.pricing-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:16px;}
+.plan-card{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:var(--r-lg);padding:28px;position:relative;
+  transition:all 0.2s;
+}
+.plan-card.featured{
+  background:linear-gradient(135deg,#1a0800,#1a0f00);
+  border-color:rgba(255,107,53,0.4);
+}
+.plan-card.featured::before{
+  content:'Most Popular';position:absolute;top:-12px;left:50%;transform:translateX(-50%);
+  background:var(--orange);color:#fff;border-radius:var(--r-full);
+  padding:3px 14px;font-size:10px;font-weight:800;letter-spacing:0.5px;text-transform:uppercase;
+  white-space:nowrap;
+}
+.plan-tier{font-family:var(--mono);font-size:10px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;margin-bottom:8px;}
+.plan-price{font-family:var(--font);font-size:28px;font-weight:800;letter-spacing:-0.03em;margin-bottom:4px;}
+.plan-price span{font-size:14px;font-weight:400;color:var(--sub);}
+.plan-note{font-size:12px;color:var(--muted);margin-bottom:20px;}
+.plan-perks{display:flex;flex-direction:column;gap:9px;margin-bottom:24px;}
+.plan-perk{display:flex;align-items:flex-start;gap:9px;font-size:13px;color:var(--sub);}
+.plan-perk-check{width:16px;height:16px;border-radius:50%;background:rgba(255,107,53,0.15);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:9px;color:var(--orange);margin-top:1px;}
+.plan-cta{
+  display:block;width:100%;text-align:center;
+  padding:11px;border-radius:var(--r-md);
+  font-family:var(--font);font-weight:700;font-size:14px;
+  text-decoration:none;transition:all 0.2s;
+}
+.plan-cta.primary{background:var(--orange);color:#fff;}
+.plan-cta.primary:hover{opacity:0.88;}
+.plan-cta.outline{background:transparent;color:var(--text);border:1px solid var(--border);}
+.plan-cta.outline:hover{background:rgba(255,255,255,0.05);}
+
+/* ── FINAL CTA ── */
+.final-cta{
+  padding:72px 48px;text-align:center;
+  background:linear-gradient(135deg,rgba(255,107,53,0.08),rgba(255,107,53,0.01));
+  border-top:1px solid rgba(255,107,53,0.18);
+}
+.final-title{
+  font-family:var(--font);font-size:clamp(40px,7vw,72px);
+  font-weight:900;letter-spacing:-0.05em;text-transform:uppercase;
+  line-height:0.92;margin-bottom:16px;
+}
+.final-title span{color:var(--orange);}
+.final-sub{font-size:15px;color:var(--sub);max-width:380px;margin:0 auto 36px;line-height:1.65;}
+.final-btns{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;}
+
+/* ── FOOTER ── */
+footer{
+  padding:40px 48px 28px;
+  border-top:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;
+  flex-wrap:wrap;gap:16px;
+}
+.footer-logo{font-family:var(--font);font-weight:800;font-size:18px;letter-spacing:-0.03em;}
+.footer-logo span{color:var(--orange);}
+.footer-copy{font-size:12px;color:var(--muted);}
+.footer-links{display:flex;gap:20px;}
+.footer-link{font-size:13px;color:var(--sub);text-decoration:none;transition:color 0.15s;}
+.footer-link:hover{color:var(--text);}
+
+/* ── FORM SUCCESS ── */
+.form-success{
+  display:none;text-align:center;padding:32px 24px;
+}
+.form-success-icon{font-size:44px;margin-bottom:14px;}
+.form-success-title{font-family:var(--font);font-weight:800;font-size:20px;color:var(--green);margin-bottom:8px;}
+.form-success-sub{font-size:14px;color:var(--sub);line-height:1.6;}
+
+/* ── MOBILE ── */
+@media(max-width:900px){
+  .hero-inner{grid-template-columns:1fr;gap:40px;}
+  .hero{padding:72px 24px 52px;}
+  nav{padding:0 20px;}
+  .section{padding:48px 24px;}
+  .stats-bar{flex-wrap:wrap;}
+  .stat-item{flex:0 0 50%;border-bottom:1px solid var(--border);}
+  .final-cta{padding:56px 24px;}
+  footer{padding:32px 24px 24px;flex-direction:column;gap:20px;}
+}
+@media(max-width:560px){
+  .field-row{grid-template-columns:1fr;}
+  .stat-item{flex:0 0 100%;}
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="https://cbusevents.com" class="nav-logo">CBUS<span>EVENTS</span></a>
+  <a href="https://cbusevents.com" class="nav-back">← Back to Platform</a>
+  <a href="#get-started" class="nav-cta">Get Started</a>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-inner">
+
+    <!-- Left: headline + trust -->
+    <div class="hero-content">
+      <div class="hero-eyebrow">
+        <span class="hero-dot"></span>
+        For Brands, Sponsors &amp; Sales Teams
+      </div>
+      <h1 class="hero-title">
+        Reach Columbus<br><span class="accent">Event Audiences</span><br>Directly.
+      </h1>
+      <p class="hero-sub">
+        CBUSEVENTS connects you to <strong>venues, planners, vendors, and thousands of Columbus event-goers</strong> on a single platform. Get your brand in front of the people who run and attend Columbus events.
+      </p>
+      <div class="hero-actions">
+        <a href="#get-started" class="btn-primary">Get Started Free →</a>
+        <a href="#how-it-works" class="btn-secondary">See How It Works</a>
+      </div>
+      <div class="hero-trust">
+        <div class="trust-item"><span class="trust-check">✓</span>Free to join</div>
+        <div class="trust-item"><span class="trust-check">✓</span>No ad spend required</div>
+        <div class="trust-item"><span class="trust-check">✓</span>Columbus-specific reach</div>
+      </div>
+    </div>
+
+    <!-- Right: get started form -->
+    <div class="hero-form-card" id="get-started">
+      <div id="formWrap">
+        <div class="hero-form-title">Start Your Partnership</div>
+        <div class="hero-form-sub">Tell us a bit about your brand and we'll get you set up on the platform.</div>
+
+        <div class="field">
+          <label>Brand / Company Name</label>
+          <input type="text" id="brandName" placeholder="e.g. Columbus Brewing Co.">
+        </div>
+        <div class="field-row">
+          <div class="field">
+            <label>Your Name</label>
+            <input type="text" id="contactName" placeholder="First Last">
+          </div>
+          <div class="field">
+            <label>Phone (optional)</label>
+            <input type="tel" id="contactPhone" placeholder="(614) 000-0000">
+          </div>
+        </div>
+        <div class="field">
+          <label>Email</label>
+          <input type="email" id="contactEmail" placeholder="you@yourbrand.com">
+        </div>
+        <div class="field">
+          <label>What best describes your goal?</label>
+          <select id="goal">
+            <option value="">Select one...</option>
+            <option value="sponsor_events">Sponsor events on the platform</option>
+            <option value="brand_promotion">Run a sitewide promo / banner</option>
+            <option value="vendor_marketplace">List services in the vendor marketplace</option>
+            <option value="food_pro">Food truck or food brand presence</option>
+            <option value="partner">Become a referral or affiliate partner</option>
+            <option value="other">Other / Not sure yet</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Anything else? (optional)</label>
+          <textarea id="notes" placeholder="Tell us what you're trying to accomplish..."></textarea>
+        </div>
+
+        <button class="form-submit" onclick="submitSalesForm()">Submit — We'll Reach Out Within 24 hrs</button>
+        <div id="formStatus" style="margin-top:10px;font-size:13px;min-height:18px;text-align:center"></div>
+        <div class="form-note">Or go straight to the platform: <a href="https://cbusevents.com/signup.html?role=vendor" style="color:var(--orange);font-weight:600">create an account →</a></div>
+      </div>
+
+      <div class="form-success" id="formSuccess">
+        <div class="form-success-icon">✓</div>
+        <div class="form-success-title">You're on our radar.</div>
+        <div class="form-success-sub">We'll be in touch within 24 hours. In the meantime, you can <a href="https://cbusevents.com/signup.html?role=vendor" style="color:var(--orange);font-weight:600">create your account now</a> and start exploring the platform.</div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- STATS BAR -->
+<div class="stats-bar">
+  <div class="stat-item">
+    <div class="stat-num">20+</div>
+    <div class="stat-label">Columbus Venues</div>
+  </div>
+  <div class="stat-item">
+    <div class="stat-num">Multi-Portal</div>
+    <div class="stat-label">Audience Types</div>
+  </div>
+  <div class="stat-item">
+    <div class="stat-num">EST. 2026</div>
+    <div class="stat-label">Columbus Built</div>
+  </div>
+  <div class="stat-item">
+    <div class="stat-num">6.5%</div>
+    <div class="stat-label">Platform Fee on Tickets</div>
+  </div>
+</div>
+
+<!-- WHO YOU REACH -->
+<section class="section">
+  <div class="section-inner">
+    <div class="section-label">Your Audience</div>
+    <h2 class="section-title">Everyone in the Columbus<br>Event World Is Here.</h2>
+    <p class="section-sub">CBUSEVENTS isn't just a ticketing site. It's the operating system for Columbus events — which means your brand reaches every role in the ecosystem.</p>
+
+    <div class="audience-grid">
+      <div class="audience-card">
+        <div class="audience-icon">🎟</div>
+        <div class="audience-name">Event Attendees</div>
+        <div class="audience-desc">Columbus locals actively searching for things to do, buy tickets, and discover new spots.</div>
+      </div>
+      <div class="audience-card">
+        <div class="audience-icon">🏛</div>
+        <div class="audience-name">Venue Owners</div>
+        <div class="audience-desc">Bar owners, club operators, and event space managers running Columbus nightlife and private events.</div>
+      </div>
+      <div class="audience-card">
+        <div class="audience-icon">📋</div>
+        <div class="audience-name">Event Planners</div>
+        <div class="audience-desc">Professional planners producing weddings, corporate events, and community gatherings.</div>
+      </div>
+      <div class="audience-card">
+        <div class="audience-icon">🤝</div>
+        <div class="audience-name">Vendors</div>
+        <div class="audience-desc">Photographers, florists, AV professionals, and creatives who service every Columbus event.</div>
+      </div>
+      <div class="audience-card">
+        <div class="audience-icon">🍽</div>
+        <div class="audience-name">Food Professionals</div>
+        <div class="audience-desc">Food trucks, caterers, and chefs actively selling at Columbus events and festivals.</div>
+      </div>
+      <div class="audience-card">
+        <div class="audience-icon">🎤</div>
+        <div class="audience-name">Event Staff</div>
+        <div class="audience-desc">Bartenders, DJs, security, and servers — the people who make every event actually run.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PARTNERSHIP OPTIONS -->
+<section class="section dark">
+  <div class="section-inner">
+    <div class="section-label">What You Can Do</div>
+    <h2 class="section-title">Ways to Show Up<br>on CBUSEVENTS.</h2>
+    <p class="section-sub">From marketplace listings to sitewide promotions, there's a tier for every goal and every budget.</p>
+
+    <div class="opp-grid">
+      <div class="opp-card">
+        <div class="opp-icon">🛍</div>
+        <div class="opp-label">Marketplace</div>
+        <div class="opp-title">List in the Vendor Marketplace</div>
+        <div class="opp-desc">Get your brand or services in front of planners and venues actively searching for what you offer. Free to list, upgrade for priority placement.</div>
+        <div class="opp-tag">Free to Start</div>
+      </div>
+      <div class="opp-card">
+        <div class="opp-icon">📣</div>
+        <div class="opp-label">Promotions</div>
+        <div class="opp-title">Sitewide Promo Banners</div>
+        <div class="opp-desc">Premium vendor accounts get a sitewide promotional banner — your brand in front of every visitor on the platform, not just marketplace browsers.</div>
+        <div class="opp-tag">Premium Vendor</div>
+      </div>
+      <div class="opp-card">
+        <div class="opp-icon">🎉</div>
+        <div class="opp-label">Event Sponsorship</div>
+        <div class="opp-title">Sponsor 1313 Festival &amp; Events</div>
+        <div class="opp-desc">Get your brand featured at CBUSEVENTS-originated events including the 1313 Festival series — food truck markets drawing Columbus crowds three times a year.</div>
+        <div class="opp-tag">Contact Us</div>
+      </div>
+      <div class="opp-card">
+        <div class="opp-icon">🤝</div>
+        <div class="opp-label">Partnerships</div>
+        <div class="opp-title">Referral &amp; Affiliate Program</div>
+        <div class="opp-desc">Earn 25% recurring commission for every business you refer to the platform. Built for sales teams, agencies, and community connectors.</div>
+        <div class="opp-tag">25% Commission</div>
+      </div>
+      <div class="opp-card">
+        <div class="opp-icon">🍕</div>
+        <div class="opp-label">Food &amp; Beverage</div>
+        <div class="opp-title">Food Professional Portal</div>
+        <div class="opp-desc">Food brands, food trucks, and caterers get a dedicated portal with preordering, walk-in orders, and festival spot access — all in one place.</div>
+        <div class="opp-tag">Built for F&amp;B</div>
+      </div>
+      <div class="opp-card">
+        <div class="opp-icon">📍</div>
+        <div class="opp-label">Discovery</div>
+        <div class="opp-title">Featured Placement &amp; Boosted Listings</div>
+        <div class="opp-desc">Rise to the top of search results, category pages, and the venue directory. Boosted events and promoted listings are available across every portal tier.</div>
+        <div class="opp-tag">Standard+ Plans</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="section" id="how-it-works">
+  <div class="section-inner">
+    <div class="section-label">Process</div>
+    <h2 class="section-title">Up and Running<br>in Minutes.</h2>
+    <p class="section-sub">No lengthy onboarding. No sales calls required unless you want one. Get on the platform today.</p>
+
+    <div class="steps-grid">
+      <div class="step">
+        <div class="step-num">01</div>
+        <div class="step-title">Submit the Form</div>
+        <div class="step-desc">Tell us your brand, goal, and what kind of presence you're looking for. We'll respond within 24 hours.</div>
+      </div>
+      <div class="step">
+        <div class="step-num">02</div>
+        <div class="step-title">Create Your Account</div>
+        <div class="step-desc">Sign up as a vendor or food professional — your portal is where you manage your listing, orders, and promotions.</div>
+      </div>
+      <div class="step">
+        <div class="step-num">03</div>
+        <div class="step-title">Go Live on the Platform</div>
+        <div class="step-desc">Your brand appears in the Columbus event ecosystem — visible to venues, planners, vendors, and attendees.</div>
+      </div>
+      <div class="step">
+        <div class="step-num">04</div>
+        <div class="step-title">Grow With the Network</div>
+        <div class="step-desc">As CBUSEVENTS grows its Columbus audience, your placement and reach grows with it — no extra cost.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section class="section dark">
+  <div class="section-inner">
+    <div class="section-label">Pricing</div>
+    <h2 class="section-title">Simple Plans.<br>Real Results.</h2>
+    <p class="section-sub">Start free and upgrade when you're ready. Every tier gives you access to the Columbus event audience.</p>
+
+    <div class="pricing-grid">
+      <div class="plan-card">
+        <div class="plan-tier" style="color:var(--sub)">Free</div>
+        <div class="plan-price">$0<span>/mo</span></div>
+        <div class="plan-note">No credit card needed</div>
+        <div class="plan-perks">
+          <div class="plan-perk"><span class="plan-perk-check">✓</span>Marketplace listing</div>
+          <div class="plan-perk"><span class="plan-perk-check">✓</span>Public brand profile</div>
+          <div class="plan-perk"><span class="plan-perk-check">✓</span>Planner and venue discovery</div>
+        </div>
+        <a href="https://cbusevents.com/signup.html?role=vendor" class="plan-cta outline">Get Started Free</a>
+      </div>
+
+      <div class="plan-card featured">
+        <div class="plan-tier" style="color:var(--orange)">Standard</div>
+        <div class="plan-price">$15<span>/mo</span></div>
+        <div class="plan-note">Best for active brands</div>
+        <div class="plan-perks">
+          <div class="plan-perk"><span class="plan-perk-check">✓</span>Everything in Free</div>
+          <div class="plan-perk"><span class="plan-perk-check">✓</span>Priority search placement</div>
+          <div class="plan-perk"><span class="plan-perk-check">✓</span>Surfaced to planners and venues</div>
+          <div class="plan-perk"><span class="plan-perk-check">✓</span>Inquiry inbox enabled</div>
+        </div>
+        <a href="https://cbusevents.com/signup.html?role=vendor" class="plan-cta primary">Start Standard</a>
+      </div>
+
+      <div class="plan-card">
+        <div class="plan-tier" style="color:var(--blue)">Premium</div>
+        <div class="plan-price">$45<span>/mo</span></div>
+        <div class="plan-note">Maximum platform visibility</div>
+        <div class="plan-perks">
+          <div class="plan-perk"><span class="plan-perk-check">✓</span>Everything in Standard</div>
+          <div class="plan-perk"><span class="plan-perk-check">✓</span>Sitewide promo banner</div>
+          <div class="plan-perk"><span class="plan-perk-check">✓</span>Featured at top of all listings</div>
+          <div class="plan-perk"><span class="plan-perk-check">✓</span>Waived spot fees at originated events</div>
+        </div>
+        <a href="https://cbusevents.com/signup.html?role=vendor" class="plan-cta outline">Go Premium</a>
+      </div>
+    </div>
+
+    <div style="margin-top:24px;padding:20px 24px;background:rgba(255,107,53,0.06);border:1px solid rgba(255,107,53,0.2);border-radius:var(--r-lg);display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap">
+      <div>
+        <div style="font-family:var(--font);font-weight:700;font-size:15px;margin-bottom:4px">Want to sponsor the 1313 Festival or a specific event?</div>
+        <div style="font-size:13px;color:var(--sub)">Custom event sponsorship packages are available. Reach out directly and we'll build something that works.</div>
+      </div>
+      <a href="mailto:info@cbusevents.com?subject=Event Sponsorship Inquiry" class="btn-primary" style="flex-shrink:0">Contact Us →</a>
+    </div>
+  </div>
+</section>
+
+<!-- FINAL CTA -->
+<section class="final-cta">
+  <div class="section-label" style="display:inline-block;margin-bottom:16px">Ready?</div>
+  <div class="final-title">Get Your Brand<br><span>Into Columbus</span><br>Events.</div>
+  <p class="final-sub">Submit the form above or create your account directly. Takes less than five minutes.</p>
+  <div class="final-btns">
+    <a href="#get-started" class="btn-primary">Fill Out the Form →</a>
+    <a href="https://cbusevents.com/signup.html?role=vendor" class="btn-secondary">Create Account Now</a>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">CBUS<span>EVENTS</span></div>
+  <div class="footer-links">
+    <a href="https://cbusevents.com" class="footer-link">Home</a>
+    <a href="https://cbusevents.com/marketplace.html" class="footer-link">Marketplace</a>
+    <a href="https://cbusevents.com/venues.html" class="footer-link">Venues</a>
+    <a href="mailto:info@cbusevents.com" class="footer-link">Contact</a>
+  </div>
+  <div class="footer-copy">© 2026 CBUSEVENTS · Columbus, Ohio</div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script>
+const SB_URL = "https://toblgvatvsjljbqogzsv.supabase.co";
+const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRvYmxndmF0dnNqbGpicW9nenN2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMDgwNTAsImV4cCI6MjA4NzY4NDA1MH0._WJEQPizNDiQfDXQB_DHPaQhixPGpMdmYQSmyWmm_FQ";
+const sb = supabase.createClient(SB_URL, SB_KEY);
+
+async function submitSalesForm() {
+  const brand   = document.getElementById('brandName').value.trim();
+  const name    = document.getElementById('contactName').value.trim();
+  const email   = document.getElementById('contactEmail').value.trim();
+  const phone   = document.getElementById('contactPhone').value.trim();
+  const goal    = document.getElementById('goal').value;
+  const notes   = document.getElementById('notes').value.trim();
+  const status  = document.getElementById('formStatus');
+  const btn     = document.querySelector('.form-submit');
+
+  if(!brand){ status.innerHTML='<span style="color:var(--orange)">Enter your brand name.</span>'; return; }
+  if(!name){  status.innerHTML='<span style="color:var(--orange)">Enter your name.</span>'; return; }
+  if(!email||!email.includes('@')){ status.innerHTML='<span style="color:var(--orange)">Enter a valid email.</span>'; return; }
+  if(!goal){  status.innerHTML='<span style="color:var(--orange)">Select your goal.</span>'; return; }
+
+  btn.disabled = true;
+  btn.textContent = 'Submitting...';
+  btn.style.opacity = '0.7';
+  status.innerHTML = '';
+
+  try {
+    // Store lead in Supabase leads table
+    const { error } = await sb.from('leads').insert({
+      email,
+      name,
+      source: 'sales-landing',
+      metadata: { brand, phone, goal, notes }
+    });
+
+    if(error && error.code !== '23505') {
+      // 23505 = duplicate email, still show success
+      throw error;
+    }
+
+    // Show success state
+    document.getElementById('formWrap').style.display = 'none';
+    document.getElementById('formSuccess').style.display = 'block';
+
+  } catch(e) {
+    status.innerHTML = '<span style="color:var(--orange)">Something went wrong. Email us directly: info@cbusevents.com</span>';
+    btn.disabled = false;
+    btn.textContent = 'Submit — We\'ll Reach Out Within 24 hrs';
+    btn.style.opacity = '1';
+  }
+}
+
+// Smooth scroll for anchor links
+document.querySelectorAll('a[href^="#"]').forEach(a => {
+  a.addEventListener('click', e => {
+    const target = document.querySelector(a.getAttribute('href'));
+    if(target){ e.preventDefault(); target.scrollIntoView({behavior:'smooth', block:'start'}); }
+  });
+});
+</script>
+</body>
+</html>
