@@ -584,8 +584,15 @@
             role: pendingFormData.applicant_type === 'food_truck' ? 'food_professional' : 'vendor'
           }}
         });
-        if (error) { showAuthError(error.message); btn.classList.remove('loading'); btn.textContent = 'Create Account & Submit 🎉'; return; }
-        userId = data.user.id;
+        if (error) { showAuthError(error.message); btn.classList.remove('loading'); btn.textContent = 'Create Account & Pay 💳'; return; }
+
+        // Sign in immediately after signup so the session is active before the DB insert
+        const { data: signInData, error: signInError } = await sb.auth.signInWithPassword({
+          email: pendingFormData.email,
+          password,
+        });
+        if (signInError) { showAuthError('Account created but sign-in failed. Please use Log In.'); btn.classList.remove('loading'); btn.textContent = 'Create Account & Pay 💳'; return; }
+        userId = signInData.user.id;
 
       } else {
         const email = document.getElementById('login-email').value.trim();
