@@ -540,7 +540,7 @@
       license_number: pendingFormData.license_number,
       license_url: licenseUrl,
       fee: pendingFormData.fee,
-      status: 'payment_pending'
+      status: 'pending'
     });
     if (insertError) throw new Error('Submission failed: ' + insertError.message);
 
@@ -568,9 +568,9 @@
       if (isSignup) {
         const password = document.getElementById('auth-password').value;
         const confirm = document.getElementById('auth-confirm').value;
-        if (!password) { showAuthError('Please create a password.'); btn.classList.remove('loading'); btn.textContent = 'Create Account & Pay 💳'; return; }
-        if (password.length < 6) { showAuthError('Password must be at least 6 characters.'); btn.classList.remove('loading'); btn.textContent = 'Create Account & Pay 💳'; return; }
-        if (password !== confirm) { showAuthError('Passwords do not match.'); btn.classList.remove('loading'); btn.textContent = 'Create Account & Pay 💳'; return; }
+        if (!password) { showAuthError('Please create a password.'); btn.classList.remove('loading'); btn.textContent = 'Create Account & Submit 🎉'; return; }
+        if (password.length < 6) { showAuthError('Password must be at least 6 characters.'); btn.classList.remove('loading'); btn.textContent = 'Create Account & Submit 🎉'; return; }
+        if (password !== confirm) { showAuthError('Passwords do not match.'); btn.classList.remove('loading'); btn.textContent = 'Create Account & Submit 🎉'; return; }
 
         const { data, error } = await sb.auth.signUp({
           email: pendingFormData.email,
@@ -584,23 +584,8 @@
             role: pendingFormData.applicant_type === 'food_truck' ? 'food_professional' : 'vendor'
           }}
         });
-        if (error) { showAuthError(error.message); btn.classList.remove('loading'); btn.textContent = 'Create Account & Pay 💳'; return; }
+        if (error) { showAuthError(error.message); btn.classList.remove('loading'); btn.textContent = 'Create Account & Submit 🎉'; return; }
         userId = data.user.id;
-
-        // If email confirmation is enabled, session won't exist yet — sign in immediately
-        if (!data.session) {
-          const { data: signInData, error: signInError } = await sb.auth.signInWithPassword({
-            email: pendingFormData.email,
-            password,
-          });
-          if (signInError) {
-            showAuthError('Account created but could not sign in automatically. Please use the Log In tab.');
-            btn.classList.remove('loading');
-            btn.textContent = 'Create Account & Pay 💳';
-            return;
-          }
-          userId = signInData.user.id;
-        }
 
       } else {
         const email = document.getElementById('login-email').value.trim();
