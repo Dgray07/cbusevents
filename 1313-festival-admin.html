@@ -872,6 +872,7 @@
         <div class="section-head">
           <h2>All Applications</h2>
           <div class="section-actions">
+            <button class="action-btn btn-primary" onclick="openAddApplicantModal()">+ Add Applicant</button>
             <button class="action-btn btn-secondary" onclick="exportCSV('applications')">Export CSV</button>
           </div>
         </div>
@@ -1539,5 +1540,138 @@
     setTimeout(() => t.classList.remove('show'), 3000);
   }
 </script>
+
+<!-- ADD APPLICANT MODAL -->
+<div id="addApplicantModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:9999;align-items:center;justify-content:center;">
+  <div style="background:#1a1a2e;border:1px solid rgba(255,255,255,0.1);border-radius:12px;padding:32px;width:100%;max-width:520px;max-height:90vh;overflow-y:auto;margin:16px;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;">
+      <h3 style="margin:0;font-size:18px;">Add Applicant Manually</h3>
+      <button onclick="closeAddApplicantModal()" style="background:none;border:none;color:var(--muted);font-size:20px;cursor:pointer;">✕</button>
+    </div>
+    <div style="display:grid;gap:14px;">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+        <div>
+          <label style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:6px;">First Name *</label>
+          <input id="maf-first" type="text" placeholder="First" style="width:100%;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:10px 12px;color:#fff;font-size:14px;box-sizing:border-box;">
+        </div>
+        <div>
+          <label style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:6px;">Last Name *</label>
+          <input id="maf-last" type="text" placeholder="Last" style="width:100%;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:10px 12px;color:#fff;font-size:14px;box-sizing:border-box;">
+        </div>
+      </div>
+      <div>
+        <label style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:6px;">Business Name *</label>
+        <input id="maf-business" type="text" placeholder="Business name" style="width:100%;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:10px 12px;color:#fff;font-size:14px;box-sizing:border-box;">
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+        <div>
+          <label style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:6px;">Email *</label>
+          <input id="maf-email" type="email" placeholder="email@example.com" style="width:100%;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:10px 12px;color:#fff;font-size:14px;box-sizing:border-box;">
+        </div>
+        <div>
+          <label style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:6px;">Phone</label>
+          <input id="maf-phone" type="tel" placeholder="6145550000" style="width:100%;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:10px 12px;color:#fff;font-size:14px;box-sizing:border-box;">
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+        <div>
+          <label style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:6px;">Type *</label>
+          <select id="maf-type" style="width:100%;background:#1a1a2e;border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:10px 12px;color:#fff;font-size:14px;box-sizing:border-box;">
+            <option value="vendor">Vendor</option>
+            <option value="food_truck">Food Truck</option>
+          </select>
+        </div>
+        <div>
+          <label style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:6px;">Category</label>
+          <input id="maf-category" type="text" placeholder="e.g. retail, desserts" style="width:100%;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:10px 12px;color:#fff;font-size:14px;box-sizing:border-box;">
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+        <div>
+          <label style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:6px;">Spot Fee ($)</label>
+          <input id="maf-fee" type="number" placeholder="75" style="width:100%;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:10px 12px;color:#fff;font-size:14px;box-sizing:border-box;">
+        </div>
+        <div>
+          <label style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:6px;">Status</label>
+          <select id="maf-status" style="width:100%;background:#1a1a2e;border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:10px 12px;color:#fff;font-size:14px;box-sizing:border-box;">
+            <option value="approved">Approved</option>
+            <option value="pending">Pending</option>
+          </select>
+        </div>
+      </div>
+      <div>
+        <label style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:6px;">Description</label>
+        <textarea id="maf-desc" rows="3" placeholder="Brief description of business..." style="width:100%;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:10px 12px;color:#fff;font-size:14px;box-sizing:border-box;resize:vertical;"></textarea>
+      </div>
+    </div>
+    <div style="display:flex;gap:12px;margin-top:24px;">
+      <button onclick="closeAddApplicantModal()" style="flex:1;padding:12px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:8px;color:var(--muted);cursor:pointer;font-size:14px;">Cancel</button>
+      <button onclick="submitManualApplicant()" style="flex:2;padding:12px;background:var(--orange);border:none;border-radius:8px;color:#fff;cursor:pointer;font-size:14px;font-weight:600;">Add Applicant</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  function openAddApplicantModal() {
+    const m = document.getElementById('addApplicantModal');
+    m.style.display = 'flex';
+    // Set default fee based on type
+    document.getElementById('maf-type').addEventListener('change', function() {
+      document.getElementById('maf-fee').placeholder = this.value === 'food_truck' ? '175' : '75';
+    });
+  }
+
+  function closeAddApplicantModal() {
+    document.getElementById('addApplicantModal').style.display = 'none';
+    ['maf-first','maf-last','maf-business','maf-email','maf-phone','maf-category','maf-fee','maf-desc'].forEach(id => {
+      document.getElementById(id).value = '';
+    });
+    document.getElementById('maf-type').value = 'vendor';
+    document.getElementById('maf-status').value = 'approved';
+  }
+
+  async function submitManualApplicant() {
+    const first = document.getElementById('maf-first').value.trim();
+    const last = document.getElementById('maf-last').value.trim();
+    const business = document.getElementById('maf-business').value.trim();
+    const email = document.getElementById('maf-email').value.trim();
+
+    if (!first || !last || !business || !email) {
+      showToast('First name, last name, business name, and email are required', 'error');
+      return;
+    }
+
+    const payload = {
+      event_name: '1313_festival',
+      first_name: first,
+      last_name: last,
+      business_name: business,
+      email: email,
+      phone: document.getElementById('maf-phone').value.trim() || null,
+      applicant_type: document.getElementById('maf-type').value,
+      category: document.getElementById('maf-category').value.trim() || null,
+      fee: parseFloat(document.getElementById('maf-fee').value) || (document.getElementById('maf-type').value === 'food_truck' ? 175 : 75),
+      description: document.getElementById('maf-desc').value.trim() || null,
+      status: document.getElementById('maf-status').value
+    };
+
+    const { error } = await sb.from('festival_applications').insert(payload);
+
+    if (error) {
+      showToast('Error: ' + error.message, 'error');
+      return;
+    }
+
+    showToast('✅ Applicant added successfully', 'success');
+    closeAddApplicantModal();
+    await loadApplications();
+    renderDashboard();
+    renderApplications();
+    renderPending();
+    renderApproved();
+    renderConversions();
+  }
+</script>
+
 </body>
 </html>
