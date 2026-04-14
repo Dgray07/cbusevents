@@ -223,7 +223,7 @@ async function sendEmail({to,subject,html}){
 const ADMIN_EMAILS=["info@cbusevents.com","deante90@gmail.com"];
 
 let currentPage='dashboard';
-let allVenues=[],allEvents=[],allInquiries=[],allDesignRequests=[],allVendors=[],currentUser=null;
+let allVenues=[],allEvents=[],allInquiries=[],allDesignRequests=[],allVendors=[],allFoodPros=[],currentUser=null;
 let venueFilter='all',eventFilter='all',inquiryFilter='all';
 let plannerCount=0,attendeeCount=0;
 
@@ -470,18 +470,20 @@ async function doLogin(){
 
 // ── DATA ──────────────────────────────────────────────────────
 async function loadData(){
- const[vRes,eRes,iRes,dRes,vendRes]=await Promise.all([
+ const[vRes,eRes,iRes,dRes,vendRes,fpRes]=await Promise.all([
  sb.from('venues').select('*').order('created_at',{ascending:false}),
  sb.from('events').select('*,venues(name)').order('created_at',{ascending:false}),
  sb.from('inquiries').select('*,venues(name)').order('created_at',{ascending:false}),
  sb.from('design_requests').select('*').order('created_at',{ascending:false}),
  sb.from('vendors').select('*').order('created_at',{ascending:false}).then(r=>r).catch(()=>({data:[]})),
+ sb.from('food_professionals').select('*').order('created_at',{ascending:false}).then(r=>r).catch(()=>({data:[]})),
  ]);
  allVenues=vRes.data||[];
  allEvents=eRes.data||[];
  allInquiries=iRes.data||[];
  allDesignRequests=dRes.data||[];
  allVendors=vendRes.data||[];
+ allFoodPros=fpRes.data||[];
  // Fetch planner and attendee counts — wrapped so any failure is silent
  try{
    const[pRes,aRes]=await Promise.all([
@@ -500,7 +502,7 @@ function renderShell(){
  const revenue=allVenues.filter(v=>v.tier==='standard').length*29+allVenues.filter(v=>v.tier==='premium').length*79;
 
  document.getElementById('app').innerHTML=`
- <div class="sidebar"> <div class="sidebar-logo"> <div class="sidebar-logo-text">CBUS<span>EVENTS</span></div> <div class="sidebar-logo-sub">Admin Portal</div> </div> <div class="sidebar-section">Main</div> <div class="nav-item" onclick="window.location.href='https://cbusevents.com'" style="border-bottom:1px solid var(--border);margin-bottom:4px;padding-bottom:12px"> Home</div> <div class="nav-item ${currentPage==='dashboard'?'active':''}" onclick="nav('dashboard')"> Dashboard</div> <div class="nav-item ${currentPage==='venues'?'active':''}" onclick="nav('venues')"> Venues ${pendingVenues?('<span class="badge">'+pendingVenues+'</span>'):''}</div> <div class="nav-item ${currentPage==='events'?'active':''}" onclick="nav('events')"> Events</div> <div class="nav-item ${currentPage==='inquiries'?'active':''}" onclick="nav('inquiries')"> Inquiries ${newInquiries?('<span class="badge green">'+newInquiries+'</span>'):''}</div> <div class="sidebar-section">Revenue</div> <div class="nav-item ${currentPage==='revenue'?'active':''}" onclick="nav('revenue')"> Revenue</div> <div class="nav-item ${currentPage==='design'?'active':''}" onclick="nav('design')"> Design Requests ${allDesignRequests.filter(d=>d.status==='new').length?('<span class="badge">'+allDesignRequests.filter(d=>d.status==='new').length+'</span>'):''}</div> <div class="sidebar-section">Platform</div> <div class="nav-item ${currentPage==='vendors'?'active':''}" onclick="nav('vendors')"> Vendors</div>
+ <div class="sidebar"> <div class="sidebar-logo"> <div class="sidebar-logo-text">CBUS<span>EVENTS</span></div> <div class="sidebar-logo-sub">Admin Portal</div> </div> <div class="sidebar-section">Main</div> <div class="nav-item" onclick="window.location.href='https://cbusevents.com'" style="border-bottom:1px solid var(--border);margin-bottom:4px;padding-bottom:12px"> Home</div> <div class="nav-item ${currentPage==='dashboard'?'active':''}" onclick="nav('dashboard')"> Dashboard</div> <div class="nav-item ${currentPage==='venues'?'active':''}" onclick="nav('venues')"> Venues ${pendingVenues?('<span class="badge">'+pendingVenues+'</span>'):''}</div> <div class="nav-item ${currentPage==='events'?'active':''}" onclick="nav('events')"> Events</div> <div class="nav-item ${currentPage==='inquiries'?'active':''}" onclick="nav('inquiries')"> Inquiries ${newInquiries?('<span class="badge green">'+newInquiries+'</span>'):''}</div> <div class="sidebar-section">Revenue</div> <div class="nav-item ${currentPage==='revenue'?'active':''}" onclick="nav('revenue')"> Revenue</div> <div class="nav-item ${currentPage==='design'?'active':''}" onclick="nav('design')"> Design Requests ${allDesignRequests.filter(d=>d.status==='new').length?('<span class="badge">'+allDesignRequests.filter(d=>d.status==='new').length+'</span>'):''}</div> <div class="sidebar-section">Platform</div> <div class="nav-item ${currentPage==='vendors'?'active':''}" onclick="nav('vendors')"> Vendors</div> <div class="nav-item ${currentPage==='foodpros'?'active':''}" onclick="nav('foodpros')"> Food Pros <span style="background:rgba(255,255,255,0.08);color:var(--sub);border-radius:20px;padding:1px 8px;font-size:9px;font-weight:800;margin-left:auto;">${allFoodPros.length}</span></div>
  <div class="nav-item ${currentPage==='planners'?'active':''}" onclick="nav('planners')"> Planners</div> <div class="nav-item ${currentPage==='subscriptions'?'active':''}" onclick="nav('subscriptions')"> Subscriptions</div> <div class="nav-item ${currentPage==='users'?'active':''}" onclick="nav('users')"> Users</div> <div class="nav-item ${currentPage==='overrides'?'active':''}" onclick="nav('overrides')"> Overrides</div> <div class="nav-item ${currentPage==='claims'?'active':''}" onclick="nav('claims')"> Claims <span style='background:#ef4444;color:#fff;border-radius:20px;padding:1px 7px;font-size:10px;font-weight:700;margin-left:auto' id='claimsBadge' style='display:none'></span></div>
  <div class="sidebar-section">Festivals</div>
  <div class="nav-item ${currentPage==='festival1313'?'active':''}" onclick="window.open('1313-festival-admin.html','_blank')" style="color:${currentPage==='festival1313'?'var(--text)':'var(--orange)'}"> 🎪 1313 Festival <span class="badge" style="background:var(--orange);color:#fff">Live</span></div>
@@ -534,6 +536,7 @@ async function renderPage(){
  else if(currentPage==='revenue')renderRevenue();
  else if(currentPage==='design')renderDesignRequests();
  else if(currentPage==='vendors')renderVendors();
+ else if(currentPage==='foodpros')renderFoodPros();
  else if(currentPage==='planners')await renderPlanners();
  else if(currentPage==='subscriptions')await renderSubscriptions();
  else if(currentPage==='users')await renderUsers();
@@ -1687,6 +1690,59 @@ function searchVendors(q){
  const el=document.getElementById('vendorListBody');
  if(el)el.innerHTML=renderVendorCards(f);
 }
+
+function renderFoodPros(){
+ document.getElementById('pageContent').innerHTML=`
+ <div class="table-card">
+   <div class="table-header">
+     <div>
+       <div class="table-title">Food Professionals</div>
+       <div class="table-title-sub">${allFoodPros.length} total &nbsp;·&nbsp; ${allFoodPros.filter(p=>p.tier==='premium').length} premium · ${allFoodPros.filter(p=>p.tier==='standard').length} standard · ${allFoodPros.filter(p=>!p.tier||p.tier==='free').length} free</div>
+     </div>
+     <input class="search-input" placeholder="Search food pros..." oninput="searchFoodPros(this.value)" style="width:220px;">
+   </div>
+   <div id="foodProListBody" style="padding:8px 16px 16px;display:flex;flex-direction:column;gap:8px;">
+     ${renderFoodProCards(allFoodPros)}
+   </div>
+ </div>`;
+}
+
+function renderFoodProCards(pros){
+ if(!pros.length)return'<div style="text-align:center;padding:52px;color:var(--muted);font-size:13px;">No food professionals found</div>';
+ return pros.map(function(p){
+   var tierClass=p.tier==='premium'?'badge-gold':p.tier==='standard'?'badge-blue':'badge-muted';
+   var tierLabel=(p.tier||'free').toUpperCase();
+   var name=p.display_name||p.business_name||'Unnamed';
+   var type=p.professional_type?p.professional_type.replace(/_/g,' '):'';
+   var typePill=type?('<span style="display:inline-block;background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:20px;padding:3px 11px;font-size:11px;font-weight:500;color:var(--sub);">'+type+'</span>'):'';
+   var stripeStatus=p.stripe_connect_status==='active'
+     ?'<span class="badge badge-green">Stripe Active</span>'
+     :'<span class="badge badge-muted">No Stripe</span>';
+   var joined=p.created_at?new Date(p.created_at).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}):'';
+   return '<div style="background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:16px 20px;display:flex;align-items:center;gap:16px;transition:border-color 0.18s;" onmouseover="this.style.borderColor=\'rgba(255,255,255,0.08)\'" onmouseout="this.style.borderColor=\'var(--border)\'">'
+     +'<div style="width:40px;height:40px;border-radius:10px;background:linear-gradient(135deg,rgba(255,107,53,0.2),rgba(255,107,53,0.06));border:1px solid rgba(255,107,53,0.2);display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:800;color:var(--orange);flex-shrink:0;">'+name.charAt(0).toUpperCase()+'</div>'
+     +'<div style="flex:1;min-width:0;">'
+       +'<div style="font-weight:700;font-size:14px;letter-spacing:-0.02em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+name+'</div>'
+       +'<div style="font-size:11px;color:var(--muted);margin-top:2px;">'+( p.email||'No email')+(joined?' &nbsp;·&nbsp; Joined '+joined:'')+'</div>'
+     +'</div>'
+     +'<div style="flex-shrink:0;">'+typePill+'</div>'
+     +'<div style="display:flex;gap:6px;flex-shrink:0;align-items:center;">'
+       +'<span class="badge '+tierClass+'">'+tierLabel+'</span>'
+       +stripeStatus
+     +'</div>'
+     +'<div style="display:flex;gap:6px;flex-shrink:0;">'
+       +'<a href="https://cbusevents.com/fp-storefront.html?id='+p.user_id+'" target="_blank" class="btn btn-ghost btn-sm">View Store</a>'
+     +'</div>'
+     +'</div>';
+ }).join('');
+}
+
+function searchFoodPros(q){
+ const f=allFoodPros.filter(p=>(p.display_name||p.business_name||'').toLowerCase().includes(q.toLowerCase())||(p.professional_type||'').toLowerCase().includes(q.toLowerCase())||(p.email||'').toLowerCase().includes(q.toLowerCase()));
+ const el=document.getElementById('foodProListBody');
+ if(el)el.innerHTML=renderFoodProCards(f);
+}
+
 
 async function toggleVendorPromo(id,val){
  await sb.from('vendors').update({admin_promoted:val}).eq('id',id);
