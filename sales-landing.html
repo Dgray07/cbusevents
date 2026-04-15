@@ -578,8 +578,7 @@ async function submitSalesForm() {
   try {
     const { data, error } = await sb.from('leads').insert({
       email,
-      source: 'ambassador',
-      metadata: { name, phone, goal, notes }
+      source: 'ambassador'
     }).select();
 
     console.log('Supabase response:', { data, error });
