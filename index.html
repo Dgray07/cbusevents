@@ -1,31 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <script>if (window.self !== window.top) { window.stop(); }</script>
-
-  <!-- preconnect to every external origin so DNS+TLS resolves before scripts need them -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="preconnect" href="https://cdn.jsdelivr.net">
-  <link rel="preconnect" href="https://api.mapbox.com">
-  <link rel="preconnect" href="https://toblgvatvsjljbqogzsv.supabase.co">
-  <link rel="dns-prefetch" href="https://events.mapbox.com">
-
-  <!-- Preload Supabase so browser starts downloading it during HTML parse -->
-  <link rel="preload" href="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js" as="script">
-
-  <!-- All fonts in one request — Barlow merged in, no @import needed -->
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700;800;900&family=DM+Mono:wght@400;500&family=Playfair+Display:ital,wght@0,700;1,700&family=Barlow+Condensed:wght@700;800;900&display=swap" rel="stylesheet">
-
-  <!-- Mapbox CSS async — never blocks render -->
-  <link rel="preload" href="https://api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
-  <noscript><link href="https://api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.css" rel="stylesheet"></noscript>
-
-  <!-- Mapbox JS deferred — never blocks HTML parsing or render -->
-  <script src="https://api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.js" defer></script>
-
+  
   <script type="application/ld+json">
 {
     "@context": "https://schema.org",
@@ -40,7 +17,12 @@
     }
   }
   </script>
-<!-- SEO META TAGS -->
+
+<link href="https://api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.css" rel="stylesheet">
+<script src="https://api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.js"></script>
+</head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/> <!-- SEO META TAGS -->
 <title id="pageTitle">CBUSEVENTS — Columbus Ohio Event Platform</title>
 <script>
   // EMERGENCY MUZZLE: Blocks the broken Unsplash link from ever loading
@@ -64,7 +46,9 @@
 <meta name="twitter:title" content="CBUSEVENTS — Columbus Ohio Venues & Events">
 <meta name="twitter:description" content="The Columbus event directory. Discover bars, comedy clubs, and unique event spaces.">
 <meta name="twitter:image" content="https://cbusevents.com/assets/cbus-shield.png"> <!-- Structured Data for Google -->
-<style>
+<script type="application/ld+json">
+</script> <link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700;800;900&family=DM+Mono:wght@400;500&family=Playfair+Display:ital,wght@0,700;1,700&display=swap" rel="stylesheet"> <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
 :root {
   --bg:         #080810;
@@ -599,7 +583,7 @@ footer { background:var(--surface); border-top:1px solid var(--border); padding:
 
 /* ═══ REDESIGN HOME STYLES ═══ */
 /* ── NEW HERO ── */
-/* Barlow Condensed loaded via <link> in <head> for better performance */
+@import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;800;900&display=swap');
 @keyframes heroFadeUp { from { opacity:0; transform:translateY(22px); } to { opacity:1; transform:translateY(0); } }
 @keyframes heroPulse { 0%,100%{opacity:1;transform:scale(1);}50%{opacity:0.4;transform:scale(0.75);} }
 
@@ -1332,13 +1316,8 @@ async function init(){
    if(parts[0]==='category'){ await initNavAuth(); showPage('category',parts[1]||null); if(rParam) history.replaceState({},'',pathToRoute); await loadSavedState(); return; }
  }
 
- // Render home immediately — hero and nav show at once, no waiting on data
- if(rParam) history.replaceState({},'',pathToRoute);
- renderHome();
- initNavAuth();
- loadSavedState();
-
- // Fetch data in background — page updates when queries return
+ // Home page: show the spinner briefly in #app while all three queries run
+ // The spinner is small and below-fold — hero bg image is already loading from CSS
  try {
    const [vRes,eRes,vendRes]=await Promise.all([
      sb.from('venues').select('*').eq('status','approved').order('tier',{ascending:false}),
@@ -1349,13 +1328,16 @@ async function init(){
    allVenues=vRes.data||[];
    allEvents=eRes.data||[];
    allVendors=vendRes.data||[];
-   // Refresh the data-dependent sections only (not the full page)
-   if(currentPage==='home') renderHome();
  } catch(e) {
    allVenues=[];
    allEvents=[];
    allVendors=[];
  }
+
+ if(rParam) history.replaceState({},'',pathToRoute);
+ renderHome();
+ await initNavAuth();
+ await loadSavedState();
 }
 
 // ── HELPERS ───────────────────────────────────────────────────
@@ -1542,11 +1524,10 @@ function renderHome(){
  const freeEvts = allEvents.filter(e=>!e.ticket_url&&!e.price_min&&e.is_free!==false).sort((a,b)=>new Date(a.start_time)-new Date(b.start_time));
  const allUpcoming = [festival1313, ...ticketed, ...freeEvts].slice(0,8);
 
- // Venue scroll — featured first
+ // Venue scroll — featured first, no image filter so all approved venues show
  const venueScroll = allVenues
-   .filter(v=>getVenueImg(v))
    .sort((a,b)=>(b.is_featured?1:0)-(a.is_featured?1:0))
-   .slice(0,6);
+   .slice(0,8);
 
  // CSS-only gradient slides - zero network fetches, instant render, no load flash
  const HERO_SLIDES = [
@@ -1747,11 +1728,14 @@ function renderHome(){
      <button onclick="window.location.href='https://cbusevents.com/venues.html'" style="font-family:var(--mono);font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:var(--orange);background:none;border:none;cursor:pointer">Browse All</button>
    </div>
    <div class="rh-venues-scroll">
-     ${(venueScroll.length?venueScroll:allVenues.slice(0,6)).map(v=>{
+     ${(venueScroll.length?venueScroll:allVenues.slice(0,8)).map(v=>{
        const img = getVenueImg(v);
        const venueEvents = allEvents.filter(e=>e.venue_id===v.id&&isThisWeek(e.start_time)).length;
        return `<div class="rh-venue-card" onclick="showPage('venue',allVenues.find(x=>x.id==='${v.id}'))" role="button" tabindex="0">
-         <div class="rh-venue-img">${img?`<img src="${img}" alt="${v.name}" onerror="this.style.display='none'">`:''}
+         <div class="rh-venue-img">
+           ${img
+             ? `<img src="${img}" alt="${v.name}" onerror="this.style.display='none'">`
+             : `<div style="width:100%;height:100%;background:linear-gradient(135deg,rgba(255,107,53,0.12),rgba(129,140,248,0.08));display:flex;align-items:center;justify-content:center;font-size:32px">${v.venue_type&&v.venue_type.toLowerCase().includes('bar')?'🍸':v.venue_type&&v.venue_type.toLowerCase().includes('comedy')?'🎭':v.venue_type&&v.venue_type.toLowerCase().includes('music')?'🎵':'🏛'}</div>`}
            ${v.is_featured?'<div class="rh-badge-featured">Featured</div>':''}
            <span class="rh-venue-tag">${v.venue_type||'Venue'}</span>
            <div style="position:absolute;top:10px;left:10px;background:rgba(52,211,153,0.9);color:#000;font-family:var(--mono);font-size:8px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;padding:3px 9px;border-radius:9999px">Available</div>
