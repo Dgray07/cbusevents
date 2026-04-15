@@ -579,8 +579,8 @@ async function submitSalesForm() {
     const { error } = await sb.from('leads').insert({
       email,
       name,
-      source: 'ambassador-landing',
-      metadata: { phone, role_type: goal, notes }
+      source: 'ambassador',
+      metadata: { phone, goal, notes }
     });
 
     if(error && error.code !== '23505') throw error;
