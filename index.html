@@ -1,8 +1,31 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <script>if (window.self !== window.top) { window.stop(); }</script>
-  
+
+  <!-- preconnect to every external origin so DNS+TLS resolves before scripts need them -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://cdn.jsdelivr.net">
+  <link rel="preconnect" href="https://api.mapbox.com">
+  <link rel="preconnect" href="https://toblgvatvsjljbqogzsv.supabase.co">
+  <link rel="dns-prefetch" href="https://events.mapbox.com">
+
+  <!-- Preload Supabase so browser starts downloading it during HTML parse -->
+  <link rel="preload" href="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js" as="script">
+
+  <!-- All fonts in one request — Barlow merged in, no @import needed -->
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700;800;900&family=DM+Mono:wght@400;500&family=Playfair+Display:ital,wght@0,700;1,700&family=Barlow+Condensed:wght@700;800;900&display=swap" rel="stylesheet">
+
+  <!-- Mapbox CSS async — never blocks render -->
+  <link rel="preload" href="https://api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+  <noscript><link href="https://api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.css" rel="stylesheet"></noscript>
+
+  <!-- Mapbox JS deferred — never blocks HTML parsing or render -->
+  <script src="https://api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.js" defer></script>
+
   <script type="application/ld+json">
 {
     "@context": "https://schema.org",
@@ -17,12 +40,7 @@
     }
   }
   </script>
-
-<link href="https://api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.css" rel="stylesheet">
-<script src="https://api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.js"></script>
-</head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/> <!-- SEO META TAGS -->
+<!-- SEO META TAGS -->
 <title id="pageTitle">CBUSEVENTS — Columbus Ohio Event Platform</title>
 <script>
   // EMERGENCY MUZZLE: Blocks the broken Unsplash link from ever loading
@@ -46,9 +64,7 @@
 <meta name="twitter:title" content="CBUSEVENTS — Columbus Ohio Venues & Events">
 <meta name="twitter:description" content="The Columbus event directory. Discover bars, comedy clubs, and unique event spaces.">
 <meta name="twitter:image" content="https://cbusevents.com/assets/cbus-shield.png"> <!-- Structured Data for Google -->
-<script type="application/ld+json">
-</script> <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700;800;900&family=DM+Mono:wght@400;500&family=Playfair+Display:ital,wght@0,700;1,700&display=swap" rel="stylesheet"> <style>
+<style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
 :root {
   --bg:         #080810;
@@ -583,7 +599,7 @@ footer { background:var(--surface); border-top:1px solid var(--border); padding:
 
 /* ═══ REDESIGN HOME STYLES ═══ */
 /* ── NEW HERO ── */
-@import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;800;900&display=swap');
+/* Barlow Condensed loaded via <link> in <head> for better performance */
 @keyframes heroFadeUp { from { opacity:0; transform:translateY(22px); } to { opacity:1; transform:translateY(0); } }
 @keyframes heroPulse { 0%,100%{opacity:1;transform:scale(1);}50%{opacity:0.4;transform:scale(0.75);} }
 
@@ -1316,8 +1332,13 @@ async function init(){
    if(parts[0]==='category'){ await initNavAuth(); showPage('category',parts[1]||null); if(rParam) history.replaceState({},'',pathToRoute); await loadSavedState(); return; }
  }
 
- // Home page: show the spinner briefly in #app while all three queries run
- // The spinner is small and below-fold — hero bg image is already loading from CSS
+ // Render home immediately — hero and nav show at once, no waiting on data
+ if(rParam) history.replaceState({},'',pathToRoute);
+ renderHome();
+ initNavAuth();
+ loadSavedState();
+
+ // Fetch data in background — page updates when queries return
  try {
    const [vRes,eRes,vendRes]=await Promise.all([
      sb.from('venues').select('*').eq('status','approved').order('tier',{ascending:false}),
@@ -1328,16 +1349,13 @@ async function init(){
    allVenues=vRes.data||[];
    allEvents=eRes.data||[];
    allVendors=vendRes.data||[];
+   // Refresh the data-dependent sections only (not the full page)
+   if(currentPage==='home') renderHome();
  } catch(e) {
    allVenues=[];
    allEvents=[];
    allVendors=[];
  }
-
- if(rParam) history.replaceState({},'',pathToRoute);
- renderHome();
- await initNavAuth();
- await loadSavedState();
 }
 
 // ── HELPERS ───────────────────────────────────────────────────
