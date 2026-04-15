@@ -222,6 +222,18 @@ async function sendEmail({to,subject,html}){
 // ADMIN EMAILS — add yours here
 const ADMIN_EMAILS=["info@cbusevents.com","deante90@gmail.com"];
 
+/* ── RLS FIX REQUIRED IF FOOD PROS/ORDERS RETURN EMPTY ────────
+   Run in Supabase SQL Editor:
+
+   CREATE POLICY "Admin read food_professionals"
+   ON food_professionals FOR SELECT
+   USING (auth.jwt() ->> 'email' IN ('deante90@gmail.com','info@cbusevents.com'));
+
+   CREATE POLICY "Admin read food_professional_orders"
+   ON food_professional_orders FOR SELECT
+   USING (auth.jwt() ->> 'email' IN ('deante90@gmail.com','info@cbusevents.com'));
+────────────────────────────────────────────────────────────── */
+
 let currentPage='dashboard';
 let allVenues=[],allEvents=[],allInquiries=[],allDesignRequests=[],allVendors=[],allFoodPros=[],currentUser=null;
 let venueFilter='all',eventFilter='all',inquiryFilter='all';
@@ -484,6 +496,20 @@ async function loadData(){
  allDesignRequests=dRes.data||[];
  allVendors=vendRes.data||[];
  allFoodPros=fpRes.data||[];
+ // Load order summaries per food pro (total revenue + order count)
+ try{
+   const{data:orders}=await sb.from('food_professional_orders').select('vendor_id,total,status');
+   if(orders){
+     const map={};
+     orders.forEach(o=>{
+       if(!map[o.vendor_id])map[o.vendor_id]={count:0,revenue:0,pending:0};
+       map[o.vendor_id].count++;
+       map[o.vendor_id].revenue+=(parseFloat(o.total)||0);
+       if(o.status==='pending')map[o.vendor_id].pending++;
+     });
+     allFoodPros=allFoodPros.map(p=>({...p,_orders:map[p.user_id]||{count:0,revenue:0,pending:0}}));
+   }
+ }catch(e){allFoodPros=allFoodPros.map(p=>({...p,_orders:{count:0,revenue:0,pending:0}}));}
  // Fetch planner and attendee counts — wrapped so any failure is silent
  try{
    const[pRes,aRes]=await Promise.all([
@@ -1692,55 +1718,187 @@ function searchVendors(q){
 }
 
 function renderFoodPros(){
+ var stripeConnected=allFoodPros.filter(p=>p.stripe_connect_status==='active').length;
+ var totalRevenue=allFoodPros.reduce(function(s,p){return s+(p._orders?p._orders.revenue:0);},0);
+ var totalOrders=allFoodPros.reduce(function(s,p){return s+(p._orders?p._orders.count:0);},0);
  document.getElementById('pageContent').innerHTML=`
+ <!-- summary stat row -->
+ <div class="stat-grid" style="grid-template-columns:repeat(4,1fr);margin-bottom:20px;">
+   <div class="stat-card">
+     <div class="stat-card-icon">🍽️</div>
+     <div class="stat-card-num">${allFoodPros.length}</div>
+     <div class="stat-card-label">Total Food Pros</div>
+   </div>
+   <div class="stat-card">
+     <div class="stat-card-icon">⚡</div>
+     <div class="stat-card-num" style="color:var(--green)">${stripeConnected}</div>
+     <div class="stat-card-label">Stripe Connected</div>
+     <div class="stat-card-sub">${allFoodPros.length-stripeConnected} not connected</div>
+   </div>
+   <div class="stat-card">
+     <div class="stat-card-icon">📦</div>
+     <div class="stat-card-num">${totalOrders}</div>
+     <div class="stat-card-label">Total Orders</div>
+   </div>
+   <div class="stat-card">
+     <div class="stat-card-icon">💰</div>
+     <div class="stat-card-num">$${totalRevenue.toFixed(0)}</div>
+     <div class="stat-card-label">Gross Order Volume</div>
+   </div>
+ </div>
+
  <div class="table-card">
    <div class="table-header">
      <div>
        <div class="table-title">Food Professionals</div>
-       <div class="table-title-sub">${allFoodPros.length} total &nbsp;·&nbsp; ${allFoodPros.filter(p=>p.tier==='premium').length} premium · ${allFoodPros.filter(p=>p.tier==='standard').length} standard · ${allFoodPros.filter(p=>!p.tier||p.tier==='free').length} free</div>
+       <div class="table-title-sub" style="font-size:12px;color:var(--muted);margin-top:3px;">${allFoodPros.length} registered &nbsp;·&nbsp; ${stripeConnected} stripe active &nbsp;·&nbsp; ${allFoodPros.length-stripeConnected} pending setup</div>
      </div>
-     <input class="search-input" placeholder="Search food pros..." oninput="searchFoodPros(this.value)" style="width:220px;">
+     <div style="display:flex;gap:8px;align-items:center;">
+       <select id="fpFilter" onchange="filterFoodPros()" class="search-input" style="min-width:140px;">
+         <option value="all">All</option>
+         <option value="stripe_active">Stripe Active</option>
+         <option value="no_stripe">No Stripe</option>
+       </select>
+       <input class="search-input" placeholder="Search..." oninput="searchFoodPros(this.value)" style="width:180px;">
+     </div>
    </div>
    <div id="foodProListBody" style="padding:8px 16px 16px;display:flex;flex-direction:column;gap:8px;">
      ${renderFoodProCards(allFoodPros)}
+   </div>
+ </div>
+
+ <!-- fees modal -->
+ <div id="fpFeesModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:300;display:none;align-items:center;justify-content:center;padding:20px;">
+   <div style="background:#13131a;border:1px solid #25252f;border-radius:16px;width:100%;max-width:520px;max-height:80vh;overflow-y:auto;">
+     <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px;border-bottom:1px solid #25252f;">
+       <div style="font-size:16px;font-weight:700;" id="fpFeesTitle">Order History</div>
+       <button onclick="closeFpFeesModal()" style="background:none;border:none;color:#888;font-size:22px;cursor:pointer;">×</button>
+     </div>
+     <div id="fpFeesBody" style="padding:20px 24px;"></div>
    </div>
  </div>`;
 }
 
 function renderFoodProCards(pros){
  if(!pros.length)return'<div style="text-align:center;padding:52px;color:var(--muted);font-size:13px;">No food professionals found</div>';
+ var typeLabels={chef:'Chef',food_truck:'Food Truck',caterer:'Caterer',popup:'Pop-up',personal_chef:'Personal Chef'};
  return pros.map(function(p){
-   var tierClass=p.tier==='premium'?'badge-gold':p.tier==='standard'?'badge-blue':'badge-muted';
-   var tierLabel=(p.tier||'free').toUpperCase();
    var name=p.display_name||p.business_name||'Unnamed';
-   var type=p.professional_type?p.professional_type.replace(/_/g,' '):'';
+   var type=typeLabels[p.professional_type]||( p.professional_type?(p.professional_type.replace(/_/g,' ')):'');
    var typePill=type?('<span style="display:inline-block;background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:20px;padding:3px 11px;font-size:11px;font-weight:500;color:var(--sub);">'+type+'</span>'):'';
-   var stripeStatus=p.stripe_connect_status==='active'
-     ?'<span class="badge badge-green">Stripe Active</span>'
-     :'<span class="badge badge-muted">No Stripe</span>';
+   var isActive=p.stripe_connect_status==='active';
+   var stripeBadge=isActive
+     ?'<span class="badge badge-green" style="white-space:nowrap;">⚡ Stripe Active</span>'
+     :'<span class="badge badge-muted" style="white-space:nowrap;">No Stripe</span>';
+   var orders=p._orders||{count:0,revenue:0,pending:0};
+   var revStr='$'+orders.revenue.toFixed(2);
    var joined=p.created_at?new Date(p.created_at).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}):'';
-   return '<div style="background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:16px 20px;display:flex;align-items:center;gap:16px;transition:border-color 0.18s;" onmouseover="this.style.borderColor=\'rgba(255,255,255,0.08)\'" onmouseout="this.style.borderColor=\'var(--border)\'">'
-     +'<div style="width:40px;height:40px;border-radius:10px;background:linear-gradient(135deg,rgba(255,107,53,0.2),rgba(255,107,53,0.06));border:1px solid rgba(255,107,53,0.2);display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:800;color:var(--orange);flex-shrink:0;">'+name.charAt(0).toUpperCase()+'</div>'
-     +'<div style="flex:1;min-width:0;">'
-       +'<div style="font-weight:700;font-size:14px;letter-spacing:-0.02em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+name+'</div>'
-       +'<div style="font-size:11px;color:var(--muted);margin-top:2px;">'+( p.email||'No email')+(joined?' &nbsp;·&nbsp; Joined '+joined:'')+'</div>'
+   var pendingDot=orders.pending>0?('<span style="background:#f59e0b;color:#000;border-radius:20px;padding:1px 7px;font-size:9px;font-weight:800;margin-left:4px;">'+orders.pending+' pending</span>'):'';
+   var emailEnc=encodeURIComponent(p.email||'');
+   return '<div style="background:var(--surface);border:1px solid '+(isActive?'rgba(52,211,153,0.15)':'var(--border)')+';border-radius:14px;padding:16px 20px;display:flex;align-items:center;gap:14px;flex-wrap:wrap;transition:border-color 0.18s;" onmouseover="this.style.borderColor=\''+(isActive?'rgba(52,211,153,0.3)':'rgba(255,255,255,0.08)')+'\'" onmouseout="this.style.borderColor=\''+(isActive?'rgba(52,211,153,0.15)':'var(--border)')+'\'">'
+     // avatar
+     +'<div style="width:42px;height:42px;border-radius:10px;background:linear-gradient(135deg,rgba(255,107,53,0.2),rgba(255,107,53,0.06));border:1px solid rgba(255,107,53,0.2);display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:800;color:var(--orange);flex-shrink:0;">'+name.charAt(0).toUpperCase()+'</div>'
+     // name + email
+     +'<div style="flex:1;min-width:160px;">'
+       +'<div style="font-weight:700;font-size:14px;letter-spacing:-0.02em;">'+name+'</div>'
+       +'<div style="font-size:11px;color:var(--muted);margin-top:2px;">'+(p.email||'No email')+(joined?' &nbsp;·&nbsp; Joined '+joined:'')+'</div>'
      +'</div>'
+     // type pill
      +'<div style="flex-shrink:0;">'+typePill+'</div>'
-     +'<div style="display:flex;gap:6px;flex-shrink:0;align-items:center;">'
-       +'<span class="badge '+tierClass+'">'+tierLabel+'</span>'
-       +stripeStatus
+     // stripe badge
+     +'<div style="flex-shrink:0;">'+stripeBadge+'</div>'
+     // order stats
+     +'<div style="flex-shrink:0;text-align:right;min-width:90px;">'
+       +'<div style="font-family:var(--mono);font-size:15px;font-weight:600;color:var(--text);">'+revStr+'</div>'
+       +'<div style="font-size:11px;color:var(--muted);margin-top:1px;">'+orders.count+' order'+(orders.count!==1?'s':'')+pendingDot+'</div>'
      +'</div>'
-     +'<div style="display:flex;gap:6px;flex-shrink:0;">'
-       +'<a href="https://cbusevents.com/fp-storefront.html?id='+p.user_id+'" target="_blank" class="btn btn-ghost btn-sm">View Store</a>'
+     // actions
+     +'<div style="display:flex;gap:6px;flex-shrink:0;flex-wrap:wrap;">'
+       +(p.email?('<button class="btn btn-ghost btn-sm" onclick="fpEmail(\''+emailEnc+'\',\''+name.replace(/'/g,"\\'")+'\')" title="Email">✉ Email</button>'):'')
+       +'<a href="https://cbusevents.com/fp-storefront.html?u='+p.user_id+'" target="_blank" class="btn btn-ghost btn-sm">Store</a>'
+       +'<button class="btn btn-ghost btn-sm" onclick="fpViewFees(\''+p.user_id+'\',\''+name.replace(/'/g,"\\'")+'\')">Fees</button>'
      +'</div>'
      +'</div>';
  }).join('');
 }
 
 function searchFoodPros(q){
- const f=allFoodPros.filter(p=>(p.display_name||p.business_name||'').toLowerCase().includes(q.toLowerCase())||(p.professional_type||'').toLowerCase().includes(q.toLowerCase())||(p.email||'').toLowerCase().includes(q.toLowerCase()));
+ const filter=document.getElementById('fpFilter')?document.getElementById('fpFilter').value:'all';
+ let f=allFoodPros;
+ if(filter==='stripe_active')f=f.filter(p=>p.stripe_connect_status==='active');
+ else if(filter==='no_stripe')f=f.filter(p=>p.stripe_connect_status!=='active');
+ if(q)f=f.filter(p=>(p.display_name||p.business_name||'').toLowerCase().includes(q.toLowerCase())||(p.professional_type||'').toLowerCase().includes(q.toLowerCase())||(p.email||'').toLowerCase().includes(q.toLowerCase()));
  const el=document.getElementById('foodProListBody');
  if(el)el.innerHTML=renderFoodProCards(f);
+}
+
+function filterFoodPros(){
+ const q=document.querySelector('#foodProListBody')? (document.querySelector('.search-input[placeholder="Search..."]')||{value:''}).value:'';
+ searchFoodPros(q);
+}
+
+function fpEmail(emailEnc,name){
+ const email=decodeURIComponent(emailEnc);
+ const subject=encodeURIComponent('CBUSEVENTS - Your Food Pro Account');
+ window.open('mailto:'+email+'?subject='+subject,'_blank');
+}
+
+async function fpViewFees(userId,name){
+ const modal=document.getElementById('fpFeesModal');
+ const body=document.getElementById('fpFeesBody');
+ const title=document.getElementById('fpFeesTitle');
+ if(!modal)return;
+ title.textContent=name+' - Order Fees';
+ body.innerHTML='<div style="text-align:center;padding:24px;color:var(--muted);">Loading...</div>';
+ modal.style.display='flex';
+ const{data:orders,error}=await sb.from('food_professional_orders').select('*').eq('vendor_id',userId).order('created_at',{ascending:false});
+ if(error||!orders||!orders.length){
+   body.innerHTML='<div style="text-align:center;padding:32px;color:var(--muted);font-size:13px;">No orders found for this food professional.</div>';
+   return;
+ }
+ var totalRev=orders.reduce(function(s,o){return s+(parseFloat(o.total)||0);},0);
+ // CBUSEVENTS platform fee: 6.5% + $1.00 per order
+ var totalFees=orders.reduce(function(s,o){var t=parseFloat(o.total)||0;return s+(t*0.065+1);},0);
+ var statusColors={pending:'#f59e0b',confirmed:'#818cf8',ready:'#34d399',completed:'#6b7280',cancelled:'#ef4444'};
+ body.innerHTML=
+   '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:20px;">'
+   +'<div style="background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:14px;text-align:center;">'
+     +'<div style="font-family:var(--mono);font-size:20px;font-weight:600;">'+orders.length+'</div>'
+     +'<div style="font-size:11px;color:var(--muted);margin-top:4px;">Total Orders</div>'
+   +'</div>'
+   +'<div style="background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:14px;text-align:center;">'
+     +'<div style="font-family:var(--mono);font-size:20px;font-weight:600;">$'+totalRev.toFixed(2)+'</div>'
+     +'<div style="font-size:11px;color:var(--muted);margin-top:4px;">Gross Volume</div>'
+   +'</div>'
+   +'<div style="background:var(--bg);border:1px solid rgba(255,107,53,0.2);border-radius:10px;padding:14px;text-align:center;">'
+     +'<div style="font-family:var(--mono);font-size:20px;font-weight:600;color:var(--orange);">$'+totalFees.toFixed(2)+'</div>'
+     +'<div style="font-size:11px;color:var(--muted);margin-top:4px;">Platform Fees (6.5%+$1)</div>'
+   +'</div>'
+   +'</div>'
+   +'<div style="display:flex;flex-direction:column;gap:8px;">'
+   +orders.map(function(o){
+     var sc=statusColors[o.status]||'#888';
+     var t=parseFloat(o.total)||0;
+     var fee=t*0.065+1;
+     var dt=o.created_at?new Date(o.created_at).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric',hour:'2-digit',minute:'2-digit'}):'';
+     return '<div style="background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:12px 14px;display:flex;align-items:center;gap:12px;">'
+       +'<span style="background:'+sc+'20;color:'+sc+';border:1px solid '+sc+'40;border-radius:20px;padding:2px 8px;font-size:9px;font-weight:700;text-transform:uppercase;flex-shrink:0;">'+( o.status||'pending')+'</span>'
+       +'<div style="flex:1;min-width:0;">'
+         +'<div style="font-size:13px;font-weight:600;">'+(o.customer_name||'Walk-in')+'</div>'
+         +'<div style="font-size:11px;color:var(--muted);">'+dt+'</div>'
+       +'</div>'
+       +'<div style="text-align:right;flex-shrink:0;">'
+         +'<div style="font-family:var(--mono);font-size:14px;font-weight:600;">$'+t.toFixed(2)+'</div>'
+         +'<div style="font-size:10px;color:var(--orange);">fee $'+fee.toFixed(2)+'</div>'
+       +'</div>'
+       +'</div>';
+   }).join('')
+   +'</div>';
+}
+
+function closeFpFeesModal(){
+ const modal=document.getElementById('fpFeesModal');
+ if(modal)modal.style.display='none';
 }
 
 
