@@ -576,12 +576,12 @@ async function submitSalesForm() {
   status.innerHTML = '';
 
   try {
-    const { data, error } = await sb.from('leads').insert({
+    const { error } = await sb.from('leads').insert({
       email,
       source: 'ambassador'
-    }).select();
+    });
 
-    console.log('Supabase response:', { data, error });
+    console.log('Supabase error:', error);
 
     if(error && error.code !== '23505') throw error;
 
