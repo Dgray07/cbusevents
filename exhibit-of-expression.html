@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Exhibit of Expression</title>
+<link href="https://fonts.googleapis.com/css2?family=Rubik+Dirt&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+  :root {
+    --orange: #FF6B35;
+    --white: #FFFFFF;
+    --black: #080810;
+    --gray: #1a1a24;
+    --gray-mid: #2a2a36;
+    --gray-text: #9999aa;
+    --border: rgba(255,255,255,0.07);
+    --error: #ff5555;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: var(--black); color: var(--white); font-family: 'DM Sans', sans-serif; overflow-x: hidden; }
+
+  /* NAV */
+  nav { display: flex; justify-content: space-between; align-items: center; padding: 1.5rem 2.5rem; border-bottom: 1px solid var(--border); position: sticky; top: 0; background: rgba(8,8,16,0.95); backdrop-filter: blur(10px); z-index: 100; }
+  .nav-brand { font-family: 'Rubik Dirt', cursive; font-size: 1.1rem; color: var(--orange); letter-spacing: 0.02em; text-decoration: none; }
+  .nav-links { display: flex; gap: 2rem; list-style: none; }
+  .nav-links a { color: var(--gray-text); text-decoration: none; font-size: 0.875rem; font-weight: 400; letter-spacing: 0.05em; text-transform: uppercase; transition: color 0.2s; }
+  .nav-links a:hover { color: var(--white); }
+
+  /* HERO */
+  .hero { min-height: 92vh; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 4rem 2rem; position: relative; overflow: hidden; }
+  .hero::before { content: ''; position: absolute; top: -200px; left: 50%; transform: translateX(-50%); width: 800px; height: 800px; background: radial-gradient(circle, rgba(255,107,53,0.08) 0%, transparent 70%); pointer-events: none; }
+  .hero-eyebrow { font-size: 0.75rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--orange); font-weight: 500; margin-bottom: 1.5rem; opacity: 0; animation: fadeUp 0.6s ease forwards 0.2s; }
+  .hero-title { font-family: 'Rubik Dirt', cursive; font-size: clamp(3rem, 10vw, 7rem); line-height: 1; letter-spacing: -0.01em; margin-bottom: 1.5rem; opacity: 0; animation: fadeUp 0.7s ease forwards 0.4s; }
+  .hero-title span { color: var(--orange); }
+  .hero-sub { font-size: clamp(1rem, 2vw, 1.2rem); color: var(--gray-text); max-width: 560px; line-height: 1.7; margin-bottom: 3rem; font-weight: 300; opacity: 0; animation: fadeUp 0.7s ease forwards 0.6s; }
+  .hero-ctas { display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center; opacity: 0; animation: fadeUp 0.7s ease forwards 0.8s; }
+  .btn-primary { background: var(--orange); color: var(--black); border: none; padding: 0.875rem 2rem; font-family: 'DM Sans', sans-serif; font-size: 0.9rem; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; cursor: pointer; text-decoration: none; transition: transform 0.15s, opacity 0.15s; display: inline-block; }
+  .btn-primary:hover { opacity: 0.88; transform: translateY(-2px); }
+  .btn-outline { background: transparent; color: var(--white); border: 1px solid rgba(255,255,255,0.25); padding: 0.875rem 2rem; font-family: 'DM Sans', sans-serif; font-size: 0.9rem; font-weight: 500; letter-spacing: 0.05em; text-transform: uppercase; cursor: pointer; text-decoration: none; transition: border-color 0.2s, transform 0.15s; display: inline-block; }
+  .btn-outline:hover { border-color: var(--white); transform: translateY(-2px); }
+  .hero-debut { margin-top: 4rem; padding-top: 2rem; border-top: 1px solid var(--border); font-size: 0.8rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--gray-text); opacity: 0; animation: fadeUp 0.7s ease forwards 1s; }
+  .hero-debut strong { color: var(--white); font-weight: 500; }
+
+  .section-divider { width: 100%; height: 1px; background: linear-gradient(90deg, transparent, rgba(255,107,53,0.4), transparent); }
+
+  .section { padding: 6rem 2rem; max-width: 1100px; margin: 0 auto; }
+  .section-label { font-size: 0.7rem; letter-spacing: 0.25em; text-transform: uppercase; color: var(--orange); font-weight: 500; margin-bottom: 1rem; }
+  .section-title { font-family: 'Rubik Dirt', cursive; font-size: clamp(2rem, 5vw, 3.5rem); line-height: 1.1; margin-bottom: 1.5rem; }
+  .section-body { font-size: 1.05rem; color: var(--gray-text); line-height: 1.8; max-width: 640px; font-weight: 300; }
+
+  .how-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.5px; margin-top: 4rem; background: rgba(255,255,255,0.06); }
+  .how-card { background: var(--black); padding: 2.5rem 2rem; }
+  .how-num { font-family: 'Rubik Dirt', cursive; font-size: 3rem; color: rgba(255,107,53,0.15); line-height: 1; margin-bottom: 1rem; }
+  .how-title { font-size: 1rem; font-weight: 600; margin-bottom: 0.75rem; color: var(--white); }
+  .how-body { font-size: 0.875rem; color: var(--gray-text); line-height: 1.7; font-weight: 300; }
+
+  .prize-section { background: var(--gray); padding: 6rem 2rem; }
+  .prize-inner { max-width: 1100px; margin: 0 auto; }
+  .prize-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5px; margin-top: 3rem; background: rgba(255,255,255,0.06); }
+  .prize-card { background: var(--gray); padding: 3rem 2rem; text-align: center; }
+  .prize-place { font-size: 0.7rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--gray-text); margin-bottom: 1rem; font-weight: 500; }
+  .prize-pct { font-family: 'Rubik Dirt', cursive; font-size: 3.5rem; color: var(--white); line-height: 1; margin-bottom: 0.5rem; }
+  .prize-card:first-child .prize-pct { color: var(--orange); }
+  .prize-desc { font-size: 0.8rem; color: var(--gray-text); font-weight: 300; }
+  .prize-note { margin-top: 2rem; font-size: 0.85rem; color: var(--gray-text); text-align: center; font-weight: 300; }
+  .prize-note strong { color: var(--white); font-weight: 500; }
+
+  .entry-section { padding: 6rem 2rem; max-width: 1100px; margin: 0 auto; }
+  .entry-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5px; margin-top: 3rem; background: rgba(255,255,255,0.06); }
+  .entry-card { background: var(--black); padding: 3.5rem 3rem; position: relative; overflow: hidden; transition: background 0.2s; cursor: pointer; }
+  .entry-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: var(--orange); transform: scaleX(0); transform-origin: left; transition: transform 0.3s ease; }
+  .entry-card:hover::before, .entry-card.active::before { transform: scaleX(1); }
+  .entry-card:hover, .entry-card.active { background: var(--gray); }
+  .entry-type { font-size: 0.7rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--orange); font-weight: 500; margin-bottom: 1rem; }
+  .entry-title { font-family: 'Rubik Dirt', cursive; font-size: 2.5rem; margin-bottom: 1.5rem; line-height: 1; }
+  .entry-body { font-size: 0.9rem; color: var(--gray-text); line-height: 1.8; font-weight: 300; margin-bottom: 2.5rem; }
+  .entry-fee { font-size: 0.8rem; color: var(--gray-text); margin-bottom: 1.5rem; letter-spacing: 0.05em; }
+  .entry-fee strong { color: var(--white); font-size: 1.5rem; font-weight: 600; display: block; margin-bottom: 0.25rem; }
+
+  /* INLINE FORM */
+  .inline-form-wrap { display: none; background: var(--gray); border-top: 3px solid var(--orange); padding: 4rem 3rem; margin-top: 1.5px; }
+  .inline-form-wrap.active { display: block; }
+  .form-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 2.5rem; }
+  .form-close-btn { background: none; border: 1px solid var(--border); color: var(--gray-text); font-family: 'DM Sans', sans-serif; font-size: 0.75rem; letter-spacing: 0.1em; text-transform: uppercase; padding: 0.5rem 1rem; cursor: pointer; transition: color 0.2s, border-color 0.2s; }
+  .form-close-btn:hover { color: var(--white); border-color: rgba(255,255,255,0.3); }
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+  .form-full { grid-column: 1 / -1; }
+  .form-group { display: flex; flex-direction: column; gap: 0.5rem; }
+  .form-group label { font-size: 0.75rem; font-weight: 500; color: var(--white); letter-spacing: 0.08em; text-transform: uppercase; }
+  .form-group label span { color: var(--orange); }
+  .form-group input, .form-group select, .form-group textarea { background: var(--black); border: 1px solid rgba(255,255,255,0.1); color: var(--white); font-family: 'DM Sans', sans-serif; font-size: 0.95rem; font-weight: 300; padding: 0.875rem 1rem; outline: none; transition: border-color 0.2s; width: 100%; -webkit-appearance: none; }
+  .form-group input::placeholder, .form-group textarea::placeholder { color: var(--gray-text); }
+  .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: var(--orange); }
+  .form-group input.err, .form-group select.err, .form-group textarea.err { border-color: var(--error); }
+  .form-group textarea { resize: vertical; min-height: 110px; line-height: 1.6; }
+  .form-group select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%239999aa' stroke-width='1.5' fill='none'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 1rem center; background-color: var(--black); cursor: pointer; }
+  .form-group select option { background: var(--gray-mid); }
+  .char-count { font-size: 0.72rem; color: var(--gray-text); text-align: right; }
+  .form-divider { grid-column: 1 / -1; height: 1px; background: var(--border); margin: 0.5rem 0; }
+  .payment-box { grid-column: 1 / -1; background: var(--black); border: 1px solid var(--border); padding: 1.5rem; }
+  .payment-row { display: flex; justify-content: space-between; font-size: 0.9rem; padding: 0.4rem 0; }
+  .payment-row .pl { color: var(--gray-text); font-weight: 300; }
+  .payment-row .pa { color: var(--white); }
+  .payment-row.ptotal { border-top: 1px solid var(--border); margin-top: 0.5rem; padding-top: 1rem; }
+  .payment-row.ptotal .pl { color: var(--white); font-weight: 500; }
+  .payment-row.ptotal .pa { color: var(--orange); font-size: 1.2rem; font-weight: 600; }
+  .payment-note { font-size: 0.75rem; color: var(--gray-text); margin-top: 1rem; line-height: 1.6; font-weight: 300; }
+  .form-status { grid-column: 1 / -1; font-size: 0.85rem; padding: 0.875rem 1rem; display: none; }
+  .form-status.err { background: rgba(255,85,85,0.1); border: 1px solid rgba(255,85,85,0.25); color: #ff9999; display: block; }
+  .form-status.ok { background: rgba(68,204,136,0.1); border: 1px solid rgba(68,204,136,0.25); color: #66ddaa; display: block; }
+  .submit-btn { grid-column: 1 / -1; background: var(--orange); color: var(--black); border: none; padding: 1rem 2rem; font-family: 'DM Sans', sans-serif; font-size: 1rem; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; cursor: pointer; transition: opacity 0.2s, transform 0.15s; width: 100%; }
+  .submit-btn:hover:not(:disabled) { opacity: 0.88; transform: translateY(-1px); }
+  .submit-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  .debut-banner { background: var(--orange); padding: 5rem 2rem; text-align: center; }
+  .debut-banner .section-label { color: rgba(8,8,16,0.6); }
+  .debut-banner .section-title { color: var(--black); font-size: clamp(2rem, 6vw, 4rem); }
+  .debut-banner p { color: rgba(8,8,16,0.7); font-size: 1rem; margin-top: 1rem; font-weight: 400; }
+  .debut-banner .btn-primary { background: var(--black); color: var(--white); margin-top: 2.5rem; display: inline-block; }
+
+  footer { padding: 3rem 2.5rem; border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; }
+  .footer-brand { font-family: 'Rubik Dirt', cursive; font-size: 1rem; color: var(--orange); }
+  footer p { font-size: 0.8rem; color: var(--gray-text); font-weight: 300; }
+  footer a { color: var(--gray-text); text-decoration: none; font-size: 0.8rem; transition: color 0.2s; }
+  footer a:hover { color: var(--white); }
+
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: translateY(0); } }
+
+  @media (max-width: 700px) {
+    nav { padding: 1.25rem 1.5rem; }
+    .nav-links { display: none; }
+    .entry-grid { grid-template-columns: 1fr; }
+    .prize-grid { grid-template-columns: 1fr; }
+    .entry-card { padding: 2.5rem 1.75rem; }
+    .inline-form-wrap { padding: 2.5rem 1.5rem; }
+    .form-grid { grid-template-columns: 1fr; }
+    footer { flex-direction: column; text-align: center; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <a class="nav-brand" href="#">Exhibit of Expression</a>
+  <ul class="nav-links">
+    <li><a href="#about">About</a></li>
+    <li><a href="#how">How It Works</a></li>
+    <li><a href="#enter">Enter</a></li>
+    <li><a href="#debut">Debut</a></li>
+  </ul>
+</nav>
+
+<section class="hero">
+  <p class="hero-eyebrow">A Poetry x Visual Art Competition Series</p>
+  <h1 class="hero-title">Exhibit of<br><span>Expression</span></h1>
+  <p class="hero-sub">Where poets and visual artists unite to create a single collaborative work and compete for a crowd-judged prize pot.</p>
+  <div class="hero-ctas">
+    <a href="#enter" class="btn-primary">Enter the Competition</a>
+    <a href="#how" class="btn-outline">How It Works</a>
+  </div>
+  <p class="hero-debut">Debut Event: <strong>1313 Festival - June 13, 2026</strong> - Columbus, Ohio</p>
+</section>
+
+<div class="section-divider"></div>
+
+<section class="section" id="about">
+  <p class="section-label">The Concept</p>
+  <h2 class="section-title">Two art forms.<br>One statement.</h2>
+  <p class="section-body">Exhibit of Expression pairs a poet with a visual artist. Together they create one collaborative piece where the artwork illustrates the poem. On competition night, the poet performs as the artwork is displayed. The crowd decides who wins.</p>
+</section>
+
+<div class="section-divider"></div>
+
+<section style="padding: 0 0 6rem; max-width: 1100px; margin: 0 auto;" id="how">
+  <div style="padding: 0 2rem;">
+    <p class="section-label">The Format</p>
+    <h2 class="section-title">How It Works</h2>
+  </div>
+  <div class="how-grid">
+    <div class="how-card">
+      <div class="how-num">01</div>
+      <p class="how-title">Enter Solo</p>
+      <p class="how-body">Poets and artists each sign up individually through their own entry path. $10 entry fee per person.</p>
+    </div>
+    <div class="how-card">
+      <div class="how-num">02</div>
+      <p class="how-title">Get Paired</p>
+      <p class="how-body">We match each poet with a visual artist. You collaborate to create one piece together before the event.</p>
+    </div>
+    <div class="how-card">
+      <div class="how-num">03</div>
+      <p class="how-title">Perform</p>
+      <p class="how-body">On competition night, the poet performs as the finished artwork is displayed alongside them.</p>
+    </div>
+    <div class="how-card">
+      <div class="how-num">04</div>
+      <p class="how-title">Crowd Votes</p>
+      <p class="how-body">Ticket holders vote through the platform. Every ticket purchase unlocks a vote. Results are announced live.</p>
+    </div>
+  </div>
+</section>
+
+<div class="section-divider"></div>
+
+<section class="prize-section">
+  <div class="prize-inner">
+    <p class="section-label">The Prize</p>
+    <h2 class="section-title">Prize Pot Split</h2>
+    <p class="section-body" style="margin-top: 1rem;">The pot grows with every pair that enters. $20 per pair goes directly into the pot. The crowd picks the winners.</p>
+    <div class="prize-grid">
+      <div class="prize-card">
+        <p class="prize-place">1st Place</p>
+        <p class="prize-pct">60%</p>
+        <p class="prize-desc">of total pot</p>
+      </div>
+      <div class="prize-card">
+        <p class="prize-place">2nd Place</p>
+        <p class="prize-pct">30%</p>
+        <p class="prize-desc">of total pot</p>
+      </div>
+      <div class="prize-card">
+        <p class="prize-place">3rd Place</p>
+        <p class="prize-pct">10%</p>
+        <p class="prize-desc">of total pot</p>
+      </div>
+    </div>
+    <p class="prize-note">Example: <strong>10 competing pairs = $200 pot.</strong> 1st takes $120, 2nd takes $60, 3rd takes $20.</p>
+  </div>
+</section>
+
+<section class="entry-section" id="enter">
+  <p class="section-label">Enter the Competition</p>
+  <h2 class="section-title">Choose Your Path</h2>
+  <p class="section-body" style="margin-top: 1rem;">Sign up as a poet or visual artist. We handle the pairing. You bring the work.</p>
+
+  <div class="entry-grid">
+    <div class="entry-card" id="card-poet" onclick="openForm('poet')">
+      <p class="entry-type">Competitor</p>
+      <h3 class="entry-title">Poet</h3>
+      <p class="entry-body">You bring original poetry. We pair you with a visual artist to create one unified collaborative piece. On competition night you perform your poem as your partner's artwork is displayed.</p>
+      <p class="entry-fee"><strong>$10</strong>Entry fee per person</p>
+      <span class="btn-primary">Enter as a Poet</span>
+    </div>
+    <div class="entry-card" id="card-artist" onclick="openForm('artist')">
+      <p class="entry-type">Competitor</p>
+      <h3 class="entry-title">Artist</h3>
+      <p class="entry-body">You bring your visual art. We pair you with a poet whose words you will illustrate. Together you create one collaborative piece displayed on competition night.</p>
+      <p class="entry-fee"><strong>$10</strong>Entry fee per person</p>
+      <span class="btn-primary">Enter as an Artist</span>
+    </div>
+  </div>
+
+  <!-- POET FORM -->
+  <div class="inline-form-wrap" id="form-poet">
+    <div class="form-top">
+      <div>
+        <p class="section-label">Poet Entry</p>
+        <p style="font-family:'Rubik Dirt',cursive; font-size:1.75rem; line-height:1;">Sign Up as a Poet</p>
+      </div>
+      <button class="form-close-btn" onclick="closeForm()">Close</button>
+    </div>
+    <div class="form-grid">
+      <div class="form-group">
+        <label>First Name <span>*</span></label>
+        <input type="text" id="p-first" placeholder="First name">
+      </div>
+      <div class="form-group">
+        <label>Last Name <span>*</span></label>
+        <input type="text" id="p-last" placeholder="Last name">
+      </div>
+      <div class="form-group form-full">
+        <label>Email <span>*</span></label>
+        <input type="email" id="p-email" placeholder="your@email.com">
+      </div>
+      <div class="form-group">
+        <label>Phone <span>*</span></label>
+        <input type="tel" id="p-phone" placeholder="(614) 000-0000">
+      </div>
+      <div class="form-group">
+        <label>Instagram</label>
+        <input type="text" id="p-instagram" placeholder="@yourhandle">
+      </div>
+      <div class="form-group">
+        <label>City <span>*</span></label>
+        <input type="text" id="p-city" placeholder="Columbus">
+      </div>
+      <div class="form-group">
+        <label>State <span>*</span></label>
+        <input type="text" id="p-state" placeholder="OH" maxlength="2">
+      </div>
+      <div class="form-group form-full">
+        <label>Poetry Style / Genre <span>*</span></label>
+        <select id="p-genre">
+          <option value="" disabled selected>Select a style</option>
+          <option value="spoken_word">Spoken Word</option>
+          <option value="slam">Slam Poetry</option>
+          <option value="lyrical">Lyrical</option>
+          <option value="narrative">Narrative</option>
+          <option value="free_verse">Free Verse</option>
+          <option value="experimental">Experimental</option>
+          <option value="other">Other</option>
+        </select>
+      </div>
+      <div class="form-group form-full">
+        <label>Bio / Artist Statement <span>*</span></label>
+        <textarea id="p-bio" maxlength="400" placeholder="Tell us about yourself and your work..." oninput="document.getElementById('p-count').textContent=this.value.length"></textarea>
+        <p class="char-count"><span id="p-count">0</span> / 400</p>
+      </div>
+      <div class="form-divider"></div>
+      <div class="payment-box">
+        <div class="payment-row"><span class="pl">Competition entry fee</span><span class="pa">$10.00</span></div>
+        <div class="payment-row ptotal"><span class="pl">Total due today</span><span class="pa">$10.00</span></div>
+        <p class="payment-note">You will be redirected to Stripe checkout to complete payment. Your spot is confirmed once payment is received.</p>
+      </div>
+      <div class="form-status" id="p-status"></div>
+      <button class="submit-btn" id="p-submit" onclick="handleSubmit('poet')">Continue to Payment</button>
+    </div>
+  </div>
+
+  <!-- ARTIST FORM -->
+  <div class="inline-form-wrap" id="form-artist">
+    <div class="form-top">
+      <div>
+        <p class="section-label">Artist Entry</p>
+        <p style="font-family:'Rubik Dirt',cursive; font-size:1.75rem; line-height:1;">Sign Up as an Artist</p>
+      </div>
+      <button class="form-close-btn" onclick="closeForm()">Close</button>
+    </div>
+    <div class="form-grid">
+      <div class="form-group">
+        <label>First Name <span>*</span></label>
+        <input type="text" id="a-first" placeholder="First name">
+      </div>
+      <div class="form-group">
+        <label>Last Name <span>*</span></label>
+        <input type="text" id="a-last" placeholder="Last name">
+      </div>
+      <div class="form-group form-full">
+        <label>Email <span>*</span></label>
+        <input type="email" id="a-email" placeholder="your@email.com">
+      </div>
+      <div class="form-group">
+        <label>Phone <span>*</span></label>
+        <input type="tel" id="a-phone" placeholder="(614) 000-0000">
+      </div>
+      <div class="form-group">
+        <label>Instagram</label>
+        <input type="text" id="a-instagram" placeholder="@yourhandle">
+      </div>
+      <div class="form-group">
+        <label>City <span>*</span></label>
+        <input type="text" id="a-city" placeholder="Columbus">
+      </div>
+      <div class="form-group">
+        <label>State <span>*</span></label>
+        <input type="text" id="a-state" placeholder="OH" maxlength="2">
+      </div>
+      <div class="form-group form-full">
+        <label>Primary Medium <span>*</span></label>
+        <select id="a-medium">
+          <option value="" disabled selected>Select a medium</option>
+          <option value="painting">Painting</option>
+          <option value="drawing">Drawing / Illustration</option>
+          <option value="digital">Digital Art</option>
+          <option value="photography">Photography</option>
+          <option value="mixed_media">Mixed Media</option>
+          <option value="printmaking">Printmaking</option>
+          <option value="collage">Collage</option>
+          <option value="other">Other</option>
+        </select>
+      </div>
+      <div class="form-group form-full">
+        <label>Bio / Artist Statement <span>*</span></label>
+        <textarea id="a-bio" maxlength="400" placeholder="Tell us about yourself and your work..." oninput="document.getElementById('a-count').textContent=this.value.length"></textarea>
+        <p class="char-count"><span id="a-count">0</span> / 400</p>
+      </div>
+      <div class="form-divider"></div>
+      <div class="payment-box">
+        <div class="payment-row"><span class="pl">Competition entry fee</span><span class="pa">$10.00</span></div>
+        <div class="payment-row ptotal"><span class="pl">Total due today</span><span class="pa">$10.00</span></div>
+        <p class="payment-note">You will be redirected to Stripe checkout to complete payment. Your spot is confirmed once payment is received.</p>
+      </div>
+      <div class="form-status" id="a-status"></div>
+      <button class="submit-btn" id="a-submit" onclick="handleSubmit('artist')">Continue to Payment</button>
+    </div>
+  </div>
+
+</section>
+
+<section class="debut-banner" id="debut">
+  <p class="section-label">Where to See It Live</p>
+  <h2 class="section-title">Debut at the<br>1313 Festival</h2>
+  <p>June 13, 2026 at 1313 E. Broad St. - Columbus, Ohio</p>
+  <a href="/1313-festival.html" class="btn-primary">View the Festival</a>
+</section>
+
+<footer>
+  <span class="footer-brand">Exhibit of Expression</span>
+  <p>A <a href="/">CBUSEVENTS</a> production</p>
+  <p>&copy; 2026 CBUS Events LLC</p>
+</footer>
+
+<script>
+  const SUPABASE_URL = 'https://toblgvatvsjljbqogzsv.supabase.co';
+  const SUPABASE_ANON_KEY = 'YOUR_ANON_KEY';
+  const CHECKOUT_URL = 'https://toblgvatvsjljbqogzsv.supabase.co/functions/v1/create-exhibit-checkout';
+  const _supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+  function openForm(type) {
+    document.getElementById('card-poet').classList.remove('active');
+    document.getElementById('card-artist').classList.remove('active');
+    document.getElementById('form-poet').classList.remove('active');
+    document.getElementById('form-artist').classList.remove('active');
+    document.getElementById('card-' + type).classList.add('active');
+    document.getElementById('form-' + type).classList.add('active');
+    setTimeout(() => document.getElementById('form-' + type).scrollIntoView({ behavior: 'smooth', block: 'start' }), 50);
+  }
+
+  function closeForm() {
+    document.getElementById('card-poet').classList.remove('active');
+    document.getElementById('card-artist').classList.remove('active');
+    document.getElementById('form-poet').classList.remove('active');
+    document.getElementById('form-artist').classList.remove('active');
+    document.getElementById('enter').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  function getVal(id) { return document.getElementById(id).value.trim(); }
+  function markErr(id) { document.getElementById(id).classList.add('err'); }
+  function clearErr(id) { document.getElementById(id).classList.remove('err'); }
+  function validEmail(e) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e); }
+
+  function setStatus(prefix, msg, isErr) {
+    const el = document.getElementById(prefix + '-status');
+    el.textContent = msg;
+    el.className = 'form-status ' + (isErr ? 'err' : 'ok');
+  }
+
+  async function handleSubmit(type) {
+    const p = type === 'poet' ? 'p' : 'a';
+    const fields = type === 'poet'
+      ? ['p-first','p-last','p-email','p-phone','p-city','p-state','p-genre','p-bio']
+      : ['a-first','a-last','a-email','a-phone','a-city','a-state','a-medium','a-bio'];
+
+    fields.forEach(clearErr);
+    document.getElementById(p + '-status').className = 'form-status';
+
+    const first = getVal(p + '-first');
+    const last = getVal(p + '-last');
+    const email = getVal(p + '-email');
+    const phone = getVal(p + '-phone');
+    const city = getVal(p + '-city');
+    const state = getVal(p + '-state');
+    const instagram = getVal(p + '-instagram');
+    const bio = getVal(p + '-bio');
+    const special = type === 'poet' ? getVal('p-genre') : getVal('a-medium');
+
+    let hasErr = false;
+    if (!first) { markErr(p + '-first'); hasErr = true; }
+    if (!last) { markErr(p + '-last'); hasErr = true; }
+    if (!email || !validEmail(email)) { markErr(p + '-email'); hasErr = true; }
+    if (!phone) { markErr(p + '-phone'); hasErr = true; }
+    if (!city) { markErr(p + '-city'); hasErr = true; }
+    if (!state) { markErr(p + '-state'); hasErr = true; }
+    if (!special) { markErr(type === 'poet' ? 'p-genre' : 'a-medium'); hasErr = true; }
+    if (!bio) { markErr(p + '-bio'); hasErr = true; }
+    if (hasErr) { setStatus(p, 'Please fill in all required fields.', true); return; }
+
+    const btn = document.getElementById(p + '-submit');
+    btn.disabled = true;
+    btn.textContent = 'Saving...';
+
+    try {
+      const payload = {
+        type, first_name: first, last_name: last, full_name: first + ' ' + last,
+        email, phone, city, state, instagram: instagram.replace('@',''), bio,
+        status: 'pending_payment', created_at: new Date().toISOString()
+      };
+      if (type === 'poet') payload.genre = special;
+      if (type === 'artist') payload.medium = special;
+
+      const { data, error } = await _supabase.from('exhibit_entries').insert([payload]).select('id').single();
+      if (error) throw error;
+
+      btn.textContent = 'Redirecting to checkout...';
+
+      const res = await fetch(CHECKOUT_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ entry_id: data.id, entry_type: type, email, name: first + ' ' + last })
+      });
+
+      const checkout = await res.json();
+      if (checkout.url) {
+        window.location.href = checkout.url;
+      } else {
+        throw new Error('Checkout session failed.');
+      }
+    } catch (err) {
+      console.error(err);
+      setStatus(p, 'Something went wrong. Please try again or contact info@cbusevents.com.', true);
+      btn.disabled = false;
+      btn.textContent = 'Continue to Payment';
+    }
+  }
+</script>
+</body>
+</html>
