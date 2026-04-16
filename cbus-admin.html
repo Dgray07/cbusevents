@@ -37,25 +37,71 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);display:flex
 .sidebar-bottom{margin-top:auto;padding:18px;border-top:1px solid var(--border-sub);}
 .admin-tag{background:linear-gradient(135deg,rgba(255,107,53,0.15),rgba(255,107,53,0.06));color:var(--orange);border:1px solid rgba(255,107,53,0.25);border-radius:8px;padding:5px 10px;font-size:10px;font-weight:700;text-align:center;letter-spacing:0.08em;text-transform:uppercase;}
 
-/* MOBILE */
+/* ── MOBILE ─────────────────────────────────────────────────── */
 @media(max-width:768px){
-  #app{flex-direction:column !important;align-items:stretch !important;}
-  .sidebar{width:100% !important;height:auto !important;flex-direction:row !important;position:fixed !important;bottom:0;top:auto !important;z-index:200;border-right:none !important;border-top:1px solid var(--border) !important;overflow-x:auto !important;overflow-y:hidden !important;padding-bottom:env(safe-area-inset-bottom);}
-  .sidebar-logo,.sidebar-section,.sidebar-bottom{display:none !important;}
-  .nav-item{flex-direction:column !important;gap:3px !important;padding:8px 6px !important;margin:0 !important;border-radius:0 !important;font-size:9px !important;min-width:56px;text-align:center;white-space:nowrap;flex-shrink:0;border-left:none !important;border-top:2px solid transparent;}
-  .nav-item.active{border-top-color:var(--orange);border-left:none !important;}
-  .nav-item-label{display:none;}
-  .main{padding-bottom:72px !important;}
+  /* Layout */
+  #app{flex-direction:column !important;}
+  .sidebar{display:none !important;}
+  .main{padding-bottom:0 !important;width:100%;}
+  .content{padding:16px !important;}
   .topbar{padding:0 16px !important;height:52px !important;}
   .topbar-title{font-size:15px !important;}
-  .topbar-time{display:none;}
-  .topbar-site-btn{font-size:11px !important;padding:5px 10px !important;}
-  .content{padding:16px !important;}
-  .stat-grid{grid-template-columns:1fr 1fr !important;gap:10px !important;}
+  .topbar-time{display:none !important;}
+
+  /* Hamburger */
+  #mobileMenuBtn{display:flex !important;align-items:center;justify-content:center;}
+
+  /* Drawer */
+  #mobileMenuDrawer{
+    display:none;
+    position:fixed;left:0;top:0;bottom:0;
+    width:280px !important;
+    background:var(--surface);
+    border-right:1px solid var(--border);
+    z-index:400;
+    overflow-y:auto;
+    -webkit-overflow-scrolling:touch;
+    padding-bottom:env(safe-area-inset-bottom);
+    transform:translateX(-100%);
+    transition:transform 0.28s cubic-bezier(0.4,0,0.2,1);
+  }
+  #mobileMenuDrawer.open{
+    transform:translateX(0) !important;
+    display:block !important;
+  }
+  #mobileMenuOverlay{
+    display:none;
+    position:fixed;inset:0;
+    background:rgba(0,0,0,0.65);
+    z-index:399;
+    -webkit-backdrop-filter:blur(4px);
+    backdrop-filter:blur(4px);
+  }
+  #mobileMenuOverlay.open{display:block !important;}
+
+  /* Tables */
+  table{display:block;overflow-x:auto;-webkit-overflow-scrolling:touch;}
+  .table-card{overflow-x:auto;}
+  .table-header{flex-direction:column;align-items:flex-start;gap:8px;}
+
+  /* Venue mobile cards */
+  .venue-card-mobile{display:flex;}
+  .table-card table{display:none;}
+
+  /* Grids */
+  .stat-grid,.stats-grid{grid-template-columns:1fr 1fr !important;gap:10px !important;}
+  .filter-row{flex-wrap:wrap;gap:6px;}
+  .filter-chip{font-size:11px;padding:4px 10px;}
+  .search-input{width:100%;margin-left:0 !important;margin-top:4px;}
   .chart-wrap{overflow-x:auto;}
+
+  /* Prevent iOS zoom on inputs */
+  input,select,textarea{font-size:16px !important;}
 }
-@media(max-width:480px){.topbar-site-btn{display:none;}.stat-grid{grid-template-columns:1fr 1fr !important;}}
-@media(max-width:768px){#mobileMenuBtn{display:block !important;}.main{padding-bottom:0 !important;}}
+@media(max-width:480px){
+  .topbar-right .topbar-site-btn:not(:first-child){display:none;}
+  .stats-grid{grid-template-columns:1fr !important;}
+}
 
 /* MAIN */
 .main{flex:1;overflow-x:hidden;position:relative;}
@@ -153,48 +199,19 @@ tr:hover td{background:rgba(255,255,255,0.025);}
 .rev-bar-fill{width:100%;background:linear-gradient(180deg,var(--orange),rgba(255,107,53,0.4));border-radius:4px 4px 0 0;min-height:4px;transition:height 0.6s cubic-bezier(0.34,1.56,0.64,1);}
 .rev-bar-label{font-size:10px;color:var(--muted);font-family:var(--mono);}
 
-/* MOBILE VENUE CARDS */
-.venue-card-mobile{display:none;flex-direction:column;gap:12px;}
-.v-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px;transition:border-color 0.2s;}
-.v-card:hover{border-color:rgba(255,255,255,0.08);}
-.v-card-name{font-weight:700;font-size:14px;margin-bottom:6px;letter-spacing:-0.02em;}
-.v-card-meta{font-size:12px;color:var(--sub);margin-bottom:10px;line-height:1.7;}
-.v-card-actions{display:flex;gap:6px;flex-wrap:wrap;}
-@media(max-width:768px){
-  .venue-card-mobile{display:flex;}
-  .table-card table{display:none;}
-  .filter-row{flex-wrap:wrap;gap:6px;}
-  .filter-chip{font-size:11px;padding:4px 10px;}
-  .search-input{width:100%;margin-left:0 !important;margin-top:4px;}
-  .content{padding:12px !important;}
-  .table-header{flex-direction:column;align-items:flex-start;gap:8px;}
-  .stat-grid{grid-template-columns:1fr 1fr !important;}
-}
-
 /* ── ADA COMPLIANCE ── */
 .skip-link{position:absolute;top:-100px;left:8px;background:#FF6B35;color:#fff;padding:8px 16px;border-radius:0 0 8px 8px;font-weight:700;font-size:14px;z-index:99999;text-decoration:none;transition:top 0.2s;}
 .skip-link:focus{top:0;}
 *:focus-visible{outline:2px solid #FF6B35;outline-offset:3px;border-radius:4px;}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:0.01ms!important;transition-duration:0.01ms!important;}}
 
-@media(max-width:768px){
-  #mobileMenuBtn{display:flex !important;align-items:center;justify-content:center;}
-  .sidebar{display:none !important;}
-  .topbar{padding:0 16px !important;}
-  .topbar-title{font-size:15px !important;}
-  .content{padding:16px !important;}
-  .stats-grid{grid-template-columns:1fr 1fr !important;}
-  table{display:block;overflow-x:auto;-webkit-overflow-scrolling:touch;}
-  .table-card{overflow-x:auto;}
-  input,select,textarea{font-size:16px !important;}
-  #mobileMenuDrawer{display:none;position:fixed;left:0;top:0;bottom:0;width:260px !important;background:var(--surface);border-right:1px solid var(--border);z-index:301;overflow-y:auto;padding-bottom:32px;transform:translateX(-100%);transition:transform 0.25s ease;}
-  #mobileMenuDrawer.open{transform:translateX(0) !important;display:block !important;}
-  #mobileMenuOverlay.open{display:block !important;}
-}
-@media(max-width:480px){
-  .stats-grid{grid-template-columns:1fr !important;}
-  .topbar-right .topbar-site-btn:not(:first-child){display:none;}
-}
+/* ── VENUE CARDS ── */
+.venue-card-mobile{display:none;flex-direction:column;gap:12px;}
+.v-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px;transition:border-color 0.2s;}
+.v-card:hover{border-color:rgba(255,255,255,0.08);}
+.v-card-name{font-weight:700;font-size:14px;margin-bottom:6px;letter-spacing:-0.02em;}
+.v-card-meta{font-size:12px;color:var(--sub);margin-bottom:10px;line-height:1.7;}
+.v-card-actions{display:flex;gap:6px;flex-wrap:wrap;}
 </style>
 </head>
 <body> <div id="app" style="display:flex;width:100%;min-height:100vh;align-items:stretch;"> <div style="text-align:center;"> <div style="font-family:'DM Sans',sans-serif;font-size:24px;font-weight:900;letter-spacing:-0.05em;text-transform:uppercase;margin-bottom:16px;">CBUS<span style="color:#FF6B35">EVENTS</span></div> <div style="width:32px;height:32px;border:3px solid #25252f;border-top-color:#FF6B35;border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 12px;"></div> <div style="color:#8888a0;font-size:13px;">Loading admin...</div> </div>
@@ -241,67 +258,87 @@ let plannerCount=0,attendeeCount=0;
 
 
 // ── MOBILE MENU ───────────────────────────────────────────────
+const MOBILE_NAV_SECTIONS = [
+  { section: 'Main', items: [
+    { id:'dashboard', label:'Dashboard', icon:'⊞' },
+    { id:'venues',    label:'Venues',    icon:'🏛' },
+    { id:'events',    label:'Events',    icon:'📅' },
+    { id:'inquiries', label:'Inquiries', icon:'💬' },
+  ]},
+  { section: 'Revenue', items: [
+    { id:'revenue',   label:'Revenue',         icon:'💰' },
+    { id:'design',    label:'Design Requests',  icon:'🎨' },
+  ]},
+  { section: 'Platform', items: [
+    { id:'vendors',       label:'Vendors',       icon:'🏪' },
+    { id:'foodpros',      label:'Food Pros',     icon:'🍳' },
+    { id:'planners',      label:'Planners',      icon:'📋' },
+    { id:'subscriptions', label:'Subscriptions', icon:'💳' },
+    { id:'users',         label:'Users',         icon:'👤' },
+    { id:'overrides',     label:'Overrides',     icon:'⚙' },
+    { id:'claims',        label:'Claims',        icon:'🔖' },
+  ]},
+  { section: 'Festivals', items: [
+    { id:'festival1313', label:'1313 Festival', icon:'🎪', external:'1313-festival-admin.html', accent:true },
+    { id:'foodtrucks',   label:'Food Truck Prospects', icon:'🚚' },
+  ]},
+  { section: 'Sales Team', items: [
+    { id:'brandreps', label:'Brand Reps', icon:'🤝' },
+  ]},
+  { section: 'Content', items: [
+    { id:'blog',      label:'Blog & SEO',         icon:'✍' },
+    { id:'outreach',  label:'Outreach',            icon:'📡', accent:true },
+    { id:'marketing', label:'Marketing AI',        icon:'🧠' },
+    { id:'inbox',     label:'Inbox',               icon:'✉' },
+  ]},
+];
+
+function populateMobileMenu(){
+  const items = document.getElementById('mobileMenuItems');
+  if(!items) return;
+  let html = '';
+  MOBILE_NAV_SECTIONS.forEach(sec => {
+    html += `<div style="padding:10px 18px 4px;font-size:9px;color:var(--muted);font-weight:700;letter-spacing:0.15em;text-transform:uppercase">${sec.section}</div>`;
+    sec.items.forEach(p => {
+      const isActive = p.id === currentPage;
+      const color = isActive ? 'var(--orange)' : (p.accent ? 'var(--orange)' : 'var(--text)');
+      const bg = isActive ? 'rgba(255,107,53,0.08)' : 'transparent';
+      const borderLeft = isActive ? '3px solid var(--orange)' : '3px solid transparent';
+      const onclick = p.external
+        ? `window.open('${p.external}','_blank');toggleMobileMenu();`
+        : `toggleMobileMenu();nav('${p.id}');`;
+      html += `<div onclick="${onclick}" style="display:flex;align-items:center;gap:10px;padding:11px 18px;font-size:13px;font-weight:600;color:${color};cursor:pointer;background:${bg};border-left:${borderLeft};transition:all 0.15s">
+        <span style="font-size:15px;width:20px;text-align:center">${p.icon}</span>
+        <span>${p.label}</span>
+      </div>`;
+    });
+  });
+  html += `<div style="padding:16px 18px;margin-top:8px;border-top:1px solid var(--border)">
+    <button onclick="sb.auth.signOut().then(()=>{toggleMobileMenu();renderLogin();})" style="width:100%;background:none;border:1px solid var(--border);border-radius:9px;padding:10px;color:var(--muted);font-size:13px;font-weight:600;cursor:pointer;font-family:var(--font)">Sign Out</button>
+  </div>`;
+  items.innerHTML = html;
+}
+
 function closeMobileNav(page){
- const overlay=document.getElementById('mobileMenuOverlay');
- const drawer=document.getElementById('mobileMenuDrawer');
- if(drawer){drawer.style.transform='translateX(-100%)';}
- setTimeout(()=>{
-   if(overlay)overlay.style.display='none';
-   if(drawer)drawer.style.display='none';
-   nav(page);
- },250);
+  toggleMobileMenu();
+  nav(page);
 }
 
 function toggleMobileMenu(){
-  var drawer=document.getElementById('mobileMenuDrawer');
-  var overlay=document.getElementById('mobileMenuOverlay');
-  if(!drawer)return;
-  var isOpen=drawer.classList.contains('open');
+  var drawer = document.getElementById('mobileMenuDrawer');
+  var overlay = document.getElementById('mobileMenuOverlay');
+  if(!drawer) return;
+  var isOpen = drawer.classList.contains('open');
   if(isOpen){
     drawer.classList.remove('open');
-    if(overlay)overlay.classList.remove('open');
-    document.body.style.overflow='';
+    if(overlay) overlay.classList.remove('open');
+    document.body.style.overflow = '';
   } else {
-    drawer.classList.add('open');
-    if(overlay)overlay.classList.add('open');
-    document.body.style.overflow='hidden';
     populateMobileMenu();
+    drawer.classList.add('open');
+    if(overlay) overlay.classList.add('open');
+    document.body.style.overflow = 'hidden';
   }
-}
-function _origToggleMobileMenu(){
- const overlay=document.getElementById('mobileMenuOverlay');
- const drawer=document.getElementById('mobileMenuDrawer');
- const items=document.getElementById('mobileMenuItems');
- const isOpen=drawer.style.transform==='translateX(0px)' || drawer.style.transform==='translateX(0%)';
- if(!isOpen){
- // Build menu items
- const pages=[
- {id:'dashboard',label:' Dashboard'},
- {id:'venues',label:' Venues'},
- {id:'events',label:' Events'},
- {id:'inquiries',label:' Inquiries'},
- {id:'revenue',label:' Revenue'},
- {id:'design',label:' Design Requests'},
- {id:'vendors',label:' Vendors'},
- {id:'planners',label:' Planners'},
- {id:'subscriptions',label:' Subscriptions'},
- {id:'users',label:' Users'},
- {id:'overrides',label:' Overrides'},
- {id:'claims',label:' Claims'},
- {id:'blog',label:' Blog & SEO'},
- {id:'outreach',label:' Outreach'},
- {id:'marketing',label:' Marketing AI'},
- ];
- items.innerHTML=pages.map(p=>`
- <div onclick="closeMobileNav('${p.id}')" style="padding:12px 20px;font-size:14px;font-weight:500;color:${p.id===currentPage?'var(--orange)':'var(--sub)'};cursor:pointer;border-bottom:1px solid var(--border);background:${p.id===currentPage?'var(--card)':'transparent'}">${p.label}</div> `).join('') + `
- <div style="padding:16px 20px;margin-top:8px"> <button onclick="sb.auth.signOut().then(()=>{toggleMobileMenu();renderLogin();})" style="width:100%;background:none;border:1px solid var(--border);border-radius:8px;padding:10px;color:var(--muted);font-size:13px;cursor:pointer">Sign Out</button> </div>`;
- overlay.style.display='block';
- drawer.style.display='block';
- setTimeout(()=>{drawer.style.transform='translateX(0%)';},10);
- } else {
- drawer.style.transform='translateX(-100%)';
- setTimeout(()=>{overlay.style.display='none';drawer.style.display='none';},250);
- }
 }
 
 // ── TOAST ─────────────────────────────────────────────────────
@@ -532,6 +569,7 @@ function renderShell(){
  <div class="nav-item ${currentPage==='planners'?'active':''}" onclick="nav('planners')"> Planners</div> <div class="nav-item ${currentPage==='subscriptions'?'active':''}" onclick="nav('subscriptions')"> Subscriptions</div> <div class="nav-item ${currentPage==='users'?'active':''}" onclick="nav('users')"> Users</div> <div class="nav-item ${currentPage==='overrides'?'active':''}" onclick="nav('overrides')"> Overrides</div> <div class="nav-item ${currentPage==='claims'?'active':''}" onclick="nav('claims')"> Claims <span style='background:#ef4444;color:#fff;border-radius:20px;padding:1px 7px;font-size:10px;font-weight:700;margin-left:auto' id='claimsBadge' style='display:none'></span></div>
  <div class="sidebar-section">Festivals</div>
  <div class="nav-item ${currentPage==='festival1313'?'active':''}" onclick="window.open('1313-festival-admin.html','_blank')" style="color:${currentPage==='festival1313'?'var(--text)':'var(--orange)'}"> 🎪 1313 Festival <span class="badge" style="background:var(--orange);color:#fff">Live</span></div>
+ <div class="nav-item ${currentPage==='foodtrucks'?'active':''}" onclick="nav('foodtrucks')"> 🚚 Food Truck Prospects</div>
  <div class="sidebar-section">Sales Team</div> <div class="nav-item ${currentPage==='brandreps'?'active':''}" onclick="nav('brandreps')"> Brand Reps <span id="repAppsBadge" style="display:none" class="badge"></span></div> <div class="sidebar-section">Content</div>
  <div class="nav-item ${currentPage==='blog'?'active':''}" onclick="nav('blog')"> Blog & SEO</div> <div class="nav-item ${currentPage==='outreach'?'active':''}" onclick="nav('outreach')" style="color:${currentPage==='outreach'?'var(--text)':'var(--orange)'}"> Outreach</div> <div class="nav-item ${currentPage==='marketing'?'active':''}" onclick="nav('marketing')"> Marketing AI</div> <div class="nav-item ${currentPage==='inbox'?'active':''}" onclick="nav('inbox')"> ✉ Inbox <span id="adminInboxBadge" style="display:none;margin-left:auto;background:#FF6B35;color:#fff;border-radius:99px;padding:1px 8px;font-size:9px;font-weight:800"></span></div> <div class="sidebar-bottom"> <div class="admin-tag">Admin Access</div> <button onclick="sb.auth.signOut().then(()=>renderLogin())" style="width:100%;margin-top:10px;background:none;border:1px solid var(--border);border-radius:9px;padding:8px;color:var(--muted);font-size:12px;font-weight:600;cursor:pointer;font-family:var(--font);letter-spacing:0.02em;transition:all 0.18s;" onmouseover="this.style.color='var(--text)';this.style.borderColor='var(--muted)'" onmouseout="this.style.color='var(--muted)';this.style.borderColor='var(--border)'">Sign Out</button> </div> </div> <div class="main" id="main-content"> <div class="topbar"> <div style="display:flex;align-items:center;gap:12px"> <button id="mobileMenuBtn" onclick="toggleMobileMenu()" style="display:none;background:none;border:none;color:var(--text);font-size:22px;cursor:pointer;padding:4px;line-height:1">☰</button> <div class="topbar-title" id="topbarTitle">Dashboard</div> </div> <div class="topbar-right"> <span class="topbar-time" id="topbarTime"></span> <button class="topbar-site-btn" onclick="window.open('https://cbusevents.com','_blank')">View Site ↗</button> <button class="topbar-site-btn" onclick="window.open('https://cbusevents.com/cbus-venue-portal.html','_blank')">Venue Portal ↗</button> </div> </div> <div id="mobileMenuOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:300;" onclick="toggleMobileMenu()" style="cursor:pointer">×</div> <div id="mobileMenuDrawer" style="display:none;position:fixed;left:0;top:0;bottom:0;width:240px;background:var(--surface);border-right:1px solid var(--border);z-index:301;overflow-y:auto;padding-bottom:32px;transform:translateX(-100%);transition:transform 0.25s ease;"> <div style="padding:20px 16px 16px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center"> <div style="font-family:'DM Sans',sans-serif;font-size:17px;font-weight:800">CBUS<span style="color:#FF6B35">EVENTS</span></div> <button onclick="toggleMobileMenu()" style="background:none;border:none;color:var(--sub);font-size:20px;cursor:pointer">✕</button> </div> <div id="mobileMenuItems"></div> </div> <div class="content" id="pageContent"></div> </div> <div id="modalContainer"></div> `;
 
@@ -548,7 +586,7 @@ function nav(page){
  currentPage=page;
  document.querySelectorAll('.nav-item').forEach(el=>el.classList.remove('active'));
  document.querySelectorAll('.nav-item').forEach(el=>{if(el.textContent.trim().toLowerCase().includes(page))el.classList.add('active');});
- const title={dashboard:'Dashboard',venues:'Venues',events:'Events',inquiries:'Inquiries',revenue:'Revenue',design:'Design Requests',vendors:'Vendors',subscriptions:'Subscriptions',users:'Users',overrides:'Overrides',claims:'Listing Claims',blog:'Blog & SEO',planners:'Planners',outreach:'Venue Outreach',inbox:'Inbox',marketing:'Marketing Intelligence',festival1313:'1313 Festival Admin',brandreps:'Brand Reps'};
+ const title={dashboard:'Dashboard',venues:'Venues',events:'Events',inquiries:'Inquiries',revenue:'Revenue',design:'Design Requests',vendors:'Vendors',subscriptions:'Subscriptions',users:'Users',overrides:'Overrides',claims:'Listing Claims',blog:'Blog & SEO',planners:'Planners',outreach:'Venue Outreach',inbox:'Inbox',marketing:'Marketing Intelligence',festival1313:'1313 Festival Admin',brandreps:'Brand Reps',foodtrucks:'Food Truck Prospects'};
  const el=document.getElementById('topbarTitle');
  if(el)el.textContent=title[page]||page;
  renderPage();
@@ -573,6 +611,7 @@ async function renderPage(){
  else if(currentPage==='inbox')renderAdminInboxPage();
  else if(currentPage==='marketing')renderMarketing();
  else if(currentPage==='brandreps')renderBrandReps();
+ else if(currentPage==='foodtrucks')renderFoodTruckProspects();
 }
 
 // ── ADMIN INBOX ───────────────────────────────────────────────
@@ -2503,6 +2542,270 @@ function copyToClipboard(btn, text){
    btn.textContent='Copied!';btn.style.background='var(--green)';btn.style.color='#000';
    setTimeout(()=>{btn.textContent=orig;btn.style.background='';btn.style.color='';},2000);
  });
+}
+
+
+// ── FOOD TRUCK PROSPECTS ─────────────────────────────────────────
+const FT_STORAGE_KEY = 'cbusevents_ft_prospects';
+let _ftQ = '', _ftS = '', _ftActiveId = null;
+const FT_STATUSES = ['Not Contacted','Contacted','Interested','Applied','Declined'];
+const FT_STATUS_COLORS = {'Not Contacted':'badge-muted','Contacted':'badge-blue','Interested':'badge-gold','Applied':'badge-green','Declined':'badge-red'};
+
+function getFTData(){
+  try{ return JSON.parse(localStorage.getItem(FT_STORAGE_KEY)||'{}'); }catch(e){ return {}; }
+}
+function saveFTData(data){
+  localStorage.setItem(FT_STORAGE_KEY, JSON.stringify(data));
+}
+function getFTProspects(){
+  const d = getFTData();
+  return Object.values(d);
+}
+function saveFTProspect(prospect){
+  const d = getFTData();
+  d[prospect.id] = prospect;
+  saveFTData(d);
+}
+function deleteFTProspect(id){
+  const d = getFTData();
+  delete d[id];
+  saveFTData(d);
+}
+
+function renderFoodTruckProspects(){
+  const titleEl = document.getElementById('topbarTitle');
+  if(titleEl) titleEl.textContent = 'Food Truck Prospects';
+  const prospects = getFTProspects();
+  const total = prospects.length;
+  const contacted = prospects.filter(p => p.status && p.status !== 'Not Contacted').length;
+  const interested = prospects.filter(p => p.status === 'Interested').length;
+  const applied = prospects.filter(p => p.status === 'Applied').length;
+
+  document.getElementById('pageContent').innerHTML = `
+  <div style="margin-bottom:20px;display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:12px">
+    <div>
+      <div style="font-size:20px;font-weight:800;margin-bottom:4px">Food Truck Prospects</div>
+      <div style="color:var(--sub);font-size:13px">Track and reach out to food trucks for the 1313 Festival series</div>
+    </div>
+    <button class="btn btn-primary" onclick="openFTModal()">+ Add Prospect</button>
+  </div>
+
+  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px">
+    <div class="stat-card"><div class="stat-card-num" style="color:var(--sub)">${total}</div><div class="stat-card-label">Total</div></div>
+    <div class="stat-card"><div class="stat-card-num" style="color:var(--blue)">${contacted}</div><div class="stat-card-label">Contacted</div></div>
+    <div class="stat-card"><div class="stat-card-num" style="color:var(--gold)">${interested}</div><div class="stat-card-label">Interested</div></div>
+    <div class="stat-card"><div class="stat-card-num" style="color:var(--green)">${applied}</div><div class="stat-card-label">Applied</div></div>
+  </div>
+
+  <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap">
+    <input class="search-input" placeholder="Search trucks..." style="flex:1;min-width:160px" oninput="_ftQ=this.value.toLowerCase();renderFTCards()" id="ftSearch">
+    <select class="search-input" onchange="_ftS=this.value;renderFTCards()" style="min-width:160px">
+      <option value="">All Statuses</option>
+      ${FT_STATUSES.map(s=>`<option value="${s}">${s}</option>`).join('')}
+    </select>
+  </div>
+
+  <div id="ftCards"></div>
+
+  <!-- ADD / EDIT MODAL -->
+  <div id="ftModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:500;display:none;align-items:center;justify-content:center;padding:20px">
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:16px;width:100%;max-width:520px;max-height:90vh;overflow-y:auto">
+      <div style="padding:22px 24px 0;display:flex;justify-content:space-between;align-items:center">
+        <div style="font-size:16px;font-weight:800" id="ftModalTitle">Add Prospect</div>
+        <button onclick="closeFTModal()" style="background:none;border:none;color:var(--sub);font-size:20px;cursor:pointer">✕</button>
+      </div>
+      <div style="padding:20px 24px 24px;display:flex;flex-direction:column;gap:14px">
+        <input type="hidden" id="ftId"/>
+        <div class="field"><label>Truck Name *</label><input id="ftName" placeholder="e.g. Smokey's BBQ Co."/></div>
+        <div class="field"><label>Instagram Handle</label><input id="ftIg" placeholder="@username (no @)"/></div>
+        <div class="field"><label>Facebook Page</label><input id="ftFb" placeholder="page-name or full URL"/></div>
+        <div class="field"><label>Email</label><input id="ftEmail" type="email" placeholder="contact@truck.com"/></div>
+        <div class="field"><label>Cuisine Type</label><input id="ftCuisine" placeholder="e.g. BBQ, Tacos, Soul Food"/></div>
+        <div class="field"><label>Source</label>
+          <select id="ftSource" style="width:100%;background:#080810;border:1px solid var(--border);border-radius:8px;padding:9px 12px;color:var(--text);font-size:13px;font-family:'DM Sans',sans-serif">
+            <option value="Street Food Finder">Street Food Finder</option>
+            <option value="Instagram">Instagram</option>
+            <option value="Referral">Referral</option>
+            <option value="Google">Google</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+        <div class="field"><label>Status</label>
+          <select id="ftStatus" style="width:100%;background:#080810;border:1px solid var(--border);border-radius:8px;padding:9px 12px;color:var(--text);font-size:13px;font-family:'DM Sans',sans-serif">
+            ${FT_STATUSES.map(s=>`<option value="${s}">${s}</option>`).join('')}
+          </select>
+        </div>
+        <div class="field"><label>Notes</label><textarea id="ftNotes" style="width:100%;background:#080810;border:1px solid var(--border);border-radius:8px;padding:9px 12px;color:var(--text);font-size:13px;font-family:'DM Sans',sans-serif;resize:vertical;min-height:70px;outline:none" placeholder="Spot fee quoted, follow-up date, what they said..."></textarea></div>
+        <div style="display:flex;gap:8px;margin-top:4px">
+          <button class="btn btn-primary" style="flex:1" onclick="saveFTProspectFromModal()">Save Prospect</button>
+          <button class="btn btn-ghost" onclick="closeFTModal()">Cancel</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- EMAIL MODAL -->
+  <div id="ftEmailModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:500;align-items:center;justify-content:center;padding:20px">
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:16px;width:100%;max-width:560px;max-height:90vh;overflow-y:auto">
+      <div style="padding:22px 24px 0;display:flex;justify-content:space-between;align-items:center">
+        <div style="font-size:16px;font-weight:800">Send Email</div>
+        <button onclick="closeFTEmailModal()" style="background:none;border:none;color:var(--sub);font-size:20px;cursor:pointer">✕</button>
+      </div>
+      <div style="padding:20px 24px 24px;display:flex;flex-direction:column;gap:14px">
+        <div class="field"><label>To</label><input id="ftEmailTo" readonly style="opacity:0.6"/></div>
+        <div class="field"><label>Subject</label><input id="ftEmailSubject" value="Join the 1313 Festival - Vendor Spot Available"/></div>
+        <div class="field"><label>Message</label><textarea id="ftEmailBody" style="width:100%;background:#080810;border:1px solid var(--border);border-radius:8px;padding:9px 12px;color:var(--text);font-size:13px;font-family:'DM Sans',sans-serif;resize:vertical;min-height:180px;outline:none"></textarea></div>
+        <div style="display:flex;gap:8px">
+          <button class="btn btn-primary" style="flex:1" id="ftEmailSendBtn" onclick="sendFTEmail()">Send Email</button>
+          <button class="btn btn-ghost" onclick="closeFTEmailModal()">Cancel</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  `;
+  renderFTCards();
+}
+
+function renderFTCards(){
+  const prospects = getFTProspects().filter(p => {
+    const mQ = !_ftQ || (p.name||'').toLowerCase().includes(_ftQ) || (p.cuisine||'').toLowerCase().includes(_ftQ);
+    const mS = !_ftS || p.status === _ftS;
+    return mQ && mS;
+  });
+  const el = document.getElementById('ftCards');
+  if(!el) return;
+  if(!prospects.length){
+    el.innerHTML = `<div style="padding:40px;text-align:center;color:var(--muted);background:var(--card);border:1px solid var(--border);border-radius:12px">
+      No prospects yet. Add one using the button above, or source trucks from <a href="https://streetfoodfinder.com/Columbus" target="_blank" style="color:var(--orange);text-decoration:none">Street Food Finder</a>.
+    </div>`;
+    return;
+  }
+  el.innerHTML = prospects.map(p => {
+    const statusColor = FT_STATUS_COLORS[p.status||'Not Contacted'] || 'badge-muted';
+    const borderMap = {'badge-green':'#34d399','badge-orange':'#FF6B35','badge-blue':'#818cf8','badge-gold':'#fbbf24','badge-red':'#f87171','badge-muted':'#1e1e2e'};
+    const border = borderMap[statusColor] || '#1e1e2e';
+    const igHandle = (p.ig||'').replace('@','');
+    const fbHandle = (p.fb||'').replace(/^https?:\/\/(www\.)?facebook\.com\//,'').replace(/\/$/,'');
+    return `<div style="background:var(--card);border:1px solid var(--border);border-left:3px solid ${border};border-radius:12px;padding:16px;margin-bottom:10px">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:10px">
+        <div style="flex:1">
+          <div style="font-weight:700;font-size:15px;margin-bottom:2px">${p.name||'Unnamed Truck'}</div>
+          <div style="font-size:12px;color:var(--muted)">${p.cuisine||''}${p.source?' · Found via '+p.source:''}</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:6px;flex-shrink:0">
+          <span class="badge ${statusColor}" style="font-size:11px">${p.status||'Not Contacted'}</span>
+          <button onclick="openFTModal('${p.id}')" style="background:none;border:1px solid var(--border);border-radius:6px;padding:4px 9px;color:var(--sub);font-size:11px;font-weight:600;cursor:pointer">Edit</button>
+          <button onclick="if(confirm('Delete this prospect?')){deleteFTProspect('${p.id}');renderFoodTruckProspects();}" style="background:none;border:1px solid #f8717130;border-radius:6px;padding:4px 9px;color:var(--red);font-size:11px;font-weight:600;cursor:pointer">Del</button>
+        </div>
+      </div>
+      ${p.notes ? `<div style="font-size:12px;color:var(--sub);margin-bottom:10px;line-height:1.5;background:var(--bg);border-radius:8px;padding:8px 10px">${p.notes}</div>` : ''}
+      <div style="display:flex;gap:7px;flex-wrap:wrap">
+        ${p.email ? `<button onclick="openFTEmailModal('${p.id}')" style="display:flex;align-items:center;gap:5px;background:#FF6B3515;color:var(--orange);border:1px solid #FF6B3530;border-radius:7px;padding:6px 12px;font-size:12px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif">✉ Email</button>` : `<span style="font-size:11px;color:var(--muted);padding:6px 2px">No email on file</span>`}
+        ${igHandle ? `<a href="https://ig.me/m/${igHandle}" target="_blank" style="display:flex;align-items:center;gap:5px;background:#c13b8415;color:#e879a8;border:1px solid #c13b8430;border-radius:7px;padding:6px 12px;font-size:12px;font-weight:700;text-decoration:none">📸 DM on Instagram</a>` : ''}
+        ${fbHandle ? `<a href="https://m.me/${fbHandle}" target="_blank" style="display:flex;align-items:center;gap:5px;background:#1877f215;color:#60a5fa;border:1px solid #1877f230;border-radius:7px;padding:6px 12px;font-size:12px;font-weight:700;text-decoration:none">💬 DM on Facebook</a>` : ''}
+        ${igHandle ? `<a href="https://instagram.com/${igHandle}" target="_blank" style="background:var(--bg);border:1px solid var(--border);border-radius:7px;padding:6px 12px;font-size:12px;font-weight:600;color:var(--sub);text-decoration:none">@${igHandle}</a>` : ''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function openFTModal(id){
+  const modal = document.getElementById('ftModal');
+  if(!modal) return;
+  if(id){
+    const d = getFTData();
+    const p = d[id];
+    if(!p) return;
+    document.getElementById('ftModalTitle').textContent = 'Edit Prospect';
+    document.getElementById('ftId').value = p.id;
+    document.getElementById('ftName').value = p.name||'';
+    document.getElementById('ftIg').value = p.ig||'';
+    document.getElementById('ftFb').value = p.fb||'';
+    document.getElementById('ftEmail').value = p.email||'';
+    document.getElementById('ftCuisine').value = p.cuisine||'';
+    document.getElementById('ftSource').value = p.source||'Street Food Finder';
+    document.getElementById('ftStatus').value = p.status||'Not Contacted';
+    document.getElementById('ftNotes').value = p.notes||'';
+  } else {
+    document.getElementById('ftModalTitle').textContent = 'Add Prospect';
+    document.getElementById('ftId').value = '';
+    ['ftName','ftIg','ftFb','ftEmail','ftCuisine','ftNotes'].forEach(id=>document.getElementById(id).value='');
+    document.getElementById('ftSource').value = 'Street Food Finder';
+    document.getElementById('ftStatus').value = 'Not Contacted';
+  }
+  modal.style.display = 'flex';
+}
+function closeFTModal(){
+  const m = document.getElementById('ftModal');
+  if(m) m.style.display = 'none';
+}
+function saveFTProspectFromModal(){
+  const name = document.getElementById('ftName').value.trim();
+  if(!name){ document.getElementById('ftName').style.borderColor='var(--red)'; return; }
+  const existingId = document.getElementById('ftId').value;
+  const prospect = {
+    id: existingId || 'ft_'+Date.now(),
+    name,
+    ig: document.getElementById('ftIg').value.trim().replace('@',''),
+    fb: document.getElementById('ftFb').value.trim(),
+    email: document.getElementById('ftEmail').value.trim(),
+    cuisine: document.getElementById('ftCuisine').value.trim(),
+    source: document.getElementById('ftSource').value,
+    status: document.getElementById('ftStatus').value,
+    notes: document.getElementById('ftNotes').value.trim(),
+    updated: new Date().toISOString()
+  };
+  saveFTProspect(prospect);
+  closeFTModal();
+  renderFoodTruckProspects();
+  toast(existingId ? 'Prospect updated' : 'Prospect added');
+}
+
+function openFTEmailModal(id){
+  const d = getFTData();
+  const p = d[id];
+  if(!p || !p.email) return;
+  _ftActiveId = id;
+  document.getElementById('ftEmailTo').value = p.email;
+  document.getElementById('ftEmailSubject').value = `Join the 1313 Festival - Vendor Spot Available ($75)`;
+  document.getElementById('ftEmailBody').value = `Hi ${p.name} team,\n\nI'm Deante Gray, founder of CBUSEVENTS - a Columbus event ecosystem connecting venues, vendors, food trucks, and attendees across the city.\n\nI'm reaching out because we're building out our vendor lineup for the 1313 Festival Series, kicking off with our inaugural event "End of Spring" on June 13, 2026 at 1313 E. Broad St.\n\nFood truck spots are $175 for the event. Participants who join the festival also receive 3 months of complimentary Premium membership on the CBUSEVENTS platform, and if you convert to a paying Premium member, your spot fee is waived at all future CBUSEVENTS events.\n\nWould love to have you be part of the inaugural festival. Reply here or apply at cbusevents.com.\n\nDeante Gray\nFounder, CBUSEVENTS\ninfo@cbusevents.com`;
+  const modal = document.getElementById('ftEmailModal');
+  if(modal) modal.style.display = 'flex';
+}
+function closeFTEmailModal(){
+  const m = document.getElementById('ftEmailModal');
+  if(m) m.style.display = 'none';
+  _ftActiveId = null;
+}
+async function sendFTEmail(){
+  const to = document.getElementById('ftEmailTo').value.trim();
+  const subject = document.getElementById('ftEmailSubject').value.trim();
+  const body = document.getElementById('ftEmailBody').value.trim();
+  const btn = document.getElementById('ftEmailSendBtn');
+  if(!to||!subject||!body) return;
+  btn.textContent = 'Sending...'; btn.disabled = true;
+  try {
+    const res = await fetch('https://toblgvatvsjljbqogzsv.supabase.co/functions/v1/send-email', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ to, subject, html: body.replace(/\n/g,'<br>'), from:'CBUSEVENTS <info@cbusevents.com>' })
+    });
+    if(!res.ok) throw new Error('Send failed');
+    // Update prospect status to Contacted if still Not Contacted
+    if(_ftActiveId){
+      const d = getFTData();
+      if(d[_ftActiveId] && d[_ftActiveId].status === 'Not Contacted'){
+        d[_ftActiveId].status = 'Contacted';
+        saveFTData(d);
+      }
+    }
+    closeFTEmailModal();
+    renderFoodTruckProspects();
+    toast('Email sent!');
+  } catch(e) {
+    btn.textContent = 'Send Email'; btn.disabled = false;
+    toast('Send failed - check your email edge function');
+  }
 }
 
 async function renderMarketing(){
