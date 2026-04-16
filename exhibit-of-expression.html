@@ -126,6 +126,20 @@
   footer a { color: var(--gray-text); text-decoration: none; font-size: 0.8rem; transition: color 0.2s; }
   footer a:hover { color: var(--white); }
 
+  /* SUCCESS BANNER */
+  #success-banner {
+    display: none;
+    background: rgba(68,204,136,0.1);
+    border: 1px solid rgba(68,204,136,0.3);
+    color: #66ddaa;
+    text-align: center;
+    padding: 2rem;
+    margin: 2rem auto;
+    max-width: 1100px;
+  }
+  #success-banner strong { color: #88ffcc; display: block; font-size: 1.1rem; margin-bottom: 0.5rem; }
+  #success-banner p { font-size: 0.9rem; font-weight: 300; line-height: 1.6; }
+
   @keyframes fadeUp { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: translateY(0); } }
 
   @media (max-width: 700px) {
@@ -404,9 +418,19 @@
 
 <script>
   const SUPABASE_URL = 'https://toblgvatvsjljbqogzsv.supabase.co';
-  const SUPABASE_ANON_KEY = 'YOUR_ANON_KEY';
-  const CHECKOUT_URL = 'https://toblgvatvsjljbqogzsv.supabase.co/functions/v1/create-exhibit-checkout';
+  const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRvYmxndmF0dnNqbGpicW9nenN2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMDgwNTAsImV4cCI6MjA4NzY4NDA1MH0._WJEQPizNDiQfDXQB_DHPaQhixPGpMdmYQSmyWmm_FQ';
+  const STRIPE_LINK = 'https://buy.stripe.com/eVqfZhaYocAO9pl1Rmc3m0b';
   const _supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+  // Show success banner if returning from Stripe
+  window.addEventListener('DOMContentLoaded', () => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('success') === 'true') {
+      const banner = document.getElementById('success-banner');
+      banner.style.display = 'block';
+      setTimeout(() => banner.scrollIntoView({ behavior: 'smooth', block: 'center' }), 100);
+    }
+  });
 
   function openForm(type) {
     document.getElementById('card-poet').classList.remove('active');
@@ -474,7 +498,7 @@
     try {
       const payload = {
         type, first_name: first, last_name: last, full_name: first + ' ' + last,
-        email, phone, city, state, instagram: instagram.replace('@',''), bio,
+        email, phone, city, state, instagram: instagram.replace('@', ''), bio,
         status: 'pending_payment', created_at: new Date().toISOString()
       };
       if (type === 'poet') payload.genre = special;
@@ -485,18 +509,16 @@
 
       btn.textContent = 'Redirecting to checkout...';
 
-      const res = await fetch(CHECKOUT_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ entry_id: data.id, entry_type: type, email, name: first + ' ' + last })
+      // Build Stripe payment link with prefilled email and entry ID as reference
+      const returnUrl = window.location.origin + window.location.pathname + '?success=true';
+      const params = new URLSearchParams({
+        prefilled_email: email,
+        client_reference_id: data.id,
+        success_url: returnUrl,
       });
 
-      const checkout = await res.json();
-      if (checkout.url) {
-        window.location.href = checkout.url;
-      } else {
-        throw new Error('Checkout session failed.');
-      }
+      window.location.href = STRIPE_LINK + '?' + params.toString();
+
     } catch (err) {
       console.error(err);
       setStatus(p, 'Something went wrong. Please try again or contact info@cbusevents.com.', true);
