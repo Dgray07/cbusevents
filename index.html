@@ -1620,6 +1620,58 @@ function renderHome(){
  </section>
 
  <!-- ══════════════════════════════════════════
+      EXHIBIT OF EXPRESSION BANNER
+ ══════════════════════════════════════════ -->
+ <section style="padding:16px 48px 0">
+   <a href="https://cbusevents.com/exhibit-of-expression.html"
+     style="display:block;text-decoration:none;position:relative;overflow:hidden;border-radius:var(--r-lg);transition:transform 0.2s;"
+     onmouseover="this.style.transform='translateY(-2px)'"
+     onmouseout="this.style.transform='translateY(0)'">
+
+     <!-- Textured black background with scratched feel -->
+     <div style="position:absolute;inset:0;background:#0a0a0a;"></div>
+
+     <!-- Diagonal orange slash accent -->
+     <div style="position:absolute;top:0;right:80px;width:3px;height:100%;background:var(--orange);transform:skewX(-8deg);opacity:0.9;"></div>
+     <div style="position:absolute;top:0;right:90px;width:1px;height:100%;background:var(--orange);transform:skewX(-8deg);opacity:0.3;"></div>
+
+     <!-- Gritty noise overlay -->
+     <div style="position:absolute;inset:0;background-image:url('data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22200%22 height=%22200%22><filter id=%22n%22><feTurbulence type=%22fractalNoise%22 baseFrequency=%220.9%22 numOctaves=%224%22 stitchTiles=%22stitch%22/><feColorMatrix type=%22saturate%22 values=%220%22/></filter><rect width=%22200%22 height=%22200%22 filter=%22url(%23n)%22 opacity=%220.04%22/></svg>');pointer-events:none;"></div>
+
+     <div style="position:relative;z-index:1;display:flex;align-items:center;justify-content:space-between;gap:24px;padding:22px 32px;flex-wrap:wrap;">
+
+       <!-- Left: identity block -->
+       <div style="display:flex;align-items:center;gap:18px;">
+         <!-- Stencil-style logo mark -->
+         <div style="flex-shrink:0;width:52px;height:52px;border:2px solid var(--orange);display:flex;align-items:center;justify-content:center;transform:rotate(-2deg);">
+           <div style="font-family:'DM Mono',monospace;font-size:9px;font-weight:700;color:var(--orange);letter-spacing:0.1em;text-align:center;line-height:1.4;text-transform:uppercase;">E×E</div>
+         </div>
+         <div>
+           <div style="font-family:var(--mono);font-size:8px;font-weight:700;letter-spacing:0.22em;text-transform:uppercase;color:var(--orange);margin-bottom:5px;">Original Series</div>
+           <!-- Title in a bold condensed feel using DM Sans heavy weight -->
+           <div style="font-family:var(--font);font-weight:900;font-size:clamp(17px,2vw,24px);color:#fff;letter-spacing:-0.01em;line-height:1;margin-bottom:6px;text-transform:uppercase;">Exhibit of Expression</div>
+           <div style="font-size:12px;color:#666;line-height:1.5;font-weight:400;max-width:420px;">Poet meets artist. One collaborative piece. One night. Crowd picks the winner.</div>
+         </div>
+       </div>
+
+       <!-- Right: CTA -->
+       <div style="display:flex;align-items:center;gap:14px;flex-shrink:0;">
+         <div style="text-align:right;">
+           <div style="font-family:var(--mono);font-size:8px;letter-spacing:0.15em;text-transform:uppercase;color:#444;margin-bottom:3px;">Debut · Jun 13, 2026</div>
+           <div style="font-family:var(--mono);font-size:10px;color:#666;">1313 Festival · $10 Entry</div>
+         </div>
+         <div style="border:1px solid var(--orange);color:var(--orange);font-family:var(--font);font-weight:700;font-size:12px;padding:10px 20px;letter-spacing:0.08em;text-transform:uppercase;white-space:nowrap;transition:all 0.15s;"
+           onmouseover="this.style.background='var(--orange)';this.style.color='#000'"
+           onmouseout="this.style.background='transparent';this.style.color='var(--orange)'">
+           Enter Now
+         </div>
+       </div>
+
+     </div>
+   </a>
+ </section>
+
+ <!-- ══════════════════════════════════════════
       UPCOMING EVENTS GRID
  ══════════════════════════════════════════ -->
  <section id="eventsSection" style="padding:40px 48px 48px">
