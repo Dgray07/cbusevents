@@ -2787,7 +2787,7 @@ async function sendFTEmail(){
   try {
     const res = await fetch('https://toblgvatvsjljbqogzsv.supabase.co/functions/v1/send-email', {
       method:'POST',
-      headers:{'Content-Type':'application/json'},
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+SB_KEY},
       body: JSON.stringify({ to, subject, html: body.replace(/\n/g,'<br>'), from:'CBUSEVENTS <info@cbusevents.com>' })
     });
     if(!res.ok) throw new Error('Send failed');
