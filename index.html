@@ -1340,6 +1340,18 @@ async function init(){
  await loadSavedState();
 }
 
+// ── SAVED STATE ───────────────────────────────────────────────
+async function loadSavedState(){
+  try {
+    const saved = sessionStorage.getItem('cbusevents_scroll');
+    if(saved){
+      const { y } = JSON.parse(saved);
+      if(typeof y === 'number') window.scrollTo({ top: y, behavior: 'instant' });
+      sessionStorage.removeItem('cbusevents_scroll');
+    }
+  } catch(e){ /* ignore */ }
+}
+
 // ── HELPERS ───────────────────────────────────────────────────
 function fmt(dt){ if(!dt)return''; return new Date(dt).toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric',timeZone:'America/New_York'}); }
 function fmtTime(dt){ if(!dt)return''; return new Date(dt).toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit',timeZone:'America/New_York'}); }
