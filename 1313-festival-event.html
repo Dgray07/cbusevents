@@ -355,6 +355,129 @@
       padding: 20px 0;
     }
 
+    /* TICKETS */
+    .tickets-section {
+      margin-bottom: 48px;
+    }
+    .tickets-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 20px;
+    }
+    .ticket-card {
+      background: var(--surface);
+      border: 2px solid var(--border);
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 5px 0 var(--border);
+      transition: all 0.2s;
+    }
+    .ticket-card:hover { transform: translateY(-3px); box-shadow: 0 8px 0 var(--border); }
+    .ticket-card.featured {
+      border-color: var(--orange);
+      box-shadow: 0 5px 0 rgba(255,107,53,0.3);
+    }
+    .ticket-card.featured:hover { box-shadow: 0 8px 0 rgba(255,107,53,0.3); }
+    .ticket-header {
+      background: var(--warm);
+      padding: 18px 22px 14px;
+      border-bottom: 2px dashed var(--border);
+      position: relative;
+    }
+    .ticket-card.featured .ticket-header {
+      background: linear-gradient(135deg, #FF6B35 0%, #C0392B 100%);
+      border-bottom-color: rgba(255,255,255,0.2);
+    }
+    .ticket-badge {
+      display: inline-block;
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      background: var(--brick);
+      color: #fff;
+      padding: 3px 10px;
+      border-radius: 20px;
+      margin-bottom: 10px;
+    }
+    .ticket-card.featured .ticket-badge {
+      background: rgba(255,255,255,0.25);
+      color: #fff;
+    }
+    .ticket-name {
+      font-family: 'Fredoka One', cursive;
+      font-size: 20px;
+      color: var(--text);
+      line-height: 1.2;
+      margin-bottom: 4px;
+    }
+    .ticket-card.featured .ticket-name { color: #fff; }
+    .ticket-price {
+      font-family: 'Fredoka One', cursive;
+      font-size: 34px;
+      color: var(--orange);
+      line-height: 1;
+    }
+    .ticket-card.featured .ticket-price { color: #fff; }
+    .ticket-price span {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--muted);
+      font-family: 'Nunito', sans-serif;
+    }
+    .ticket-card.featured .ticket-price span { color: rgba(255,255,255,0.7); }
+    .ticket-body {
+      padding: 18px 22px 22px;
+    }
+    .ticket-perks {
+      list-style: none;
+      margin-bottom: 20px;
+    }
+    .ticket-perks li {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text);
+      padding: 5px 0;
+      border-bottom: 1px dashed var(--border);
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      line-height: 1.4;
+    }
+    .ticket-perks li:last-child { border-bottom: none; }
+    .ticket-perks li .perk-icon { font-size: 15px; flex-shrink: 0; margin-top: 1px; }
+    .ticket-btn {
+      display: block;
+      width: 100%;
+      text-align: center;
+      background: var(--brick);
+      color: #fff;
+      font-family: 'Fredoka One', cursive;
+      font-size: 16px;
+      padding: 13px 20px;
+      border-radius: 12px;
+      text-decoration: none;
+      box-shadow: 0 4px 0 rgba(0,0,0,0.15);
+      transition: all 0.2s;
+      position: relative;
+      top: 0;
+    }
+    .ticket-btn:hover { top: -2px; box-shadow: 0 6px 0 rgba(0,0,0,0.15); }
+    .ticket-btn:active { top: 2px; box-shadow: 0 2px 0 rgba(0,0,0,0.15); }
+    .ticket-card.featured .ticket-btn {
+      background: var(--orange);
+      box-shadow: 0 4px 0 var(--brick);
+    }
+    .ticket-card.featured .ticket-btn:hover { box-shadow: 0 6px 0 var(--brick); }
+    .tickets-note {
+      text-align: center;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--muted);
+      margin-top: 18px;
+    }
+    .tickets-note a { color: var(--orange); text-decoration: none; font-weight: 700; }
+
     /* LOGISTICS */
     .logistics-grid {
       display: grid;
@@ -611,6 +734,75 @@
     <h3>Skip the Line 🍔</h3>
     <p>Preorder from your favorite food trucks before the event. Pick up at their truck - no waiting.</p>
     <a href="https://cbusevents.com" class="preorder-btn">Browse & Preorder</a>
+  </div>
+
+  <!-- TICKETS -->
+  <div class="tickets-section">
+    <div class="section-header">
+      <div class="section-tag">Evening Experience</div>
+      <div class="section-title">Get Your <span>Tickets</span></div>
+      <div class="section-sub">Free to walk through the fest - upgrade for comp drinks and the poetry x art show</div>
+    </div>
+
+    <div class="tickets-grid">
+
+      <!-- Poetry Show Only -->
+      <div class="ticket-card">
+        <div class="ticket-header">
+          <div class="ticket-badge">Evening Show</div>
+          <div class="ticket-name">Poetry x Art Show</div>
+          <div class="ticket-price">$10 <span>/ person</span></div>
+        </div>
+        <div class="ticket-body">
+          <ul class="ticket-perks">
+            <li><span class="perk-icon">🎤</span> Live poetry x visual art performances</li>
+            <li><span class="perk-icon">🗳️</span> Spectator voting on poet-artist pairs</li>
+            <li><span class="perk-icon">🏆</span> Watch $$ prizes awarded live</li>
+            <li><span class="perk-icon">🌙</span> Evening show access</li>
+          </ul>
+          <a href="https://buy.stripe.com/9B628r2rS8kyfNJgMgc3m0e" target="_blank" class="ticket-btn">Get Show Ticket</a>
+        </div>
+      </div>
+
+      <!-- Comp Drinks Only -->
+      <div class="ticket-card">
+        <div class="ticket-header">
+          <div class="ticket-badge">All Day</div>
+          <div class="ticket-name">Comp Drinks Pass</div>
+          <div class="ticket-price">$25 <span>/ person</span></div>
+        </div>
+        <div class="ticket-body">
+          <ul class="ticket-perks">
+            <li><span class="perk-icon">🍹</span> Complimentary drinks all day long</li>
+            <li><span class="perk-icon">🎶</span> Daytime DJ set access</li>
+            <li><span class="perk-icon">🚚</span> Full festival floor + vendor access</li>
+            <li><span class="perk-icon">📍</span> 11AM - festival close</li>
+          </ul>
+          <a href="https://buy.stripe.com/9B600j8QggR4gRNfIcc3m0d" target="_blank" class="ticket-btn">Get Drinks Pass</a>
+        </div>
+      </div>
+
+      <!-- Best Value: Comp Drinks + Poetry Show -->
+      <div class="ticket-card featured">
+        <div class="ticket-header">
+          <div class="ticket-badge">Best Value</div>
+          <div class="ticket-name">Comp Drinks + Poetry Show</div>
+          <div class="ticket-price">$35 <span>/ person</span></div>
+        </div>
+        <div class="ticket-body">
+          <ul class="ticket-perks">
+            <li><span class="perk-icon">🍹</span> Complimentary drinks all day long</li>
+            <li><span class="perk-icon">🎶</span> Daytime DJ set access</li>
+            <li><span class="perk-icon">🎤</span> Live poetry x visual art performances</li>
+            <li><span class="perk-icon">🗳️</span> Spectator voting + live prize reveal</li>
+            <li><span class="perk-icon">📍</span> Full day - 11AM through close</li>
+          </ul>
+          <a href="https://buy.stripe.com/9B64gzd6w7gu6d99jOc3m0c" target="_blank" class="ticket-btn">Get Full Experience</a>
+        </div>
+      </div>
+
+    </div>
+    <div class="tickets-note">General admission is always free. Tickets unlock the full 1313 experience. Questions? <a href="mailto:info@cbusevents.com">info@cbusevents.com</a></div>
   </div>
 
   <!-- LOGISTICS -->
