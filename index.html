@@ -19,7 +19,7 @@
   </script>
 
 <link href="https://api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.css" rel="stylesheet">
-<script src="https://api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.js"></script>
+<script src="https://api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.js" defer></script>
 </head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/> <!-- SEO META TAGS -->
@@ -1235,6 +1235,8 @@ h1,h2,h3,h4,h5,h6{font-family:var(--font);letter-spacing:-0.02em;}
 const SB_URL="https://toblgvatvsjljbqogzsv.supabase.co";
 const SB_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRvYmxndmF0dnNqbGpicW9nenN2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMDgwNTAsImV4cCI6MjA4NzY4NDA1MH0._WJEQPizNDiQfDXQB_DHPaQhixPGpMdmYQSmyWmm_FQ";
 const sb=supabase.createClient(SB_URL,SB_KEY);
+// Warm the Supabase connection immediately so the handshake is done before init() fires
+sb.from('venues').select('id').limit(1).then(()=>{});
 function initMapsApi(){ mapsReady=true; }
 
 // ── STATE ─────────────────────────────────────────────────────
@@ -1316,8 +1318,10 @@ async function init(){
    if(parts[0]==='category'){ await initNavAuth(); showPage('category',parts[1]||null); if(rParam) history.replaceState({},'',pathToRoute); await loadSavedState(); return; }
  }
 
- // Home page: show the spinner briefly in #app while all three queries run
- // The spinner is small and below-fold — hero bg image is already loading from CSS
+ // Home page: render hero instantly, load data in background then update
+ if(rParam) history.replaceState({},'',pathToRoute);
+ renderHome(); // immediate render — hero visible in <1s
+
  try {
    const [vRes,eRes,vendRes]=await Promise.all([
      sb.from('venues').select('*').eq('status','approved').order('tier',{ascending:false}),
@@ -1328,14 +1332,13 @@ async function init(){
    allVenues=vRes.data||[];
    allEvents=eRes.data||[];
    allVendors=vendRes.data||[];
+   renderHome(); // re-render once data is ready
  } catch(e) {
    allVenues=[];
    allEvents=[];
    allVendors=[];
  }
 
- if(rParam) history.replaceState({},'',pathToRoute);
- renderHome();
  await initNavAuth();
  await loadSavedState();
 }
