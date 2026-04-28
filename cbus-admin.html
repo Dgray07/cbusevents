@@ -2082,13 +2082,13 @@ async function renderUsers(){
  // Load all user_roles joined with auth users via RPC or direct query
  const[{data:roles},{data:profiles}]=await Promise.all([
    sb.from('user_roles').select('user_id,role').order('role'),
-   sb.from('customer_profiles').select('user_id,display_name').catch(()=>({data:[]})),
+   sb.from('customer_profiles').select('user_id,display_name').then(r=>r).catch(()=>({data:[]})),
  ]);
 
  // Also load vendors and venues to get emails
  const[{data:vendors},{data:venues}]=await Promise.all([
-   sb.from('vendors').select('user_id,email,business_name').catch(()=>({data:[]})),
-   sb.from('venues').select('owner_id,email,name').catch(()=>({data:[]})),
+   sb.from('vendors').select('user_id,email,business_name').then(r=>r).catch(()=>({data:[]})),
+   sb.from('venues').select('owner_id,email,name').then(r=>r).catch(()=>({data:[]})),
  ]);
 
  const profileMap=Object.fromEntries((profiles||[]).map(p=>[p.user_id,p.display_name]));
@@ -2531,13 +2531,11 @@ async function renderClaims(){
     <div style="font-size:13px;font-weight:700;color:var(--orange);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:14px">Columbus Calendar Claims</div>
     ${pendingEvent.length===0
       ?'<div style="color:var(--muted);font-size:13px;padding:16px 0">No pending event claims</div>'
-      :pendingEvent.map(c=>{
-        const evtDate=c.external_events?.start_time?new Date(c.external_events.start_time).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}):'';
-        return `
+      :pendingEvent.map(c=>`
         <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:18px 20px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap">
           <div>
             <div style="font-weight:700;font-size:15px;margin-bottom:5px">${c.external_events?.title||'Unknown Event'}</div>
-            <div style="font-size:12px;color:var(--sub);margin-bottom:4px">Source: ${c.external_events?.source||'unknown'} · ${evtDate}</div>
+            <div style="font-size:12px;color:var(--sub);margin-bottom:4px">Source: ${c.external_events?.source||'unknown'} · ${c.external_events?.start_time?fmt(c.external_events.start_time):''}</div>
             <div style="font-size:12px;color:var(--muted)">Claimant: ${c.claimant_email} · Role: ${c.claimant_role||'unspecified'}</div>
             ${c.note?`<div style="font-size:12px;color:var(--sub);margin-top:6px;font-style:italic">"${c.note}"</div>`:''}
             <div style="font-size:11px;color:var(--muted);margin-top:4px">${timeAgoAdmin(c.created_at)}</div>
@@ -2546,7 +2544,7 @@ async function renderClaims(){
             <button onclick="approveEventClaim('${c.id}','${c.external_event_id}')" style="background:var(--green);color:#000;border:none;border-radius:8px;padding:8px 16px;font-size:12px;font-weight:700;cursor:pointer">Approve</button>
             <button onclick="rejectEventClaim('${c.id}')" style="background:var(--card);color:var(--red);border:1px solid rgba(248,113,113,0.3);border-radius:8px;padding:8px 14px;font-size:12px;font-weight:600;cursor:pointer">Reject</button>
           </div>
-        </div>`;}).join('')}
+        </div>`).join('')}
   </div>
 
   <!-- Venue Claims (legacy) -->
@@ -2554,20 +2552,18 @@ async function renderClaims(){
     <div style="font-size:13px;font-weight:700;color:var(--orange);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:14px">Venue Listing Claims</div>
     ${pendingVenue.length===0
       ?'<div style="color:var(--muted);font-size:13px;padding:16px 0">No pending venue claims</div>'
-      :pendingVenue.map(c=>{
-        const claimedDate=c.claimed_at?new Date(c.claimed_at).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}):'';
-        return `
+      :pendingVenue.map(c=>`
         <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:18px 20px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap">
           <div>
             <div style="font-weight:700;font-size:15px;margin-bottom:4px">${c.name}</div>
             <div style="font-size:12px;color:var(--sub)">${c.venue_type||''} ${c.neighborhood?'· '+c.neighborhood:''}</div>
-            <div style="font-size:12px;color:var(--muted);margin-top:3px">${c.claim_email||''} · ${claimedDate}</div>
+            <div style="font-size:12px;color:var(--muted);margin-top:3px">${c.claim_email||''} · ${c.claimed_at?fmt(c.claimed_at):''}</div>
           </div>
           <div style="display:flex;gap:8px;flex-shrink:0">
-            <button onclick="approveClaim('${c.id}','${c.name.replace(/'/g,"\\'")}'" style="background:var(--green);color:#000;border:none;border-radius:8px;padding:8px 16px;font-size:12px;font-weight:700;cursor:pointer">Approve</button>
-            <button onclick="rejectClaim('${c.id}','${c.name.replace(/'/g,"\\'")}'" style="background:var(--card);color:var(--red);border:1px solid rgba(248,113,113,0.3);border-radius:8px;padding:8px 14px;font-size:12px;font-weight:600;cursor:pointer">Reject</button>
+            <button onclick="approveClaim('${c.id}','${c.name.replace(/'/g,"\\'")}')\"  style="background:var(--green);color:#000;border:none;border-radius:8px;padding:8px 16px;font-size:12px;font-weight:700;cursor:pointer">Approve</button>
+            <button onclick="rejectClaim('${c.id}','${c.name.replace(/'/g,"\\'")}')\" style="background:var(--card);color:var(--red);border:1px solid rgba(248,113,113,0.3);border-radius:8px;padding:8px 14px;font-size:12px;font-weight:600;cursor:pointer">Reject</button>
           </div>
-        </div>`;}).join('')}
+        </div>`).join('')}
   </div>`;
 }
 
@@ -2597,15 +2593,17 @@ async function renderExternalSync(){
   const el=document.getElementById('pageContent');
   el.innerHTML='<div class="spinner"></div>';
 
-  const [sourceRes, extRes, claimRes] = await Promise.all([
-    sb.from('sync_source_controls').select('*').catch(()=>({data:[]})),
-    sb.from('external_events').select('id,title,source,status,venue_name,start_time,created_at').order('start_time',{ascending:true}).catch(()=>({data:[],count:0})),
-    sb.from('event_claims').select('id,status',{count:'exact'}).eq('status','pending').catch(()=>({data:[],count:0}))
-  ]);
-
-  const sources=sourceRes.data||[];
-  const extEvents=extRes.data||[];
-  const pendingClaims=claimRes.count||0;
+  let sources=[], extEvents=[], pendingClaims=0;
+  try {
+    const [sourceRes, extRes, claimRes] = await Promise.all([
+      sb.from('sync_source_controls').select('*'),
+      sb.from('external_events').select('id,title,source,status,venue_name,start_time,created_at').order('start_time',{ascending:true}),
+      sb.from('event_claims').select('id',{count:'exact',head:true}).eq('status','pending')
+    ]);
+    sources       = sourceRes.data || [];
+    extEvents     = extRes.data    || [];
+    pendingClaims = claimRes.count || 0;
+  } catch(e){ console.error('renderExternalSync fetch error:',e); }
 
   // Group by source
   const bySource={};
@@ -2671,16 +2669,14 @@ async function renderExternalSync(){
     <div style="font-size:13px;font-weight:700;color:var(--orange);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:14px">Recent Events in Feed</div>
     ${extEvents.slice(0,10).length===0
       ?'<div style="color:var(--muted);font-size:13px">No external events yet. Activate a sync source above to populate the Columbus Calendar.</div>'
-      :extEvents.slice(0,10).map(e=>{
-        const d=e.start_time?new Date(e.start_time).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}):'';
-        return `
+      :extEvents.slice(0,10).map(e=>`
         <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid var(--border-sub);gap:12px">
           <div>
             <div style="font-weight:600;font-size:13px;margin-bottom:3px">${e.title||'Untitled'}</div>
-            <div style="font-size:11px;color:var(--muted)">${e.venue_name||'Unknown venue'} · ${d} · <span style="color:${e.status==='active'?'var(--green)':'var(--muted)'}">${e.status}</span> · ${e.source}</div>
+            <div style="font-size:11px;color:var(--muted)">${e.venue_name||'Unknown venue'} · ${e.start_time?fmt(e.start_time):''} · <span style="color:${e.status==='active'?'var(--green)':'var(--muted)'}">${e.status}</span> · ${e.source}</div>
           </div>
           <button onclick="suppressExtEvent('${e.id}')" style="background:none;border:1px solid var(--border);border-radius:6px;padding:5px 10px;font-size:11px;color:var(--muted);cursor:pointer;flex-shrink:0">Suppress</button>
-        </div>`;}).join('')}
+        </div>`).join('')}
   </div>`;
 }
 
