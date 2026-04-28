@@ -1355,7 +1355,14 @@ async function submitMessageModal(recipientId, recipientRole, recipientName){
 }
 
 function renderVendors(){
- const tier=(plannerProfile?.plan_tier||'free').toLowerCase();
+ // If vendors not loaded yet, fetch them fresh
+ if(!allVendors.length){
+   sb.from('vendors').select('id,user_id,business_name,description,services,portfolio_photos,subscription_tier,instagram,email,cover_image_url,neighborhood,status').order('created_at',{ascending:false})
+     .then(({data})=>{ allVendors=data||[]; renderVendors(); })
+     .catch(()=>{});
+   document.getElementById('app').innerHTML='<div class="page"><div class="spinner" style="margin:80px auto"></div></div>';
+   return;
+ }
  document.getElementById('app').innerHTML=`
  <div class="page">
    <div style="margin-bottom:20px">
