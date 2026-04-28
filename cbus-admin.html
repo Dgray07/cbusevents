@@ -2587,7 +2587,7 @@ async function renderExternalSync(){
 
   const [sourceRes, extRes, claimRes] = await Promise.all([
     sb.from('sync_source_controls').select('*').catch(()=>({data:[]})),
-    sb.from('external_events').select('id,source,status,created_at',{count:'exact'}).catch(()=>({data:[],count:0})),
+    sb.from('external_events').select('id,title,source,status,venue_name,start_time,created_at').order('start_time',{ascending:true}).catch(()=>({data:[],count:0})),
     sb.from('event_claims').select('id,status',{count:'exact'}).eq('status','pending').catch(()=>({data:[],count:0}))
   ]);
 
@@ -2660,12 +2660,12 @@ async function renderExternalSync(){
     ${extEvents.slice(0,10).length===0
       ?'<div style="color:var(--muted);font-size:13px">No external events yet. Activate a sync source above to populate the Columbus Calendar.</div>'
       :extEvents.slice(0,10).map(e=>`
-        <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border-sub);gap:12px">
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid var(--border-sub);gap:12px">
           <div>
-            <div style="font-weight:600;font-size:13px">${e.id}</div>
-            <div style="font-size:11px;color:var(--muted)">${e.source} · ${e.status}</div>
+            <div style="font-weight:600;font-size:13px;margin-bottom:3px">${e.title||'Untitled'}</div>
+            <div style="font-size:11px;color:var(--muted)">${e.venue_name||'Unknown venue'} · ${e.start_time?fmt(e.start_time):''} · <span style="color:${e.status==='active'?'var(--green)':'var(--muted)'}">${e.status}</span> · ${e.source}</div>
           </div>
-          <button onclick="suppressExtEvent('${e.id}')" style="background:none;border:1px solid var(--border);border-radius:6px;padding:5px 10px;font-size:11px;color:var(--muted);cursor:pointer">Suppress</button>
+          <button onclick="suppressExtEvent('${e.id}')" style="background:none;border:1px solid var(--border);border-radius:6px;padding:5px 10px;font-size:11px;color:var(--muted);cursor:pointer;flex-shrink:0">Suppress</button>
         </div>`).join('')}
   </div>`;
 }
@@ -2678,9 +2678,26 @@ async function toggleSyncSource(source, newState){
 }
 
 async function triggerManualSync(source){
-  showToast(`Triggering ${source} sync... (Edge Function not yet deployed)`,'success');
-  // Will call: await fetch(`https://toblgvatvsjljbqogzsv.supabase.co/functions/v1/sync-${source}`, {...})
-  // once the sync Edge Functions are built in Phase 2
+  showToast(`Triggering ${source} sync...`,'success');
+  try {
+    const res = await fetch(`https://toblgvatvsjljbqogzsv.supabase.co/functions/v1/sync-${source}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRvYmxndmF0dnNqbGpicW9nenN2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMDgwNTAsImV4cCI6MjA4NzY4NDA1MH0._WJEQPizNDiQfDXQB_DHPaQhixPGpMdmYQSmyWmm_FQ`
+      },
+      body: '{}'
+    });
+    const data = await res.json();
+    if(data.ok){
+      showToast(`${source} sync complete · ${data.inserted||0} inserted · ${data.fetched||0} fetched`,'success');
+    } else {
+      showToast(`Sync returned: ${data.reason||data.error||'unknown error'}`,'error');
+    }
+  } catch(e){
+    showToast(`Sync failed: ${e.message}`,'error');
+  }
+  setTimeout(renderExternalSync, 1500);
 }
 
 async function suppressExtEvent(id){
