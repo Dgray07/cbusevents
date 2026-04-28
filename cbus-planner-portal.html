@@ -705,12 +705,14 @@ async function loadData(){
  sb.from('venues').select('*').eq('status','approved').order('tier',{ascending:false}),
  sb.from('inquiries').select('*,venues(name,venue_type,neighborhood)').eq('email',currentUser.email).order('created_at',{ascending:false}),
  sb.from('events').select('*,venues(name)').eq('owner_id',currentUser.id).order('start_time',{ascending:true}),
- sb.from('vendors').select('id,user_id,business_name,description,services,portfolio_photos,subscription_tier,instagram,email,city').order('subscription_tier',{ascending:false}),
+ sb.from('vendors').select('id,user_id,business_name,description,services,portfolio_photos,subscription_tier,instagram,email,city').order('created_at',{ascending:false}),
  ]);
  allVenues=vRes.data||[];
  myInquiries=iRes.data||[];
  myEvents=eRes.data||[];
  allVendors=vendRes.data||[];
+ if(vendRes.error) console.error('Vendor load error:', vendRes.error);
+ console.log('Vendors loaded:', allVendors.length);
 }
 
 // ── HERO ──────────────────────────────────────────────────────
