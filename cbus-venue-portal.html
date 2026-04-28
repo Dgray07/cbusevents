@@ -293,6 +293,19 @@ function AuthProvider({ children }) {
  return () => subscription.unsubscribe();
  }, []);
  async function fetchProfile(id) {
+   const ADMIN_EMAIL = 'deant90@gmail.com';
+   const {data:{user:u}} = await sb.auth.getUser();
+   // Admin bypass — inject synthetic venue profile
+   if(u?.email === ADMIN_EMAIL){
+     setProfile({
+       id: id,
+       full_name: 'Admin Preview',
+       email: ADMIN_EMAIL,
+       role: 'venue_owner',
+     });
+     setLoading(false);
+     return;
+   }
    sb.from("profiles").select("*").eq("id", id).single().then(({data}) => {
      setProfile(data); setLoading(false);
    }).catch(() => setLoading(false));

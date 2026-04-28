@@ -481,6 +481,18 @@ async function init(){
  const{data:{session}}=await sb.auth.getSession();
  if(session){
  currentUser=session.user;
+ const ADMIN_EMAIL = 'deant90@gmail.com';
+ const isAdmin = currentUser.email === ADMIN_EMAIL;
+
+ // Admin bypass — skip role check
+ if(isAdmin){
+   window._userRoles = ['planner','vendor','venue_owner','admin'];
+   await loadData();
+   setLoggedInNav();
+   nav('dashboard');
+   return;
+ }
+
  // Redirect if wrong portal
  const{data:roleRows}=await sb.from('user_roles').select('role').eq('user_id',currentUser.id);
  const roles=(roleRows||[]).map(r=>r.role);
@@ -817,22 +829,17 @@ async function renderEventDetail(){
  const fmt=d=>d?new Date(d).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}):'TBD';
 
  // Load supporting data in parallel
- const[budgetRes,guestRes,vendorReqRes,alertRes]=await Promise.all([
+ const[{data:budgetRows},{data:guestRows},{data:vendorReqs},{data:alertRows}]=await Promise.all([
    sb.from('event_budget').select('*').eq('event_id',e.id).order('created_at',{ascending:true}),
    sb.from('event_rsvps').select('*').eq('event_id',e.id).order('created_at',{ascending:false}),
    sb.from('vendor_inquiries').select('*').eq('event_id',e.id).order('created_at',{ascending:false}),
    sb.from('event_alerts').select('*').eq('event_id',e.id).order('created_at',{ascending:false}),
  ]);
- // Log any table errors to DevTools — likely means table doesn't exist in Supabase yet
- if(budgetRes.error) console.warn('[Planner] event_budget query failed:',budgetRes.error.message);
- if(guestRes.error) console.warn('[Planner] event_rsvps query failed:',guestRes.error.message);
- if(vendorReqRes.error) console.warn('[Planner] vendor_inquiries query failed:',vendorReqRes.error.message);
- if(alertRes.error) console.warn('[Planner] event_alerts query failed:',alertRes.error.message);
 
- const budget=budgetRes.data||[];
- const guests=guestRes.data||[];
- const vendors=vendorReqRes.data||[];
- const alerts=alertRes.data||[];
+ const budget=budgetRows||[];
+ const guests=guestRows||[];
+ const vendors=vendorReqs||[];
+ const alerts=alertRows||[];
 
  const totalBudget=budget.reduce((s,r)=>s+(parseFloat(r.estimated)||0),0);
  const totalActual=budget.reduce((s,r)=>s+(parseFloat(r.actual)||0),0);
@@ -1381,7 +1388,6 @@ async function submitVendorInquiry(vendorId, vendorEmail){
    expected_attendance:document.getElementById('vinqAttendance').value||null,
    message:msg,
    status:'new',
-   ...(currentEventId ? {event_id:currentEventId} : {}),
  };
  const{error}=await sb.from('vendor_inquiries').insert(payload);
  if(error){

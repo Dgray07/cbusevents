@@ -476,6 +476,32 @@ async function doSignOut(){
 }
 
 async function enterPortal(){
+ const ADMIN_EMAIL = 'deant90@gmail.com';
+ const isAdmin = currentUser.email === ADMIN_EMAIL;
+
+ // Admin bypass — skip role check, create synthetic vendor profile
+ if(isAdmin){
+   vendorProfile = {
+     id: 'admin-preview',
+     user_id: currentUser.id,
+     email: currentUser.email,
+     business_name: 'Admin Preview',
+     subscription_tier: 'PREMIUM',
+     subscription_status: 'active',
+     services: [],
+     portfolio_photos: [],
+   };
+   selectedServices = new Set();
+   portfolioPhotos = [];
+   updatePlanBadge();
+   renderPortalSwitcher();
+   document.getElementById('authGate').style.display='none';
+   document.getElementById('portalSidebar').style.display='';
+   document.getElementById('portalMain').style.display='';
+   showPage('dashboard');
+   return;
+ }
+
  // Check role — support multi-role accounts
  const{data:roleRows}=await sb.from('user_roles').select('role').eq('user_id',currentUser.id);
  const roles=(roleRows||[]).map(r=>r.role);
