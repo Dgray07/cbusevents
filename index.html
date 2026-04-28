@@ -3449,10 +3449,33 @@ function renderFeed(){
   const grid=document.getElementById('liveFeedGrid');
   const loadBtn=document.getElementById('feedLoadMore');
   if(!grid) return;
-  const filtered=getFeedFiltered();
+  let filtered=getFeedFiltered();
+
+  // Smart fallback: if current filter returns nothing, cascade to next window
+  if(!filtered.length && feedFilter !== 'all'){
+    const fallbackOrder=['tonight','tomorrow','weekend','week','all'];
+    const fallbacks=fallbackOrder.slice(fallbackOrder.indexOf(feedFilter)+1);
+    for(const f of fallbacks){
+      const prev=feedFilter;
+      feedFilter=f;
+      filtered=getFeedFiltered();
+      if(filtered.length){
+        // Update tab UI to reflect the fallback
+        document.querySelectorAll('.feed-time-tab').forEach(t=>{
+          t.classList.toggle('active', t.dataset.filter===f);
+        });
+        const titles={tonight:'Tonight',tomorrow:'Tomorrow',weekend:'This Weekend',week:'This Week',all:'Upcoming'};
+        const titleEl=document.getElementById('feedMainTitle');
+        if(titleEl) titleEl.innerHTML='What\'s Happening <span>'+(titles[f]||'Soon')+'</span>';
+        break;
+      }
+      feedFilter=prev;
+    }
+  }
+
   const page=filtered.slice(0,(feedPage+1)*FEED_PAGE_SIZE);
   if(!filtered.length){
-    grid.innerHTML=`<div class="feed-empty"><div class="feed-empty-icon">📅</div><div style="font-weight:600;margin-bottom:4px">Nothing scheduled yet</div><div style="font-size:13px">Try "This Week" or "All Upcoming"</div></div>`;
+    grid.innerHTML=`<div class="feed-empty"><div class="feed-empty-icon">📅</div><div style="font-weight:600;margin-bottom:4px">No upcoming events yet</div><div style="font-size:13px;margin-top:4px">Be the first to <a href="https://cbusevents.com/signup.html" style="color:var(--orange);font-weight:600">post an event</a></div></div>`;
     if(loadBtn) loadBtn.style.display='none'; return;
   }
   grid.innerHTML=page.map((e,i)=>feedCardHTML(e,i)).join('');
