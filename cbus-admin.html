@@ -2483,22 +2483,21 @@ async function renderClaims(){
   const el=document.getElementById('pageContent');
   el.innerHTML='<div class="spinner"></div>';
 
-  let venueClaims=[], eventClaims=[];
-  try {
-    const [venueRes, eventRes] = await Promise.all([
-      sb.from('venues')
-        .select('id,name,venue_type,neighborhood,status,claim_status,claim_email,claimed_at,owner_id')
-        .not('claim_status','is',null)
-        .order('claimed_at',{ascending:false}),
-      sb.from('event_claims')
-        .select('*,external_events(title,source,start_time,venue_name)')
-        .order('created_at',{ascending:false})
-    ]);
-    venueClaims = venueRes.data || [];
-    eventClaims = eventRes.data || [];
-  } catch(e) {
-    console.error('renderClaims fetch error:', e);
-  }
+  // Load both venue claims (legacy) and new event_claims
+  const [venueRes, eventRes] = await Promise.all([
+    sb.from('venues')
+      .select('id,name,venue_type,neighborhood,status,claim_status,claim_email,claimed_at,owner_id')
+      .not('claim_status','is',null)
+      .order('claimed_at',{ascending:false})
+      .catch(()=>({data:[]})),
+    sb.from('event_claims')
+      .select('*,external_events(title,source,start_time,venue_name)')
+      .order('created_at',{ascending:false})
+      .catch(()=>({data:[]}))
+  ]);
+
+  const venueClaims=(venueRes.data||[]);
+  const eventClaims=(eventRes.data||[]);
   const pendingVenue=venueClaims.filter(c=>c.claim_status==='pending');
   const pendingEvent=eventClaims.filter(c=>c.status==='pending');
   const totalPending=pendingVenue.length+pendingEvent.length;
@@ -2567,8 +2566,8 @@ async function approveEventClaim(claimId, externalEventId){
     sb.from('event_claims').update({status:'approved',reviewed_at:new Date().toISOString()}).eq('id',claimId).then(r=>r.error),
     sb.from('external_events').update({status:'claimed'}).eq('id',externalEventId).then(r=>r.error)
   ]);
-  if(claimErr||eventErr){showToast('Error approving claim','error');return;}
-  showToast('Claim approved','success');
+  if(claimErr||eventErr){toast('Error approving claim','error');return;}
+  toast('Claim approved','success');
   renderClaims();
 }
 
@@ -2576,8 +2575,8 @@ async function rejectEventClaim(claimId){
   const reason=prompt('Reason for rejection (optional):');
   if(reason===null)return;
   const{error}=await sb.from('event_claims').update({status:'rejected',reviewed_at:new Date().toISOString()}).eq('id',claimId);
-  if(error){showToast('Error: '+error.message,'error');return;}
-  showToast('Claim rejected','error');
+  if(error){toast('Error: '+error.message,'error');return;}
+  toast('Claim rejected','error');
   renderClaims();
 }
 
@@ -2586,19 +2585,15 @@ async function renderExternalSync(){
   const el=document.getElementById('pageContent');
   el.innerHTML='<div class="spinner"></div>';
 
-  let sources=[], extEvents=[], pendingClaims=0;
-  try {
-    const [sourceRes, extRes, claimRes] = await Promise.all([
-      sb.from('sync_source_controls').select('*'),
-      sb.from('external_events').select('id,title,source,status,venue_name,start_time,created_at').order('start_time',{ascending:true}),
-      sb.from('event_claims').select('id,status',{count:'exact',head:true}).eq('status','pending')
-    ]);
-    sources       = sourceRes.data  || [];
-    extEvents     = extRes.data     || [];
-    pendingClaims = claimRes.count  || 0;
-  } catch(e) {
-    console.error('renderExternalSync fetch error:', e);
-  }
+  const [sourceRes, extRes, claimRes] = await Promise.all([
+    sb.from('sync_source_controls').select('*').catch(()=>({data:[]})),
+    sb.from('external_events').select('id,title,source,status,venue_name,start_time,created_at').order('start_time',{ascending:true}).catch(()=>({data:[],count:0})),
+    sb.from('event_claims').select('id,status',{count:'exact'}).eq('status','pending').catch(()=>({data:[],count:0}))
+  ]);
+
+  const sources=sourceRes.data||[];
+  const extEvents=extRes.data||[];
+  const pendingClaims=claimRes.count||0;
 
   // Group by source
   const bySource={};
@@ -2677,13 +2672,13 @@ async function renderExternalSync(){
 
 async function toggleSyncSource(source, newState){
   const{error}=await sb.from('sync_source_controls').update({is_active:newState}).eq('source',source);
-  if(error){showToast('Error: '+error.message,'error');return;}
-  showToast(`${source} ${newState?'activated':'paused'}`,'success');
+  if(error){toast('Error: '+error.message,'error');return;}
+  toast(`${source} ${newState?'activated':'paused'}`,'success');
   renderExternalSync();
 }
 
 async function triggerManualSync(source){
-  showToast(`Triggering ${source} sync...`,'success');
+  toast(`Triggering ${source} sync...`,'success');
   try {
     const res = await fetch(`https://toblgvatvsjljbqogzsv.supabase.co/functions/v1/sync-${source}`, {
       method: 'POST',
@@ -2695,20 +2690,20 @@ async function triggerManualSync(source){
     });
     const data = await res.json();
     if(data.ok){
-      showToast(`${source} sync complete · ${data.inserted||0} inserted · ${data.fetched||0} fetched`,'success');
+      toast(`${source} sync complete · ${data.inserted||0} inserted · ${data.fetched||0} fetched`,'success');
     } else {
-      showToast(`Sync returned: ${data.reason||data.error||'unknown error'}`,'error');
+      toast(`Sync returned: ${data.reason||data.error||'unknown error'}`,'error');
     }
   } catch(e){
-    showToast(`Sync failed: ${e.message}`,'error');
+    toast(`Sync failed: ${e.message}`,'error');
   }
   setTimeout(renderExternalSync, 1500);
 }
 
 async function suppressExtEvent(id){
   const{error}=await sb.from('external_events').update({status:'suppressed'}).eq('id',id);
-  if(error){showToast('Error','error');return;}
-  showToast('Event suppressed','success');
+  if(error){toast('Error','error');return;}
+  toast('Event suppressed','success');
   renderExternalSync();
 }
 
@@ -2719,7 +2714,7 @@ async function approveClaim(venueId, venueName){
  status:'approved',
  }).eq('id',venueId);
  if(error){alert('Error: '+error.message);return;}
- showToast(` Claim approved — ${venueName} is now live`,'success');
+ toast(` Claim approved — ${venueName} is now live`,'success');
  renderClaims();
 }
 
@@ -2732,7 +2727,7 @@ async function rejectClaim(venueId, venueName){
  claim_email:null,
  }).eq('id',venueId);
  if(error){alert('Error: '+error.message);return;}
- showToast(`Claim rejected for ${venueName}`,'error');
+ toast(`Claim rejected for ${venueName}`,'error');
  renderClaims();
 }
 
