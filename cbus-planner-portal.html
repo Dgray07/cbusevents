@@ -411,7 +411,12 @@ function venueEmoji(type){
  return'';
 }
 function getImg(v){return VENUE_IMGS[v.name]||v.cover_image_url||null;}
-function closeModal(){document.getElementById('modal').innerHTML='';}
+function closeModal(){
+  const m1=document.getElementById('modal');
+  const m2=document.getElementById('modalContainer');
+  if(m1)m1.innerHTML='';
+  if(m2)m2.innerHTML='';
+}
 
 // ── AUTH ──────────────────────────────────────────────────────
 
