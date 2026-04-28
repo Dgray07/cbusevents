@@ -863,7 +863,7 @@ function Inquiries({venue}) {
  return (
  <div> <h2 style={{fontFamily:"'DM Sans',sans-serif",fontSize:22,fontWeight:800,marginBottom:6}}>Inquiries</h2> <p style={{color:"var(--sub)",fontSize:14,marginBottom:24}}>{items.filter(i=>i.status==="new").length} unread</p> {items.length===0&&<Card style={{textAlign:"center",padding:48}}><div style={{fontSize:40,marginBottom:12}}></div><h3 style={{fontFamily:"'DM Sans',sans-serif",fontWeight:700,marginBottom:8}}>No inquiries yet</h3><p style={{color:"var(--sub)",fontSize:14}}>Booking requests will show up here.</p></Card>}
  <div style={{display:"flex",flexDirection:"column",gap:12}}> {items.map(i=>(
- <Card key={i.id} style={{borderColor:i.status==="new"?"#FF6B35":"var(--border)",padding:18}}> <div style={{display:"flex",justifyContent:"space-between",marginBottom:8}}> <div><strong>{i.name}</strong><span style={{color:"var(--sub)",fontSize:13,marginLeft:10}}>{i.email}</span></div> <div style={{display:"flex",gap:8,alignItems:"center"}}><Badge color={i.status==="new"?"#FF6B35":"var(--muted)"}>{i.status}</Badge>{i.status==="new"&&<Btn size="sm" variant="secondary" onClick={()=>markRead(i.id)}>Mark Read</Btn>}</div> </div> {i.event_date&&<div style={{fontSize:13,color:"var(--sub)",marginBottom:8}}> {i.event_date} · {i.guest_count} guests</div>}
+ <Card key={i.id} style={{borderColor:i.status==="new"?"#FF6B35":"var(--border)",padding:18}}> <div style={{display:"flex",justifyContent:"space-between",marginBottom:8}}> <div><strong>{i.name}</strong><span style={{color:"var(--sub)",fontSize:13,marginLeft:10}}>{i.email}</span></div> <div style={{display:"flex",gap:8,alignItems:"center"}}><Badge color={i.status==="new"?"#FF6B35":"var(--muted)"}>{i.status}</Badge>{i.status==="new"&&<Btn size="sm" variant="secondary" onClick={()=>markRead(i.id)}>Mark Read</Btn>}{i.planner_id&&<Btn size="sm" variant="ghost" onClick={()=>window.startVenueConversation(i.planner_id,'planner',i.name||'Planner','Re: '+i.event_name)}>💬 Reply</Btn>}</div> </div> {i.event_date&&<div style={{fontSize:13,color:"var(--sub)",marginBottom:8}}> {i.event_date} · {i.guest_count} guests</div>}
  <p style={{fontSize:14,lineHeight:1.7}}>{i.message}</p> </Card> ))}
  </div> </div> );
 }
@@ -1999,6 +1999,47 @@ function App() {
 function Root() {
  return <AuthProvider><App/></AuthProvider>;
 }
+
+// ── GLOBAL START CONVERSATION (called from React components) ──
+window.startVenueConversation = async function(recipientId, recipientRole, recipientName, subject){
+  if(!recipientId){ alert('Cannot start conversation - recipient not found'); return; }
+  const {data:{user}} = await sb.auth.getUser();
+  if(!user){ alert('Please sign in'); return; }
+  const uid = user.id;
+
+  // Check if conversation already exists
+  const {data:existing} = await sb.from('conversations')
+    .select('id')
+    .or(`and(participant_a.eq.${uid},participant_b.eq.${recipientId}),and(participant_a.eq.${recipientId},participant_b.eq.${uid})`)
+    .neq('status','archived')
+    .maybeSingle();
+
+  let convoId = existing?.id;
+
+  if(!convoId){
+    const {data:convo, error} = await sb.from('conversations').insert({
+      participant_a:      uid,
+      participant_b:      recipientId,
+      participant_a_role: 'venue_owner',
+      participant_b_role: recipientRole,
+      subject:            subject||null,
+      status:             'active',
+      last_message_at:    new Date().toISOString(),
+    }).select().single();
+    if(error){ alert('Could not start conversation'); return; }
+    convoId = convo.id;
+    await sb.from('message_requests').insert({
+      conversation_id: convoId,
+      recipient_id:    recipientId,
+      status:          'pending',
+    });
+  }
+
+  // Navigate to inbox - trigger React nav
+  const navInbox = document.querySelector('[data-key="inbox"]') || document.getElementById('nav-inbox');
+  if(navInbox) navInbox.click();
+  else { window._pendingInboxConvo = convoId; }
+};
 
 ReactDOM.createRoot(document.getElementById("root")).render(<Root/>);
 </script>

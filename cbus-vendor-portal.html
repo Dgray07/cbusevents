@@ -1133,9 +1133,10 @@ async function loadBrowseEvents(){
  const proposedIds=new Set((myProps||[]).map(p=>p.event_id));
 
  el.innerHTML=events.map(e=>`
- <div class="event-row"> <div class="event-row-info"> <div class="event-title">${e.title}</div> <div class="event-meta"> ${e.venues?.name||'Venue'} · ${e.venues?.neighborhood||'Columbus'} · ${fmt(e.start_time)} · ${e.category||'Event'}</div> </div> <div style="flex-shrink:0"> ${proposedIds.has(e.id)
+ <div class="event-row"> <div class="event-row-info"> <div class="event-title">${e.title}</div> <div class="event-meta"> ${e.venues?.name||'Venue'} · ${e.venues?.neighborhood||'Columbus'} · ${fmt(e.start_time)} · ${e.category||'Event'}</div> </div> <div style="flex-shrink:0;display:flex;gap:8px;align-items:center"> ${proposedIds.has(e.id)
  ?'<span class="badge-green"> Proposed</span>'
  :`<button class="btn btn-orange btn-sm" onclick="openProposalModal('${e.id}','${(e.title||'').replace(/'/g,"\\'")}','${e.venues?.name||''}')">Send Proposal</button>`}
+ ${e.owner_id?`<button class="btn btn-ghost btn-sm" onclick="openMessageModal('${e.owner_id}','planner','Event Organizer')" title="Message the organizer">💬</button>`:''}
  ${e.status==='published'?`<button class="btn btn-ghost btn-sm" onclick="openVendorShareModal('${e.id}','${(e.title||'').replace(/'/g,"\\'")}','${e.venues?.name||''}','${e.start_time?new Date(e.start_time).toLocaleDateString('en-US',{month:'short',day:'numeric'}):''}')" style="color:#FF6B35;border-color:#FF6B3540"> Share</button>`:''}
  </div> </div>`).join('');
 }
@@ -1166,6 +1167,88 @@ async function sendProposal(eventId){
 }
 
 // ── PLAN ──────────────────────────────────────────────────────
+// ── START CONVERSATION ─────────────────────────────────────────
+async function startConversation(recipientId, recipientRole, subject, openingMessage){
+  if(!currentUser){ toast('Sign in to send messages','error'); return; }
+  const uid = currentUser.id;
+  const myRole = 'vendor';
+
+  const {data:existing} = await sb.from('conversations')
+    .select('id')
+    .or(`and(participant_a.eq.${uid},participant_b.eq.${recipientId}),and(participant_a.eq.${recipientId},participant_b.eq.${uid})`)
+    .neq('status','archived')
+    .maybeSingle();
+
+  let convoId = existing?.id;
+
+  if(!convoId){
+    const {data:convo, error:convoErr} = await sb.from('conversations').insert({
+      participant_a:      uid,
+      participant_b:      recipientId,
+      participant_a_role: myRole,
+      participant_b_role: recipientRole,
+      subject:            subject||null,
+      status:             'active',
+      last_message_at:    new Date().toISOString(),
+    }).select().single();
+    if(convoErr){ toast('Could not start conversation','error'); return; }
+    convoId = convo.id;
+    await sb.from('message_requests').insert({
+      conversation_id: convoId,
+      recipient_id:    recipientId,
+      status:          'pending',
+    });
+  }
+
+  if(openingMessage){
+    await sb.from('messages').insert({
+      conversation_id: convoId,
+      sender_id:       uid,
+      sender_role:     myRole,
+      body:            openingMessage,
+    });
+  }
+
+  showPage('inbox');
+  setTimeout(async ()=>{
+    await loadInboxConversations(uid);
+    openInboxConvo(convoId);
+  }, 400);
+  toast('Message sent');
+}
+
+function openMessageModal(recipientId, recipientRole, recipientName){
+  document.getElementById('modalContainer').innerHTML=`
+  <div class="modal-overlay" onclick="if(event.target===this)closeModal()">
+    <div class="modal">
+      <div class="modal-header">
+        <div class="modal-title">Message ${recipientName}</div>
+        <button onclick="closeModal()" style="background:none;border:none;color:var(--muted);font-size:20px;cursor:pointer;line-height:1">&times;</button>
+      </div>
+      <div class="modal-body" style="display:flex;flex-direction:column;gap:12px">
+        <div class="field"><label>Subject <span style="color:var(--muted);font-weight:400">(optional)</span></label><input id="msgSubject" placeholder="e.g. Available for your June event"></div>
+        <div class="field"><label>Message</label><textarea id="msgBody" style="min-height:120px" placeholder="Introduce yourself and what you can offer..."></textarea></div>
+        <div id="msgErr" style="color:var(--red);font-size:12px;display:none"></div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
+        <button class="btn btn-orange" id="msgSubmitBtn" onclick="submitMessageModal('${recipientId}','${recipientRole}','${recipientName}')">Send Message &#8594;</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+async function submitMessageModal(recipientId, recipientRole, recipientName){
+  const subject = document.getElementById('msgSubject')?.value.trim();
+  const body    = document.getElementById('msgBody')?.value.trim();
+  const errEl   = document.getElementById('msgErr');
+  const btn     = document.getElementById('msgSubmitBtn');
+  if(!body){ errEl.textContent='Please write a message.'; errEl.style.display='block'; return; }
+  btn.disabled=true; btn.textContent='Sending...';
+  closeModal();
+  await startConversation(recipientId, recipientRole, subject||null, body);
+}
+
 function renderInboxPage(){
   const uid=currentUser?.id;
   document.getElementById('pageContent').innerHTML=`
