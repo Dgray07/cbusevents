@@ -188,7 +188,7 @@ nav {
  display:flex; align-items:center; justify-content:space-between;
  padding:0 48px; height:62px;
 }
-.nav-logo { font-family:var(--font); font-weight:800; font-size:20px; cursor:pointer; color:#fff; }
+.nav-logo { font-family:var(--font); font-weight:800; font-size:20px; cursor:pointer; color:var(--text); }
 .nav-logo span { color:var(--orange); }
 .nav-links { display:flex; gap:4px; }
 .nav-link {
@@ -1210,6 +1210,52 @@ footer { background:var(--surface); border-top:1px solid var(--border); padding:
 [data-theme="light"] .cal-comment-bubble { background:var(--card); border-color:var(--border); }
 [data-theme="light"] .cal-comment-input { background:var(--card); border-color:var(--border); color:var(--text); }
 [data-theme="light"] .feed-primary-tab.active { background:rgba(232,90,32,0.08); }
+
+/* ── LIGHT MODE - HARDCODED WHITE TEXT FIXES ── */
+[data-theme="light"] .nav-logo { color: var(--text) !important; }
+[data-theme="light"] .rh-urgency-desc { color: var(--sub); }
+[data-theme="light"] .rh-section-sub { color: var(--sub); }
+[data-theme="light"] .rh-benefit-desc { color: var(--sub) !important; }
+[data-theme="light"] .rh-step-desc { color: var(--sub); }
+[data-theme="light"] .rh-founding-desc { color: var(--sub); }
+[data-theme="light"] .rh-perk { color: var(--text); }
+[data-theme="light"] .rh-community-desc { color: var(--sub) !important; }
+[data-theme="light"] .rh-venue-meta { color: var(--muted) !important; }
+[data-theme="light"] .rh-event-cat { color: var(--muted) !important; }
+[data-theme="light"] .rh-event-venue { color: var(--muted); }
+[data-theme="light"] .rh-event-time { color: var(--muted); }
+[data-theme="light"] .rh-event-arrow { color: rgba(26,24,20,0.2) !important; }
+[data-theme="light"] .rh-final-sub { color: var(--sub) !important; }
+[data-theme="light"] .rh-outline { color: var(--text) !important; }
+[data-theme="light"] .rh-section-title { color: var(--text); }
+[data-theme="light"] .rh-benefit-title { color: var(--text); }
+[data-theme="light"] .rh-step-title { color: var(--text); }
+[data-theme="light"] .rh-community-name { color: var(--text); }
+[data-theme="light"] .rh-urgency-title { color: var(--text); }
+[data-theme="light"] .cal-post-title { color: var(--text); }
+[data-theme="light"] .cal-post-meta { color: var(--muted); }
+[data-theme="light"] .cal-comment-author { color: var(--text); }
+[data-theme="light"] .cal-comment-body { color: var(--sub); }
+[data-theme="light"] .feed-card-title { color: var(--text); }
+[data-theme="light"] .feed-card-venue { color: var(--muted); }
+[data-theme="light"] .feed-card-date { color: var(--sub); }
+[data-theme="light"] .cal-claim-link { color: var(--muted); }
+[data-theme="light"] .hero-ticker-label { color: rgba(26,24,20,0.4); }
+[data-theme="light"] p[style*="rgba(255,255,255,0.15)"] { color: rgba(26,24,20,0.3) !important; }
+[data-theme="light"] .rh-proof-label { color: var(--muted); }
+[data-theme="light"] .feed-primary-tab { color: var(--sub); }
+[data-theme="light"] .feed-primary-tab.active { color: var(--orange); }
+[data-theme="light"] .cal-sort-btn { color: var(--muted); }
+[data-theme="light"] .cal-eyebrow { color: var(--orange); }
+[data-theme="light"] .feed-eyebrow { color: var(--orange); }
+[data-theme="light"] .rh-section { color: var(--text); }
+[data-theme="light"] .rh-section.dark { color: var(--text); }
+[data-theme="light"] .rh-section.dark .rh-section-title { color: var(--text); }
+[data-theme="light"] .rh-section.dark .rh-section-sub { color: var(--sub); }
+[data-theme="light"] .rh-section.dark .rh-benefit-desc { color: var(--sub); }
+[data-theme="light"] .rh-section.dark .rh-step-desc { color: var(--sub); }
+[data-theme="light"] .rh-section.dark .rh-community-desc { color: var(--sub); }
+[data-theme="light"] .rh-section.dark .rh-perk { color: var(--text); }
 /* Skip navigation */
 .skip-link{position:absolute;top:-100px;left:8px;background:var(--orange,#FF6B35);color:#fff;padding:8px 16px;border-radius:0 0 8px 8px;font-weight:700;font-size:14px;z-index:99999;text-decoration:none;transition:top 0.2s;}
 .skip-link:focus{top:0;}
