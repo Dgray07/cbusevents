@@ -1665,15 +1665,24 @@ async function deletePlanner(userId){
  await renderPlanners();
 }
 
-function renderVendors(){
+async function renderVendors(){
+ document.getElementById('pageContent').innerHTML='<div class="spinner"></div>';
+ // Always re-fetch so new signups appear without reloading the page
+ try {
+   const {data} = await sb.from('vendors').select('*').order('created_at',{ascending:false});
+   allVendors = data || [];
+ } catch(e) {}
  document.getElementById('pageContent').innerHTML=`
  <div class="table-card">
    <div class="table-header">
      <div>
        <div class="table-title">All Vendors</div>
-       <div class="table-title-sub">${allVendors.length} total &nbsp;·&nbsp; ${allVendors.filter(v=>v.subscription_status==='active'||v.tier==='premium'||v.tier==='standard').length} paid</div>
+       <div class="table-title-sub">${allVendors.length} total &nbsp;·&nbsp; ${allVendors.filter(v=>v.subscription_status==='active'||v.tier==='premium'||v.tier==='standard').length} paid &nbsp;·&nbsp; ${allVendors.filter(v=>!v.subscription_tier&&!v.tier).length} free tier</div>
      </div>
-     <input class="search-input" placeholder="Search vendors..." oninput="searchVendors(this.value)" style="width:220px;">
+     <div style="display:flex;gap:8px;align-items:center">
+       <button onclick="renderVendors()" style="background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:7px 14px;font-size:12px;font-weight:600;color:var(--sub);cursor:pointer;font-family:var(--font)" onmouseover="this.style.color='var(--text)'" onmouseout="this.style.color='var(--sub)'">↻ Refresh</button>
+       <input class="search-input" placeholder="Search vendors..." oninput="searchVendors(this.value)" style="width:220px;">
+     </div>
    </div>
    <div id="vendorListBody" style="padding:8px 16px 16px;display:flex;flex-direction:column;gap:8px;">
      ${renderVendorCards(allVendors)}
