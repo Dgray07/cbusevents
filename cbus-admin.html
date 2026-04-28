@@ -2067,13 +2067,13 @@ async function renderUsers(){
  // Load all user_roles joined with auth users via RPC or direct query
  const[{data:roles},{data:profiles}]=await Promise.all([
    sb.from('user_roles').select('user_id,role').order('role'),
-   sb.from('customer_profiles').select('user_id,display_name').catch(()=>({data:[]})),
+   sb.from('customer_profiles').select('user_id,display_name').then(r=>r).catch(()=>({data:[]})),
  ]);
 
  // Also load vendors and venues to get emails
  const[{data:vendors},{data:venues}]=await Promise.all([
-   sb.from('vendors').select('user_id,email,business_name').catch(()=>({data:[]})),
-   sb.from('venues').select('owner_id,email,name').catch(()=>({data:[]})),
+   sb.from('vendors').select('user_id,email,business_name').then(r=>r).catch(()=>({data:[]})),
+   sb.from('venues').select('owner_id,email,name').then(r=>r).catch(()=>({data:[]})),
  ]);
 
  const profileMap=Object.fromEntries((profiles||[]).map(p=>[p.user_id,p.display_name]));
@@ -2585,15 +2585,17 @@ async function renderExternalSync(){
   const el=document.getElementById('pageContent');
   el.innerHTML='<div class="spinner"></div>';
 
-  const [sourceRes, extRes, claimRes] = await Promise.all([
-    sb.from('sync_source_controls').select('*').catch(()=>({data:[]})),
-    sb.from('external_events').select('id,title,source,status,venue_name,start_time,created_at').order('start_time',{ascending:true}).catch(()=>({data:[],count:0})),
-    sb.from('event_claims').select('id,status',{count:'exact'}).eq('status','pending').catch(()=>({data:[],count:0}))
-  ]);
-
-  const sources=sourceRes.data||[];
-  const extEvents=extRes.data||[];
-  const pendingClaims=claimRes.count||0;
+  let sources=[], extEvents=[], pendingClaims=0;
+  try {
+    const [sourceRes, extRes, claimRes] = await Promise.all([
+      sb.from('sync_source_controls').select('*'),
+      sb.from('external_events').select('id,title,source,status,venue_name,start_time,created_at').order('start_time',{ascending:true}),
+      sb.from('event_claims').select('id',{count:'exact',head:true}).eq('status','pending')
+    ]);
+    sources       = sourceRes.data  || [];
+    extEvents     = extRes.data     || [];
+    pendingClaims = claimRes.count  || 0;
+  } catch(e){ console.error('renderExternalSync error:',e); }
 
   // Group by source
   const bySource={};
