@@ -705,7 +705,7 @@ async function loadData(){
  sb.from('venues').select('*').eq('status','approved').order('tier',{ascending:false}),
  sb.from('inquiries').select('*,venues(name,venue_type,neighborhood)').eq('email',currentUser.email).order('created_at',{ascending:false}),
  sb.from('events').select('*,venues(name)').eq('owner_id',currentUser.id).order('start_time',{ascending:true}),
- sb.from('vendors').select('id,user_id,business_name,description,services,portfolio_photos,subscription_tier,instagram,email,cover_image_url,neighborhood,status').order('created_at',{ascending:false}),
+ sb.from('vendors').select('id,business_name,description,services,portfolio_photos,subscription_tier,instagram,email,city').order('subscription_tier',{ascending:false}),
  ]);
  allVenues=vRes.data||[];
  myInquiries=iRes.data||[];
@@ -1356,17 +1356,12 @@ async function submitMessageModal(recipientId, recipientRole, recipientName){
 
 function renderVendors(){
  const tier=(plannerProfile?.plan_tier||'free').toLowerCase();
- const isPaid=tier==='standard'||tier==='premium';
  document.getElementById('app').innerHTML=`
  <div class="page">
    <div style="margin-bottom:20px">
      <div class="section-title">Find Vendors</div>
      <div class="section-sub">${allVendors.length} vendors listed in Columbus</div>
    </div>
-   ${!isPaid?`<div style="background:linear-gradient(135deg,rgba(255,107,53,0.06),rgba(255,107,53,0.02));border:1px solid rgba(255,107,53,0.15);border-radius:12px;padding:12px 16px;margin-bottom:20px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap">
-     <div style="font-size:13px;color:var(--sub)">⭐ <strong style="color:var(--text)">Standard plan</strong> surfaces verified vendors first and adds priority search ranking.</div>
-     <button class="btn btn-ghost btn-sm" onclick="nav('billing')" style="white-space:nowrap">See Plans →</button>
-   </div>`:''}
    <div style="margin-bottom:16px">
      <input class="search-input" style="width:100%;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:11px 14px;color:var(--text);font-size:14px;outline:none;margin-bottom:10px" placeholder="Search by name or service..." oninput="vendorSearchQ=this.value;renderVendorGrid()">
      <div style="display:flex;gap:8px;flex-wrap:wrap">
