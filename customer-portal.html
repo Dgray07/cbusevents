@@ -1086,6 +1086,12 @@ window.showSection = function showSection(section) {
   const titleEl = document.getElementById('topbarTitle');
   if (titleEl) titleEl.textContent = SECTION_TITLES[section] || 'My Dashboard';
 
+  // Handle inbox as overlay
+  if(section === 'inbox'){
+    openInboxOverlay();
+    return;
+  }
+
   // All content lives in section-dashboard wrapper - show/hide subsections
   const dashboard = document.getElementById('section-dashboard');
   if (!dashboard) return;
@@ -1114,6 +1120,164 @@ window.showSection = function showSection(section) {
     setTimeout(() => { target.style.outline = ''; target.style.outlineOffset = ''; }, 1200);
   }
 };
+
+// ── INBOX OVERLAY ─────────────────────────────────────────────
+let _inboxTab='messages',_inboxConvos=[],_inboxRequests=[],_activeConvo=null,_inboxChannel=null;
+
+function openInboxOverlay(){
+  let overlay=document.getElementById('inboxOverlay');
+  if(!overlay){
+    overlay=document.createElement('div');
+    overlay.id='inboxOverlay';
+    overlay.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:500;display:flex;flex-direction:column';
+    overlay.innerHTML=`
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid rgba(255,255,255,0.08);flex-shrink:0">
+        <div style="font-weight:800;font-size:18px">Inbox <span id="inboxUnreadBadge" style="display:none;background:#FF6B35;color:#fff;border-radius:99px;font-size:12px;font-weight:700;padding:2px 8px;margin-left:6px;vertical-align:middle"></span></div>
+        <button onclick="document.getElementById('inboxOverlay').style.display='none'" style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:8px;color:#fff;padding:6px 14px;font-size:13px;cursor:pointer">Close</button>
+      </div>
+      <div style="display:flex;flex:1;overflow:hidden">
+        <div style="width:280px;border-right:1px solid rgba(255,255,255,0.08);display:flex;flex-direction:column;flex-shrink:0">
+          <div style="padding:12px;border-bottom:1px solid rgba(255,255,255,0.08);display:flex;gap:6px">
+            <button id="inboxTabMsg" onclick="switchInboxTab('messages')" style="flex:1;padding:7px 0;border-radius:8px;border:none;background:#FF6B35;color:#fff;font-weight:700;font-size:12px;cursor:pointer">Messages</button>
+            <button id="inboxTabReq" onclick="switchInboxTab('requests')" style="flex:1;padding:7px 0;border-radius:8px;border:1px solid rgba(255,255,255,0.1);background:transparent;color:rgba(255,255,255,0.5);font-weight:700;font-size:12px;cursor:pointer">Requests</button>
+          </div>
+          <div id="inboxList" style="flex:1;overflow-y:auto"><div style="padding:24px;color:rgba(255,255,255,0.4);font-size:13px;text-align:center">Loading...</div></div>
+        </div>
+        <div id="inboxThread" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;color:rgba(255,255,255,0.4);font-size:14px">
+          Select a conversation to start messaging
+        </div>
+      </div>`;
+    document.body.appendChild(overlay);
+  } else {
+    overlay.style.display='flex';
+  }
+  loadInboxConversations(currentUser?.id);
+}
+
+function switchInboxTab(tab){
+  _inboxTab=tab;
+  const msg=document.getElementById('inboxTabMsg');
+  const req=document.getElementById('inboxTabReq');
+  if(msg){msg.style.background=tab==='messages'?'#FF6B35':'transparent';msg.style.color=tab==='messages'?'#fff':'rgba(255,255,255,0.5)';}
+  if(req){req.style.background=tab==='requests'?'#FF6B35':'transparent';req.style.color=tab==='requests'?'#fff':'rgba(255,255,255,0.5)';}
+  renderInboxList();
+}
+
+async function loadInboxConversations(uid){
+  if(!uid) return;
+  const {data:convos}=await sb.from('conversations').select('*')
+    .or('participant_a.eq.'+uid+',participant_b.eq.'+uid)
+    .eq('status','active').order('last_message_at',{ascending:false});
+  _inboxConvos=convos||[];
+  const {data:reqs}=await sb.from('message_requests').select('*,conversations(*)')
+    .eq('recipient_id',uid).eq('status','pending');
+  _inboxRequests=reqs||[];
+  let unread=0;
+  for(const c of _inboxConvos){
+    const {count}=await sb.from('messages').select('id',{count:'exact',head:true})
+      .eq('conversation_id',c.id).neq('sender_id',uid).is('read_at',null);
+    unread+=count||0;
+  }
+  const badge=document.getElementById('inboxUnreadBadge');
+  if(badge){badge.textContent=unread;badge.style.display=unread>0?'inline':'none';}
+  renderInboxList();
+}
+
+function renderInboxList(){
+  const el=document.getElementById('inboxList'); if(!el)return;
+  const uid=currentUser?.id;
+  if(_inboxTab==='messages'){
+    if(!_inboxConvos.length){el.innerHTML='<div style="padding:24px;color:rgba(255,255,255,0.4);font-size:13px;text-align:center">No active conversations yet.</div>';return;}
+    el.innerHTML=_inboxConvos.map(c=>{
+      const role=c.participant_a===uid?c.participant_b_role:c.participant_a_role;
+      const active=_activeConvo?.id===c.id;
+      return `<div onclick="openInboxConvo('${c.id}')" style="padding:14px 16px;border-bottom:1px solid rgba(255,255,255,0.06);cursor:pointer;background:${active?'rgba(255,107,53,0.1)':'transparent'};border-left:${active?'2px solid #FF6B35':'2px solid transparent'}">
+        <div style="display:flex;justify-content:space-between;margin-bottom:3px">
+          <span style="font-weight:700;font-size:13px;color:#fff;text-transform:capitalize">${role}</span>
+          <span style="font-size:10px;color:rgba(255,255,255,0.3)">${new Date(c.last_message_at).toLocaleDateString()}</span>
+        </div>
+        <div style="font-size:11px;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:0.08em">Active thread</div>
+      </div>`;
+    }).join('');
+  } else {
+    if(!_inboxRequests.length){el.innerHTML='<div style="padding:24px;color:rgba(255,255,255,0.4);font-size:13px;text-align:center">No pending requests.</div>';return;}
+    el.innerHTML=_inboxRequests.map(r=>`
+      <div style="padding:16px;border-bottom:1px solid rgba(255,255,255,0.06)">
+        <div style="font-weight:700;font-size:13px;color:#fff;margin-bottom:4px;text-transform:capitalize">${r.conversations?.participant_a_role||'Someone'} wants to connect</div>
+        <div style="font-size:12px;color:rgba(255,255,255,0.4);margin-bottom:12px">${new Date(r.created_at).toLocaleDateString()}</div>
+        <div style="display:flex;gap:8px">
+          <button onclick="acceptInboxRequest('${r.id}','${r.conversation_id}')" style="flex:1;padding:7px 0;border-radius:8px;background:#FF6B35;color:#fff;border:none;font-weight:700;font-size:12px;cursor:pointer">Accept</button>
+          <button onclick="declineInboxRequest('${r.id}','${r.conversation_id}')" style="flex:1;padding:7px 0;border-radius:8px;background:transparent;color:rgba(255,255,255,0.4);border:1px solid rgba(255,255,255,0.15);font-weight:700;font-size:12px;cursor:pointer">Decline</button>
+        </div>
+      </div>`).join('');
+  }
+}
+
+async function openInboxConvo(convoId){
+  const uid=currentUser?.id;
+  _activeConvo=_inboxConvos.find(c=>c.id===convoId);
+  renderInboxList();
+  const {data:msgs}=await sb.from('messages').select('*').eq('conversation_id',convoId).order('created_at',{ascending:true});
+  await sb.from('messages').update({read_at:new Date().toISOString()}).eq('conversation_id',convoId).neq('sender_id',uid).is('read_at',null);
+  loadInboxConversations(uid);
+  const role=_activeConvo.participant_a===uid?_activeConvo.participant_b_role:_activeConvo.participant_a_role;
+  const thread=document.getElementById('inboxThread');
+  thread.innerHTML=`
+    <div style="padding:14px 20px;border-bottom:1px solid rgba(255,255,255,0.08);display:flex;align-items:center;gap:12px;width:100%;flex-shrink:0">
+      <div style="width:34px;height:34px;border-radius:50%;background:rgba(255,107,53,0.15);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;color:#FF6B35">${role[0].toUpperCase()}</div>
+      <div style="font-weight:700;font-size:14px;color:#fff;text-transform:capitalize">${role}</div>
+    </div>
+    <div id="msgFeed" style="flex:1;overflow-y:auto;padding:16px 20px;display:flex;flex-direction:column;gap:10px;width:100%"></div>
+    <div style="padding:12px 20px;border-top:1px solid rgba(255,255,255,0.08);width:100%">
+      <div style="display:flex;gap:8px;align-items:flex-end">
+        <textarea id="msgInput" placeholder="Type a message..." rows="2" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendInboxMessage();}" style="flex:1;resize:none;border-radius:10px;padding:10px 14px;font-size:14px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);color:#fff;font-family:inherit"></textarea>
+        <button onclick="sendInboxMessage()" style="width:38px;height:38px;border-radius:10px;background:#FF6B35;border:none;color:#fff;cursor:pointer;font-size:16px">↑</button>
+      </div>
+    </div>`;
+  thread.style.cssText='flex:1;display:flex;flex-direction:column;align-items:unset;justify-content:unset';
+  renderMsgFeed(msgs||[],uid);
+  if(_inboxChannel) sb.removeChannel(_inboxChannel);
+  _inboxChannel=sb.channel('inbox-att-'+convoId)
+    .on('postgres_changes',{event:'INSERT',schema:'public',table:'messages',filter:'conversation_id=eq.'+convoId},
+      async p=>{const f=document.getElementById('msgFeed');if(f){f.innerHTML+=renderMsgBubble(p.new,uid);document.getElementById('msgFeedBottom')?.scrollIntoView({behavior:'smooth'});}}).subscribe();
+}
+
+function renderMsgBubble(m,uid){
+  const mine=m.sender_id===uid;
+  const ts=new Date(m.created_at).toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
+  return `<div style="display:flex;flex-direction:column;align-items:${mine?'flex-end':'flex-start'}">
+    <div style="max-width:70%;background:${mine?'#FF6B35':'rgba(255,255,255,0.07)'};color:#fff;border-radius:${mine?'16px 16px 4px 16px':'16px 16px 16px 4px'};padding:10px 14px;font-size:14px;line-height:1.5">${m.body||''}</div>
+    <div style="font-size:10px;color:rgba(255,255,255,0.3);margin-top:4px">${ts}</div>
+  </div>`;
+}
+
+function renderMsgFeed(msgs,uid){
+  const feed=document.getElementById('msgFeed');if(!feed)return;
+  feed.innerHTML=msgs.map(m=>renderMsgBubble(m,uid)).join('')+'<div id="msgFeedBottom"></div>';
+  document.getElementById('msgFeedBottom')?.scrollIntoView();
+}
+
+async function sendInboxMessage(){
+  const uid=currentUser?.id;
+  const input=document.getElementById('msgInput');
+  const body=input?.value.trim();
+  if(!body)return;
+  await sb.from('messages').insert({conversation_id:_activeConvo.id,sender_id:uid,sender_role:'attendee',body});
+  if(input)input.value='';
+  const {data:msgs}=await sb.from('messages').select('*').eq('conversation_id',_activeConvo.id).order('created_at',{ascending:true});
+  renderMsgFeed(msgs||[],uid);
+}
+
+async function acceptInboxRequest(reqId,convoId){
+  await sb.from('message_requests').update({status:'accepted'}).eq('id',reqId);
+  await sb.from('conversations').update({status:'active'}).eq('id',convoId);
+  switchInboxTab('messages');loadInboxConversations(currentUser?.id);
+}
+async function declineInboxRequest(reqId,convoId){
+  await sb.from('message_requests').update({status:'declined'}).eq('id',reqId);
+  await sb.from('conversations').update({status:'archived'}).eq('id',convoId);
+  loadInboxConversations(currentUser?.id);
+}
 
 // ── FILTER CHIPS ────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', function() {
