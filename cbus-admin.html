@@ -1665,24 +1665,15 @@ async function deletePlanner(userId){
  await renderPlanners();
 }
 
-async function renderVendors(){
- document.getElementById('pageContent').innerHTML='<div class="spinner"></div>';
- // Always re-fetch so new signups appear without reloading the page
- try {
-   const {data} = await sb.from('vendors').select('*').order('created_at',{ascending:false});
-   allVendors = data || [];
- } catch(e) {}
+function renderVendors(){
  document.getElementById('pageContent').innerHTML=`
  <div class="table-card">
    <div class="table-header">
      <div>
        <div class="table-title">All Vendors</div>
-       <div class="table-title-sub">${allVendors.length} total &nbsp;·&nbsp; ${allVendors.filter(v=>v.subscription_status==='active'||v.tier==='premium'||v.tier==='standard').length} paid &nbsp;·&nbsp; ${allVendors.filter(v=>!v.subscription_tier&&!v.tier).length} free tier</div>
+       <div class="table-title-sub">${allVendors.length} total &nbsp;·&nbsp; ${allVendors.filter(v=>v.subscription_status==='active'||v.tier==='premium'||v.tier==='standard').length} paid</div>
      </div>
-     <div style="display:flex;gap:8px;align-items:center">
-       <button onclick="renderVendors()" style="background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:7px 14px;font-size:12px;font-weight:600;color:var(--sub);cursor:pointer;font-family:var(--font)" onmouseover="this.style.color='var(--text)'" onmouseout="this.style.color='var(--sub)'">↻ Refresh</button>
-       <input class="search-input" placeholder="Search vendors..." oninput="searchVendors(this.value)" style="width:220px;">
-     </div>
+     <input class="search-input" placeholder="Search vendors..." oninput="searchVendors(this.value)" style="width:220px;">
    </div>
    <div id="vendorListBody" style="padding:8px 16px 16px;display:flex;flex-direction:column;gap:8px;">
      ${renderVendorCards(allVendors)}
@@ -2492,21 +2483,22 @@ async function renderClaims(){
   const el=document.getElementById('pageContent');
   el.innerHTML='<div class="spinner"></div>';
 
-  // Load both venue claims (legacy) and new event_claims
-  const [venueRes, eventRes] = await Promise.all([
-    sb.from('venues')
-      .select('id,name,venue_type,neighborhood,status,claim_status,claim_email,claimed_at,owner_id')
-      .not('claim_status','is',null)
-      .order('claimed_at',{ascending:false})
-      .catch(()=>({data:[]})),
-    sb.from('event_claims')
-      .select('*,external_events(title,source,start_time,venue_name)')
-      .order('created_at',{ascending:false})
-      .catch(()=>({data:[]}))
-  ]);
-
-  const venueClaims=(venueRes.data||[]);
-  const eventClaims=(eventRes.data||[]);
+  let venueClaims=[], eventClaims=[];
+  try {
+    const [venueRes, eventRes] = await Promise.all([
+      sb.from('venues')
+        .select('id,name,venue_type,neighborhood,status,claim_status,claim_email,claimed_at,owner_id')
+        .not('claim_status','is',null)
+        .order('claimed_at',{ascending:false}),
+      sb.from('event_claims')
+        .select('*,external_events(title,source,start_time,venue_name)')
+        .order('created_at',{ascending:false})
+    ]);
+    venueClaims = venueRes.data || [];
+    eventClaims = eventRes.data || [];
+  } catch(e) {
+    console.error('renderClaims fetch error:', e);
+  }
   const pendingVenue=venueClaims.filter(c=>c.claim_status==='pending');
   const pendingEvent=eventClaims.filter(c=>c.status==='pending');
   const totalPending=pendingVenue.length+pendingEvent.length;
@@ -2594,15 +2586,19 @@ async function renderExternalSync(){
   const el=document.getElementById('pageContent');
   el.innerHTML='<div class="spinner"></div>';
 
-  const [sourceRes, extRes, claimRes] = await Promise.all([
-    sb.from('sync_source_controls').select('*').catch(()=>({data:[]})),
-    sb.from('external_events').select('id,title,source,status,venue_name,start_time,created_at').order('start_time',{ascending:true}).catch(()=>({data:[],count:0})),
-    sb.from('event_claims').select('id,status',{count:'exact'}).eq('status','pending').catch(()=>({data:[],count:0}))
-  ]);
-
-  const sources=sourceRes.data||[];
-  const extEvents=extRes.data||[];
-  const pendingClaims=claimRes.count||0;
+  let sources=[], extEvents=[], pendingClaims=0;
+  try {
+    const [sourceRes, extRes, claimRes] = await Promise.all([
+      sb.from('sync_source_controls').select('*'),
+      sb.from('external_events').select('id,title,source,status,venue_name,start_time,created_at').order('start_time',{ascending:true}),
+      sb.from('event_claims').select('id,status',{count:'exact',head:true}).eq('status','pending')
+    ]);
+    sources       = sourceRes.data  || [];
+    extEvents     = extRes.data     || [];
+    pendingClaims = claimRes.count  || 0;
+  } catch(e) {
+    console.error('renderExternalSync fetch error:', e);
+  }
 
   // Group by source
   const bySource={};
