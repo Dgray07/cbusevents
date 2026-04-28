@@ -78,7 +78,98 @@
   --r-lg:  14px;
   --r-xl:  16px;
   --r-full: 9999px;
+  --nav-bg: rgba(8,8,16,0.92);
+  --nav-border: rgba(255,255,255,0.07);
 }
+
+/* ── LIGHT THEME ── */
+[data-theme="light"] {
+  --bg:         #f5f2ed;
+  --surface:    #eeebe4;
+  --card:       #ffffff;
+  --card-hover: #f9f7f4;
+  --border:     #e0dbd2;
+  --border-sub: #e8e4dc;
+  --text:       #1a1814;
+  --sub:        #6b6560;
+  --muted:      #a09890;
+  --orange:     #e85a20;
+  --orange-dim: rgba(232,90,32,0.08);
+  --orange-border: rgba(232,90,32,0.22);
+  --green:      #16a34a;
+  --green-dim:  rgba(22,163,74,0.08);
+  --green-border: rgba(22,163,74,0.2);
+  --red:        #dc2626;
+  --blue:       #4f46e5;
+  --blue-dim:   rgba(79,70,229,0.08);
+  --blue-border:rgba(79,70,229,0.2);
+  --gold:       #d97706;
+  --nav-bg: rgba(245,242,237,0.95);
+  --nav-border: rgba(0,0,0,0.08);
+}
+
+/* ── THEME SWITCHER BUTTON ── */
+.theme-toggle {
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  background: var(--card);
+  border: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; transition: all 0.2s;
+  flex-shrink: 0; color: var(--text); font-size: 16px;
+}
+.theme-toggle:hover { border-color: var(--orange); transform: rotate(15deg); }
+
+/* ── LIGHT THEME ADJUSTMENTS ── */
+[data-theme="light"] nav {
+  background: var(--nav-bg);
+  border-bottom-color: var(--nav-border);
+}
+[data-theme="light"] .nav-logo { color: var(--text); }
+[data-theme="light"] .nav-link { color: rgba(26,24,20,0.5); }
+[data-theme="light"] .nav-link:hover,
+[data-theme="light"] .nav-link.active { background: rgba(0,0,0,0.05); color: var(--text); }
+[data-theme="light"] body { background: var(--bg); color: var(--text); }
+[data-theme="light"] .rh-sub, [data-theme="light"] .rh-section-sub,
+[data-theme="light"] .rh-benefit-desc, [data-theme="light"] .rh-community-desc { color: var(--sub); }
+[data-theme="light"] .rh-event-card-venue, [data-theme="light"] .rh-venue-meta { color: var(--muted); }
+[data-theme="light"] #sticky-cta-bar { background: rgba(245,242,237,0.95); border-top-color: rgba(232,90,32,0.2); }
+[data-theme="light"] .sticky-nav-btn { background: rgba(0,0,0,0.05); color: rgba(26,24,20,0.6); border-color: rgba(0,0,0,0.1); }
+[data-theme="light"] #sticky-cta-sub { color: rgba(26,24,20,0.35); }
+[data-theme="light"] .nav-mobile-menu { background: rgba(245,242,237,0.99); }
+[data-theme="light"] .nav-mobile-link { color: var(--text); }
+[data-theme="light"] .rh-headline { color: var(--text); }
+[data-theme="light"] #heroParticleCanvas { opacity: 0.4; }
+[data-theme="light"] .rh-section.dark { background: #eae6df; }
+[data-theme="light"] .rh-trust-bar { background: #eae6df; }
+[data-theme="light"] .rh-trust-item { color: var(--muted); }
+[data-theme="light"] .rh-proof-num { color: var(--sub); }
+[data-theme="light"] .proof-sep { background: var(--border); }
+[data-theme="light"] .rh-final { background: linear-gradient(135deg,rgba(232,90,32,0.06),rgba(232,90,32,0.01)); border-top-color: rgba(232,90,32,0.15); }
+[data-theme="light"] .rh-final-sub { color: var(--sub); }
+[data-theme="light"] .tag { background: var(--surface); color: var(--sub); }
+[data-theme="light"] .rh-chip { background: rgba(0,0,0,0.06); color: var(--sub); }
+[data-theme="light"] .rh-event-arrow { color: rgba(26,24,20,0.2); }
+[data-theme="light"] .rh-event-cat { color: rgba(26,24,20,0.4); }
+[data-theme="light"] .rh-event:hover { border-color: rgba(0,0,0,0.15); }
+[data-theme="light"] .rh-stat-label { color: var(--muted); }
+[data-theme="light"] .rh-stat { background: var(--card); border-color: var(--border); }
+[data-theme="light"] .rh-venue-tag { background: rgba(0,0,0,0.5); }
+[data-theme="light"] .rh-venue-img::after { background: linear-gradient(to top, rgba(245,242,237,0.85) 0%, rgba(245,242,237,0.1) 60%, transparent 100%); }
+[data-theme="light"] .rh-venue-name { color: var(--text); }
+[data-theme="light"] #columbusMenu { background: var(--card); border-color: var(--border); box-shadow: 0 16px 40px rgba(0,0,0,0.12); }
+[data-theme="light"] .search-input, [data-theme="light"] .search-select { background: var(--card); color: var(--text); border-color: var(--border); }
+[data-theme="light"] .field input, [data-theme="light"] .field textarea, [data-theme="light"] .field select { background: var(--surface); color: var(--text); border-color: var(--border); }
+[data-theme="light"] .hero-ticker { background: rgba(245,242,237,0.9); border-top-color: rgba(232,90,32,0.12); }
+[data-theme="light"] .ticker-item { color: rgba(26,24,20,0.55); }
+
+/* Feed section light adjustments */
+[data-theme="light"] .feed-time-tab { background: var(--card); border-color: var(--border); color: var(--sub); }
+[data-theme="light"] .feed-time-tab.active { background: var(--orange); color: #fff; border-color: var(--orange); }
+[data-theme="light"] .feed-card { background: var(--card); border-color: var(--border); }
+[data-theme="light"] .feed-card:hover { border-color: var(--orange); }
+[data-theme="light"] .feed-source-badge { background: rgba(232,90,32,0.1); color: var(--orange); border-color: rgba(232,90,32,0.2); }
+[data-theme="light"] .feed-ext-badge { background: rgba(0,0,0,0.06); color: var(--muted); }
 html { scroll-behavior: smooth; }
 body { background:var(--bg); color:var(--text); font-family:var(--font); }
 a { text-decoration:none; color:inherit; }
@@ -92,8 +183,8 @@ button { cursor:pointer; font-family:var(--font); border:none; }
 /* ── NAV ── */
 nav {
  position:sticky; top:0; z-index:100;
- background:rgba(8,8,16,0.92); backdrop-filter:blur(20px);
- border-bottom:1px solid rgba(255,255,255,0.07);
+ background:var(--nav-bg); backdrop-filter:blur(20px);
+ border-bottom:1px solid var(--nav-border);
  display:flex; align-items:center; justify-content:space-between;
  padding:0 48px; height:62px;
 }
@@ -970,7 +1061,155 @@ footer { background:var(--surface); border-top:1px solid var(--border); padding:
   .hero-cards-desktop { display:none !important; }
 }
 
-/* ── ADA COMPLIANCE ── */
+/* ── LIVE EVENT FEED ── */
+.feed-section { padding: 52px 48px; }
+@media(max-width:768px){ .feed-section { padding: 36px 16px; } }
+
+.feed-header { display:flex; align-items:flex-end; justify-content:space-between; margin-bottom:20px; flex-wrap:wrap; gap:12px; }
+.feed-title-block {}
+.feed-eyebrow { font-family:var(--mono); font-size:9px; font-weight:700; letter-spacing:0.2em; text-transform:uppercase; color:var(--orange); margin-bottom:7px; display:flex; align-items:center; gap:7px; }
+.feed-live-dot { width:6px; height:6px; border-radius:50%; background:var(--orange); animation:heroPulse 2s infinite; flex-shrink:0; }
+.feed-title { font-family:var(--font); font-size:clamp(22px,3vw,30px); font-weight:800; letter-spacing:-0.03em; color:var(--text); }
+.feed-title span { color:var(--orange); }
+
+.feed-time-tabs { display:flex; gap:6px; flex-wrap:wrap; margin-bottom:20px; }
+.feed-time-tab {
+  font-family:var(--mono); font-size:10px; font-weight:700; letter-spacing:0.1em; text-transform:uppercase;
+  padding:7px 16px; border-radius:var(--r-full); border:1px solid var(--border);
+  background:var(--card); color:var(--sub); cursor:pointer; transition:all 0.15s;
+}
+.feed-time-tab:hover { border-color:var(--orange); color:var(--orange); }
+.feed-time-tab.active { background:var(--orange); color:#fff; border-color:var(--orange); }
+
+.feed-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:14px; }
+@media(max-width:560px){ .feed-grid { grid-template-columns:1fr; } }
+
+.feed-card {
+  background:var(--card); border:1px solid var(--border); border-radius:var(--r-lg);
+  overflow:hidden; cursor:pointer; transition:all 0.2s; display:flex; flex-direction:column;
+}
+.feed-card:hover { border-color:var(--orange); transform:translateY(-2px); box-shadow:0 8px 28px rgba(0,0,0,0.3); }
+.feed-card-img { height:140px; position:relative; overflow:hidden; background:var(--surface); flex-shrink:0; }
+.feed-card-img img { width:100%; height:100%; object-fit:cover; }
+.feed-card-img-placeholder { width:100%; height:100%; display:flex; align-items:center; justify-content:center; font-size:40px; background:linear-gradient(135deg,rgba(255,107,53,0.06),rgba(129,140,248,0.04)); }
+.feed-card-body { padding:14px 16px; flex:1; display:flex; flex-direction:column; gap:4px; }
+.feed-card-top { display:flex; align-items:center; justify-content:space-between; margin-bottom:4px; }
+.feed-card-cat { font-family:var(--mono); font-size:9px; font-weight:700; letter-spacing:1.2px; text-transform:uppercase; color:var(--orange); }
+.feed-source-badge { font-family:var(--mono); font-size:8px; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; padding:2px 7px; border-radius:4px; background:var(--orange-dim); color:var(--orange); border:1px solid var(--orange-border); }
+.feed-ext-badge { font-family:var(--mono); font-size:8px; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; padding:2px 7px; border-radius:4px; background:rgba(255,255,255,0.05); color:var(--muted); border:1px solid var(--border); }
+.feed-card-title { font-family:var(--font); font-weight:700; font-size:14px; color:var(--text); line-height:1.3; }
+.feed-card-venue { font-size:11px; color:var(--muted); }
+.feed-card-footer { display:flex; align-items:center; justify-content:space-between; margin-top:8px; }
+.feed-card-date { font-family:var(--mono); font-size:10px; color:var(--sub); }
+.feed-card-price { font-size:11px; font-weight:700; }
+.feed-card-price.free { color:var(--green); }
+.feed-card-price.paid { color:var(--text); }
+.feed-tonight-badge { position:absolute; top:10px; left:10px; background:var(--orange); color:#fff; font-family:var(--mono); font-size:8px; font-weight:700; letter-spacing:1px; text-transform:uppercase; padding:3px 8px; border-radius:4px; }
+.feed-free-badge { position:absolute; top:10px; right:10px; background:rgba(0,0,0,0.65); backdrop-filter:blur(6px); color:#fff; font-family:var(--mono); font-size:8px; font-weight:700; padding:3px 8px; border-radius:4px; }
+
+.feed-empty { text-align:center; padding:52px 20px; color:var(--sub); grid-column:1/-1; }
+.feed-empty-icon { font-size:36px; margin-bottom:12px; }
+.feed-load-more { display:block; width:100%; margin-top:20px; padding:13px; background:var(--card); border:1px solid var(--border); border-radius:var(--r-md); font-family:var(--mono); font-size:10px; font-weight:700; letter-spacing:0.12em; text-transform:uppercase; color:var(--sub); cursor:pointer; transition:all 0.15s; }
+.feed-load-more:hover { border-color:var(--orange); color:var(--orange); }
+.feed-count-label { font-family:var(--mono); font-size:10px; color:var(--muted); }
+
+/* ── PRIMARY FEED TABS ── */
+.feed-primary-tabs { display:flex; gap:8px; margin-bottom:20px; border-bottom:1px solid var(--border); padding-bottom:0; }
+.feed-primary-tab {
+  display:flex; align-items:center; gap:7px;
+  font-family:var(--font); font-size:14px; font-weight:700;
+  padding:10px 20px; border-radius:10px 10px 0 0;
+  background:none; border:none; border-bottom:2px solid transparent;
+  color:var(--sub); cursor:pointer; transition:all 0.18s;
+  position:relative; bottom:-1px;
+}
+.feed-primary-tab:hover { color:var(--text); }
+.feed-primary-tab.active { color:var(--orange); border-bottom-color:var(--orange); background:var(--orange-dim); }
+.feed-primary-tab-icon { font-size:15px; }
+.feed-primary-tab-badge {
+  background:var(--orange); color:#fff;
+  font-family:var(--mono); font-size:9px; font-weight:800;
+  padding:2px 7px; border-radius:20px; margin-left:2px;
+}
+
+/* ── CALENDAR TOOLBAR ── */
+.cal-toolbar { display:flex; align-items:center; justify-content:space-between; margin-bottom:20px; flex-wrap:wrap; gap:12px; }
+.cal-sort-row { display:flex; align-items:center; gap:6px; }
+.cal-sort-btn {
+  font-family:var(--mono); font-size:9px; font-weight:700; letter-spacing:0.08em;
+  text-transform:uppercase; padding:5px 12px; border-radius:var(--r-full);
+  background:none; border:1px solid var(--border); color:var(--muted); cursor:pointer; transition:all 0.15s;
+}
+.cal-sort-btn.active, .cal-sort-btn:hover { border-color:var(--orange); color:var(--orange); }
+
+/* ── COLUMBUS CALENDAR TIMELINE ── */
+#calendarFeed { display:flex; flex-direction:column; gap:12px; }
+
+.cal-post {
+  background:var(--card); border:1px solid var(--border); border-radius:var(--r-lg);
+  overflow:hidden; transition:border-color 0.2s;
+}
+.cal-post:hover { border-color:rgba(255,255,255,0.12); }
+
+.cal-post-inner { display:flex; gap:0; }
+.cal-post-img {
+  width:120px; flex-shrink:0; position:relative; overflow:hidden;
+  background:var(--surface); min-height:100px;
+}
+.cal-post-img img { width:100%; height:100%; object-fit:cover; position:absolute; inset:0; }
+.cal-post-img-placeholder { width:100%; height:100%; display:flex; align-items:center; justify-content:center; font-size:32px; position:absolute; inset:0; background:linear-gradient(135deg,rgba(255,107,53,0.06),rgba(129,140,248,0.04)); }
+@media(max-width:560px){ .cal-post-img { width:80px; } }
+
+.cal-post-body { flex:1; padding:14px 16px; display:flex; flex-direction:column; gap:4px; min-width:0; }
+.cal-post-top { display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+.cal-post-cat { font-family:var(--mono); font-size:9px; font-weight:700; letter-spacing:1.2px; text-transform:uppercase; color:var(--orange); }
+.cal-post-source { font-family:var(--mono); font-size:8px; padding:2px 7px; border-radius:4px; background:rgba(255,255,255,0.05); color:var(--muted); border:1px solid var(--border); text-transform:uppercase; letter-spacing:0.08em; font-weight:700; }
+.cal-post-title { font-family:var(--font); font-weight:700; font-size:15px; color:var(--text); line-height:1.3; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.cal-post-meta { font-size:12px; color:var(--muted); display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+
+.cal-post-actions { display:flex; align-items:center; gap:0; border-top:1px solid var(--border); }
+.cal-action-btn {
+  flex:1; display:flex; align-items:center; justify-content:center; gap:6px;
+  padding:10px 8px; background:none; border:none; border-right:1px solid var(--border);
+  font-family:var(--font); font-size:12px; font-weight:600; color:var(--sub);
+  cursor:pointer; transition:all 0.15s;
+}
+.cal-action-btn:last-child { border-right:none; }
+.cal-action-btn:hover { background:var(--surface); color:var(--text); }
+.cal-action-btn.liked { color:#ef4444; }
+.cal-action-btn.liked:hover { color:#ef4444; }
+.cal-action-btn .cal-count { font-family:var(--mono); font-size:11px; font-weight:700; }
+
+/* Comments drawer */
+.cal-comments-drawer {
+  border-top:1px solid var(--border); background:var(--surface);
+  padding:0; max-height:0; overflow:hidden; transition:max-height 0.3s ease, padding 0.2s;
+}
+.cal-comments-drawer.open { max-height:400px; padding:14px 16px; overflow-y:auto; }
+.cal-comment-item { display:flex; gap:10px; margin-bottom:12px; }
+.cal-comment-avatar { width:28px; height:28px; border-radius:50%; background:var(--orange-dim); border:1px solid var(--orange-border); display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; color:var(--orange); flex-shrink:0; }
+.cal-comment-bubble { flex:1; background:var(--card); border:1px solid var(--border); border-radius:0 10px 10px 10px; padding:8px 12px; }
+.cal-comment-author { font-size:11px; font-weight:700; color:var(--text); margin-bottom:3px; }
+.cal-comment-body { font-size:13px; color:var(--sub); line-height:1.5; }
+.cal-comment-time { font-family:var(--mono); font-size:9px; color:var(--muted); margin-top:3px; }
+.cal-comment-input-row { display:flex; gap:8px; margin-top:10px; padding-top:10px; border-top:1px solid var(--border); }
+.cal-comment-input { flex:1; background:var(--card); border:1px solid var(--border); border-radius:8px; padding:8px 12px; color:var(--text); font-family:var(--font); font-size:13px; outline:none; }
+.cal-comment-input:focus { border-color:var(--orange); }
+.cal-comment-submit { background:var(--orange); color:#fff; border:none; border-radius:8px; padding:8px 14px; font-family:var(--font); font-size:12px; font-weight:700; cursor:pointer; white-space:nowrap; transition:opacity 0.15s; }
+.cal-comment-submit:hover { opacity:0.85; }
+.cal-post-claim { padding:8px 16px; border-top:1px solid var(--border-sub); text-align:right; }
+.cal-claim-link { font-family:var(--mono); font-size:9px; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; color:var(--muted); background:none; border:none; cursor:pointer; transition:color 0.15s; }
+.cal-claim-link:hover { color:var(--orange); }
+
+/* Light theme adjustments for calendar */
+[data-theme="light"] .cal-post { background:var(--card); border-color:var(--border); }
+[data-theme="light"] .cal-post-source { background:rgba(0,0,0,0.05); color:var(--muted); border-color:var(--border); }
+[data-theme="light"] .cal-action-btn { color:var(--sub); }
+[data-theme="light"] .cal-action-btn:hover { background:var(--surface); }
+[data-theme="light"] .cal-comments-drawer { background:var(--surface); }
+[data-theme="light"] .cal-comment-bubble { background:var(--card); border-color:var(--border); }
+[data-theme="light"] .cal-comment-input { background:var(--card); border-color:var(--border); color:var(--text); }
+[data-theme="light"] .feed-primary-tab.active { background:rgba(232,90,32,0.08); }
 /* Skip navigation */
 .skip-link{position:absolute;top:-100px;left:8px;background:var(--orange,#FF6B35);color:#fff;padding:8px 16px;border-radius:0 0 8px 8px;font-weight:700;font-size:14px;z-index:99999;text-decoration:none;transition:top 0.2s;}
 .skip-link:focus{top:0;}
@@ -1198,6 +1437,7 @@ h1,h2,h3,h4,h5,h6{font-family:var(--font);letter-spacing:-0.02em;}
   </div>
 </div> </div>
 <button class="nav-hamburger" id="navHamburger" aria-label="Menu"><span></span><span></span><span></span></button>
+<button class="theme-toggle" id="themeToggle" aria-label="Toggle theme" title="Toggle light/dark mode">☀️</button>
 </nav>
 <div id="navMobileMenu" class="nav-mobile-menu">
   <a onclick="showPage('home')" class="nav-mobile-link" style="cursor:pointer">Home</a>
@@ -1321,6 +1561,7 @@ async function init(){
  // Home page: render hero instantly, load data in background then update
  if(rParam) history.replaceState({},'',pathToRoute);
  renderHome(); // immediate render — hero visible in <1s
+ initFeed();   // show feed immediately (empty state until data loads)
 
  try {
    const [vRes,eRes,vendRes]=await Promise.all([
@@ -1333,6 +1574,7 @@ async function init(){
    allEvents=eRes.data||[];
    allVendors=vendRes.data||[];
    renderHome(); // re-render once data is ready
+   initFeed();   // populate live feed
  } catch(e) {
    allVenues=[];
    allEvents=[];
@@ -1687,48 +1929,101 @@ function renderHome(){
  </section>
 
  <!-- ══════════════════════════════════════════
-      UPCOMING EVENTS GRID
+      TWO-TAB EVENT FEED
  ══════════════════════════════════════════ -->
- <section id="eventsSection" style="padding:40px 48px 48px">
-   <div style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:24px">
-     <div>
-       <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.2em;text-transform:uppercase;color:var(--orange);margin-bottom:6px">Happening in Columbus</div>
-       <h2 id="eventsGridTitle" style="font-family:var(--font);font-size:22px;font-weight:800;letter-spacing:-0.03em;color:var(--text)">Upcoming Events</h2>
+ <section class="feed-section" id="liveFeedSection">
+
+   <!-- Section header -->
+   <div class="feed-header">
+     <div class="feed-title-block">
+       <div class="feed-eyebrow"><span class="feed-live-dot"></span> Columbus, Ohio</div>
+       <h2 class="feed-title" id="feedMainTitle">What's Happening <span>Tonight</span></h2>
      </div>
-     <button onclick="showPage('events')" style="font-family:var(--mono);font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:var(--orange);background:none;border:none;cursor:pointer">View All</button>
+     <button onclick="showPage('events')" style="background:none;border:none;cursor:pointer;color:var(--orange);font-family:var(--mono);font-size:10px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase">View All →</button>
    </div>
-   ${allUpcoming.length === 0 ? `
-     <div style="text-align:center;padding:48px 20px;color:var(--sub)">
-       <div style="font-size:15px;font-weight:600;margin-bottom:6px">No upcoming events yet</div>
-       <div style="font-size:13px;color:var(--muted)">Check back soon</div>
-     </div>` : `
-   <div id="homeEventsGrid" style="display:flex;gap:16px;overflow-x:auto;padding-bottom:12px;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;scrollbar-width:none;-ms-overflow-style:none">
-   <style>#homeEventsGrid::-webkit-scrollbar{display:none}#homeEventsGrid>div{scroll-snap-align:start;flex:0 0 72vw;max-width:280px}@media(min-width:768px){#homeEventsGrid{display:grid!important;grid-template-columns:repeat(auto-fill,minmax(220px,1fr))!important;overflow-x:visible!important}#homeEventsGrid>div{flex:unset!important;max-width:unset!important}}</style>
-     ${allUpcoming.map(e=>{
-       const venueName = e.venue_name_override||e.venues?.name||'Columbus Venue';
-       const img = e.cover_image_url;
-       return `
-         <div onclick="this.dataset.festivalUrl ? window.location.href=this.dataset.festivalUrl : openEventModal(this.dataset.id)"
-           data-id="${e.id}" data-festival-url="${e._festival_url||''}"
-           style="cursor:pointer;transition:transform 0.2s"
-           onmouseover="this.style.transform='translateY(-3px)'"
-           onmouseout="this.style.transform='translateY(0)'" role="button" tabindex="0">
-           <div style="width:100%;aspect-ratio:1/1;border-radius:16px;overflow:hidden;background:var(--surface);margin-bottom:14px;position:relative">
-             ${e._is_festival
-               ? '<div style="width:100%;height:100%;background:linear-gradient(135deg,#1a0800,#0f0a00,#1a1000);display:flex;align-items:center;justify-content:center;font-size:52px">🎪</div>'
-               : img
-                 ? '<img src="'+img+'" alt="'+e.title+'" style="width:100%;height:100%;object-fit:cover" loading="lazy">'
-                 : '<div style="width:100%;height:100%;background:linear-gradient(135deg,rgba(255,107,53,0.08),rgba(129,140,248,0.06));display:flex;align-items:center;justify-content:center;font-size:44px">'+HOME_EVENT_ICONS[allUpcoming.indexOf(e)%HOME_EVENT_ICONS.length]+'</div>'}
-             ${e.is_boosted?'<div style="position:absolute;top:10px;left:10px;background:var(--orange);color:#fff;font-family:var(--mono);font-size:8px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:3px 9px;border-radius:4px">Featured</div>':''}
-             ${e.is_free?'<div style="position:absolute;top:10px;right:10px;background:rgba(0,0,0,0.7);backdrop-filter:blur(6px);color:#fff;font-family:var(--mono);font-size:8px;font-weight:700;padding:3px 9px;border-radius:4px">Free</div>':''}
-           </div>
-           <div style="font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:var(--orange);margin-bottom:5px">${e.category||'Event'}</div>
-           <div style="font-family:var(--font);font-weight:700;font-size:15px;color:var(--text);margin-bottom:4px;line-height:1.25">${e.title}</div>
-           <div style="font-size:12px;color:var(--muted)">${venueName}</div>
-           <div style="font-size:12px;color:var(--sub);margin-top:3px">${fmt(e.start_time)}${fmtTime(e.start_time)?' · '+fmtTime(e.start_time):''}</div>
-         </div>`}).join('')}
-   </div>`}
+
+   <!-- Primary tab switcher: Events vs Columbus Calendar -->
+   <div class="feed-primary-tabs">
+     <button class="feed-primary-tab active" id="tabEvents" onclick="switchFeedTab('events')">
+       <span class="feed-primary-tab-icon">🎟</span> Events
+     </button>
+     <button class="feed-primary-tab" id="tabCalendar" onclick="switchFeedTab('calendar')">
+       <span class="feed-primary-tab-icon">📍</span> Columbus Calendar
+       <span class="feed-primary-tab-badge" id="calendarBadge" style="display:none"></span>
+     </button>
+   </div>
+
+   <!-- EVENTS PANEL -->
+   <div id="feedEventsPanel">
+     <div class="feed-time-tabs" id="feedTimeTabs">
+       <button class="feed-time-tab active" data-filter="tonight" onclick="setFeedFilter('tonight',this)">Tonight</button>
+       <button class="feed-time-tab" data-filter="tomorrow" onclick="setFeedFilter('tomorrow',this)">Tomorrow</button>
+       <button class="feed-time-tab" data-filter="weekend" onclick="setFeedFilter('weekend',this)">This Weekend</button>
+       <button class="feed-time-tab" data-filter="week" onclick="setFeedFilter('week',this)">This Week</button>
+       <button class="feed-time-tab" data-filter="all" onclick="setFeedFilter('all',this)">All Upcoming</button>
+     </div>
+     <div class="feed-grid" id="liveFeedGrid">
+       <div class="feed-empty"><div class="feed-empty-icon">📅</div><div>Loading events...</div></div>
+     </div>
+     <button class="feed-load-more" id="feedLoadMore" style="display:none" onclick="feedLoadMore()">Load More Events</button>
+   </div>
+
+   <!-- COLUMBUS CALENDAR PANEL -->
+   <div id="feedCalendarPanel" style="display:none">
+     <div class="cal-toolbar">
+       <div class="feed-time-tabs" style="margin-bottom:0">
+         <button class="feed-time-tab active" data-cal="all"    onclick="setCalFilter('all',this)">All</button>
+         <button class="feed-time-tab" data-cal="tonight"       onclick="setCalFilter('tonight',this)">Tonight</button>
+         <button class="feed-time-tab" data-cal="weekend"       onclick="setCalFilter('weekend',this)">Weekend</button>
+         <button class="feed-time-tab" data-cal="trending"      onclick="setCalFilter('trending',this)">🔥 Trending</button>
+       </div>
+       <div class="cal-sort-row">
+         <span style="font-family:var(--mono);font-size:9px;color:var(--muted);letter-spacing:0.1em;text-transform:uppercase">Sort:</span>
+         <button class="cal-sort-btn active" onclick="setCalSort('date',this)">Date</button>
+         <button class="cal-sort-btn" onclick="setCalSort('popular',this)">Most Liked</button>
+       </div>
+     </div>
+
+     <!-- Social timeline feed -->
+     <div id="calendarFeed">
+       <div class="feed-empty"><div class="feed-empty-icon">🗓</div><div>Loading Columbus Calendar...</div></div>
+     </div>
+     <button class="feed-load-more" id="calLoadMore" style="display:none" onclick="calLoadMore()">Load More</button>
+   </div>
+
  </section>
+
+ <!-- CLAIM MODAL -->
+ <div id="claimModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:600;display:flex;align-items:center;justify-content:center;padding:20px" onclick="if(event.target===this)closeClaimModal()">
+   <div style="background:var(--card);border:1px solid var(--border);border-radius:18px;max-width:460px;width:100%;padding:32px;position:relative">
+     <button onclick="closeClaimModal()" style="position:absolute;top:16px;right:16px;background:none;border:none;color:var(--muted);font-size:20px;cursor:pointer;line-height:1">✕</button>
+     <div style="font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:var(--orange);margin-bottom:8px">Claim This Event</div>
+     <div id="claimEventTitle" style="font-family:var(--font);font-size:18px;font-weight:800;margin-bottom:20px;line-height:1.2"></div>
+     <div id="claimFormBody">
+       <div style="margin-bottom:14px">
+         <label style="font-size:12px;color:var(--sub);font-weight:600;display:block;margin-bottom:6px">Your role</label>
+         <select id="claimRole" style="width:100%;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:10px 13px;color:var(--text);font-family:var(--font);font-size:14px;outline:none">
+           <option value="">Select your role...</option>
+           <option value="venue">Venue Owner</option>
+           <option value="planner">Event Planner / Organizer</option>
+           <option value="vendor">Vendor</option>
+           <option value="food_professional">Food Professional</option>
+         </select>
+       </div>
+       <div style="margin-bottom:14px">
+         <label style="font-size:12px;color:var(--sub);font-weight:600;display:block;margin-bottom:6px">Your email</label>
+         <input id="claimEmail" type="email" placeholder="you@email.com" style="width:100%;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:10px 13px;color:var(--text);font-family:var(--font);font-size:14px;outline:none">
+       </div>
+       <div style="margin-bottom:20px">
+         <label style="font-size:12px;color:var(--sub);font-weight:600;display:block;margin-bottom:6px">Your connection to this event <span style="color:var(--muted)">(optional)</span></label>
+         <textarea id="claimNote" placeholder="e.g. I organized this event, I own the venue..." style="width:100%;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:10px 13px;color:var(--text);font-family:var(--font);font-size:14px;outline:none;min-height:80px;resize:vertical"></textarea>
+       </div>
+       <div id="claimStatus" style="margin-bottom:12px;font-size:13px"></div>
+       <button onclick="submitClaim()" style="width:100%;background:var(--orange);color:#fff;border:none;border-radius:10px;padding:13px;font-family:var(--font);font-weight:700;font-size:15px;cursor:pointer">Submit Claim</button>
+       <div style="text-align:center;margin-top:12px;font-size:12px;color:var(--muted)">Not a member? <a href="https://cbusevents.com/signup.html" style="color:var(--orange);font-weight:600">Join free</a> to claim and manage events.</div>
+     </div>
+   </div>
+ </div>
 
  <!-- ══════════════════════════════════════════
       CATEGORY STRIP + MAP
@@ -3015,6 +3310,444 @@ document.addEventListener('click',function(e){
 
 // ── START ─────────────────────────────────────────────────────
 setNavActive('home');
+// ── THEME SWITCHER ────────────────────────────────────────────
+(function(){
+  const root = document.documentElement;
+  const btn  = document.getElementById('themeToggle');
+  const stored = localStorage.getItem('cbusevents_theme') || 'dark';
+  function applyTheme(t){
+    root.setAttribute('data-theme', t);
+    if(btn) btn.textContent = t === 'dark' ? '☀️' : '🌙';
+    localStorage.setItem('cbusevents_theme', t);
+  }
+  applyTheme(stored);
+  if(btn) btn.addEventListener('click', function(){
+    const current = root.getAttribute('data-theme') || 'dark';
+    applyTheme(current === 'dark' ? 'light' : 'dark');
+  });
+})();
+
+// ── FEED STATE ───────────────────────────────────────────────
+const FEED_PAGE_SIZE = 8;
+let feedFilter    = 'tonight';
+let feedPage      = 0;
+let feedAllEvents = [];
+let activeFeedTab = 'events'; // 'events' | 'calendar'
+
+// Columbus Calendar state
+let calFilter     = 'all';
+let calSort       = 'date';
+let calPage       = 0;
+let calEvents     = [];        // external_events from Supabase
+let userLikes     = new Set(); // external_event_ids liked by current user
+let openCommentId = null;      // which post has comments open
+let claimTargetId = null;      // external_event_id being claimed
+
+const FEED_ICONS = ['🎵','🎭','🍕','🎤','🎨','🥂','🎪','🎶','🏆','🌆'];
+
+// ── TIME HELPERS ─────────────────────────────────────────────
+function isTonight(dt){
+  const d=new Date(dt),n=new Date();
+  return d>=new Date(n.getFullYear(),n.getMonth(),n.getDate()) && d<new Date(n.getFullYear(),n.getMonth(),n.getDate()+1);
+}
+function isTomorrow(dt){
+  const d=new Date(dt),n=new Date();
+  return d>=new Date(n.getFullYear(),n.getMonth(),n.getDate()+1) && d<new Date(n.getFullYear(),n.getMonth(),n.getDate()+2);
+}
+function isThisWeekend(dt){
+  const d=new Date(dt),n=new Date();
+  const toFri=(5-n.getDay()+7)%7;
+  const fri=new Date(n.getFullYear(),n.getMonth(),n.getDate()+toFri);
+  const sun=new Date(n.getFullYear(),n.getMonth(),n.getDate()+toFri+2,23,59,59);
+  return d>=fri && d<=sun;
+}
+function isThisWeek7(dt){
+  const d=new Date(dt),n=new Date();
+  return d>=n && d<=new Date(n.getTime()+7*24*60*60*1000);
+}
+function timeAgo(dt){
+  const s=Math.floor((Date.now()-new Date(dt))/1000);
+  if(s<60)return'just now';
+  if(s<3600)return Math.floor(s/60)+'m ago';
+  if(s<86400)return Math.floor(s/3600)+'h ago';
+  return Math.floor(s/86400)+'d ago';
+}
+
+// ── PRIMARY TAB SWITCH ───────────────────────────────────────
+function switchFeedTab(tab){
+  activeFeedTab = tab;
+  document.getElementById('tabEvents').classList.toggle('active', tab==='events');
+  document.getElementById('tabCalendar').classList.toggle('active', tab==='calendar');
+  document.getElementById('feedEventsPanel').style.display   = tab==='events'   ? '' : 'none';
+  document.getElementById('feedCalendarPanel').style.display = tab==='calendar' ? '' : 'none';
+
+  const titleEl = document.getElementById('feedMainTitle');
+  if(tab === 'calendar'){
+    if(titleEl) titleEl.innerHTML = 'Columbus <span>Calendar</span>';
+    if(!calEvents.length) loadCalendarEvents();
+  } else {
+    const titles = {tonight:'Tonight',tomorrow:'Tomorrow',weekend:'This Weekend',week:'This Week',all:'Upcoming'};
+    if(titleEl) titleEl.innerHTML = 'What\'s Happening <span>'+(titles[feedFilter]||'Soon')+'</span>';
+  }
+}
+
+// ── EVENTS PANEL ─────────────────────────────────────────────
+function getFeedFiltered(){
+  const pool = feedAllEvents.filter(e => new Date(e.start_time) >= new Date());
+  if(feedFilter==='tonight')  return pool.filter(e=>isTonight(e.start_time));
+  if(feedFilter==='tomorrow') return pool.filter(e=>isTomorrow(e.start_time));
+  if(feedFilter==='weekend')  return pool.filter(e=>isThisWeekend(e.start_time));
+  if(feedFilter==='week')     return pool.filter(e=>isThisWeek7(e.start_time));
+  return pool;
+}
+
+function setFeedFilter(f, btn){
+  feedFilter = f; feedPage = 0;
+  document.querySelectorAll('.feed-time-tab').forEach(t=>t.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+  const titles={tonight:'Tonight',tomorrow:'Tomorrow',weekend:'This Weekend',week:'This Week',all:'Upcoming'};
+  const titleEl=document.getElementById('feedMainTitle');
+  if(titleEl) titleEl.innerHTML='What\'s Happening <span>'+(titles[f]||'Soon')+'</span>';
+  renderFeed();
+}
+
+function feedCardHTML(e, idx){
+  const venueName=e.venue_name_override||(e.venues&&e.venues.name)||e.venue_name||'Columbus Venue';
+  const tonight=isTonight(e.start_time);
+  const icon=FEED_ICONS[idx%FEED_ICONS.length];
+  const img=e.cover_image_url
+    ?`<img src="${e.cover_image_url}" alt="${e.title}" loading="lazy" onerror="this.parentNode.innerHTML='<div class=feed-card-img-placeholder>${icon}</div>'">`
+    :`<div class="feed-card-img-placeholder">${icon}</div>`;
+  const price=e.is_free?'<span class="feed-card-price free">Free</span>':(e.price_min?`<span class="feed-card-price paid">From $${e.price_min}</span>`:'');
+  const srcBadge=e.source_type==='external'
+    ?`<span class="feed-ext-badge">${e.source||'Columbus'}</span>`
+    :'<span class="feed-source-badge">CBUS Events</span>';
+  const clickFn=e._festival_url?`window.location.href='${e._festival_url}'`:e.source_type==='external'?`window.open('${e.ticket_url||'#'}','_blank')`:`openEventModal('${e.id}')`;
+  return `
+    <div class="feed-card" onclick="${clickFn}" role="button" tabindex="0">
+      <div class="feed-card-img">
+        ${img}
+        ${tonight?'<div class="feed-tonight-badge">Tonight</div>':''}
+        ${e.is_free?'<div class="feed-free-badge">Free</div>':''}
+      </div>
+      <div class="feed-card-body">
+        <div class="feed-card-top">
+          <span class="feed-card-cat">${e.category||'Event'}</span>
+          ${srcBadge}
+        </div>
+        <div class="feed-card-title">${e.title}</div>
+        <div class="feed-card-venue">📍 ${venueName}</div>
+        <div class="feed-card-footer">
+          <span class="feed-card-date">${fmt(e.start_time)}${fmtTime(e.start_time)?' · '+fmtTime(e.start_time):''}</span>
+          ${price}
+        </div>
+      </div>
+    </div>`;
+}
+
+function renderFeed(){
+  const grid=document.getElementById('liveFeedGrid');
+  const loadBtn=document.getElementById('feedLoadMore');
+  if(!grid) return;
+  const filtered=getFeedFiltered();
+  const page=filtered.slice(0,(feedPage+1)*FEED_PAGE_SIZE);
+  if(!filtered.length){
+    grid.innerHTML=`<div class="feed-empty"><div class="feed-empty-icon">📅</div><div style="font-weight:600;margin-bottom:4px">Nothing scheduled yet</div><div style="font-size:13px">Try "This Week" or "All Upcoming"</div></div>`;
+    if(loadBtn) loadBtn.style.display='none'; return;
+  }
+  grid.innerHTML=page.map((e,i)=>feedCardHTML(e,i)).join('');
+  if(loadBtn) loadBtn.style.display=page.length<filtered.length?'block':'none';
+}
+
+function feedLoadMore(){ feedPage++; renderFeed(); }
+
+function initFeed(){
+  feedAllEvents=(allEvents||[]).map(e=>({...e,source_type:'native'}));
+  const has1313=feedAllEvents.some(e=>e.title&&e.title.includes('1313'));
+  if(!has1313){
+    feedAllEvents.unshift({
+      id:'festival-1313',title:'1313 Festival',category:'Festival',
+      start_time:'2026-06-13T11:00:00',end_time:'2026-06-13T20:00:00',
+      is_free:true,_festival_url:'https://cbusevents.com/1313-festival-event.html',
+      venues:{name:'1313 E. Broad St'},source_type:'native',is_boosted:true
+    });
+  }
+  feedAllEvents.sort((a,b)=>new Date(a.start_time)-new Date(b.start_time));
+  renderFeed();
+  // Load external event count for badge
+  sb.from('external_events').select('id',{count:'exact',head:true}).eq('status','active')
+    .then(({count})=>{
+      if(count>0){
+        const badge=document.getElementById('calendarBadge');
+        if(badge){badge.textContent=count;badge.style.display='';}
+      }
+    }).catch(()=>{});
+  // Load user likes if logged in
+  if(currentUser){
+    sb.from('external_event_likes').select('external_event_id').eq('user_id',currentUser.id)
+      .then(({data})=>{(data||[]).forEach(r=>userLikes.add(r.external_event_id));})
+      .catch(()=>{});
+  }
+}
+
+// ── COLUMBUS CALENDAR ─────────────────────────────────────────
+async function loadCalendarEvents(){
+  const feed=document.getElementById('calendarFeed');
+  if(feed) feed.innerHTML='<div class="feed-empty"><div class="feed-empty-icon">🗓</div><div>Loading Columbus Calendar...</div></div>';
+  try {
+    const {data,error}=await sb.from('external_events')
+      .select('*').eq('status','active')
+      .gte('start_time',new Date().toISOString())
+      .order('start_time',{ascending:true})
+      .limit(100);
+    if(error) throw error;
+    calEvents=data||[];
+    calPage=0;
+    renderCalendar();
+  } catch(e){
+    if(feed) feed.innerHTML='<div class="feed-empty"><div class="feed-empty-icon">📡</div><div style="font-weight:600">Columbus Calendar coming soon</div><div style="font-size:13px;margin-top:4px">External events sync in progress</div></div>';
+  }
+}
+
+function getCalFiltered(){
+  let pool=[...calEvents];
+  if(calFilter==='tonight')  pool=pool.filter(e=>isTonight(e.start_time));
+  if(calFilter==='weekend')  pool=pool.filter(e=>isThisWeekend(e.start_time));
+  if(calFilter==='trending') pool=[...pool].sort((a,b)=>b.like_count-a.like_count);
+  else if(calSort==='popular') pool=[...pool].sort((a,b)=>b.like_count-a.like_count);
+  return pool;
+}
+
+function setCalFilter(f, btn){
+  calFilter=f; calPage=0;
+  document.querySelectorAll('[data-cal]').forEach(t=>t.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+  renderCalendar();
+}
+
+function setCalSort(s, btn){
+  calSort=s; calPage=0;
+  document.querySelectorAll('.cal-sort-btn').forEach(t=>t.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+  renderCalendar();
+}
+
+function calPostHTML(e, idx){
+  const icon=FEED_ICONS[idx%FEED_ICONS.length];
+  const liked=userLikes.has(e.id);
+  const img=e.cover_image_url
+    ?`<img src="${e.cover_image_url}" alt="${e.title}" loading="lazy" onerror="this.style.display='none'">`
+    :`<div class="cal-post-img-placeholder">${icon}</div>`;
+  const srcLabel={ticketmaster:'Ticketmaster',eventbrite:'Eventbrite',rss:'Columbus Underground',manual:'Columbus'}[e.source]||e.source||'Columbus';
+  const price=e.is_free?'<span style="color:var(--green);font-weight:700;font-size:11px">Free</span>':(e.price_min?`<span style="font-size:11px">From $${e.price_min}</span>`:'');
+  return `
+    <div class="cal-post" id="calpost-${e.id}">
+      <div class="cal-post-inner">
+        <div class="cal-post-img">${img}</div>
+        <div class="cal-post-body">
+          <div class="cal-post-top">
+            <span class="cal-post-cat">${e.category||'Event'}</span>
+            <span class="cal-post-source">${srcLabel}</span>
+          </div>
+          <div class="cal-post-title" title="${e.title}">${e.title}</div>
+          <div class="cal-post-meta">
+            <span>📍 ${e.venue_name||'Columbus'}</span>
+            <span>🕐 ${fmt(e.start_time)}${fmtTime(e.start_time)?' · '+fmtTime(e.start_time):''}</span>
+            ${price}
+          </div>
+        </div>
+      </div>
+      <div class="cal-post-actions">
+        <button class="cal-action-btn${liked?' liked':''}" onclick="toggleCalLike('${e.id}',this)" title="${currentUser?'Like':'Join free to like'}">
+          <span>${liked?'❤️':'🤍'}</span>
+          <span class="cal-count" id="likecount-${e.id}">${e.like_count||0}</span>
+        </button>
+        <button class="cal-action-btn" onclick="toggleCalComments('${e.id}')">
+          <span>💬</span>
+          <span class="cal-count" id="commentcount-${e.id}">${e.comment_count||0}</span>
+          Comments
+        </button>
+        ${e.ticket_url?`<button class="cal-action-btn" onclick="window.open('${e.ticket_url}','_blank')">🎟 Tickets</button>`:''}
+      </div>
+      <div class="cal-comments-drawer" id="comments-${e.id}">
+        <div id="commentslist-${e.id}"></div>
+        ${currentUser
+          ?`<div class="cal-comment-input-row">
+              <input class="cal-comment-input" id="commentinput-${e.id}" placeholder="Add a comment..." maxlength="500" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();submitComment('${e.id}');}">
+              <button class="cal-comment-submit" onclick="submitComment('${e.id}')">Post</button>
+            </div>`
+          :`<div style="text-align:center;padding:12px 0;font-size:13px;color:var(--muted)"><a href="https://cbusevents.com/signup.html" style="color:var(--orange);font-weight:600">Join free</a> to comment</div>`
+        }
+      </div>
+      <div class="cal-post-claim">
+        <button class="cal-claim-link" onclick="openClaimModal('${e.id}','${e.title.replace(/'/g,"\\'")}')">Is this your event? Claim it</button>
+      </div>
+    </div>`;
+}
+
+function renderCalendar(){
+  const feed=document.getElementById('calendarFeed');
+  const loadBtn=document.getElementById('calLoadMore');
+  if(!feed) return;
+  const filtered=getCalFiltered();
+  const page=filtered.slice(0,(calPage+1)*FEED_PAGE_SIZE);
+  if(!filtered.length){
+    feed.innerHTML=`<div class="feed-empty"><div class="feed-empty-icon">📡</div><div style="font-weight:600;margin-bottom:4px">No events found</div><div style="font-size:13px">Try a different filter</div></div>`;
+    if(loadBtn) loadBtn.style.display='none'; return;
+  }
+  feed.innerHTML=page.map((e,i)=>calPostHTML(e,i)).join('');
+  if(loadBtn) loadBtn.style.display=page.length<filtered.length?'block':'none';
+}
+
+function calLoadMore(){ calPage++; renderCalendar(); }
+
+// ── LIKE / UNLIKE ────────────────────────────────────────────
+async function toggleCalLike(eventId, btn){
+  if(!currentUser){
+    window.location.href='https://cbusevents.com/signup.html';
+    return;
+  }
+  const liked=userLikes.has(eventId);
+  const countEl=document.getElementById('likecount-'+eventId);
+  const current=parseInt(countEl?.textContent||'0');
+
+  // Optimistic update
+  if(liked){
+    userLikes.delete(eventId);
+    btn.classList.remove('liked');
+    btn.querySelector('span').textContent='🤍';
+    if(countEl) countEl.textContent=Math.max(0,current-1);
+  } else {
+    userLikes.add(eventId);
+    btn.classList.add('liked');
+    btn.querySelector('span').textContent='❤️';
+    if(countEl) countEl.textContent=current+1;
+  }
+
+  try {
+    if(liked){
+      await sb.from('external_event_likes').delete()
+        .eq('external_event_id',eventId).eq('user_id',currentUser.id);
+    } else {
+      await sb.from('external_event_likes').insert({external_event_id:eventId,user_id:currentUser.id});
+    }
+  } catch(e){
+    // Revert on error
+    if(liked){ userLikes.add(eventId); } else { userLikes.delete(eventId); }
+    renderCalendar();
+  }
+}
+
+// ── COMMENTS ─────────────────────────────────────────────────
+async function toggleCalComments(eventId){
+  const drawer=document.getElementById('comments-'+eventId);
+  if(!drawer) return;
+  const isOpen=drawer.classList.contains('open');
+  // Close any open drawer first
+  document.querySelectorAll('.cal-comments-drawer.open').forEach(d=>d.classList.remove('open'));
+  if(isOpen){ openCommentId=null; return; }
+  openCommentId=eventId;
+  drawer.classList.add('open');
+  await loadComments(eventId);
+}
+
+async function loadComments(eventId){
+  const list=document.getElementById('commentslist-'+eventId);
+  if(!list) return;
+  list.innerHTML='<div style="font-size:12px;color:var(--muted);padding:4px 0">Loading...</div>';
+  try {
+    const {data}=await sb.from('external_event_comments')
+      .select('*,profiles:user_id(full_name,email)')
+      .eq('external_event_id',eventId).eq('is_flagged',false)
+      .order('created_at',{ascending:true}).limit(50);
+    if(!data?.length){ list.innerHTML='<div style="font-size:12px;color:var(--muted);padding:4px 0">No comments yet. Be the first.</div>'; return; }
+    list.innerHTML=(data||[]).map(c=>{
+      const name=c.profiles?.full_name||c.profiles?.email?.split('@')[0]||'Anonymous';
+      const initials=name.charAt(0).toUpperCase();
+      return `<div class="cal-comment-item">
+        <div class="cal-comment-avatar">${initials}</div>
+        <div class="cal-comment-bubble">
+          <div class="cal-comment-author">${name}</div>
+          <div class="cal-comment-body">${c.body}</div>
+          <div class="cal-comment-time">${timeAgo(c.created_at)}</div>
+        </div>
+      </div>`;
+    }).join('');
+  } catch(e){
+    list.innerHTML='<div style="font-size:12px;color:var(--muted)">Could not load comments.</div>';
+  }
+}
+
+async function submitComment(eventId){
+  if(!currentUser){ window.location.href='https://cbusevents.com/signup.html'; return; }
+  const input=document.getElementById('commentinput-'+eventId);
+  const body=input?.value?.trim();
+  if(!body) return;
+  input.value='';
+  input.disabled=true;
+  try {
+    await sb.from('external_event_comments').insert({
+      external_event_id:eventId, user_id:currentUser.id, body
+    });
+    // Update comment count optimistically
+    const countEl=document.getElementById('commentcount-'+eventId);
+    if(countEl) countEl.textContent=parseInt(countEl.textContent||'0')+1;
+    await loadComments(eventId);
+  } catch(e){
+    input.value=body;
+  } finally {
+    input.disabled=false;
+    input.focus();
+  }
+}
+
+// ── CLAIM MODAL ──────────────────────────────────────────────
+function openClaimModal(eventId, eventTitle){
+  claimTargetId=eventId;
+  const modal=document.getElementById('claimModal');
+  const titleEl=document.getElementById('claimEventTitle');
+  const status=document.getElementById('claimStatus');
+  if(titleEl) titleEl.textContent=eventTitle;
+  if(status) status.innerHTML='';
+  // Pre-fill email if logged in
+  const emailInput=document.getElementById('claimEmail');
+  if(emailInput && currentUser) emailInput.value=currentUser.email||'';
+  if(modal) modal.style.display='flex';
+}
+
+function closeClaimModal(){
+  const modal=document.getElementById('claimModal');
+  if(modal) modal.style.display='none';
+  claimTargetId=null;
+}
+
+async function submitClaim(){
+  const role=document.getElementById('claimRole')?.value;
+  const email=document.getElementById('claimEmail')?.value?.trim();
+  const note=document.getElementById('claimNote')?.value?.trim();
+  const status=document.getElementById('claimStatus');
+
+  if(!role){ if(status) status.innerHTML='<span style="color:var(--orange)">Please select your role.</span>'; return; }
+  if(!email||!email.includes('@')){ if(status) status.innerHTML='<span style="color:var(--orange)">Enter a valid email.</span>'; return; }
+
+  if(status) status.innerHTML='<span style="color:var(--sub)">Submitting...</span>';
+
+  try {
+    await sb.from('event_claims').insert({
+      external_event_id: claimTargetId,
+      claimant_user_id:  currentUser?.id||null,
+      claimant_email:    email,
+      claimant_role:     role,
+      note:              note||null,
+      status:            'pending'
+    });
+    if(status) status.innerHTML='<span style="color:var(--green)">✓ Claim submitted! We\'ll review and reach out within 24 hours.</span>';
+    setTimeout(closeClaimModal, 2500);
+  } catch(e){
+    if(status) status.innerHTML='<span style="color:var(--orange)">Something went wrong. Try again.</span>';
+  }
+}
+
 // ── EMAIL CAPTURE ─────────────────────────────────────────────────────────────
 const EDGE_FN_URL = 'https://toblgvatvsjljbqogzsv.supabase.co/functions/v1/email-capture';
 

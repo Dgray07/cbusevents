@@ -566,7 +566,7 @@ function renderShell(){
 
  document.getElementById('app').innerHTML=`
  <div class="sidebar"> <div class="sidebar-logo"> <div class="sidebar-logo-text">CBUS<span>EVENTS</span></div> <div class="sidebar-logo-sub">Admin Portal</div> </div> <div class="sidebar-section">Main</div> <div class="nav-item" onclick="window.location.href='https://cbusevents.com'" style="border-bottom:1px solid var(--border);margin-bottom:4px;padding-bottom:12px"> Home</div> <div class="nav-item ${currentPage==='dashboard'?'active':''}" onclick="nav('dashboard')"> Dashboard</div> <div class="nav-item ${currentPage==='venues'?'active':''}" onclick="nav('venues')"> Venues ${pendingVenues?('<span class="badge">'+pendingVenues+'</span>'):''}</div> <div class="nav-item ${currentPage==='events'?'active':''}" onclick="nav('events')"> Events</div> <div class="nav-item ${currentPage==='inquiries'?'active':''}" onclick="nav('inquiries')"> Inquiries ${newInquiries?('<span class="badge green">'+newInquiries+'</span>'):''}</div> <div class="sidebar-section">Revenue</div> <div class="nav-item ${currentPage==='revenue'?'active':''}" onclick="nav('revenue')"> Revenue</div> <div class="nav-item ${currentPage==='design'?'active':''}" onclick="nav('design')"> Design Requests ${allDesignRequests.filter(d=>d.status==='new').length?('<span class="badge">'+allDesignRequests.filter(d=>d.status==='new').length+'</span>'):''}</div> <div class="sidebar-section">Platform</div> <div class="nav-item ${currentPage==='vendors'?'active':''}" onclick="nav('vendors')"> Vendors</div> <div class="nav-item ${currentPage==='foodpros'?'active':''}" onclick="nav('foodpros')"> Food Pros <span style="background:rgba(255,255,255,0.08);color:var(--sub);border-radius:20px;padding:1px 8px;font-size:9px;font-weight:800;margin-left:auto;">${allFoodPros.length}</span></div>
- <div class="nav-item ${currentPage==='planners'?'active':''}" onclick="nav('planners')"> Planners</div> <div class="nav-item ${currentPage==='subscriptions'?'active':''}" onclick="nav('subscriptions')"> Subscriptions</div> <div class="nav-item ${currentPage==='users'?'active':''}" onclick="nav('users')"> Users</div> <div class="nav-item ${currentPage==='overrides'?'active':''}" onclick="nav('overrides')"> Overrides</div> <div class="nav-item ${currentPage==='claims'?'active':''}" onclick="nav('claims')"> Claims <span style='background:#ef4444;color:#fff;border-radius:20px;padding:1px 7px;font-size:10px;font-weight:700;margin-left:auto' id='claimsBadge' style='display:none'></span></div>
+ <div class="nav-item ${currentPage==='planners'?'active':''}" onclick="nav('planners')"> Planners</div> <div class="nav-item ${currentPage==='subscriptions'?'active':''}" onclick="nav('subscriptions')"> Subscriptions</div> <div class="nav-item ${currentPage==='users'?'active':''}" onclick="nav('users')"> Users</div> <div class="nav-item ${currentPage==='overrides'?'active':''}" onclick="nav('overrides')"> Overrides</div> <div class="nav-item ${currentPage==='claims'?'active':''}" onclick="nav('claims')"> Claims <span style='background:#ef4444;color:#fff;border-radius:20px;padding:1px 7px;font-size:10px;font-weight:700;margin-left:auto' id='claimsBadge' style='display:none'></span></div> <div class="nav-item ${currentPage==='externalsync'?'active':''}" onclick="nav('externalsync')"> 🌐 External Sync <span id='syncBadge' style='display:none;background:#818cf8;color:#fff;border-radius:20px;padding:1px 7px;font-size:10px;font-weight:700;margin-left:auto'></span></div>
  <div class="sidebar-section">Festivals</div>
  <div class="nav-item ${currentPage==='festival1313'?'active':''}" onclick="window.open('1313-festival-admin.html','_blank')" style="color:${currentPage==='festival1313'?'var(--text)':'var(--orange)'}"> 🎪 1313 Festival <span class="badge" style="background:var(--orange);color:#fff">Live</span></div>
  <div class="nav-item ${currentPage==='foodtrucks'?'active':''}" onclick="nav('foodtrucks')"> 🚚 Food Truck Prospects</div>
@@ -586,7 +586,7 @@ function nav(page){
  currentPage=page;
  document.querySelectorAll('.nav-item').forEach(el=>el.classList.remove('active'));
  document.querySelectorAll('.nav-item').forEach(el=>{if(el.textContent.trim().toLowerCase().includes(page))el.classList.add('active');});
- const title={dashboard:'Dashboard',venues:'Venues',events:'Events',inquiries:'Inquiries',revenue:'Revenue',design:'Design Requests',vendors:'Vendors',subscriptions:'Subscriptions',users:'Users',overrides:'Overrides',claims:'Listing Claims',blog:'Blog & SEO',planners:'Planners',outreach:'Venue Outreach',inbox:'Inbox',marketing:'Marketing Intelligence',festival1313:'1313 Festival Admin',brandreps:'Brand Reps',foodtrucks:'Food Truck Prospects'};
+ const title={dashboard:'Dashboard',venues:'Venues',events:'Events',inquiries:'Inquiries',revenue:'Revenue',design:'Design Requests',vendors:'Vendors',subscriptions:'Subscriptions',users:'Users',overrides:'Overrides',claims:'Event Claims',externalsync:'External Sync',blog:'Blog & SEO',planners:'Planners',outreach:'Venue Outreach',inbox:'Inbox',marketing:'Marketing Intelligence',festival1313:'1313 Festival Admin',brandreps:'Brand Reps',foodtrucks:'Food Truck Prospects'};
  const el=document.getElementById('topbarTitle');
  if(el)el.textContent=title[page]||page;
  renderPage();
@@ -606,6 +606,7 @@ async function renderPage(){
  else if(currentPage==='users')await renderUsers();
  else if(currentPage==='overrides')renderOverrides();
  else if(currentPage==='claims')renderClaims();
+ else if(currentPage==='externalsync')renderExternalSync();
  else if(currentPage==='blog')renderBlog();
  else if(currentPage==='outreach')renderOutreach();
  else if(currentPage==='inbox')renderAdminInboxPage();
@@ -2479,25 +2480,214 @@ function claimsReviewedHtml(reviewed){
    }).join('')+'</div>';
 }
 async function renderClaims(){
- const el=document.getElementById('pageContent');
- el.innerHTML='<div class="spinner"></div>';
+  const el=document.getElementById('pageContent');
+  el.innerHTML='<div class="spinner"></div>';
 
- const{data:claims}=await sb.from('venues')
- .select('id,name,venue_type,neighborhood,status,claim_status,claim_email,claimed_at,owner_id')
- .not('claim_status','is',null)
- .order('claimed_at',{ascending:false})
- .catch(()=>({data:[]}));
+  // Load both venue claims (legacy) and new event_claims
+  const [venueRes, eventRes] = await Promise.all([
+    sb.from('venues')
+      .select('id,name,venue_type,neighborhood,status,claim_status,claim_email,claimed_at,owner_id')
+      .not('claim_status','is',null)
+      .order('claimed_at',{ascending:false})
+      .catch(()=>({data:[]})),
+    sb.from('event_claims')
+      .select('*,external_events(title,source,start_time,venue_name)')
+      .order('created_at',{ascending:false})
+      .catch(()=>({data:[]}))
+  ]);
 
- const pending=(claims||[]).filter(c=>c.claim_status==='pending');
- const reviewed=(claims||[]).filter(c=>c.claim_status!=='pending');
+  const venueClaims=(venueRes.data||[]);
+  const eventClaims=(eventRes.data||[]);
+  const pendingVenue=venueClaims.filter(c=>c.claim_status==='pending');
+  const pendingEvent=eventClaims.filter(c=>c.status==='pending');
+  const totalPending=pendingVenue.length+pendingEvent.length;
 
- // Update badge
- const badge=document.getElementById('claimsBadge');
- if(badge){badge.textContent=pending.length||'';badge.style.display=pending.length?'':'none';}
+  const badge=document.getElementById('claimsBadge');
+  if(badge){badge.textContent=totalPending||'';badge.style.display=totalPending?'':'none';}
 
- el.innerHTML=`
- <div style="margin-bottom:28px"> <div style="font-family:'DM Sans',sans-serif;font-size:20px;font-weight:800;margin-bottom:6px">Listing Claims</div> <div style="color:var(--sub);font-size:14px">${pending.length} pending · ${reviewed.length} reviewed</div> </div> ${pending.length?claimsPendingHtml(pending):''}
- `;
+  el.innerHTML=`
+  <div style="margin-bottom:28px">
+    <div style="font-size:20px;font-weight:800;margin-bottom:6px">Event Claims</div>
+    <div style="color:var(--sub);font-size:14px">${totalPending} pending · ${venueClaims.length+eventClaims.length} total</div>
+  </div>
+
+  <!-- Event Claims (external events) -->
+  <div style="margin-bottom:32px">
+    <div style="font-size:13px;font-weight:700;color:var(--orange);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:14px">Columbus Calendar Claims</div>
+    ${pendingEvent.length===0
+      ?'<div style="color:var(--muted);font-size:13px;padding:16px 0">No pending event claims</div>'
+      :pendingEvent.map(c=>`
+        <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:18px 20px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap">
+          <div>
+            <div style="font-weight:700;font-size:15px;margin-bottom:5px">${c.external_events?.title||'Unknown Event'}</div>
+            <div style="font-size:12px;color:var(--sub);margin-bottom:4px">Source: ${c.external_events?.source||'unknown'} · ${c.external_events?.start_time?fmt(c.external_events.start_time):''}</div>
+            <div style="font-size:12px;color:var(--muted)">Claimant: ${c.claimant_email} · Role: ${c.claimant_role||'unspecified'}</div>
+            ${c.note?`<div style="font-size:12px;color:var(--sub);margin-top:6px;font-style:italic">"${c.note}"</div>`:''}
+            <div style="font-size:11px;color:var(--muted);margin-top:4px">${timeAgoAdmin(c.created_at)}</div>
+          </div>
+          <div style="display:flex;gap:8px;flex-shrink:0">
+            <button onclick="approveEventClaim('${c.id}','${c.external_event_id}')" style="background:var(--green);color:#000;border:none;border-radius:8px;padding:8px 16px;font-size:12px;font-weight:700;cursor:pointer">Approve</button>
+            <button onclick="rejectEventClaim('${c.id}')" style="background:var(--card);color:var(--red);border:1px solid rgba(248,113,113,0.3);border-radius:8px;padding:8px 14px;font-size:12px;font-weight:600;cursor:pointer">Reject</button>
+          </div>
+        </div>`).join('')}
+  </div>
+
+  <!-- Venue Claims (legacy) -->
+  <div>
+    <div style="font-size:13px;font-weight:700;color:var(--orange);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:14px">Venue Listing Claims</div>
+    ${pendingVenue.length===0
+      ?'<div style="color:var(--muted);font-size:13px;padding:16px 0">No pending venue claims</div>'
+      :pendingVenue.map(c=>`
+        <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:18px 20px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap">
+          <div>
+            <div style="font-weight:700;font-size:15px;margin-bottom:4px">${c.name}</div>
+            <div style="font-size:12px;color:var(--sub)">${c.venue_type||''} ${c.neighborhood?'· '+c.neighborhood:''}</div>
+            <div style="font-size:12px;color:var(--muted);margin-top:3px">${c.claim_email||''} · ${c.claimed_at?fmt(c.claimed_at):''}</div>
+          </div>
+          <div style="display:flex;gap:8px;flex-shrink:0">
+            <button onclick="approveClaim('${c.id}','${c.name.replace(/'/g,"\\'")}')\"  style="background:var(--green);color:#000;border:none;border-radius:8px;padding:8px 16px;font-size:12px;font-weight:700;cursor:pointer">Approve</button>
+            <button onclick="rejectClaim('${c.id}','${c.name.replace(/'/g,"\\'")}')\" style="background:var(--card);color:var(--red);border:1px solid rgba(248,113,113,0.3);border-radius:8px;padding:8px 14px;font-size:12px;font-weight:600;cursor:pointer">Reject</button>
+          </div>
+        </div>`).join('')}
+  </div>`;
+}
+
+function timeAgoAdmin(dt){
+  const s=Math.floor((Date.now()-new Date(dt))/1000);
+  if(s<60)return'just now';
+  if(s<3600)return Math.floor(s/60)+'m ago';
+  if(s<86400)return Math.floor(s/3600)+'h ago';
+  return Math.floor(s/86400)+'d ago';
+}
+
+async function approveEventClaim(claimId, externalEventId){
+  if(!confirm('Approve this claim? This will mark the event as claimed and notify the claimant.'))return;
+  const [claimErr, eventErr] = await Promise.all([
+    sb.from('event_claims').update({status:'approved',reviewed_at:new Date().toISOString()}).eq('id',claimId).then(r=>r.error),
+    sb.from('external_events').update({status:'claimed'}).eq('id',externalEventId).then(r=>r.error)
+  ]);
+  if(claimErr||eventErr){showToast('Error approving claim','error');return;}
+  showToast('Claim approved','success');
+  renderClaims();
+}
+
+async function rejectEventClaim(claimId){
+  const reason=prompt('Reason for rejection (optional):');
+  if(reason===null)return;
+  const{error}=await sb.from('event_claims').update({status:'rejected',reviewed_at:new Date().toISOString()}).eq('id',claimId);
+  if(error){showToast('Error: '+error.message,'error');return;}
+  showToast('Claim rejected','error');
+  renderClaims();
+}
+
+// ── EXTERNAL SYNC DASHBOARD ────────────────────────────────────
+async function renderExternalSync(){
+  const el=document.getElementById('pageContent');
+  el.innerHTML='<div class="spinner"></div>';
+
+  const [sourceRes, extRes, claimRes] = await Promise.all([
+    sb.from('sync_source_controls').select('*').catch(()=>({data:[]})),
+    sb.from('external_events').select('id,source,status,created_at',{count:'exact'}).catch(()=>({data:[],count:0})),
+    sb.from('event_claims').select('id,status',{count:'exact'}).eq('status','pending').catch(()=>({data:[],count:0}))
+  ]);
+
+  const sources=sourceRes.data||[];
+  const extEvents=extRes.data||[];
+  const pendingClaims=claimRes.count||0;
+
+  // Group by source
+  const bySource={};
+  extEvents.forEach(e=>{ if(!bySource[e.source])bySource[e.source]={active:0,expired:0,claimed:0,total:0}; bySource[e.source].total++; bySource[e.source][e.status]=(bySource[e.source][e.status]||0)+1; });
+
+  const sourceInfo={
+    ticketmaster:{label:'Ticketmaster',icon:'🎟',desc:'Columbus events via Discovery API'},
+    eventbrite:{label:'Eventbrite',icon:'🎫',desc:'Columbus events via Eventbrite API'},
+    rss:{label:'RSS Feeds',icon:'📰',desc:'Columbus Underground + Experience Columbus'}
+  };
+
+  el.innerHTML=`
+  <div style="margin-bottom:28px">
+    <div style="font-size:20px;font-weight:800;margin-bottom:6px">External Sync</div>
+    <div style="color:var(--sub);font-size:14px">Columbus Calendar data sources · ${extEvents.length} total external events · ${pendingClaims} pending claims</div>
+  </div>
+
+  <!-- Stats row -->
+  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;margin-bottom:32px">
+    ${[
+      {label:'Total External',val:extEvents.length,color:'var(--blue)'},
+      {label:'Active',val:extEvents.filter(e=>e.status==='active').length,color:'var(--green)'},
+      {label:'Expired',val:extEvents.filter(e=>e.status==='expired').length,color:'var(--muted)'},
+      {label:'Claimed',val:extEvents.filter(e=>e.status==='claimed').length,color:'var(--orange)'},
+      {label:'Pending Claims',val:pendingClaims,color:'#ef4444'},
+    ].map(s=>`
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px;text-align:center">
+        <div style="font-size:28px;font-weight:800;color:${s.color}">${s.val}</div>
+        <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:0.1em;margin-top:3px">${s.label}</div>
+      </div>`).join('')}
+  </div>
+
+  <!-- Source controls -->
+  <div style="margin-bottom:28px">
+    <div style="font-size:13px;font-weight:700;color:var(--orange);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:14px">Sync Sources</div>
+    ${sources.length===0
+      ?`<div style="background:var(--card);border:1px solid var(--orange-border);border-radius:12px;padding:20px;color:var(--sub);font-size:14px">
+          <strong style="color:var(--text)">Tables not yet created.</strong> Run the Phase 1 SQL in Supabase first, then refresh this page.
+        </div>`
+      :sources.map(s=>{
+        const info=sourceInfo[s.source]||{label:s.source,icon:'🔌',desc:''};
+        const stats=bySource[s.source]||{active:0,expired:0,total:0};
+        return `
+          <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:18px 20px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap">
+            <div style="display:flex;align-items:center;gap:14px">
+              <div style="font-size:24px">${info.icon}</div>
+              <div>
+                <div style="font-weight:700;font-size:15px;margin-bottom:3px">${info.label}</div>
+                <div style="font-size:12px;color:var(--muted)">${info.desc}</div>
+                <div style="font-size:11px;color:var(--sub);margin-top:4px">${stats.total} events · ${stats.active} active · Last run: ${s.last_run?timeAgoAdmin(s.last_run):'Never'}</div>
+              </div>
+            </div>
+            <div style="display:flex;align-items:center;gap:10px;flex-shrink:0">
+              <span style="font-size:11px;color:${s.is_active?'var(--green)':'var(--muted)'}">● ${s.is_active?'Active':'Paused'}</span>
+              <button onclick="toggleSyncSource('${s.source}',${!s.is_active})" style="background:${s.is_active?'rgba(248,113,113,0.12)':'rgba(52,211,153,0.12)'};color:${s.is_active?'var(--red)':'var(--green)'};border:1px solid ${s.is_active?'rgba(248,113,113,0.25)':'rgba(52,211,153,0.25)'};border-radius:8px;padding:7px 14px;font-size:12px;font-weight:700;cursor:pointer">${s.is_active?'Pause':'Activate'}</button>
+              <button onclick="triggerManualSync('${s.source}')" style="background:var(--surface);color:var(--text);border:1px solid var(--border);border-radius:8px;padding:7px 14px;font-size:12px;font-weight:600;cursor:pointer">Sync Now</button>
+            </div>
+          </div>`;}).join('')}
+  </div>
+
+  <!-- Recent external events preview -->
+  <div>
+    <div style="font-size:13px;font-weight:700;color:var(--orange);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:14px">Recent Events in Feed</div>
+    ${extEvents.slice(0,10).length===0
+      ?'<div style="color:var(--muted);font-size:13px">No external events yet. Activate a sync source above to populate the Columbus Calendar.</div>'
+      :extEvents.slice(0,10).map(e=>`
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border-sub);gap:12px">
+          <div>
+            <div style="font-weight:600;font-size:13px">${e.id}</div>
+            <div style="font-size:11px;color:var(--muted)">${e.source} · ${e.status}</div>
+          </div>
+          <button onclick="suppressExtEvent('${e.id}')" style="background:none;border:1px solid var(--border);border-radius:6px;padding:5px 10px;font-size:11px;color:var(--muted);cursor:pointer">Suppress</button>
+        </div>`).join('')}
+  </div>`;
+}
+
+async function toggleSyncSource(source, newState){
+  const{error}=await sb.from('sync_source_controls').update({is_active:newState}).eq('source',source);
+  if(error){showToast('Error: '+error.message,'error');return;}
+  showToast(`${source} ${newState?'activated':'paused'}`,'success');
+  renderExternalSync();
+}
+
+async function triggerManualSync(source){
+  showToast(`Triggering ${source} sync... (Edge Function not yet deployed)`,'success');
+  // Will call: await fetch(`https://toblgvatvsjljbqogzsv.supabase.co/functions/v1/sync-${source}`, {...})
+  // once the sync Edge Functions are built in Phase 2
+}
+
+async function suppressExtEvent(id){
+  const{error}=await sb.from('external_events').update({status:'suppressed'}).eq('id',id);
+  if(error){showToast('Error','error');return;}
+  showToast('Event suppressed','success');
+  renderExternalSync();
 }
 
 async function approveClaim(venueId, venueName){
