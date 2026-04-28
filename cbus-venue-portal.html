@@ -2007,14 +2007,13 @@ window.startVenueConversation = async function(recipientId, recipientRole, recip
   if(!user){ alert('Please sign in'); return; }
   const uid = user.id;
 
-  // Check if conversation already exists
-  const {data:existing} = await sb.from('conversations')
-    .select('id')
-    .or(`and(participant_a.eq.${uid},participant_b.eq.${recipientId}),and(participant_a.eq.${recipientId},participant_b.eq.${uid})`)
-    .neq('status','archived')
-    .maybeSingle();
+  // Find existing conversation - two separate queries avoids PostgREST nested and() issues
+  const {data:asA} = await sb.from('conversations')
+    .select('id').eq('participant_a', uid).eq('participant_b', recipientId).neq('status','archived').maybeSingle();
+  const {data:asB} = await sb.from('conversations')
+    .select('id').eq('participant_a', recipientId).eq('participant_b', uid).neq('status','archived').maybeSingle();
 
-  let convoId = existing?.id;
+  let convoId = asA?.id || asB?.id;
 
   if(!convoId){
     const {data:convo, error} = await sb.from('conversations').insert({
