@@ -2021,7 +2021,6 @@ window.startVenueConversation = async function(recipientId, recipientRole, recip
       participant_b:      recipientId,
       participant_a_role: 'venue_owner',
       participant_b_role: recipientRole,
-      subject:            subject||null,
       status:             'active',
       last_message_at:    new Date().toISOString(),
     }).select().single();

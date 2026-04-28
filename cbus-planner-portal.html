@@ -411,12 +411,7 @@ function venueEmoji(type){
  return'';
 }
 function getImg(v){return VENUE_IMGS[v.name]||v.cover_image_url||null;}
-function closeModal(){
-  const m1=document.getElementById('modal');
-  const m2=document.getElementById('modalContainer');
-  if(m1)m1.innerHTML='';
-  if(m2)m2.innerHTML='';
-}
+function closeModal(){document.getElementById('modal').innerHTML='';}
 
 // ── AUTH ──────────────────────────────────────────────────────
 
@@ -1286,16 +1281,11 @@ async function startConversation(recipientId, recipientRole, subject, openingMes
       participant_b:      recipientId,
       participant_a_role: myRole,
       participant_b_role: recipientRole,
-      subject:            subject||null,
       status:             'active',
       last_message_at:    new Date().toISOString(),
     }).select().single();
 
-    if(convoErr){ 
-      console.error('Conversation insert error:', convoErr);
-      toast('Could not start conversation: '+convoErr.message,'error'); 
-      return; 
-    }
+    if(convoErr){ toast('Could not start conversation','error'); return; }
     convoId = convo.id;
 
     // Create message request so recipient sees it in their Requests tab

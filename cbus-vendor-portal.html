@@ -1186,7 +1186,6 @@ async function startConversation(recipientId, recipientRole, subject, openingMes
       participant_b:      recipientId,
       participant_a_role: myRole,
       participant_b_role: recipientRole,
-      subject:            subject||null,
       status:             'active',
       last_message_at:    new Date().toISOString(),
     }).select().single();
