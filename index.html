@@ -18,8 +18,7 @@
   }
   </script>
 
-<link href="https://api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.css" rel="stylesheet">
-<script src="https://api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.js" defer></script>
+
 </head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/> <!-- SEO META TAGS -->
@@ -2096,31 +2095,92 @@ function renderHome(){
    </div>
  </section>
 
+ <!-- ══════════════════════════════════════════
+      CULTURE PROMO SECTION
+ ══════════════════════════════════════════ -->
  <section style="padding:0 48px;margin-top:32px;margin-bottom:52px">
-   <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
-     <div>
-       <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.2em;text-transform:uppercase;color:var(--orange);margin-bottom:5px">
-         <span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--orange);animation:pulse 2s infinite;margin-right:6px;vertical-align:middle"></span>
-         Live Near You
+   <div style="border-radius:var(--r-lg);overflow:hidden;border:1px solid var(--border);display:grid;grid-template-columns:1fr 1fr;min-height:420px">
+
+     <!-- LEFT: Statement panel -->
+     <div style="position:relative;padding:48px 44px;display:flex;flex-direction:column;justify-content:space-between;background:linear-gradient(145deg,#0f0a05 0%,#080810 60%);overflow:hidden">
+       <!-- Textured BG number -->
+       <div style="position:absolute;right:-10px;bottom:-30px;font-family:var(--mono);font-size:200px;font-weight:700;color:rgba(255,107,53,0.05);line-height:1;pointer-events:none;user-select:none">614</div>
+
+       <div>
+         <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.22em;text-transform:uppercase;color:var(--orange);margin-bottom:20px">Columbus, Ohio</div>
+         <div style="font-family:var(--font);font-size:38px;font-weight:800;line-height:1.1;letter-spacing:-0.03em;color:#fff;margin-bottom:20px">The scene was<br>always here.<br><span style="color:var(--orange)">Now it has<br>a home.</span></div>
+         <div style="font-size:14px;color:rgba(255,255,255,0.45);line-height:1.7;max-width:340px;font-weight:400">
+           Columbus has the talent, the culture, the food, and the energy. What it needed was one place connecting all of it - for the people who live it every weekend.
+         </div>
        </div>
-       <h2 id="mapSectionTitle" style="font-family:var(--font);font-size:22px;font-weight:800;letter-spacing:-0.03em;color:var(--text)">All Columbus Events</h2>
+
+       <div style="display:flex;gap:12px;margin-top:36px;flex-wrap:wrap">
+         <button onclick="showPage('events')" style="background:var(--orange);color:#fff;border:none;border-radius:var(--r-md);padding:11px 22px;font-family:var(--mono);font-size:10px;letter-spacing:0.12em;text-transform:uppercase;font-weight:600;transition:opacity 0.2s" onmouseover="this.style.opacity='0.85'" onmouseout="this.style.opacity='1'">Browse Events</button>
+         <button onclick="showPage('venues')" style="background:transparent;color:rgba(255,255,255,0.7);border:1px solid rgba(255,255,255,0.15);border-radius:var(--r-md);padding:11px 22px;font-family:var(--mono);font-size:10px;letter-spacing:0.12em;text-transform:uppercase;transition:border-color 0.2s" onmouseover="this.style.borderColor='var(--orange)';this.style.color='#fff'" onmouseout="this.style.borderColor='rgba(255,255,255,0.15)';this.style.color='rgba(255,255,255,0.7)'">Find Venues</button>
+       </div>
      </div>
-     <div style="font-family:var(--mono);font-size:10px;color:var(--sub);letter-spacing:0.08em" id="mapEventCount"></div>
+
+     <!-- RIGHT: Three culture tiles stacked -->
+     <div style="display:grid;grid-template-rows:1fr 1fr 1fr">
+
+       <!-- Tile 1: For the weekend crowd -->
+       <div onclick="showPage('events')" style="position:relative;overflow:hidden;cursor:pointer;border-left:1px solid var(--border);border-bottom:1px solid var(--border);background:#0a0a12" onmouseover="this.querySelector('.tile-overlay').style.opacity='1'" onmouseout="this.querySelector('.tile-overlay').style.opacity='0'">
+         <img src="https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?w=800&q=80" alt="Nightlife" style="width:100%;height:100%;object-fit:cover;opacity:0.45;transition:opacity 0.4s;display:block" loading="lazy">
+         <div class="tile-overlay" style="position:absolute;inset:0;background:rgba(255,107,53,0.15);opacity:0;transition:opacity 0.3s"></div>
+         <div style="position:absolute;inset:0;background:linear-gradient(to right,rgba(8,8,16,0.7) 0%,transparent 50%)"></div>
+         <div style="position:absolute;bottom:18px;left:20px;right:20px">
+           <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.18em;text-transform:uppercase;color:var(--orange);margin-bottom:4px">For the Weekend</div>
+           <div style="font-family:var(--font);font-size:16px;font-weight:800;color:#fff;line-height:1.2">Nightlife, markets, shows - all in one feed</div>
+         </div>
+         <div style="position:absolute;top:16px;right:16px;font-family:var(--mono);font-size:9px;color:rgba(255,255,255,0.35);letter-spacing:0.1em">EVENTS &rarr;</div>
+       </div>
+
+       <!-- Tile 2: For vendors -->
+       <div onclick="showPage('vendor-signup')" style="position:relative;overflow:hidden;cursor:pointer;border-left:1px solid var(--border);border-bottom:1px solid var(--border);background:#080810" onmouseover="this.querySelector('.tile-overlay').style.opacity='1'" onmouseout="this.querySelector('.tile-overlay').style.opacity='0'">
+         <img src="https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=800&q=80" alt="Vendors" style="width:100%;height:100%;object-fit:cover;opacity:0.35;transition:opacity 0.4s;display:block" loading="lazy">
+         <div class="tile-overlay" style="position:absolute;inset:0;background:rgba(255,107,53,0.15);opacity:0;transition:opacity 0.3s"></div>
+         <div style="position:absolute;inset:0;background:linear-gradient(to right,rgba(8,8,16,0.75) 0%,transparent 55%)"></div>
+         <div style="position:absolute;bottom:18px;left:20px;right:20px">
+           <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.18em;text-transform:uppercase;color:var(--orange);margin-bottom:4px">For Vendors</div>
+           <div style="font-family:var(--font);font-size:16px;font-weight:800;color:#fff;line-height:1.2">Get discovered. Get booked. Get paid.</div>
+         </div>
+         <div style="position:absolute;top:16px;right:16px;font-family:var(--mono);font-size:9px;color:rgba(255,255,255,0.35);letter-spacing:0.1em">JOIN &rarr;</div>
+       </div>
+
+       <!-- Tile 3: For planners / venues -->
+       <div onclick="showPage('venue-signup')" style="position:relative;overflow:hidden;cursor:pointer;border-left:1px solid var(--border);background:#060610" onmouseover="this.querySelector('.tile-overlay').style.opacity='1'" onmouseout="this.querySelector('.tile-overlay').style.opacity='0'">
+         <img src="https://images.unsplash.com/photo-1519167758481-83f550bb49b3?w=800&q=80" alt="Venues" style="width:100%;height:100%;object-fit:cover;opacity:0.35;transition:opacity 0.4s;display:block" loading="lazy">
+         <div class="tile-overlay" style="position:absolute;inset:0;background:rgba(255,107,53,0.15);opacity:0;transition:opacity 0.3s"></div>
+         <div style="position:absolute;inset:0;background:linear-gradient(to right,rgba(8,8,16,0.75) 0%,transparent 55%)"></div>
+         <div style="position:absolute;bottom:18px;left:20px;right:20px">
+           <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.18em;text-transform:uppercase;color:var(--orange);margin-bottom:4px">For Venues</div>
+           <div style="font-family:var(--font);font-size:16px;font-weight:800;color:#fff;line-height:1.2">Your space. Your events. Your platform.</div>
+         </div>
+         <div style="position:absolute;top:16px;right:16px;font-family:var(--mono);font-size:9px;color:rgba(255,255,255,0.35);letter-spacing:0.1em">LIST &rarr;</div>
+       </div>
+
+     </div>
    </div>
-   <div style="position:relative;border-radius:var(--r-lg);overflow:hidden;border:1px solid var(--border)">
-     <div id="homeMap" style="width:100%;height:420px"></div>
-     <div id="homeMapPopup" style="display:none;position:absolute;bottom:20px;left:50%;transform:translateX(-50%);background:var(--card);border:1px solid var(--border);border-radius:var(--r-lg);padding:0;min-width:260px;max-width:320px;box-shadow:0 8px 40px rgba(0,0,0,0.6);z-index:10;overflow:hidden;cursor:pointer">
-       <div id="homeMapPopupImg" style="height:120px;background:var(--surface);overflow:hidden;position:relative"></div>
-       <div style="padding:14px 16px">
-         <div id="homeMapPopupCat" style="font-family:var(--mono);font-size:9px;letter-spacing:0.14em;text-transform:uppercase;color:var(--orange);margin-bottom:4px"></div>
-         <div id="homeMapPopupTitle" style="font-family:var(--font);font-weight:700;font-size:14px;color:var(--text);margin-bottom:4px;line-height:1.2"></div>
-         <div id="homeMapPopupMeta" style="font-size:11px;color:var(--muted)"></div>
-         <div id="homeMapPopupVenue" style="font-size:11px;color:var(--sub);margin-top:2px"></div>
+
+   <!-- Vendor ticker -->
+   <div style="border:1px solid var(--border);border-top:none;border-radius:0 0 var(--r-lg) var(--r-lg);overflow:hidden">
+     <!-- Ticker header -->
+     <div style="display:flex;align-items:center;gap:16px;padding:9px 20px;border-bottom:1px solid var(--border);background:var(--surface)">
+       <div style="display:flex;align-items:center;gap:7px;font-family:var(--mono);font-size:9px;letter-spacing:0.2em;text-transform:uppercase;color:var(--orange);flex-shrink:0">
+         <span style="width:6px;height:6px;border-radius:50%;background:var(--orange);display:inline-block;animation:pulse 2s infinite"></span>
+         1313 Festival Vendors
+       </div>
+       <div style="width:1px;height:14px;background:var(--border);flex-shrink:0"></div>
+       <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:var(--sub)">Confirmed Lineup</div>
+       <div style="margin-left:auto;font-family:var(--mono);font-size:9px;letter-spacing:0.1em;text-transform:uppercase;color:var(--sub);white-space:nowrap">Jun 13 &nbsp;&bull;&nbsp; 1313 E. Broad St</div>
+     </div>
+     <!-- Scrolling track -->
+     <div style="overflow:hidden;padding:12px 0;position:relative" id="vendorTickerWrap">
+       <div style="position:absolute;top:0;bottom:0;left:0;width:60px;background:linear-gradient(to right,var(--bg),transparent);z-index:2;pointer-events:none"></div>
+       <div style="position:absolute;top:0;bottom:0;right:0;width:60px;background:linear-gradient(to left,var(--bg),transparent);z-index:2;pointer-events:none"></div>
+       <div id="vendorTrack" style="display:flex;align-items:center;width:max-content;animation:vendorScroll 32s linear infinite">
        </div>
      </div>
-     <button onclick="centerHomeMapOnUser()" style="position:absolute;top:12px;right:12px;background:var(--card);border:1px solid var(--border);border-radius:var(--r-md);padding:8px 12px;font-family:var(--mono);font-size:9px;letter-spacing:0.1em;text-transform:uppercase;color:var(--text);cursor:pointer;z-index:10;display:flex;align-items:center;gap:6px">
-       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg>Near Me
-     </button>
    </div>
  </section>
 
@@ -2361,6 +2421,8 @@ function renderHome(){
  ${footer()}
  `;
 
+ buildVendorTicker();
+
  // Init hero slider
  let heroIdx = 0;
  let heroTimer = setInterval(()=>goSlide((heroIdx+1)%HERO_SLIDES.length), 5200);
@@ -2395,6 +2457,43 @@ function initHero(){
 }
 
 // goSlide defined in renderHome
+
+function buildVendorTicker(){
+  const track = document.getElementById('vendorTrack');
+  if(!track) return;
+  const BASE = 'https://toblgvatvsjljbqogzsv.supabase.co/storage/v1/object/public/public/';
+  const vendors = [
+    { name:'Family of Faith',     type:'Custom Designs',        img: BASE+'93317305-E1BD-4E7D-8F52-7DC6A0F39484.jpeg', dark:false },
+    { name:'Highly Flavored',     type:'Lemonade & Water Ice',  img: BASE+'IMG_2880.jpeg',  dark:false },
+    { name:'J&S Soulfoodnetwork', type:'Food',                  img: BASE+'80E2C7A6-0975-4D47-9333-63075538366A.jpeg', dark:true  },
+    { name:'The Suite Treat',     type:'Desserts',               img: BASE+'IMG_2833.jpeg',  dark:false },
+    { name:'2 Sisters Lemonade',  type:'Beverages',              img: BASE+'IMG_4368.png',   dark:false },
+    { name:"Bo' Alejandro",       type:'Visual Art',             img: BASE+'IMG_5782.jpeg',  dark:true  },
+    { name:'Kairoma Candle Co.',  type:'Candles & Fragrance',    img: BASE+'IMG_2776.jpeg',  dark:false },
+    { name:"Ri's Recipes",        type:'Cakes & Treat Tables',   img: BASE+'IMG_6805.png',   dark:false },
+    { name:'Way Down Yonder',     type:'New Orleans Cuisine',    img: BASE+'IMG_0338.png',   dark:false },
+  ];
+  function chip(v){
+    var bg = v.dark ? '#111' : '#fff';
+    return '<div style="display:flex;align-items:center;gap:11px;padding:6px 22px 6px 14px;border-right:1px solid var(--border);flex-shrink:0;white-space:nowrap">'
+      + '<div style="width:42px;height:42px;border-radius:8px;background:'+bg+';display:flex;align-items:center;justify-content:center;overflow:hidden;flex-shrink:0;border:1px solid rgba(128,128,128,0.12)">'
+      + '<img src="'+v.img+'" alt="'+v.name+'" style="width:100%;height:100%;object-fit:contain;display:block" loading="lazy">'
+      + '</div>'
+      + '<div>'
+      + '<div style="font-family:var(--font);font-size:13px;font-weight:700;color:var(--text);line-height:1.2">'+v.name+'</div>'
+      + '<div style="font-family:var(--mono);font-size:9px;letter-spacing:0.1em;text-transform:uppercase;color:var(--sub);margin-top:2px">'+v.type+'</div>'
+      + '</div></div>'
+      + '<div style="padding:0 16px;font-size:12px;color:rgba(255,107,53,0.3);flex-shrink:0;user-select:none">&#10022;</div>';
+  }
+  var html = vendors.map(chip).join('');
+  track.innerHTML = html + html;
+  if(!document.getElementById('vendorScrollStyle')){
+    var s = document.createElement('style');
+    s.id = 'vendorScrollStyle';
+    s.textContent = '@keyframes vendorScroll{0%{transform:translateX(0)}100%{transform:translateX(-50%)}} #vendorTrack:hover{animation-play-state:paused}';
+    document.head.appendChild(s);
+  }
+}
 
 
 // ── HOME MAP ─────────────────────────────────────────────────
