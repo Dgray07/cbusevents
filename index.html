@@ -2070,30 +2070,7 @@ function renderHome(){
    </div>
  </div>
 
- <!-- ══════════════════════════════════════════
-      CATEGORY STRIP + MAP
- ══════════════════════════════════════════ -->
- <section class="cat-section">
-   <div class="cat-section-header">
-     <div>
-       <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.2em;text-transform:uppercase;color:var(--orange);margin-bottom:6px">Browse by Category</div>
-       <h2 style="font-family:var(--font);font-size:22px;font-weight:800;letter-spacing:-0.03em;color:var(--text)">What are you looking for?</h2>
-     </div>
-     <button onclick="showPage('events')" style="font-family:var(--mono);font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:var(--orange);background:none;border:none;cursor:pointer;white-space:nowrap">View All</button>
-   </div>
-   <div class="cat-scroll-track">
-     <div id="catAll" class="cat-card cat-card-active" onclick="filterHomeMap('All',this)" role="button" tabindex="0">
-       <div style="position:absolute;inset:0;background:linear-gradient(135deg,#1a0800,#0f0f1a)"></div>
-       <div class="cat-card-body"><div class="cat-card-name">All Events</div><div class="cat-card-count">${allEvents.length} total</div></div>
-     </div>
-     ${CATEGORIES.map(cat=>`
-       <div id="cat${cat.key}" class="cat-card" onclick="filterHomeMap('${cat.key}',this)" role="button" tabindex="0">
-         <img src="${cat.img}" alt="${cat.name}" class="cat-card-img" loading="lazy" onerror="this.style.display='none'">
-         <div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(8,8,16,0.88) 0%,rgba(8,8,16,0.3) 60%,transparent 100%)"></div>
-         <div class="cat-card-body"><div class="cat-card-name">${cat.name}</div><div class="cat-card-count">${cat.count} event${cat.count!==1?'s':''}</div></div>
-       </div>`).join('')}
-   </div>
- </section>
+
 
  <!-- ══════════════════════════════════════════
       CULTURE PROMO SECTION
@@ -2461,7 +2438,7 @@ function initHero(){
 function buildVendorTicker(){
   const track = document.getElementById('vendorTrack');
   if(!track) return;
-  const BASE = 'https://toblgvatvsjljbqogzsv.supabase.co/storage/v1/object/public/public/';
+  const BASE = 'https://toblgvatvsjljbqogzsv.supabase.co/storage/v1/object/public/attachments/';
   const vendors = [
     { name:'Family of Faith',     type:'Custom Designs',        img: BASE+'93317305-E1BD-4E7D-8F52-7DC6A0F39484.jpeg', dark:false },
     { name:'Highly Flavored',     type:'Lemonade & Water Ice',  img: BASE+'IMG_2880.jpeg',  dark:false },
