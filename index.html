@@ -3052,7 +3052,8 @@ function renderEvents(){
 
  ${footer()}
  `;
- loadCalendarEvents();
+ // Load calendar after DOM settles
+ setTimeout(()=>{ if(calEvents.length){ renderCalendar(); } else { loadCalendarEvents(); } }, 50);
 }
 function filterEvents(){
  const q=(document.getElementById('eSearch')?.value||'').toLowerCase();
