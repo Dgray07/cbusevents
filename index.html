@@ -2939,6 +2939,7 @@ function renderEvents(){
  </select> </div> </div> </div>
 
  <section class="section">
+   <!-- 1313 Festival pinned banner -->
    <a href="https://cbusevents.com/1313-festival-event.html" style="display:flex;align-items:center;justify-content:space-between;gap:20px;background:linear-gradient(135deg,#1a0800,#0f0a00 50%,#0a0f0a);border:1px solid rgba(255,107,53,0.35);border-radius:var(--r-lg);padding:22px 28px;text-decoration:none;margin-bottom:32px;position:relative;overflow:hidden;flex-wrap:wrap" onmouseover="this.style.borderColor='rgba(255,107,53,0.6)'" onmouseout="this.style.borderColor='rgba(255,107,53,0.35)'">
      <div style="position:absolute;inset:0;background:radial-gradient(ellipse 60% 80% at 100% 50%,rgba(255,107,53,0.07),transparent);pointer-events:none"></div>
      <div style="display:flex;align-items:center;gap:16px">
@@ -2952,30 +2953,34 @@ function renderEvents(){
      <span style="background:var(--orange);color:#fff;font-family:var(--mono);font-size:10px;letter-spacing:0.1em;text-transform:uppercase;padding:9px 18px;border-radius:var(--r-md);font-weight:600;flex-shrink:0">Get Tickets &rarr;</span>
    </a>
 
-   <div id="eventResults">
-     ${tw.length?`<div class="section-header" style="margin-bottom:16px"><div><div class="section-title"> This Week</div></div></div><div class="event-grid" style="margin-bottom:40px">${tw.map(e=>eventCard(e)).join('')}</div>`:''}
-     ${later.length?`<div class="section-header" style="margin-bottom:16px"><div><div class="section-title"> Coming Up</div></div></div><div class="event-grid">${later.map(e=>eventCard(e)).join('')}</div>`:''}
-     ${!allEvents.length?'<div class="empty"><h3>No upcoming events yet</h3><p>Check back soon!</p></div>':''}
-   </div>
- </section>
+   <!-- Two-column layout: events left, calendar sidebar right -->
+   <div style="display:grid;grid-template-columns:1fr 340px;gap:32px;align-items:start">
 
- <section style="padding:48px 48px 52px;border-top:1px solid var(--border)">
-   <div style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:24px;flex-wrap:wrap;gap:12px">
-     <div>
-       <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.2em;text-transform:uppercase;color:var(--orange);margin-bottom:6px">Ticketmaster &middot; Eventbrite &middot; Columbus Underground</div>
-       <h2 style="font-family:var(--font);font-size:22px;font-weight:800;letter-spacing:-0.03em;color:var(--text);margin-bottom:6px">Columbus Calendar</h2>
-       <p style="font-size:14px;color:var(--sub)">Everything happening in Columbus &mdash; updated in real time.</p>
+     <!-- LEFT: events -->
+     <div id="eventResults">
+       ${tw.length?`<div class="section-header" style="margin-bottom:16px"><div><div class="section-title"> This Week</div></div></div><div class="event-grid" style="grid-template-columns:repeat(2,1fr);margin-bottom:40px">${tw.map(e=>eventCard(e)).join('')}</div>`:''}
+       ${later.length?`<div class="section-header" style="margin-bottom:16px"><div><div class="section-title"> Coming Up</div></div></div><div class="event-grid" style="grid-template-columns:repeat(2,1fr)">${later.map(e=>eventCard(e)).join('')}</div>`:''}
+       ${!allEvents.length?'<div class="empty"><h3>No upcoming events yet</h3><p>Check back soon!</p></div>':''}
      </div>
-     <div style="display:flex;gap:8px">
-       <button data-cal="all"    onclick="setCalFilter('all',this)"     style="font-family:var(--mono);font-size:9px;letter-spacing:0.1em;text-transform:uppercase;padding:7px 14px;border-radius:var(--r-md);border:1px solid var(--border);background:var(--orange);color:#fff;cursor:pointer">All</button>
-       <button data-cal="tonight"  onclick="setCalFilter('tonight',this)"  style="font-family:var(--mono);font-size:9px;letter-spacing:0.1em;text-transform:uppercase;padding:7px 14px;border-radius:var(--r-md);border:1px solid var(--border);background:var(--surface);color:var(--sub);cursor:pointer">Tonight</button>
-       <button data-cal="weekend"  onclick="setCalFilter('weekend',this)"  style="font-family:var(--mono);font-size:9px;letter-spacing:0.1em;text-transform:uppercase;padding:7px 14px;border-radius:var(--r-md);border:1px solid var(--border);background:var(--surface);color:var(--sub);cursor:pointer">Weekend</button>
+
+     <!-- RIGHT: Columbus Calendar sidebar -->
+     <div style="position:sticky;top:80px">
+       <div style="margin-bottom:16px">
+         <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.2em;text-transform:uppercase;color:var(--orange);margin-bottom:5px">Live &middot; Ticketmaster &middot; Eventbrite</div>
+         <div style="font-family:var(--font);font-size:17px;font-weight:800;color:var(--text);margin-bottom:10px">Columbus Calendar</div>
+         <div style="display:flex;gap:6px">
+           <button data-cal="all"     onclick="setCalFilter('all',this)"     style="font-family:var(--mono);font-size:8px;letter-spacing:0.1em;text-transform:uppercase;padding:5px 11px;border-radius:20px;border:1px solid var(--orange);background:var(--orange);color:#fff;cursor:pointer">All</button>
+           <button data-cal="tonight" onclick="setCalFilter('tonight',this)" style="font-family:var(--mono);font-size:8px;letter-spacing:0.1em;text-transform:uppercase;padding:5px 11px;border-radius:20px;border:1px solid var(--border);background:transparent;color:var(--sub);cursor:pointer">Tonight</button>
+           <button data-cal="weekend" onclick="setCalFilter('weekend',this)" style="font-family:var(--mono);font-size:8px;letter-spacing:0.1em;text-transform:uppercase;padding:5px 11px;border-radius:20px;border:1px solid var(--border);background:transparent;color:var(--sub);cursor:pointer">Weekend</button>
+         </div>
+       </div>
+       <div id="calendarFeed" style="display:flex;flex-direction:column;gap:10px;max-height:70vh;overflow-y:auto;padding-right:4px">
+         <div style="text-align:center;padding:32px;color:var(--sub);font-size:13px">Loading...</div>
+       </div>
+       <button id="calLoadMore" onclick="calLoadMore()" style="display:none;margin-top:12px;font-family:var(--mono);font-size:9px;letter-spacing:0.1em;text-transform:uppercase;padding:9px;border-radius:var(--r-md);border:1px solid var(--border);background:var(--surface);color:var(--text);cursor:pointer;width:100%">Load More</button>
      </div>
+
    </div>
-   <div id="calendarFeed" style="display:flex;flex-direction:column;gap:12px">
-     <div style="text-align:center;padding:40px;color:var(--sub)">Loading Columbus Calendar...</div>
-   </div>
-   <button id="calLoadMore" onclick="calLoadMore()" style="display:none;margin:24px auto 0;font-family:var(--mono);font-size:10px;letter-spacing:0.12em;text-transform:uppercase;padding:11px 28px;border-radius:var(--r-md);border:1px solid var(--border);background:var(--surface);color:var(--text);cursor:pointer;width:100%">Load More Events</button>
  </section>
 
  ${footer()}
