@@ -2936,11 +2936,51 @@ function renderEvents(){
  const later=allEvents.filter(e=>!isThisWeek(e.start_time));
  document.getElementById('app').innerHTML=`
  <div class="search-section"> <div class="search-inner"> <div style="margin-bottom:16px"> <h1 style="font-family:var(--font);font-size:28px;font-weight:800;margin-bottom:4px">Columbus Events</h1> <p style="color:var(--sub);font-size:14px">${allEvents.length} upcoming events across Columbus</p> </div> <div class="search-bar"> <div class="search-wrap"> <span class="search-icon"></span> <input class="search-input" id="eSearch" placeholder="Search events..." oninput="filterEvents()"> </div> <select class="search-select" id="eCat" onchange="filterEvents()"> ${cats.map(c=>`<option>${c}</option>`).join('')}
- </select> </div> </div> </div> <section class="section"> <div id="eventResults"> ${tw.length?`<div class="section-header" style="margin-bottom:16px"><div><div class="section-title"> This Week</div></div></div><div class="event-grid" style="margin-bottom:40px">${tw.map(e=>eventCard(e)).join('')}</div>`:''}
- ${later.length?`<div class="section-header" style="margin-bottom:16px"><div><div class="section-title"> Coming Up</div></div></div><div class="event-grid">${later.map(e=>eventCard(e)).join('')}</div>`:''}
- ${!allEvents.length?'<div class="empty"><h3>No upcoming events yet</h3><p>Check back soon!</p></div>':''}
- </div> </section> ${footer()}
+ </select> </div> </div> </div>
+
+ <section class="section">
+   <a href="https://cbusevents.com/1313-festival-event.html" style="display:flex;align-items:center;justify-content:space-between;gap:20px;background:linear-gradient(135deg,#1a0800,#0f0a00 50%,#0a0f0a);border:1px solid rgba(255,107,53,0.35);border-radius:var(--r-lg);padding:22px 28px;text-decoration:none;margin-bottom:32px;position:relative;overflow:hidden;flex-wrap:wrap" onmouseover="this.style.borderColor='rgba(255,107,53,0.6)'" onmouseout="this.style.borderColor='rgba(255,107,53,0.35)'">
+     <div style="position:absolute;inset:0;background:radial-gradient(ellipse 60% 80% at 100% 50%,rgba(255,107,53,0.07),transparent);pointer-events:none"></div>
+     <div style="display:flex;align-items:center;gap:16px">
+       <div style="background:rgba(255,107,53,0.15);border:1px solid rgba(255,107,53,0.3);border-radius:10px;padding:10px 14px;font-size:22px;flex-shrink:0">&#127981;</div>
+       <div>
+         <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.18em;text-transform:uppercase;color:var(--orange);margin-bottom:4px">CBUSEVENTS Produced &middot; Jun 13</div>
+         <div style="font-family:var(--font);font-size:18px;font-weight:800;color:var(--text);letter-spacing:-0.02em;margin-bottom:3px">1313 Festival &mdash; End of Spring</div>
+         <div style="font-size:13px;color:var(--sub)">Food trucks, vendors &amp; vibes &middot; 1313 E. Broad St &middot; Free Entry</div>
+       </div>
+     </div>
+     <span style="background:var(--orange);color:#fff;font-family:var(--mono);font-size:10px;letter-spacing:0.1em;text-transform:uppercase;padding:9px 18px;border-radius:var(--r-md);font-weight:600;flex-shrink:0">Get Tickets &rarr;</span>
+   </a>
+
+   <div id="eventResults">
+     ${tw.length?`<div class="section-header" style="margin-bottom:16px"><div><div class="section-title"> This Week</div></div></div><div class="event-grid" style="margin-bottom:40px">${tw.map(e=>eventCard(e)).join('')}</div>`:''}
+     ${later.length?`<div class="section-header" style="margin-bottom:16px"><div><div class="section-title"> Coming Up</div></div></div><div class="event-grid">${later.map(e=>eventCard(e)).join('')}</div>`:''}
+     ${!allEvents.length?'<div class="empty"><h3>No upcoming events yet</h3><p>Check back soon!</p></div>':''}
+   </div>
+ </section>
+
+ <section style="padding:48px 48px 52px;border-top:1px solid var(--border)">
+   <div style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:24px;flex-wrap:wrap;gap:12px">
+     <div>
+       <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.2em;text-transform:uppercase;color:var(--orange);margin-bottom:6px">Ticketmaster &middot; Eventbrite &middot; Columbus Underground</div>
+       <h2 style="font-family:var(--font);font-size:22px;font-weight:800;letter-spacing:-0.03em;color:var(--text);margin-bottom:6px">Columbus Calendar</h2>
+       <p style="font-size:14px;color:var(--sub)">Everything happening in Columbus &mdash; updated in real time.</p>
+     </div>
+     <div style="display:flex;gap:8px">
+       <button data-cal="all"    onclick="setCalFilter('all',this)"     style="font-family:var(--mono);font-size:9px;letter-spacing:0.1em;text-transform:uppercase;padding:7px 14px;border-radius:var(--r-md);border:1px solid var(--border);background:var(--orange);color:#fff;cursor:pointer">All</button>
+       <button data-cal="tonight"  onclick="setCalFilter('tonight',this)"  style="font-family:var(--mono);font-size:9px;letter-spacing:0.1em;text-transform:uppercase;padding:7px 14px;border-radius:var(--r-md);border:1px solid var(--border);background:var(--surface);color:var(--sub);cursor:pointer">Tonight</button>
+       <button data-cal="weekend"  onclick="setCalFilter('weekend',this)"  style="font-family:var(--mono);font-size:9px;letter-spacing:0.1em;text-transform:uppercase;padding:7px 14px;border-radius:var(--r-md);border:1px solid var(--border);background:var(--surface);color:var(--sub);cursor:pointer">Weekend</button>
+     </div>
+   </div>
+   <div id="calendarFeed" style="display:flex;flex-direction:column;gap:12px">
+     <div style="text-align:center;padding:40px;color:var(--sub)">Loading Columbus Calendar...</div>
+   </div>
+   <button id="calLoadMore" onclick="calLoadMore()" style="display:none;margin:24px auto 0;font-family:var(--mono);font-size:10px;letter-spacing:0.12em;text-transform:uppercase;padding:11px 28px;border-radius:var(--r-md);border:1px solid var(--border);background:var(--surface);color:var(--text);cursor:pointer;width:100%">Load More Events</button>
+ </section>
+
+ ${footer()}
  `;
+ loadCalendarEvents();
 }
 function filterEvents(){
  const q=(document.getElementById('eSearch')?.value||'').toLowerCase();
