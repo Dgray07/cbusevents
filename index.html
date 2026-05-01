@@ -1609,15 +1609,7 @@ async function init(){
  if(pParam==='events'){
    await initNavAuth();
    renderEventsLoading();
-   const [vRes,eRes,vendRes]=await Promise.all([
-     sb.from('venues').select('*').eq('status','approved').order('tier',{ascending:false}),
-     sb.from('events').select('*,venues(name,neighborhood,lat,lng)').eq('status','published')
-       .gte('start_time',new Date().toISOString()).order('start_time',{ascending:true}),
-     sb.from('vendors').select('*').order('admin_promoted',{ascending:false})
-   ]).catch(()=>[{data:[]},{data:[]},{data:[]}]);
-   allVenues=vRes.data||[];
-   allEvents=eRes.data||[];
-   allVendors=vendRes.data||[];
+   await loadEventsData();
    showPage('events',null,false);
    await loadSavedState();
    return;
@@ -1694,6 +1686,20 @@ function toSlug(name){
  return (name||'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
 }
 
+async function loadEventsData(){
+ try{
+   const [vRes,eRes,vendRes]=await Promise.all([
+     sb.from('venues').select('*').eq('status','approved').order('tier',{ascending:false}),
+     sb.from('events').select('*,venues(name,neighborhood,lat,lng)').eq('status','published')
+       .gte('start_time',new Date().toISOString()).order('start_time',{ascending:true}),
+     sb.from('vendors').select('*').order('admin_promoted',{ascending:false})
+   ]);
+   allVenues=vRes.data||[];
+   allEvents=eRes.data||[];
+   allVendors=vendRes.data||[];
+ }catch(e){ allVenues=[];allEvents=[];allVendors=[]; }
+}
+
 function showPage(page,data=null,pushState=true){
  currentPage=page;
  if(heroTimer){clearInterval(heroTimer);heroTimer=null;}
@@ -1704,19 +1710,10 @@ function showPage(page,data=null,pushState=true){
  else if(page==='events'){
    if(!allEvents.length){
      renderEventsLoading();
-     try{
-       const [vRes,eRes,vendRes]=await Promise.all([
-         sb.from('venues').select('*').eq('status','approved').order('tier',{ascending:false}),
-         sb.from('events').select('*,venues(name,neighborhood,lat,lng)').eq('status','published')
-           .gte('start_time',new Date().toISOString()).order('start_time',{ascending:true}),
-         sb.from('vendors').select('*').order('admin_promoted',{ascending:false})
-       ]);
-       allVenues=vRes.data||[];
-       allEvents=eRes.data||[];
-       allVendors=vendRes.data||[];
-     }catch(e){}
+     loadEventsData().then(()=>renderEvents());
+   } else {
+     renderEvents();
    }
-   renderEvents();
  }
  else if(page==='venue')renderVenueDetail(data);
  else if(page==='category')renderCategory(data);
