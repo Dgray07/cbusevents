@@ -1144,6 +1144,16 @@ footer { background:var(--surface); border-top:1px solid var(--border); padding:
 /* ── COLUMBUS CALENDAR TIMELINE ── */
 #calendarFeed { display:flex; flex-direction:column; gap:12px; }
 
+/* Sidebar calendar cards */
+#calendarFeed .cal-post { border-radius:10px; overflow:hidden; }
+#calendarFeed .cal-post-actions { display:none; }
+#calendarFeed .cal-post-claim { display:none; }
+#calendarFeed .cal-comments-drawer { display:none; }
+#calendarFeed .cal-post-img { width:56px; height:56px; min-width:56px; border-radius:8px; overflow:hidden; position:relative; flex-shrink:0; }
+#calendarFeed .cal-post-inner { align-items:center; gap:10px; padding:10px; }
+#calendarFeed .cal-post-title { font-size:13px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+#calendarFeed .cal-post-meta { font-size:11px; flex-direction:column; gap:2px; align-items:flex-start; }
+
 .cal-post {
   background:var(--card); border:1px solid var(--border); border-radius:var(--r-lg);
   overflow:hidden; transition:border-color 0.2s;
@@ -1596,7 +1606,22 @@ async function init(){
  // For non-home routes, show the nav immediately then let the page render
  // (those pages fetch their own data as needed)
  if(pParam==='venues'){ await initNavAuth(); showPage('venues',null,false); await loadSavedState(); return; }
- if(pParam==='events'){ await initNavAuth(); showPage('events',null,false); await loadSavedState(); return; }
+ if(pParam==='events'){
+   await initNavAuth();
+   renderEventsLoading();
+   const [vRes,eRes,vendRes]=await Promise.all([
+     sb.from('venues').select('*').eq('status','approved').order('tier',{ascending:false}),
+     sb.from('events').select('*,venues(name,neighborhood,lat,lng)').eq('status','published')
+       .gte('start_time',new Date().toISOString()).order('start_time',{ascending:true}),
+     sb.from('vendors').select('*').order('admin_promoted',{ascending:false})
+   ]).catch(()=>[{data:[]},{data:[]},{data:[]}]);
+   allVenues=vRes.data||[];
+   allEvents=eRes.data||[];
+   allVendors=vendRes.data||[];
+   showPage('events',null,false);
+   await loadSavedState();
+   return;
+ }
  if(pathToRoute && pathToRoute !== '/'){
    const parts = pathToRoute.replace(/^\//,'').split('/');
    if(parts[0]==='events'){ await initNavAuth(); showPage('events'); if(rParam) history.replaceState({},'',pathToRoute); await loadSavedState(); return; }
@@ -1676,7 +1701,23 @@ function showPage(page,data=null,pushState=true){
  window.scrollTo({top:0,behavior:'smooth'});
  if(page==='home')renderHome();
  else if(page==='venues')renderVenues();
- else if(page==='events')renderEvents();
+ else if(page==='events'){
+   if(!allEvents.length){
+     renderEventsLoading();
+     try{
+       const [vRes,eRes,vendRes]=await Promise.all([
+         sb.from('venues').select('*').eq('status','approved').order('tier',{ascending:false}),
+         sb.from('events').select('*,venues(name,neighborhood,lat,lng)').eq('status','published')
+           .gte('start_time',new Date().toISOString()).order('start_time',{ascending:true}),
+         sb.from('vendors').select('*').order('admin_promoted',{ascending:false})
+       ]);
+       allVenues=vRes.data||[];
+       allEvents=eRes.data||[];
+       allVendors=vendRes.data||[];
+     }catch(e){}
+   }
+   renderEvents();
+ }
  else if(page==='venue')renderVenueDetail(data);
  else if(page==='category')renderCategory(data);
  else if(page==='listVenue')renderVenueLanding();
@@ -2930,6 +2971,35 @@ function filterVendors(){
 }
 
 // ── EVENTS PAGE ───────────────────────────────────────────────
+function renderEventsLoading(){
+ document.getElementById('app').innerHTML=`
+ <div class="search-section"> <div class="search-inner"> <div style="margin-bottom:16px"> <h1 style="font-family:var(--font);font-size:28px;font-weight:800;margin-bottom:4px">Columbus Events</h1> <p style="color:var(--sub);font-size:14px">Loading upcoming events...</p> </div> <div class="search-bar"> <div class="search-wrap"> <span class="search-icon"></span> <input class="search-input" placeholder="Search events..." disabled> </div> </div> </div> </div>
+ <section class="section">
+   <div style="display:grid;grid-template-columns:1fr 340px;gap:32px;align-items:start">
+     <div>
+       <div style="font-family:var(--font);font-size:16px;font-weight:700;margin-bottom:16px;color:var(--text)">This Week</div>
+       <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:24px;margin-bottom:40px">
+         ${[1,2].map(()=>`<div style="border-radius:var(--r-lg);overflow:hidden;border:1px solid var(--border);background:var(--card)"><div style="height:180px;background:var(--surface);animation:shimmer 1.4s infinite linear;background:linear-gradient(90deg,var(--surface) 25%,var(--border) 50%,var(--surface) 75%);background-size:200% 100%"></div><div style="padding:14px"><div style="height:14px;border-radius:6px;background:var(--surface);margin-bottom:10px;width:80%;animation:shimmer 1.4s infinite linear;background:linear-gradient(90deg,var(--surface) 25%,var(--border) 50%,var(--surface) 75%);background-size:200% 100%"></div><div style="height:11px;border-radius:6px;background:var(--surface);width:55%;animation:shimmer 1.4s infinite linear;background:linear-gradient(90deg,var(--surface) 25%,var(--border) 50%,var(--surface) 75%);background-size:200% 100%"></div></div></div>`).join('')}
+       </div>
+       <div style="font-family:var(--font);font-size:16px;font-weight:700;margin-bottom:16px;color:var(--text)">Coming Up</div>
+       <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:24px">
+         ${[1,2,3,4].map(()=>`<div style="border-radius:var(--r-lg);overflow:hidden;border:1px solid var(--border);background:var(--card)"><div style="height:180px;animation:shimmer 1.4s infinite linear;background:linear-gradient(90deg,var(--surface) 25%,var(--border) 50%,var(--surface) 75%);background-size:200% 100%"></div><div style="padding:14px"><div style="height:14px;border-radius:6px;margin-bottom:10px;width:75%;animation:shimmer 1.4s infinite linear;background:linear-gradient(90deg,var(--surface) 25%,var(--border) 50%,var(--surface) 75%);background-size:200% 100%"></div><div style="height:11px;border-radius:6px;width:50%;animation:shimmer 1.4s infinite linear;background:linear-gradient(90deg,var(--surface) 25%,var(--border) 50%,var(--surface) 75%);background-size:200% 100%"></div></div></div>`).join('')}
+       </div>
+     </div>
+     <div style="position:sticky;top:80px">
+       <div style="font-family:var(--font);font-size:17px;font-weight:800;color:var(--text);margin-bottom:12px">Columbus Calendar</div>
+       ${[1,2,3,4,5].map(()=>`<div style="border-radius:var(--r-lg);border:1px solid var(--border);background:var(--card);padding:12px;margin-bottom:10px;display:flex;gap:10px;align-items:center"><div style="width:56px;height:56px;border-radius:8px;flex-shrink:0;animation:shimmer 1.4s infinite linear;background:linear-gradient(90deg,var(--surface) 25%,var(--border) 50%,var(--surface) 75%);background-size:200% 100%"></div><div style="flex:1"><div style="height:12px;border-radius:6px;margin-bottom:8px;width:90%;animation:shimmer 1.4s infinite linear;background:linear-gradient(90deg,var(--surface) 25%,var(--border) 50%,var(--surface) 75%);background-size:200% 100%"></div><div style="height:10px;border-radius:6px;width:60%;animation:shimmer 1.4s infinite linear;background:linear-gradient(90deg,var(--surface) 25%,var(--border) 50%,var(--surface) 75%);background-size:200% 100%"></div></div></div>`).join('')}
+     </div>
+   </div>
+ </section> ${footer()}`;
+ if(!document.getElementById('shimmerStyle')){
+   const s=document.createElement('style');
+   s.id='shimmerStyle';
+   s.textContent='@keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}';
+   document.head.appendChild(s);
+ }
+}
+
 function renderEvents(){
  const cats=['All',...new Set(allEvents.map(e=>e.category).filter(Boolean))];
  const tw=allEvents.filter(e=>isThisWeek(e.start_time));
@@ -2974,7 +3044,7 @@ function renderEvents(){
            <button data-cal="weekend" onclick="setCalFilter('weekend',this)" style="font-family:var(--mono);font-size:8px;letter-spacing:0.1em;text-transform:uppercase;padding:5px 11px;border-radius:20px;border:1px solid var(--border);background:transparent;color:var(--sub);cursor:pointer">Weekend</button>
          </div>
        </div>
-       <div id="calendarFeed" style="display:flex;flex-direction:column;gap:10px;max-height:70vh;overflow-y:auto;padding-right:4px">
+       <div id="calendarFeed" style="display:flex;flex-direction:column;gap:10px;max-height:72vh;overflow-y:auto;overflow-x:hidden;padding-right:2px;scrollbar-width:thin">
          <div style="text-align:center;padding:32px;color:var(--sub);font-size:13px">Loading...</div>
        </div>
        <button id="calLoadMore" onclick="calLoadMore()" style="display:none;margin-top:12px;font-family:var(--mono);font-size:9px;letter-spacing:0.1em;text-transform:uppercase;padding:9px;border-radius:var(--r-md);border:1px solid var(--border);background:var(--surface);color:var(--text);cursor:pointer;width:100%">Load More</button>
