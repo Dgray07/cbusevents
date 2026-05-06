@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Join CBUSEVENTS — Columbus Event Ecosystem</title>
+<title>Join CBUSEVENTS - Columbus Event Ecosystem</title>
 <meta name="theme-color" content="#080810">
 <link rel="apple-touch-icon" href="/assets/cbus-shield.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -151,6 +151,16 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
         <div class="role-desc">Refer venues, vendors, and planners to CBUSEVENTS. Earn 25% recurring commission on every paid account you bring in</div>
         <span class="role-badge">25% commission</span>
       </div>
+      <div class="role-card" onclick="selectRole('creator',this)" role="button" tabindex="0" style="grid-column:1/-1;border-color:rgba(180,107,255,0.25);">
+        <div class="role-name" style="color:#b46bff;">Creator</div>
+        <div class="role-desc">Columbus-based content creators - get your own public page, curate Columbus picks and earn commission on platform revenue you drive</div>
+        <span class="role-badge" style="background:rgba(180,107,255,0.1);color:#b46bff;border-color:rgba(180,107,255,0.25);">Application reviewed</span>
+      </div>
+      <div class="role-card" onclick="selectRole('brand',this)" role="button" tabindex="0" style="grid-column:1/-1;">
+        <div class="role-name">Brand Partner</div>
+        <div class="role-desc">Columbus brands - access creator discovery, event sponsorships and platform placements to reach Columbus's event audience</div>
+        <span class="role-badge">Free to start</span>
+      </div>
     </div>
 
     <!-- FORM CARD -->
@@ -245,6 +255,58 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
         <div class="field"><label>Primary Role *</label><select id="staffRole"><option value="">Select your role...</option><option value="bartender">Bartender</option><option value="barback">Bar Back</option><option value="server">Server / Waitstaff</option><option value="security">Security / Bouncer</option><option value="host">Host / Greeter</option><option value="coat_check">Coat Check</option><option value="event_coordinator">On-Site Coordinator</option><option value="other">Other</option></select></div>
         <div class="field-row"><div class="field"><label>Years Experience</label><input type="number" id="staffExp" placeholder="e.g. 3"></div><div class="field"><label>Phone</label><input id="staffPhone" placeholder="+1 (614) 000-0000"></div></div>
       </div>
+      <div class="role-fields" id="creatorFields">
+        <div style="height:1px;background:var(--border-sub);margin:16px 0"></div>
+        <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.14em;text-transform:uppercase;color:var(--muted);margin-bottom:12px">Creator details</div>
+        <div style="background:rgba(180,107,255,0.08);border:1px solid rgba(180,107,255,0.2);border-radius:10px;padding:12px 14px;margin-bottom:14px;font-size:12px;color:#b46bff;line-height:1.6;">Your application will be reviewed before your creator page goes live. You will hear back within 48 hours.</div>
+        <div class="field"><label>Facebook or Instagram handle</label><input id="creatorHandle" placeholder="@yourhandle"></div>
+        <div class="field"><label>Primary Columbus niche</label>
+          <select id="creatorNiche">
+            <option value="">Select your niche</option>
+            <option value="food">Food and drink</option>
+            <option value="nightlife">Nightlife</option>
+            <option value="fashion">Fashion and lifestyle</option>
+            <option value="music">Music</option>
+            <option value="arts">Arts</option>
+            <option value="community">Community</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+        <div class="field"><label>Columbus following size (approx.)</label>
+          <select id="creatorFollowing">
+            <option value="">Select range</option>
+            <option value="1k-5k">1,000 - 5,000</option>
+            <option value="5k-15k">5,000 - 15,000</option>
+            <option value="15k-50k">15,000 - 50,000</option>
+            <option value="50k+">50,000+</option>
+          </select>
+        </div>
+      </div>
+      <div class="role-fields" id="brandFields">
+        <div style="height:1px;background:var(--border-sub);margin:16px 0"></div>
+        <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.14em;text-transform:uppercase;color:var(--muted);margin-bottom:12px">Brand details</div>
+        <div class="field"><label>Brand name *</label><input id="brandName" placeholder="Your brand or company name"></div>
+        <div class="field"><label>Brand category</label>
+          <select id="brandCategory">
+            <option value="">Select category</option>
+            <option value="food_beverage">Food and beverage</option>
+            <option value="financial">Financial</option>
+            <option value="fashion">Fashion</option>
+            <option value="real_estate">Real estate</option>
+            <option value="entertainment">Entertainment</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+        <div class="field"><label>Monthly partnership budget</label>
+          <select id="brandBudget">
+            <option value="">Select range</option>
+            <option value="under500">Under $500</option>
+            <option value="500-2k">$500 - $2,000</option>
+            <option value="2k-5k">$2,000 - $5,000</option>
+            <option value="5k+">$5,000+</option>
+          </select>
+        </div>
+      </div>
       <div class="msg" id="errorMsg"></div>
       <button class="submit-btn" id="submitBtn" onclick="handleSubmit()">Create Account</button>
       <div style="font-size:11px;color:var(--muted);text-align:center;margin-top:12px;line-height:1.6">
@@ -286,6 +348,8 @@ const PORTAL_URLS = {
   food_professional: 'https://cbusevents.com/food-professional.html',
   event_staff:       'https://cbusevents.com/event-staff.html',
   sales_rep:         'https://cbusevents.com/brand-rep.html',
+  creator:           'https://cbusevents.com/creator-portal.html',
+  brand:             'https://cbusevents.com/brand-portal.html',
 };
 
 const FORM_TITLES = {
@@ -296,13 +360,15 @@ const FORM_TITLES = {
   food_professional: 'Create Your Food Professional Account',
   event_staff:       'Create Your Event Staff Account',
   sales_rep:         'Create Your Brand Rep Account',
+  creator:           'Join the Creator Collective',
+  brand:             'Create Your Brand Profile',
 };
 
 // Pre-select role from URL param
 const urlParams = new URLSearchParams(window.location.search);
 const roleParam = urlParams.get('role');
 if (roleParam) {
-  const roleMap = { venue_owner: 'venue', vendor: 'vendor', planner: 'planner', attendee: 'attendee', customer: 'attendee', food_professional: 'food_professional', event_staff: 'event_staff', sales_rep: 'sales_rep' };
+  const roleMap = { venue_owner: 'venue', vendor: 'vendor', planner: 'planner', attendee: 'attendee', customer: 'attendee', food_professional: 'food_professional', event_staff: 'event_staff', sales_rep: 'sales_rep', creator: 'creator', brand: 'brand' };
   const mapped = roleMap[roleParam] || roleParam;
   const el = document.querySelector(`.role-card:nth-child(${['venue','vendor','planner','attendee'].indexOf(mapped)+1})`);
   if (el) selectRole(mapped, el);
@@ -336,6 +402,8 @@ async function handleSubmit() {
   if (selectedRole === 'vendor' && !document.getElementById('businessName').value.trim()) { showError('Business name is required.'); return; }
   if (selectedRole === 'food_professional' && !document.getElementById('foodBrandName').value.trim()) { showError('Brand or business name is required.'); return; }
   if (selectedRole === 'event_staff' && !document.getElementById('staffRole').value) { showError('Please select your primary staff role.'); return; }
+
+  if (selectedRole === 'brand' && !document.getElementById('brandName').value.trim()) { showError('Brand name is required.'); return; }
 
   btn.disabled = true;
   btn.innerHTML = '<span class="spinner-sm"></span>Creating account...';
@@ -383,7 +451,7 @@ async function handleSubmit() {
     }
 
     if (userId && data.session) {
-      const roleMap = { venue: 'venue_owner', vendor: 'vendor', planner: 'planner', attendee: 'customer', food_professional: 'food_professional', event_staff: 'event_staff' };
+      const roleMap = { venue: 'venue_owner', vendor: 'vendor', planner: 'planner', attendee: 'customer', food_professional: 'food_professional', event_staff: 'event_staff', creator: 'creator', brand: 'brand' };
       await sb.from('user_roles').upsert({ user_id: userId, role: roleMap[selectedRole] || selectedRole }, { onConflict: 'user_id' });
 
       if (selectedRole === 'venue' && meta.venue_name) {
@@ -401,9 +469,24 @@ async function handleSubmit() {
       if (selectedRole === 'event_staff') {
         await sb.from('event_staff').upsert({ user_id: userId, email, display_name: meta.full_name||null, primary_role: meta.primary_role||null, phone: meta.phone||null, years_experience: meta.years_experience?parseInt(meta.years_experience):null, city: 'Columbus, OH', tier: 'free', is_accepting: true }, { onConflict: 'user_id' }).catch(()=>{});
       }
-      if (selectedRole === 'sales_rep') {
+      if (selectedRole === 'creator') {
+    meta.handle       = document.getElementById('creatorHandle').value.trim();
+    meta.niche        = document.getElementById('creatorNiche').value;
+    meta.following    = document.getElementById('creatorFollowing').value;
+    meta.portal       = 'creator';
+    meta.status       = 'pending_review';
+  } else if (selectedRole === 'brand') {
+    meta.brand_name   = document.getElementById('brandName').value.trim();
+    meta.category     = document.getElementById('brandCategory').value;
+    meta.budget       = document.getElementById('brandBudget').value;
+    meta.portal       = 'brand';
+  } else if (selectedRole === 'sales_rep') {
         const code = (meta.full_name||email).toLowerCase().replace(/[^a-z0-9]/g,'-').replace(/-+/g,'-').slice(0,20);
         await sb.from('sales_reps').upsert({ user_id: userId, email, name: meta.full_name||null, phone: meta.phone||null, referral_code: code, rank: 'Brand Rep' }, { onConflict: 'user_id' }).catch(()=>{});
+      } else if (selectedRole === 'creator') {
+        await sb.from('brand_rep_applications').insert({ first_name: meta.first_name||null, last_name: meta.last_name||null, email, notes: 'Creator signup. Handle: '+(meta.handle||'')+ '. Niche: '+(meta.niche||'')+'. Following: '+(meta.following||''), status: 'pending', source: 'signup' }).catch(()=>{});
+      } else if (selectedRole === 'brand') {
+        await sb.from('leads').insert({ name: meta.full_name||null, email, notes: 'Brand signup. Brand: '+(meta.brand_name||'')+'. Category: '+(meta.category||'')+'. Budget: '+(meta.budget||''), source: 'brand_signup', status: 'new' }).catch(()=>{});
       }
       window.location.href = PORTAL_URLS[selectedRole] || PORTAL_URLS.attendee;
     }
