@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Terms of Service | CBUSEVENTS</title>
+<meta name="description" content="CBUSEVENTS Terms of Service — the rules governing your use of the platform.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700;800;900&family=DM+Mono:wght@400;500&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --bg:#080810;--surface:#0f0f1a;--card:#141420;--border:#1e1e2e;
+  --text:#f0f0fa;--sub:#7070a0;--muted:#40405a;
+  --orange:#FF6B35;--orange-dim:rgba(255,107,53,0.1);--orange-border:rgba(255,107,53,0.25);
+  --font:'DM Sans',sans-serif;--mono:'DM Mono',monospace;--display:'Playfair Display',serif;
+}
+body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:16px;line-height:1.7;}
+nav{background:rgba(8,8,16,0.95);border-bottom:1px solid rgba(255,255,255,0.07);padding:0 32px;display:flex;align-items:center;justify-content:space-between;height:56px;position:sticky;top:0;z-index:100;backdrop-filter:blur(20px);}
+.nav-logo{font-family:var(--display);font-size:18px;font-weight:900;color:var(--text);text-decoration:none;letter-spacing:-0.5px;}
+.nav-logo span{color:var(--orange);}
+.nav-back{font-family:var(--mono);font-size:11px;color:var(--sub);letter-spacing:1px;text-decoration:none;display:flex;align-items:center;gap:6px;}
+.nav-back:hover{color:var(--text);}
+.legal-hero{background:var(--surface);border-bottom:1px solid var(--border);padding:48px 32px 40px;}
+.legal-hero-inner{max-width:800px;margin:0 auto;}
+.legal-eyebrow{font-family:var(--mono);font-size:10px;color:var(--orange);letter-spacing:2px;text-transform:uppercase;margin-bottom:12px;}
+.legal-title{font-family:var(--display);font-size:clamp(28px,4vw,42px);font-weight:900;line-height:1.08;letter-spacing:-0.8px;margin-bottom:12px;}
+.legal-meta{font-family:var(--mono);font-size:11px;color:var(--sub);letter-spacing:0.5px;display:flex;gap:20px;flex-wrap:wrap;}
+.toc{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:24px 28px;margin:32px 0;}
+.toc-title{font-family:var(--mono);font-size:10px;color:var(--orange);letter-spacing:2px;text-transform:uppercase;margin-bottom:14px;}
+.toc-list{display:flex;flex-direction:column;gap:6px;}
+.toc-link{font-size:13px;color:var(--sub);text-decoration:none;padding:3px 0;display:flex;align-items:center;gap:8px;}
+.toc-link:hover{color:var(--orange);}
+.toc-num{font-family:var(--mono);font-size:10px;color:var(--muted);width:20px;flex-shrink:0;}
+.legal-content{max-width:800px;margin:0 auto;padding:48px 32px 64px;}
+.legal-section{margin-bottom:48px;}
+.legal-section h2{font-family:var(--display);font-size:22px;font-weight:700;margin-bottom:16px;padding-top:8px;border-top:1px solid var(--border);}
+.legal-section h3{font-size:15px;font-weight:700;color:var(--text);margin:20px 0 10px;}
+.legal-section p{font-size:14px;color:rgba(240,240,250,0.75);line-height:1.75;margin-bottom:14px;}
+.legal-section ul{margin:10px 0 16px 0;display:flex;flex-direction:column;gap:6px;}
+.legal-section li{font-size:14px;color:rgba(240,240,250,0.75);line-height:1.65;padding-left:20px;position:relative;}
+.legal-section li::before{content:'—';position:absolute;left:0;color:var(--orange);font-weight:700;}
+.legal-section strong{color:var(--text);font-weight:600;}
+.legal-section a{color:var(--orange);text-decoration:none;}
+.legal-section a:hover{text-decoration:underline;}
+.price-table{width:100%;border-collapse:collapse;margin:16px 0 24px;}
+.price-table th{font-family:var(--mono);font-size:10px;color:var(--orange);letter-spacing:1.5px;text-transform:uppercase;text-align:left;padding:10px 14px;border-bottom:1px solid var(--border);}
+.price-table td{font-size:13px;color:rgba(240,240,250,0.75);padding:10px 14px;border-bottom:1px solid rgba(255,255,255,0.04);}
+.price-table tr:last-child td{border-bottom:none;}
+.price-table td:last-child{font-family:var(--mono);color:var(--orange);text-align:right;}
+.caps-block{background:var(--card);border:1px solid var(--border);border-left:3px solid var(--orange);border-radius:0 8px 8px 0;padding:16px 20px;margin:16px 0;}
+.caps-block p{font-size:12px;color:var(--sub);line-height:1.65;margin-bottom:0;font-family:var(--mono);letter-spacing:0.3px;}
+.contact-block{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:24px 28px;margin-top:16px;}
+.contact-block p{margin-bottom:6px;}
+footer{background:var(--surface);border-top:1px solid var(--border);padding:28px 32px;text-align:center;}
+footer p{font-family:var(--mono);font-size:10px;color:var(--muted);letter-spacing:1px;margin-bottom:6px;}
+footer a{color:var(--sub);text-decoration:none;margin:0 8px;}
+footer a:hover{color:var(--orange);}
+@media(max-width:640px){nav{padding:0 18px;}.legal-hero{padding:32px 18px 28px;}.legal-content{padding:32px 18px 48px;}}
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="https://cbusevents.com" class="nav-logo">CBUS<span>EVENTS</span></a>
+  <a href="https://cbusevents.com" class="nav-back">&#8592; Back to CBUSEVENTS</a>
+</nav>
+
+<div class="legal-hero">
+  <div class="legal-hero-inner">
+    <div class="legal-eyebrow">Legal</div>
+    <h1 class="legal-title">Terms of Service</h1>
+    <div class="legal-meta">
+      <div>Effective date: May 6, 2026</div>
+      <div>Last updated: May 6, 2026</div>
+      <div>CBUS Events LLC &nbsp;·&nbsp; Columbus, Ohio</div>
+    </div>
+
+    <div class="toc">
+      <div class="toc-title">Contents</div>
+      <div class="toc-list">
+        <a href="#s1" class="toc-link"><span class="toc-num">1.</span>The Platform</a>
+        <a href="#s2" class="toc-link"><span class="toc-num">2.</span>Accounts</a>
+        <a href="#s3" class="toc-link"><span class="toc-num">3.</span>Subscriptions and fees</a>
+        <a href="#s4" class="toc-link"><span class="toc-num">4.</span>Brand Ambassador program</a>
+        <a href="#s5" class="toc-link"><span class="toc-num">5.</span>Creator Collective program</a>
+        <a href="#s6" class="toc-link"><span class="toc-num">6.</span>Vendor and venue obligations</a>
+        <a href="#s7" class="toc-link"><span class="toc-num">7.</span>User content</a>
+        <a href="#s8" class="toc-link"><span class="toc-num">8.</span>Prohibited conduct</a>
+        <a href="#s9" class="toc-link"><span class="toc-num">9.</span>Intellectual property</a>
+        <a href="#s10" class="toc-link"><span class="toc-num">10.</span>Disclaimers</a>
+        <a href="#s11" class="toc-link"><span class="toc-num">11.</span>Limitation of liability</a>
+        <a href="#s12" class="toc-link"><span class="toc-num">12.</span>Indemnification</a>
+        <a href="#s13" class="toc-link"><span class="toc-num">13.</span>Governing law and disputes</a>
+        <a href="#s14" class="toc-link"><span class="toc-num">14.</span>Changes to these Terms</a>
+        <a href="#s15" class="toc-link"><span class="toc-num">15.</span>Contact</a>
+      </div>
+    </div>
+
+    <p style="font-size:14px;color:rgba(240,240,250,0.6);line-height:1.75;">These Terms of Service ("Terms") govern your access to and use of the CBUSEVENTS platform at cbusevents.com, operated by CBUS Events LLC, an Ohio limited liability company incorporated March 15, 2026 ("CBUSEVENTS," "we," "our," or "us"). By creating an account, making a purchase, or using any part of the Platform, you agree to be bound by these Terms.</p>
+  </div>
+</div>
+
+<div class="legal-content">
+
+  <div class="legal-section" id="s1">
+    <h2>1. The Platform</h2>
+    <p>CBUSEVENTS is a Columbus, Ohio event ecosystem connecting venues, vendors, event planners, food professionals, event staff, attendees, creators and brand partners. The Platform is currently in its inaugural season (2026) and some features are actively under development.</p>
+  </div>
+
+  <div class="legal-section" id="s2">
+    <h2>2. Accounts</h2>
+    <h3>2.1 Eligibility</h3>
+    <p>You must be at least 18 years old to create an account. By registering, you represent that you are 18 or older and that the information you provide is accurate and complete.</p>
+
+    <h3>2.2 Account types</h3>
+    <p>The Platform offers the following account roles:</p>
+    <ul>
+      <li>Attendee (free)</li>
+      <li>Vendor (free, Standard, or Premium subscription)</li>
+      <li>Event Planner (free, Standard, or Premium subscription)</li>
+      <li>Venue Owner (free, Standard, or Premium subscription)</li>
+      <li>Food Professional (free)</li>
+      <li>Event Staff (free)</li>
+      <li>Brand Ambassador (commission-based, 1099 independent contractor)</li>
+      <li>Creator (application-based, Creator Collective program)</li>
+      <li>Brand Partner (application-based)</li>
+    </ul>
+
+    <h3>2.3 Account security</h3>
+    <p>You are responsible for maintaining the confidentiality of your account credentials. Notify us immediately at <a href="mailto:hello@cbusevents.com">hello@cbusevents.com</a> if you believe your account has been compromised. CBUSEVENTS is not liable for losses resulting from unauthorized account access where you have failed to maintain credential security.</p>
+  </div>
+
+  <div class="legal-section" id="s3">
+    <h2>3. Subscriptions and fees</h2>
+    <h3>3.1 Subscription plans</h3>
+    <p>Paid subscription plans are billed monthly through Stripe. Current pricing:</p>
+    <table class="price-table">
+      <thead><tr><th>Plan</th><th>Price</th></tr></thead>
+      <tbody>
+        <tr><td>Vendor Standard</td><td>$15 / month</td></tr>
+        <tr><td>Vendor Premium</td><td>$45 / month</td></tr>
+        <tr><td>Planner Standard</td><td>$15 / month</td></tr>
+        <tr><td>Planner Premium</td><td>$45 / month</td></tr>
+        <tr><td>Venue Standard</td><td>$39 / month</td></tr>
+        <tr><td>Venue Premium</td><td>$99 / month</td></tr>
+      </tbody>
+    </table>
+    <p>Subscription pricing may change with 30 days advance notice to active subscribers.</p>
+
+    <h3>3.2 Event and festival fees</h3>
+    <p>The following one-time fees apply to CBUSEVENTS-produced events:</p>
+    <table class="price-table">
+      <thead><tr><th>Product</th><th>Price</th></tr></thead>
+      <tbody>
+        <tr><td>Vendor Table Fee</td><td>$75</td></tr>
+        <tr><td>Food Truck Spot Fee</td><td>$175</td></tr>
+        <tr><td>Food Truck Spot Fee — Early Bird</td><td>$150</td></tr>
+        <tr><td>Poetry x Art Show entry</td><td>$10</td></tr>
+        <tr><td>Poet x Art Entry Fee</td><td>$10</td></tr>
+        <tr><td>1313 Food and Art Festival — Complimentary drinks</td><td>$25</td></tr>
+        <tr><td>1313 Food and Art Festival — Complimentary drinks and poetry show</td><td>$35</td></tr>
+      </tbody>
+    </table>
+
+    <h3>3.3 Inaugural spot fee incentive</h3>
+    <p>Vendors and food truck operators who pay a spot fee for the inaugural 1313 Festival (June 13, 2026) receive three months of free Premium subscription access upon completion of the event. Premium access activates within five business days of the event date. Maintaining a Premium subscription after the complimentary period waives future spot fees for CBUSEVENTS-produced events, subject to availability.</p>
+
+    <h3>3.4 Platform ticket fee</h3>
+    <p>For ticketed events hosted on the Platform, CBUSEVENTS charges a platform fee of 6.5% plus $1 per ticket. This fee is deducted from ticket revenue before disbursement to the event organizer.</p>
+
+    <h3>3.5 Ticket revenue share</h3>
+    <p>Venue Premium subscribers receive a 25% share of the platform fee on ticket transactions processed through their venue listing. This is calculated as 25% of the 6.5% platform fee, not 25% of gross ticket revenue.</p>
+
+    <h3>3.6 Refunds</h3>
+    <p>Subscription fees are non-refundable except where required by law. Event and festival spot fees are non-refundable after the application approval date. Ticket refund policies are set by the individual event organizer. CBUSEVENTS-produced event tickets are non-refundable unless the event is canceled by CBUSEVENTS.</p>
+  </div>
+
+  <div class="legal-section" id="s4">
+    <h2>4. Brand Ambassador program</h2>
+    <p>The CBUSEVENTS Brand Ambassador program is a 1099 independent contractor arrangement. Ambassadors earn 25% recurring monthly commission on paid subscriptions from accounts they refer, for as long as those accounts remain on a paid plan. Commissions are paid through Stripe Connect.</p>
+    <p>Ambassador ranks — Brand Rep, Brand Manager, Territory Manager — unlock additional earning streams based on performance milestones. CBUSEVENTS reserves the right to modify commission rates with 30 days advance notice. Ambassadors are responsible for their own tax obligations on commission income.</p>
+  </div>
+
+  <div class="legal-section" id="s5">
+    <h2>5. Creator Collective program</h2>
+    <p>The CBUSEVENTS Creator Collective is an application-based program for Columbus-based content creators. Participation requires application approval by CBUSEVENTS. Creators receive a public profile page at cbusevents.com/creators/[handle] and earn commission on RSVPs, ticket sales and vendor sign-ups driven through their referral link.</p>
+    <p>CBUSEVENTS facilitates brand partnership transactions between brands and creators and takes a platform facilitation fee on each brand deal transacted through the Platform. Creators are responsible for disclosing sponsored content in accordance with FTC guidelines.</p>
+    <p>Founding Creator status — available to the inaugural cohort — carries a permanently higher commission rate. CBUSEVENTS reserves the right to remove a creator from the program for violations of these Terms or conduct that reflects negatively on the CBUSEVENTS brand.</p>
+  </div>
+
+  <div class="legal-section" id="s6">
+    <h2>6. Vendor and venue obligations</h2>
+    <p>By listing on the Platform, vendors and venues agree to:</p>
+    <ul>
+      <li>Provide accurate, current information about their business, products and services</li>
+      <li>Honor bookings, orders and inquiries made through the Platform in good faith</li>
+      <li>Maintain all required local, state and federal licenses and permits</li>
+      <li>Comply with Columbus city regulations for food service, events and commerce</li>
+      <li>Notify CBUSEVENTS promptly of any changes to availability, pricing or services</li>
+    </ul>
+    <p>CBUSEVENTS reserves the right to remove any listing that contains false or misleading information, violates applicable law, or reflects negatively on the Platform.</p>
+  </div>
+
+  <div class="legal-section" id="s7">
+    <h2>7. User content</h2>
+    <p>You retain ownership of content you submit to the Platform (photos, descriptions, posts). By submitting content, you grant CBUSEVENTS a non-exclusive, royalty-free, worldwide license to display, reproduce and distribute your content in connection with operating and promoting the Platform.</p>
+    <p>You represent that you have the right to submit all content you post and that your content does not infringe any third-party rights. CBUSEVENTS may remove content that violates these Terms without notice.</p>
+  </div>
+
+  <div class="legal-section" id="s8">
+    <h2>8. Prohibited conduct</h2>
+    <p>You agree not to:</p>
+    <ul>
+      <li>Create false or misleading listings or profiles</li>
+      <li>Use the Platform to facilitate unlawful transactions</li>
+      <li>Harass, threaten or abuse other users</li>
+      <li>Scrape, crawl or extract Platform data without written permission</li>
+      <li>Attempt to gain unauthorized access to any part of the Platform or its infrastructure</li>
+      <li>Use the Platform to distribute spam or unsolicited communications</li>
+      <li>Impersonate any person or entity</li>
+    </ul>
+  </div>
+
+  <div class="legal-section" id="s9">
+    <h2>9. Intellectual property</h2>
+    <p>The CBUSEVENTS name, logo, design system and Platform content (excluding user-submitted content) are the intellectual property of CBUS Events LLC. You may not reproduce, distribute or create derivative works from CBUSEVENTS intellectual property without written permission.</p>
+  </div>
+
+  <div class="legal-section" id="s10">
+    <h2>10. Disclaimers</h2>
+    <div class="caps-block">
+      <p>THE PLATFORM IS PROVIDED "AS IS" WITHOUT WARRANTIES OF ANY KIND, EXPRESS OR IMPLIED. CBUSEVENTS DOES NOT WARRANT THAT THE PLATFORM WILL BE UNINTERRUPTED, ERROR-FREE OR FREE OF HARMFUL COMPONENTS. CBUSEVENTS IS NOT RESPONSIBLE FOR THE CONDUCT OF ANY USER, VENDOR, VENUE OR EVENT ORGANIZER ON OR OFF THE PLATFORM.</p>
+    </div>
+  </div>
+
+  <div class="legal-section" id="s11">
+    <h2>11. Limitation of liability</h2>
+    <div class="caps-block">
+      <p>TO THE MAXIMUM EXTENT PERMITTED BY OHIO LAW, CBUSEVENTS SHALL NOT BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, CONSEQUENTIAL OR PUNITIVE DAMAGES ARISING FROM YOUR USE OF THE PLATFORM. OUR TOTAL LIABILITY TO YOU FOR ANY CLAIM SHALL NOT EXCEED THE AMOUNT YOU PAID TO CBUSEVENTS IN THE 12 MONTHS PRECEDING THE CLAIM.</p>
+    </div>
+  </div>
+
+  <div class="legal-section" id="s12">
+    <h2>12. Indemnification</h2>
+    <p>You agree to indemnify and hold harmless CBUS Events LLC, its members, employees and agents from any claims, damages, losses or expenses (including reasonable legal fees) arising from your use of the Platform, your violation of these Terms, or your violation of any third-party rights.</p>
+  </div>
+
+  <div class="legal-section" id="s13">
+    <h2>13. Governing law and disputes</h2>
+    <p>These Terms are governed by the laws of the State of Ohio without regard to conflict of law principles. Any disputes arising from these Terms or your use of the Platform shall be resolved in the state or federal courts located in Franklin County, Ohio. You consent to the personal jurisdiction of such courts.</p>
+  </div>
+
+  <div class="legal-section" id="s14">
+    <h2>14. Changes to these Terms</h2>
+    <p>CBUSEVENTS may update these Terms at any time. We will notify registered users of material changes by email at least 14 days before the changes take effect. Continued use of the Platform after the effective date of changes constitutes acceptance of the updated Terms.</p>
+  </div>
+
+  <div class="legal-section" id="s15">
+    <h2>15. Contact</h2>
+    <p>Questions about these Terms? Reach us at:</p>
+    <div class="contact-block">
+      <p><strong>CBUS Events LLC</strong></p>
+      <p>Email: <a href="mailto:hello@cbusevents.com">hello@cbusevents.com</a></p>
+      <p>Website: <a href="https://cbusevents.com">cbusevents.com</a></p>
+      <p>Columbus, Ohio</p>
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  <p>&#169; 2026 CBUSEVENTS &nbsp;·&nbsp; Columbus, Ohio &nbsp;·&nbsp; Inaugural Season 2026</p>
+  <p>
+    <a href="https://cbusevents.com">Home</a>
+    <a href="https://cbusevents.com/privacy.html">Privacy policy</a>
+    <a href="https://cbusevents.com/privacy.html#cookies">Cookie notice</a>
+    <a href="mailto:hello@cbusevents.com">Contact</a>
+  </p>
+</footer>
+
+</body>
+</html>
