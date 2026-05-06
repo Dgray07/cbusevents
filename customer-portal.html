@@ -3,11 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>My CBUSEVENTS — Customer Portal</title>
+<title>My CBUSEVENTS - Customer Portal</title>
 
 <!-- Brand Meta Tags -->
-<meta property="og:title" content="CBUSEVENTS — Columbus Event Ecosystem">
-<meta property="og:description" content="Columbus venues, planners, vendors, and customers — all connected.">
+<meta property="og:title" content="CBUSEVENTS - Columbus Event Ecosystem">
+<meta property="og:description" content="Columbus venues, planners, vendors, and customers - all connected.">
 <meta property="og:image" content="https://cbusevents.com/assets/cbus-shield.png">
 <meta property="og:image:width" content="1024">
 <meta property="og:image:height" content="1024">
@@ -618,50 +618,46 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
     <div class="table-card" id="ticketsSection">
       <div class="table-header">
         <div class="table-title">My Tickets</div>
-        <button class="btn btn-ghost btn-sm">View All</button>
+        <button class="btn btn-ghost btn-sm" onclick="loadMyTickets()">Refresh</button>
       </div>
-
       <div id="ticketsContainer">
-      <div class="ticket-row">
-        <div class="ticket-date-block"><div class="ticket-date-month">Apr</div><div class="ticket-date-day">26</div></div>
-        <div class="ticket-info">
-          <div class="ticket-name">Friday Night R&B Vol. 4</div>
-          <div class="ticket-detail">Kemba Live &middot; General Admission</div>
-        </div>
-        <div class="ticket-right">
-          <div class="ticket-type">GA &middot; 1 ticket</div>
-          <div class="ticket-price">$27.00</div>
-        </div>
+        <div style="padding:32px;text-align:center;color:var(--muted);font-size:13px;">Loading your tickets...</div>
       </div>
-
-      <div class="ticket-row">
-        <div class="ticket-date-block"><div class="ticket-date-month">May</div><div class="ticket-date-day">08</div></div>
-        <div class="ticket-info">
-          <div class="ticket-name">Columbus Tech Mixer</div>
-          <div class="ticket-detail">The Exchange &middot; General Admission</div>
-        </div>
-        <div class="ticket-right">
-          <div class="ticket-type">GA &middot; 1 ticket</div>
-          <div class="ticket-price">$17.00</div>
-        </div>
-      </div>
-
-      <div class="ticket-row">
-        <div class="ticket-date-block" style="background:rgba(255,255,255,0.04);border-color:var(--border);"><div class="ticket-date-month" style="color:var(--muted)">Mar</div><div class="ticket-date-day" style="color:var(--muted)">15</div></div>
-        <div class="ticket-info">
-          <div class="ticket-name" style="color:var(--sub)">Winter Networking Night</div>
-          <div class="ticket-detail">The Exchange &middot; VIP</div>
-        </div>
-        <div class="ticket-right">
-          <div class="ticket-type">VIP &middot; 2 tickets</div>
-          <div class="ticket-price" style="color:var(--sub)">$92.00</div>
-        </div>
-      </div>
-      </div><!-- /ticketsContainer -->
-
     </div>
 
-    <!-- HIRE A PLANNER — Discovery layer -->
+    <!-- TICKET MODAL - QR CODE VIEW -->
+    <div id="ticketModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:500;align-items:center;justify-content:center;padding:20px;">
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;width:100%;max-width:360px;overflow:hidden;">
+        <div style="padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;">
+          <div style="font-size:14px;font-weight:700;" id="modalEventTitle">Your Ticket</div>
+          <button onclick="closeTicketModal()" style="background:none;border:none;color:var(--sub);font-size:20px;cursor:pointer;line-height:1;">&times;</button>
+        </div>
+        <div style="padding:20px;text-align:center;">
+          <div style="background:#fff;border-radius:12px;padding:16px;display:inline-block;margin-bottom:14px;">
+            <div id="modalQR"></div>
+          </div>
+          <div style="font-family:'DM Mono',monospace;font-size:18px;font-weight:500;color:var(--orange);letter-spacing:3px;margin-bottom:4px;" id="modalCode"></div>
+          <div style="font-size:11px;color:var(--muted);margin-bottom:16px;">Show this at the door for entry</div>
+          <div style="background:var(--card);border-radius:10px;padding:14px;text-align:left;font-size:12px;margin-bottom:14px;">
+            <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--border);">
+              <span style="color:var(--sub);">Event</span><span id="modalEvent" style="font-weight:600;text-align:right;max-width:180px;"></span>
+            </div>
+            <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--border);">
+              <span style="color:var(--sub);">Date</span><span id="modalDate" style="font-weight:600;"></span>
+            </div>
+            <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--border);">
+              <span style="color:var(--sub);">Tier</span><span id="modalTier" style="font-weight:600;"></span>
+            </div>
+            <div style="display:flex;justify-content:space-between;padding:5px 0;">
+              <span style="color:var(--sub);">Qty</span><span id="modalQty" style="font-weight:600;"></span>
+            </div>
+          </div>
+          <button onclick="window.print()" style="width:100%;background:var(--orange);color:#fff;border:none;border-radius:8px;padding:11px;font-size:13px;font-weight:700;cursor:pointer;">Save or print ticket</button>
+        </div>
+      </div>
+    </div>/div>
+
+    <!-- HIRE A PLANNER - Discovery layer -->
     <div class="planner-section" id="plannerSection">
       <div class="planner-section-header">
         <div>
@@ -1367,5 +1363,97 @@ document.addEventListener('DOMContentLoaded', function(){
   },100);
 })();
 </script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script>
+async function loadMyTickets(){
+  const container=document.getElementById('ticketsContainer');
+  if(!container)return;
+  container.innerHTML='<div style="padding:32px;text-align:center;color:var(--muted);font-size:13px;">Loading your tickets...</div>';
+
+  try{
+    const {data:{session}}=await sb.auth.getSession();
+    if(!session){container.innerHTML='<div style="padding:32px;text-align:center;color:var(--muted);font-size:13px;">Sign in to view your tickets.</div>';return;}
+
+    const email=session.user.email;
+    const {data:tickets,error}=await sb.from('tickets')
+      .select('*,events(id,title,start_time)')
+      .eq('email',email)
+      .eq('status','active')
+      .order('created_at',{ascending:false})
+      .limit(20);
+
+    if(error||!tickets||tickets.length===0){
+      container.innerHTML=`<div style="padding:32px;text-align:center;">
+        <div style="font-size:32px;opacity:0.2;margin-bottom:12px;">&#127903;&#65039;</div>
+        <div style="font-size:13px;color:var(--muted);">No tickets yet. <a href="https://cbusevents.com/attendees.html" style="color:var(--orange);">Browse events</a></div>
+      </div>`;
+      return;
+    }
+
+    container.innerHTML=tickets.map(t=>{
+      const ev=t.events||{};
+      const d=ev.start_time?new Date(ev.start_time):null;
+      const month=d?d.toLocaleDateString('en-US',{month:'short'}):'';
+      const day=d?d.getDate():'';
+      const upcoming=d&&d>new Date();
+      const checkedIn=t.checked_in;
+      const price=t.amount_paid?(t.amount_paid/100).toFixed(2):null;
+      const badgeHtml=checkedIn
+        ?'<span style="font-family:var(--mono);font-size:8px;background:rgba(52,211,153,0.1);color:#34d399;border:1px solid rgba(52,211,153,0.2);padding:2px 7px;border-radius:4px;letter-spacing:1px;text-transform:uppercase;">Checked in</span>'
+        :upcoming
+        ?'<span style="font-family:var(--mono);font-size:8px;background:rgba(255,107,53,0.1);color:#FF6B35;border:1px solid rgba(255,107,53,0.2);padding:2px 7px;border-radius:4px;letter-spacing:1px;text-transform:uppercase;">Upcoming</span>'
+        :'<span style="font-family:var(--mono);font-size:8px;background:rgba(255,255,255,0.05);color:var(--muted);padding:2px 7px;border-radius:4px;letter-spacing:1px;text-transform:uppercase;">Past</span>';
+      return `<div class="ticket-row" onclick="openTicketModal(${JSON.stringify(t).replace(/"/g,'&quot;')})" style="cursor:pointer;">
+        <div class="ticket-date-block" style="${upcoming?'':'background:rgba(255,255,255,0.04);border-color:var(--border);'}">
+          <div class="ticket-date-month" style="${upcoming?'':'color:var(--muted);'}">${month}</div>
+          <div class="ticket-date-day" style="${upcoming?'':'color:var(--muted);'}">${day}</div>
+        </div>
+        <div class="ticket-info">
+          <div class="ticket-name" style="${upcoming?'':'color:var(--sub);'}">${ev.title||'Event'}</div>
+          <div class="ticket-detail">${t.tier_name||'General Admission'} &middot; ${badgeHtml}</div>
+        </div>
+        <div class="ticket-right">
+          <div class="ticket-type">x${t.quantity||1}</div>
+          <div class="ticket-price" style="${upcoming?'':'color:var(--sub);'}">${price?'$'+price:'Free'}</div>
+        </div>
+      </div>`;
+    }).join('');
+  }catch(e){
+    document.getElementById('ticketsContainer').innerHTML='<div style="padding:24px;text-align:center;font-size:12px;color:var(--muted);">Could not load tickets. Try refreshing.</div>';
+  }
+}
+
+function openTicketModal(ticket){
+  const modal=document.getElementById('ticketModal');
+  const ev=ticket.events||{};
+  const code=ticket.ticket_code||ticket.id?.slice(0,8).toUpperCase()||'N/A';
+  const qrData='CBUSEVENTS:'+code+':'+ticket.id;
+  const d=ev.start_time?new Date(ev.start_time):null;
+  const dateStr=d?d.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric',year:'numeric'}):'';
+
+  document.getElementById('modalEventTitle').textContent=ev.title||'Your Ticket';
+  document.getElementById('modalEvent').textContent=ev.title||'Event';
+  document.getElementById('modalDate').textContent=dateStr;
+  document.getElementById('modalTier').textContent=ticket.tier_name||'General Admission';
+  document.getElementById('modalQty').textContent=(ticket.quantity||1)+' ticket'+(ticket.quantity>1?'s':'');
+  document.getElementById('modalCode').textContent=code;
+
+  const qrEl=document.getElementById('modalQR');
+  qrEl.innerHTML='';
+  new QRCode(qrEl,{text:qrData,width:180,height:180,colorDark:'#000',colorLight:'#fff',correctLevel:QRCode.CorrectLevel.H});
+
+  modal.style.display='flex';
+}
+
+function closeTicketModal(){
+  document.getElementById('ticketModal').style.display='none';
+}
+
+document.addEventListener('DOMContentLoaded',function(){
+  setTimeout(loadMyTickets,800);
+});
+</script>
+
 </body>
 </html>

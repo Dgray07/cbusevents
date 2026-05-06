@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Door Check-In | CBUSEVENTS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/@zxing/library@0.18.6/umd/index.min.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --bg:#080810;--surface:#0f0f1a;--card:#141420;--border:rgba(255,255,255,0.08);
+  --text:#f0f0fa;--sub:#7070a0;--muted:#40405a;
+  --orange:#FF6B35;--orange-dim:rgba(255,107,53,0.12);--orange-border:rgba(255,107,53,0.3);
+  --green:#34d399;--green-dim:rgba(52,211,153,0.12);--green-border:rgba(52,211,153,0.3);
+  --red:#f87171;--red-dim:rgba(248,113,113,0.12);--red-border:rgba(248,113,113,0.3);
+  --font:'DM Sans',sans-serif;--mono:'DM Mono',monospace;
+  --r:10px;
+}
+body{background:var(--bg);color:var(--text);font-family:var(--font);min-height:100vh;}
+
+nav{background:rgba(8,8,16,0.97);border-bottom:1px solid var(--border);padding:0 20px;display:flex;align-items:center;justify-content:space-between;height:52px;}
+.logo{font-size:16px;font-weight:900;letter-spacing:-0.5px;}
+.logo span{color:var(--orange);}
+.nav-badge{font-family:var(--mono);font-size:9px;background:var(--orange-dim);color:var(--orange);border:1px solid var(--orange-border);padding:3px 10px;border-radius:20px;letter-spacing:1px;text-transform:uppercase;}
+
+.wrap{max-width:520px;margin:0 auto;padding:24px 16px 48px;}
+
+.page-eyebrow{font-family:var(--mono);font-size:9px;color:var(--orange);letter-spacing:2px;text-transform:uppercase;margin-bottom:8px;}
+.page-title{font-size:22px;font-weight:800;margin-bottom:4px;letter-spacing:-0.5px;}
+.page-sub{font-size:13px;color:var(--sub);margin-bottom:24px;}
+
+.event-select-card{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:16px;margin-bottom:20px;}
+.event-select-label{font-family:var(--mono);font-size:9px;color:var(--sub);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px;}
+.event-select{width:100%;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:10px 12px;color:var(--text);font-size:13px;font-family:var(--font);outline:none;cursor:pointer;appearance:none;}
+.event-stats{display:flex;gap:0;margin-top:12px;border-top:1px solid var(--border);padding-top:12px;}
+.event-stat{flex:1;text-align:center;}
+.event-stat:not(:last-child){border-right:1px solid var(--border);}
+.event-stat-num{font-family:var(--mono);font-size:18px;font-weight:500;color:var(--orange);}
+.event-stat-label{font-family:var(--mono);font-size:8px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-top:2px;}
+
+.tabs{display:flex;gap:0;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:3px;margin-bottom:20px;}
+.tab{flex:1;padding:8px;text-align:center;font-size:12px;font-weight:600;cursor:pointer;border-radius:7px;transition:all 0.15s;color:var(--sub);}
+.tab.active{background:var(--orange);color:#fff;}
+
+.scan-card{background:var(--card);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;margin-bottom:16px;}
+.scan-card-head{padding:14px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+.scan-card-title{font-size:13px;font-weight:700;}
+.scan-status{font-family:var(--mono);font-size:9px;letter-spacing:1px;text-transform:uppercase;padding:3px 8px;border-radius:4px;}
+.scan-status.ready{background:var(--green-dim);color:var(--green);border:1px solid var(--green-border);}
+.scan-status.off{background:var(--muted);color:var(--sub);}
+
+.video-wrap{position:relative;background:#000;aspect-ratio:4/3;display:flex;align-items:center;justify-content:center;}
+#preview{width:100%;height:100%;object-fit:cover;display:none;}
+.scan-overlay{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;}
+.scan-frame{width:200px;height:200px;border:2px solid var(--orange);border-radius:12px;position:relative;}
+.scan-corner{position:absolute;width:20px;height:20px;border-color:var(--orange);border-style:solid;}
+.sc-tl{top:-2px;left:-2px;border-width:3px 0 0 3px;border-radius:3px 0 0 0;}
+.sc-tr{top:-2px;right:-2px;border-width:3px 3px 0 0;border-radius:0 3px 0 0;}
+.sc-bl{bottom:-2px;left:-2px;border-width:0 0 3px 3px;border-radius:0 0 0 3px;}
+.sc-br{bottom:-2px;right:-2px;border-width:0 3px 3px 0;border-radius:0 0 3px 0;}
+.scan-line{position:absolute;left:0;right:0;height:2px;background:var(--orange);opacity:0.7;animation:scanline 2s ease-in-out infinite;}
+@keyframes scanline{0%,100%{top:10%;}50%{top:85%;}}
+.video-placeholder{display:flex;flex-direction:column;align-items:center;gap:10px;padding:32px;text-align:center;}
+.video-placeholder-icon{font-size:32px;opacity:0.3;}
+.video-placeholder-text{font-size:12px;color:var(--sub);line-height:1.6;}
+.btn-scan-start{background:var(--orange);color:#fff;padding:10px 22px;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;border:none;margin-top:8px;}
+.btn-scan-stop{background:transparent;border:1px solid var(--red-border);color:var(--red);padding:8px 16px;border-radius:8px;font-size:11px;font-weight:600;cursor:pointer;display:none;}
+
+.result-card{border-radius:var(--r);padding:16px;margin-bottom:16px;display:none;}
+.result-card.success{background:var(--green-dim);border:1px solid var(--green-border);}
+.result-card.error{background:var(--red-dim);border:1px solid var(--red-border);}
+.result-card.warn{background:var(--orange-dim);border:1px solid var(--orange-border);}
+.result-icon{font-size:28px;margin-bottom:8px;}
+.result-title{font-size:16px;font-weight:800;margin-bottom:4px;}
+.result-card.success .result-title{color:var(--green);}
+.result-card.error .result-title{color:var(--red);}
+.result-card.warn .result-title{color:var(--orange);}
+.result-name{font-size:14px;font-weight:700;color:var(--text);margin-bottom:2px;}
+.result-detail{font-size:12px;color:var(--sub);line-height:1.6;}
+.result-code{font-family:var(--mono);font-size:11px;color:var(--muted);margin-top:6px;}
+.btn-reset{background:var(--surface);border:1px solid var(--border);color:var(--text);padding:8px 16px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;margin-top:10px;width:100%;}
+
+.manual-form{display:flex;gap:8px;margin-bottom:20px;}
+.manual-input{flex:1;background:var(--card);border:1px solid var(--border);border-radius:8px;padding:10px 12px;color:var(--text);font-size:13px;font-family:var(--mono);outline:none;letter-spacing:1px;text-transform:uppercase;}
+.manual-input::placeholder{color:var(--muted);font-size:12px;text-transform:none;letter-spacing:0;}
+.manual-input:focus{border-color:var(--orange-border);}
+.btn-lookup{background:var(--orange);color:#fff;padding:10px 16px;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;border:none;white-space:nowrap;}
+
+.log-card{background:var(--card);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;}
+.log-head{padding:12px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+.log-title{font-size:12px;font-weight:700;}
+.log-count{font-family:var(--mono);font-size:10px;color:var(--orange);}
+.log-list{max-height:300px;overflow-y:auto;}
+.log-row{display:flex;align-items:center;gap:10px;padding:10px 16px;border-bottom:1px solid rgba(255,255,255,0.04);}
+.log-row:last-child{border-bottom:none;}
+.log-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.log-dot.in{background:var(--green);}
+.log-dot.err{background:var(--red);}
+.log-dot.dup{background:var(--orange);}
+.log-name{font-size:12px;font-weight:600;flex:1;}
+.log-code{font-family:var(--mono);font-size:9px;color:var(--muted);}
+.log-time{font-family:var(--mono);font-size:9px;color:var(--muted);}
+.log-empty{padding:24px;text-align:center;font-size:12px;color:var(--muted);}
+
+.auth-gate{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:60vh;text-align:center;padding:32px;}
+.auth-gate-title{font-size:20px;font-weight:800;margin-bottom:8px;}
+.auth-gate-sub{font-size:13px;color:var(--sub);margin-bottom:20px;}
+.auth-gate-btn{background:var(--orange);color:#fff;padding:11px 24px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;border:none;text-decoration:none;display:inline-block;}
+
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.4;}}
+.scanning-pulse{animation:pulse 1.5s infinite;}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="logo">CBUS<span>EVENTS</span></div>
+  <div class="nav-badge">Door check-in</div>
+</nav>
+
+<div class="wrap" id="authGate" style="display:none;">
+  <div class="auth-gate">
+    <div class="auth-gate-title">Staff access required</div>
+    <div class="auth-gate-sub">Sign in as event staff or admin to access the check-in scanner.</div>
+    <a href="https://cbusevents.com/auth.html?role=event_staff&next=checkin.html" class="auth-gate-btn">Sign in as staff</a>
+  </div>
+</div>
+
+<div class="wrap" id="mainContent">
+
+  <div class="page-eyebrow">CBUSEVENTS</div>
+  <div class="page-title">Door check-in</div>
+  <div class="page-sub">Scan tickets or look up attendees by ticket code.</div>
+
+  <div class="event-select-card">
+    <div class="event-select-label">Event</div>
+    <select class="event-select" id="eventSelect" onchange="loadEventStats()">
+      <option value="">Select event to check in</option>
+    </select>
+    <div class="event-stats" id="eventStats" style="display:none;">
+      <div class="event-stat"><div class="event-stat-num" id="statTotal">0</div><div class="event-stat-label">Sold</div></div>
+      <div class="event-stat"><div class="event-stat-num" id="statChecked">0</div><div class="event-stat-label">Checked in</div></div>
+      <div class="event-stat"><div class="event-stat-num" id="statRemaining">0</div><div class="event-stat-label">Remaining</div></div>
+    </div>
+  </div>
+
+  <div class="tabs">
+    <div class="tab active" id="tab-scan" onclick="switchTab('scan')">Scan QR code</div>
+    <div class="tab" id="tab-manual" onclick="switchTab('manual')">Manual lookup</div>
+  </div>
+
+  <div id="result-area"></div>
+
+  <div id="pane-scan">
+    <div class="scan-card">
+      <div class="scan-card-head">
+        <div class="scan-card-title">QR scanner</div>
+        <div class="scan-status off" id="scanStatus">Off</div>
+      </div>
+      <div class="video-wrap" id="videoWrap">
+        <video id="preview" playsinline></video>
+        <div class="scan-overlay" id="scanOverlay">
+          <div class="video-placeholder" id="startPrompt">
+            <div class="video-placeholder-icon">&#128247;</div>
+            <div class="video-placeholder-text">Select an event above then start the camera to scan tickets at the door.</div>
+            <button class="btn-scan-start" onclick="startScan()">Start camera</button>
+          </div>
+          <div class="scan-frame" id="scanFrame" style="display:none;">
+            <div class="scan-corner sc-tl"></div>
+            <div class="scan-corner sc-tr"></div>
+            <div class="scan-corner sc-bl"></div>
+            <div class="scan-corner sc-br"></div>
+            <div class="scan-line"></div>
+          </div>
+        </div>
+      </div>
+      <div style="padding:12px 16px;display:flex;justify-content:flex-end;">
+        <button class="btn-scan-stop" id="stopBtn" onclick="stopScan()">Stop camera</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="pane-manual" style="display:none;">
+    <div class="manual-form">
+      <input class="manual-input" id="manualCode" placeholder="Enter ticket code e.g. CBE-ABC123" maxlength="20" oninput="this.value=this.value.toUpperCase()">
+      <button class="btn-lookup" onclick="manualLookup()">Look up</button>
+    </div>
+    <div style="font-size:11px;color:var(--muted);margin-top:-12px;margin-bottom:16px;font-family:var(--mono);letter-spacing:0.5px;">Ticket codes start with CBE- and are on the attendee's confirmation page.</div>
+  </div>
+
+  <div class="log-card">
+    <div class="log-head">
+      <div class="log-title">Check-in log</div>
+      <div class="log-count" id="logCount">0 scanned</div>
+    </div>
+    <div class="log-list" id="logList">
+      <div class="log-empty">No check-ins yet. Scans will appear here.</div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const SB_URL='https://toblgvatvsjljbqogzsv.supabase.co';
+const SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRvYmxndmF0dnNqbGpicW9nenN2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMDgwNTAsImV4cCI6MjA4NzY4NDA1MH0._WJEQPizNDiQfDXQB_DHPaQhixPGpMdmYQSmyWmm_FQ';
+
+let scanner=null;
+let scanning=false;
+let lastScan='';
+let lastScanTime=0;
+let checkLog=[];
+let currentEventId=null;
+
+async function sbFetch(path,opts={}){
+  const res=await fetch(SB_URL+'/rest/v1/'+path,{
+    headers:{apikey:SB_KEY,Authorization:'Bearer '+SB_KEY,'Content-Type':'application/json',...(opts.headers||{})},
+    ...opts
+  });
+  return res.json();
+}
+
+async function init(){
+  await loadEvents();
+}
+
+async function loadEvents(){
+  try{
+    const now=new Date().toISOString();
+    const data=await sbFetch('events?select=id,title,start_time&start_time=gte.'+encodeURIComponent(new Date(Date.now()-86400000*2).toISOString())+'&order=start_time.asc&limit=20');
+    const sel=document.getElementById('eventSelect');
+    if(Array.isArray(data)&&data.length){
+      data.forEach(e=>{
+        const opt=document.createElement('option');
+        opt.value=e.id;
+        const d=new Date(e.start_time);
+        opt.textContent=e.title+' - '+d.toLocaleDateString('en-US',{month:'short',day:'numeric'});
+        sel.appendChild(opt);
+      });
+    }
+    // Add 1313 Festival as first option
+    const opt1313=document.createElement('option');
+    opt1313.value='1313-festival';
+    opt1313.textContent='1313 Food and Arts Festival - June 13';
+    sel.insertBefore(opt1313,sel.options[1]);
+  }catch(e){console.log('Events load error:',e);}
+}
+
+async function loadEventStats(){
+  const sel=document.getElementById('eventSelect');
+  currentEventId=sel.value;
+  if(!currentEventId){document.getElementById('eventStats').style.display='none';return;}
+  try{
+    const [all,checked]=await Promise.all([
+      sbFetch('tickets?select=id&event_id=eq.'+currentEventId+'&status=eq.active'),
+      sbFetch('tickets?select=id&event_id=eq.'+currentEventId+'&status=eq.active&checked_in=eq.true')
+    ]);
+    const total=Array.isArray(all)?all.length:0;
+    const done=Array.isArray(checked)?checked.length:0;
+    document.getElementById('statTotal').textContent=total;
+    document.getElementById('statChecked').textContent=done;
+    document.getElementById('statRemaining').textContent=total-done;
+    document.getElementById('eventStats').style.display='flex';
+  }catch(e){}
+}
+
+function switchTab(tab){
+  document.getElementById('pane-scan').style.display=tab==='scan'?'':'none';
+  document.getElementById('pane-manual').style.display=tab==='manual'?'':'none';
+  document.getElementById('tab-scan').classList.toggle('active',tab==='scan');
+  document.getElementById('tab-manual').classList.toggle('active',tab==='manual');
+  if(tab==='manual'&&scanning)stopScan();
+}
+
+async function startScan(){
+  if(!currentEventId){showResult('warn','Select an event first','Choose an event from the dropdown above before scanning.','');return;}
+  try{
+    const codeReader=new ZXing.BrowserQRCodeReader();
+    scanner=codeReader;
+    const videoEl=document.getElementById('preview');
+    videoEl.style.display='block';
+    document.getElementById('startPrompt').style.display='none';
+    document.getElementById('scanFrame').style.display='block';
+    document.getElementById('scanStatus').textContent='Scanning';
+    document.getElementById('scanStatus').className='scan-status ready scanning-pulse';
+    document.getElementById('stopBtn').style.display='block';
+    scanning=true;
+
+    await codeReader.decodeFromVideoDevice(null,'preview',async(result,err)=>{
+      if(result){
+        const text=result.getText();
+        const now=Date.now();
+        if(text===lastScan&&(now-lastScanTime)<3000)return;
+        lastScan=text;lastScanTime=now;
+        await processCode(text);
+      }
+    });
+  }catch(e){
+    showResult('error','Camera error',e.message||'Could not access camera. Check browser permissions.','');
+  }
+}
+
+function stopScan(){
+  if(scanner){try{scanner.reset();}catch(e){}}
+  scanner=null;scanning=false;
+  const videoEl=document.getElementById('preview');
+  videoEl.style.display='none';
+  document.getElementById('startPrompt').style.display='flex';
+  document.getElementById('scanFrame').style.display='none';
+  document.getElementById('scanStatus').textContent='Off';
+  document.getElementById('scanStatus').className='scan-status off';
+  document.getElementById('stopBtn').style.display='none';
+}
+
+async function manualLookup(){
+  const code=document.getElementById('manualCode').value.trim().toUpperCase();
+  if(!code){return;}
+  if(!currentEventId){showResult('warn','Select an event first','Choose an event from the dropdown above.','');return;}
+  await processCode(code);
+  document.getElementById('manualCode').value='';
+}
+
+async function processCode(raw){
+  let code=raw;
+  if(raw.startsWith('CBUSEVENTS:')){
+    const parts=raw.split(':');
+    code=parts[1]||raw;
+  }
+  code=code.toUpperCase().trim();
+
+  try{
+    const tickets=await sbFetch('tickets?select=*,events(title,start_time)&ticket_code=eq.'+encodeURIComponent(code)+'&limit=1');
+    if(!Array.isArray(tickets)||tickets.length===0){
+      showResult('error','Ticket not found','No ticket found with code '+code+'. Check the code and try again.',code);
+      addLog('err',code,'Not found',new Date());
+      return;
+    }
+
+    const ticket=tickets[0];
+    const eventTitle=ticket.events?.title||'Event';
+
+    if(ticket.event_id!==currentEventId&&currentEventId!=='1313-festival'){
+      showResult('warn','Wrong event',ticket.attendee_name+' has a ticket for "'+eventTitle+'" - not the selected event.',code);
+      addLog('err',code,ticket.attendee_name+' - wrong event',new Date());
+      return;
+    }
+
+    if(ticket.checked_in){
+      const checkedTime=ticket.checked_in_at?new Date(ticket.checked_in_at).toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit',hour12:true}):'earlier';
+      showResult('warn','Already checked in',ticket.attendee_name+' was already checked in at '+checkedTime+'. Do not admit again.',code);
+      addLog('dup',code,ticket.attendee_name+' - already in',new Date());
+      return;
+    }
+
+    await sbFetch('tickets?id=eq.'+ticket.id,{
+      method:'PATCH',
+      headers:{'Prefer':'return=minimal'},
+      body:JSON.stringify({checked_in:true,checked_in_at:new Date().toISOString()})
+    });
+
+    showResult('success','Welcome in!',ticket.attendee_name||'Attendee',code,ticket.tier_name||'General Admission',ticket.quantity||1);
+    addLog('in',code,ticket.attendee_name||'Attendee',new Date());
+    await loadEventStats();
+
+  }catch(e){
+    showResult('error','Lookup error','Could not check this ticket. Try manual code entry or contact support.',code);
+  }
+}
+
+function showResult(type,title,detail,code,tier='',qty=1){
+  const area=document.getElementById('result-area');
+  const icons={success:'&#10003;',error:'&#10007;',warn:'&#9888;'};
+  const extra=type==='success'?`<div style="font-size:12px;color:var(--sub);margin-top:4px;">${tier}${qty>1?' - '+qty+' tickets':''}</div>`:'';
+  area.innerHTML=`
+    <div class="result-card ${type}" style="display:block;">
+      <div class="result-icon">${icons[type]||''}</div>
+      <div class="result-title">${title}</div>
+      <div class="result-name">${type==='success'?detail:''}</div>
+      <div class="result-detail">${type!=='success'?detail:''}</div>
+      ${extra}
+      ${code?`<div class="result-code">${code}</div>`:''}
+      <button class="btn-reset" onclick="clearResult()">Scan next ticket</button>
+    </div>`;
+  area.scrollIntoView({behavior:'smooth',block:'nearest'});
+  if(type==='success')vibrate();
+}
+
+function clearResult(){
+  document.getElementById('result-area').innerHTML='';
+}
+
+function vibrate(){
+  if(navigator.vibrate)navigator.vibrate([100,50,100]);
+}
+
+function fmtTime(d){return d.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit',hour12:true});}
+
+function addLog(type,code,name,time){
+  checkLog.unshift({type,code,name,time});
+  const list=document.getElementById('logList');
+  const count=document.getElementById('logCount');
+  count.textContent=checkLog.length+' scanned';
+  list.innerHTML=checkLog.map(l=>`
+    <div class="log-row">
+      <div class="log-dot ${l.type}"></div>
+      <div class="log-name">${l.name}</div>
+      <div class="log-code">${l.code}</div>
+      <div class="log-time">${fmtTime(l.time)}</div>
+    </div>`).join('');
+}
+
+document.getElementById('manualCode')?.addEventListener('keydown',e=>{
+  if(e.key==='Enter')manualLookup();
+});
+
+init();
+</script>
+</body>
+</html>
