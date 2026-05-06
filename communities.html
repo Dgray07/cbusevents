@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Columbus Communities — CBUSEVENTS</title>
-<meta name="description" content="Explore Columbus communities — Black Columbus, Latino Columbus, LGBTQ+, Arts, Tech, Faith and more on CBUSEVENTS.">
+<title>Columbus Communities - CBUSEVENTS</title>
+<meta name="description" content="Explore Columbus communities - Black Columbus, Latino Columbus, LGBTQ+, Arts, Tech, Faith and more on CBUSEVENTS.">
 <meta name="theme-color" content="#080810">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800;900&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -108,89 +108,251 @@ nav.site-nav{display:flex;align-items:center;justify-content:space-between;paddi
   <button class="nav-hamburger" id="siteNavHamburger" aria-label="Menu"><span></span><span></span><span></span></button>
 </nav>
 
-<!-- COMMUNITIES HERO -->
+<!-- HERO -->
 <div style="background:#0f0f1a;border-bottom:1px solid rgba(255,255,255,0.07);padding:52px 32px 48px;position:relative;overflow:hidden;">
-  <div style="position:absolute;inset:0;background:radial-gradient(ellipse 60% 60% at 60% 50%,rgba(255,107,53,0.06) 0%,transparent 70%);"></div>
-  <div style="max-width:1280px;margin:0 auto;position:relative;z-index:2;">
-    <div style="font-family:'DM Mono',monospace;font-size:10px;color:#FF6B35;letter-spacing:2px;text-transform:uppercase;margin-bottom:12px;">Columbus, Ohio</div>
-    <h1 style="font-family:'Playfair Display',serif;font-size:clamp(32px,4vw,52px);font-weight:900;line-height:1.06;letter-spacing:-1px;margin-bottom:16px;">Every corner of Columbus<br>has its own <em style="color:#FF6B35;font-style:normal;">culture.</em></h1>
-    <p style="font-size:15px;color:rgba(245,242,237,0.5);line-height:1.7;max-width:500px;margin-bottom:0;">Find the community that moves you. Each hub connects events, venues and vendors specific to your Columbus.</p>
+  <div style="position:absolute;inset:0;background:radial-gradient(ellipse 60% 60% at 65% 50%,rgba(255,107,53,0.06) 0%,transparent 70%);pointer-events:none;"></div>
+  <div style="max-width:1200px;margin:0 auto;display:grid;grid-template-columns:1fr 320px;gap:40px;align-items:center;position:relative;z-index:2;">
+    <div>
+      <div style="font-family:'DM Mono',monospace;font-size:10px;color:#FF6B35;letter-spacing:2px;text-transform:uppercase;margin-bottom:12px;">Columbus, Ohio</div>
+      <h1 style="font-family:'Playfair Display',serif;font-size:clamp(28px,3.5vw,46px);font-weight:900;line-height:1.06;letter-spacing:-0.8px;margin-bottom:14px;color:#f0f0fa;">Your Columbus community<br>deserves a home <em style="color:#FF6B35;font-style:normal;">beyond Eventbrite.</em></h1>
+      <p style="font-size:14px;color:rgba(240,240,250,0.55);line-height:1.75;max-width:460px;margin-bottom:22px;">CBUSEVENTS gives Columbus communities a permanent hub - not just a one-time event link. List all your events here. Keep your audience in Columbus. Grow your community year-round.</p>
+      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+        <a href="#list-community" style="background:#FF6B35;color:#fff;padding:11px 22px;border-radius:8px;font-size:12px;font-weight:700;text-decoration:none;display:inline-block;">List your community free</a>
+        <a href="#why-here" style="background:transparent;color:rgba(240,240,250,0.5);padding:10px 16px;border-radius:8px;font-size:12px;border:1px solid rgba(255,255,255,0.1);text-decoration:none;display:inline-block;">See how it works &darr;</a>
+      </div>
+    </div>
+    <div style="background:#141422;border:1px solid rgba(255,255,255,0.07);border-radius:14px;padding:20px;" id="why-here">
+      <div style="font-size:13px;font-weight:700;color:#f0f0fa;margin-bottom:14px;">What you get that Eventbrite does not</div>
+      <div style="display:flex;gap:10px;align-items:flex-start;padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.07);">
+        <div style="width:30px;height:30px;border-radius:7px;background:rgba(255,107,53,0.1);border:1px solid rgba(255,107,53,0.2);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:13px;">&#127968;</div>
+        <div><div style="font-size:12px;font-weight:700;color:#f0f0fa;margin-bottom:2px;">A permanent Columbus page</div><div style="font-size:11px;color:rgba(240,240,250,0.5);line-height:1.55;">Your hub stays live between events. Followers find you here, not on a national directory.</div></div>
+      </div>
+      <div style="display:flex;gap:10px;align-items:flex-start;padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.07);">
+        <div style="width:30px;height:30px;border-radius:7px;background:rgba(255,107,53,0.1);border:1px solid rgba(255,107,53,0.2);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:13px;">&#128101;</div>
+        <div><div style="font-size:12px;font-weight:700;color:#f0f0fa;margin-bottom:2px;">Connected to Columbus's event audience</div><div style="font-size:11px;color:rgba(240,240,250,0.5);line-height:1.55;">Your events reach people browsing CBUSEVENTS who would not find you on Eventbrite.</div></div>
+      </div>
+      <div style="display:flex;gap:10px;align-items:flex-start;padding:10px 0;">
+        <div style="width:30px;height:30px;border-radius:7px;background:rgba(255,107,53,0.1);border:1px solid rgba(255,107,53,0.2);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:13px;">&#127903;&#65039;</div>
+        <div><div style="font-size:12px;font-weight:700;color:#f0f0fa;margin-bottom:2px;">Ticketing that stays local</div><div style="font-size:11px;color:rgba(240,240,250,0.5);line-height:1.55;">6.5% plus $1 per ticket - same as Eventbrite. Your audience stays on a Columbus platform.</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- FEATURED COMMUNITY - THE GRIEF CLUB -->
+<div style="padding:36px 32px;border-bottom:1px solid rgba(255,255,255,0.07);">
+  <div style="max-width:1200px;margin:0 auto;">
+    <div style="font-family:'DM Mono',monospace;font-size:9px;color:#FF6B35;letter-spacing:2px;text-transform:uppercase;margin-bottom:16px;">Featured community partner</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+
+      <!-- GRIEF CLUB CARD -->
+      <div style="background:#141422;border:1px solid rgba(255,107,53,0.25);border-radius:14px;overflow:hidden;">
+        <div style="height:2px;background:linear-gradient(90deg,transparent,#FF6B35,transparent);"></div>
+        <div style="padding:24px;">
+          <div style="display:flex;align-items:flex-start;gap:14px;margin-bottom:16px;">
+            <div style="width:52px;height:52px;border-radius:10px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);display:flex;flex-direction:column;align-items:center;justify-content:center;flex-shrink:0;">
+              <div style="font-family:'DM Mono',monospace;font-size:6px;color:#f0f0fa;letter-spacing:0.5px;text-transform:uppercase;text-align:center;line-height:1.4;">THE<br>GRIEF<br>CLUB</div>
+            </div>
+            <div>
+              <div style="font-family:'Playfair Display',serif;font-size:18px;font-weight:700;color:#f0f0fa;margin-bottom:4px;">The Grief Club</div>
+              <div style="font-family:'DM Mono',monospace;font-size:9px;color:rgba(240,240,250,0.35);letter-spacing:1px;text-transform:uppercase;margin-bottom:7px;">Mental health - Columbus, Ohio</div>
+              <div style="display:flex;gap:5px;flex-wrap:wrap;">
+                <span style="font-family:'DM Mono',monospace;font-size:8px;letter-spacing:1px;text-transform:uppercase;background:rgba(52,211,153,0.1);color:#34d399;border:1px solid rgba(52,211,153,0.2);padding:2px 7px;border-radius:4px;">Community partner</span>
+                <span style="font-family:'DM Mono',monospace;font-size:8px;letter-spacing:1px;text-transform:uppercase;background:rgba(255,107,53,0.1);color:#FF6B35;border:1px solid rgba(255,107,53,0.2);padding:2px 7px;border-radius:4px;">Columbus, Ohio</span>
+              </div>
+            </div>
+          </div>
+          <p style="font-size:12px;color:rgba(240,240,250,0.55);line-height:1.7;margin-bottom:16px;">A safe space normalizing and redefining how Columbus integrates grief. Open mic nights, peer support circles and community field days. A real Columbus audience that shows up.</p>
+          <div style="display:flex;gap:20px;margin-bottom:16px;">
+            <div><div style="font-family:'DM Mono',monospace;font-size:17px;font-weight:500;color:#FF6B35;">2K</div><div style="font-family:'DM Mono',monospace;font-size:9px;color:rgba(240,240,250,0.3);letter-spacing:1px;text-transform:uppercase;margin-top:2px;">Followers</div></div>
+            <div><div style="font-family:'DM Mono',monospace;font-size:17px;font-weight:500;color:#FF6B35;">3.85%</div><div style="font-family:'DM Mono',monospace;font-size:9px;color:rgba(240,240,250,0.3);letter-spacing:1px;text-transform:uppercase;margin-top:2px;">Engagement</div></div>
+            <div><div style="font-family:'DM Mono',monospace;font-size:17px;font-weight:500;color:#FF6B35;">3</div><div style="font-family:'DM Mono',monospace;font-size:9px;color:rgba(240,240,250,0.3);letter-spacing:1px;text-transform:uppercase;margin-top:2px;">Event series</div></div>
+          </div>
+          <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:18px;">
+            <span style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:20px;padding:4px 10px;font-size:11px;color:rgba(240,240,250,0.5);">Open Mic</span>
+            <span style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:20px;padding:4px 10px;font-size:11px;color:rgba(240,240,250,0.5);">Our Circles</span>
+            <span style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:20px;padding:4px 10px;font-size:11px;color:rgba(240,240,250,0.5);">Field Day</span>
+          </div>
+          <div style="display:flex;gap:7px;">
+            <a href="https://cbusevents.com/community.html?c=grief-club" style="background:#FF6B35;color:#fff;padding:9px 16px;border-radius:7px;font-size:11px;font-weight:700;text-decoration:none;display:inline-block;">View community hub &rarr;</a>
+            <a href="https://www.instagram.com/wearethegriefclub/" target="_blank" rel="noopener" style="background:transparent;color:rgba(240,240,250,0.45);padding:8px 14px;border-radius:7px;font-size:11px;border:1px solid rgba(255,255,255,0.1);text-decoration:none;display:inline-block;">@wearethegriefclub</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- WHY LIST HERE -->
+      <div style="background:#0f0f1a;border:1px solid rgba(255,255,255,0.07);border-radius:14px;padding:24px;">
+        <div style="font-family:'Playfair Display',serif;font-size:17px;font-weight:700;color:#f0f0fa;margin-bottom:6px;">Why list here instead of Eventbrite?</div>
+        <p style="font-size:12px;color:rgba(240,240,250,0.5);line-height:1.7;margin-bottom:20px;">Eventbrite is a national directory. CBUSEVENTS is Columbus. Your community stays here, builds here and comes back here.</p>
+        <div style="display:flex;flex-direction:column;gap:14px;">
+          <div style="display:flex;gap:12px;align-items:flex-start;">
+            <div style="width:32px;height:32px;border-radius:8px;background:rgba(255,107,53,0.1);border:1px solid rgba(255,107,53,0.2);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;">&#127968;</div>
+            <div><div style="font-size:12px;font-weight:700;color:#f0f0fa;margin-bottom:3px;">A permanent Columbus home</div><div style="font-size:11px;color:rgba(240,240,250,0.5);line-height:1.6;">Your page stays live year-round. Followers find your full event history, upcoming dates and how to get involved.</div></div>
+          </div>
+          <div style="display:flex;gap:12px;align-items:flex-start;">
+            <div style="width:32px;height:32px;border-radius:8px;background:rgba(255,107,53,0.1);border:1px solid rgba(255,107,53,0.2);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;">&#128101;</div>
+            <div><div style="font-size:12px;font-weight:700;color:#f0f0fa;margin-bottom:3px;">Connected to all of Columbus</div><div style="font-size:11px;color:rgba(240,240,250,0.5);line-height:1.6;">Your events reach people browsing CBUSEVENTS who would never find you on a national platform.</div></div>
+          </div>
+          <div style="display:flex;gap:12px;align-items:flex-start;">
+            <div style="width:32px;height:32px;border-radius:8px;background:rgba(255,107,53,0.1);border:1px solid rgba(255,107,53,0.2);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;">&#128176;</div>
+            <div><div style="font-size:12px;font-weight:700;color:#f0f0fa;margin-bottom:3px;">Same ticketing rate, local audience</div><div style="font-size:11px;color:rgba(240,240,250,0.5);line-height:1.6;">6.5% plus $1 per ticket - comparable to Eventbrite. The difference is your audience stays in Columbus.</div></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
   </div>
 </div>
 
 <!-- COMMUNITY GRID -->
-<div style="max-width:1280px;margin:0 auto;padding:40px 32px;">
-  <div style="font-family:'DM Mono',monospace;font-size:9px;color:#FF6B35;letter-spacing:2px;text-transform:uppercase;margin-bottom:20px;">Columbus communities</div>
-  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px;">
+<div style="max-width:1200px;margin:0 auto;padding:36px 32px;border-bottom:1px solid rgba(255,255,255,0.07);">
+  <div style="font-family:'DM Mono',monospace;font-size:9px;color:#FF6B35;letter-spacing:2px;text-transform:uppercase;margin-bottom:20px;">Columbus community hubs</div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px;">
+
+    <a href="https://cbusevents.com/community.html?c=grief-club" style="text-decoration:none;">
+      <div style="background:#141422;border:1px solid rgba(45,212,191,0.2);border-radius:12px;padding:20px;cursor:pointer;transition:border-color 0.15s;" onmouseover="this.style.borderColor='rgba(45,212,191,0.45)'" onmouseout="this.style.borderColor='rgba(45,212,191,0.2)'">
+        <div style="font-size:22px;margin-bottom:12px;">&#129293;</div>
+        <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:#f0f0fa;margin-bottom:5px;">The Grief Club</div>
+        <div style="font-size:11px;color:rgba(240,240,250,0.5);line-height:1.6;margin-bottom:12px;">Grief, mental health and healing. Open mic nights, peer support circles and field days.</div>
+        <div style="font-family:'DM Mono',monospace;font-size:9px;color:#FF6B35;letter-spacing:1px;text-transform:uppercase;">View hub &rarr;</div>
+      </div>
+    </a>
 
     <a href="https://cbusevents.com/community.html?c=black-columbus" style="text-decoration:none;">
-      <div style="background:#141422;border:1px solid rgba(255,255,255,0.07);border-radius:14px;padding:24px;cursor:pointer;transition:border-color 0.2s;" onmouseover="this.style.borderColor='rgba(255,107,53,0.35)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.07)'">
-        <div style="font-size:28px;margin-bottom:14px;">✊🏾</div>
-        <div style="font-family:'Playfair Display',serif;font-size:18px;font-weight:700;margin-bottom:6px;color:#f5f2ed;">Black Columbus</div>
-        <div style="font-size:12px;color:rgba(245,242,237,0.5);line-height:1.6;margin-bottom:14px;">Events, venues, vendors and spaces celebrating Black culture and community across Columbus.</div>
+      <div style="background:#141422;border:1px solid rgba(255,255,255,0.07);border-radius:12px;padding:20px;cursor:pointer;transition:border-color 0.15s;" onmouseover="this.style.borderColor='rgba(255,107,53,0.35)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.07)'">
+        <div style="font-size:22px;margin-bottom:12px;">&#x270A;&#x1F3FE;</div>
+        <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:#f0f0fa;margin-bottom:5px;">Black Columbus</div>
+        <div style="font-size:11px;color:rgba(240,240,250,0.5);line-height:1.6;margin-bottom:12px;">Events, venues and spaces celebrating Black culture and community across Columbus.</div>
         <div style="font-family:'DM Mono',monospace;font-size:9px;color:#FF6B35;letter-spacing:1px;text-transform:uppercase;">Explore &rarr;</div>
       </div>
     </a>
 
     <a href="https://cbusevents.com/community.html?c=latino-columbus" style="text-decoration:none;">
-      <div style="background:#141422;border:1px solid rgba(255,255,255,0.07);border-radius:14px;padding:24px;cursor:pointer;" onmouseover="this.style.borderColor='rgba(255,107,53,0.35)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.07)'">
-        <div style="font-size:28px;margin-bottom:14px;">🌮</div>
-        <div style="font-family:'Playfair Display',serif;font-size:18px;font-weight:700;margin-bottom:6px;color:#f5f2ed;">Latino Columbus</div>
-        <div style="font-size:12px;color:rgba(245,242,237,0.5);line-height:1.6;margin-bottom:14px;">Festivals, food, music and cultural events from Columbus's Latino community.</div>
+      <div style="background:#141422;border:1px solid rgba(255,255,255,0.07);border-radius:12px;padding:20px;cursor:pointer;transition:border-color 0.15s;" onmouseover="this.style.borderColor='rgba(255,107,53,0.35)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.07)'">
+        <div style="font-size:22px;margin-bottom:12px;">&#127790;</div>
+        <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:#f0f0fa;margin-bottom:5px;">Latino Columbus</div>
+        <div style="font-size:11px;color:rgba(240,240,250,0.5);line-height:1.6;margin-bottom:12px;">Festivals, food, music and cultural events from Columbus's Latino community.</div>
         <div style="font-family:'DM Mono',monospace;font-size:9px;color:#FF6B35;letter-spacing:1px;text-transform:uppercase;">Explore &rarr;</div>
       </div>
     </a>
 
     <a href="https://cbusevents.com/community.html?c=lgbtq-columbus" style="text-decoration:none;">
-      <div style="background:#141422;border:1px solid rgba(255,255,255,0.07);border-radius:14px;padding:24px;cursor:pointer;" onmouseover="this.style.borderColor='rgba(255,107,53,0.35)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.07)'">
-        <div style="font-size:28px;margin-bottom:14px;">🏳️‍🌈</div>
-        <div style="font-family:'Playfair Display',serif;font-size:18px;font-weight:700;margin-bottom:6px;color:#f5f2ed;">LGBTQ+ Columbus</div>
-        <div style="font-size:12px;color:rgba(245,242,237,0.5);line-height:1.6;margin-bottom:14px;">Events, venues and community spaces across Columbus welcoming everyone.</div>
+      <div style="background:#141422;border:1px solid rgba(255,255,255,0.07);border-radius:12px;padding:20px;cursor:pointer;transition:border-color 0.15s;" onmouseover="this.style.borderColor='rgba(255,107,53,0.35)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.07)'">
+        <div style="font-size:22px;margin-bottom:12px;">&#127987;&#65039;&#8205;&#127752;</div>
+        <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:#f0f0fa;margin-bottom:5px;">LGBTQ+ Columbus</div>
+        <div style="font-size:11px;color:rgba(240,240,250,0.5);line-height:1.6;margin-bottom:12px;">Events, venues and community spaces across Columbus welcoming everyone.</div>
         <div style="font-family:'DM Mono',monospace;font-size:9px;color:#FF6B35;letter-spacing:1px;text-transform:uppercase;">Explore &rarr;</div>
       </div>
     </a>
 
     <a href="https://cbusevents.com/community.html?c=arts-creative" style="text-decoration:none;">
-      <div style="background:#141422;border:1px solid rgba(255,255,255,0.07);border-radius:14px;padding:24px;cursor:pointer;" onmouseover="this.style.borderColor='rgba(255,107,53,0.35)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.07)'">
-        <div style="font-size:28px;margin-bottom:14px;">🎨</div>
-        <div style="font-family:'Playfair Display',serif;font-size:18px;font-weight:700;margin-bottom:6px;color:#f5f2ed;">Arts and Creative</div>
-        <div style="font-size:12px;color:rgba(245,242,237,0.5);line-height:1.6;margin-bottom:14px;">Gallery hops, art shows, open studios, poetry nights and creative markets across Columbus.</div>
+      <div style="background:#141422;border:1px solid rgba(255,255,255,0.07);border-radius:12px;padding:20px;cursor:pointer;transition:border-color 0.15s;" onmouseover="this.style.borderColor='rgba(255,107,53,0.35)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.07)'">
+        <div style="font-size:22px;margin-bottom:12px;">&#127912;</div>
+        <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:#f0f0fa;margin-bottom:5px;">Arts and Creative</div>
+        <div style="font-size:11px;color:rgba(240,240,250,0.5);line-height:1.6;margin-bottom:12px;">Gallery hops, art shows, open studios, poetry nights and creative markets across Columbus.</div>
         <div style="font-family:'DM Mono',monospace;font-size:9px;color:#FF6B35;letter-spacing:1px;text-transform:uppercase;">Explore &rarr;</div>
       </div>
     </a>
 
     <a href="https://cbusevents.com/community.html?c=osu-campus" style="text-decoration:none;">
-      <div style="background:#141422;border:1px solid rgba(255,255,255,0.07);border-radius:14px;padding:24px;cursor:pointer;" onmouseover="this.style.borderColor='rgba(255,107,53,0.35)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.07)'">
-        <div style="font-size:28px;margin-bottom:14px;">🎓</div>
-        <div style="font-family:'Playfair Display',serif;font-size:18px;font-weight:700;margin-bottom:6px;color:#f5f2ed;">OSU and Campus</div>
-        <div style="font-size:12px;color:rgba(245,242,237,0.5);line-height:1.6;margin-bottom:14px;">Live music, sports, shows and campus-area events for Columbus's student community.</div>
+      <div style="background:#141422;border:1px solid rgba(255,255,255,0.07);border-radius:12px;padding:20px;cursor:pointer;transition:border-color 0.15s;" onmouseover="this.style.borderColor='rgba(255,107,53,0.35)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.07)'">
+        <div style="font-size:22px;margin-bottom:12px;">&#127891;</div>
+        <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:#f0f0fa;margin-bottom:5px;">OSU and Campus</div>
+        <div style="font-size:11px;color:rgba(240,240,250,0.5);line-height:1.6;margin-bottom:12px;">Live music, sports, shows and campus-area events for Columbus's student community.</div>
         <div style="font-family:'DM Mono',monospace;font-size:9px;color:#FF6B35;letter-spacing:1px;text-transform:uppercase;">Explore &rarr;</div>
       </div>
     </a>
 
-    <div style="background:#141422;border:1px dashed rgba(255,255,255,0.1);border-radius:14px;padding:24px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;min-height:180px;">
-      <div style="font-family:'DM Mono',monospace;font-size:9px;color:rgba(245,242,237,0.3);letter-spacing:2px;text-transform:uppercase;margin-bottom:8px;">Coming soon</div>
-      <div style="font-size:13px;color:rgba(245,242,237,0.4);line-height:1.5;">More Columbus communities<br>being added in 2026</div>
+    <div style="background:#141422;border:1px dashed rgba(255,255,255,0.1);border-radius:12px;padding:20px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;min-height:160px;">
+      <div style="font-family:'DM Mono',monospace;font-size:9px;color:rgba(240,240,250,0.3);letter-spacing:2px;text-transform:uppercase;margin-bottom:6px;">Your community here</div>
+      <div style="font-size:12px;color:rgba(240,240,250,0.4);line-height:1.5;margin-bottom:10px;">Columbus communities of all kinds are welcome.</div>
+      <a href="#list-community" style="font-family:'DM Mono',monospace;font-size:9px;color:#FF6B35;letter-spacing:1px;text-transform:uppercase;text-decoration:none;">Get listed free &rarr;</a>
     </div>
 
   </div>
 </div>
 
-<!-- CREATOR HUB CTA -->
-<div style="background:#0f0f1a;border-top:1px solid rgba(255,255,255,0.07);border-bottom:1px solid rgba(255,255,255,0.07);padding:40px 32px;">
-  <div style="max-width:1280px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:32px;flex-wrap:wrap;">
+<!-- LIST YOUR COMMUNITY -->
+<div id="list-community" style="padding:56px 32px;border-bottom:1px solid rgba(255,255,255,0.07);">
+  <div style="max-width:900px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:start;">
     <div>
-      <div style="font-family:'DM Mono',monospace;font-size:9px;color:#FF6B35;letter-spacing:2px;text-transform:uppercase;margin-bottom:8px;">For creators and influencers</div>
-      <div style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700;margin-bottom:8px;">Your community needs a Columbus voice.</div>
-      <div style="font-size:13px;color:rgba(245,242,237,0.5);max-width:480px;line-height:1.65;">If you're connected to any of these communities, CBUSEVENTS pays you to share what's happening. Your own creator page. Real commission on every RSVP.</div>
+      <div style="font-family:'DM Mono',monospace;font-size:10px;color:#FF6B35;letter-spacing:2px;text-transform:uppercase;margin-bottom:10px;">For community organizers</div>
+      <h2 style="font-family:'Playfair Display',serif;font-size:clamp(22px,3vw,32px);font-weight:700;color:#f0f0fa;margin-bottom:10px;line-height:1.1;">List your community free</h2>
+      <p style="font-size:13px;color:rgba(240,240,250,0.55);line-height:1.75;margin-bottom:24px;">Tell us about your Columbus community. We will set up your hub and get your events in front of Columbus attendees.</p>
+      <form id="communityForm" style="display:flex;flex-direction:column;gap:8px;" onsubmit="submitCommunity(event)">
+        <input id="c-name" style="background:#141422;border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:10px 12px;color:#f0f0fa;font-size:12px;font-family:'DM Sans',sans-serif;outline:none;" placeholder="Community name" required>
+        <input id="c-contact" style="background:#141422;border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:10px 12px;color:#f0f0fa;font-size:12px;font-family:'DM Sans',sans-serif;outline:none;" placeholder="Your name" required>
+        <input id="c-email" type="email" style="background:#141422;border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:10px 12px;color:#f0f0fa;font-size:12px;font-family:'DM Sans',sans-serif;outline:none;" placeholder="Email address" required>
+        <select id="c-type" style="background:#141422;border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:10px 12px;color:#f0f0fa;font-size:12px;font-family:'DM Sans',sans-serif;outline:none;cursor:pointer;appearance:none;">
+          <option value="">Community type</option>
+          <option>Mental health and wellness</option>
+          <option>Arts and creative</option>
+          <option>Cultural</option>
+          <option>Faith and spirituality</option>
+          <option>Sports and fitness</option>
+          <option>Professional networking</option>
+          <option>Social and lifestyle</option>
+          <option>Other</option>
+        </select>
+        <input id="c-handle" style="background:#141422;border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:10px 12px;color:#f0f0fa;font-size:12px;font-family:'DM Sans',sans-serif;outline:none;" placeholder="Instagram or Facebook handle">
+        <button type="submit" id="c-submit" style="background:#FF6B35;color:#fff;padding:11px;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;border:none;">Submit your community</button>
+        <div id="c-msg" style="font-family:'DM Mono',monospace;font-size:9px;color:rgba(240,240,250,0.4);text-align:center;margin-top:2px;letter-spacing:0.5px;">Free to list. We will reach out within 24 hours.</div>
+      </form>
     </div>
-    <div style="display:flex;gap:10px;align-items:center;flex-shrink:0;">
-      <a href="https://cbusevents.com/creators.html" style="background:#FF6B35;color:#fff;padding:12px 22px;border-radius:8px;font-size:13px;font-weight:700;text-decoration:none;white-space:nowrap;">Apply as a creator</a>
-      <a href="https://cbusevents.com/1313-festival-event.html" style="background:transparent;color:rgba(245,242,237,0.7);padding:12px 18px;border-radius:8px;font-size:13px;border:1px solid rgba(255,255,255,0.1);text-decoration:none;white-space:nowrap;">See 1313 Festival &rarr;</a>
+    <div style="display:flex;flex-direction:column;gap:10px;padding-top:48px;">
+      <div style="font-family:'DM Mono',monospace;font-size:9px;color:rgba(240,240,250,0.3);letter-spacing:2px;text-transform:uppercase;margin-bottom:6px;">What is included</div>
+      <div style="display:flex;gap:10px;align-items:flex-start;padding:12px;background:#141422;border:1px solid rgba(255,255,255,0.07);border-radius:9px;">
+        <div style="width:20px;height:20px;border-radius:5px;background:rgba(52,211,153,0.1);border:1px solid rgba(52,211,153,0.2);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;font-size:11px;">&#10003;</div>
+        <div><div style="font-size:12px;font-weight:700;color:#f0f0fa;margin-bottom:2px;">Dedicated community hub page</div><div style="font-size:11px;color:rgba(240,240,250,0.5);">Your own page at cbusevents.com showing all your events and how to get involved.</div></div>
+      </div>
+      <div style="display:flex;gap:10px;align-items:flex-start;padding:12px;background:#141422;border:1px solid rgba(255,255,255,0.07);border-radius:9px;">
+        <div style="width:20px;height:20px;border-radius:5px;background:rgba(52,211,153,0.1);border:1px solid rgba(52,211,153,0.2);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;font-size:11px;">&#10003;</div>
+        <div><div style="font-size:12px;font-weight:700;color:#f0f0fa;margin-bottom:2px;">Event listings with ticketing</div><div style="font-size:11px;color:rgba(240,240,250,0.5);">List all your events. Sell tickets at 6.5% plus $1 per ticket - no monthly fee.</div></div>
+      </div>
+      <div style="display:flex;gap:10px;align-items:flex-start;padding:12px;background:#141422;border:1px solid rgba(255,255,255,0.07);border-radius:9px;">
+        <div style="width:20px;height:20px;border-radius:5px;background:rgba(52,211,153,0.1);border:1px solid rgba(52,211,153,0.2);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;font-size:11px;">&#10003;</div>
+        <div><div style="font-size:12px;font-weight:700;color:#f0f0fa;margin-bottom:2px;">Discovery by Columbus attendees</div><div style="font-size:11px;color:rgba(240,240,250,0.5);">Your events surface to people browsing CBUSEVENTS who are looking for exactly what you do.</div></div>
+      </div>
+      <div style="display:flex;gap:10px;align-items:flex-start;padding:12px;background:#141422;border:1px solid rgba(255,255,255,0.07);border-radius:9px;">
+        <div style="width:20px;height:20px;border-radius:5px;background:rgba(52,211,153,0.1);border:1px solid rgba(52,211,153,0.2);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;font-size:11px;">&#10003;</div>
+        <div><div style="font-size:12px;font-weight:700;color:#f0f0fa;margin-bottom:2px;">Always free to list</div><div style="font-size:11px;color:rgba(240,240,250,0.5);">No monthly fee. You only pay the ticket fee when tickets sell.</div></div>
+      </div>
     </div>
   </div>
 </div>
 
+<script>
+const SB_URL='https://toblgvatvsjljbqogzsv.supabase.co';
+const SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRvYmxndmF0dnNqbGpicW9nenN2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMDgwNTAsImV4cCI6MjA4NzY4NDA1MH0._WJEQPizNDiQfDXQB_DHPaQhixPGpMdmYQSmyWmm_FQ';
+async function submitCommunity(e){
+  e.preventDefault();
+  const btn=document.getElementById('c-submit');
+  const msg=document.getElementById('c-msg');
+  const name=document.getElementById('c-name').value.trim();
+  const contact=document.getElementById('c-contact').value.trim();
+  const email=document.getElementById('c-email').value.trim();
+  const type=document.getElementById('c-type').value;
+  const handle=document.getElementById('c-handle').value.trim();
+  btn.textContent='Submitting...';btn.disabled=true;
+  try{
+    const res=await fetch(SB_URL+'/rest/v1/leads',{
+      method:'POST',
+      headers:{apikey:SB_KEY,Authorization:'Bearer '+SB_KEY,'Content-Type':'application/json','Prefer':'return=minimal'},
+      body:JSON.stringify({name:contact,email:email,notes:'Community listing request. Community: '+name+'. Type: '+type+'. Handle: '+handle,source:'community_listing',status:'new'})
+    });
+    if(res.ok||res.status===201){
+      msg.textContent='Received. We will reach out within 24 hours.';
+      msg.style.color='#34d399';
+      btn.textContent='Submitted';
+    } else {throw new Error();}
+  }catch(err){
+    msg.textContent='Something went wrong. Email hello@cbusevents.com directly.';
+    msg.style.color='#FF6B35';
+    btn.textContent='Submit your community';
+    btn.disabled=false;
+  }
+}
+</script>
 <footer>
   <div style="background:#080810;border-top:1px solid rgba(255,255,255,0.07);padding:32px;max-width:100%;">
     <div style="max-width:1280px;margin:0 auto;">
@@ -215,7 +377,7 @@ nav.site-nav{display:flex;align-items:center;justify-content:space-between;paddi
             <div style="display:flex;flex-direction:column;gap:7px;">
               <a href="https://cbusevents.com/signup.html?role=venue" style="font-size:12px;color:rgba(245,242,237,0.5);text-decoration:none;">List your venue</a>
               <a href="https://cbusevents.com/signup.html?role=vendor" style="font-size:12px;color:rgba(245,242,237,0.5);text-decoration:none;">List your services</a>
-              <a href="https://cbusevents.com/1313-festival-event.html" style="font-size:12px;color:#FF6B35;text-decoration:none;font-weight:600;">1313 Festival — June 13 &#8599;</a>
+              <a href="https://cbusevents.com/1313-festival-event.html" style="font-size:12px;color:#FF6B35;text-decoration:none;font-weight:600;">1313 Festival - June 13 &#8599;</a>
               <a href="https://cbusevents.com/sales-landing.html" style="font-size:12px;color:rgba(245,242,237,0.5);text-decoration:none;">Brand Ambassador program</a>
             </div>
           </div>
