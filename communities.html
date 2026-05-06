@@ -93,6 +93,23 @@ nav.site-nav{display:flex;align-items:center;justify-content:space-between;paddi
   .site-nav .nav-links,.site-nav .nav-right{display:none !important;}
   html,body{overflow-x:hidden;}
 }
+
+@media(max-width:860px){
+  nav{padding:0 16px !important;}
+  .hero-inner-grid{grid-template-columns:1fr !important;}
+  .featured-grid{grid-template-columns:1fr !important;}
+  .list-section-grid{grid-template-columns:1fr !important;}
+  .list-right-col{padding-top:0 !important;}
+  .hero-sec{padding:36px 20px 32px !important;}
+  .featured-sec{padding:28px 20px !important;}
+  .comm-grid-sec{padding:28px 20px !important;}
+  .list-sec{padding:36px 20px !important;}
+}
+@media(max-width:640px){
+  .nav-desktop-links{display:none !important;}
+  .site-nav .nav-links{display:none !important;}
+  .site-nav{padding:0 16px !important;}
+}
 </style>
 </head>
 <body>
@@ -109,9 +126,9 @@ nav.site-nav{display:flex;align-items:center;justify-content:space-between;paddi
 </nav>
 
 <!-- HERO -->
-<div style="background:#0f0f1a;border-bottom:1px solid rgba(255,255,255,0.07);padding:52px 32px 48px;position:relative;overflow:hidden;">
+<div class="hero-sec" style="background:#0f0f1a;border-bottom:1px solid rgba(255,255,255,0.07);padding:52px 32px 48px;position:relative;overflow:hidden;">
   <div style="position:absolute;inset:0;background:radial-gradient(ellipse 60% 60% at 65% 50%,rgba(255,107,53,0.06) 0%,transparent 70%);pointer-events:none;"></div>
-  <div style="max-width:1200px;margin:0 auto;display:grid;grid-template-columns:1fr 320px;gap:40px;align-items:center;position:relative;z-index:2;">
+  <div class="hero-inner-grid" style="max-width:1200px;margin:0 auto;display:grid;grid-template-columns:1fr 320px;gap:40px;align-items:center;position:relative;z-index:2;">
     <div>
       <div style="font-family:'DM Mono',monospace;font-size:10px;color:#FF6B35;letter-spacing:2px;text-transform:uppercase;margin-bottom:12px;">Columbus, Ohio</div>
       <h1 style="font-family:'Playfair Display',serif;font-size:clamp(28px,3.5vw,46px);font-weight:900;line-height:1.06;letter-spacing:-0.8px;margin-bottom:14px;color:#f0f0fa;">Your Columbus community<br>deserves a home <em style="color:#FF6B35;font-style:normal;">beyond Eventbrite.</em></h1>
@@ -140,10 +157,10 @@ nav.site-nav{display:flex;align-items:center;justify-content:space-between;paddi
 </div>
 
 <!-- FEATURED COMMUNITY - THE GRIEF CLUB -->
-<div style="padding:36px 32px;border-bottom:1px solid rgba(255,255,255,0.07);">
+<div class="featured-sec" style="padding:36px 32px;border-bottom:1px solid rgba(255,255,255,0.07);">
   <div style="max-width:1200px;margin:0 auto;">
     <div style="font-family:'DM Mono',monospace;font-size:9px;color:#FF6B35;letter-spacing:2px;text-transform:uppercase;margin-bottom:16px;">Featured community partner</div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+    <div class="featured-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
 
       <!-- GRIEF CLUB CARD -->
       <div style="background:#141422;border:1px solid rgba(255,107,53,0.25);border-radius:14px;overflow:hidden;">
@@ -205,7 +222,7 @@ nav.site-nav{display:flex;align-items:center;justify-content:space-between;paddi
 </div>
 
 <!-- COMMUNITY GRID -->
-<div style="max-width:1200px;margin:0 auto;padding:36px 32px;border-bottom:1px solid rgba(255,255,255,0.07);">
+<div class="comm-grid-sec" style="max-width:1200px;margin:0 auto;padding:36px 32px;border-bottom:1px solid rgba(255,255,255,0.07);">
   <div style="font-family:'DM Mono',monospace;font-size:9px;color:#FF6B35;letter-spacing:2px;text-transform:uppercase;margin-bottom:20px;">Columbus community hubs</div>
   <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px;">
 
@@ -273,8 +290,8 @@ nav.site-nav{display:flex;align-items:center;justify-content:space-between;paddi
 </div>
 
 <!-- LIST YOUR COMMUNITY -->
-<div id="list-community" style="padding:56px 32px;border-bottom:1px solid rgba(255,255,255,0.07);">
-  <div style="max-width:900px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:start;">
+<div id="list-community" class="list-sec" style="padding:56px 32px;border-bottom:1px solid rgba(255,255,255,0.07);">
+  <div class="list-section-grid" style="max-width:900px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:start;">
     <div>
       <div style="font-family:'DM Mono',monospace;font-size:10px;color:#FF6B35;letter-spacing:2px;text-transform:uppercase;margin-bottom:10px;">For community organizers</div>
       <h2 style="font-family:'Playfair Display',serif;font-size:clamp(22px,3vw,32px);font-weight:700;color:#f0f0fa;margin-bottom:10px;line-height:1.1;">List your community free</h2>
@@ -299,7 +316,7 @@ nav.site-nav{display:flex;align-items:center;justify-content:space-between;paddi
         <div id="c-msg" style="font-family:'DM Mono',monospace;font-size:9px;color:rgba(240,240,250,0.4);text-align:center;margin-top:2px;letter-spacing:0.5px;">Free to list. We will reach out within 24 hours.</div>
       </form>
     </div>
-    <div style="display:flex;flex-direction:column;gap:10px;padding-top:48px;">
+    <div class="list-right-col" style="display:flex;flex-direction:column;gap:10px;padding-top:48px;">
       <div style="font-family:'DM Mono',monospace;font-size:9px;color:rgba(240,240,250,0.3);letter-spacing:2px;text-transform:uppercase;margin-bottom:6px;">What is included</div>
       <div style="display:flex;gap:10px;align-items:flex-start;padding:12px;background:#141422;border:1px solid rgba(255,255,255,0.07);border-radius:9px;">
         <div style="width:20px;height:20px;border-radius:5px;background:rgba(52,211,153,0.1);border:1px solid rgba(52,211,153,0.2);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;font-size:11px;">&#10003;</div>
