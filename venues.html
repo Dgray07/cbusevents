@@ -277,6 +277,35 @@ nav.site-nav{display:flex;align-items:center;justify-content:space-between;paddi
 </div>
 
 <!-- PAGE HEADER -->
+
+<!-- AUDIENCE SWITCHER -->
+<div style="background:var(--surface);border-bottom:1px solid var(--border);padding:0 32px;">
+  <div style="max-width:1280px;margin:0 auto;display:flex;gap:0;">
+    <button id="tab-find" onclick="switchTab('find')" style="padding:14px 24px;font-family:var(--mono);font-size:11px;letter-spacing:1.5px;text-transform:uppercase;background:none;border:none;border-bottom:2px solid var(--orange);color:var(--text);cursor:pointer;font-weight:600;">Find a Venue</button>
+    <button id="tab-list" onclick="switchTab('list')" style="padding:14px 24px;font-family:var(--mono);font-size:11px;letter-spacing:1.5px;text-transform:uppercase;background:none;border:none;border-bottom:2px solid transparent;color:var(--text-dim,rgba(245,242,237,0.45));cursor:pointer;">List Your Venue</button>
+  </div>
+</div>
+<script>
+function switchTab(t){
+  var tabFind=document.getElementById('tab-find');
+  var tabList=document.getElementById('tab-list');
+  var findView=document.getElementById('view-find');
+  var listView=document.getElementById('view-list');
+  if(!tabFind||!tabList||!findView||!listView)return;
+  if(t==='find'){
+    tabFind.style.borderBottomColor='var(--orange)';tabFind.style.color='var(--text)';
+    tabList.style.borderBottomColor='transparent';tabList.style.color='rgba(245,242,237,0.45)';
+    findView.style.display='';listView.style.display='none';
+  } else {
+    tabList.style.borderBottomColor='var(--orange)';tabList.style.color='var(--text)';
+    tabFind.style.borderBottomColor='transparent';tabFind.style.color='rgba(245,242,237,0.45)';
+    listView.style.display='';findView.style.display='none';
+  }
+}
+// Auto-switch to list tab if ?tab=list in URL
+if(window.location.search.includes('tab=list'))switchTab('list');
+</script>
+<div id="view-find">
 <div class="page-head">
   <div>
     <div class="page-eyebrow">Columbus Event Venues</div>
@@ -330,6 +359,8 @@ nav.site-nav{display:flex;align-items:center;justify-content:space-between;paddi
 <!-- DIVIDER -->
 <div class="section-divider"><div class="divider-line"></div></div>
 
+</div><!-- /view-find -->
+<div id="view-list" style="display:none;">
 <!-- LIST YOUR VENUE CTA SECTION -->
 <div class="list-section">
   <div class="list-section-inner">
@@ -462,11 +493,50 @@ nav.site-nav{display:flex;align-items:center;justify-content:space-between;paddi
   </div>
 </section>
 
+</div><!-- /view-list -->
 <footer>
-  <span class="footer-copy">© 2026 CBUSEVENTS · Columbus, Ohio</span>
-  <div style="display:flex;gap:20px;align-items:center">
-    <span class="footer-copy">Made for Columbus</span>
-    <a href="https://cbusevents.com/cbus-admin.html" class="footer-admin">Admin</a>
+  <div style="background:#080810;border-top:1px solid rgba(255,255,255,0.07);padding:32px;max-width:100%;">
+    <div style="max-width:1280px;margin:0 auto;">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:32px;flex-wrap:wrap;margin-bottom:28px;">
+        <div>
+          <div style="font-family:'Playfair Display',serif;font-size:20px;font-weight:900;letter-spacing:-0.5px;margin-bottom:6px;">CBUS<span style="color:#FF6B35;">EVENTS</span></div>
+          <div style="font-family:'DM Mono',monospace;font-size:10px;color:rgba(245,242,237,0.4);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:4px;">Inaugural Season 2026 &nbsp;·&nbsp; Columbus, Ohio</div>
+          <div style="font-size:12px;color:rgba(245,242,237,0.4);margin-top:6px;max-width:260px;line-height:1.6;">The Columbus event ecosystem connecting venues, vendors, planners and attendees.</div>
+        </div>
+        <div style="display:flex;gap:48px;flex-wrap:wrap;">
+          <div>
+            <div style="font-family:'DM Mono',monospace;font-size:9px;color:#FF6B35;letter-spacing:2px;text-transform:uppercase;margin-bottom:10px;">Discover</div>
+            <div style="display:flex;flex-direction:column;gap:7px;">
+              <a href="https://cbusevents.com/attendees.html" style="font-size:12px;color:rgba(245,242,237,0.5);text-decoration:none;">Browse events</a>
+              <a href="https://cbusevents.com/venues.html" style="font-size:12px;color:rgba(245,242,237,0.5);text-decoration:none;">Find a venue</a>
+              <a href="https://cbusevents.com/communities.html" style="font-size:12px;color:rgba(245,242,237,0.5);text-decoration:none;">Communities</a>
+              <a href="https://cbusevents.com/gallery-hop.html" style="font-size:12px;color:rgba(245,242,237,0.5);text-decoration:none;">Gallery Hop</a>
+            </div>
+          </div>
+          <div>
+            <div style="font-family:'DM Mono',monospace;font-size:9px;color:#FF6B35;letter-spacing:2px;text-transform:uppercase;margin-bottom:10px;">Join</div>
+            <div style="display:flex;flex-direction:column;gap:7px;">
+              <a href="https://cbusevents.com/signup.html?role=venue" style="font-size:12px;color:rgba(245,242,237,0.5);text-decoration:none;">List your venue</a>
+              <a href="https://cbusevents.com/signup.html?role=vendor" style="font-size:12px;color:rgba(245,242,237,0.5);text-decoration:none;">List your services</a>
+              <a href="https://cbusevents.com/1313-festival-event.html" style="font-size:12px;color:#FF6B35;text-decoration:none;font-weight:600;">1313 Festival — June 13 &#8599;</a>
+              <a href="https://cbusevents.com/sales-landing.html" style="font-size:12px;color:rgba(245,242,237,0.5);text-decoration:none;">Brand Ambassador program</a>
+            </div>
+          </div>
+          <div>
+            <div style="font-family:'DM Mono',monospace;font-size:9px;color:#FF6B35;letter-spacing:2px;text-transform:uppercase;margin-bottom:10px;">Legal</div>
+            <div style="display:flex;flex-direction:column;gap:7px;">
+              <a href="https://cbusevents.com/privacy.html" style="font-size:12px;color:rgba(245,242,237,0.5);text-decoration:none;">Privacy policy</a>
+              <a href="https://cbusevents.com/terms.html" style="font-size:12px;color:rgba(245,242,237,0.5);text-decoration:none;">Terms of service</a>
+              <a href="https://cbusevents.com/privacy.html#cookies" style="font-size:12px;color:rgba(245,242,237,0.5);text-decoration:none;">Cookie notice</a>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div style="border-top:1px solid rgba(255,255,255,0.07);padding-top:20px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
+        <div style="font-family:'DM Mono',monospace;font-size:10px;color:rgba(245,242,237,0.3);letter-spacing:0.5px;">&#169; 2026 CBUSEVENTS &nbsp;·&nbsp; Columbus, Ohio &nbsp;·&nbsp; Made for Columbus</div>
+        <a href="https://cbusevents.com/cbus-admin.html" style="font-family:'DM Mono',monospace;font-size:10px;color:rgba(245,242,237,0.2);text-decoration:none;letter-spacing:1px;">Admin</a>
+      </div>
+    </div>
   </div>
 </footer>
 
@@ -753,13 +823,14 @@ async function submitVenuesCapture() {
     if (data.ok) {
       const form = document.getElementById('venuesCaptureForm');
       if (form) {
-        form.innerHTML =
-          '<div style="display:flex;align-items:center;gap:12px;background:rgba(34,197,94,0.08);border:1px solid rgba(34,197,94,0.2);border-radius:12px;padding:16px 20px">' +
-          '<div style="font-size:22px">&#10003;</div>' +
-          '<div>' +
-          "<div style='font-weight:700;color:#4ade80;margin-bottom:3px'>You're on the list.</div>" +
-          '<div style="font-size:13px;color:#a0a0c0">Check your inbox for a welcome from CBUS EVENTS.</div>' +
-          '</div></div>';
+        form.innerHTML = `
+          <div style="display:flex;align-items:center;gap:12px;background:rgba(34,197,94,0.08);border:1px solid rgba(34,197,94,0.2);border-radius:12px;padding:16px 20px">
+            <div style="font-size:22px">✓</div>
+            <div>
+              <div style="font-weight:700;color:#4ade80;margin-bottom:3px">You're on the list.</div>
+              <div style="font-size:13px;color:#a0a0c0">Check your inbox for a welcome from CBUS EVENTS.</div>
+            </div>
+          </div>`;
       }
     } else {
       status.innerHTML = '<span style="color:#FF6B35">Something went wrong. Try again.</span>';

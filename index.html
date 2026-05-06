@@ -1494,6 +1494,14 @@ h1,h2,h3,h4,h5,h6{font-family:var(--font);letter-spacing:-0.02em;}
 <button class="nav-hamburger" id="navHamburger" aria-label="Menu"><span></span><span></span><span></span></button>
 <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme" title="Toggle light/dark mode">☀️</button>
 </nav>
+
+<div id="inauguralRibbon" style="background:rgba(255,107,53,0.1);border-bottom:1px solid rgba(255,107,53,0.18);padding:9px 32px;display:flex;align-items:center;justify-content:center;gap:12px;">
+  <div style="width:5px;height:5px;background:var(--orange);border-radius:50%;animation:pulse 2s infinite;flex-shrink:0;"></div>
+  <span style="font-family:var(--mono);font-size:11px;color:var(--orange);letter-spacing:1.5px;text-transform:uppercase;">Columbus's first dedicated event ecosystem</span>
+  <div style="width:1px;height:12px;background:rgba(255,107,53,0.3);flex-shrink:0;"></div>
+  <a href="https://cbusevents.com/1313-festival-event.html" style="font-family:var(--mono);font-size:11px;color:var(--orange);letter-spacing:1.5px;text-transform:uppercase;text-decoration:none;">Inaugural 1313 Festival &mdash; June 13, 2026 &rarr;</a>
+  <div style="width:5px;height:5px;background:var(--orange);border-radius:50%;animation:pulse 2s infinite;flex-shrink:0;"></div>
+</div>
 <div id="navMobileMenu" class="nav-mobile-menu">
   <a onclick="showPage('home')" class="nav-mobile-link" style="cursor:pointer">Home</a>
   <a onclick="showPage('events')" class="nav-mobile-link" style="cursor:pointer">Events</a>
@@ -1909,6 +1917,26 @@ function renderHome(){
      <div style="display:flex;gap:12px;flex-wrap:wrap">
        <a href="https://cbusevents.com/signup.html" style="display:inline-flex;align-items:center;gap:8px;background:var(--orange);color:#fff;font-family:var(--font);font-weight:700;font-size:15px;padding:14px 32px;border-radius:var(--r-md);text-decoration:none;transition:opacity 0.15s" onmouseover="this.style.opacity='0.88'" onmouseout="this.style.opacity='1'">Join Free Today</a>
        <button onclick="showPage('events')" style="display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,0.06);color:var(--text);border:1px solid var(--border);font-family:var(--font);font-weight:600;font-size:15px;padding:14px 24px;border-radius:var(--r-md);cursor:pointer;transition:all 0.15s" onmouseover="this.style.background='rgba(255,255,255,0.1)'" onmouseout="this.style.background='rgba(255,255,255,0.06)'">Browse Events</button>
+     </div>
+     <div style="margin-top:28px;">
+       <div style="font-family:var(--mono);font-size:9px;color:rgba(245,242,237,0.35);letter-spacing:2px;text-transform:uppercase;margin-bottom:10px;">I am a&hellip;</div>
+       <div style="display:flex;gap:8px;flex-wrap:wrap;">
+         <a href="https://cbusevents.com/attendees.html" style="flex:1;min-width:140px;padding:12px 14px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:10px;text-decoration:none;display:block;transition:border-color 0.2s;" onmouseover="this.style.borderColor='rgba(255,107,53,0.4)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.08)'">
+           <div style="font-family:var(--mono);font-size:9px;color:var(--orange);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:4px;">Attendee</div>
+           <div style="font-size:12px;font-weight:700;color:var(--text);margin-bottom:2px;">Find what's happening</div>
+           <div style="font-size:11px;color:var(--sub);">Browse events tonight &rarr;</div>
+         </a>
+         <a href="https://cbusevents.com/1313-festival-event.html" style="flex:1;min-width:140px;padding:12px 14px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:10px;text-decoration:none;display:block;transition:border-color 0.2s;" onmouseover="this.style.borderColor='rgba(255,107,53,0.4)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.08)'">
+           <div style="font-family:var(--mono);font-size:9px;color:var(--orange);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:4px;">Vendor</div>
+           <div style="font-size:12px;font-weight:700;color:var(--text);margin-bottom:2px;">Get booked. Get paid.</div>
+           <div style="font-size:11px;color:var(--sub);">Apply for 1313 &rarr;</div>
+         </a>
+         <a href="https://cbusevents.com/venues.html?tab=list" style="flex:1;min-width:140px;padding:12px 14px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:10px;text-decoration:none;display:block;transition:border-color 0.2s;" onmouseover="this.style.borderColor='rgba(255,107,53,0.4)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.08)'">
+           <div style="font-family:var(--mono);font-size:9px;color:var(--orange);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:4px;">Venue</div>
+           <div style="font-size:12px;font-weight:700;color:var(--text);margin-bottom:2px;">Fill your calendar</div>
+           <div style="font-size:11px;color:var(--sub);">List your space free &rarr;</div>
+         </a>
+       </div>
      </div>
    </div>
  </section>
@@ -2410,7 +2438,34 @@ function renderHome(){
  <!-- ══════════════════════════════════════════
       EMAIL CAPTURE + FINAL CTA
  ══════════════════════════════════════════ -->
- <section style="padding:52px 48px;background:var(--surface);border-bottom:1px solid var(--border)">
+ 
+<!-- GROWTH ENGINE: CREATORS AND BRANDS -->
+<section style="display:grid;grid-template-columns:1fr 1fr;border-top:1px solid var(--border);">
+  <a href="https://cbusevents.com/creators.html" style="padding:40px 48px;background:rgba(180,107,255,0.04);border-right:1px solid var(--border);text-decoration:none;display:block;transition:background 0.2s;" onmouseover="this.style.background='rgba(180,107,255,0.08)'" onmouseout="this.style.background='rgba(180,107,255,0.04)'">
+    <div style="font-family:var(--mono);font-size:9px;color:#b46bff;letter-spacing:2px;text-transform:uppercase;margin-bottom:10px;">Columbus Creator Collective</div>
+    <h2 style="font-family:var(--font);font-size:clamp(20px,2.5vw,28px);font-weight:800;color:var(--text);line-height:1.1;margin-bottom:10px;">Your Columbus audience<br>is worth more than likes.</h2>
+    <p style="font-size:13px;color:var(--sub);line-height:1.65;margin-bottom:20px;max-width:340px;">CBUSEVENTS pays Columbus creators to do what they already do. Your own page. Your own brand deals. Real commission on every RSVP.</p>
+    <div style="display:flex;gap:16px;margin-bottom:20px;">
+      <div><div style="font-family:var(--mono);font-size:16px;font-weight:500;color:#b46bff;">$1,200</div><div style="font-family:var(--mono);font-size:9px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-top:2px;">Monthly partner rate</div></div>
+      <div><div style="font-family:var(--mono);font-size:16px;font-weight:500;color:#b46bff;">25%</div><div style="font-family:var(--mono);font-size:9px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-top:2px;">RSVP commission</div></div>
+      <div><div style="font-family:var(--mono);font-size:16px;font-weight:500;color:#b46bff;">8</div><div style="font-family:var(--mono);font-size:9px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-top:2px;">Founding spots</div></div>
+    </div>
+    <span style="display:inline-block;background:#b46bff;color:#fff;padding:10px 20px;border-radius:8px;font-size:12px;font-weight:700;letter-spacing:0.3px;">Apply for a spot &rarr;</span>
+  </a>
+  <a href="https://cbusevents.com/brands.html" style="padding:40px 48px;background:rgba(255,107,53,0.04);text-decoration:none;display:block;transition:background 0.2s;" onmouseover="this.style.background='rgba(255,107,53,0.08)'" onmouseout="this.style.background='rgba(255,107,53,0.04)'">
+    <div style="font-family:var(--mono);font-size:9px;color:var(--orange);letter-spacing:2px;text-transform:uppercase;margin-bottom:10px;">Brand partners</div>
+    <h2 style="font-family:var(--font);font-size:clamp(20px,2.5vw,28px);font-weight:800;color:var(--text);line-height:1.1;margin-bottom:10px;">Columbus is your market.<br>We own the room.</h2>
+    <p style="font-size:13px;color:var(--sub);line-height:1.65;margin-bottom:20px;max-width:340px;">Reach Columbus's most engaged event audience through creators they already trust, at events they actually attend.</p>
+    <div style="display:flex;gap:16px;margin-bottom:20px;">
+      <div><div style="font-family:var(--mono);font-size:16px;font-weight:500;color:var(--orange);">61K+</div><div style="font-family:var(--mono);font-size:9px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-top:2px;">Columbus reach</div></div>
+      <div><div style="font-family:var(--mono);font-size:16px;font-weight:500;color:var(--orange);">$0</div><div style="font-family:var(--mono);font-size:9px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-top:2px;">To get started</div></div>
+      <div><div style="font-family:var(--mono);font-size:16px;font-weight:500;color:var(--orange);">Live</div><div style="font-family:var(--mono);font-size:9px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-top:2px;">ROI dashboard</div></div>
+    </div>
+    <span style="display:inline-block;background:var(--orange);color:#fff;padding:10px 20px;border-radius:8px;font-size:12px;font-weight:700;letter-spacing:0.3px;">Create brand profile free &rarr;</span>
+  </a>
+</section>
+
+<section style="padding:52px 48px;background:var(--surface);border-bottom:1px solid var(--border)">
    <div style="max-width:1100px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:52px;align-items:center">
      <div>
        <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.2em;text-transform:uppercase;color:var(--orange);margin-bottom:12px">Columbus Events Weekly</div>
@@ -3361,7 +3416,17 @@ function closeVendorModal(){
 
 // ── FOOTER ────────────────────────────────────────────────────
 function footer(){
- return`<footer> <div class="footer-grid"> <div> <div class="footer-logo">CBUS<span>EVENTS</span></div> <p class="footer-desc">The Columbus event directory connecting venues, organizers, and audiences. Discover spaces, find events, make things happen.</p> </div> <div class="footer-col"> <h4>Discover</h4> <div class="footer-link" onclick="window.location.href='https://cbusevents.com/venues.html'">All Venues</div> <div class="footer-link" onclick="showPage('events')">Upcoming Events</div> <a class="footer-link" href="https://cbusevents.com/blog.html" style="text-decoration:none">Columbus Blog</a> <div class="footer-link" onclick="showPage('category','bars')">Bars & Nightlife</div> <div class="footer-link" onclick="showPage('category','comedy')">Comedy Clubs</div> <div class="footer-link" onclick="showPage('category','rooftop')">Rooftop Bars</div> </div> <div class="footer-col"> <h4>For Venues</h4> <div class="footer-link" onclick="window.location.href='https://cbusevents.com/signup.html?role=venue'">List Your Venue</div> <div class="footer-link" onclick="window.location.href='https://cbusevents.com/signup.html'">Manage Events</div> <div class="footer-link" onclick="showPricing()">Pricing Plans</div> <div class="footer-link" onclick="window.location.href='https://cbusevents.com/signup.html'">Venue Sign In</div> </div> <div class="footer-col"> <h4>For Planners</h4> <div class="footer-link" onclick="window.location.href='https://cbusevents.com/signup.html?role=planner'" role="button" tabindex="0">Create Free Account</div> <div class="footer-link" onclick="window.location.href='https://cbusevents.com/venues.html'" role="button" tabindex="0">Browse Venues</div> <div class="footer-link" onclick="window.location.href='https://cbusevents.com/signup.html'" role="button" tabindex="0">List Your Event</div> <div class="footer-link" onclick="window.location.href='https://cbusevents.com/signup.html'" role="button" tabindex="0">Boost an Event</div> </div> <div class="footer-col"> <h4>Columbus</h4> <div class="footer-link" onclick="homeNeighborhood&&homeNeighborhood('Short North',{classList:{remove:()=>{},add:()=>{}}})" role="button" tabindex="0">Short North</div> <div class="footer-link">Downtown</div> <div class="footer-link">Clintonville</div> <div class="footer-link">Easton</div> <div class="footer-link">Brewery District</div> </div> </div> <div class="footer-bottom"> <span class="footer-copy">© 2026 CBUSEVENTS · Columbus, Ohio</span> <div style="display:flex;align-items:center;gap:20px"> <span class="footer-copy">Made for Columbus </span> <a href="https://cbusevents.com/cbus-admin.html" style="color:var(--muted);font-size:11px;font-weight:600;letter-spacing:0.5px;opacity:0.5;transition:opacity 0.2s" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.5'">Admin</a> </div> </div> </footer>`;
+ return`<footer> <div class="footer-grid"> <div> <div class="footer-logo">CBUS<span>EVENTS</span></div> <p class="footer-desc">The Columbus event directory connecting venues, organizers, and audiences. Discover spaces, find events, make things happen.</p> </div> <div class="footer-col"> <h4>Discover</h4> <div class="footer-link" onclick="window.location.href='https://cbusevents.com/venues.html'">All Venues</div> <div class="footer-link" onclick="showPage('events')">Upcoming Events</div> <a class="footer-link" href="https://cbusevents.com/blog.html" style="text-decoration:none">Columbus Blog</a> <div class="footer-link" onclick="showPage('category','bars')">Bars & Nightlife</div> <div class="footer-link" onclick="showPage('category','comedy')">Comedy Clubs</div> <div class="footer-link" onclick="showPage('category','rooftop')">Rooftop Bars</div> </div> <div class="footer-col"> <h4>For Venues</h4> <div class="footer-link" onclick="window.location.href='https://cbusevents.com/signup.html?role=venue'">List Your Venue</div> <div class="footer-link" onclick="window.location.href='https://cbusevents.com/signup.html'">Manage Events</div> <div class="footer-link" onclick="showPricing()">Pricing Plans</div> <div class="footer-link" onclick="window.location.href='https://cbusevents.com/signup.html'">Venue Sign In</div> </div> <div class="footer-col"> <h4>For Planners</h4> <div class="footer-link" onclick="window.location.href='https://cbusevents.com/signup.html?role=planner'" role="button" tabindex="0">Create Free Account</div> <div class="footer-link" onclick="window.location.href='https://cbusevents.com/venues.html'" role="button" tabindex="0">Browse Venues</div> <div class="footer-link" onclick="window.location.href='https://cbusevents.com/signup.html'" role="button" tabindex="0">List Your Event</div> <div class="footer-link" onclick="window.location.href='https://cbusevents.com/signup.html'" role="button" tabindex="0">Boost an Event</div> </div> <div class="footer-col"> <h4>Columbus</h4> <div class="footer-link" onclick="homeNeighborhood&&homeNeighborhood('Short North',{classList:{remove:()=>{},add:()=>{}}})" role="button" tabindex="0">Short North</div> <div class="footer-link">Downtown</div> <div class="footer-link">Clintonville</div> <div class="footer-link">Easton</div> <div class="footer-link">Brewery District</div> </div> </div> <div class="footer-bottom"> <span class="footer-copy">© 2026 CBUSEVENTS · Columbus, Ohio · Inaugural Season 2026</span> <div style="display:flex;align-items:center;gap:20px"> <span class="footer-copy">Made for Columbus </span> <a href="https://cbusevents.com/cbus-admin.html" style="color:var(--muted);font-size:11px;font-weight:600;letter-spacing:0.5px;opacity:0.5;transition:opacity 0.2s" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.5'">Admin</a> </div> </div> 
+  <div style="border-top:1px solid rgba(255,255,255,0.05);padding:12px 32px;display:flex;align-items:center;justify-content:center;gap:16px;flex-wrap:wrap;">
+    <a href="https://cbusevents.com/privacy.html" style="font-family:var(--mono);font-size:10px;color:var(--muted);text-decoration:none;letter-spacing:0.5px;">Privacy policy</a>
+    <span style="color:rgba(255,255,255,0.1);font-size:10px;">&middot;</span>
+    <a href="https://cbusevents.com/terms.html" style="font-family:var(--mono);font-size:10px;color:var(--muted);text-decoration:none;letter-spacing:0.5px;">Terms of service</a>
+    <span style="color:rgba(255,255,255,0.1);font-size:10px;">&middot;</span>
+    <a href="https://cbusevents.com/privacy.html#cookies" style="font-family:var(--mono);font-size:10px;color:var(--muted);text-decoration:none;letter-spacing:0.5px;">Cookie notice</a>
+    <span style="color:rgba(255,255,255,0.1);font-size:10px;">&middot;</span>
+    <a href="https://cbusevents.com/1313-festival-event.html" style="font-family:var(--mono);font-size:10px;color:var(--orange);text-decoration:none;font-weight:600;letter-spacing:0.5px;">1313 Festival &mdash; June 13, 2026</a>
+  </div>
+</footer>`;
 }
 
 
