@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Creator Portal | CBUSEVENTS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800;900&family=DM+Mono:wght@400;500&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --bg:#080810;--surface:#0f0f1a;--card:#141420;--border:#1e1e2e;--border-sub:rgba(255,255,255,0.07);
+  --text:#f0f0fa;--sub:#7070a0;--muted:#40405a;
+  --orange:#FF6B35;--orange-dim:rgba(255,107,53,0.1);--orange-border:rgba(255,107,53,0.25);
+  --purple:#b46bff;--purple-dim:rgba(180,107,255,0.1);--purple-border:rgba(180,107,255,0.3);
+  --green:#34d399;--green-dim:rgba(52,211,153,0.1);--green-border:rgba(52,211,153,0.2);
+  --font:'DM Sans',sans-serif;--mono:'DM Mono',monospace;--display:'Playfair Display',serif;
+  --r-sm:8px;--r-md:10px;--r-lg:14px;
+}
+body{background:var(--bg);color:var(--text);font-family:var(--font);line-height:1.65;min-height:100vh;}
+a{text-decoration:none;color:inherit;}
+
+/* PORTAL NAV */
+.portal-nav{background:rgba(8,8,16,0.97);border-bottom:1px solid var(--border-sub);display:flex;align-items:stretch;height:52px;}
+.pnav-logo{padding:0 20px;display:flex;align-items:center;border-right:1px solid var(--border-sub);}
+.logo{font-family:var(--display);font-size:16px;font-weight:900;}
+.logo span{color:var(--orange);}
+.pnav-tabs{display:flex;align-items:stretch;overflow-x:auto;scrollbar-width:none;-ms-overflow-style:none;}
+.pnav-tabs::-webkit-scrollbar{display:none;}
+.pnav-tab{padding:0 16px;display:flex;align-items:center;font-size:11px;color:var(--sub);cursor:pointer;border-bottom:2px solid transparent;gap:6px;white-space:nowrap;background:none;border-top:none;border-left:none;border-right:none;font-family:var(--font);}
+.pnav-tab.active{color:var(--text);border-bottom-color:var(--purple);}
+.pnav-tab:hover{color:var(--text);}
+.pnav-right{margin-left:auto;display:flex;align-items:center;gap:10px;padding:0 16px;}
+.creator-pill{background:var(--purple-dim);border:1px solid var(--purple-border);border-radius:9999px;padding:4px 12px;font-family:var(--mono);font-size:10px;color:var(--purple);letter-spacing:1px;}
+.pnav-avatar{width:30px;height:30px;border-radius:50%;background:var(--purple-dim);border:1px solid var(--purple-border);display:flex;align-items:center;justify-content:center;font-family:var(--display);font-size:11px;font-weight:700;color:var(--purple);}
+
+/* LAYOUT */
+.portal-layout{display:grid;grid-template-columns:210px 1fr;min-height:calc(100vh - 52px);}
+.sidebar{background:var(--surface);border-right:1px solid var(--border-sub);padding:16px 0;}
+.sb-label{font-family:var(--mono);font-size:9px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;padding:0 16px;margin-bottom:6px;margin-top:12px;}
+.sb-item{display:flex;align-items:center;gap:9px;padding:9px 16px;font-size:12px;color:var(--sub);cursor:pointer;transition:all 0.15s;}
+.sb-item:hover{color:var(--text);background:rgba(255,255,255,0.03);}
+.sb-item.active{color:var(--text);background:var(--purple-dim);border-right:2px solid var(--purple);}
+.sb-icon{font-size:15px;width:18px;text-align:center;}
+
+.main{overflow:hidden;}
+.page-header{padding:22px 28px 0;border-bottom:1px solid var(--border-sub);}
+.page-eyebrow{font-family:var(--mono);font-size:9px;color:var(--purple);letter-spacing:2px;text-transform:uppercase;margin-bottom:5px;}
+.page-title{font-family:var(--display);font-size:22px;font-weight:700;margin-bottom:16px;}
+.content{padding:22px 28px;}
+
+/* SHARE BLOCK */
+.share-block{background:var(--purple-dim);border:1px solid var(--purple-border);border-radius:var(--r-lg);padding:20px;margin-bottom:22px;display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap;}
+.share-block-left{}
+.share-block-title{font-size:13px;font-weight:700;margin-bottom:4px;}
+.share-block-sub{font-size:11px;color:var(--sub);line-height:1.5;}
+.share-link-row{display:flex;gap:6px;margin-top:10px;}
+.share-link-input{background:var(--surface);border:1px solid var(--border-sub);border-radius:var(--r-sm);padding:8px 12px;font-family:var(--mono);font-size:10px;color:var(--purple);letter-spacing:0.5px;min-width:240px;}
+.copy-btn{background:var(--purple);color:#fff;padding:8px 14px;border-radius:var(--r-sm);font-family:var(--mono);font-size:10px;cursor:pointer;border:none;font-weight:600;white-space:nowrap;}
+.copy-btn:hover{opacity:0.88;}
+.view-page-btn{background:transparent;border:1px solid var(--purple-border);color:var(--purple);padding:8px 14px;border-radius:var(--r-sm);font-family:var(--mono);font-size:10px;cursor:pointer;white-space:nowrap;}
+
+/* METRICS */
+.metric-row{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:22px;}
+.metric{background:var(--card);border:1px solid var(--border-sub);border-radius:var(--r-lg);padding:14px 16px;}
+.metric-label{font-family:var(--mono);font-size:9px;color:var(--sub);letter-spacing:1px;text-transform:uppercase;margin-bottom:6px;}
+.metric-val{font-family:var(--mono);font-size:22px;font-weight:500;color:var(--purple);line-height:1;}
+.metric-delta{font-family:var(--mono);font-size:9px;color:var(--green);margin-top:4px;}
+
+/* TWO COL */
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:22px;}
+.card{background:var(--card);border:1px solid var(--border-sub);border-radius:var(--r-lg);overflow:hidden;}
+.card-head{padding:12px 16px;border-bottom:1px solid var(--border-sub);display:flex;align-items:center;justify-content:space-between;}
+.card-title{font-size:12px;font-weight:600;}
+.card-link{font-family:var(--mono);font-size:9px;color:var(--purple);cursor:pointer;letter-spacing:0.5px;}
+.card-body{padding:14px 16px;}
+
+/* POST SUBMISSION */
+.post-form{display:flex;flex-direction:column;gap:10px;}
+.post-input{width:100%;background:var(--surface);border:1px solid var(--border-sub);border-radius:var(--r-sm);padding:9px 12px;color:var(--text);font-size:12px;font-family:var(--font);outline:none;}
+.post-input:focus{border-color:var(--purple-border);}
+.post-input::placeholder{color:var(--muted);}
+.post-select{width:100%;background:var(--surface);border:1px solid var(--border-sub);border-radius:var(--r-sm);padding:9px 12px;color:var(--text);font-size:12px;font-family:var(--font);outline:none;cursor:pointer;}
+.post-submit{background:var(--purple);color:#fff;padding:9px;border-radius:var(--r-sm);font-size:12px;font-weight:700;cursor:pointer;border:none;}
+.post-submit:hover{opacity:0.88;}
+
+/* PICKS MANAGER */
+.picks-list{display:flex;flex-direction:column;gap:8px;}
+.pick-item{display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--surface);border:1px solid var(--border-sub);border-radius:var(--r-sm);}
+.pick-dot{width:7px;height:7px;border-radius:50%;background:var(--orange);flex-shrink:0;}
+.pick-name{font-size:12px;font-weight:600;flex:1;}
+.pick-date{font-family:var(--mono);font-size:10px;color:var(--sub);}
+.pick-remove{font-family:var(--mono);font-size:9px;color:var(--muted);cursor:pointer;letter-spacing:0.5px;}
+.pick-remove:hover{color:var(--orange);}
+.add-pick-btn{width:100%;padding:9px;border-radius:var(--r-sm);border:1px dashed var(--border-sub);background:transparent;color:var(--sub);font-size:12px;cursor:pointer;margin-top:6px;}
+.add-pick-btn:hover{border-color:var(--purple-border);color:var(--purple);}
+
+/* BRAND INBOX */
+.inbox-list{display:flex;flex-direction:column;gap:0;}
+.inbox-row{display:flex;align-items:flex-start;gap:10px;padding:12px 16px;border-bottom:1px solid var(--border-sub);cursor:pointer;}
+.inbox-row:last-child{border-bottom:none;}
+.inbox-row:hover{background:rgba(255,255,255,0.02);}
+.inbox-av{width:32px;height:32px;border-radius:var(--r-sm);background:var(--orange-dim);display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:10px;color:var(--orange);flex-shrink:0;font-weight:600;}
+.inbox-name{font-size:12px;font-weight:600;margin-bottom:2px;}
+.inbox-msg{font-size:11px;color:var(--sub);line-height:1.4;}
+.inbox-time{font-family:var(--mono);font-size:9px;color:var(--muted);margin-left:auto;flex-shrink:0;}
+.inbox-unread{width:6px;height:6px;border-radius:50%;background:var(--purple);flex-shrink:0;margin-top:4px;}
+
+/* EARNINGS */
+.earn-list{display:flex;flex-direction:column;gap:0;}
+.earn-row{display:flex;align-items:center;gap:12px;padding:10px 16px;border-bottom:1px solid var(--border-sub);}
+.earn-row:last-child{border-bottom:none;}
+.earn-icon{width:30px;height:30px;border-radius:var(--r-sm);display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;}
+.earn-desc{font-size:11px;color:var(--text);flex:1;}
+.earn-desc span{color:var(--purple);}
+.earn-time{font-family:var(--mono);font-size:9px;color:var(--muted);}
+.earn-amt{font-family:var(--mono);font-size:12px;color:var(--green);margin-left:auto;}
+
+/* AUTH GATE */
+.auth-gate{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:calc(100vh - 52px);padding:32px;text-align:center;}
+.auth-gate-title{font-family:var(--display);font-size:24px;font-weight:700;margin-bottom:8px;}
+.auth-gate-sub{font-size:14px;color:var(--sub);margin-bottom:24px;}
+.auth-gate-btn{background:var(--purple);color:#fff;padding:12px 28px;border-radius:var(--r-md);font-size:13px;font-weight:700;cursor:pointer;border:none;display:block;margin:0 auto 12px;}
+.auth-gate-link{font-size:12px;color:var(--sub);}
+.auth-gate-link a{color:var(--purple);}
+</style>
+</head>
+<body>
+
+<div class="portal-nav">
+  <a href="https://cbusevents.com" class="pnav-logo"><div class="logo">CBUS<span>EVENTS</span></div></a>
+  <div class="pnav-tabs">
+    <button class="pnav-tab active" onclick="showTab('dashboard',this)">Dashboard</button>
+    <button class="pnav-tab" onclick="showTab('posts',this)">My posts</button>
+    <button class="pnav-tab" onclick="showTab('picks',this)">Columbus picks</button>
+    <button class="pnav-tab" onclick="showTab('inbox',this)">Brand inbox</button>
+    <button class="pnav-tab" onclick="showTab('earnings',this)">Earnings</button>
+  </div>
+  <div class="pnav-right">
+    <div class="creator-pill" id="creatorPill">Creator</div>
+    <div class="pnav-avatar" id="creatorAv">?</div>
+  </div>
+</div>
+
+<div id="authGate" class="auth-gate" style="display:none;">
+  <div class="auth-gate-title">Creator portal</div>
+  <div class="auth-gate-sub">Sign in to access your dashboard, manage your Columbus picks and track your earnings.</div>
+  <a href="https://cbusevents.com/auth.html?role=creator&next=creator-portal.html" class="auth-gate-btn">Sign in as creator</a>
+  <div class="auth-gate-link">Not a creator yet? <a href="https://cbusevents.com/creators.html">Apply for a spot &rarr;</a></div>
+</div>
+
+<div id="portalContent" class="portal-layout">
+  <div class="sidebar">
+    <div class="sb-label">Overview</div>
+    <div class="sb-item active" onclick="showTab('dashboard',null)"><span class="sb-icon">&#9632;</span>Dashboard</div>
+    <div class="sb-item" onclick="showTab('earnings',null)"><span class="sb-icon">&#9656;</span>Earnings</div>
+    <div class="sb-label">Content</div>
+    <div class="sb-item" onclick="showTab('posts',null)"><span class="sb-icon">&#9632;</span>My posts</div>
+    <div class="sb-item" onclick="showTab('picks',null)"><span class="sb-icon">&#9632;</span>Columbus picks</div>
+    <div class="sb-label">Partnerships</div>
+    <div class="sb-item" onclick="showTab('inbox',null)"><span class="sb-icon">&#9632;</span>Brand inbox</div>
+    <div class="sb-label">Account</div>
+    <div class="sb-item" onclick="window.location.href='https://cbusevents.com/creators/raine.html'"><span class="sb-icon">&#9632;</span>View my page</div>
+    <div class="sb-item" onclick="signOut()"><span class="sb-icon">&#9632;</span>Sign out</div>
+  </div>
+
+  <div class="main">
+
+    <!-- DASHBOARD TAB -->
+    <div id="tab-dashboard">
+      <div class="page-header">
+        <div class="page-eyebrow">Creator portal</div>
+        <div class="page-title" id="welcomeTitle">Welcome back</div>
+      </div>
+      <div class="content">
+
+        <div class="share-block">
+          <div class="share-block-left">
+            <div class="share-block-title">Your creator page is live</div>
+            <div class="share-block-sub">Drop this link in your Facebook bio and every Columbus post. Every click that converts earns you commission.</div>
+            <div class="share-link-row">
+              <div class="share-link-input" id="creatorLink">cbusevents.com/creators/raine</div>
+              <button class="copy-btn" onclick="copyLink()">Copy link</button>
+              <button class="view-page-btn" onclick="window.open('https://cbusevents.com/creators/raine.html','_blank')">View page &rarr;</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="metric-row">
+          <div class="metric"><div class="metric-label">RSVPs driven</div><div class="metric-val" id="m-rsvp">0</div><div class="metric-delta">Through your link</div></div>
+          <div class="metric"><div class="metric-label">This month</div><div class="metric-val" id="m-earn">$0</div><div class="metric-delta">Estimated earnings</div></div>
+          <div class="metric"><div class="metric-label">Posts live</div><div class="metric-val" id="m-posts">0</div><div class="metric-delta">On your page</div></div>
+          <div class="metric"><div class="metric-label">Brand deals</div><div class="metric-val" id="m-deals">0</div><div class="metric-delta">Active this month</div></div>
+        </div>
+
+        <div class="two-col">
+          <div class="card">
+            <div class="card-head"><div class="card-title">Submit a post to your page</div></div>
+            <div class="card-body">
+              <div class="post-form">
+                <input class="post-input" placeholder="Paste Facebook or Instagram post URL" id="postUrl">
+                <select class="post-select" id="postTag">
+                  <option value="">Tag this post (optional)</option>
+                  <option>1313 Festival</option>
+                  <option>Food and drink</option>
+                  <option>Nightlife</option>
+                  <option>Arts</option>
+                  <option>Music</option>
+                  <option>Community</option>
+                </select>
+                <button class="post-submit" onclick="submitPost()">Submit for review</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-head">
+              <div class="card-title">Brand inbox</div>
+              <div class="card-link" onclick="showTab('inbox',null)">View all &rarr;</div>
+            </div>
+            <div class="inbox-list" id="inboxPreview">
+              <div class="inbox-row">
+                <div class="inbox-av">CB</div>
+                <div style="flex:1;">
+                  <div class="inbox-name">Columbus Baking Co.</div>
+                  <div class="inbox-msg">Interested in a monthly partner package for the 1313 Festival...</div>
+                </div>
+                <div class="inbox-unread"></div>
+              </div>
+              <div style="padding:14px 16px;font-size:11px;color:var(--muted);text-align:center;">Brand requests arrive here when Columbus brands find your page</div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- POSTS TAB -->
+    <div id="tab-posts" style="display:none;">
+      <div class="page-header">
+        <div class="page-eyebrow">Content</div>
+        <div class="page-title">My posts</div>
+      </div>
+      <div class="content">
+        <div class="card" style="margin-bottom:16px;">
+          <div class="card-head"><div class="card-title">Submit a new post</div></div>
+          <div class="card-body">
+            <div class="post-form">
+              <input class="post-input" placeholder="Paste Facebook or Instagram post URL" id="postUrl2">
+              <select class="post-select" id="postTag2">
+                <option value="">Tag this post (optional)</option>
+                <option>1313 Festival</option>
+                <option>Food and drink</option>
+                <option>Nightlife</option>
+                <option>Arts</option>
+                <option>Music</option>
+                <option>Community</option>
+              </select>
+              <button class="post-submit" onclick="submitPost2()">Submit for review</button>
+            </div>
+            <div style="font-family:var(--mono);font-size:9px;color:var(--muted);margin-top:8px;letter-spacing:0.5px;" id="postMsg2">Posts are reviewed by CBUSEVENTS before appearing on your public page.</div>
+          </div>
+        </div>
+        <div style="font-family:var(--mono);font-size:10px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-bottom:12px;">Live on your page</div>
+        <div id="livePostsList" style="font-size:12px;color:var(--sub);padding:16px;background:var(--card);border:1px solid var(--border-sub);border-radius:var(--r-lg);text-align:center;">No posts submitted yet. Your public Facebook posts appear here once approved.</div>
+      </div>
+    </div>
+
+    <!-- PICKS TAB -->
+    <div id="tab-picks" style="display:none;">
+      <div class="page-header">
+        <div class="page-eyebrow">Content</div>
+        <div class="page-title">Columbus picks this week</div>
+      </div>
+      <div class="content">
+        <div style="font-size:13px;color:var(--sub);margin-bottom:16px;line-height:1.65;">These events show on your public page as your weekly Columbus recommendations. Update them every week to keep your page fresh.</div>
+        <div class="picks-list" id="picksList">
+          <div class="pick-item">
+            <div class="pick-dot"></div>
+            <div class="pick-name">1313 Food and Arts Festival</div>
+            <div class="pick-date">June 13</div>
+            <div class="pick-remove" onclick="removePick(this)">Remove</div>
+          </div>
+          <div class="pick-item">
+            <div class="pick-dot" style="background:var(--purple);"></div>
+            <div class="pick-name">Gallery Hop - Short North</div>
+            <div class="pick-date">June 6</div>
+            <div class="pick-remove" onclick="removePick(this)">Remove</div>
+          </div>
+        </div>
+        <button class="add-pick-btn" onclick="addPick()">+ Add an event to your picks</button>
+      </div>
+    </div>
+
+    <!-- INBOX TAB -->
+    <div id="tab-inbox" style="display:none;">
+      <div class="page-header">
+        <div class="page-eyebrow">Partnerships</div>
+        <div class="page-title">Brand inbox</div>
+      </div>
+      <div class="content">
+        <div class="card">
+          <div class="inbox-list">
+            <div class="inbox-row">
+              <div class="inbox-av">CB</div>
+              <div style="flex:1;">
+                <div class="inbox-name">Columbus Baking Co.</div>
+                <div class="inbox-msg">Interested in the monthly partner package for June around the 1313 Festival. Our budget is $500&ndash;$1,200. Let us know if you're available.</div>
+              </div>
+              <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0;">
+                <div class="inbox-time">Today</div>
+                <div class="inbox-unread"></div>
+              </div>
+            </div>
+            <div style="padding:16px;font-size:11px;color:var(--muted);text-align:center;">More brand requests will appear here as brands discover your page. Reply at <a href="mailto:hello@cbusevents.com" style="color:var(--purple);">hello@cbusevents.com</a> to facilitate deals.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- EARNINGS TAB -->
+    <div id="tab-earnings" style="display:none;">
+      <div class="page-header">
+        <div class="page-eyebrow">Earnings</div>
+        <div class="page-title">Your commission dashboard</div>
+      </div>
+      <div class="content">
+        <div class="metric-row" style="grid-template-columns:repeat(3,1fr);">
+          <div class="metric"><div class="metric-label">Total earned</div><div class="metric-val" style="color:var(--green);">$0</div><div class="metric-delta">All time</div></div>
+          <div class="metric"><div class="metric-label">This month</div><div class="metric-val" style="color:var(--green);">$0</div><div class="metric-delta">Estimated</div></div>
+          <div class="metric"><div class="metric-label">Pending payout</div><div class="metric-val" style="color:var(--green);">$0</div><div class="metric-delta">Paid via Stripe</div></div>
+        </div>
+        <div class="card">
+          <div class="card-head"><div class="card-title">Commission activity</div></div>
+          <div style="padding:24px;font-size:12px;color:var(--muted);text-align:center;line-height:1.65;">Your commission earnings appear here as RSVPs, ticket sales and vendor sign-ups come through your creator link.<br><br>Share your link to start earning: <span style="font-family:var(--mono);color:var(--purple);">cbusevents.com/creators/raine</span></div>
+        </div>
+        <div style="margin-top:14px;font-size:12px;color:var(--sub);line-height:1.65;">Earning structures for RSVPs, tickets and referrals are built with founding creators as the platform scales. Brand deal rates are set by you. Questions: <a href="mailto:hello@cbusevents.com" style="color:var(--orange);">hello@cbusevents.com</a></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+const SB_URL='https://toblgvatvsjljbqogzsv.supabase.co';
+const SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRvYmxndmF0dnNqbGpicW9nenN2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMDgwNTAsImV4cCI6MjA4NzY4NDA1MH0._WJEQPizNDiQfDXQB_DHPaQhixPGpMdmYQSmyWmm_FQ';
+
+// Check auth - look for creator session in Supabase auth
+async function checkAuth(){
+  try{
+    const res=await fetch(SB_URL+'/auth/v1/user',{headers:{apikey:SB_KEY,Authorization:'Bearer '+localStorage.getItem('sb-access-token')||''}});
+    if(res.ok){
+      const user=await res.json();
+      const meta=user.user_metadata||{};
+      if(meta.role==='creator'||meta.role==='brand_rep'){
+        document.getElementById('welcomeTitle').textContent='Welcome back, '+(meta.first_name||user.email.split('@')[0]);
+        document.getElementById('creatorPill').textContent=meta.first_name||'Creator';
+        document.getElementById('creatorAv').textContent=(meta.first_name||'C')[0].toUpperCase();
+        loadMetrics();
+      } else {
+        showGate();
+      }
+    } else {
+      showGate();
+    }
+  } catch(e){
+    // Dev mode - show portal anyway
+    console.log('Auth check failed, showing portal in dev mode');
+  }
+}
+
+function showGate(){
+  document.getElementById('authGate').style.display='flex';
+  document.getElementById('portalContent').style.display='none';
+}
+
+async function loadMetrics(){
+  try{
+    const token=localStorage.getItem('sb-access-token')||SB_KEY;
+    const res=await fetch(SB_URL+'/rest/v1/event_rsvps?select=id&creator_ref=eq.raine-whicker',{
+      headers:{apikey:SB_KEY,Authorization:'Bearer '+token}
+    });
+    if(res.ok){
+      const data=await res.json();
+      if(Array.isArray(data)){
+        document.getElementById('m-rsvp').textContent=data.length;
+        document.getElementById('m-earn').textContent='$'+(data.length*1.5).toFixed(0);
+      }
+    }
+  } catch(e){}
+}
+
+function showTab(name,btn){
+  document.querySelectorAll('[id^="tab-"]').forEach(t=>t.style.display='none');
+  document.getElementById('tab-'+name).style.display='';
+  document.querySelectorAll('.pnav-tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.sb-item').forEach(t=>t.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+}
+
+function copyLink(){
+  navigator.clipboard&&navigator.clipboard.writeText('https://cbusevents.com/creators/raine.html').then(()=>{
+    const b=document.querySelector('.copy-btn');
+    b.textContent='Copied!';
+    setTimeout(()=>b.textContent='Copy link',2000);
+  });
+}
+
+function submitPost(){
+  const url=document.getElementById('postUrl').value.trim();
+  if(!url){return;}
+  alert('Post submitted for review. It will appear on your page within 24 hours.');
+  document.getElementById('postUrl').value='';
+}
+
+function submitPost2(){
+  const url=document.getElementById('postUrl2').value.trim();
+  if(!url){document.getElementById('postMsg2').textContent='Please paste a post URL.';return;}
+  document.getElementById('postMsg2').textContent='Submitted for review. It will appear on your page within 24 hours.';
+  document.getElementById('postMsg2').style.color='var(--green)';
+  document.getElementById('postUrl2').value='';
+}
+
+function removePick(el){el.closest('.pick-item').remove();}
+
+function addPick(){
+  const name=prompt('Event name:');
+  if(!name)return;
+  const date=prompt('Date (e.g. June 13):');
+  const li=document.createElement('div');
+  li.className='pick-item';
+  li.innerHTML='<div class="pick-dot" style="background:var(--green);"></div><div class="pick-name">'+name+'</div><div class="pick-date">'+(date||'TBD')+'</div><div class="pick-remove" onclick="removePick(this)">Remove</div>';
+  document.getElementById('picksList').appendChild(li);
+}
+
+function signOut(){
+  localStorage.removeItem('sb-access-token');
+  window.location.href='https://cbusevents.com';
+}
+
+checkAuth();
+</script>
+</body>
+</html>

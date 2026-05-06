@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Creator Collective | CBUSEVENTS</title>
+<meta name="description" content="Columbus creators earn real commission sharing what they already love. Your own page. Brand deals. Apply to join the founding cohort.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800;900&family=DM+Mono:wght@400;500&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --bg:#080810;--surface:#0f0f1a;--card:#141420;--border:#1e1e2e;--border-sub:rgba(255,255,255,0.07);
+  --text:#f0f0fa;--sub:#7070a0;--muted:#40405a;
+  --orange:#FF6B35;--orange-dim:rgba(255,107,53,0.1);--orange-border:rgba(255,107,53,0.25);
+  --purple:#b46bff;--purple-dim:rgba(180,107,255,0.1);--purple-border:rgba(180,107,255,0.3);
+  --green:#34d399;--green-dim:rgba(52,211,153,0.1);
+  --font:'DM Sans',sans-serif;--mono:'DM Mono',monospace;--display:'Playfair Display',serif;
+  --r-sm:8px;--r-md:10px;--r-lg:14px;
+}
+body{background:var(--bg);color:var(--text);font-family:var(--font);line-height:1.65;}
+a{text-decoration:none;color:inherit;}
+nav{background:rgba(8,8,16,0.95);border-bottom:1px solid var(--border-sub);padding:0 32px;display:flex;align-items:center;justify-content:space-between;height:56px;position:sticky;top:0;z-index:100;backdrop-filter:blur(20px);}
+.nav-logo{font-family:var(--display);font-size:18px;font-weight:900;letter-spacing:-0.5px;}
+.nav-logo span{color:var(--orange);}
+.nav-links{display:flex;gap:4px;}
+.nav-link{padding:7px 14px;font-size:13px;color:var(--sub);border-radius:var(--r-sm);cursor:pointer;background:none;border:none;font-family:var(--font);}
+.nav-link:hover{color:var(--text);background:rgba(255,255,255,0.04);}
+.nav-right{display:flex;gap:8px;align-items:center;}
+.btn-signin{font-family:var(--mono);font-size:11px;color:var(--sub);letter-spacing:1px;cursor:pointer;background:none;border:none;}
+.btn-signin:hover{color:var(--text);}
+.btn-apply{background:var(--purple);color:#fff;padding:8px 18px;border-radius:var(--r-sm);font-size:12px;font-weight:700;cursor:pointer;border:none;}
+.btn-apply:hover{opacity:0.88;}
+
+/* HERO */
+.hero{padding:52px 40px 52px;position:relative;overflow:hidden;border-bottom:1px solid var(--border-sub);}
+.hero-bg{position:absolute;inset:0;background:radial-gradient(ellipse 60% 70% at 75% 40%,rgba(180,107,255,0.07) 0%,transparent 70%);}
+.hero-grid{display:grid;grid-template-columns:1fr 360px;gap:36px;align-items:center;max-width:1200px;margin:0 auto;position:relative;z-index:2;}
+.hero-eyebrow{font-family:var(--mono);font-size:10px;color:var(--purple);letter-spacing:2.5px;text-transform:uppercase;margin-bottom:14px;display:flex;align-items:center;gap:8px;}
+.hero-eyebrow-line{width:24px;height:1px;background:var(--purple);}
+.hero-title{font-family:var(--display);font-size:clamp(36px,4.5vw,58px);font-weight:900;line-height:1.05;letter-spacing:-1px;margin-bottom:18px;}
+.hero-title em{color:var(--purple);font-style:normal;}
+.hero-sub{font-size:15px;color:var(--sub);line-height:1.75;max-width:460px;margin-bottom:28px;}
+.proof-row{display:flex;gap:28px;margin-bottom:32px;}
+.proof-item{}
+.proof-num{font-family:var(--mono);font-size:22px;font-weight:500;color:var(--purple);}
+.proof-label{font-family:var(--mono);font-size:9px;color:var(--muted);letter-spacing:1.2px;text-transform:uppercase;margin-top:3px;}
+.cta-row{display:flex;gap:10px;align-items:center;}
+.btn-primary-purple{background:var(--purple);color:#fff;padding:13px 28px;border-radius:var(--r-md);font-size:13px;font-weight:700;cursor:pointer;border:none;letter-spacing:0.3px;}
+.btn-primary-purple:hover{opacity:0.88;}
+.btn-ghost{background:transparent;color:var(--sub);padding:12px 20px;border-radius:var(--r-md);font-size:13px;cursor:pointer;border:1px solid var(--border-sub);}
+.btn-ghost:hover{color:var(--text);border-color:var(--purple-border);}
+
+/* APPLICATION CARD */
+.app-card{background:var(--card);border:1px solid var(--purple-border);border-radius:var(--r-lg);overflow:hidden;}
+.app-card-head{padding:18px 22px;border-bottom:1px solid var(--border-sub);background:rgba(180,107,255,0.04);}
+.app-card-title{font-size:14px;font-weight:700;margin-bottom:3px;}
+.app-card-sub{font-family:var(--mono);font-size:9px;color:var(--sub);letter-spacing:1px;text-transform:uppercase;}
+.app-card-body{padding:20px 22px;}
+.invite-notice{background:var(--purple-dim);border:1px solid var(--purple-border);border-radius:var(--r-sm);padding:10px 14px;margin-bottom:16px;display:flex;align-items:flex-start;gap:8px;}
+.invite-icon{font-size:14px;flex-shrink:0;margin-top:1px;}
+.invite-text{font-size:11px;color:var(--sub);line-height:1.55;}
+.invite-text strong{color:var(--purple);}
+.field{margin-bottom:11px;}
+.field-label{font-family:var(--mono);font-size:9px;color:var(--sub);letter-spacing:1.2px;text-transform:uppercase;margin-bottom:5px;}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.field-input{width:100%;background:var(--surface);border:1px solid var(--border-sub);border-radius:var(--r-sm);padding:9px 12px;color:var(--text);font-size:12px;font-family:var(--font);outline:none;}
+.field-input:focus{border-color:var(--purple-border);}
+.field-input::placeholder{color:var(--muted);}
+.field-select{width:100%;background:var(--surface);border:1px solid var(--border-sub);border-radius:var(--r-sm);padding:9px 12px;color:var(--text);font-size:12px;font-family:var(--font);outline:none;cursor:pointer;appearance:none;}
+.niche-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:4px;}
+.niche-chip{padding:7px 8px;border:1px solid var(--border-sub);border-radius:var(--r-sm);font-family:var(--mono);font-size:9px;color:var(--sub);letter-spacing:1px;text-transform:uppercase;cursor:pointer;text-align:center;transition:all 0.15s;}
+.niche-chip:hover{border-color:var(--purple-border);color:var(--purple);}
+.niche-chip.active{border-color:var(--purple);color:var(--purple);background:var(--purple-dim);}
+.form-submit{width:100%;background:var(--purple);color:#fff;padding:12px;border-radius:var(--r-sm);font-size:13px;font-weight:700;cursor:pointer;border:none;margin-top:6px;letter-spacing:0.3px;transition:opacity 0.15s;}
+.form-submit:hover{opacity:0.88;}
+.form-note{font-family:var(--mono);font-size:9px;color:var(--muted);text-align:center;margin-top:8px;letter-spacing:0.5px;}
+
+/* PERKS */
+.section{padding:56px 48px;border-bottom:1px solid var(--border-sub);}
+.section-inner{max-width:1200px;margin:0 auto;}
+.section-eyebrow{font-family:var(--mono);font-size:10px;color:var(--purple);letter-spacing:2px;text-transform:uppercase;margin-bottom:8px;}
+.section-title{font-family:var(--display);font-size:26px;font-weight:700;margin-bottom:28px;}
+.perks-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:36px;}
+.perk-card{background:var(--card);border:1px solid var(--border-sub);border-radius:var(--r-lg);padding:22px;}
+.perk-icon{width:42px;height:42px;border-radius:var(--r-md);background:var(--purple-dim);display:flex;align-items:center;justify-content:center;margin-bottom:14px;font-size:18px;}
+.perk-name{font-size:13px;font-weight:700;margin-bottom:6px;}
+.perk-desc{font-size:12px;color:var(--sub);line-height:1.65;}
+
+/* EARNINGS */
+.earn-bar{background:var(--surface);border:1px solid var(--border-sub);border-radius:var(--r-lg);padding:24px;margin-bottom:36px;}
+.earn-title{font-size:13px;font-weight:700;margin-bottom:16px;}
+.earn-row{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border-sub);}
+.earn-row:last-child{border-bottom:none;padding-bottom:0;}
+.earn-src{font-size:12px;color:var(--sub);}
+.earn-amt{font-family:var(--mono);font-size:13px;color:var(--green);}
+.earn-total{font-size:14px;font-weight:700;color:var(--text);}
+
+/* FOUNDING COHORT */
+.cohort-row{display:flex;gap:10px;flex-wrap:wrap;}
+.founder-pill{background:var(--card);border:1px solid var(--border-sub);border-radius:var(--r-full,9999px);padding:8px 14px;display:flex;align-items:center;gap:8px;}
+.founder-av{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--display);font-size:11px;font-weight:700;}
+.founder-av-active{background:var(--purple-dim);color:var(--purple);}
+.founder-av-open{background:var(--card);color:var(--muted);}
+.founder-name{font-size:12px;font-weight:600;}
+.founder-niche{font-family:var(--mono);font-size:9px;color:var(--sub);}
+.founder-badge{font-family:var(--mono);font-size:8px;color:var(--orange);background:var(--orange-dim);padding:2px 6px;border-radius:4px;margin-left:3px;}
+.open-pill{border-style:dashed;opacity:0.5;}
+
+/* FOOTER */
+footer{background:var(--surface);border-top:1px solid var(--border-sub);padding:28px 32px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;}
+.footer-logo{font-family:var(--display);font-size:15px;font-weight:900;}
+.footer-logo span{color:var(--orange);}
+.footer-note{font-family:var(--mono);font-size:10px;color:var(--muted);letter-spacing:1px;}
+.footer-links{display:flex;gap:14px;}
+.footer-link{font-size:12px;color:var(--sub);}
+.footer-link:hover{color:var(--text);}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:translateY(0);}}
+.fade-up{animation:fadeUp 0.5s ease forwards;}
+
+@media(max-width:1100px){
+  .hero-grid{grid-template-columns:1fr 340px;gap:32px;}
+}
+@media(max-width:860px){
+  .hero{padding:40px 20px;}
+  .hero-grid{grid-template-columns:1fr;}
+  .section{padding:36px 20px;}
+  .perks-grid{grid-template-columns:1fr 1fr;}
+  nav{padding:0 16px;}
+  .nav-links{display:none;}
+}
+@media(max-width:560px){
+  .perks-grid{grid-template-columns:1fr;}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="https://cbusevents.com" class="nav-logo">CBUS<span>EVENTS</span></a>
+  <div class="nav-links">
+    <a href="https://cbusevents.com/attendees.html" class="nav-link">Events</a>
+    <a href="https://cbusevents.com/venues.html" class="nav-link">Venues</a>
+    <a href="https://cbusevents.com/brands.html" class="nav-link">For brands</a>
+  </div>
+  <div class="nav-right">
+    <a href="https://cbusevents.com/creator-portal.html" class="btn-signin">Sign in &rarr;</a>
+    <button class="btn-apply" onclick="document.getElementById('applyForm').scrollIntoView({behavior:'smooth'})">Apply for a spot</button>
+  </div>
+</nav>
+
+<div class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-grid fade-up">
+    <div>
+      <div class="hero-eyebrow"><div class="hero-eyebrow-line"></div>Columbus Creator Collective</div>
+      <h1 class="hero-title">Your Columbus<br>audience is worth<br><em>more than likes.</em></h1>
+      <p class="hero-sub">CBUSEVENTS pays Columbus creators to do what they already do - show their people what's worth showing up for. Your own public page. Your own brand deals. Commission on every revenue-generating action through your link.</p>
+      <div class="proof-row">
+        <div class="proof-item"><div class="proof-num">You set</div><div class="proof-label">Your brand deal rate</div></div>
+        <div class="proof-item"><div class="proof-num">Revenue</div><div class="proof-label">Based commissions only</div></div>
+        <div class="proof-item"><div class="proof-num">8</div><div class="proof-label">Founding spots</div></div>
+      </div>
+      <div class="cta-row">
+        <button class="btn-primary-purple" onclick="document.getElementById('applyForm').scrollIntoView({behavior:'smooth'})">Apply for a founding spot</button>
+        <a href="https://cbusevents.com/creators/raine.html" class="btn-ghost">See a creator page &rarr;</a>
+      </div>
+    </div>
+
+    <div id="applyForm" class="app-card">
+      <div class="app-card-head">
+        <div class="app-card-title">Apply to join</div>
+        <div class="app-card-sub">Founding cohort - limited spots</div>
+      </div>
+      <div class="app-card-body">
+        <div class="invite-notice">
+          <div class="invite-icon">&#128274;</div>
+          <div class="invite-text">This is an <strong>application-only</strong> program. Founding creators receive a permanently higher commission rate and a founder badge on their public page.</div>
+        </div>
+        <div class="field field-row">
+          <div><div class="field-label">First name</div><input class="field-input" placeholder="First" id="f-first"></div>
+          <div><div class="field-label">Last name</div><input class="field-input" placeholder="Last" id="f-last"></div>
+        </div>
+        <div class="field"><div class="field-label">Email</div><input class="field-input" type="email" placeholder="you@email.com" id="f-email"></div>
+        <div class="field"><div class="field-label">Facebook or Instagram handle</div><input class="field-input" placeholder="@yourhandle" id="f-handle"></div>
+        <div class="field">
+          <div class="field-label">Your Columbus niche - pick all that fit</div>
+          <div class="niche-grid">
+            <div class="niche-chip" onclick="toggleNiche(this)">Food</div>
+            <div class="niche-chip" onclick="toggleNiche(this)">Nightlife</div>
+            <div class="niche-chip" onclick="toggleNiche(this)">Fashion</div>
+            <div class="niche-chip" onclick="toggleNiche(this)">Music</div>
+            <div class="niche-chip" onclick="toggleNiche(this)">Arts</div>
+            <div class="niche-chip" onclick="toggleNiche(this)">Lifestyle</div>
+          </div>
+        </div>
+        <div class="field">
+          <div class="field-label">Columbus following size (approx.)</div>
+          <select class="field-select" id="f-size">
+            <option value="">Select range</option>
+            <option>1,000 &ndash; 5,000</option>
+            <option>5,000 &ndash; 15,000</option>
+            <option>15,000 &ndash; 50,000</option>
+            <option>50,000+</option>
+          </select>
+        </div>
+        <button class="form-submit" onclick="submitApplication()">Submit application</button>
+        <div class="form-note" id="formMsg">We review every application. You'll hear back within 48 hours.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <div class="section-inner">
+    <div class="section-eyebrow">What you get</div>
+    <div class="section-title">Built for creators who know Columbus.</div>
+    <div class="perks-grid">
+      <div class="perk-card">
+        <div class="perk-icon">&#128101;</div>
+        <div class="perk-name">Your own public page</div>
+        <div class="perk-desc">cbusevents.com/creators/you - your posts, your Columbus picks, your brand deals. A media profile that works while you sleep.</div>
+      </div>
+      <div class="perk-card">
+        <div class="perk-icon">&#128176;</div>
+        <div class="perk-name">Real commission</div>
+        <div class="perk-desc">Earn commission on ticket sales, vendor paid sign-ups and brand deals that come through your page. See it happen in real time on your dashboard.</div>
+      </div>
+      <div class="perk-card">
+        <div class="perk-icon">&#127981;</div>
+        <div class="perk-name">Brand deals, facilitated</div>
+        <div class="perk-desc">Columbus brands request you through the platform. You set your own package rates, accept what fits and CBUSEVENTS facilitates the deal.</div>
+      </div>
+    </div>
+
+    <div class="earn-bar">
+      <div class="earn-title">How founding creators earn - revenue only</div>
+      <div class="earn-row"><div class="earn-src">Brand deals facilitated through the platform</div><div class="earn-amt">Your rate</div></div>
+      <div class="earn-row"><div class="earn-src">Ticket sales through your link - share of platform fee</div><div class="earn-amt">Per sale</div></div>
+      <div class="earn-row"><div class="earn-src">Vendor paid plan sign-ups you refer</div><div class="earn-amt">Per paid sign-up</div></div>
+      <div class="earn-row" style="padding-top:12px;"><div class="earn-src" style="font-size:12px;color:var(--sub);line-height:1.65;">Founding creators set their own brand deal rates. Commission structures for RSVPs and referrals are built with founding members as the platform scales. You are in from the start.</div><div class="earn-amt"></div></div>
+    </div>
+
+    <div class="section-eyebrow" style="margin-bottom:12px;">Founding creator cohort</div>
+    <div class="cohort-row">
+      <div class="founder-pill">
+        <div class="founder-av founder-av-active">RW</div>
+        <div><div class="founder-name">Raine Whicker<span class="founder-badge">Founding</span></div><div class="founder-niche">Food &middot; Community</div></div>
+      </div>
+      <div class="founder-pill open-pill">
+        <div class="founder-av founder-av-open">?</div>
+        <div><div class="founder-name" style="color:var(--sub);">Open spot</div><div class="founder-niche">Music &middot; Arts</div></div>
+      </div>
+      <div class="founder-pill open-pill">
+        <div class="founder-av founder-av-open">?</div>
+        <div><div class="founder-name" style="color:var(--sub);">Open spot</div><div class="founder-niche">Fashion &middot; Lifestyle</div></div>
+      </div>
+      <div class="founder-pill open-pill">
+        <div class="founder-av founder-av-open">?</div>
+        <div><div class="founder-name" style="color:var(--sub);">Open spot</div><div class="founder-niche">Food critic</div></div>
+      </div>
+      <div class="founder-pill open-pill">
+        <div class="founder-av founder-av-open">?</div>
+        <div><div class="founder-name" style="color:var(--sub);">Open spot</div><div class="founder-niche">Nightlife</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <a href="https://cbusevents.com" class="footer-logo">CBUS<span>EVENTS</span></a>
+  <div class="footer-note">Inaugural Season 2026 &nbsp;&middot;&nbsp; Columbus, Ohio</div>
+  <div class="footer-links">
+    <a href="https://cbusevents.com" class="footer-link">Home</a>
+    <a href="https://cbusevents.com/brands.html" class="footer-link">For brands</a>
+    <a href="https://cbusevents.com/privacy.html" class="footer-link">Privacy policy</a>
+    <a href="https://cbusevents.com/terms.html" class="footer-link">Terms of service</a>
+  </div>
+</footer>
+
+<script>
+const SB_URL='https://toblgvatvsjljbqogzsv.supabase.co';
+const SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRvYmxndmF0dnNqbGpicW9nenN2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMDgwNTAsImV4cCI6MjA4NzY4NDA1MH0._WJEQPizNDiQfDXQB_DHPaQhixPGpMdmYQSmyWmm_FQ';
+
+function toggleNiche(el){el.classList.toggle('active');}
+
+async function submitApplication(){
+  const first=document.getElementById('f-first').value.trim();
+  const last=document.getElementById('f-last').value.trim();
+  const email=document.getElementById('f-email').value.trim();
+  const handle=document.getElementById('f-handle').value.trim();
+  const size=document.getElementById('f-size').value;
+  const niches=[...document.querySelectorAll('.niche-chip.active')].map(c=>c.textContent).join(', ');
+  const msg=document.getElementById('formMsg');
+
+  if(!first||!last||!email||!handle){
+    msg.textContent='Please fill in all required fields.';
+    msg.style.color='var(--orange)';
+    return;
+  }
+
+  const btn=document.querySelector('.form-submit');
+  btn.textContent='Submitting...';
+  btn.disabled=true;
+
+  try{
+    const res=await fetch(SB_URL+'/rest/v1/brand_rep_applications',{
+      method:'POST',
+      headers:{apikey:SB_KEY,Authorization:'Bearer '+SB_KEY,'Content-Type':'application/json','Prefer':'return=minimal'},
+      body:JSON.stringify({
+        first_name:first,last_name:last,email:email,
+        notes:'Creator application. Handle: '+handle+'. Niche: '+niches+'. Following: '+size,
+        status:'pending',source:'creator_landing'
+      })
+    });
+    if(res.ok||res.status===201){
+      msg.textContent='Application received. You\'ll hear back within 48 hours.';
+      msg.style.color='var(--green)';
+      btn.textContent='Application submitted';
+    } else {
+      throw new Error('Server error');
+    }
+  } catch(e){
+    msg.textContent='Something went wrong. Email hello@cbusevents.com to apply directly.';
+    msg.style.color='var(--orange)';
+    btn.textContent='Submit application';
+    btn.disabled=false;
+  }
+}
+</script>
+</body>
+</html>
