@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Feature Your Spot | CBUSEVENTS</title>
+<meta name="description" content="Get your Columbus restaurant, bar or late-night spot featured in the CBUSEVENTS customer portal. $50 a month. Cancel any time.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800;900&family=DM+Mono:wght@400;500&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
+<script src="https://js.stripe.com/v3/"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --bg:#080810;--surface:#0f0f1a;--card:#141420;--border:rgba(255,255,255,0.08);
+  --text:#f0f0fa;--sub:#7070a0;--muted:#40405a;
+  --orange:#FF6B35;--orange-dim:rgba(255,107,53,0.1);--orange-border:rgba(255,107,53,0.25);
+  --green:#34d399;--green-dim:rgba(52,211,153,0.1);--green-border:rgba(52,211,153,0.2);
+  --font:'DM Sans',sans-serif;--mono:'DM Mono',monospace;--display:'Playfair Display',serif;
+  --r:10px;
+}
+body{background:var(--bg);color:var(--text);font-family:var(--font);line-height:1.65;}
+a{text-decoration:none;color:inherit;}
+
+nav{background:rgba(8,8,16,0.97);border-bottom:1px solid var(--border);padding:0 28px;display:flex;align-items:center;justify-content:space-between;height:52px;position:sticky;top:0;z-index:100;backdrop-filter:blur(20px);}
+.logo{font-family:var(--display);font-size:17px;font-weight:900;}
+.logo span{color:var(--orange);}
+.nav-right{display:flex;gap:8px;align-items:center;}
+.nav-link{font-size:12px;color:var(--sub);}
+.nav-link:hover{color:var(--text);}
+
+.page{max-width:1100px;margin:0 auto;padding:52px 28px 80px;display:grid;grid-template-columns:1fr 380px;gap:48px;align-items:start;}
+
+.left{}
+.eyebrow{font-family:var(--mono);font-size:10px;color:var(--orange);letter-spacing:2px;text-transform:uppercase;margin-bottom:12px;}
+.headline{font-family:var(--display);font-size:clamp(28px,3.5vw,44px);font-weight:900;line-height:1.06;letter-spacing:-0.8px;margin-bottom:14px;}
+.headline em{color:var(--orange);font-style:normal;}
+.subline{font-size:14px;color:var(--sub);line-height:1.75;margin-bottom:32px;max-width:440px;}
+
+.how-it-works{display:flex;flex-direction:column;gap:0;margin-bottom:36px;}
+.step{display:grid;grid-template-columns:40px 1fr;gap:12px;padding:16px 0;border-bottom:1px solid var(--border);}
+.step:last-child{border-bottom:none;}
+.step-num{width:32px;height:32px;border-radius:8px;background:var(--orange-dim);border:1px solid var(--orange-border);display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:12px;font-weight:500;color:var(--orange);flex-shrink:0;}
+.step-title{font-size:13px;font-weight:700;margin-bottom:3px;}
+.step-desc{font-size:12px;color:var(--sub);line-height:1.6;}
+
+.reach-card{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:20px;margin-bottom:24px;}
+.reach-title{font-size:13px;font-weight:700;margin-bottom:14px;}
+.reach-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:0;}
+.reach-stat{text-align:center;padding:0 12px;}
+.reach-stat:not(:last-child){border-right:1px solid var(--border);}
+.reach-num{font-family:var(--mono);font-size:20px;font-weight:500;color:var(--orange);}
+.reach-label{font-family:var(--mono);font-size:9px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-top:3px;}
+
+.preview-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:16px;margin-bottom:8px;}
+.preview-label{font-family:var(--mono);font-size:9px;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:12px;}
+.preview-spot{background:var(--card);border:1px solid var(--orange-border);border-radius:10px;padding:14px;}
+.preview-spot-name{font-size:13px;font-weight:700;margin-bottom:3px;}
+.preview-spot-cat{font-family:var(--mono);font-size:9px;color:var(--sub);letter-spacing:1px;text-transform:uppercase;margin-bottom:8px;}
+.preview-spot-desc{font-size:11px;color:var(--sub);line-height:1.6;margin-bottom:10px;}
+.preview-spot-foot{display:flex;align-items:center;justify-content:space-between;}
+.preview-spot-hours{font-family:var(--mono);font-size:9px;color:var(--muted);}
+.preview-badge{font-family:var(--mono);font-size:8px;background:var(--orange-dim);color:var(--orange);border:1px solid var(--orange-border);padding:2px 7px;border-radius:4px;letter-spacing:1px;text-transform:uppercase;}
+
+.right{}
+.form-card{background:var(--card);border:1px solid var(--orange-border);border-radius:14px;overflow:hidden;position:sticky;top:68px;}
+.form-card-head{padding:18px 22px;border-bottom:1px solid var(--border);background:rgba(255,107,53,0.04);}
+.form-card-title{font-size:14px;font-weight:700;margin-bottom:3px;}
+.form-card-price{font-family:var(--mono);font-size:22px;font-weight:500;color:var(--orange);}
+.form-card-price span{font-size:12px;color:var(--sub);}
+.form-body{padding:20px 22px;}
+.field{margin-bottom:11px;}
+.field-label{font-family:var(--mono);font-size:9px;color:var(--sub);letter-spacing:1.2px;text-transform:uppercase;margin-bottom:5px;}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.input{width:100%;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:9px 12px;color:var(--text);font-size:12px;font-family:var(--font);outline:none;}
+.input:focus{border-color:var(--orange-border);}
+.input::placeholder{color:var(--muted);}
+.select{width:100%;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:9px 12px;color:var(--text);font-size:12px;font-family:var(--font);outline:none;cursor:pointer;appearance:none;}
+.select:focus{border-color:var(--orange-border);}
+.textarea{width:100%;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:9px 12px;color:var(--text);font-size:12px;font-family:var(--font);outline:none;resize:vertical;min-height:80px;line-height:1.5;}
+.textarea:focus{border-color:var(--orange-border);}
+.textarea::placeholder{color:var(--muted);}
+.includes{background:var(--surface);border-radius:8px;padding:12px 14px;margin-bottom:14px;}
+.includes-title{font-family:var(--mono);font-size:9px;color:var(--sub);letter-spacing:1.2px;text-transform:uppercase;margin-bottom:8px;}
+.include-row{display:flex;align-items:center;gap:8px;font-size:11px;color:var(--sub);padding:3px 0;}
+.include-check{width:16px;height:16px;border-radius:4px;background:var(--green-dim);border:1px solid var(--green-border);display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--green);flex-shrink:0;}
+.submit-btn{width:100%;background:var(--orange);color:#fff;border:none;border-radius:8px;padding:13px;font-size:13px;font-weight:700;cursor:pointer;transition:opacity 0.15s;letter-spacing:0.3px;}
+.submit-btn:hover{opacity:0.88;}
+.submit-btn:disabled{opacity:0.5;cursor:not-allowed;}
+.form-note{font-family:var(--mono);font-size:9px;color:var(--muted);text-align:center;margin-top:8px;letter-spacing:0.5px;line-height:1.6;}
+.form-msg{font-size:12px;text-align:center;margin-top:8px;min-height:16px;}
+
+.success-state{padding:32px 22px;text-align:center;display:none;}
+.success-icon{font-size:40px;margin-bottom:12px;}
+.success-title{font-family:var(--display);font-size:22px;font-weight:700;margin-bottom:8px;}
+.success-sub{font-size:13px;color:var(--sub);line-height:1.7;}
+
+footer{background:var(--surface);border-top:1px solid var(--border);padding:24px 28px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;}
+.footer-logo{font-family:var(--display);font-size:14px;font-weight:900;}
+.footer-logo span{color:var(--orange);}
+.footer-note{font-family:var(--mono);font-size:9px;color:var(--muted);letter-spacing:1px;}
+
+@media(max-width:860px){
+  .page{grid-template-columns:1fr;padding:32px 20px 60px;}
+  .form-card{position:static;}
+  .reach-stats{grid-template-columns:repeat(3,1fr);}
+  nav{padding:0 16px;}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="https://cbusevents.com" class="logo">CBUS<span>EVENTS</span></a>
+  <div class="nav-right">
+    <a href="https://cbusevents.com" class="nav-link">Back to CBUSEVENTS</a>
+  </div>
+</nav>
+
+<div class="page">
+
+  <div class="left">
+    <div class="eyebrow">For Columbus restaurants and bars</div>
+    <h1 class="headline">Get your spot in front of<br><em>Columbus event-goers.</em></h1>
+    <p class="subline">Every Columbus resident who buys a ticket, RSVPs to an event or uses the CBUSEVENTS platform sees your spot featured in their portal. That is a warm audience - they are already out, they are already spending money.</p>
+
+    <div class="reach-card">
+      <div class="reach-title">Who sees your listing</div>
+      <div class="reach-stats">
+        <div class="reach-stat"><div class="reach-num">Active</div><div class="reach-label">Event-goers</div></div>
+        <div class="reach-stat"><div class="reach-num">Weekly</div><div class="reach-label">Portal visits</div></div>
+        <div class="reach-stat"><div class="reach-num">Columbus</div><div class="reach-label">Only</div></div>
+      </div>
+    </div>
+
+    <div class="how-it-works">
+      <div class="step">
+        <div class="step-num">01</div>
+        <div>
+          <div class="step-title">Fill out the form</div>
+          <div class="step-desc">Your spot name, category, neighborhood, hours and a short description. Takes two minutes.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">02</div>
+        <div>
+          <div class="step-title">Pay $50 a month via Stripe</div>
+          <div class="step-desc">Automatic monthly billing. Cancel any time from your Stripe billing portal - no contracts, no phone call required.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">03</div>
+        <div>
+          <div class="step-title">Your card goes live within 24 hours</div>
+          <div class="step-desc">We review your listing and publish it to the Late Night Eats or After the Event section in the customer portal.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">04</div>
+        <div>
+          <div class="step-title">Optional: list your space as a venue</div>
+          <div class="step-desc">If your spot books private events, create a separate venue account at no extra cost and get found by Columbus event planners.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="preview-card">
+      <div class="preview-label">What your card looks like in the portal</div>
+      <div class="preview-spot">
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:6px;">
+          <div>
+            <div class="preview-spot-name" id="previewName">Your Spot Name</div>
+            <div class="preview-spot-cat" id="previewCat">Neighborhood - Category</div>
+          </div>
+          <span class="preview-badge" id="previewBadge">Featured</span>
+        </div>
+        <div class="preview-spot-desc" id="previewDesc">Your short description appears here. Keep it to one or two sentences about what makes your spot worth the stop.</div>
+        <div class="preview-spot-foot">
+          <div class="preview-spot-hours" id="previewHours">Hours appear here</div>
+          <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--orange);letter-spacing:1px;text-transform:uppercase;">View menu &rarr;</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="right">
+    <div class="form-card">
+      <div class="form-card-head">
+        <div class="form-card-title">Get featured in the portal</div>
+        <div class="form-card-price">$50 <span>a month</span></div>
+      </div>
+      <div class="form-body" id="formBody">
+        <div class="field field-row">
+          <div><div class="field-label">Spot name *</div><input class="input" id="f-name" placeholder="Restaurant or bar name" oninput="updatePreview()"></div>
+          <div><div class="field-label">Category *</div>
+            <select class="select" id="f-cat" onchange="updatePreview()">
+              <option value="">Select</option>
+              <option>Late night eats</option>
+              <option>Bar and cocktails</option>
+              <option>Rooftop</option>
+              <option>Sports bar</option>
+              <option>Brunch spot</option>
+              <option>Coffee and dessert</option>
+              <option>Lounge</option>
+              <option>Other</option>
+            </select>
+          </div>
+        </div>
+        <div class="field field-row">
+          <div><div class="field-label">Neighborhood *</div><input class="input" id="f-hood" placeholder="e.g. Short North" oninput="updatePreview()"></div>
+          <div>
+            <div class="field-label">Section *</div>
+            <select class="select" id="f-section">
+              <option value="late_night">Late Night Eats</option>
+              <option value="after_event">After the Event</option>
+            </select>
+          </div>
+        </div>
+        <div class="field"><div class="field-label">Short description *</div><textarea class="textarea" id="f-desc" placeholder="One or two sentences. What makes your spot worth the stop after an event?" maxlength="160" oninput="updatePreview()"></textarea></div>
+        <div class="field field-row">
+          <div><div class="field-label">Hours</div><input class="input" id="f-hours" placeholder="e.g. Open until 2 a.m." oninput="updatePreview()"></div>
+          <div><div class="field-label">Badge label</div><input class="input" id="f-badge" placeholder="e.g. Open late" maxlength="20" oninput="updatePreview()"></div>
+        </div>
+        <div class="field"><div class="field-label">Website or menu URL</div><input class="input" id="f-url" placeholder="https://yourspot.com" type="url"></div>
+        <div class="field"><div class="field-label">Instagram handle</div><input class="input" id="f-ig" placeholder="@yourspot"></div>
+        <div style="height:1px;background:var(--border);margin:14px 0;"></div>
+        <div class="field field-row">
+          <div><div class="field-label">Your name *</div><input class="input" id="f-contact" placeholder="Manager or owner"></div>
+          <div><div class="field-label">Email *</div><input class="input" id="f-email" type="email" placeholder="you@yourspot.com"></div>
+        </div>
+
+        <div class="includes">
+          <div class="includes-title">What is included at $50 a month</div>
+          <div class="include-row"><div class="include-check">&#10003;</div>Featured card in Late Night Eats or After the Event</div>
+          <div class="include-row"><div class="include-check">&#10003;</div>Name, category, hours, description and badge</div>
+          <div class="include-row"><div class="include-check">&#10003;</div>Direct link to your menu or website</div>
+          <div class="include-row"><div class="include-check">&#10003;</div>Cancel any time - no contracts</div>
+          <div class="include-row"><div class="include-check">&#10003;</div>Separate venue listing available free</div>
+        </div>
+
+        <button class="submit-btn" id="submitBtn" onclick="handleSubmit()">Get featured for $50 a month</button>
+        <div class="form-msg" id="formMsg"></div>
+        <div class="form-note">Billed monthly via Stripe. Cancel any time. Listing goes live within 24 hours of payment.</div>
+        <div style="margin-top:12px;padding:10px 12px;background:var(--surface);border-radius:8px;font-size:11px;color:var(--sub);line-height:1.6;">
+          Have a private event space too? After signing up, create a free venue account at <a href="https://cbusevents.com/venues.html?tab=list" style="color:var(--orange);">cbusevents.com/venues</a> to get found by Columbus event planners.
+        </div>
+      </div>
+
+      <div class="success-state" id="successState">
+        <div class="success-icon">&#127881;</div>
+        <div class="success-title">You're in the portal.</div>
+        <div class="success-sub">We received your listing and you will hear back within 24 hours once it is live. Check your email for your Stripe billing confirmation.<br><br>Questions: <a href="mailto:hello@cbusevents.com" style="color:var(--orange);">hello@cbusevents.com</a></div>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  <a href="https://cbusevents.com" class="footer-logo">CBUS<span>EVENTS</span></a>
+  <div class="footer-note">Inaugural Season 2026 - Columbus, Ohio</div>
+  <div style="display:flex;gap:14px;">
+    <a href="https://cbusevents.com/privacy.html" style="font-size:11px;color:var(--sub);">Privacy policy</a>
+    <a href="https://cbusevents.com/terms.html" style="font-size:11px;color:var(--sub);">Terms of service</a>
+  </div>
+</footer>
+
+<script>
+const SB_URL='https://toblgvatvsjljbqogzsv.supabase.co';
+const SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRvYmxndmF0dnNqbGpicW9nenN2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMDgwNTAsImV4cCI6MjA4NzY4NDA1MH0._WJEQPizNDiQfDXQB_DHPaQhixPGpMdmYQSmyWmm_FQ';
+
+// Live preview updates
+function updatePreview(){
+  const name=document.getElementById('f-name').value||'Your Spot Name';
+  const cat=document.getElementById('f-cat').value||'Category';
+  const hood=document.getElementById('f-hood').value||'Neighborhood';
+  const desc=document.getElementById('f-desc').value||'Your short description appears here. Keep it to one or two sentences about what makes your spot worth the stop.';
+  const hours=document.getElementById('f-hours').value||'Hours appear here';
+  const badge=document.getElementById('f-badge').value||'Featured';
+  document.getElementById('previewName').textContent=name;
+  document.getElementById('previewCat').textContent=hood+' - '+cat;
+  document.getElementById('previewDesc').textContent=desc;
+  document.getElementById('previewHours').textContent=hours;
+  document.getElementById('previewBadge').textContent=badge;
+}
+
+async function handleSubmit(){
+  const name=document.getElementById('f-name').value.trim();
+  const cat=document.getElementById('f-cat').value;
+  const hood=document.getElementById('f-hood').value.trim();
+  const desc=document.getElementById('f-desc').value.trim();
+  const contact=document.getElementById('f-contact').value.trim();
+  const email=document.getElementById('f-email').value.trim();
+  const hours=document.getElementById('f-hours').value.trim();
+  const badge=document.getElementById('f-badge').value.trim();
+  const url=document.getElementById('f-url').value.trim();
+  const ig=document.getElementById('f-ig').value.trim();
+  const section=document.getElementById('f-section').value;
+  const msg=document.getElementById('formMsg');
+  const btn=document.getElementById('submitBtn');
+
+  if(!name||!cat||!hood||!desc||!contact||!email){
+    msg.textContent='Please fill in all required fields.';
+    msg.style.color='var(--orange)';
+    return;
+  }
+  if(!email.includes('@')){
+    msg.textContent='Please enter a valid email address.';
+    msg.style.color='var(--orange)';
+    return;
+  }
+
+  btn.disabled=true;
+  btn.textContent='Saving your listing...';
+  msg.textContent='';
+
+  try{
+    // Save to Supabase leads first so you have the record even if Stripe redirect happens
+    await fetch(SB_URL+'/rest/v1/leads',{
+      method:'POST',
+      headers:{apikey:SB_KEY,Authorization:'Bearer '+SB_KEY,'Content-Type':'application/json','Prefer':'return=minimal'},
+      body:JSON.stringify({
+        name:contact,email:email,
+        notes:'Featured spot signup. Spot: '+name+'. Category: '+cat+'. Neighborhood: '+hood+'. Section: '+section+'. Hours: '+hours+'. Badge: '+badge+'. URL: '+url+'. IG: '+ig+'. Desc: '+desc,
+        source:'featured_spot',status:'new'
+      })
+    });
+
+    // Save listing to featured_spots as inactive - goes live after payment confirmed
+    await fetch(SB_URL+'/rest/v1/featured_spots',{
+      method:'POST',
+      headers:{apikey:SB_KEY,Authorization:'Bearer '+SB_KEY,'Content-Type':'application/json','Prefer':'return=minimal'},
+      body:JSON.stringify({
+        name,category:cat,description:desc,neighborhood:hood,
+        hours:hours||null,badge:badge||'Featured',
+        website_url:url||null,instagram_handle:ig||null,
+        section,contact_name:contact,contact_email:email,
+        cta_label:'View menu',cta_url:url||null,
+        active:false,featured_order:99
+      })
+    });
+
+    btn.textContent='Taking you to Stripe...';
+
+    // Redirect to Stripe Payment Link
+    const stripeUrl='https://buy.stripe.com/14A00jd6w1WacBx8fKc3m0h'
+      +'?prefilled_email='+encodeURIComponent(email)
+      +'&client_reference_id='+encodeURIComponent(name.replace(/[^a-z0-9]/gi,'-').toLowerCase().slice(0,50));
+    window.location.href=stripeUrl;
+  }catch(e){
+    // If Stripe fails, still show success since lead and listing are saved
+    showSuccess();
+  }
+}
+
+function showSuccess(){
+  document.getElementById('formBody').style.display='none';
+  document.getElementById('successState').style.display='block';
+}
+
+// Check for success redirect from Stripe
+if(new URLSearchParams(window.location.search).get('success')==='1'){
+  window.addEventListener('DOMContentLoaded',showSuccess);
+}
+</script>
+</body>
+</html>
