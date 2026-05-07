@@ -22,7 +22,7 @@
 </head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/> <!-- SEO META TAGS -->
-<title id="pageTitle">CBUSEVENTS — Columbus Ohio Event Platform</title>
+<title id="pageTitle">CBUSEVENTS - Columbus Ohio Event Platform</title>
 <script>
   // EMERGENCY MUZZLE: Blocks the broken Unsplash link from ever loading
   window.addEventListener('error', function(e) {
@@ -38,11 +38,11 @@
 <link rel="canonical" href="https://cbusevents.com"> <!-- Open Graph (Facebook/LinkedIn) -->
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://cbusevents.com">
-<meta property="og:title" content="CBUSEVENTS — Columbus Ohio Venues & Events">
+<meta property="og:title" content="CBUSEVENTS - Columbus Ohio Venues & Events">
 <meta property="og:description" content="The Columbus event directory. Discover bars, comedy clubs, concert halls & unique spaces. Browse upcoming events or list your venue.">
 <meta property="og:image" content="https://cbusevents.com/assets/cbus-shield.png"> <!-- Twitter Card -->
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="CBUSEVENTS — Columbus Ohio Venues & Events">
+<meta name="twitter:title" content="CBUSEVENTS - Columbus Ohio Venues & Events">
 <meta name="twitter:description" content="The Columbus event directory. Discover bars, comedy clubs, and unique event spaces.">
 <meta name="twitter:image" content="https://cbusevents.com/assets/cbus-shield.png"> <!-- Structured Data for Google -->
 <script type="application/ld+json">
@@ -1343,7 +1343,7 @@ h1,h2,h3,h4,h5,h6{font-family:var(--font);letter-spacing:-0.02em;}
   font-family: var(--font),sans-serif; margin-top: 6px; letter-spacing: 0.3px;
 }
 
-/* ── 2. BUTTON HIERARCHY — ghost secondary ── */
+/* ── 2. BUTTON HIERARCHY - ghost secondary ── */
 .rh-btn-secondary {
   background: transparent !important;
   color: #FF6B35 !important;
@@ -1362,7 +1362,7 @@ h1,h2,h3,h4,h5,h6{font-family:var(--font);letter-spacing:-0.02em;}
   50%      { box-shadow: 0 0 0 6px rgba(255,107,53,0.14); }
 }
 
-/* ── 3. FOUNDING VENUE CARD — glow + gradient border ── */
+/* ── 3. FOUNDING VENUE CARD - glow + gradient border ── */
 .rh-founding-card {
   border: 1px solid transparent !important;
   background-clip: padding-box !important;
@@ -1406,7 +1406,7 @@ h1,h2,h3,h4,h5,h6{font-family:var(--font);letter-spacing:-0.02em;}
   0%,100% { opacity: 1; } 50% { opacity: 0.7; }
 }
 
-/* ── 4. COMMUNITY CARDS — spacing + scale hover ── */
+/* ── 4. COMMUNITY CARDS - spacing + scale hover ── */
 .rh-communities { gap: 18px !important; }
 .rh-community {
   padding: 28px !important;
@@ -1499,7 +1499,7 @@ h1,h2,h3,h4,h5,h6{font-family:var(--font);letter-spacing:-0.02em;}
   <div style="width:5px;height:5px;background:var(--orange);border-radius:50%;animation:pulse 2s infinite;flex-shrink:0;"></div>
   <span style="font-family:var(--mono);font-size:11px;color:var(--orange);letter-spacing:1.5px;text-transform:uppercase;">Columbus's first dedicated event ecosystem</span>
   <div style="width:1px;height:12px;background:rgba(255,107,53,0.3);flex-shrink:0;"></div>
-  <a href="https://cbusevents.com/1313-festival-event.html" style="font-family:var(--mono);font-size:11px;color:var(--orange);letter-spacing:1.5px;text-transform:uppercase;text-decoration:none;">Inaugural 1313 Festival &mdash; June 13, 2026 &rarr;</a>
+  <a href="https://cbusevents.com/1313-festival-event.html" style="font-family:var(--mono);font-size:11px;color:var(--orange);letter-spacing:1.5px;text-transform:uppercase;text-decoration:none;">Inaugural 1313 Festival - June 13, 2026 &rarr;</a>
   <div style="width:5px;height:5px;background:var(--orange);border-radius:50%;animation:pulse 2s infinite;flex-shrink:0;"></div>
 </div>
 <div id="navMobileMenu" class="nav-mobile-menu">
@@ -1606,7 +1606,7 @@ function getVenueImg(venue){
 
 // ── INIT ──────────────────────────────────────────────────────
 async function init(){
- // Routing params — handle before any data fetch
+ // Routing params - handle before any data fetch
  const pParam = new URLSearchParams(location.search).get('p');
  const rParam = new URLSearchParams(location.search).get('r');
  const pathToRoute = rParam ? decodeURIComponent(rParam) : location.pathname;
@@ -1630,7 +1630,7 @@ async function init(){
 
  // Home page: render hero instantly, load data in background then update
  if(rParam) history.replaceState({},'',pathToRoute);
- renderHome(); // immediate render — hero visible in <1s
+ renderHome(); // immediate render - hero visible in <1s
  initFeed();   // show feed immediately (empty state until data loads)
 
  try {
@@ -1728,7 +1728,7 @@ function showPage(page,data=null,pushState=true){
  else if(page==='listVenue')renderVenueLanding();
 
  // Update URL and SEO title
- const titles={home:'CBUSEVENTS — Columbus Ohio Venues & Events',venues:'Columbus Venues — CBUSEVENTS',events:'Columbus Events — CBUSEVENTS'};
+ const titles={home:'CBUSEVENTS - Columbus Ohio Venues & Events',venues:'Columbus Venues - CBUSEVENTS',events:'Columbus Events - CBUSEVENTS'};
  let url='/';
  let title=titles[page]||document.title;
  if(page==='venues'){url='/?p=venues';}
@@ -1736,7 +1736,7 @@ function showPage(page,data=null,pushState=true){
  else if(page==='venue'&&data){
    const slug=data.slug||toSlug(data.name);
    url=`/venues/${slug}`;
-   title=`${data.name} — Columbus Venue | CBUSEVENTS`;
+   title=`${data.name} - Columbus Venue | CBUSEVENTS`;
  }
  else if(page==='category'&&data){url=`/category/${data}`;}
  
@@ -1872,7 +1872,7 @@ function renderHome(){
  const freeEvts = allEvents.filter(e=>!e.ticket_url&&!e.price_min&&e.is_free!==false).sort((a,b)=>new Date(a.start_time)-new Date(b.start_time));
  const allUpcoming = [festival1313, ...ticketed, ...freeEvts].slice(0,8);
 
- // Venue scroll — featured first, no image filter so all approved venues show
+ // Venue scroll - featured first, no image filter so all approved venues show
  const venueScroll = allVenues
    .sort((a,b)=>(b.is_featured?1:0)-(a.is_featured?1:0))
    .slice(0,8);
@@ -1979,8 +1979,8 @@ function renderHome(){
      <div style="display:flex;align-items:center;gap:16px;flex-shrink:0;flex-wrap:wrap">
        <div>
          <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);margin-bottom:4px">Next Event</div>
-         <div style="font-family:var(--mono);font-size:13px;font-weight:600;color:var(--text)">Jun 13, 2026</div>
-         <div style="font-family:var(--mono);font-size:10px;color:var(--sub);margin-top:2px">11 AM - 8 PM · Free Entry</div>
+         <div style="font-family:var(--mono);font-size:13px;font-weight:600;color:var(--text)">June 13, 2026</div>
+         <div style="font-family:var(--mono);font-size:10px;color:var(--sub);margin-top:2px">11 a.m. - 8 p.m. · Free Entry</div>
        </div>
        <div style="background:var(--orange);color:#fff;font-family:var(--font);font-weight:700;font-size:13px;padding:11px 22px;border-radius:var(--r-md);white-space:nowrap">Get Details →</div>
      </div>
@@ -2025,7 +2025,7 @@ function renderHome(){
        <!-- Right: CTA -->
        <div style="display:flex;align-items:center;gap:14px;flex-shrink:0;">
          <div style="text-align:right;">
-           <div style="font-family:var(--mono);font-size:8px;letter-spacing:0.15em;text-transform:uppercase;color:#444;margin-bottom:3px;">Debut · Jun 13, 2026</div>
+           <div style="font-family:var(--mono);font-size:8px;letter-spacing:0.15em;text-transform:uppercase;color:#444;margin-bottom:3px;">Debut · June 13, 2026</div>
            <div style="font-family:var(--mono);font-size:10px;color:#666;">1313 Festival · $10 Entry</div>
          </div>
          <div style="border:1px solid var(--orange);color:var(--orange);font-family:var(--font);font-weight:700;font-size:12px;padding:10px 20px;letter-spacing:0.08em;text-transform:uppercase;white-space:nowrap;transition:all 0.15s;"
@@ -2424,7 +2424,7 @@ function renderHome(){
      ${[
        {num:'49.6M', label:'Trips to Columbus annually'},
        {num:'$6.6B', label:'Visitor spending per year'},
-       {num:'933K',  label:'Residents — fastest-growing Midwest city'},
+       {num:'933K',  label:'Residents - fastest-growing Midwest city'},
        {num:'#2',    label:'Fastest-growing U.S. city'},
      ].map(s=>`
        <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--r-lg);padding:22px 20px;text-align:center">
@@ -2531,38 +2531,72 @@ function initHero(){
 function buildVendorTicker(){
   const track = document.getElementById('vendorTrack');
   if(!track) return;
+
   const BASE = 'https://toblgvatvsjljbqogzsv.supabase.co/storage/v1/object/public/attachments/';
-  const vendors = [
-    { name:'Family of Faith',     type:'Custom Designs',        img: BASE+'93317305-E1BD-4E7D-8F52-7DC6A0F39484.jpeg', dark:false },
-    { name:'Highly Flavored',     type:'Lemonade & Water Ice',  img: BASE+'IMG_2880.jpeg',  dark:false },
-    { name:'J&S Soulfoodnetwork', type:'Food',                  img: BASE+'80E2C7A6-0975-4D47-9333-63075538366A.jpeg', dark:true  },
-    { name:'The Suite Treat',     type:'Desserts',               img: BASE+'IMG_2833.jpeg',  dark:false },
-    { name:'2 Sisters Lemonade',  type:'Beverages',              img: BASE+'IMG_4368.png',   dark:false },
-    { name:"Bo' Alejandro",       type:'Visual Art',             img: BASE+'IMG_5782.jpeg',  dark:true  },
-    { name:'Kairoma Candle Co.',  type:'Candles & Fragrance',    img: BASE+'IMG_2776.jpeg',  dark:false },
-    { name:"Ri's Recipes",        type:'Cakes & Treat Tables',   img: BASE+'IMG_6805.png',   dark:false },
-    { name:'Way Down Yonder',     type:'New Orleans Cuisine',    img: BASE+'IMG_0338.png',   dark:false },
-  ];
+  const PHOTOS = {
+    'Family of Faith':     { img: BASE+'93317305-E1BD-4E7D-8F52-7DC6A0F39484.jpeg', dark:false },
+    'Highly flavored Lemonade and Water Ice': { img: BASE+'IMG_2880.jpeg', dark:false },
+    'J&S Soulfoodnetwork': { img: BASE+'80E2C7A6-0975-4D47-9333-63075538366A.jpeg', dark:true  },
+    'The Suite Treat':     { img: BASE+'IMG_2833.jpeg', dark:false },
+    '2 sisters lemonade':  { img: BASE+'IMG_4368.png',  dark:false },
+    "BO' Alejandro Art":   { img: BASE+'IMG_5782.jpeg', dark:true  },
+    'Kairoma Candle Co':   { img: BASE+'IMG_2776.jpeg', dark:false },
+    'Ris Recipes LLC':     { img: BASE+'IMG_6805.png',  dark:false },
+    'Way Down Yonder Food Truck': { img: BASE+'IMG_0338.png', dark:false },
+  };
+
+  function initials(name){
+    return name.split(' ').slice(0,2).map(function(w){return w[0]||'';}).join('').toUpperCase();
+  }
+
   function chip(v){
-    var bg = v.dark ? '#111' : '#fff';
+    const photo = PHOTOS[v.business_name];
+    const inner = photo
+      ? '<img src="'+photo.img+'" alt="'+v.business_name+'" style="width:100%;height:100%;object-fit:contain;display:block" loading="lazy">'
+      : '<span style="font-family:var(--mono);font-size:12px;font-weight:600;color:var(--orange)">'+initials(v.business_name)+'</span>';
+    const bg = photo ? (photo.dark ? '#111' : '#fff') : 'rgba(255,107,53,0.1)';
+    const label = v.business_name.length > 22 ? v.business_name.slice(0,20)+'...' : v.business_name;
+    const typeLabel = v.applicant_type === 'food_truck' ? 'Food truck' : 'Vendor';
     return '<div style="display:flex;align-items:center;gap:11px;padding:6px 22px 6px 14px;border-right:1px solid var(--border);flex-shrink:0;white-space:nowrap">'
       + '<div style="width:42px;height:42px;border-radius:8px;background:'+bg+';display:flex;align-items:center;justify-content:center;overflow:hidden;flex-shrink:0;border:1px solid rgba(128,128,128,0.12)">'
-      + '<img src="'+v.img+'" alt="'+v.name+'" style="width:100%;height:100%;object-fit:contain;display:block" loading="lazy">'
+      + inner
       + '</div>'
       + '<div>'
-      + '<div style="font-family:var(--font);font-size:13px;font-weight:700;color:var(--text);line-height:1.2">'+v.name+'</div>'
-      + '<div style="font-family:var(--mono);font-size:9px;letter-spacing:0.1em;text-transform:uppercase;color:var(--sub);margin-top:2px">'+v.type+'</div>'
+      + '<div style="font-family:var(--font);font-size:13px;font-weight:700;color:var(--text);line-height:1.2">'+label+'</div>'
+      + '<div style="font-family:var(--mono);font-size:9px;letter-spacing:0.1em;text-transform:uppercase;color:var(--sub);margin-top:2px">'+typeLabel+'</div>'
       + '</div></div>'
       + '<div style="padding:0 16px;font-size:12px;color:rgba(255,107,53,0.3);flex-shrink:0;user-select:none">&#10022;</div>';
   }
-  var html = vendors.map(chip).join('');
-  track.innerHTML = html + html;
-  if(!document.getElementById('vendorScrollStyle')){
-    var s = document.createElement('style');
-    s.id = 'vendorScrollStyle';
-    s.textContent = '@keyframes vendorScroll{0%{transform:translateX(0)}100%{transform:translateX(-50%)}} #vendorTrack:hover{animation-play-state:paused}';
-    document.head.appendChild(s);
+
+  function render(vendors){
+    if(!vendors||!vendors.length) return;
+    var inner = vendors.map(chip).join('');
+    track.innerHTML = inner + inner;
+    if(!document.getElementById('vendorScrollStyle')){
+      var s = document.createElement('style');
+      s.id = 'vendorScrollStyle';
+      s.textContent = '@keyframes vendorScroll{0%{transform:translateX(0)}100%{transform:translateX(-50%)}} #vendorTrack:hover{animation-play-state:paused}';
+      document.head.appendChild(s);
+    }
   }
+
+  fetch(SB_URL+'/rest/v1/festival_applications?select=business_name,applicant_type&status=eq.approved&business_name=neq.Test+app&order=applicant_type.desc,business_name.asc',{
+    headers:{ apikey: SB_KEY, Authorization:'Bearer '+SB_KEY }
+  })
+  .then(function(r){return r.json();})
+  .then(function(data){if(Array.isArray(data)&&data.length) render(data);})
+  .catch(function(){
+    render([
+      {business_name:"Way Down Yonder Food Truck",applicant_type:"food_truck"},
+      {business_name:"2 sisters lemonade",applicant_type:"vendor"},
+      {business_name:"BO' Alejandro Art",applicant_type:"vendor"},
+      {business_name:"Family of Faith",applicant_type:"vendor"},
+      {business_name:"J&S Soulfoodnetwork",applicant_type:"vendor"},
+      {business_name:"Kairoma Candle Co",applicant_type:"vendor"},
+      {business_name:"Ris Recipes LLC",applicant_type:"vendor"},
+      {business_name:"The Suite Treat",applicant_type:"vendor"},
+    ]);
+  });
 }
 
 
@@ -2771,7 +2805,7 @@ function buildHeroCards(){
 const RH_AUDIENCES={
  venues:{
    headline:'Your Venue.<br>Every <span class="rh-accent">Planner</span><br>In Columbus.',
-   sub:'<strong>Stop waiting for word of mouth.</strong> Get your space in front of the planners, organizers, and bookers who are actively searching — right now.',
+   sub:'<strong>Stop waiting for word of mouth.</strong> Get your space in front of the planners, organizers, and bookers who are actively searching - right now.',
    ctas:`<a href="https://cbusevents.com/signup.html?role=venue" class="rh-btn-primary">List Your Venue Free →</a><button class="rh-btn-secondary" onclick="window.location.href='https://cbusevents.com/venues.html'">Browse Venues</button>`
  },
  vendors:{
@@ -2781,12 +2815,12 @@ const RH_AUDIENCES={
  },
  planners:{
    headline:'Every Columbus<br>Venue. One<br><span class="rh-accent">Dashboard.</span>',
-   sub:'<strong>Stop juggling spreadsheets and DMs.</strong> Browse every Columbus venue, send booking inquiries, hire vendors, and manage your events — all in one free planner portal.',
+   sub:'<strong>Stop juggling spreadsheets and DMs.</strong> Browse every Columbus venue, send booking inquiries, hire vendors, and manage your events - all in one free planner portal.',
    ctas:`<a href="https://cbusevents.com/signup.html?role=planner" class="rh-btn-primary">Create Free Planner Account →</a><button class="rh-btn-secondary" onclick="window.location.href='https://cbusevents.com/venues.html'">Browse Venues</button>`
  },
  attendees:{
    headline:'Columbus Is<br><span class="rh-accent">Always On.</span><br>Are You?',
-   sub:'<strong>Never miss another night.</strong> Discover what\'s happening across Columbus — bars, comedy, live music, rooftops, pop-ups, and events you won\'t find anywhere else.',
+   sub:'<strong>Never miss another night.</strong> Discover what\'s happening across Columbus - bars, comedy, live music, rooftops, pop-ups, and events you won\'t find anywhere else.',
    ctas:`<button class="rh-btn-primary" onclick="showPage('events')">Browse Columbus Events →</button><a href="https://cbusevents.com/signup.html?role=attendee" class="rh-btn-secondary">Find My Scene</a>`
  }
 };
@@ -3068,7 +3102,7 @@ function renderEvents(){
        <div style="background:rgba(255,107,53,0.15);border:1px solid rgba(255,107,53,0.3);border-radius:10px;padding:10px 14px;font-size:22px;flex-shrink:0">&#127981;</div>
        <div>
          <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.18em;text-transform:uppercase;color:var(--orange);margin-bottom:4px">CBUSEVENTS Produced &middot; Jun 13</div>
-         <div style="font-family:var(--font);font-size:18px;font-weight:800;color:var(--text);letter-spacing:-0.02em;margin-bottom:3px">1313 Festival &mdash; End of Spring</div>
+         <div style="font-family:var(--font);font-size:18px;font-weight:800;color:var(--text);letter-spacing:-0.02em;margin-bottom:3px">1313 Festival - End of Spring</div>
          <div style="font-size:13px;color:var(--sub)">Food trucks, vendors &amp; vibes &middot; 1313 E. Broad St &middot; Free Entry</div>
        </div>
      </div>
@@ -3131,7 +3165,7 @@ function filterEvents(){
 // ── VENUE DETAIL PAGE ─────────────────────────────────────────
 async function renderVenueDetail(venue){
  if(!venue)return showPage('venues');
- document.title=`${venue.name} — CBUSEVENTS`;
+ document.title=`${venue.name} - CBUSEVENTS`;
 
  // Load this venue's events
  const{data:events}=await sb.from('events').select('*').eq('venue_id',venue.id).eq('status','published').gte('start_time',new Date().toISOString()).order('start_time',{ascending:true});
@@ -3242,12 +3276,12 @@ async function sendInquiry(venueId){
 // ── CATEGORY PAGE ─────────────────────────────────────────────
 function renderCategory(cat){
  const cats={
- bars:{ name:'Columbus Bars & Nightlife', icon:'', desc:'From hidden speakeasies to rooftop lounges, Short North dive bars to late-night clubs — Columbus has a bar for every night out.', keys:['bar','tavern','pub','dive','speakeasy','cocktail','brewery','rooftop','nightlife','lounge','social','theme'] },
+ bars:{ name:'Columbus Bars & Nightlife', icon:'', desc:'From hidden speakeasies to rooftop lounges, Short North dive bars to late-night clubs - Columbus has a bar for every night out.', keys:['bar','tavern','pub','dive','speakeasy','cocktail','brewery','rooftop','nightlife','lounge','social','theme'] },
  comedy:{ name:'Columbus Comedy Clubs', icon:'', desc:'Columbus has a thriving comedy scene with dedicated clubs, improv theatres, and performance spaces running shows every week.', keys:['comedy','improv','sketch','performance'] },
  rooftop:{ name:'Columbus Rooftop Bars', icon:'', desc:'Sip cocktails above the Columbus skyline. These rooftop venues offer the best views in the city.', keys:['rooftop'] },
  music:{ name:'Columbus Live Music Venues', icon:'', desc:"From jazz dives to full concert halls, Columbus's live music scene punches above its weight.", amenityKey:'stage' },
  dive:{ name:'Columbus Dive Bars', icon:'', desc:"Columbus's best no-frills, no-pretense bars. Cheap drinks, pool tables, and real regulars.", keys:['dive'] },
- events:{ name:'Columbus Private Event Venues', icon:'', desc:'Venues that specialize in private bookings — birthdays, corporate events, weddings, and more.', tagKey:'private' },
+ events:{ name:'Columbus Private Event Venues', icon:'', desc:'Venues that specialize in private bookings - birthdays, corporate events, weddings, and more.', tagKey:'private' },
  };
  const c=cats[cat]||cats.bars;
  let venues;
@@ -3260,7 +3294,7 @@ function renderCategory(cat){
  const evCats=catEventMap[cat]||[];
  const catEvents=evCats.length?allEvents.filter(e=>evCats.includes(e.category)).slice(0,6):[];
 
- document.title=`${c.name} — CBUSEVENTS`;
+ document.title=`${c.name} - CBUSEVENTS`;
 
  document.getElementById('app').innerHTML=`
  <div class="cat-hero"> <div class="breadcrumb"> <button onclick="showPage('home')">Home</button> <span>›</span> <button onclick="window.location.href='https://cbusevents.com/venues.html'">Venues</button> <span>›</span> <span>${c.name}</span> </div> <div style="font-size:48px;margin-bottom:12px">${c.icon}</div> <h1 class="cat-hero-title">${c.name}</h1> <p class="cat-hero-sub">${c.desc}</p> <div style="margin-top:16px;color:var(--orange);font-size:14px;font-weight:600">${venues.length} venues in Columbus</div> </div> <section class="section"> <div class="venue-grid">${venues.map(v=>venueCard(v)).join('')||'<div class="empty"><div class="empty-icon">${c.icon}</div><h3>No venues in this category yet</h3></div>'}</div> </section> ${catEvents.length?`
@@ -3400,7 +3434,7 @@ function openVendorModal(id){
        ? `<a href="${v.website}" target="_blank" style="flex:2;background:var(--orange);color:#fff;border:none;border-radius:10px;padding:12px;font-size:14px;font-weight:700;cursor:pointer;text-align:center;text-decoration:none;display:block">Visit Website →</a>`
        : v.instagram
        ? `<a href="https://instagram.com/${v.instagram.replace('@','')}" target="_blank" style="flex:2;background:var(--orange);color:#fff;border:none;border-radius:10px;padding:12px;font-size:14px;font-weight:700;cursor:pointer;text-align:center;text-decoration:none;display:block">View on Instagram →</a>`
-       : `<a href="mailto:info@cbusevents.com?subject=Vendor Inquiry — ${encodeURIComponent(name)}" style="flex:2;background:var(--orange);color:#fff;border:none;border-radius:10px;padding:12px;font-size:14px;font-weight:700;cursor:pointer;text-align:center;text-decoration:none;display:block">Request Intro →</a>`
+       : `<a href="mailto:info@cbusevents.com?subject=Vendor Inquiry - ${encodeURIComponent(name)}" style="flex:2;background:var(--orange);color:#fff;border:none;border-radius:10px;padding:12px;font-size:14px;font-weight:700;cursor:pointer;text-align:center;text-decoration:none;display:block">Request Intro →</a>`
      }
    </div>
  </div>`;
@@ -3420,11 +3454,13 @@ function footer(){
   <div style="border-top:1px solid rgba(255,255,255,0.05);padding:12px 32px;display:flex;align-items:center;justify-content:center;gap:16px;flex-wrap:wrap;">
     <a href="https://cbusevents.com/privacy.html" style="font-family:var(--mono);font-size:10px;color:var(--muted);text-decoration:none;letter-spacing:0.5px;">Privacy policy</a>
     <span style="color:rgba(255,255,255,0.1);font-size:10px;">&middot;</span>
+    <a href="https://cbusevents.com/feature-your-spot.html" style="font-family:var(--mono);font-size:10px;color:var(--muted);text-decoration:none;letter-spacing:0.5px;">Feature your spot</a>
+    <span style="color:rgba(255,255,255,0.1);font-size:10px;">&middot;</span>
     <a href="https://cbusevents.com/terms.html" style="font-family:var(--mono);font-size:10px;color:var(--muted);text-decoration:none;letter-spacing:0.5px;">Terms of service</a>
     <span style="color:rgba(255,255,255,0.1);font-size:10px;">&middot;</span>
     <a href="https://cbusevents.com/privacy.html#cookies" style="font-family:var(--mono);font-size:10px;color:var(--muted);text-decoration:none;letter-spacing:0.5px;">Cookie notice</a>
     <span style="color:rgba(255,255,255,0.1);font-size:10px;">&middot;</span>
-    <a href="https://cbusevents.com/1313-festival-event.html" style="font-family:var(--mono);font-size:10px;color:var(--orange);text-decoration:none;font-weight:600;letter-spacing:0.5px;">1313 Festival &mdash; June 13, 2026</a>
+    <a href="https://cbusevents.com/1313-festival-event.html" style="font-family:var(--mono);font-size:10px;color:var(--orange);text-decoration:none;font-weight:600;letter-spacing:0.5px;">1313 Festival - June 13, 2026</a>
   </div>
 </footer>`;
 }
@@ -3437,11 +3473,11 @@ function renderVenueLanding(){
  <div style="max-width:960px;margin:0 auto;padding:52px 32px"> <!-- Hero --> <div style="text-align:center;margin-bottom:60px"> <div style="display:inline-flex;align-items:center;gap:6px;background:#FF6B3520;color:#FF6B35;border:1px solid #FF6B3540;border-radius:20px;padding:4px 14px;font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:16px"> For Venue Owners</div> <h1 style="font-family:var(--font);font-size:clamp(28px,5vw,48px);font-weight:800;margin-bottom:14px;line-height:1.1">Get your Columbus venue in front of<br><span style="color:#FF6B35">thousands of event planners</span></h1> <p style="color:#8888a0;font-size:16px;max-width:540px;margin:0 auto 28px;line-height:1.65">CBUSEVENTS is Columbus's go-to directory for bars, comedy clubs, rooftops, and unique event spaces. List free and start getting discovered today.</p> <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-bottom:14px"> <button onclick="window.location.href='https://cbusevents.com/signup.html'" style="background:#FF6B35;color:#fff;border:none;border-radius:10px;padding:14px 32px;font-size:16px;font-weight:700;cursor:pointer;font-family:var(--font)">Create Free Listing →</button> <button onclick="window.location.href='https://cbusevents.com/signup.html'" style="background:transparent;color:#e8e8f0;border:1.5px solid #25252f;border-radius:10px;padding:13px 24px;font-size:15px;font-weight:500;cursor:pointer;font-family:var(--font)">Sign In</button> </div> <p style="color:#55556a;font-size:13px">Free to list · No credit card needed · Takes 5 minutes</p> </div> <!-- Benefits grid --> <div style="margin-bottom:60px"> <h2 style="font-family:var(--font);font-size:22px;font-weight:800;text-align:center;margin-bottom:32px">Everything your venue needs to grow bookings</h2> <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px"> ${[
  {icon:'',title:'Get Discovered',desc:'Show up when Columbus locals and event planners search for bars, comedy clubs, rooftops, and unique event spaces.',badge:''},
  {icon:'',title:'Manage Your Events',desc:'Add and publish events directly from your dashboard. Keep your calendar live and visible to thousands.',badge:''},
- {icon:'',title:'Receive Booking Requests',desc:'Event planners send inquiries straight to your portal inbox. Name, email, date, guest count — everything you need.',badge:''},
+ {icon:'',title:'Receive Booking Requests',desc:'Event planners send inquiries straight to your portal inbox. Name, email, date, guest count - everything you need.',badge:''},
  {icon:'',title:'Analytics Dashboard',desc:'See how many people viewed your listing, clicked through, and sent inquiries every month.',badge:'Standard+'},
  {icon:'⭐',title:'Priority Placement',desc:'Standard and Premium venues appear at the top of search results and category pages.',badge:'Standard+'},
- {icon:'',title:'Hero Slider',desc:'Premium venues rotate through the homepage hero — maximum visibility across the entire site.',badge:'Premium'},
- {icon:'',title:'Free Flyer Design',desc:'Get custom event flyers designed for your social media and print — included with Premium.',badge:'Premium'},
+ {icon:'',title:'Hero Slider',desc:'Premium venues rotate through the homepage hero - maximum visibility across the entire site.',badge:'Premium'},
+ {icon:'',title:'Free Flyer Design',desc:'Get custom event flyers designed for your social media and print - included with Premium.',badge:'Premium'},
  {icon:'',title:'Merch On Demand',desc:'Branded shirts, hats, and more printed via heat press and ready for your staff and events.',badge:'Premium'},
  ].map(b=>`
  <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--r-lg);padding:22px"> <div style="font-size:28px;margin-bottom:10px">${b.icon}</div> <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px"> <div style="font-family:var(--font);font-weight:700;font-size:15px">${b.title}</div> ${b.badge?`<span style="background:#FF6B3520;color:#FF6B35;border:1px solid #FF6B3530;border-radius:20px;padding:1px 8px;font-size:10px;font-weight:700">${b.badge}</span>`:''}
@@ -3559,7 +3595,7 @@ async function initNavAuth(){
         <button class="nav-cta" onclick="sb.auth.signOut().then(()=>window.location.reload())" style="background:var(--card);border:1px solid var(--border);color:#8888a0;cursor:pointer">Sign Out</button>
       `;
     } else {
-      // Not logged in — restore default nav
+      // Not logged in - restore default nav
       navRight.innerHTML=`
         <div style="position:relative" id="joinDropdown">
           <button class="nav-link" onclick="toggleJoinMenu()" style="display:flex;align-items:center;gap:4px">Join ▾</button>

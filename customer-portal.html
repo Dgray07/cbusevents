@@ -556,6 +556,7 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
   </a>
 
   <div class="sidebar-bottom">
+    <a href="https://cbusevents.com/feature-your-spot.html" style="display:block;font-family:'DM Mono',monospace;font-size:9px;color:rgba(255,107,53,0.5);letter-spacing:1px;text-transform:uppercase;text-decoration:none;padding:4px 0;">Feature your spot</a>
   </div>
 </aside>
 
@@ -718,6 +719,67 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
       </div>
 
     </div>
+
+      <!-- FEATURED SPOTS - LATE NIGHT EATS + AFTER THE EVENT -->
+      <div id="featuredSpotsSection" style="margin-top:24px;" data-hide-on="dashboard">
+
+        <!-- LATE NIGHT EATS -->
+        <div class="table-card" style="margin-bottom:16px;">
+          <div class="table-header">
+            <div>
+              <div class="table-title">Late Night Eats</div>
+              <div class="table-title-sub">Columbus spots open after the show</div>
+            </div>
+            <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--orange);letter-spacing:1px;text-transform:uppercase;background:rgba(255,107,53,0.1);border:1px solid rgba(255,107,53,0.2);padding:3px 10px;border-radius:20px;">Featured</div>
+          </div>
+          <div id="lateNightContainer" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px;padding:16px;">
+            <div style="padding:20px;text-align:center;color:var(--muted);font-size:12px;grid-column:1/-1;">
+              <div style="width:16px;height:16px;border:2px solid var(--border);border-top-color:var(--orange);border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 8px;"></div>
+              Loading...
+            </div>
+          </div>
+        </div>
+
+        <!-- RIDESHARE CALCULATOR -->
+        <div class="table-card" style="margin-bottom:16px;">
+          <div class="table-header">
+            <div>
+              <div class="table-title">Get There</div>
+              <div class="table-title-sub">Rideshare estimate from your location</div>
+            </div>
+          </div>
+          <div style="padding:16px;">
+            <div style="display:flex;gap:8px;margin-bottom:12px;">
+              <input id="rideDestination" placeholder="Destination address or event name" style="flex:1;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:9px 12px;color:var(--text);font-size:12px;font-family:'DM Sans',sans-serif;outline:none;" />
+              <button onclick="estimateRide()" style="background:var(--orange);color:#fff;border:none;border-radius:8px;padding:9px 16px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;">Estimate</button>
+            </div>
+            <div id="rideResult" style="display:none;"></div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;" id="rideLinks" style="display:none;">
+              <a id="uberLink" href="#" target="_blank" rel="noopener" style="display:none;flex:1;background:#000;color:#fff;padding:10px 16px;border-radius:8px;font-size:12px;font-weight:700;text-decoration:none;text-align:center;">Open in Uber</a>
+              <a id="lyftLink" href="#" target="_blank" rel="noopener" style="display:none;flex:1;background:#FF00BF;color:#fff;padding:10px 16px;border-radius:8px;font-size:12px;font-weight:700;text-decoration:none;text-align:center;">Open in Lyft</a>
+            </div>
+            <div style="font-size:10px;color:var(--muted);margin-top:8px;font-family:'DM Mono',monospace;letter-spacing:0.5px;">Estimates based on distance. Actual fares vary by time, demand and traffic.</div>
+          </div>
+        </div>
+
+        <!-- AFTER THE EVENT -->
+        <div class="table-card">
+          <div class="table-header">
+            <div>
+              <div class="table-title">After the Event</div>
+              <div class="table-title-sub">Bars, rooftops and venues worth the stop</div>
+            </div>
+            <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--orange);letter-spacing:1px;text-transform:uppercase;background:rgba(255,107,53,0.1);border:1px solid rgba(255,107,53,0.2);padding:3px 10px;border-radius:20px;">Featured</div>
+          </div>
+          <div id="afterEventContainer" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px;padding:16px;">
+            <div style="padding:20px;text-align:center;color:var(--muted);font-size:12px;grid-column:1/-1;">
+              <div style="width:16px;height:16px;border:2px solid var(--border);border-top-color:var(--orange);border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 8px;"></div>
+              Loading...
+            </div>
+          </div>
+        </div>
+
+      </div>
     </div><!-- /section-dashboard -->
 
   </div>
@@ -1454,6 +1516,116 @@ document.addEventListener('DOMContentLoaded',function(){
   setTimeout(loadMyTickets,800);
 });
 </script>
+
+
+// ── FEATURED SPOTS ──────────────────────────────────────────
+async function loadFeaturedSpots(){
+  try{
+    const res=await fetch(SB_URL+'/rest/v1/featured_spots?active=eq.true&order=featured_order.asc&select=*',{
+      headers:{apikey:SB_KEY,Authorization:'Bearer '+SB_KEY}
+    });
+    const spots=await res.json();
+    if(!Array.isArray(spots))return;
+
+    const lateNight=spots.filter(s=>s.section==='late_night');
+    const afterEvent=spots.filter(s=>s.section==='after_event');
+
+    renderSpots('lateNightContainer',lateNight,'&#127839;');
+    renderSpots('afterEventContainer',afterEvent,'&#127867;');
+  }catch(e){console.log('Featured spots error:',e);}
+}
+
+function renderSpots(containerId,spots,fallbackIcon){
+  const el=document.getElementById(containerId);
+  if(!el)return;
+  if(!spots||spots.length===0){
+    el.innerHTML='<div style="padding:20px;text-align:center;color:var(--muted);font-size:12px;grid-column:1/-1;">More spots coming soon.</div>';
+    return;
+  }
+  el.innerHTML=spots.map(s=>`
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px;display:flex;flex-direction:column;gap:8px;transition:border-color 0.15s;" onmouseover="this.style.borderColor='rgba(255,107,53,0.35)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.08)'">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;">
+        <div>
+          <div style="font-size:13px;font-weight:700;margin-bottom:3px;">${s.name}</div>
+          <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--sub);letter-spacing:1px;text-transform:uppercase;">${s.neighborhood||''} ${s.neighborhood&&s.category?' &middot; ':''} ${s.category||''}</div>
+        </div>
+        ${s.badge?`<span style="font-family:'DM Mono',monospace;font-size:8px;background:rgba(255,107,53,0.1);color:var(--orange);border:1px solid rgba(255,107,53,0.2);padding:2px 8px;border-radius:4px;letter-spacing:1px;text-transform:uppercase;white-space:nowrap;">${s.badge}</span>`:''}
+      </div>
+      ${s.description?`<div style="font-size:11px;color:var(--sub);line-height:1.6;">${s.description}</div>`:''}
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-top:4px;">
+        ${s.hours?`<div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);letter-spacing:0.5px;">${s.hours}</div>`:'<div></div>'}
+        ${s.cta_url&&s.cta_url!=='#'?`<a href="${s.cta_url}" target="_blank" rel="noopener" style="font-family:'DM Mono',monospace;font-size:9px;color:var(--orange);letter-spacing:1px;text-transform:uppercase;text-decoration:none;">${s.cta_label||'View'} &rarr;</a>`:''}
+      </div>
+    </div>`).join('');
+}
+
+// ── RIDESHARE CALCULATOR ─────────────────────────────────────
+let userLat=null,userLng=null;
+
+function getUserLocation(){
+  return new Promise(resolve=>{
+    if(navigator.geolocation){
+      navigator.geolocation.getCurrentPosition(
+        p=>{userLat=p.coords.latitude;userLng=p.coords.longitude;resolve(true);},
+        ()=>resolve(false),
+        {timeout:5000}
+      );
+    } else resolve(false);
+  });
+}
+
+async function estimateRide(){
+  const dest=document.getElementById('rideDestination').value.trim();
+  const resultEl=document.getElementById('rideResult');
+  const linksEl=document.getElementById('rideLinks');
+  if(!dest)return;
+
+  resultEl.style.display='block';
+  resultEl.innerHTML='<div style="font-size:12px;color:var(--muted);padding:8px 0;">Detecting your location...</div>';
+  linksEl.style.display='none';
+
+  const hasLocation=await getUserLocation();
+  if(!hasLocation){
+    resultEl.innerHTML='<div style="font-size:12px;color:var(--sub);padding:8px 0;">Could not detect your location. Enable location access and try again.</div>';
+    return;
+  }
+
+  // Use Google Maps geocoding to get dest coords via a free approach
+  // Show deep links to Uber and Lyft with destination pre-filled
+  const destEncoded=encodeURIComponent(dest);
+  const uberUrl=`https://m.uber.com/ul/?action=setPickup&pickup=my_location&dropoff[formatted_address]=${destEncoded}`;
+  const lyftUrl=`https://lyft.com/ride?id=lyft&pickup[latitude]=${userLat}&pickup[longitude]=${userLng}&destination[address]=${destEncoded}`;
+
+  // Rough distance estimate using Haversine - Columbus center as fallback dest
+  const R=3959;
+  const dLat=(40.7128-userLat)*Math.PI/180;
+  const dLon=(-74.006-userLng)*Math.PI/180;
+  const a=Math.sin(dLat/2)*Math.sin(dLat/2)+Math.cos(userLat*Math.PI/180)*Math.cos(40.7128*Math.PI/180)*Math.sin(dLon/2)*Math.sin(dLon/2);
+  const distMiles=R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a));
+  const estMins=Math.round(distMiles*2.5+3);
+  const estLow=(distMiles*1.8+2).toFixed(0);
+  const estHigh=(distMiles*2.4+4).toFixed(0);
+
+  resultEl.innerHTML=`
+    <div style="display:flex;gap:16px;padding:10px;background:var(--surface);border-radius:8px;margin-bottom:10px;border:1px solid var(--border);">
+      <div style="text-align:center;"><div style="font-family:'DM Mono',monospace;font-size:16px;font-weight:500;color:var(--orange);">~${estMins} min</div><div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-top:2px;">Est. ride time</div></div>
+      <div style="width:1px;background:var(--border);"></div>
+      <div style="text-align:center;"><div style="font-family:'DM Mono',monospace;font-size:16px;font-weight:500;color:var(--orange);">$${estLow}-${estHigh}</div><div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-top:2px;">Est. fare</div></div>
+    </div>`;
+
+  document.getElementById('uberLink').href=uberUrl;
+  document.getElementById('uberLink').style.display='block';
+  document.getElementById('lyftLink').href=lyftUrl;
+  document.getElementById('lyftLink').style.display='block';
+  linksEl.style.display='flex';
+}
+
+document.getElementById('rideDestination')?.addEventListener('keydown',e=>{if(e.key==='Enter')estimateRide();});
+
+// Load spots after auth check
+document.addEventListener('DOMContentLoaded',function(){
+  setTimeout(loadFeaturedSpots,1000);
+});
 
 </body>
 </html>
