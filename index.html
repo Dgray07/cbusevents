@@ -3752,8 +3752,8 @@ function feedCardHTML(e, idx){
   const tonight=isTonight(e.start_time);
   const icon=FEED_ICONS[idx%FEED_ICONS.length];
   const img=e.cover_image_url
-    ?`<img src="${e.cover_image_url}" alt="${e.title}" loading="lazy" onerror="this.parentNode.innerHTML='<div class=feed-card-img-placeholder>${icon}</div>'">`
-    :`<div class="feed-card-img-placeholder">${icon}</div>`;
+    ?`<img src="${e.cover_image_url}" alt="${e.title}" loading="lazy" onerror="this.parentNode.innerHTML='<div class=https://toblgvatvsjljbqogzsv.supabase.co/storage/v1/object/public/attachments/Demon%20Slayer-Inspired%20Poet%20on%20Fire%20Escape.PNG>${icon}</div>'">`
+    :`<div class="https://toblgvatvsjljbqogzsv.supabase.co/storage/v1/object/public/attachments/Demon%20Slayer-Inspired%20Poet%20on%20Fire%20Escape.PNG">${icon}</div>`;
   const price=e.is_free?'<span class="feed-card-price free">Free</span>':(e.price_min?`<span class="feed-card-price paid">From $${e.price_min}</span>`:'');
   const srcBadge=e.source_type==='external'
     ?`<span class="feed-ext-badge">${e.source||'Columbus'}</span>`
