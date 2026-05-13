@@ -362,13 +362,7 @@ async function loadProducts() {
   const { data, error } = await query;
 
   if (error) {
-    console.error('[Marketplace] vendor_products load error:', error.message);
-    const isTableMissing = error.message?.includes('does not exist') || error.code === '42P01';
-    grid.innerHTML = `<div class="empty-state">
-      <div class="empty-icon">🏪</div>
-      <div class="empty-title">${isTableMissing ? 'Marketplace Coming Soon' : 'Could not load products'}</div>
-      <div class="empty-sub">${isTableMissing ? 'Vendor products are on their way.' : 'Please try again in a moment.'}</div>
-    </div>`;
+    grid.innerHTML = `<div class="empty-state"><div class="empty-icon">⚠️</div><div class="empty-title">Could not load products</div></div>`;
     return;
   }
 
@@ -646,7 +640,7 @@ function renderCartDrawer() {
     </div>`).join('');
 
   const subtotal = cart.reduce((s, i) => s + (i.price * i.quantity), 0);
-  const fee = (subtotal * 0.065) + 1.00;
+  const fee = (subtotal * 0.059) + 1.00;
   const total = subtotal + fee;
 
   footerEl.innerHTML = `

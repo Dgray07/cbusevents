@@ -1612,7 +1612,7 @@ async function renderPayouts(){
       +'<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px">'
         +['$25','$50','$100'].map(function(price,i){
           var p=parseInt(price.replace('$',''));
-          var fee=Math.round(p*100*0.065)+100;
+          var fee=Math.round(p*100*0.059)+100;
           var stripe_fee=Math.round(p*100*0.029)+30;
           var net=p*100-fee-stripe_fee;
           return '<div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px;text-align:center">'

@@ -211,25 +211,20 @@ const SB_URL='https://toblgvatvsjljbqogzsv.supabase.co';
 const SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRvYmxndmF0dnNqbGpicW9nenN2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMDgwNTAsImV4cCI6MjA4NzY4NDA1MH0._WJEQPizNDiQfDXQB_DHPaQhixPGpMdmYQSmyWmm_FQ';
 const{createClient}=supabase;
 const db=createClient(SB_URL,SB_KEY);
-const FEE=0.065,FLAT=1;
+const FEE=0.059,FLAT=1;
 let profile=null,evtCfg=null,items=[],cart={},activeTab='all',cdTimer=null;
 
 (async()=>{
   const p=new URLSearchParams(window.location.search);
   const uid=p.get('u');
-  const slug=p.get('slug');
-  if(!uid&&!slug){notFound();return;}
+  if(!uid){notFound();return;}
   try{
-    let profQuery=db.from('food_professionals').select('*');
-    if(slug) profQuery=profQuery.eq('storefront_slug',slug);
-    else profQuery=profQuery.eq('user_id',uid);
-    const{data:prof}=await profQuery.maybeSingle();
+    const{data:prof}=await db.from('food_professionals').select('*').eq('user_id',uid).maybeSingle();
     if(!prof){notFound();return;}
     profile=prof;
-    const resolvedUid=prof.user_id;
-    const{data:evt}=await db.from('food_professional_events').select('*').eq('user_id',resolvedUid).maybeSingle();
+    const{data:evt}=await db.from('food_professional_events').select('*').eq('user_id',uid).maybeSingle();
     evtCfg=evt;
-    const{data:its}=await db.from('food_professional_menu_items').select('*').eq('user_id',resolvedUid).order('category').order('name');
+    const{data:its}=await db.from('food_professional_menu_items').select('*').eq('user_id',uid).order('category').order('name');
     items=(its||[]).filter(i=>i.is_available!==false);
     render();
   }catch(e){console.error(e);notFound();}
@@ -479,13 +474,9 @@ function showSuccess(order,first,email,total){
 }
 
 function shareStore(){
-  // Prefer slug-based URL for sharing if profile has one
-  const base=window.location.origin+window.location.pathname;
-  const shareUrl=profile?.storefront_slug
-    ? base+'?slug='+profile.storefront_slug
-    : window.location.href;
-  if(navigator.share)navigator.share({title:profile?.display_name||'Order Now',url:shareUrl});
-  else navigator.clipboard.writeText(shareUrl).then(()=>toast('Link copied!','success'));
+  const url=window.location.href;
+  if(navigator.share)navigator.share({title:profile?.display_name||'Order Now',url});
+  else navigator.clipboard.writeText(url).then(()=>toast('Link copied!','success'));
 }
 
 function openSheet(){document.getElementById('sheet-ov').classList.add('open');}

@@ -2368,7 +2368,7 @@ async function renderPayoutsPage(){
  const vendorEarnings=vendorOrders.map(o=>{
    const myItems=(o.items||[]).filter(i=>i.vendor_id===vendorProfile.id);
    const subtotal=myItems.reduce((s,i)=>s+(i.price*i.quantity),0);
-   const platformFee=(subtotal*0.065)+1.00;
+   const platformFee=(subtotal*0.059)+1.00;
    const net=subtotal-platformFee;
    return{...o,myItems,subtotal,platformFee,net};
  });
