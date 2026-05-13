@@ -154,13 +154,20 @@ button{font-family:var(--font);cursor:pointer;border:none;}
 .modal-close-btn{position:absolute;top:16px;right:16px;background:rgba(0,0,0,0.5);border:none;color:#fff;width:32px;height:32px;border-radius:var(--r-full);font-size:18px;display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:10;}
 
 /* ── VENDOR STOREFRONT BANNER ── */
-.storefront-banner{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:20px 24px;margin-bottom:24px;display:flex;align-items:center;gap:16px;}
-.storefront-cover{width:64px;height:64px;border-radius:var(--r-md);background:var(--card);border:1px solid var(--border);overflow:hidden;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:24px;}
-.storefront-cover img{width:100%;height:100%;object-fit:cover;}
-.storefront-name{font-size:18px;font-weight:800;letter-spacing:-0.02em;margin-bottom:4px;}
-.storefront-meta{font-size:13px;color:var(--sub);}
-.storefront-back{margin-left:auto;font-family:var(--mono);font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);cursor:pointer;background:none;border:none;transition:color 0.15s;}
-.storefront-back:hover{color:var(--orange);}
+.storefront-hero{position:relative;height:220px;overflow:hidden;background:linear-gradient(135deg,#1a1410,#2d1f10);margin-bottom:24px;}
+.storefront-hero-img{width:100%;height:100%;object-fit:cover;opacity:.6;}
+.storefront-hero-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(8,8,16,.92) 0%,rgba(8,8,16,.3) 60%,transparent 100%);}
+.storefront-hero-content{position:absolute;bottom:0;left:0;right:0;padding:24px 28px;display:flex;align-items:flex-end;justify-content:space-between;gap:16px;}
+.storefront-hero-identity{display:flex;align-items:flex-end;gap:14px;}
+.storefront-hero-avatar{width:56px;height:56px;border-radius:4px;border:2px solid rgba(255,255,255,.15);background:rgba(255,255,255,.08);overflow:hidden;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:22px;}
+.storefront-hero-avatar img{width:100%;height:100%;object-fit:cover;}
+.storefront-hero-name{font-family:'DM Sans',sans-serif;font-size:22px;font-weight:800;color:white;letter-spacing:-.03em;margin-bottom:4px;}
+.storefront-hero-meta{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.5);}
+.storefront-hero-actions{display:flex;align-items:center;gap:10px;flex-shrink:0;}
+.storefront-back{font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.5);cursor:pointer;background:none;border:1px solid rgba(255,255,255,.2);padding:8px 16px;transition:all .15s;}
+.storefront-back:hover{color:white;border-color:rgba(255,255,255,.5);}
+.storefront-visit-btn{font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;background:var(--orange);color:white;padding:8px 18px;border:none;cursor:pointer;transition:background .15s;}
+.storefront-visit-btn:hover{opacity:.9;}
 
 /* ── TOAST ── */
 #toast{display:none;position:fixed;bottom:100px;left:50%;transform:translateX(-50%);background:var(--card);border:1px solid var(--border);border-radius:var(--r-md);padding:10px 20px;font-size:13px;font-weight:600;z-index:1000;white-space:nowrap;box-shadow:0 8px 32px rgba(0,0,0,0.5);}
@@ -350,7 +357,7 @@ async function loadProducts() {
 
   let query = sb
     .from('vendor_products')
-    .select('*, vendors(id, business_name, cover_image_url, subscription_tier)')
+    .select('*, vendors(id, business_name, cover_image_url, subscription_tier, slug, storefront_active, description, neighborhood, category)')
     .eq('status', 'active')
     .order('created_at', { ascending: false });
 
@@ -373,24 +380,35 @@ async function loadProducts() {
 async function loadStorefrontBanner(vendorId) {
   const { data: vendor } = await sb
     .from('vendors')
-    .select('id, business_name, cover_image_url, description')
+    .select('id, business_name, cover_image_url, description, slug, neighborhood, category, storefront_active')
     .eq('id', vendorId)
     .single();
 
   if (!vendor) return;
 
   const banner = document.getElementById('storefrontBanner');
-  banner.style.display = 'flex';
+  banner.style.display = 'block';
+  const meta = [vendor.neighborhood, vendor.category].filter(Boolean).join(' · ') || 'Columbus Event Vendor';
+  const slug = vendor.slug;
   banner.innerHTML = `
-    <div class="storefront-banner">
-      <div class="storefront-cover">
-        ${vendor.cover_image_url ? `<img src="${vendor.cover_image_url}" alt="${vendor.business_name}">` : '🏪'}
+    <div class="storefront-hero">
+      ${vendor.cover_image_url ? `<img src="${vendor.cover_image_url}" alt="${vendor.business_name}" class="storefront-hero-img">` : ''}
+      <div class="storefront-hero-overlay"></div>
+      <div class="storefront-hero-content">
+        <div class="storefront-hero-identity">
+          <div class="storefront-hero-avatar">
+            ${vendor.cover_image_url ? `<img src="${vendor.cover_image_url}" alt="">` : '🏪'}
+          </div>
+          <div>
+            <div class="storefront-hero-name">${vendor.business_name || 'Vendor Store'}</div>
+            <div class="storefront-hero-meta">${meta}</div>
+          </div>
+        </div>
+        <div class="storefront-hero-actions">
+          <button class="storefront-back" onclick="clearStorefront()">&#8592; All Products</button>
+          ${slug ? `<button class="storefront-visit-btn" onclick="window.location.href='/vendor-storefront.html?slug=${slug}'">Visit Full Store &#8594;</button>` : ''}
+        </div>
       </div>
-      <div>
-        <div class="storefront-name">${vendor.business_name || 'Vendor Store'}</div>
-        <div class="storefront-meta">${vendor.description ? vendor.description.substring(0, 80) + (vendor.description.length > 80 ? '...' : '') : 'Columbus Event Vendor'}</div>
-      </div>
-      <button class="storefront-back" onclick="clearStorefront()">← All Vendors</button>
     </div>`;
 }
 
@@ -445,7 +463,7 @@ function productCard(p) {
         <span class="product-type-badge badge-${p.product_type}">${p.product_type}</span>
       </div>
       <div class="product-body">
-        <div class="product-vendor" onclick="event.stopPropagation();viewStorefront('${p.vendor_id}')">${p.vendors?.business_name || 'Vendor'}</div>
+        <div class="product-vendor" onclick="event.stopPropagation();${p.vendors?.slug ? `window.location.href='/vendor-storefront.html?slug=${p.vendors.slug}'` : `viewStorefront('${p.vendor_id}')`}">${p.vendors?.business_name || 'Vendor'} &#8594;</div>
         <div class="product-name">${p.name}</div>
         <div class="product-category">${p.category || 'General'}</div>
         <div class="product-footer">

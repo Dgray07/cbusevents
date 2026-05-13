@@ -2058,6 +2058,32 @@ function vcRenderRequests(el){
   <div id="vcModal"></div>`;
 }
 
+
+async function toggleStorefront(active){
+  const track=document.getElementById('toggle-track');
+  const thumb=document.getElementById('toggle-thumb');
+  const badge=document.getElementById('storefront-status-badge');
+  const lbl=document.querySelector('#storefront-toggle').parentElement.nextElementSibling;
+
+  // Optimistic UI update
+  if(track){track.style.background=active?'var(--orange)':'rgba(255,255,255,0.1)';track.style.borderColor=active?'var(--orange)':'var(--border)';}
+  if(thumb){thumb.style.left=active?'26px':'3px';}
+  if(badge){badge.textContent=active?'Live':'Hidden';badge.style.cssText=`font-family:var(--mono);font-size:9px;letter-spacing:0.12em;text-transform:uppercase;padding:3px 10px;border-radius:99px;${active?'background:var(--green-dim);color:var(--green);border:1px solid var(--green-border)':'background:rgba(255,255,255,0.04);color:var(--muted);border:1px solid var(--border)'}`;}
+  if(lbl)lbl.textContent=active?'Turn Off':'Turn On';
+
+  const{error}=await sb.from('vendors').update({storefront_active:active}).eq('id',vendorProfile.id);
+  if(error){
+    toast('Could not update storefront status','error');
+    // Revert
+    if(track){track.style.background=!active?'var(--orange)':'rgba(255,255,255,0.1)';}
+    if(thumb){thumb.style.left=!active?'26px':'3px';}
+    document.getElementById('storefront-toggle').checked=!active;
+    return;
+  }
+  vendorProfile.storefront_active=active;
+  toast(active?'Storefront is now live!':'Storefront hidden','success');
+}
+
 async function renderStorePage(){
  const tier=(vendorProfile?.subscription_tier||'FREE').toUpperCase();
  const canSell=tier==='STANDARD'||tier==='PREMIUM';
@@ -2074,24 +2100,51 @@ async function renderStorePage(){
    return;
  }
 
+ const slug=vendorProfile.slug||null;
+ const storeUrl=slug?`https://cbusevents.com/vendor-storefront.html?slug=${slug}`:`https://cbusevents.com/marketplace.html?vendor=${vendorProfile.id}`;
+ const isActive=vendorProfile.storefront_active||false;
  document.getElementById('pageContent').innerHTML=`
  <div style="margin-bottom:20px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px">
    <div><div style="font-family:var(--mono);font-size:9px;letter-spacing:0.18em;text-transform:uppercase;color:var(--muted);margin-bottom:4px">My Store</div><div style="font-size:22px;font-weight:800;letter-spacing:-0.03em">Vendor Storefront</div></div>
    <div style="display:flex;gap:10px;flex-wrap:wrap">
-     <a href="https://cbusevents.com/marketplace.html?vendor=${vendorProfile.id}" target="_blank" class="btn btn-ghost btn-sm">View Public Store →</a>
+     <a href="${storeUrl}" target="_blank" class="btn btn-ghost btn-sm">View Public Store →</a>
      <button class="btn btn-primary btn-sm" onclick="openProductModal()">+ Add Product</button>
    </div>
  </div>
- <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r-md);padding:12px 16px;margin-bottom:20px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap">
+
+ <!-- STOREFRONT TOGGLE -->
+ <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r-md);padding:20px 20px;margin-bottom:16px">
+   <div style="display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap">
+     <div style="flex:1">
+       <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px">
+         <div style="font-size:15px;font-weight:700">Storefront Active</div>
+         <span id="storefront-status-badge" style="font-family:var(--mono);font-size:9px;letter-spacing:0.12em;text-transform:uppercase;padding:3px 10px;border-radius:99px;${isActive?'background:var(--green-dim);color:var(--green);border:1px solid var(--green-border)':'background:rgba(255,255,255,0.04);color:var(--muted);border:1px solid var(--border)'}">${isActive?'Live':'Hidden'}</span>
+       </div>
+       <div style="font-size:13px;color:var(--sub);line-height:1.6;max-width:480px">When active, your storefront is publicly visible at your unique URL and your products appear in the marketplace. Turn this off to hide your store without deleting your products.</div>
+     </div>
+     <div style="flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:8px">
+       <label style="position:relative;display:inline-block;width:52px;height:28px;cursor:pointer">
+         <input type="checkbox" id="storefront-toggle" ${isActive?'checked':''} onchange="toggleStorefront(this.checked)" style="opacity:0;width:0;height:0;position:absolute">
+         <span id="toggle-track" style="position:absolute;inset:0;border-radius:28px;background:${isActive?'var(--orange)':'rgba(255,255,255,0.1)'};transition:background .2s;border:1px solid ${isActive?'var(--orange)':'var(--border)'}"></span>
+         <span id="toggle-thumb" style="position:absolute;top:3px;left:${isActive?'26':'3'}px;width:20px;height:20px;border-radius:50%;background:white;transition:left .2s;box-shadow:0 1px 4px rgba(0,0,0,0.3)"></span>
+       </label>
+       <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted)">${isActive?'Turn Off':'Turn On'}</div>
+     </div>
+   </div>
+ </div>
+
+ <!-- STOREFRONT URL -->
+ <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r-md);padding:14px 18px;margin-bottom:20px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap">
    <div>
-     <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);margin-bottom:4px">Your public storefront</div>
-     <div style="font-family:var(--mono);font-size:12px;color:var(--orange)">cbusevents.com/marketplace.html?vendor=${vendorProfile.id}</div>
+     <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);margin-bottom:4px">Your storefront URL</div>
+     <div style="font-family:var(--mono);font-size:12px;color:var(--orange)">${slug?`cbusevents.com/vendor-storefront.html?slug=${slug}`:`cbusevents.com/marketplace.html?vendor=${vendorProfile.id}`}</div>
    </div>
    <div style="display:flex;gap:8px;flex-shrink:0">
-     <button class="btn btn-ghost btn-sm" onclick="navigator.clipboard.writeText('https://cbusevents.com/marketplace.html?vendor=${vendorProfile.id}').then(()=>toast('Link copied!'))">Copy Link</button>
+     <button class="btn btn-ghost btn-sm" onclick="navigator.clipboard.writeText('${storeUrl}').then(()=>toast('Link copied!'))">Copy Link</button>
      <button class="btn btn-ghost btn-sm" onclick="showPage('payouts')" style="color:var(--green);border-color:rgba(52,211,153,0.3)">View Earnings</button>
    </div>
  </div>
+
  <div id="storeProducts"><div class="spinner"></div></div>`;
 
  await loadStoreProducts();
