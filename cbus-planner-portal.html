@@ -1600,7 +1600,7 @@ async function renderPayouts(){
         +'<div style="display:flex;flex-direction:column;gap:7px;font-size:13px;color:var(--sub)">'
           +'<div>&#x1F3DF; Attendees buy tickets directly on CBUSEVENTS</div>'
           +'<div>&#x1F4B8; Stripe deposits your share to your bank in 2 business days</div>'
-          +'<div>&#x1F4CA; CBUSEVENTS takes 6.5% + $1.00 per ticket sold</div>'
+          +'<div>&#x1F4CA; CBUSEVENTS takes 5.9% + $1.00 per ticket sold</div>'
           +'<div>&#x1F511; You keep the rest &mdash; no monthly fees</div>'
         +'</div>'
       +'</div>'
@@ -2805,14 +2805,72 @@ async function viewVendorTableApps(listingId,eventName){
 async function updateVTApp(appId,status,listingId,eventName){
   const{error}=await sb.from('vendor_table_applications').update({status,reviewed_at:new Date().toISOString()}).eq('id',appId);
   if(error){toast('Error updating application','error');return;}
+
   if(status==='approved'){
-    // Decrement spots remaining
-    const{data:listing}=await sb.from('vendor_table_listings').select('spots_remaining').eq('id',listingId).maybeSingle();
-    if(listing&&listing.spots_remaining>0){
-      await sb.from('vendor_table_listings').update({spots_remaining:listing.spots_remaining-1}).eq('id',listingId);
+    // Send vendor a payment link via the checkout Edge Function
+    // First get vendor details from the application
+    const{data:app}=await sb
+      .from('vendor_table_applications')
+      .select('vendor_id, vendors(email,contact_email,business_name)')
+      .eq('id',appId)
+      .maybeSingle();
+
+    const vendorEmail=app?.vendors?.contact_email||app?.vendors?.email||null;
+    const vendorName=app?.vendors?.business_name||'Vendor';
+
+    if(vendorEmail){
+      try{
+        const res=await fetch(`${SB_URL}/functions/v1/vendor-table-checkout`,{
+          method:'POST',
+          headers:{'Content-Type':'application/json','apikey':SB_KEY},
+          body:JSON.stringify({
+            application_id:appId,
+            listing_id:listingId,
+            vendor_id:app.vendor_id,
+            vendor_email:vendorEmail,
+            vendor_name:vendorName,
+          })
+        });
+        const data=await res.json();
+        if(data.url){
+          // Email the payment link to the vendor via send-email function
+          await fetch(`${SB_URL}/functions/v1/send-email`,{
+            method:'POST',
+            headers:{'Content-Type':'application/json','apikey':SB_KEY},
+            body:JSON.stringify({
+              to:vendorEmail,
+              subject:`You've been approved — Pay to confirm your spot at ${eventName}`,
+              html:`
+                <div style="font-family:sans-serif;max-width:480px;margin:0 auto">
+                  <h2 style="color:#FF6B35">You've been approved!</h2>
+                  <p>Hi ${vendorName},</p>
+                  <p>Your application for a vendor spot at <strong>${eventName}</strong> has been approved.</p>
+                  <p>To confirm your spot, complete your payment using the link below. Spots are held on a first-paid basis.</p>
+                  <a href="${data.url}" style="display:inline-block;background:#FF6B35;color:white;padding:14px 28px;text-decoration:none;font-weight:700;margin:16px 0;font-size:15px">Pay Now to Confirm Your Spot &rarr;</a>
+                  <p style="font-size:13px;color:#666">This link expires in 24 hours. If you have questions, reply through your CBUSEVENTS vendor portal inbox.</p>
+                  <p style="font-size:12px;color:#999;margin-top:24px">Powered by CBUSEVENTS &mdash; United by Events</p>
+                </div>
+              `
+            })
+          });
+          toast('Vendor approved and payment link sent to '+vendorEmail);
+        } else {
+          // Checkout failed but approval saved - notify planner
+          toast('Vendor approved. Payment link could not be sent automatically — share manually.','error');
+          console.error('Checkout error:',data.error);
+        }
+      }catch(err){
+        toast('Vendor approved but payment email failed. Share link manually.','error');
+        console.error('Payment link error:',err);
+      }
+    } else {
+      // No email on file - just approve
+      toast('Vendor approved. No email on file — notify them directly.');
     }
+  } else {
+    toast('Application declined');
   }
-  toast(status==='approved'?'Vendor approved!':'Application declined');
+
   await viewVendorTableApps(listingId,eventName);
 }
 
