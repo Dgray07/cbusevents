@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Collab Board | CBUSEVENTS</title>
+<meta name="description" content="Open vendor spots, gigs, and event opportunities in Columbus. Posted by local event planners. Apply through CBUSEVENTS.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<style>
+:root{
+  --bg:#f9f6f1;
+  --white:#ffffff;
+  --cream:#faf7f2;
+  --ink:#141210;
+  --ash:#3a3530;
+  --sub:#6b6560;
+  --mist:#a09890;
+  --rule:#e8e0d4;
+  --orange:#FF6B35;
+  --orange-light:#fff3ee;
+  --orange-mid:#ffd0b8;
+  --green:#1a6b40;
+  --green-bg:#edf7f2;
+  --green-border:#b0dfc4;
+  --shadow-sm:0 1px 4px rgba(0,0,0,.06),0 1px 2px rgba(0,0,0,.04);
+  --shadow-md:0 4px 20px rgba(0,0,0,.08),0 2px 8px rgba(0,0,0,.04);
+}
+
+/* ── DARK MODE ─────────────────────────────────────────────── */
+[data-theme="dark"]{
+  --bg:#0d0d0f;
+  --white:#141418;
+  --cream:#111115;
+  --ink:#f0ece4;
+  --ash:#b8b0a4;
+  --sub:#8a8278;
+  --mist:#5a5450;
+  --rule:#2a2824;
+  --orange:#FF6B35;
+  --orange-light:rgba(255,107,53,0.1);
+  --orange-mid:rgba(255,107,53,0.25);
+  --green:#22c55e;
+  --green-bg:rgba(34,197,94,0.1);
+  --green-border:rgba(34,197,94,0.25);
+  --shadow-sm:0 1px 4px rgba(0,0,0,.3),0 1px 2px rgba(0,0,0,.2);
+  --shadow-md:0 4px 20px rgba(0,0,0,.4),0 2px 8px rgba(0,0,0,.2);
+}
+
+/* Theme toggle button */
+.theme-toggle{
+  width:36px;height:36px;border-radius:50%;
+  border:1.5px solid var(--rule);background:var(--cream);
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;font-size:15px;transition:all .2s;
+  flex-shrink:0;
+}
+.theme-toggle:hover{border-color:var(--orange);background:var(--orange-light);}
+.theme-toggle .icon-sun{display:none}
+.theme-toggle .icon-moon{display:block}
+[data-theme="dark"] .theme-toggle .icon-sun{display:block}
+[data-theme="dark"] .theme-toggle .icon-moon{display:none}
+
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-font-smoothing:antialiased}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--ink);font-family:'DM Sans',sans-serif;font-weight:300;overflow-x:hidden}
+a{text-decoration:none;color:inherit}
+
+/* NAV */
+nav{position:sticky;top:0;z-index:100;background:rgba(250,247,242,.96);backdrop-filter:blur(16px);border-bottom:1px solid var(--rule)}
+.nav-inner{display:flex;align-items:center;justify-content:space-between;padding:0 56px;height:64px}
+.nav-logo{font-family:'Playfair Display',serif;font-weight:900;font-size:22px;letter-spacing:.1em;color:var(--ink)}
+.nav-logo span{color:var(--orange)}
+.nav-links{display:flex;gap:36px;list-style:none}
+.nav-links a{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--ash);transition:color .15s}
+.nav-links a:hover,.nav-links a.active{color:var(--orange)}
+.nav-right{display:flex;gap:12px;align-items:center}
+.nav-btn-ghost{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--ash);border:1.5px solid var(--rule);padding:9px 18px;transition:all .15s}
+.nav-btn-ghost:hover{border-color:var(--orange);color:var(--orange)}
+.nav-btn-primary{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;background:var(--orange);color:white;padding:10px 20px;transition:background .15s}
+.nav-btn-primary:hover{background:#e85a20}
+
+/* HERO */
+.hero{background:var(--cream);border-bottom:1px solid var(--rule);padding:56px 56px 0}
+.hero-inner{max-width:1200px;margin:0 auto}
+.hero-eyebrow{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.22em;text-transform:uppercase;color:var(--orange);margin-bottom:20px;display:flex;align-items:center;gap:10px}
+.hero-eyebrow::before{content:'';width:24px;height:1px;background:var(--orange)}
+.hero-headline{font-family:'Playfair Display',serif;font-size:clamp(48px,6vw,84px);font-weight:900;line-height:.92;letter-spacing:-.02em;color:var(--ink);margin-bottom:20px}
+.hero-headline em{font-style:italic;color:var(--orange)}
+.hero-sub{font-size:17px;line-height:1.7;color:var(--sub);max-width:560px;margin-bottom:40px;font-weight:300}
+.hero-bottom{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:20px;padding-bottom:0}
+.hero-stats{display:flex;gap:40px}
+.hero-stat-num{font-family:'Playfair Display',serif;font-size:36px;font-weight:700;line-height:1;color:var(--ink)}
+.hero-stat-num sup{font-size:18px;color:var(--orange)}
+.hero-stat-label{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:var(--mist);margin-top:5px}
+.hero-post-cta{display:flex;flex-direction:column;align-items:flex-end;gap:6px}
+.hero-post-btn{font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.16em;text-transform:uppercase;background:var(--ink);color:white;padding:14px 28px;transition:background .15s;border:none;cursor:pointer}
+.hero-post-btn:hover{background:var(--orange)}
+.hero-post-note{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:var(--mist)}
+
+/* TICKER */
+.ticker{background:var(--ink);padding:12px 0;overflow:hidden}
+.ticker-track{display:flex;white-space:nowrap;animation:scroll 30s linear infinite}
+.ticker-item{font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--cream);padding:0 36px}
+.ticker-sep{color:var(--orange)}
+@keyframes scroll{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+
+/* FILTER BAR */
+.filter-bar{background:var(--white);border-bottom:1px solid var(--rule);position:sticky;top:64px;z-index:90}
+.filter-bar-inner{max-width:1200px;margin:0 auto;padding:0 56px;display:flex;align-items:center;gap:16px;height:56px;overflow-x:auto;scrollbar-width:none}
+.filter-bar-inner::-webkit-scrollbar{display:none}
+.filter-label{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--mist);white-space:nowrap;flex-shrink:0}
+.filter-chips{display:flex;gap:6px;flex-wrap:nowrap}
+.chip{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.14em;text-transform:uppercase;padding:6px 14px;border:1.5px solid var(--rule);background:var(--white);color:var(--ash);cursor:pointer;transition:all .15s;white-space:nowrap;flex-shrink:0}
+.chip:hover{border-color:var(--orange);color:var(--orange)}
+.chip.active{background:var(--orange);border-color:var(--orange);color:white}
+.filter-search{margin-left:auto;flex-shrink:0;position:relative}
+.filter-search input{font-family:'DM Sans',sans-serif;font-size:13px;padding:7px 14px 7px 32px;border:1.5px solid var(--rule);background:var(--cream);color:var(--ink);outline:none;transition:border-color .2s;width:220px}
+.filter-search input:focus{border-color:var(--orange)}
+.filter-search input::placeholder{color:var(--mist)}
+.search-icon{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--mist);font-size:13px;pointer-events:none}
+
+/* MAIN LAYOUT */
+.main{max-width:1200px;margin:0 auto;padding:40px 56px 80px;display:grid;grid-template-columns:1fr 300px;gap:40px;align-items:start}
+
+/* LISTINGS */
+.listings-col{}
+.section-rule{display:flex;align-items:center;gap:16px;margin-bottom:32px}
+.section-rule-label{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.24em;text-transform:uppercase;color:var(--orange);white-space:nowrap}
+.section-rule-line{flex:1;height:1px;background:var(--rule)}
+.live-badge{display:inline-flex;align-items:center;gap:7px;background:var(--green-bg);border:1px solid var(--green-border);padding:5px 12px}
+.live-dot{width:6px;height:6px;border-radius:50%;background:#22c55e;animation:blink 2s infinite}
+.live-text{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:var(--green)}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.4}}
+
+/* LISTING CARD */
+.listing-card{background:var(--white);border:1px solid var(--rule);margin-bottom:10px;overflow:hidden;transition:box-shadow .18s,border-color .18s,transform .18s;cursor:default}
+.listing-card:hover{box-shadow:var(--shadow-md);border-color:var(--orange-mid);transform:translateY(-1px)}
+.listing-card.urgent{border-left:4px solid var(--orange)}
+.listing-urgency{background:var(--orange-light);border-bottom:1px solid var(--orange-mid);padding:6px 20px;font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:var(--orange)}
+.listing-body{padding:22px 24px}
+.listing-top{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:14px;flex-wrap:wrap}
+.listing-main{flex:1;min-width:0}
+.listing-title{font-family:'Playfair Display',serif;font-size:20px;font-weight:700;color:var(--ink);margin-bottom:6px;line-height:1.15;letter-spacing:-.01em}
+.listing-meta{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.1em;color:var(--mist);display:flex;gap:14px;flex-wrap:wrap}
+.listing-right{flex-shrink:0;text-align:right}
+.listing-fee{font-family:'Playfair Display',serif;font-size:28px;font-weight:900;color:var(--ink);line-height:1}
+.listing-fee-label{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--mist);margin-top:3px}
+.listing-spots{font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.1em;color:var(--orange);margin-top:6px}
+.listing-tags{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+.listing-tag{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.12em;text-transform:uppercase;background:var(--orange-light);color:var(--orange);border:1px solid var(--orange-mid);padding:4px 12px}
+.listing-desc{font-size:13px;line-height:1.65;color:var(--sub);font-weight:300;margin-bottom:16px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.listing-footer{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.listing-applicants{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.1em;color:var(--mist)}
+.listing-apply-btn{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.16em;text-transform:uppercase;background:var(--ink);color:white;padding:10px 22px;border:none;cursor:pointer;transition:background .15s;white-space:nowrap}
+.listing-apply-btn:hover{background:var(--orange)}
+.listing-apply-btn.full{background:var(--mist);cursor:default}
+.listing-apply-btn.full:hover{background:var(--mist)}
+
+/* EMPTY / LOADING */
+.empty-state{text-align:center;padding:60px 20px;color:var(--mist)}
+.empty-icon{font-size:40px;margin-bottom:14px}
+.empty-title{font-family:'Playfair Display',serif;font-size:20px;font-weight:700;color:var(--ash);margin-bottom:8px}
+.empty-sub{font-size:14px;line-height:1.65;max-width:340px;margin:0 auto}
+.spinner{width:24px;height:24px;border:2px solid var(--rule);border-top-color:var(--orange);border-radius:50%;animation:spin .7s linear infinite;margin:60px auto}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* SIDEBAR */
+.sidebar{display:flex;flex-direction:column;gap:16px;position:sticky;top:136px}
+.sidebar-card{background:var(--white);border:1px solid var(--rule);padding:22px;box-shadow:var(--shadow-sm)}
+.sidebar-title{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--mist);margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid var(--rule)}
+
+/* HOW IT WORKS sidebar */
+.how-steps{display:flex;flex-direction:column;gap:14px}
+.how-step{display:flex;gap:12px;align-items:flex-start}
+.how-step-num{width:24px;height:24px;border-radius:50%;background:var(--orange);color:white;font-family:'DM Mono',monospace;font-size:11px;font-weight:500;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+.how-step-title{font-size:13px;font-weight:500;color:var(--ink);margin-bottom:3px}
+.how-step-desc{font-size:12px;color:var(--sub);line-height:1.55;font-weight:300}
+
+/* UPCOMING EVENTS sidebar */
+.upcoming-list{display:flex;flex-direction:column;gap:12px}
+.upcoming-item{display:flex;gap:12px;align-items:flex-start;padding:8px;cursor:pointer;transition:background .15s}
+.upcoming-item:hover{background:var(--orange-light)}
+.upcoming-date{text-align:center;flex-shrink:0;min-width:36px}
+.upcoming-month{font-family:'DM Mono',monospace;font-size:8px;letter-spacing:.16em;text-transform:uppercase;color:var(--orange)}
+.upcoming-day{font-family:'Playfair Display',serif;font-size:22px;font-weight:900;color:var(--ink);line-height:1}
+.upcoming-info{}
+.upcoming-name{font-size:13px;font-weight:500;color:var(--ink);line-height:1.2;margin-bottom:2px}
+.upcoming-venue{font-size:11px;color:var(--mist)}
+.upcoming-spots{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.1em;color:var(--orange);margin-top:3px}
+
+/* POST CTA sidebar */
+.post-cta-card{background:var(--orange);padding:24px}
+.post-cta-label{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:rgba(255,255,255,.7);margin-bottom:10px}
+.post-cta-title{font-family:'Playfair Display',serif;font-size:19px;font-weight:700;color:white;line-height:1.2;margin-bottom:16px}
+.post-cta-btn{display:block;text-align:center;background:white;color:var(--orange);font-family:'DM Mono',monospace;font-size:10px;font-weight:500;letter-spacing:.16em;text-transform:uppercase;padding:12px;transition:background .15s}
+.post-cta-btn:hover{background:var(--orange-light)}
+.post-cta-note{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.55);margin-top:10px;text-align:center}
+
+/* APPLY MODAL */
+.modal-overlay{position:fixed;inset:0;z-index:300;background:rgba(0,0,0,.5);display:none;align-items:center;justify-content:center;padding:20px}
+.modal-overlay.open{display:flex}
+.modal{background:var(--white);max-width:520px;width:100%;max-height:90vh;overflow-y:auto;position:relative}
+.modal-head{padding:20px 24px;border-bottom:1px solid var(--rule);display:flex;align-items:center;justify-content:space-between}
+.modal-title{font-family:'Playfair Display',serif;font-size:20px;font-weight:700;letter-spacing:-.01em}
+.modal-close{background:none;border:none;color:var(--sub);font-size:22px;cursor:pointer;line-height:1;padding:4px}
+.modal-body{padding:24px}
+.modal-listing-preview{background:var(--cream);border:1px solid var(--rule);padding:14px 16px;margin-bottom:20px}
+.mlp-name{font-weight:600;font-size:14px;margin-bottom:4px}
+.mlp-meta{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.1em;color:var(--mist);display:flex;gap:12px;flex-wrap:wrap}
+.modal-info-box{background:var(--orange-light);border:1px solid var(--orange-mid);padding:12px 14px;margin-bottom:20px}
+.modal-info-label{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:var(--orange);margin-bottom:6px}
+.modal-info-text{font-size:12px;color:var(--sub);line-height:1.65}
+.form-group{margin-bottom:12px}
+.form-label{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:var(--mist);display:block;margin-bottom:6px}
+.form-input{width:100%;padding:11px 14px;border:1.5px solid var(--rule);background:var(--white);font-family:'DM Sans',sans-serif;font-size:14px;color:var(--ink);font-weight:300;outline:none;transition:border-color .2s}
+.form-input:focus{border-color:var(--ink)}
+.form-input::placeholder{color:var(--mist)}
+.form-textarea{resize:none;height:80px}
+.modal-footer{display:flex;justify-content:flex-end;gap:10px;padding-top:16px;border-top:1px solid var(--rule)}
+.btn-ghost{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;background:none;border:1.5px solid var(--rule);color:var(--ash);padding:10px 18px;cursor:pointer;transition:all .15s}
+.btn-ghost:hover{border-color:var(--orange);color:var(--orange)}
+.btn-primary{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;background:var(--ink);color:white;padding:10px 22px;border:none;cursor:pointer;transition:background .15s}
+.btn-primary:hover{background:var(--orange)}
+.btn-primary:disabled{opacity:.5;cursor:not-allowed}
+
+/* TOAST */
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--ink);color:white;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.12em;padding:12px 24px;z-index:500;opacity:0;transition:opacity .25s;pointer-events:none;white-space:nowrap}
+.toast.show{opacity:1}
+.toast.success{background:var(--green)}
+.toast.error{background:#b83020}
+
+/* REVEAL */
+.reveal{opacity:0;transform:translateY(20px);transition:opacity .55s ease,transform .55s ease}
+.reveal.in{opacity:1;transform:none}
+
+/* MOBILE */
+@media(max-width:900px){
+  .nav-inner{padding:0 20px}
+  .nav-links{display:none}
+  .hero{padding:40px 20px 0}
+  .hero-stats{gap:24px}
+  .hero-post-cta{align-items:flex-start}
+  .filter-bar-inner{padding:0 20px}
+  .main{grid-template-columns:1fr;padding:24px 20px 60px}
+  .sidebar{position:static;top:auto}
+  .listing-top{flex-direction:column}
+  .listing-right{text-align:left}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-inner">
+    <a href="https://cbusevents.com" class="nav-logo">CBUS<span>EVENTS</span></a>
+    <ul class="nav-links">
+      <li><a href="https://cbusevents.com">Home</a></li>
+      <li><a href="https://cbusevents.com/events.html">Events</a></li>
+      <li><a href="https://cbusevents.com/marketplace.html">Marketplace</a></li>
+      <li><a href="collab-board.html" class="active">Collab Board</a></li>
+      <li><a href="https://cbusevents.com/venues.html">Venues</a></li>
+    </ul>
+    <div class="nav-right">
+      <button class="theme-toggle" onclick="toggleTheme()" title="Toggle dark mode" aria-label="Toggle dark mode">
+        <span class="icon-moon">&#9790;</span>
+        <span class="icon-sun">&#9728;</span>
+      </button>
+      <a href="https://cbusevents.com/cbus-vendor-portal.html" class="nav-btn-ghost">Vendor Portal</a>
+      <a href="https://cbusevents.com/cbus-planner-portal.html" class="nav-btn-primary">Post a Listing</a>
+    </div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-inner">
+    <div class="hero-eyebrow">Columbus Event Ecosystem</div>
+    <h1 class="hero-headline">Open spots.<br><em>Real money.</em></h1>
+    <p class="hero-sub">Vendor tables, food truck spots, event staff shifts, and creative gigs posted by Columbus event planners. Apply through CBUSEVENTS and get paid through the platform.</p>
+    <div class="hero-bottom">
+      <div class="hero-stats">
+        <div>
+          <div class="hero-stat-num" id="stat-listings">--</div>
+          <div class="hero-stat-label">Open Listings</div>
+        </div>
+        <div>
+          <div class="hero-stat-num" id="stat-spots">--</div>
+          <div class="hero-stat-label">Spots Available</div>
+        </div>
+        <div>
+          <div class="hero-stat-num" id="stat-events">--</div>
+          <div class="hero-stat-label">Upcoming Events</div>
+        </div>
+      </div>
+      <div class="hero-post-cta">
+        <a href="https://cbusevents.com/cbus-planner-portal.html" class="hero-post-btn">Post Vendor Spots</a>
+        <div class="hero-post-note">Planners only &bull; Free to post</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TICKER -->
+<div class="ticker">
+  <div class="ticker-track" id="ticker">
+    <span class="ticker-item">Collab Board <span class="ticker-sep">&bull;</span></span>
+    <span class="ticker-item">Vendor Tables <span class="ticker-sep">&bull;</span></span>
+    <span class="ticker-item">Food Truck Spots <span class="ticker-sep">&bull;</span></span>
+    <span class="ticker-item">Event Staff <span class="ticker-sep">&bull;</span></span>
+    <span class="ticker-item">Creative Gigs <span class="ticker-sep">&bull;</span></span>
+    <span class="ticker-item">United by Events <span class="ticker-sep">&bull;</span></span>
+    <span class="ticker-item">Columbus, Ohio <span class="ticker-sep">&bull;</span></span>
+    <span class="ticker-item">Collab Board <span class="ticker-sep">&bull;</span></span>
+    <span class="ticker-item">Vendor Tables <span class="ticker-sep">&bull;</span></span>
+    <span class="ticker-item">Food Truck Spots <span class="ticker-sep">&bull;</span></span>
+    <span class="ticker-item">Event Staff <span class="ticker-sep">&bull;</span></span>
+    <span class="ticker-item">Creative Gigs <span class="ticker-sep">&bull;</span></span>
+    <span class="ticker-item">United by Events <span class="ticker-sep">&bull;</span></span>
+    <span class="ticker-item">Columbus, Ohio <span class="ticker-sep">&bull;</span></span>
+  </div>
+</div>
+
+<!-- FILTER BAR -->
+<div class="filter-bar">
+  <div class="filter-bar-inner">
+    <span class="filter-label">Filter</span>
+    <div class="filter-chips" id="filter-chips">
+      <button class="chip active" onclick="setFilter('all',this)">All</button>
+      <button class="chip" onclick="setFilter('Food Vendor',this)">Food Vendor</button>
+      <button class="chip" onclick="setFilter('Food Truck',this)">Food Truck</button>
+      <button class="chip" onclick="setFilter('Artisan / Craft',this)">Artisan</button>
+      <button class="chip" onclick="setFilter('Apparel / Merchandise',this)">Apparel</button>
+      <button class="chip" onclick="setFilter('Beauty / Wellness',this)">Beauty</button>
+      <button class="chip" onclick="setFilter('Pop-up Retail',this)">Pop-up Retail</button>
+      <button class="chip" onclick="setFilter('Art / Photography',this)">Art</button>
+      <button class="chip" onclick="setFilter('Other',this)">Other</button>
+    </div>
+    <div class="filter-search">
+      <span class="search-icon">&#128269;</span>
+      <input type="text" id="search-input" placeholder="Search listings..." oninput="handleSearch(this.value)">
+    </div>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+  <div class="listings-col">
+    <div class="section-rule">
+      <span class="section-rule-label">Open Listings</span>
+      <span class="section-rule-line"></span>
+      <div class="live-badge"><div class="live-dot"></div><span class="live-text">Live</span></div>
+    </div>
+    <div id="listings-wrap"><div class="spinner"></div></div>
+  </div>
+
+  <aside class="sidebar">
+
+    <!-- HOW IT WORKS -->
+    <div class="sidebar-card">
+      <div class="sidebar-title">How It Works</div>
+      <div class="how-steps">
+        <div class="how-step">
+          <div class="how-step-num">1</div>
+          <div>
+            <div class="how-step-title">Browse open spots</div>
+            <div class="how-step-desc">Planners post vendor tables, food truck spots, and event gigs here as they build Columbus events.</div>
+          </div>
+        </div>
+        <div class="how-step">
+          <div class="how-step-num">2</div>
+          <div>
+            <div class="how-step-title">Apply through CBUSEVENTS</div>
+            <div class="how-step-desc">Create a free vendor profile and submit your application directly to the planner.</div>
+          </div>
+        </div>
+        <div class="how-step">
+          <div class="how-step-num">3</div>
+          <div>
+            <div class="how-step-title">Get approved and pay</div>
+            <div class="how-step-desc">Planner reviews and approves. You receive a secure payment link to confirm your spot.</div>
+          </div>
+        </div>
+        <div class="how-step">
+          <div class="how-step-num">4</div>
+          <div>
+            <div class="how-step-title">Show up and sell</div>
+            <div class="how-step-desc">Your spot is confirmed. Show up, set up, and keep everything you make minus the spot fee.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- UPCOMING EVENTS WITH OPEN SPOTS -->
+    <div class="sidebar-card">
+      <div class="sidebar-title">Events with Open Spots</div>
+      <div class="upcoming-list" id="upcoming-list">
+        <div class="spinner" style="margin:20px auto"></div>
+      </div>
+    </div>
+
+    <!-- POST CTA -->
+    <div class="post-cta-card">
+      <div class="post-cta-label">For Event Planners</div>
+      <div class="post-cta-title">Need vendors for your event? Post spots here for free.</div>
+      <a href="https://cbusevents.com/cbus-planner-portal.html" class="post-cta-btn">Post Vendor Spots</a>
+      <div class="post-cta-note">Planners only &bull; Free to post</div>
+    </div>
+
+  </aside>
+</div>
+
+<!-- APPLY MODAL -->
+<div class="modal-overlay" id="modal-overlay">
+  <div class="modal" id="modal">
+    <div class="modal-head">
+      <div class="modal-title">Apply for This Spot</div>
+      <button class="modal-close" onclick="closeModal()">&#215;</button>
+    </div>
+    <div class="modal-body" id="modal-body"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const {createClient}=supabase;
+const SB_URL='https://toblgvatvsjljbqogzsv.supabase.co';
+const SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRvYmxndmF0dnNqbGpicW9nenN2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMDgwNTAsImV4cCI6MjA4NzY4NDA1MH0._WJEQPizNDiQfDXQB_DHPaQhixPGpMdmYQSmyWmm_FQ';
+const db=createClient(SB_URL,SB_KEY);
+
+let allListings=[],activeFilter='all',searchQuery='';
+
+async function init(){
+  const t=document.getElementById('ticker');
+  if(t)t.innerHTML+=t.innerHTML;
+
+  await loadListings();
+
+  // Scroll reveal
+  const obs=new IntersectionObserver(entries=>{
+    entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('in');});
+  },{threshold:.07,rootMargin:'0px 0px -20px 0px'});
+  document.querySelectorAll('.reveal').forEach(el=>obs.observe(el));
+}
+
+async function loadListings(){
+  const{data:listings,error}=await db
+    .from('vendor_table_listings')
+    .select('*, vendor_table_applications(id,status)')
+    .eq('is_active',true)
+    .gte('event_date',new Date().toISOString().split('T')[0])
+    .order('event_date',{ascending:true});
+
+  if(error){
+    document.getElementById('listings-wrap').innerHTML=`<div class="empty-state"><div class="empty-icon">&#9888;</div><div class="empty-title">Could not load listings</div><div class="empty-sub">Try refreshing the page.</div></div>`;
+    return;
+  }
+
+  allListings=listings||[];
+
+  // Update stats
+  const totalSpots=allListings.reduce((s,l)=>s+l.spots_remaining,0);
+  const uniqueEvents=new Set(allListings.map(l=>l.event_name)).size;
+  document.getElementById('stat-listings').textContent=allListings.length;
+  document.getElementById('stat-spots').textContent=totalSpots;
+  document.getElementById('stat-events').textContent=uniqueEvents;
+
+  renderListings();
+  renderUpcoming();
+}
+
+function renderListings(){
+  const wrap=document.getElementById('listings-wrap');
+  let filtered=allListings;
+
+  if(activeFilter!=='all'){
+    filtered=filtered.filter(l=>l.vendor_types_wanted?.includes(activeFilter));
+  }
+  if(searchQuery){
+    const q=searchQuery.toLowerCase();
+    filtered=filtered.filter(l=>
+      l.event_name?.toLowerCase().includes(q)||
+      l.event_location?.toLowerCase().includes(q)||
+      l.requirements?.toLowerCase().includes(q)||
+      l.vendor_types_wanted?.some(t=>t.toLowerCase().includes(q))
+    );
+  }
+
+  if(!filtered.length){
+    wrap.innerHTML=`
+    <div class="empty-state">
+      <div class="empty-icon">&#128203;</div>
+      <div class="empty-title">${allListings.length?'No listings match your filter':'No open listings right now'}</div>
+      <div class="empty-sub">${allListings.length?'Try a different filter or clear your search.':'Columbus event planners post vendor spots here as they build their events. Check back soon.'}</div>
+    </div>`;
+    return;
+  }
+
+  wrap.innerHTML=filtered.map(l=>listingCard(l)).join('');
+
+  // Attach scroll reveal
+  const obs=new IntersectionObserver(entries=>{
+    entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('in');});
+  },{threshold:.07,rootMargin:'0px 0px -20px 0px'});
+  document.querySelectorAll('.reveal').forEach(el=>{if(!el.classList.contains('in'))obs.observe(el);});
+}
+
+function listingCard(l){
+  const apps=l.vendor_table_applications||[];
+  const spotsLeft=l.spots_remaining;
+  const isFull=spotsLeft<=0;
+  const eventDate=l.event_date?new Date(l.event_date).toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric',year:'numeric'}):'TBD';
+  const deadline=l.deadline?new Date(l.deadline).toLocaleDateString('en-US',{month:'short',day:'numeric'}):'Open until filled';
+  const daysUntil=l.event_date?Math.ceil((new Date(l.event_date)-new Date())/(1000*60*60*24)):null;
+  const urgent=daysUntil!==null&&daysUntil<=14&&!isFull;
+
+  const applyBtn=isFull
+    ?`<button class="listing-apply-btn full">Spots Full</button>`
+    :`<button class="listing-apply-btn" onclick="openApply('${l.id}')">Apply Now &#8594;</button>`;
+
+  return `
+  <div class="listing-card ${urgent?'urgent':''} reveal">
+    ${urgent?`<div class="listing-urgency">&#9650; ${daysUntil} days away &mdash; apply soon</div>`:''}
+    <div class="listing-body">
+      <div class="listing-top">
+        <div class="listing-main">
+          <div class="listing-title">${l.event_name}</div>
+          <div class="listing-meta">
+            <span>&#128197; ${eventDate}</span>
+            <span>&#128205; ${l.event_location}</span>
+            <span>&#9203; Apply by ${deadline}</span>
+          </div>
+        </div>
+        <div class="listing-right">
+          <div class="listing-fee">$${parseFloat(l.spot_fee).toFixed(0)}</div>
+          <div class="listing-fee-label">Spot Fee</div>
+          <div class="listing-spots">${isFull?'Full':spotsLeft+' spot'+(spotsLeft!==1?'s':'')+' left'}</div>
+        </div>
+      </div>
+      ${l.vendor_types_wanted?.length?`<div class="listing-tags">${l.vendor_types_wanted.map(t=>`<span class="listing-tag">${t}</span>`).join('')}</div>`:''}
+      ${l.requirements?`<div class="listing-desc">${l.requirements}</div>`:''}
+      <div class="listing-footer">
+        <div class="listing-applicants">${apps.length} applicant${apps.length!==1?'s':''}</div>
+        ${applyBtn}
+      </div>
+    </div>
+  </div>`;
+}
+
+function renderUpcoming(){
+  const el=document.getElementById('upcoming-list');
+  const unique={};
+  allListings.forEach(l=>{
+    if(!unique[l.event_name]){unique[l.event_name]=l;}
+  });
+  const events=Object.values(unique).slice(0,5);
+  if(!events.length){el.innerHTML=`<div style="text-align:center;padding:20px;color:var(--mist);font-size:13px">No upcoming events with open spots.</div>`;return;}
+  el.innerHTML=events.map(l=>{
+    const d=l.event_date?new Date(l.event_date):null;
+    const month=d?d.toLocaleDateString('en-US',{month:'short'}).toUpperCase():'';
+    const day=d?d.getDate():'?';
+    const spotsLeft=allListings.filter(x=>x.event_name===l.event_name).reduce((s,x)=>s+x.spots_remaining,0);
+    return`<div class="upcoming-item" onclick="filterByEvent('${l.event_name}')">
+      <div class="upcoming-date">
+        <div class="upcoming-month">${month}</div>
+        <div class="upcoming-day">${day}</div>
+      </div>
+      <div class="upcoming-info">
+        <div class="upcoming-name">${l.event_name}</div>
+        <div class="upcoming-venue">${l.event_location}</div>
+        <div class="upcoming-spots">${spotsLeft} spot${spotsLeft!==1?'s':''} open</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function filterByEvent(name){
+  document.getElementById('search-input').value=name;
+  handleSearch(name);
+  window.scrollTo({top:300,behavior:'smooth'});
+}
+
+function setFilter(val,el){
+  activeFilter=val;
+  document.querySelectorAll('.chip').forEach(c=>c.classList.remove('active'));
+  el.classList.add('active');
+  renderListings();
+}
+
+function handleSearch(val){
+  searchQuery=val;
+  renderListings();
+}
+
+function openApply(listingId){
+  const l=allListings.find(x=>x.id===listingId);
+  if(!l)return;
+  const eventDate=l.event_date?new Date(l.event_date).toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'}):'TBD';
+  document.getElementById('modal-body').innerHTML=`
+    <div class="modal-listing-preview">
+      <div class="mlp-name">${l.event_name}</div>
+      <div class="mlp-meta">
+        <span>${eventDate}</span>
+        <span>${l.event_location}</span>
+        <span>$${parseFloat(l.spot_fee).toFixed(2)} spot fee</span>
+        <span>${l.spots_remaining} spot${l.spots_remaining!==1?'s':''} left</span>
+      </div>
+    </div>
+    <div class="modal-info-box">
+      <div class="modal-info-label">Before you apply</div>
+      <div class="modal-info-text">You need a CBUSEVENTS vendor account to apply. If approved, you will receive a secure payment link to confirm your spot. Spot fees are processed through CBUSEVENTS and are non-refundable once paid.</div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Business Name *</label>
+      <input class="form-input" id="apply-biz" placeholder="Your business name" type="text">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Email Address *</label>
+      <input class="form-input" id="apply-email" placeholder="you@email.com" type="email">
+    </div>
+    <div class="form-group">
+      <label class="form-label">What do you sell? *</label>
+      <input class="form-input" id="apply-type" placeholder="e.g. Handmade candles, jerk chicken, vintage clothing..." type="text">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Message to Planner <span style="color:var(--mist);font-weight:300">(optional)</span></label>
+      <textarea class="form-input form-textarea" id="apply-msg" placeholder="Tell the planner about your setup, past events, social media, etc."></textarea>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-ghost" onclick="closeModal()">Cancel</button>
+      <button class="btn-primary" id="apply-submit-btn" onclick="submitPublicApply('${listingId}')">Submit Application</button>
+    </div>`;
+  document.getElementById('modal-overlay').classList.add('open');
+}
+
+async function submitPublicApply(listingId){
+  const biz=document.getElementById('apply-biz').value.trim();
+  const email=document.getElementById('apply-email').value.trim();
+  const type=document.getElementById('apply-type').value.trim();
+  const msg=document.getElementById('apply-msg').value.trim();
+  if(!biz)return toast('Business name required','error');
+  if(!email||!email.includes('@'))return toast('Valid email required','error');
+  if(!type)return toast('Tell us what you sell','error');
+
+  const btn=document.getElementById('apply-submit-btn');
+  btn.disabled=true;btn.textContent='Submitting...';
+
+  // Check if vendor exists with this email
+  const{data:vendor}=await db.from('vendors').select('id').eq('email',email).maybeSingle();
+
+  if(!vendor){
+    // No account - redirect to signup
+    btn.disabled=false;btn.textContent='Submit Application';
+    closeModal();
+    toast('Create a free vendor account to apply for spots','error');
+    setTimeout(()=>{window.location.href=`https://cbusevents.com/signup.html?role=vendor&redirect=collab-board.html&listing=${listingId}`;},1800);
+    return;
+  }
+
+  const listing=allListings.find(l=>l.id===listingId);
+  const{error}=await db.from('vendor_table_applications').insert({
+    listing_id:listingId,
+    vendor_id:vendor.id,
+    planner_id:listing?.planner_id||null,
+    message:`What I sell: ${type}${msg?'\n\n'+msg:''}`,
+    status:'pending',
+  });
+
+  if(error){
+    btn.disabled=false;btn.textContent='Submit Application';
+    if(error.code==='23505')toast('You have already applied for this listing','error');
+    else toast('Error submitting. Try again.','error');
+    return;
+  }
+
+  closeModal();
+  toast('Application submitted! The planner will review and reach out.','success');
+  await loadListings();
+}
+
+function closeModal(){document.getElementById('modal-overlay').classList.remove('open');}
+document.getElementById('modal-overlay').addEventListener('click',e=>{if(e.target===document.getElementById('modal-overlay'))closeModal();});
+function toast(msg,type=''){const t=document.getElementById('toast');t.textContent=msg;t.className=`toast ${type} show`;setTimeout(()=>t.classList.remove('show'),2800);}
+
+
+/* ── THEME ──────────────────────────────────────────────────── */
+function toggleTheme(){
+  const current=document.documentElement.getAttribute('data-theme');
+  const next=current==='dark'?'light':'dark';
+  document.documentElement.setAttribute('data-theme',next);
+  localStorage.setItem('cbus-theme',next);
+}
+
+function initTheme(){
+  const saved=localStorage.getItem('cbus-theme');
+  const prefersDark=window.matchMedia('(prefers-color-scheme: dark)').matches;
+  const theme=saved||(prefersDark?'dark':'light');
+  if(theme==='dark')document.documentElement.setAttribute('data-theme','dark');
+}
+
+initTheme();
+
+init();
+</script>
+</body>
+</html>

@@ -1,0 +1,206 @@
+/* ============================================================
+   CBUSEVENTS THEME SYSTEM
+   theme.css — loaded on every page
+   ============================================================ */
+
+/* Dark mode variable overrides */
+[data-theme="dark"] {
+  --bg: #0d0d0f;
+  --white: #141418;
+  --cream: #111115;
+  --ink: #f0ece4;
+  --ash: #b8b0a4;
+  --sub: #8a8278;
+  --mist: #5a5450;
+  --rule: #2a2824;
+  --orange: #FF6B35;
+  --orange-light: rgba(255,107,53,0.1);
+  --orange-mid: rgba(255,107,53,0.25);
+  --green: #22c55e;
+  --green-bg: rgba(34,197,94,0.1);
+  --green-border: rgba(34,197,94,0.25);
+  --shadow-sm: 0 1px 4px rgba(0,0,0,.3), 0 1px 2px rgba(0,0,0,.2);
+  --shadow-md: 0 4px 20px rgba(0,0,0,.4), 0 2px 8px rgba(0,0,0,.2);
+  --shadow-lg: 0 16px 48px rgba(0,0,0,.5), 0 4px 16px rgba(0,0,0,.3);
+
+  /* Portal-specific dark mode overrides (already dark portals go light) */
+  --surface: #1a1a20;
+  --card: #1e1e24;
+  --border: #2a2824;
+  --border-sub: #222228;
+  --text: #f0ece4;
+  --muted: #5a5450;
+}
+
+/* Light mode for pages that are natively dark (portals) */
+[data-theme="light"][data-default="dark"] {
+  --bg: #f9f6f1;
+  --white: #ffffff;
+  --cream: #faf7f2;
+  --ink: #141210;
+  --ash: #3a3530;
+  --sub: #6b6560;
+  --mist: #a09890;
+  --rule: #e8e0d4;
+  --surface: #f5f0ea;
+  --card: #ffffff;
+  --border: #e8e0d4;
+  --border-sub: #f0e8dc;
+  --text: #141210;
+  --muted: #a09890;
+}
+
+/* Smooth transitions on theme switch */
+html {
+  transition: background-color .25s ease, color .2s ease;
+}
+
+body {
+  transition: background-color .25s ease, color .2s ease;
+}
+
+/* Avoid transition on things that would look weird */
+img, video, canvas, svg {
+  transition: none !important;
+}
+
+/* Theme toggle button — works on any page */
+.theme-toggle {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1.5px solid var(--rule, #e8e0d4);
+  background: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 16px;
+  flex-shrink: 0;
+  color: var(--ash, #3a3530);
+  transition: border-color .15s, color .15s, background .15s !important;
+  padding: 0;
+  line-height: 1;
+}
+
+.theme-toggle:hover {
+  border-color: #FF6B35;
+  color: #FF6B35;
+}
+
+/* Icon visibility */
+.theme-icon-sun { display: none; }
+.theme-icon-moon { display: block; }
+
+[data-theme="dark"] .theme-icon-sun { display: block; }
+[data-theme="dark"] .theme-icon-moon { display: none; }
+
+/* For pages defaulting to dark, flip icon logic */
+[data-default="dark"] .theme-icon-sun { display: block; }
+[data-default="dark"] .theme-icon-moon { display: none; }
+[data-default="dark"][data-theme="light"] .theme-icon-sun { display: none; }
+[data-default="dark"][data-theme="light"] .theme-icon-moon { display: block; }
+
+/* Dark mode card/surface overrides for light pages */
+[data-theme="dark"] .card,
+[data-theme="dark"] .sidebar-card,
+[data-theme="dark"] .lk-card,
+[data-theme="dark"] .listing-card,
+[data-theme="dark"] .product-card,
+[data-theme="dark"] .review-card,
+[data-theme="dark"] .bio-card,
+[data-theme="dark"] .about-card,
+[data-theme="dark"] .modal,
+[data-theme="dark"] .sheet {
+  background: var(--white) !important;
+  border-color: var(--rule) !important;
+}
+
+[data-theme="dark"] nav,
+[data-theme="dark"] .top-nav,
+[data-theme="dark"] .profile-bar,
+[data-theme="dark"] .filter-bar {
+  background: rgba(13,13,15,.96) !important;
+  border-bottom-color: var(--rule) !important;
+}
+
+[data-theme="dark"] input,
+[data-theme="dark"] textarea,
+[data-theme="dark"] select,
+[data-theme="dark"] .form-input,
+[data-theme="dark"] .form-select,
+[data-theme="dark"] .form-textarea {
+  background: var(--cream) !important;
+  border-color: var(--rule) !important;
+  color: var(--ink) !important;
+}
+
+[data-theme="dark"] .hero,
+[data-theme="dark"] .hero-datebar {
+  background: var(--cream) !important;
+  border-color: var(--rule) !important;
+}
+
+[data-theme="dark"] .ticker {
+  background: #050507 !important;
+}
+
+[data-theme="dark"] .filter-bar,
+[data-theme="dark"] .events-strip,
+[data-theme="dark"] .profile-bar {
+  background: var(--white) !important;
+}
+
+[data-theme="dark"] .event-strip-card,
+[data-theme="dark"] .scene-card,
+[data-theme="dark"] .sc {
+  background: var(--white) !important;
+}
+
+[data-theme="dark"] .scene-card:hover,
+[data-theme="dark"] .event-strip-card:hover,
+[data-theme="dark"] .sc:hover {
+  background: var(--orange-light) !important;
+}
+
+[data-theme="dark"] .hero-featured-event {
+  background: #FF6B35 !important;
+}
+
+[data-theme="dark"] .sidebar-card,
+[data-theme="dark"] .order-sidebar .sidebar-card {
+  background: var(--white) !important;
+  border-color: var(--rule) !important;
+}
+
+[data-theme="dark"] .totals,
+[data-theme="dark"] .modal-listing-preview,
+[data-theme="dark"] .modal-info-box {
+  background: var(--cream) !important;
+}
+
+[data-theme="dark"] .lk-bg,
+[data-theme="dark"] .feed-section {
+  background: #0a0a0c !important;
+}
+
+[data-theme="dark"] .lk-card {
+  background: #141418 !important;
+  border-color: #2a2824 !important;
+}
+
+[data-theme="dark"] .community-join-strip,
+[data-theme="dark"] .sidebar-card {
+  background: var(--white) !important;
+  border-color: var(--rule) !important;
+}
+
+/* Digest section in dark */
+[data-theme="dark"] .digest-section {
+  background: var(--cream) !important;
+}
+
+/* Footer stays dark always */
+footer {
+  transition: none !important;
+}
