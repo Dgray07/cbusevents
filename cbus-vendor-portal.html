@@ -1,7 +1,10 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-default="dark">
 <head>
 <meta charset="UTF-8">
+  <link rel="stylesheet" href="/theme.css">
+  <script src="/theme.js"></script>
+
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Vendor Portal — CBUSEVENTS</title>
 <meta name="theme-color" content="#080810">
@@ -312,7 +315,7 @@ label{display:block;font-family:var(--mono);font-size:10px;font-weight:700;lette
 <div class="main" id="main-content">
   <div class="topbar">
     <div class="topbar-title" id="topbarTitle">Dashboard</div>
-    <div class="topbar-right">
+    <div class="topbar-right"><button class="theme-toggle" onclick="CBUSTheme.toggle()" title="Toggle dark mode" aria-label="Toggle dark mode"><span class="theme-icon-moon">&#9790;</span><span class="theme-icon-sun">&#9728;</span></button> 
       <button class="btn btn-ghost btn-sm" onclick="window.open('https://cbusevents.com','_blank')">View Site</button>
       <button class="nav-item" id="nav-plan" onclick="showPage('plan')" style="margin:0;width:auto;padding:7px 14px;border-radius:var(--r-md)">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>

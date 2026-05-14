@@ -2,6 +2,9 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+  <link rel="stylesheet" href="/theme.css">
+  <script src="/theme.js"></script>
+
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Marketplace — CBUSEVENTS</title>
 <meta name="description" content="Shop local Columbus event vendors. Products, services, and digital goods from Columbus's best event professionals.">
@@ -236,7 +239,7 @@ nav.site-nav{display:flex;align-items:center;justify-content:space-between;paddi
     <a href="https://cbusevents.com/venues.html" class="nav-link">Venues</a>
     <a href="https://cbusevents.com/vendors.html" class="nav-link">Vendors</a>
     <a href="https://cbusevents.com/marketplace.html" class="nav-link active">Marketplace</a></div>
-  <div class="nav-right"><a href="https://cbusevents.com/cbus-vendor-portal.html" class="nav-btn-ghost">Vendor Portal</a>
+  <div class="nav-right"><button class="theme-toggle" onclick="CBUSTheme.toggle()" title="Toggle dark mode" aria-label="Toggle dark mode"><span class="theme-icon-moon">&#9790;</span><span class="theme-icon-sun">&#9728;</span></button> <a href="https://cbusevents.com/cbus-vendor-portal.html" class="nav-btn-ghost">Vendor Portal</a>
     <a href="https://cbusevents.com/signup.html?role=vendor" class="nav-btn-primary">List Your Products</a></div>
   <button class="nav-hamburger" id="siteNavHamburger" aria-label="Menu"><span></span><span></span><span></span></button>
 </nav>

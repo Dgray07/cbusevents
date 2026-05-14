@@ -2,6 +2,9 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+  <link rel="stylesheet" href="/theme.css">
+  <script src="/theme.js"></script>
+
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>Feature Your Spot | CBUSEVENTS</title>
 <meta name="description" content="Get your Columbus restaurant, bar or late-night spot featured in the CBUSEVENTS customer portal. $50 a month. Cancel any time.">
@@ -111,7 +114,7 @@ footer{background:var(--surface);border-top:1px solid var(--border);padding:24px
 
 <nav>
   <a href="https://cbusevents.com" class="logo">CBUS<span>EVENTS</span></a>
-  <div class="nav-right">
+  <div class="nav-right"><button class="theme-toggle" onclick="CBUSTheme.toggle()" title="Toggle dark mode" aria-label="Toggle dark mode"><span class="theme-icon-moon">&#9790;</span><span class="theme-icon-sun">&#9728;</span></button> 
     <a href="https://cbusevents.com" class="nav-link">Back to CBUSEVENTS</a>
   </div>
 </nav>

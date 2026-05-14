@@ -2,6 +2,9 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+  <link rel="stylesheet" href="/theme.css">
+  <script src="/theme.js"></script>
+
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Vendor | CBUSEVENTS</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -212,7 +215,7 @@ a{text-decoration:none;color:inherit}
 
   <nav class="top-nav">
     <a href="https://cbusevents.com" class="nav-brand">CBUS<strong>EVENTS</strong></a>
-    <div class="nav-actions">
+    <div class="nav-actions"><button class="theme-toggle" onclick="CBUSTheme.toggle()" title="Toggle dark mode" aria-label="Toggle dark mode"><span class="theme-icon-moon">&#9790;</span><span class="theme-icon-sun">&#9728;</span></button> 
       <button class="nav-share-btn" onclick="shareStore()" title="Share">&#8679;</button>
       <button class="nav-cart-btn" onclick="openSheet()">Cart <span class="nav-cart-count" id="nav-cart-count">0</span></button>
     </div>

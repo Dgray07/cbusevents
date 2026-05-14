@@ -1,6 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-default="dark">
 <head>
+  <link rel="stylesheet" href="/theme.css">
+  <script src="/theme.js"></script>
+
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>1313 Festival Admin | CBUS Events</title>
@@ -731,7 +734,7 @@
       <div class="nav-sep">|</div>
       <div class="nav-title">1313 Festival Admin</div>
     </div>
-    <div class="nav-right">
+    <div class="nav-right"><button class="theme-toggle" onclick="CBUSTheme.toggle()" title="Toggle dark mode" aria-label="Toggle dark mode"><span class="theme-icon-moon">&#9790;</span><span class="theme-icon-sun">&#9728;</span></button> 
       <div class="nav-pill pill-event">📅 June 13, 2026</div>
       <div class="nav-pill pill-date" id="liveTime"></div>
       <button class="refresh-btn" onclick="refreshAll()">↺ Refresh</button>

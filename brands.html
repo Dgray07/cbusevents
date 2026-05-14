@@ -2,6 +2,9 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+  <link rel="stylesheet" href="/theme.css">
+  <script src="/theme.js"></script>
+
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>Brand Partners | CBUSEVENTS</title>
 <meta name="description" content="Reach Columbus's most engaged event audience through creators they already trust. Create your brand profile free.">
@@ -149,7 +152,7 @@ footer{background:var(--surface);border-top:1px solid var(--border-sub);padding:
     <a href="https://cbusevents.com/creators.html" class="nav-link">For creators</a>
     <a href="https://cbusevents.com/1313-festival-event.html" class="nav-link">1313 Festival</a>
   </div>
-  <div class="nav-right">
+  <div class="nav-right"><button class="theme-toggle" onclick="CBUSTheme.toggle()" title="Toggle dark mode" aria-label="Toggle dark mode"><span class="theme-icon-moon">&#9790;</span><span class="theme-icon-sun">&#9728;</span></button> 
     <a href="https://cbusevents.com/brand-portal.html" class="btn-signin">Sign in &rarr;</a>
     <button class="btn-start" onclick="document.getElementById('signupForm').scrollIntoView({behavior:'smooth'})">Get started free</button>
   </div>

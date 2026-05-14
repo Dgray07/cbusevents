@@ -2,6 +2,9 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+  <link rel="stylesheet" href="/theme.css">
+  <script src="/theme.js"></script>
+
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Collab Board | CBUSEVENTS</title>
 <meta name="description" content="Open vendor spots, gigs, and event opportunities in Columbus. Posted by local event planners. Apply through CBUSEVENTS.">
@@ -262,7 +265,7 @@ nav{position:sticky;top:0;z-index:100;background:rgba(250,247,242,.96);backdrop-
       <li><a href="collab-board.html" class="active">Collab Board</a></li>
       <li><a href="https://cbusevents.com/venues.html">Venues</a></li>
     </ul>
-    <div class="nav-right">
+    <div class="nav-right"><button class="theme-toggle" onclick="CBUSTheme.toggle()" title="Toggle dark mode" aria-label="Toggle dark mode"><span class="theme-icon-moon">&#9790;</span><span class="theme-icon-sun">&#9728;</span></button> 
       <button class="theme-toggle" onclick="toggleTheme()" title="Toggle dark mode" aria-label="Toggle dark mode">
         <span class="icon-moon">&#9790;</span>
         <span class="icon-sun">&#9728;</span>

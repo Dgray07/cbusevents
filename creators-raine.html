@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+  <link rel="stylesheet" href="/theme.css">
+  <script src="/theme.js"></script>
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Raine Whicker - Columbus Creator | CBUSEVENTS</title>
+<meta name="description" content="Raine Whicker is a Columbus food finder and community voice on CBUSEVENTS. Follow her picks, RSVP to events she recommends, and work with her as a brand partner.">
+<meta property="og:title" content="Raine Whicker - Columbus Creator | CBUSEVENTS">
+<meta property="og:description" content="Columbus food finder, nightlife navigator and the reason your weekend plans actually happen.">
+<meta property="og:url" content="https://cbusevents.com/creators/raine">
+<meta property="og:type" content="profile">
+<link rel="canonical" href="https://cbusevents.com/creators/raine">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700;800;900&family=DM+Mono:wght@400;500&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --bg:#080810;--surface:#0f0f1a;--card:#141420;--border:#1e1e2e;--border-sub:rgba(255,255,255,0.07);
+  --text:#f0f0fa;--sub:#7070a0;--muted:#40405a;
+  --orange:#FF6B35;--orange-dim:rgba(255,107,53,0.1);--orange-border:rgba(255,107,53,0.25);
+  --purple:#b46bff;--purple-dim:rgba(180,107,255,0.1);--purple-border:rgba(180,107,255,0.25);
+  --green:#34d399;--green-dim:rgba(52,211,153,0.1);
+  --blue:#6bc8ff;--blue-dim:rgba(107,200,255,0.1);
+  --font:'DM Sans',sans-serif;--mono:'DM Mono',monospace;--display:'Playfair Display',serif;
+  --r-sm:8px;--r-md:10px;--r-lg:14px;
+}
+body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:15px;line-height:1.65;}
+a{color:inherit;text-decoration:none;}
+
+/* NAV */
+nav{background:rgba(8,8,16,0.95);border-bottom:1px solid var(--border-sub);padding:0 32px;display:flex;align-items:center;justify-content:space-between;height:56px;position:sticky;top:0;z-index:100;backdrop-filter:blur(20px);}
+.nav-logo{font-family:var(--display);font-size:18px;font-weight:900;letter-spacing:-0.5px;color:var(--text);}
+.nav-logo span{color:var(--orange);}
+.nav-center{font-family:var(--mono);font-size:10px;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase;}
+.nav-right{display:flex;align-items:center;gap:10px;}
+.nav-back{font-family:var(--mono);font-size:10px;color:var(--sub);letter-spacing:1px;display:flex;align-items:center;gap:5px;}
+.nav-back:hover{color:var(--text);}
+.nav-cta{background:var(--orange);color:#fff;padding:7px 16px;border-radius:var(--r-sm);font-size:12px;font-weight:700;cursor:pointer;}
+
+/* HERO BAND */
+.hero-band{background:var(--surface);border-bottom:1px solid var(--border-sub);}
+.hero-inner{max-width:1200px;margin:0 auto;padding:36px 32px 0;}
+.creator-top{display:grid;grid-template-columns:auto 1fr auto;gap:24px;align-items:flex-start;margin-bottom:32px;}
+
+/* AVATAR */
+.avatar-wrap{position:relative;flex-shrink:0;}
+.avatar{width:84px;height:84px;border-radius:50%;background:#1a0d2e;border:2px solid var(--purple-border);overflow:hidden;display:flex;align-items:center;justify-content:center;}
+.avatar-initials{font-family:var(--display);font-size:30px;font-weight:900;color:var(--purple);}
+.verified-mark{position:absolute;bottom:2px;right:2px;width:22px;height:22px;border-radius:50%;background:var(--orange);border:2px solid var(--surface);display:flex;align-items:center;justify-content:center;}
+.verified-mark svg{width:11px;height:11px;stroke:#fff;fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round;}
+
+/* CREATOR INFO */
+.creator-badges{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px;}
+.badge{font-family:var(--mono);font-size:9px;letter-spacing:1.2px;text-transform:uppercase;padding:3px 10px;border-radius:20px;}
+.badge-founder{background:var(--orange-dim);color:var(--orange);border:1px solid var(--orange-border);}
+.badge-voice{background:var(--green-dim);color:var(--green);border:1px solid rgba(52,211,153,0.25);}
+.badge-city{background:var(--blue-dim);color:var(--blue);border:1px solid rgba(107,200,255,0.2);}
+.creator-name{font-family:var(--display);font-size:28px;font-weight:900;line-height:1.08;margin-bottom:4px;}
+.creator-url{font-family:var(--mono);font-size:11px;color:var(--orange);letter-spacing:1px;display:flex;align-items:center;gap:5px;margin-bottom:8px;cursor:pointer;}
+.creator-bio{font-size:13px;color:var(--sub);line-height:1.7;max-width:500px;}
+
+/* ACTION COL */
+.action-col{display:flex;flex-direction:column;gap:8px;align-items:flex-end;}
+.btn-work{background:var(--orange);color:#fff;padding:10px 22px;border-radius:var(--r-sm);font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;border:none;display:block;text-align:center;}
+.btn-work:hover{opacity:0.88;}
+.btn-follow{background:transparent;color:var(--text);padding:9px 22px;border-radius:var(--r-sm);font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;border:1px solid var(--border-sub);display:block;text-align:center;}
+.btn-follow:hover{border-color:var(--orange-border);}
+.share-btns{display:flex;gap:6px;}
+.share-btn{background:var(--card);border:1px solid var(--border-sub);border-radius:var(--r-sm);padding:7px 11px;font-family:var(--mono);font-size:9px;color:var(--sub);cursor:pointer;display:flex;align-items:center;gap:5px;letter-spacing:0.5px;}
+.share-btn:hover{border-color:var(--orange-border);color:var(--orange);}
+
+/* STATS ROW */
+.stats-row{display:flex;border-top:1px solid var(--border-sub);}
+.stat{flex:1;padding:16px 20px;border-right:1px solid var(--border-sub);text-align:center;}
+.stat:last-child{border-right:none;}
+.stat-num{font-family:var(--mono);font-size:19px;font-weight:500;color:var(--orange);line-height:1;}
+.stat-label{font-family:var(--mono);font-size:9px;color:var(--muted);letter-spacing:1.2px;text-transform:uppercase;margin-top:3px;}
+
+/* PAGE BODY */
+.page-body{max-width:1200px;margin:0 auto;display:grid;grid-template-columns:1fr 300px;gap:0;}
+.main-col{border-right:1px solid var(--border-sub);padding:28px 32px;}
+.side-col{padding:0;}
+
+/* SECTION */
+.section-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;}
+.section-eyebrow{font-family:var(--mono);font-size:10px;color:var(--orange);letter-spacing:2px;text-transform:uppercase;}
+.section-link{font-family:var(--mono);font-size:9px;color:var(--sub);letter-spacing:1px;cursor:pointer;}
+.section-link:hover{color:var(--orange);}
+
+/* SHARE BLOCK */
+.share-block{background:var(--orange-dim);border:1px solid var(--orange-border);border-radius:var(--r-lg);padding:18px 20px;margin-bottom:18px;}
+.share-block-title{font-size:13px;font-weight:700;margin-bottom:4px;}
+.share-block-sub{font-size:11px;color:var(--sub);line-height:1.55;margin-bottom:12px;}
+.share-link-row{display:flex;gap:6px;}
+.share-link-input{flex:1;background:var(--surface);border:1px solid var(--border-sub);border-radius:var(--r-sm);padding:8px 10px;font-family:var(--mono);font-size:10px;color:var(--orange);letter-spacing:0.5px;cursor:pointer;}
+.copy-btn{background:var(--orange);color:#fff;padding:8px 14px;border-radius:var(--r-sm);font-family:var(--mono);font-size:10px;cursor:pointer;border:none;white-space:nowrap;font-weight:600;transition:opacity 0.15s;}
+.copy-btn:hover{opacity:0.88;}
+
+/* FACEBOOK POST CARDS */
+.fb-feed{display:flex;flex-direction:column;gap:10px;}
+.fb-card{background:var(--card);border:1px solid var(--border-sub);border-radius:var(--r-lg);overflow:hidden;transition:border-color 0.15s;}
+.fb-card:hover{border-color:var(--orange-border);}
+.fb-card.featured{border-color:var(--orange-border);}
+.fb-card-head{padding:12px 16px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--border-sub);}
+.fb-av{width:36px;height:36px;border-radius:50%;background:#1a0d2e;display:flex;align-items:center;justify-content:center;font-family:var(--display);font-size:13px;font-weight:700;color:var(--purple);flex-shrink:0;}
+.fb-name{font-size:12px;font-weight:700;}
+.fb-time{font-size:10px;color:var(--sub);}
+.fb-platform{margin-left:auto;display:flex;align-items:center;gap:4px;font-family:var(--mono);font-size:9px;color:var(--sub);}
+.fb-body{padding:14px 16px;}
+.fb-text{font-size:13px;color:var(--text);line-height:1.65;margin-bottom:10px;}
+.fb-text strong{color:var(--orange);}
+.fb-img{width:100%;height:140px;background:var(--surface);border-radius:var(--r-sm);margin-bottom:10px;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;}
+.fb-img-bg{font-size:48px;opacity:0.1;position:absolute;}
+.fb-img-label{font-family:var(--mono);font-size:9px;color:var(--sub);letter-spacing:1px;text-transform:uppercase;position:relative;z-index:2;}
+.fb-coming{font-family:var(--mono);font-size:9px;color:var(--orange);letter-spacing:1px;text-transform:uppercase;}
+.fb-stats{display:flex;align-items:center;justify-content:space-between;}
+.fb-reactions{font-size:11px;color:var(--sub);}
+.fb-engagements{display:flex;gap:12px;}
+.fb-eng{font-family:var(--mono);font-size:10px;color:var(--sub);display:flex;align-items:center;gap:4px;}
+.fb-tag{display:inline-block;background:var(--orange-dim);border:1px solid var(--orange-border);border-radius:4px;padding:2px 7px;font-family:var(--mono);font-size:9px;color:var(--orange);margin-top:8px;}
+
+/* PICKS */
+.picks-list{display:flex;flex-direction:column;gap:8px;}
+.pick-row{display:flex;gap:12px;align-items:center;padding:12px;background:var(--card);border:1px solid var(--border-sub);border-radius:var(--r-lg);cursor:pointer;transition:border-color 0.15s;}
+.pick-row:hover{border-color:var(--orange-border);}
+.pick-icon{width:40px;height:40px;border-radius:var(--r-sm);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}
+.pick-name{font-size:13px;font-weight:700;margin-bottom:2px;}
+.pick-meta{font-size:11px;color:var(--sub);}
+.pick-right{text-align:right;flex-shrink:0;margin-left:auto;}
+.pick-date{font-family:var(--mono);font-size:10px;color:var(--orange);}
+.pick-cta{font-family:var(--mono);font-size:9px;color:var(--orange);letter-spacing:1px;text-transform:uppercase;margin-top:3px;cursor:pointer;}
+
+/* SIDE SECTIONS */
+.side-section{padding:22px;border-bottom:1px solid var(--border-sub);}
+.side-eyebrow{font-family:var(--mono);font-size:9px;color:var(--orange);letter-spacing:2px;text-transform:uppercase;margin-bottom:12px;}
+
+/* BRAND CARD */
+.brand-card{background:var(--card);border:1px solid var(--orange-border);border-radius:var(--r-lg);padding:18px;margin-bottom:14px;}
+.brand-card-title{font-family:var(--display);font-size:17px;font-weight:700;margin-bottom:6px;line-height:1.2;}
+.brand-card-sub{font-size:12px;color:var(--sub);line-height:1.55;margin-bottom:14px;}
+.pkg-list{display:flex;flex-direction:column;gap:5px;margin-bottom:14px;}
+.pkg-row{display:flex;align-items:center;justify-content:space-between;padding:8px 10px;background:var(--surface);border:1px solid var(--border-sub);border-radius:var(--r-sm);}
+.pkg-row.featured{border-color:var(--orange-border);}
+.pkg-name{font-size:12px;font-weight:600;}
+.pkg-sub{font-size:10px;color:var(--sub);}
+.pkg-price{font-family:var(--mono);font-size:12px;color:var(--orange);}
+.brand-btn{background:var(--orange);color:#fff;width:100%;padding:11px;border-radius:var(--r-sm);font-size:12px;font-weight:700;cursor:pointer;text-align:center;border:none;}
+.brand-btn:hover{opacity:0.88;}
+
+/* FOLLOW BLOCK */
+.follow-block{background:var(--card);border:1px solid var(--border-sub);border-radius:var(--r-lg);padding:16px;margin-bottom:12px;}
+.follow-title{font-size:13px;font-weight:700;margin-bottom:4px;}
+.follow-sub{font-size:11px;color:var(--sub);line-height:1.55;margin-bottom:12px;}
+.follow-btn{background:transparent;border:1px solid var(--purple-border);color:var(--purple);width:100%;padding:9px;border-radius:var(--r-sm);font-size:12px;font-weight:600;cursor:pointer;text-align:center;display:block;}
+.follow-btn:hover{background:var(--purple-dim);}
+
+/* VERIFIED STRIP */
+.verified-strip{display:flex;align-items:flex-start;gap:8px;padding:12px 14px;background:var(--surface);border:1px solid var(--border-sub);border-radius:var(--r-sm);}
+.verified-text{font-size:11px;color:var(--sub);line-height:1.5;}
+.verified-text strong{color:var(--text);font-weight:600;}
+
+/* OPEN PARTNER SLOTS */
+.open-slot{display:flex;align-items:center;gap:8px;padding:10px 12px;background:var(--card);border:1px dashed var(--border-sub);border-radius:var(--r-sm);opacity:0.55;}
+.open-slot-text{font-family:var(--mono);font-size:9px;color:var(--sub);letter-spacing:0.5px;}
+
+/* FOOTER */
+footer{background:var(--surface);border-top:1px solid var(--border-sub);padding:24px 32px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;}
+.footer-logo{font-family:var(--display);font-size:15px;font-weight:900;}
+.footer-logo span{color:var(--orange);}
+.footer-note{font-family:var(--mono);font-size:10px;color:var(--muted);letter-spacing:1px;}
+.footer-links{display:flex;gap:14px;}
+.footer-link{font-size:12px;color:var(--sub);}
+.footer-link:hover{color:var(--text);}
+
+/* ANIMATIONS */
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.35;}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:translateY(0);}}
+.fade-up{animation:fadeUp 0.5s ease forwards;}
+
+@media(max-width:900px){
+  .creator-top{grid-template-columns:auto 1fr;}
+  .action-col{grid-column:1/-1;flex-direction:row;align-items:center;flex-wrap:wrap;}
+  .page-body{grid-template-columns:1fr;}
+  .main-col{border-right:none;padding:20px 18px;}
+  .side-col{border-top:1px solid var(--border-sub);}
+  nav{padding:0 18px;}
+  .hero-inner{padding:24px 18px 0;}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="https://cbusevents.com" class="nav-logo">CBUS<span>EVENTS</span></a>
+  <div class="nav-center">Columbus Creator Collective</div>
+  <div class="nav-right"><button class="theme-toggle" onclick="CBUSTheme.toggle()" title="Toggle dark mode" aria-label="Toggle dark mode"><span class="theme-icon-moon">&#9790;</span><span class="theme-icon-sun">&#9728;</span></button> 
+    <a href="https://cbusevents.com/creators.html" class="nav-back">&#8592; All creators</a>
+    <a href="https://cbusevents.com/auth.html" class="nav-cta">Sign in</a>
+  </div>
+</nav>
+
+<div class="hero-band">
+  <div class="hero-inner fade-up">
+    <div class="creator-top">
+
+      <div class="avatar-wrap">
+        <div class="avatar"><div class="avatar-initials">RW</div></div>
+        <div class="verified-mark">
+          <svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg>
+        </div>
+      </div>
+
+      <div>
+        <div class="creator-badges">
+          <div class="badge badge-founder">Founding creator</div>
+          <div class="badge badge-voice">Community voice</div>
+          <div class="badge badge-city">Columbus, Ohio</div>
+        </div>
+        <div class="creator-name">Raine Whicker</div>
+        <div class="creator-url" onclick="copyLink()">
+          <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M6 9a3 3 0 004.5.5l2-2a3 3 0 00-4.2-4.3l-1.1 1.1"/><path d="M10 7a3 3 0 00-4.5-.5l-2 2a3 3 0 004.2 4.3l1.1-1.1"/></svg>
+          cbusevents.com/creators/raine
+        </div>
+        <div class="creator-bio">Columbus food finder, nightlife navigator and the reason your weekend plans actually happen. She spots what's worth showing up for every single week - and tells you exactly why.</div>
+      </div>
+
+      <div class="action-col">
+        <a href="#work-with-raine" class="btn-work">Work with Raine</a>
+        <button class="btn-follow" onclick="handleFollow(this)">
+          <span>&#9825;</span> Follow her picks
+        </button>
+        <div class="share-btns">
+          <button class="share-btn" onclick="copyLink()">
+            <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="5" y="2" width="9" height="9" rx="1"/><path d="M2 6v7a1 1 0 001 1h7"/></svg>
+            Copy link
+          </button>
+          <a href="https://www.facebook.com/raine.whicker.127" target="_blank" rel="noopener" class="share-btn">
+            <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor"><path d="M16 8a8 8 0 10-9.25 7.9V10.3H4.7V8h2.05V6.25c0-2.02 1.2-3.14 3.04-3.14.88 0 1.8.16 1.8.16v1.98h-1.01c-1 0-1.31.62-1.31 1.26V8h2.22l-.35 2.3H9.27V15.9A8 8 0 0016 8z"/></svg>
+            Facebook
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <div class="stats-row">
+      <div class="stat">
+        <div class="stat-num">21K</div>
+        <div class="stat-label">Facebook followers</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">190</div>
+        <div class="stat-label">Top post reactions</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">88</div>
+        <div class="stat-label">Top post comments</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num" id="rsvp-count">-</div>
+        <div class="stat-label">RSVPs driven</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">Columbus</div>
+        <div class="stat-label">Primary market</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="page-body">
+
+  <!-- MAIN COLUMN -->
+  <div class="main-col">
+
+    <!-- FACEBOOK COMMUNITY POSTS -->
+    <div style="margin-bottom:32px;">
+      <div class="section-head">
+        <div class="section-eyebrow">From the community</div>
+        <a href="https://www.facebook.com/raine.whicker.127" target="_blank" rel="noopener" class="section-link">View on Facebook &rarr;</a>
+      </div>
+      <div class="fb-feed">
+
+        <!-- 1313 FESTIVAL POST - FEATURED / UPCOMING -->
+        <div class="fb-card featured">
+          <div class="fb-card-head">
+            <div class="fb-av">RW</div>
+            <div>
+              <div class="fb-name">Raine Whicker</div>
+              <div class="fb-time fb-coming">Posting about 1313 Festival</div>
+            </div>
+            <div class="fb-platform">
+              <svg width="12" height="12" viewBox="0 0 16 16" fill="var(--sub)"><path d="M16 8a8 8 0 10-9.25 7.9V10.3H4.7V8h2.05V6.25c0-2.02 1.2-3.14 3.04-3.14.88 0 1.8.16 1.8.16v1.98h-1.01c-1 0-1.31.62-1.31 1.26V8h2.22l-.35 2.3H9.27V15.9A8 8 0 0016 8z"/></svg>
+              Facebook
+            </div>
+          </div>
+          <div class="fb-body">
+            <div class="fb-img">
+              <div class="fb-img-bg">&#127914;</div>
+              <div class="fb-img-label">1313 Food and Arts Festival - June 13, 2026</div>
+            </div>
+            <div class="fb-text">This one is going to be different. <strong>1313 Festival</strong> at 1313 E. Broad St. on June 13 - 13 confirmed vendors, a food truck, live poetry and art. Free entry. RSVP through the link in my bio.</div>
+            <div class="fb-stats">
+              <div class="fb-reactions" style="color:var(--orange);">Post goes live before June 13</div>
+              <div class="fb-engagements">
+                <a href="https://cbusevents.com/1313-festival-event.html" class="fb-eng" style="color:var(--orange);cursor:pointer;">RSVP now &rarr;</a>
+              </div>
+            </div>
+            <div class="fb-tag">1313 Festival</div>
+          </div>
+        </div>
+
+        <!-- WHITEHALL FOOD FESTIVAL POST - REAL -->
+        <div class="fb-card">
+          <div class="fb-card-head">
+            <div class="fb-av">RW</div>
+            <div>
+              <div class="fb-name">Raine Whicker</div>
+              <div class="fb-time">May 1 at 7:37 p.m.</div>
+            </div>
+            <div class="fb-platform">
+              <svg width="12" height="12" viewBox="0 0 16 16" fill="var(--sub)"><path d="M16 8a8 8 0 10-9.25 7.9V10.3H4.7V8h2.05V6.25c0-2.02 1.2-3.14 3.04-3.14.88 0 1.8.16 1.8.16v1.98h-1.01c-1 0-1.31.62-1.31 1.26V8h2.22l-.35 2.3H9.27V15.9A8 8 0 0016 8z"/></svg>
+              Facebook
+            </div>
+          </div>
+          <div class="fb-body">
+            <div class="fb-text">Why is Whitehall having Brian McKnight as opening act for their food festival</div>
+            <div class="fb-stats">
+              <div class="fb-reactions">190 reactions</div>
+              <div class="fb-engagements">
+                <div class="fb-eng">
+                  <svg width="11" height="11" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H2v10h3l3 3 3-3h3V2z"/></svg>
+                  88 comments
+                </div>
+                <div class="fb-eng">
+                  <svg width="11" height="11" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 12l4-4 4 4M8 8V2"/></svg>
+                  42 shares
+                </div>
+              </div>
+            </div>
+            <div class="fb-tag">Columbus events</div>
+          </div>
+        </div>
+
+        <!-- SPIRIT AIRLINES POST - REAL -->
+        <div class="fb-card">
+          <div class="fb-card-head">
+            <div class="fb-av">RW</div>
+            <div>
+              <div class="fb-name">Raine Whicker</div>
+              <div class="fb-time">May 2 at 9:41 a.m.</div>
+            </div>
+            <div class="fb-platform">
+              <svg width="12" height="12" viewBox="0 0 16 16" fill="var(--sub)"><path d="M16 8a8 8 0 10-9.25 7.9V10.3H4.7V8h2.05V6.25c0-2.02 1.2-3.14 3.04-3.14.88 0 1.8.16 1.8.16v1.98h-1.01c-1 0-1.31.62-1.31 1.26V8h2.22l-.35 2.3H9.27V15.9A8 8 0 0016 8z"/></svg>
+              Facebook
+            </div>
+          </div>
+          <div class="fb-body">
+            <div class="fb-text">Just imagine how many people who worked for Spirit without a job. Times are too hard to be losing your job with no warning.</div>
+            <div class="fb-stats">
+              <div class="fb-reactions">61 reactions</div>
+              <div class="fb-engagements">
+                <div class="fb-eng">
+                  <svg width="11" height="11" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H2v10h3l3 3 3-3h3V2z"/></svg>
+                  9 comments
+                </div>
+                <div class="fb-eng">
+                  <svg width="11" height="11" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 12l4-4 4 4M8 8V2"/></svg>
+                  8 shares
+                </div>
+              </div>
+            </div>
+            <div class="fb-tag">Community</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- COLUMBUS PICKS THIS WEEK -->
+    <div>
+      <div class="section-head">
+        <div class="section-eyebrow">Raine's Columbus picks this week</div>
+        <a href="https://cbusevents.com/attendees.html" class="section-link">All events &rarr;</a>
+      </div>
+      <div class="picks-list">
+
+        <a href="https://cbusevents.com/1313-festival-event.html" class="pick-row" style="text-decoration:none;">
+          <div class="pick-icon" style="background:var(--orange-dim);">&#127914;</div>
+          <div style="flex:1;min-width:0;">
+            <div class="pick-name">1313 Food and Arts Festival</div>
+            <div class="pick-meta">1313 E. Broad St. &nbsp;&middot;&nbsp; Free entry &nbsp;&middot;&nbsp; 13 vendors &nbsp;&middot;&nbsp; 1 food truck</div>
+          </div>
+          <div class="pick-right">
+            <div class="pick-date">June 13</div>
+            <div class="pick-cta">RSVP &rarr;</div>
+          </div>
+        </a>
+
+        <a href="https://cbusevents.com/gallery-hop.html" class="pick-row" style="text-decoration:none;">
+          <div class="pick-icon" style="background:rgba(180,107,255,0.1);">&#127912;</div>
+          <div style="flex:1;min-width:0;">
+            <div class="pick-name">Gallery Hop - Short North</div>
+            <div class="pick-meta">Short North &nbsp;&middot;&nbsp; First Friday &nbsp;&middot;&nbsp; Free</div>
+          </div>
+          <div class="pick-right">
+            <div class="pick-date">June 6</div>
+            <div class="pick-cta">Details &rarr;</div>
+          </div>
+        </a>
+
+        <div class="pick-row" id="dynamicPick">
+          <div class="pick-icon" style="background:var(--blue-dim);">&#127926;</div>
+          <div style="flex:1;min-width:0;">
+            <div class="pick-name">R&amp;B Night - Franklinton Arts Space</div>
+            <div class="pick-meta">Franklinton &nbsp;&middot;&nbsp; Saturday &nbsp;&middot;&nbsp; $10</div>
+          </div>
+          <div class="pick-right">
+            <div class="pick-date">June 7</div>
+            <div class="pick-cta">Tickets &rarr;</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+  <!-- SIDE COLUMN -->
+  <div class="side-col">
+
+    <!-- SHARE YOUR PAGE - visible only to Raine when logged in (simulated here) -->
+    <div class="side-section" id="creatorShareBlock">
+      <div class="side-eyebrow">Your creator page</div>
+      <div class="share-block">
+        <div class="share-block-title">Start sharing this link</div>
+        <div class="share-block-sub">Drop it in your Facebook bio, pin it in your subscriber hub and paste it at the bottom of every Columbus post. Every click that converts earns you commission.</div>
+        <div class="share-link-row">
+          <div class="share-link-input" onclick="copyLink()">cbusevents.com/creators/raine</div>
+          <button class="copy-btn" id="copyBtn" onclick="copyLink()">Copy</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- BRAND PARTNERSHIP -->
+    <div class="side-section" id="work-with-raine">
+      <div class="side-eyebrow">For brands</div>
+      <div class="brand-card">
+        <div class="brand-card-title">Partner with Raine</div>
+        <div class="brand-card-sub">Reach 21,000+ Columbus residents who trust her voice. She posts what matters to the community - your brand fits right in.</div>
+        <div class="pkg-list">
+          <div class="pkg-row">
+            <div>
+              <div class="pkg-name">Single post</div>
+              <div class="pkg-sub">One Facebook feature</div>
+            </div>
+            <div class="pkg-price">$250</div>
+          </div>
+          <div class="pkg-row">
+            <div>
+              <div class="pkg-name">Event presence</div>
+              <div class="pkg-sub">Live post and recap</div>
+            </div>
+            <div class="pkg-price">$500</div>
+          </div>
+          <div class="pkg-row featured">
+            <div>
+              <div class="pkg-name">Monthly partner</div>
+              <div class="pkg-sub">Four posts per month</div>
+            </div>
+            <div class="pkg-price">$1,200</div>
+          </div>
+        </div>
+        <button class="brand-btn" onclick="handleBrandRequest()">Request partnership</button>
+      </div>
+    </div>
+
+    <!-- FOLLOW BLOCK -->
+    <div class="side-section">
+      <div class="follow-block">
+        <div class="follow-title">Follow Raine's picks</div>
+        <div class="follow-sub">Get her Columbus recommendations every week - events, food spots and what's worth showing up for.</div>
+        <button class="follow-btn" onclick="handleFollow(this)">&#9825; Follow on CBUSEVENTS</button>
+      </div>
+      <div class="verified-strip">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="var(--orange)" stroke-width="1.5" stroke-linecap="round" style="flex-shrink:0;margin-top:1px;"><path d="M8 1l1.8 3.6L14 5.5l-3 2.9.7 4.1L8 10.4l-3.7 2.1.7-4.1L2 5.5l4.2-.9L8 1z"/></svg>
+        <div class="verified-text"><strong>Verified creator</strong> - brand deals and earnings facilitated by <strong>CBUSEVENTS</strong></div>
+      </div>
+    </div>
+
+    <!-- OPEN PARTNER SLOTS -->
+    <div class="side-section">
+      <div class="side-eyebrow">Active brand partners</div>
+      <div style="display:flex;flex-direction:column;gap:7px;">
+        <div class="open-slot">
+          <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="var(--sub)" stroke-width="1.5" stroke-linecap="round"><line x1="8" y1="3" x2="8" y2="13"/><line x1="3" y1="8" x2="13" y2="8"/></svg>
+          <div class="open-slot-text">First partner spot open</div>
+        </div>
+        <div class="open-slot">
+          <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="var(--sub)" stroke-width="1.5" stroke-linecap="round"><line x1="8" y1="3" x2="8" y2="13"/><line x1="3" y1="8" x2="13" y2="8"/></svg>
+          <div class="open-slot-text">Second partner spot open</div>
+        </div>
+        <div class="open-slot">
+          <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="var(--sub)" stroke-width="1.5" stroke-linecap="round"><line x1="8" y1="3" x2="8" y2="13"/><line x1="3" y1="8" x2="13" y2="8"/></svg>
+          <div class="open-slot-text">Third partner spot open</div>
+        </div>
+        <div style="font-family:var(--mono);font-size:9px;color:var(--muted);text-align:center;margin-top:4px;letter-spacing:0.5px;">Category exclusivity available</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<footer>
+  <a href="https://cbusevents.com" class="footer-logo">CBUS<span>EVENTS</span></a>
+  <div class="footer-note">Inaugural Season 2026 &nbsp;&middot;&nbsp; Columbus, Ohio</div>
+  <div class="footer-links">
+    <a href="https://cbusevents.com/creators.html" class="footer-link">All creators</a>
+    <a href="https://cbusevents.com/privacy.html" class="footer-link">Privacy policy</a>
+    <a href="https://cbusevents.com/terms.html" class="footer-link">Terms of service</a>
+  </div>
+</footer>
+
+<script>
+const SB_URL = 'https://toblgvatvsjljbqogzsv.supabase.co';
+const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRvYmxndmF0dnNqbGpicW9nenN2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMDgwNTAsImV4cCI6MjA4NzY4NDA1MH0._WJEQPizNDiQfDXQB_DHPaQhixPGpMdmYQSmyWmm_FQ';
+const CREATOR_ID = 'raine-whicker';
+
+async function loadRSVPCount(){
+  try {
+    const res = await fetch(
+      SB_URL + '/rest/v1/rsvps?select=id&creator_ref=eq.' + CREATOR_ID,
+      { headers: { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY } }
+    );
+    const data = await res.json();
+    if(Array.isArray(data)){
+      document.getElementById('rsvp-count').textContent = data.length.toLocaleString();
+    }
+  } catch(e) {
+    document.getElementById('rsvp-count').textContent = '-';
+  }
+}
+
+function copyLink(){
+  const url = 'https://cbusevents.com/creators/raine';
+  if(navigator.clipboard){
+    navigator.clipboard.writeText(url).then(()=>{
+      const btn = document.getElementById('copyBtn');
+      if(btn){ btn.textContent = 'Copied!'; setTimeout(()=>btn.textContent='Copy', 2000); }
+    });
+  }
+}
+
+function handleFollow(btn){
+  const current = btn.querySelector('span') || btn;
+  if(btn.dataset.following){
+    btn.dataset.following = '';
+    btn.innerHTML = '<span>&#9825;</span> Follow her picks';
+    btn.style.borderColor = '';
+    btn.style.color = '';
+  } else {
+    btn.dataset.following = '1';
+    btn.innerHTML = '<span>&#9829;</span> Following';
+    btn.style.borderColor = 'var(--orange)';
+    btn.style.color = 'var(--orange)';
+  }
+}
+
+function handleBrandRequest(){
+  const email = 'hello@cbusevents.com';
+  const subject = encodeURIComponent('Brand partnership request - Raine Whicker');
+  const body = encodeURIComponent('Hi,\n\nI\'m interested in partnering with Raine Whicker through CBUSEVENTS.\n\nBrand name:\nCategory:\nBudget:\nGoal:\n\nThanks');
+  window.location.href = 'mailto:' + email + '?subject=' + subject + '&body=' + body;
+}
+
+loadRSVPCount();
+</script>
+</body>
+</html>

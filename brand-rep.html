@@ -1,6 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <link rel="stylesheet" href="/theme.css">
+  <script src="/theme.js"></script>
+
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
 <title>CBUSEVENTS - Brand Rep</title>
@@ -262,7 +265,7 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--font);min-hei
 
   <header class="topbar">
     <div class="topbar-logo">CBUS<span>EVENTS</span></div>
-    <div class="topbar-right">
+    <div class="topbar-right"><button class="theme-toggle" onclick="CBUSTheme.toggle()" title="Toggle dark mode" aria-label="Toggle dark mode"><span class="theme-icon-moon">&#9790;</span><span class="theme-icon-sun">&#9728;</span></button> 
       <div class="rank-pill" id="rankPill">Brand Rep</div>
       <div class="avatar" id="userAvatar">?</div>
     </div>

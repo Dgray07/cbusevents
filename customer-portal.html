@@ -1,7 +1,10 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-default="dark">
 <head>
 <meta charset="UTF-8">
+  <link rel="stylesheet" href="/theme.css">
+  <script src="/theme.js"></script>
+
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>My CBUSEVENTS - Customer Portal</title>
 
@@ -565,7 +568,7 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
 
   <div class="topbar">
     <div class="topbar-title" id="topbarTitle">My Dashboard</div>
-    <div class="topbar-right">
+    <div class="topbar-right"><button class="theme-toggle" onclick="CBUSTheme.toggle()" title="Toggle dark mode" aria-label="Toggle dark mode"><span class="theme-icon-moon">&#9790;</span><span class="theme-icon-sun">&#9728;</span></button> 
       <button class="btn btn-ghost btn-sm" onclick="window.open('https://cbusevents.com','_blank')">Browse Events &nearr;</button>
       <button class="btn btn-ghost btn-sm" id="signOutBtn" onclick="doSignOut()" style="display:none">Sign Out</button>
     </div>
