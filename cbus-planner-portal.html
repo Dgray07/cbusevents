@@ -366,7 +366,7 @@ tr:hover td{ background:rgba(255,255,255,0.02) !important; }
 .pmn-more-divider{height:1px;background:var(--border);margin:6px 0;}
 </style>
 </head>
-<body> <nav id="topNav"> <div class="nav-logo" onclick="currentUser?nav('dashboard'):showAuth('login')"> CBUS<span>EVENTS</span> <span class="nav-logo-sub">Planner</span> </div> <div class="nav-links" id="navLinks" style="display:none"> <button class="nav-btn" onclick="window.location.href='https://cbusevents.com'"> Home</button> <button class="nav-btn" id="nav-dashboard" onclick="nav('dashboard')">Dashboard</button> <button class="nav-btn" id="nav-venues" onclick="nav('venues')">Find Venues</button> <button class="nav-btn" id="nav-vendors" onclick="nav('vendors')">Find Vendors</button><button class="nav-btn" id="nav-inquiries" onclick="nav('inquiries')">My Inquiries</button> <button class="nav-btn" id="nav-events" onclick="nav('events')">My Events</button> <button class="nav-btn" id="nav-payouts" onclick="nav('payouts')">Payouts</button> <button class="nav-btn" id="nav-profile" onclick="nav('profile')">My Profile</button> <button class="nav-btn" id="nav-billing" onclick="nav('billing')">Plan & Billing</button> <button class="nav-btn" id="nav-inbox" onclick="nav('inbox')">Inbox <span id="inboxNavBadge" style="display:none;background:#FF6B35;color:#fff;border-radius:99px;font-size:10px;font-weight:700;padding:1px 7px;margin-left:4px"></span></button> </div> <div class="nav-right" id="navRight"> <button class="nav-outline" onclick="showAuth('login')">Sign In</button> <button class="nav-cta" onclick="showAuth('signup')">Get Started Free →</button> </div>
+<body> <nav id="topNav"> <div class="nav-logo" onclick="currentUser?nav('dashboard'):showAuth('login')"> CBUS<span>EVENTS</span> <span class="nav-logo-sub">Planner</span> </div> <div class="nav-links" id="navLinks" style="display:none"> <button class="nav-btn" onclick="window.location.href='https://cbusevents.com'"> Home</button> <button class="nav-btn" id="nav-dashboard" onclick="nav('dashboard')">Dashboard</button> <button class="nav-btn" id="nav-venues" onclick="nav('venues')">Find Venues</button> <button class="nav-btn" id="nav-vendors" onclick="nav('vendors')">Find Vendors</button><button class="nav-btn" id="nav-inquiries" onclick="nav('inquiries')">My Inquiries</button> <button class="nav-btn" id="nav-vendortables" onclick="nav('vendortables')">Vendor Tables</button> <button class="nav-btn" id="nav-events" onclick="nav('events')">My Events</button> <button class="nav-btn" id="nav-payouts" onclick="nav('payouts')">Payouts</button> <button class="nav-btn" id="nav-profile" onclick="nav('profile')">My Profile</button> <button class="nav-btn" id="nav-billing" onclick="nav('billing')">Plan & Billing</button> <button class="nav-btn" id="nav-inbox" onclick="nav('inbox')">Inbox <span id="inboxNavBadge" style="display:none;background:#FF6B35;color:#fff;border-radius:99px;font-size:10px;font-weight:700;padding:1px 7px;margin-left:4px"></span></button> </div> <div class="nav-right" id="navRight"> <button class="nav-outline" onclick="showAuth('login')">Sign In</button> <button class="nav-cta" onclick="showAuth('signup')">Get Started Free →</button> </div>
 </nav> <div id="app" id="main-content"></div><div id="modalContainer"></div>
 <div id="modal"></div>
 <div id="toast" class="toast"></div> <script src="https://unpkg.com/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
@@ -809,6 +809,7 @@ function nav(page){
  else if(page==='billing')renderBilling();
   else if(page==='payouts')renderPayouts();
   else if(page==='inbox')renderInboxPage();
+  else if(page==='vendortables')renderVendorTables();
 }
 
 // ── EVENT DETAIL / MANAGEMENT ────────────────────────────────
@@ -2518,6 +2519,303 @@ function plannerPopulateEvent({event_name,event_date,description,cover_image}){
     }
   }
 }
+
+// ── VENDOR TABLE LISTINGS ─────────────────────────────────────
+
+async function renderVendorTables(){
+  const app=document.getElementById('app');
+  app.innerHTML=`<div class="page">
+  <div style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:6px;flex-wrap:wrap;gap:12px">
+    <div>
+      <div class="section-title">Vendor Tables</div>
+      <div class="section-sub">Post open vendor spots for your events. Vendors apply and pay through the platform.</div>
+    </div>
+    <button class="btn btn-primary btn-sm" onclick="openVendorTableModal()">+ Post Vendor Spots</button>
+  </div>
+  <div id="vtListings"><div class="spinner"></div></div>
+  </div>`;
+  await loadVendorTableListings();
+}
+
+async function loadVendorTableListings(){
+  const el=document.getElementById('vtListings');
+  if(!el)return;
+  const{data:listings,error}=await sb
+    .from('vendor_table_listings')
+    .select('*, vendor_table_applications(id,status,vendor_id)')
+    .eq('planner_id',currentUser.id)
+    .order('created_at',{ascending:false});
+
+  if(error){el.innerHTML=`<div style="color:var(--red);font-size:13px;padding:20px">Error loading listings: ${error.message}</div>`;return;}
+
+  if(!listings?.length){
+    el.innerHTML=`
+    <div class="empty" style="border:1px solid var(--border);border-radius:14px">
+      <h3>No vendor spots posted yet</h3>
+      <p style="font-size:13px;margin-bottom:16px">Post open vendor table spots for your events and let vendors apply directly through CBUSEVENTS.</p>
+      <button class="btn btn-primary" onclick="openVendorTableModal()">+ Post Your First Listing</button>
+    </div>`;
+    return;
+  }
+
+  el.innerHTML=listings.map(l=>{
+    const apps=l.vendor_table_applications||[];
+    const pending=apps.filter(a=>a.status==='pending').length;
+    const approved=apps.filter(a=>a.status==='approved').length;
+    const spotsLeft=l.spots_remaining;
+    const isActive=l.is_active;
+    const eventDate=l.event_date?new Date(l.event_date).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}):'TBD';
+    const deadline=l.deadline?new Date(l.deadline).toLocaleDateString('en-US',{month:'short',day:'numeric'}):'No deadline';
+    return `
+    <div class="card" style="margin-bottom:12px;padding:0;overflow:hidden">
+      <div style="padding:18px 20px;display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap">
+        <div style="flex:1;min-width:0">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;flex-wrap:wrap">
+            <div style="font-weight:700;font-size:15px">${l.event_name}</div>
+            <span style="font-family:var(--mono);font-size:9px;letter-spacing:0.1em;text-transform:uppercase;padding:3px 10px;border-radius:99px;${isActive?'background:var(--green-dim);color:var(--green);border:1px solid var(--green-border)':'background:rgba(255,255,255,0.04);color:var(--muted);border:1px solid var(--border)'}">${isActive?'Active':'Closed'}</span>
+          </div>
+          <div style="font-family:var(--mono);font-size:10px;letter-spacing:0.1em;color:var(--muted);display:flex;gap:14px;flex-wrap:wrap">
+            <span>&#128197; ${eventDate}</span>
+            <span>&#128205; ${l.event_location}</span>
+            <span>&#128176; $${parseFloat(l.spot_fee).toFixed(2)} / spot</span>
+            <span>&#128197; Deadline: ${deadline}</span>
+          </div>
+          ${l.vendor_types_wanted?.length?`<div style="margin-top:8px;display:flex;gap:6px;flex-wrap:wrap">${l.vendor_types_wanted.map(t=>`<span style="font-family:var(--mono);font-size:9px;letter-spacing:0.1em;text-transform:uppercase;background:rgba(255,107,53,0.1);color:var(--orange);border:1px solid rgba(255,107,53,0.2);padding:3px 10px">${t}</span>`).join('')}</div>`:''}
+        </div>
+        <div style="display:flex;gap:8px;flex-shrink:0;flex-wrap:wrap">
+          <button class="btn btn-ghost btn-sm" onclick="openVendorTableModal('${l.id}')">Edit</button>
+          <button class="btn btn-ghost btn-sm" onclick="viewVendorTableApps('${l.id}','${l.event_name}')">Applications ${apps.length?`<span style="background:var(--orange);color:white;border-radius:99px;font-size:10px;font-weight:700;padding:1px 7px;margin-left:4px">${apps.length}</span>`:''}
+          </button>
+          <button class="btn btn-danger btn-sm" onclick="deleteVendorTableListing('${l.id}')">Delete</button>
+        </div>
+      </div>
+      <div style="background:var(--surface);border-top:1px solid var(--border);padding:12px 20px;display:flex;gap:24px;flex-wrap:wrap">
+        <div style="display:flex;align-items:center;gap:8px">
+          <span style="font-family:var(--mono);font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted)">Spots</span>
+          <span style="font-weight:700;font-size:14px">${spotsLeft} <span style="font-weight:300;color:var(--sub)">/ ${l.total_spots} remaining</span></span>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <span style="font-family:var(--mono);font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted)">Pending</span>
+          <span style="font-weight:700;font-size:14px;color:var(--orange)">${pending}</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <span style="font-family:var(--mono);font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted)">Approved</span>
+          <span style="font-weight:700;font-size:14px;color:var(--green)">${approved}</span>
+        </div>
+        <div style="margin-left:auto">
+          <button class="btn btn-ghost btn-sm" onclick="toggleListingActive('${l.id}',${!isActive})">${isActive?'Close Listing':'Reopen Listing'}</button>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function openVendorTableModal(listingId=null){
+  document.getElementById('modalContainer').style.display='flex';
+  document.getElementById('modalContainer').innerHTML=`
+  <div class="modal-overlay" onclick="if(event.target===this)closeModal()">
+    <div class="modal" style="max-width:580px">
+      <div class="modal-header">
+        <div class="modal-title">${listingId?'Edit Vendor Spot Listing':'Post Vendor Spots'}</div>
+        <button onclick="closeModal()" style="background:none;border:none;color:var(--sub);font-size:22px;cursor:pointer;line-height:1">&#215;</button>
+      </div>
+      <div class="modal-body" id="vtFormWrap"><div class="spinner"></div></div>
+    </div>
+  </div>`;
+  loadVendorTableForm(listingId);
+}
+
+async function loadVendorTableForm(listingId){
+  const wrap=document.getElementById('vtFormWrap');
+  let listing=null;
+  if(listingId){
+    const{data}=await sb.from('vendor_table_listings').select('*').eq('id',listingId).maybeSingle();
+    listing=data;
+  }
+
+  const vendorTypes=['Food Vendor','Food Truck','Artisan / Craft','Apparel / Merchandise','Beauty / Wellness','Nonprofit / Community','Pop-up Retail','Art / Photography','Other'];
+  const selectedTypes=listing?.vendor_types_wanted||[];
+
+  wrap.innerHTML=`
+  <div style="display:flex;flex-direction:column;gap:14px">
+    <div class="field">
+      <label>Event Name *</label>
+      <input id="vt-event-name" value="${listing?.event_name||''}" placeholder="e.g. 1313 Festival" />
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <div class="field">
+        <label>Event Date *</label>
+        <input id="vt-event-date" type="date" value="${listing?.event_date||''}" />
+      </div>
+      <div class="field">
+        <label>Application Deadline</label>
+        <input id="vt-deadline" type="date" value="${listing?.deadline||''}" />
+      </div>
+    </div>
+    <div class="field">
+      <label>Event Location *</label>
+      <input id="vt-location" value="${listing?.event_location||''}" placeholder="e.g. 1313 E. Broad St., Columbus" />
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px">
+      <div class="field">
+        <label>Total Spots *</label>
+        <input id="vt-total" type="number" min="1" value="${listing?.total_spots||1}" />
+      </div>
+      <div class="field">
+        <label>Spots Remaining *</label>
+        <input id="vt-remaining" type="number" min="0" value="${listing?.spots_remaining??listing?.total_spots??1}" />
+      </div>
+      <div class="field">
+        <label>Spot Fee ($) *</label>
+        <input id="vt-fee" type="number" min="0" step="0.01" value="${listing?.spot_fee||75}" />
+      </div>
+    </div>
+    <div class="field">
+      <label>Vendor Types Wanted</label>
+      <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:4px">
+        ${vendorTypes.map(t=>`
+          <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:13px;background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:6px 12px;transition:all 0.15s" id="vttype-wrap-${t.replace(/\W/g,'')}">
+            <input type="checkbox" id="vttype-${t.replace(/\W/g,'')}" value="${t}" ${selectedTypes.includes(t)?'checked':''} onchange="vtTypeToggle(this)" style="accent-color:var(--orange)">
+            ${t}
+          </label>`).join('')}
+      </div>
+    </div>
+    <div class="field">
+      <label>Description / Requirements</label>
+      <textarea id="vt-desc" style="height:80px;resize:none" placeholder="What types of vendors are you looking for? Any requirements?">${listing?.requirements||listing?.description||''}</textarea>
+    </div>
+    <div style="display:flex;justify-content:flex-end;gap:10px;padding-top:4px;border-top:1px solid var(--border)">
+      <button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="saveVendorTableListing('${listingId||''}')">${listingId?'Save Changes':'Post Listing'}</button>
+    </div>
+  </div>`;
+}
+
+function vtTypeToggle(el){
+  const wrap=el.closest('label');
+  if(el.checked){wrap.style.background='rgba(255,107,53,0.1)';wrap.style.borderColor='rgba(255,107,53,0.4)';}
+  else{wrap.style.background='var(--surface)';wrap.style.borderColor='var(--border)';}
+}
+
+async function saveVendorTableListing(listingId){
+  const eventName=document.getElementById('vt-event-name').value.trim();
+  const eventDate=document.getElementById('vt-event-date').value;
+  const deadline=document.getElementById('vt-deadline').value;
+  const location=document.getElementById('vt-location').value.trim();
+  const total=parseInt(document.getElementById('vt-total').value)||1;
+  const remaining=parseInt(document.getElementById('vt-remaining').value)??total;
+  const fee=parseFloat(document.getElementById('vt-fee').value)||0;
+  const desc=document.getElementById('vt-desc').value.trim();
+  const types=[...document.querySelectorAll('[id^="vttype-"]:checked')].map(el=>el.value);
+
+  if(!eventName)return toast('Event name is required','error');
+  if(!eventDate)return toast('Event date is required','error');
+  if(!location)return toast('Event location is required','error');
+  if(fee<0)return toast('Spot fee cannot be negative','error');
+
+  const payload={
+    planner_id:currentUser.id,
+    event_name:eventName,
+    event_date:eventDate,
+    deadline:deadline||null,
+    event_location:location,
+    total_spots:total,
+    spots_remaining:remaining,
+    spot_fee:fee,
+    requirements:desc||null,
+    vendor_types_wanted:types.length?types:null,
+    is_active:true,
+  };
+
+  let error;
+  if(listingId){
+    ({error}=await sb.from('vendor_table_listings').update(payload).eq('id',listingId));
+  } else {
+    ({error}=await sb.from('vendor_table_listings').insert(payload));
+  }
+
+  if(error){toast('Error saving listing: '+error.message,'error');return;}
+  toast(listingId?'Listing updated!':'Listing posted! Vendors can now apply.','success');
+  closeModal();
+  await loadVendorTableListings();
+}
+
+async function deleteVendorTableListing(id){
+  if(!confirm('Delete this listing? All applications will also be removed.'))return;
+  const{error}=await sb.from('vendor_table_listings').delete().eq('id',id);
+  if(error){toast('Error deleting listing','error');return;}
+  toast('Listing deleted');
+  await loadVendorTableListings();
+}
+
+async function toggleListingActive(id,active){
+  const{error}=await sb.from('vendor_table_listings').update({is_active:active}).eq('id',id);
+  if(error){toast('Error updating listing','error');return;}
+  toast(active?'Listing reopened':'Listing closed');
+  await loadVendorTableListings();
+}
+
+async function viewVendorTableApps(listingId,eventName){
+  document.getElementById('modalContainer').style.display='flex';
+  document.getElementById('modalContainer').innerHTML=`
+  <div class="modal-overlay" onclick="if(event.target===this)closeModal()">
+    <div class="modal" style="max-width:640px">
+      <div class="modal-header">
+        <div class="modal-title">Applications — ${eventName}</div>
+        <button onclick="closeModal()" style="background:none;border:none;color:var(--sub);font-size:22px;cursor:pointer;line-height:1">&#215;</button>
+      </div>
+      <div class="modal-body" id="vtAppsWrap"><div class="spinner"></div></div>
+    </div>
+  </div>`;
+
+  const{data:apps,error}=await sb
+    .from('vendor_table_applications')
+    .select('*, vendors(business_name,category,email,instagram,description)')
+    .eq('listing_id',listingId)
+    .order('created_at',{ascending:false});
+
+  const wrap=document.getElementById('vtAppsWrap');
+  if(error){wrap.innerHTML=`<div style="color:var(--red);font-size:13px">Error loading applications</div>`;return;}
+  if(!apps?.length){wrap.innerHTML=`<div style="text-align:center;padding:40px;color:var(--muted)"><div style="font-size:36px;margin-bottom:12px">&#128203;</div><div style="font-weight:600;margin-bottom:6px">No applications yet</div><div style="font-size:13px">Share your listing to attract vendors.</div></div>`;return;}
+
+  const statusColor={pending:'color:var(--orange);background:rgba(255,107,53,0.08);border:1px solid rgba(255,107,53,0.25)',approved:'color:var(--green);background:var(--green-dim);border:1px solid var(--green-border)',rejected:'color:var(--red);background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.2)',withdrawn:'color:var(--muted);background:rgba(255,255,255,0.04);border:1px solid var(--border)'};
+
+  wrap.innerHTML=apps.map(a=>`
+  <div style="padding:16px 0;border-bottom:1px solid var(--border)">
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap">
+      <div style="flex:1;min-width:0">
+        <div style="font-weight:700;font-size:14px;margin-bottom:3px">${a.vendors?.business_name||'Unknown Vendor'}</div>
+        <div style="font-family:var(--mono);font-size:10px;letter-spacing:0.1em;color:var(--muted);margin-bottom:6px">${a.vendors?.category||'Vendor'}${a.vendors?.email?' · '+a.vendors.email:''}</div>
+        ${a.vendors?.description?`<div style="font-size:12px;color:var(--sub);line-height:1.5;margin-bottom:8px;max-width:360px">${a.vendors.description.substring(0,120)}${a.vendors.description.length>120?'...':''}</div>`:''}
+        ${a.message?`<div style="background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:10px 12px;font-size:12px;color:var(--sub);font-style:italic;line-height:1.55">"${a.message}"</div>`:''}
+      </div>
+      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:8px;flex-shrink:0">
+        <span style="font-family:var(--mono);font-size:9px;letter-spacing:0.1em;text-transform:uppercase;padding:4px 12px;border-radius:99px;${statusColor[a.status]||statusColor.pending}">${a.status}</span>
+        ${a.status==='pending'?`
+        <div style="display:flex;gap:6px">
+          <button class="btn btn-primary btn-sm" onclick="updateVTApp('${a.id}','approved','${listingId}','${eventName}')">Approve</button>
+          <button class="btn btn-danger btn-sm" onclick="updateVTApp('${a.id}','rejected','${listingId}','${eventName}')">Decline</button>
+        </div>`:''}
+        ${a.vendors?.instagram?`<a href="https://instagram.com/${a.vendors.instagram.replace('@','')}" target="_blank" style="font-family:var(--mono);font-size:9px;letter-spacing:0.1em;color:var(--muted);text-decoration:none">&#128247; @${a.vendors.instagram.replace('@','')}</a>`:''}
+      </div>
+    </div>
+  </div>`).join('');
+}
+
+async function updateVTApp(appId,status,listingId,eventName){
+  const{error}=await sb.from('vendor_table_applications').update({status,reviewed_at:new Date().toISOString()}).eq('id',appId);
+  if(error){toast('Error updating application','error');return;}
+  if(status==='approved'){
+    // Decrement spots remaining
+    const{data:listing}=await sb.from('vendor_table_listings').select('spots_remaining').eq('id',listingId).maybeSingle();
+    if(listing&&listing.spots_remaining>0){
+      await sb.from('vendor_table_listings').update({spots_remaining:listing.spots_remaining-1}).eq('id',listingId);
+    }
+  }
+  toast(status==='approved'?'Vendor approved!':'Application declined');
+  await viewVendorTableApps(listingId,eventName);
+}
+
 </script>
 </body>
 </html>
