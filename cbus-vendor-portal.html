@@ -278,6 +278,11 @@ label{display:block;font-family:var(--mono);font-size:10px;font-weight:700;lette
     Festival Apps
     <span id="festivalAppsBadge" style="display:none;margin-left:auto;background:var(--gold);color:#000;border-radius:var(--r-full);padding:1px 8px;font-size:9px;font-weight:800">0</span>
   </button>
+  <button class="nav-item" id="nav-listings" onclick="showPage('listings')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 9h6M9 12h6M9 15h4"/><circle cx="6" cy="9" r="1" fill="currentColor"/><circle cx="6" cy="12" r="1" fill="currentColor"/><circle cx="6" cy="15" r="1" fill="currentColor"/></svg>
+    Open Listings
+    <span id="listingsBadge" style="display:none;margin-left:auto;background:var(--orange);color:#fff;border-radius:var(--r-full);padding:1px 8px;font-size:9px;font-weight:800">0</span>
+  </button>
   <button class="nav-item" id="nav-events" onclick="showPage('events')">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
     Browse Events
@@ -2639,6 +2644,229 @@ document.addEventListener('DOMContentLoaded',function(){
     closePmnMore();
   });
 });
+
+// ── OPEN VENDOR TABLE LISTINGS ───────────────────────────────
+
+async function renderListingsPage(){
+  const pc=document.getElementById('pageContent');
+  pc.innerHTML=`
+  <div style="margin-bottom:20px;display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:12px">
+    <div>
+      <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.18em;text-transform:uppercase;color:var(--muted);margin-bottom:4px">Opportunities</div>
+      <div style="font-size:22px;font-weight:800;letter-spacing:-0.03em">Open Vendor Spots</div>
+      <div style="font-size:13px;color:var(--sub);margin-top:4px">Vendor table spots and food truck opportunities posted by Columbus event planners.</div>
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <select id="listings-filter" onchange="filterListings()" style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r-md);padding:8px 14px;font-size:13px;color:var(--text);cursor:pointer">
+        <option value="all">All Types</option>
+        <option value="Food Vendor">Food Vendor</option>
+        <option value="Food Truck">Food Truck</option>
+        <option value="Artisan / Craft">Artisan / Craft</option>
+        <option value="Apparel / Merchandise">Apparel / Merchandise</option>
+        <option value="Beauty / Wellness">Beauty / Wellness</option>
+        <option value="Pop-up Retail">Pop-up Retail</option>
+        <option value="Art / Photography">Art / Photography</option>
+        <option value="Other">Other</option>
+      </select>
+    </div>
+  </div>
+  <div id="listingsWrap"><div class="spinner"></div></div>`;
+  await loadOpenListings();
+}
+
+let allListings=[];
+
+async function loadOpenListings(){
+  const el=document.getElementById('listingsWrap');
+  if(!el)return;
+
+  const{data:listings,error}=await sb
+    .from('vendor_table_listings')
+    .select('*, vendor_table_applications(id,vendor_id,status)')
+    .eq('is_active',true)
+    .gte('event_date',new Date().toISOString().split('T')[0])
+    .order('event_date',{ascending:true});
+
+  if(error){el.innerHTML=`<div style="color:var(--red);font-size:13px;padding:20px">Error loading listings: ${error.message}</div>`;return;}
+
+  allListings=listings||[];
+
+  // Update badge
+  const badge=document.getElementById('listingsBadge');
+  if(badge&&allListings.length){badge.style.display='inline';badge.textContent=allListings.length;}
+
+  renderListingCards(allListings);
+}
+
+function filterListings(){
+  const val=document.getElementById('listings-filter')?.value||'all';
+  const filtered=val==='all'?allListings:allListings.filter(l=>l.vendor_types_wanted?.includes(val));
+  renderListingCards(filtered);
+}
+
+function renderListingCards(listings){
+  const el=document.getElementById('listingsWrap');
+  if(!el)return;
+
+  if(!listings.length){
+    el.innerHTML=`
+    <div class="card" style="padding:48px 32px;text-align:center">
+      <div style="font-size:36px;margin-bottom:12px">&#128203;</div>
+      <div style="font-weight:700;font-size:15px;margin-bottom:6px">No open listings right now</div>
+      <div style="font-size:13px;color:var(--sub);max-width:360px;margin:0 auto">Event planners post vendor spots here as they build their events. Check back soon or make sure your profile is complete so planners can find you.</div>
+    </div>`;
+    return;
+  }
+
+  el.innerHTML=listings.map(l=>{
+    const apps=l.vendor_table_applications||[];
+    const myApp=apps.find(a=>a.vendor_id===vendorProfile?.id);
+    const spotsLeft=l.spots_remaining;
+    const isFull=spotsLeft<=0;
+    const eventDate=l.event_date?new Date(l.event_date).toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric',year:'numeric'}):'TBD';
+    const deadline=l.deadline?new Date(l.deadline).toLocaleDateString('en-US',{month:'short',day:'numeric'}):'Open until filled';
+    const daysUntil=l.event_date?Math.ceil((new Date(l.event_date)-new Date())/(1000*60*60*24)):null;
+    const urgency=daysUntil!==null&&daysUntil<=14;
+
+    let applyBtn='';
+    if(myApp){
+      const statusColor={
+        pending:'background:rgba(255,107,53,0.1);color:var(--orange);border:1px solid rgba(255,107,53,0.3)',
+        approved:'background:var(--green-dim);color:var(--green);border:1px solid var(--green-border)',
+        rejected:'background:rgba(239,68,68,0.08);color:var(--red);border:1px solid rgba(239,68,68,0.2)',
+        withdrawn:'background:rgba(255,255,255,0.04);color:var(--muted);border:1px solid var(--border)'
+      };
+      applyBtn=`<div style="display:flex;align-items:center;gap:8px">
+        <span style="font-family:var(--mono);font-size:9px;letter-spacing:0.1em;text-transform:uppercase;padding:6px 14px;border-radius:var(--r-full);${statusColor[myApp.status]||statusColor.pending}">
+          ${myApp.status==='pending'?'Applied - Pending Review':myApp.status==='approved'?'Approved!':myApp.status==='rejected'?'Not Selected':myApp.status}
+        </span>
+        ${myApp.status==='pending'?`<button class="btn btn-ghost btn-sm" onclick="withdrawApplication('${myApp.id}','${l.id}')">Withdraw</button>`:''}
+      </div>`;
+    } else if(isFull){
+      applyBtn=`<span style="font-family:var(--mono);font-size:9px;letter-spacing:0.1em;text-transform:uppercase;padding:6px 14px;border-radius:var(--r-full);background:rgba(255,255,255,0.04);color:var(--muted);border:1px solid var(--border)">Spots Full</span>`;
+    } else {
+      applyBtn=`<button class="btn btn-primary btn-sm" onclick="openApplyModal('${l.id}')">Apply for a Spot &#8594;</button>`;
+    }
+
+    return `
+    <div class="card" style="margin-bottom:12px;padding:0;overflow:hidden;${urgency&&!myApp&&!isFull?'border-color:rgba(255,107,53,0.3)':''}">
+      ${urgency&&!myApp&&!isFull?`<div style="background:linear-gradient(90deg,rgba(255,107,53,0.15),transparent);border-bottom:1px solid rgba(255,107,53,0.15);padding:6px 20px;font-family:var(--mono);font-size:9px;letter-spacing:0.14em;text-transform:uppercase;color:var(--orange)">&#9650; ${daysUntil} days away - Apply soon</div>`:''}
+      <div style="padding:20px">
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:14px">
+          <div style="flex:1;min-width:0">
+            <div style="font-weight:800;font-size:16px;margin-bottom:5px;letter-spacing:-0.02em">${l.event_name}</div>
+            <div style="font-family:var(--mono);font-size:10px;letter-spacing:0.1em;color:var(--muted);display:flex;gap:12px;flex-wrap:wrap">
+              <span>&#128197; ${eventDate}</span>
+              <span>&#128205; ${l.event_location}</span>
+              <span>&#128176; $${parseFloat(l.spot_fee).toFixed(2)} spot fee</span>
+              <span>&#9203; Apply by: ${deadline}</span>
+            </div>
+          </div>
+          <div style="flex-shrink:0;text-align:right">
+            <div style="font-family:var(--mono);font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:2px">Spots Left</div>
+            <div style="font-family:'DM Sans',sans-serif;font-size:28px;font-weight:900;color:${isFull?'var(--muted)':spotsLeft<=3?'var(--orange)':'var(--text)'};line-height:1">${isFull?'Full':spotsLeft}</div>
+            <div style="font-size:11px;color:var(--muted)">of ${l.total_spots}</div>
+          </div>
+        </div>
+        ${l.vendor_types_wanted?.length?`
+        <div style="margin-bottom:12px">
+          <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);margin-bottom:6px">Looking for</div>
+          <div style="display:flex;gap:6px;flex-wrap:wrap">${l.vendor_types_wanted.map(t=>`<span style="font-family:var(--mono);font-size:9px;letter-spacing:0.1em;text-transform:uppercase;background:rgba(255,107,53,0.08);color:var(--orange);border:1px solid rgba(255,107,53,0.2);padding:4px 12px;border-radius:99px">${t}</span>`).join('')}</div>
+        </div>`:''}
+        ${l.requirements?`<div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r-md);padding:12px 14px;font-size:13px;color:var(--sub);line-height:1.6;margin-bottom:14px">${l.requirements}</div>`:''}
+        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px">
+          <div style="font-size:12px;color:var(--muted)">${apps.length} applicant${apps.length!==1?'s':''}</div>
+          ${applyBtn}
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function openApplyModal(listingId){
+  const listing=allListings.find(l=>l.id===listingId);
+  if(!listing)return;
+
+  document.getElementById('modalContainer').style.display='flex';
+  document.getElementById('modalContainer').innerHTML=`
+  <div class="modal-overlay" onclick="if(event.target===this)closeModal()">
+    <div class="modal" style="max-width:500px">
+      <div class="modal-header">
+        <div class="modal-title">Apply for a Spot</div>
+        <button onclick="closeModal()" style="background:none;border:none;color:var(--sub);font-size:22px;cursor:pointer;line-height:1">&#215;</button>
+      </div>
+      <div class="modal-body">
+
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r-md);padding:14px 16px;margin-bottom:20px">
+          <div style="font-weight:700;font-size:14px;margin-bottom:4px">${listing.event_name}</div>
+          <div style="font-family:var(--mono);font-size:10px;letter-spacing:0.1em;color:var(--muted);display:flex;gap:12px;flex-wrap:wrap">
+            <span>${new Date(listing.event_date).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})}</span>
+            <span>${listing.event_location}</span>
+            <span>$${parseFloat(listing.spot_fee).toFixed(2)} spot fee</span>
+          </div>
+        </div>
+
+        <div style="background:rgba(255,107,53,0.06);border:1px solid rgba(255,107,53,0.15);border-radius:var(--r-md);padding:12px 14px;margin-bottom:20px">
+          <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.14em;text-transform:uppercase;color:var(--orange);margin-bottom:6px">How it works</div>
+          <div style="font-size:12px;color:var(--sub);line-height:1.65">Submit your application below. The planner will review and approve or decline. If approved, you will receive a payment link to secure your spot. Spot fees are non-refundable once paid.</div>
+        </div>
+
+        <div class="field" style="margin-bottom:14px">
+          <label style="font-size:12px;font-weight:600;color:var(--sub);text-transform:uppercase;letter-spacing:0.08em;font-family:var(--mono)">Applying as</label>
+          <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r-md);padding:10px 14px;font-size:13px;margin-top:6px">
+            ${vendorProfile?.business_name||'Your Business'} <span style="color:var(--muted);font-size:11px">· ${vendorProfile?.category||'Vendor'}</span>
+          </div>
+        </div>
+
+        <div class="field" style="margin-bottom:20px">
+          <label style="font-size:12px;font-weight:600;color:var(--sub);text-transform:uppercase;letter-spacing:0.08em;font-family:var(--mono)">Message to Planner <span style="color:var(--muted);font-weight:400">(optional)</span></label>
+          <textarea id="apply-message" style="width:100%;margin-top:6px;height:90px;resize:none;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-md);padding:10px 14px;font-size:13px;color:var(--text);font-family:'DM Sans',sans-serif" placeholder="Tell the planner about what you sell, your setup, past events, etc."></textarea>
+        </div>
+
+        <div style="display:flex;justify-content:flex-end;gap:10px;padding-top:4px;border-top:1px solid var(--border)">
+          <button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
+          <button class="btn btn-primary" id="submit-apply-btn" onclick="submitApplication('${listingId}')">Submit Application &#8594;</button>
+        </div>
+
+      </div>
+    </div>
+  </div>`;
+}
+
+async function submitApplication(listingId){
+  if(!vendorProfile?.id){toast('Could not find your vendor profile','error');return;}
+  const message=document.getElementById('apply-message')?.value.trim()||null;
+  const btn=document.getElementById('submit-apply-btn');
+  btn.disabled=true;btn.textContent='Submitting...';
+
+  const{error}=await sb.from('vendor_table_applications').insert({
+    listing_id:listingId,
+    vendor_id:vendorProfile.id,
+    planner_id:(allListings.find(l=>l.id===listingId)?.planner_id||null),
+    message:message,
+    status:'pending',
+  });
+
+  if(error){
+    btn.disabled=false;btn.textContent='Submit Application →';
+    if(error.code==='23505')toast('You have already applied for this spot','error');
+    else toast('Error submitting application: '+error.message,'error');
+    return;
+  }
+
+  closeModal();
+  toast('Application submitted! The planner will review and get back to you.','success');
+  await loadOpenListings();
+}
+
+async function withdrawApplication(appId,listingId){
+  if(!confirm('Withdraw your application for this listing?'))return;
+  const{error}=await sb.from('vendor_table_applications').update({status:'withdrawn'}).eq('id',appId);
+  if(error){toast('Error withdrawing application','error');return;}
+  toast('Application withdrawn');
+  await loadOpenListings();
+}
+
 </script>
 </body>
 </html>
