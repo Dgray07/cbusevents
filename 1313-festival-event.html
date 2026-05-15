@@ -1,8 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <link rel="stylesheet" href="/theme.css">
-  <script src="/theme.js"></script>
 
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
@@ -524,6 +522,127 @@
       color: #fff;
       box-shadow: 0 2px 0 var(--brick);
     }
+
+    /* SUPPORTER TICKET */
+    .supporter-ticket {
+      background: #1a1008;
+      border-radius: 20px;
+      padding: 28px;
+      margin-bottom: 48px;
+      box-shadow: 0 6px 0 rgba(0,0,0,0.3);
+      display: flex;
+      align-items: center;
+      gap: 24px;
+      position: relative;
+      overflow: hidden;
+    }
+    .supporter-ticket::before {
+      content: '🔥';
+      position: absolute;
+      font-size: 120px;
+      right: -10px;
+      top: -20px;
+      opacity: 0.08;
+      pointer-events: none;
+    }
+    .supporter-ticket-left { flex: 1; min-width: 0; }
+    .supporter-ticket-badge {
+      font-family: 'DM Mono', 'Fredoka One', monospace;
+      font-size: 9px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      background: rgba(255,107,53,0.15);
+      color: var(--orange);
+      border: 1px solid rgba(255,107,53,0.3);
+      padding: 4px 12px;
+      border-radius: 99px;
+      display: inline-block;
+      margin-bottom: 10px;
+    }
+    .supporter-ticket-title {
+      font-family: 'Fredoka One', cursive;
+      font-size: 26px;
+      color: #fff;
+      margin-bottom: 6px;
+      line-height: 1.1;
+    }
+    .supporter-ticket-desc {
+      font-size: 13px;
+      color: rgba(255,255,255,0.6);
+      line-height: 1.6;
+      font-weight: 400;
+      max-width: 420px;
+    }
+    .supporter-ticket-right {
+      flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+    }
+    .supporter-price {
+      font-family: 'Fredoka One', cursive;
+      font-size: 48px;
+      color: #fff;
+      line-height: 1;
+    }
+    .supporter-price sup {
+      font-size: 22px;
+      vertical-align: top;
+      margin-top: 8px;
+    }
+    .supporter-price-label {
+      font-size: 11px;
+      color: rgba(255,255,255,0.4);
+      text-align: center;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-top: -8px;
+    }
+    .supporter-btn {
+      background: var(--orange);
+      color: #fff;
+      font-family: 'Fredoka One', cursive;
+      font-size: 17px;
+      border: none;
+      padding: 13px 28px;
+      border-radius: 10px;
+      cursor: pointer;
+      box-shadow: 0 4px 0 var(--brick);
+      text-decoration: none;
+      display: inline-block;
+      transition: all 0.2s;
+      white-space: nowrap;
+      position: relative;
+      top: 0;
+    }
+    .supporter-btn:hover { top: -2px; box-shadow: 0 6px 0 var(--brick); }
+    .supporter-btn:active { top: 2px; box-shadow: 0 2px 0 var(--brick); }
+    .supporter-perks {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-top: 14px;
+    }
+    .supporter-perk {
+      font-size: 12px;
+      color: rgba(255,255,255,0.55);
+      display: flex;
+      align-items: center;
+      gap: 7px;
+    }
+    .supporter-perk::before {
+      content: '✓';
+      color: var(--orange);
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+    @media (max-width: 640px) {
+      .supporter-ticket { flex-direction: column; text-align: center; }
+      .supporter-ticket-right { width: 100%; }
+      .supporter-ticket-desc { max-width: 100%; }
+      .supporter-perks { align-items: center; }
+    }
   </style>
 </head>
 <body>
@@ -558,15 +677,31 @@
     <div class="info-pill"><span class="icon">⏰</span> 11AM - 10PM</div>
     <div class="info-pill"><span class="icon">📍</span> 1313 E Broad St, Columbus, OH</div>
     <div class="info-pill"><span class="icon">🎟️</span> Free Entry</div>
-    <div class="info-pill"><span class="icon">🚚</span> 8 Food Trucks</div>
-    <div class="info-pill"><span class="icon">⛺</span> 20 Vendors</div>
+    <div class="info-pill"><span class="icon">🛍️</span> 15+ Food &amp; Retail Vendors</div>
+  </div>
+
+
+  <!-- FUEL THE FESTIVAL SUPPORTER TICKET -->
+  <div class="supporter-ticket">
+    <div class="supporter-ticket-left">
+      <div class="supporter-ticket-badge">Supporter Ticket</div>
+      <div class="supporter-ticket-title">Fuel the Festival 🔥</div>
+      <div class="supporter-ticket-desc">This $20 community support pass is for those who want to help keep 1313 and future experiences alive. This ticket includes no entry benefits &mdash; just direct support toward building and sustaining independent cultural events in Columbus.</div>
+    </div>
+    <div class="supporter-ticket-right">
+      <div>
+        <div class="supporter-price"><sup>$</sup>20</div>
+        <div class="supporter-price-label">One-time support</div>
+      </div>
+      <a href="https://buy.stripe.com/aFabJ15E444i8lh2Vqc3m0i" target="_blank" class="supporter-btn">Fuel the Festival</a>
+    </div>
   </div>
 
   <!-- RSVP -->
   <div class="rsvp-section" id="rsvp">
     <div id="rsvpFormWrap">
-      <div class="rsvp-title">Reserve Your Spot 🎪</div>
-      <div class="rsvp-sub">Free to attend. RSVP to get text alerts, vendor updates, and preorder access before the event.</div>
+      <div class="rsvp-title">Enter the Drawing 🍽️</div>
+      <div class="rsvp-sub">RSVP for a chance to win a free dessert or meal from one of our vendors. One winner drawn the week of the festival.</div>
       <div class="rsvp-form">
         <div class="rsvp-field">
           <label>Your Name</label>
@@ -577,7 +712,7 @@
           <input type="email" id="rsvp-email" placeholder="you@email.com"/>
         </div>
         <div class="rsvp-field">
-          <label>Phone (for text alerts)</label>
+          <label>Phone (optional)</label>
           <input type="tel" id="rsvp-phone" placeholder="(614) 000-0000"/>
         </div>
         <button class="rsvp-btn" id="rsvpBtn" onclick="submitRsvp()">I'm Going! 🙌</button>
@@ -588,7 +723,7 @@
     <div class="rsvp-success" id="rsvpSuccess">
       <div class="rsvp-success-icon">🎊</div>
       <h3>You're on the list!</h3>
-      <p>We'll text you updates, vendor reveals, and preorder access as June 13th gets closer.</p>
+      <p>You're entered! We'll reach out if you're selected for a free dessert or meal. See you June 13th. 🎉</p>
     </div>
   </div>
 
