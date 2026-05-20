@@ -876,94 +876,196 @@ async function adminCreateConvo(){
 
 // ── DASHBOARD ─────────────────────────────────────────────────
 function renderDashboard(){
- const approved=allVenues.filter(v=>v.status==='approved').length;
- const pending=allVenues.filter(v=>v.status==='pending').length;
- const premium=allVenues.filter(v=>v.tier==='premium').length;
- const standard=allVenues.filter(v=>v.tier==='standard').length;
- const revenue=standard*29+premium*79;
- const newInq=allInquiries.filter(i=>i.status==='new').length;
- const thisWeekEvents=allEvents.filter(e=>{const d=new Date(e.start_time),n=new Date();return d>=n&&d<=new Date(n.getTime()+7*86400000);}).length;
+  const approved=allVenues.filter(v=>v.status==='approved').length;
+  const pending=allVenues.filter(v=>v.status==='pending').length;
+  const premium=allVenues.filter(v=>v.tier==='premium').length;
+  const standard=allVenues.filter(v=>v.tier==='standard').length;
+  const newInq=allInquiries.filter(i=>i.status==='new').length;
+  const thisWeekEvents=allEvents.filter(e=>{const d=new Date(e.start_time),n=new Date();return d>=n&&d<=new Date(n.getTime()+7*86400000);}).length;
+  const liveEvents=allEvents.filter(e=>e.status==='published'||e.status==='active').length;
+  const totalVendors=allVendors.length;
+  const activeVendors=allVendors.filter(v=>v.storefront_active).length;
 
- var pendingHtml='';
- if(pending){
-   var pCards=allVenues.filter(function(v){return v.status==='pending';}).map(function(v){
-     return '<div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px 18px;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between;gap:12px">'
-       +'<div><div style="font-weight:700;font-size:13px">'+v.name+'</div>'
-       +'<div style="font-size:11px;color:var(--muted)">'+(v.venue_type||'Venue')+(v.neighborhood?' · '+v.neighborhood:'')+' · '+new Date(v.created_at).toLocaleDateString()+'</div></div>'
-       +'<div style="display:flex;gap:6px">'
-       +'<button class="btn btn-success btn-sm" onclick="approveVenue(\''+v.id+'\')">Approve</button>'
-       +'<button class="btn btn-danger btn-sm" onclick="rejectVenue(\''+v.id+'\')">Reject</button>'
-       +'</div></div>';
-   }).join('');
-   pendingHtml='<div class="table-card" style="margin-bottom:20px">'
-     +'<div class="table-header"><div class="table-title">Pending Approval ('+pending+')</div>'
-     +'<button class="btn btn-ghost btn-sm" onclick="nav(\'venues\')">View All →</button></div>'
-     +'<div style="padding:12px 16px">'+pCards+'</div></div>';
- } else {
-   pendingHtml='<div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px 22px;margin-bottom:20px;display:flex;align-items:center;gap:10px;color:var(--green);font-size:14px;font-weight:500">No pending venues — all caught up!</div>';
- }
+  // Pending approvals HTML
+  const pendingVenues=allVenues.filter(v=>v.status==='pending').slice(0,5);
+  const pendingRows=pendingVenues.map(v=>`
+    <div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--border-sub)">
+      <div style="width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--orange),#c84000);display:flex;align-items:center;justify-content:center;font-weight:900;font-size:13px;flex-shrink:0">${(v.name||'V')[0]}</div>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${v.name||'Unnamed'}</div>
+        <div style="font-family:var(--mono);font-size:9px;letter-spacing:.1em;color:var(--muted);text-transform:uppercase;margin-top:1px">${v.venue_type||'Venue'}${v.neighborhood?' · '+v.neighborhood:''}</div>
+      </div>
+      <div style="display:flex;gap:6px;flex-shrink:0">
+        <button class="btn btn-success btn-sm" onclick="approveVenue('${v.id}')">Approve</button>
+        <button class="btn btn-danger btn-sm" onclick="rejectVenue('${v.id}')">✕</button>
+      </div>
+    </div>`).join('');
 
- var iRows=allInquiries.slice(0,5).map(function(i){
-   return '<tr>'
-     +'<td><strong>'+i.name+'</strong><div style="font-size:11px;color:var(--muted)">'+i.email+'</div></td>'
-     +'<td style="color:var(--sub)">'+(i.venues?i.venues.name:'—')+'</td>'
-     +'<td style="color:var(--muted)">'+new Date(i.created_at).toLocaleDateString()+'</td>'
-     +'<td><span class="badge '+(i.status==='new'?'badge-orange':'badge-muted')+'">'+i.status+'</span></td>'
-     +'</tr>';
- }).join('')||'<tr class="empty-row"><td colspan="4">No inquiries yet</td></tr>';
- var inqHtml='<div class="table-card"><div class="table-header"><div class="table-title">Recent Inquiries</div>'
-   +'<button class="btn btn-ghost btn-sm" onclick="nav(\'inquiries\')">View All →</button></div>'
-   +'<table><thead><tr><th>From</th><th>Venue</th><th>Date</th><th>Status</th></tr></thead>'
-   +'<tbody>'+iRows+'</tbody></table></div>';
+  // Recent activity HTML (inquiries as proxy)
+  const recentActivity=allInquiries.slice(0,6).map(i=>`
+    <div style="display:flex;align-items:flex-start;gap:12px;padding:12px 0;border-bottom:1px solid var(--border-sub);cursor:pointer" onclick="nav('inquiries')">
+      <div style="width:30px;height:30px;border-radius:50%;background:rgba(255,107,53,.15);border:1px solid rgba(255,107,53,.3);display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;margin-top:1px">📋</div>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:13px;color:var(--sub);line-height:1.5"><strong style="color:var(--text)">${i.name||'Anonymous'}</strong> submitted a venue inquiry for ${i.venues?.name||'a venue'}</div>
+        <div style="font-family:var(--mono);font-size:9px;letter-spacing:.1em;color:var(--muted);margin-top:3px">${new Date(i.created_at).toLocaleDateString('en-US',{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'})}</div>
+      </div>
+      <div style="font-family:var(--mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;padding:3px 10px;border-radius:99px;flex-shrink:0;${i.status==='new'?'background:rgba(255,107,53,.12);color:var(--orange);border:1px solid rgba(255,107,53,.3)':'background:var(--border);color:var(--muted)'}">${i.status}</div>
+    </div>`).join('') || `<div style="padding:32px;text-align:center;color:var(--muted);font-size:13px">No recent activity</div>`;
 
- document.getElementById('pageContent').innerHTML=`
- <div class="stat-grid">
-   <div class="stat-card" style="cursor:pointer" onclick="nav('venues')">
-     <div class="stat-card-num">${allVenues.length}</div>
-     <div class="stat-card-label">Total Venues</div>
-     <div class="stat-card-sub" style="color:var(--green)">${approved} approved · ${pending} pending</div>
-   </div>
-   <div class="stat-card" style="cursor:pointer" onclick="nav('revenue')">
-     <div class="stat-card-num" style="color:var(--green)">$${revenue}</div>
-     <div class="stat-card-label">Monthly Revenue (est.)</div>
-     <div class="stat-card-sub" style="color:var(--sub)">${standard} standard · ${premium} premium</div>
-   </div>
-   <div class="stat-card" style="cursor:pointer" onclick="nav('inquiries')">
-     <div class="stat-card-num" style="color:${newInq?'var(--orange)':'var(--text)'}">${newInq}</div>
-     <div class="stat-card-label">New Inquiries</div>
-     <div class="stat-card-sub" style="color:var(--sub)">${allInquiries.length} total</div>
-   </div>
-   <div class="stat-card" style="cursor:pointer" onclick="nav('design')">
-     <div class="stat-card-num" style="color:${allDesignRequests.filter(d=>d.status==='new').length?'var(--gold)':'var(--text)'}">${allDesignRequests.filter(d=>d.status==='new').length}</div>
-     <div class="stat-card-label">Design Requests</div>
-     <div class="stat-card-sub" style="color:var(--sub)">${allDesignRequests.length} total</div>
-   </div>
-   <div class="stat-card" style="cursor:pointer" onclick="nav('events')">
-     <div class="stat-card-num">${thisWeekEvents}</div>
-     <div class="stat-card-label">Events This Week</div>
-     <div class="stat-card-sub" style="color:var(--sub)">${allEvents.length} total upcoming</div>
-   </div>
-   <div class="stat-card" style="cursor:pointer" onclick="nav('vendors')">
-     <div class="stat-card-num" style="color:var(--blue)">${allVendors.length}</div>
-     <div class="stat-card-label">Total Vendors</div>
-     <div class="stat-card-sub" style="color:var(--sub)">${allVendors.filter(v=>v.subscription_status==='active'||v.tier==='premium'||v.tier==='standard').length} paid · ${allVendors.filter(v=>!v.subscription_status||v.subscription_status!=='active').length} free</div>
-   </div>
-   <div class="stat-card" style="cursor:pointer" onclick="nav('organizers')">
-     <div class="stat-card-num" style="color:var(--gold)">${organizerCount}</div>
-     <div class="stat-card-label">Organizers</div>
-     <div class="stat-card-sub" style="color:var(--sub)">Registered accounts</div>
-   </div>
-   <div class="stat-card" style="cursor:pointer" onclick="nav('users')">
-     <div class="stat-card-num" style="color:var(--green)">${attendeeCount}</div>
-     <div class="stat-card-label">Attendees</div>
-     <div class="stat-card-sub" style="color:var(--sub)">Registered accounts</div>
-   </div>
- </div>
- ${pendingHtml}
- ${inqHtml}
-`;
+  document.getElementById('pageContent').innerHTML=`
+
+    <!-- REVENUE HERO -->
+    <div style="background:linear-gradient(135deg,#0f0f1a 0%,#1a0f0a 100%);border:1px solid var(--border);border-radius:14px;padding:28px 32px;margin-bottom:20px;position:relative;overflow:hidden;display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:0">
+      <div style="position:absolute;top:-60px;right:-60px;width:240px;height:240px;border-radius:50%;background:radial-gradient(circle,rgba(255,107,53,.1) 0%,transparent 70%);pointer-events:none"></div>
+
+      <div style="padding-right:28px;border-right:1px solid var(--border)">
+        <div style="font-family:var(--mono);font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);margin-bottom:10px">Platform Revenue</div>
+        <div style="font-family:'DM Sans',sans-serif;font-size:44px;font-weight:900;color:var(--text);line-height:1;margin-bottom:8px"><span style="color:var(--orange);font-size:26px">$</span>${(standard*29+premium*79).toLocaleString()}<span style="font-size:20px;color:var(--muted)">.00</span></div>
+        <div style="display:flex;align-items:center;gap:6px;font-family:var(--mono);font-size:11px;letter-spacing:.1em;color:var(--green)">▲ Subscription revenue est.</div>
+        <div style="display:flex;align-items:flex-end;gap:3px;height:36px;margin-top:14px">
+          ${[30,45,35,60,50,70,55,80,65,90,75,100].map(h=>`<div style="flex:1;height:${h}%;background:var(--orange);opacity:${h/120+0.3};border-radius:2px 2px 0 0"></div>`).join('')}
+        </div>
+      </div>
+
+      <div style="padding:0 24px;border-right:1px solid var(--border);display:flex;flex-direction:column;justify-content:center">
+        <div style="font-family:var(--mono);font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);margin-bottom:6px">Total Venues</div>
+        <div style="font-family:'DM Sans',sans-serif;font-size:28px;font-weight:900;color:var(--text);margin-bottom:4px">${allVenues.length}</div>
+        <div style="font-family:var(--mono);font-size:10px;letter-spacing:.08em;color:var(--green)">▲ ${approved} approved</div>
+      </div>
+
+      <div style="padding:0 24px;border-right:1px solid var(--border);display:flex;flex-direction:column;justify-content:center">
+        <div style="font-family:var(--mono);font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);margin-bottom:6px">Live Events</div>
+        <div style="font-family:'DM Sans',sans-serif;font-size:28px;font-weight:900;color:var(--text);margin-bottom:4px">${liveEvents}</div>
+        <div style="font-family:var(--mono);font-size:10px;letter-spacing:.08em;color:var(--sub)">${thisWeekEvents} this week</div>
+      </div>
+
+      <div style="padding:0 24px;display:flex;flex-direction:column;justify-content:center">
+        <div style="font-family:var(--mono);font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);margin-bottom:6px">Open Inquiries</div>
+        <div style="font-family:'DM Sans',sans-serif;font-size:28px;font-weight:900;color:${newInq?'var(--orange)':'var(--text)'};margin-bottom:4px">${newInq}</div>
+        <div style="font-family:var(--mono);font-size:10px;letter-spacing:.08em;color:var(--sub)">${allInquiries.length} total</div>
+      </div>
+    </div>
+
+    <!-- ROLE STATS ROW -->
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px">
+      ${[
+        {icon:'🏟️',label:'Organizers',val:organizerCount,color:'var(--gold)',click:"nav('organizers')"},
+        {icon:'🏪',label:'Vendors',val:totalVendors,color:'var(--blue)',click:"nav('vendors')"},
+        {icon:'👥',label:'Attendees',val:attendeeCount,color:'var(--green)',click:"nav('users')"},
+        {icon:'⭐',label:'Premium Venues',val:premium,color:'var(--orange)',click:"nav('venues')"},
+      ].map(s=>`
+        <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:18px 20px;cursor:pointer;transition:border-color .15s" onclick="${s.click}" onmouseover="this.style.borderColor='var(--border-sub)'" onmouseout="this.style.borderColor='var(--border)'">
+          <div style="font-size:20px;margin-bottom:10px">${s.icon}</div>
+          <div style="font-family:'DM Sans',sans-serif;font-size:26px;font-weight:900;color:${s.color};line-height:1;margin-bottom:4px">${s.val}</div>
+          <div style="font-family:var(--mono);font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted)">${s.label}</div>
+        </div>`).join('')}
+    </div>
+
+    <!-- MAIN GRID -->
+    <div style="display:grid;grid-template-columns:1fr 320px;gap:20px;margin-bottom:20px">
+
+      <!-- LIVE ACTIVITY -->
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden">
+        <div style="padding:16px 22px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between">
+          <div style="font-family:'DM Sans',sans-serif;font-size:15px;font-weight:700">Live Activity</div>
+          <div style="display:flex;align-items:center;gap:7px;font-family:var(--mono);font-size:10px;letter-spacing:.12em;color:var(--green)">
+            <div style="width:6px;height:6px;border-radius:50%;background:var(--green);animation:spin 0s linear;box-shadow:0 0 6px var(--green)"></div>
+            Live
+          </div>
+        </div>
+        <div style="padding:0 22px">${recentActivity}</div>
+        <div style="padding:14px 22px;border-top:1px solid var(--border)">
+          <button class="btn btn-ghost btn-sm" onclick="nav('inquiries')">View all activity →</button>
+        </div>
+      </div>
+
+      <!-- RIGHT COLUMN -->
+      <div style="display:flex;flex-direction:column;gap:14px">
+
+        <!-- PENDING APPROVALS -->
+        <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden">
+          <div style="padding:14px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between">
+            <div style="font-family:'DM Sans',sans-serif;font-size:14px;font-weight:700">Pending Approvals</div>
+            ${pending?`<span style="background:var(--orange);color:white;font-family:var(--mono);font-size:9px;font-weight:600;padding:2px 9px;border-radius:99px">${pending}</span>`:''}
+          </div>
+          <div style="padding:0 18px">
+            ${pendingRows || `<div style="padding:20px 0;text-align:center;color:var(--muted);font-size:13px">All caught up ✓</div>`}
+          </div>
+          ${pending?`<div style="padding:12px 18px;border-top:1px solid var(--border)"><button class="btn btn-ghost btn-sm" onclick="nav('venues')">View all venues →</button></div>`:''}
+        </div>
+
+        <!-- QUICK ACTIONS -->
+        <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px 18px">
+          <div style="font-family:'DM Sans',sans-serif;font-size:14px;font-weight:700;margin-bottom:12px">Quick Actions</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+            ${[
+              {icon:'⭐',label:'Feature Event',click:"nav('events')"},
+              {icon:'📰',label:'Scene Report',click:"nav('blog')"},
+              {icon:'💰',label:'View Revenue',click:"nav('revenue')"},
+              {icon:'📣',label:'Send Bulk Email',click:"nav('email')"},
+              {icon:'🎯',label:'Boost Listing',click:"nav('marketing')"},
+              {icon:'📊',label:'Analytics',click:"nav('analytics')"},
+            ].map(a=>`
+              <button onclick="${a.click}" style="background:var(--card-hover,#18182a);border:1px solid var(--border);border-radius:8px;padding:11px;cursor:pointer;text-align:left;transition:border-color .15s;font-family:var(--font)" onmouseover="this.style.borderColor='rgba(255,107,53,.3)'" onmouseout="this.style.borderColor='var(--border)'">
+                <div style="font-size:16px;margin-bottom:5px">${a.icon}</div>
+                <div style="font-size:12px;font-weight:500;color:var(--text);line-height:1.3">${a.label}</div>
+              </button>`).join('')}
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- BOTTOM STATS -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+
+      <!-- TOP EVENTS -->
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden">
+        <div style="padding:16px 22px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between">
+          <div style="font-family:'DM Sans',sans-serif;font-size:15px;font-weight:700">Upcoming Events</div>
+          <button class="btn btn-ghost btn-sm" onclick="nav('events')">View all →</button>
+        </div>
+        ${allEvents.slice(0,5).map(e=>`
+          <div style="padding:12px 22px;border-bottom:1px solid var(--border-sub);display:flex;align-items:center;gap:14px;cursor:pointer" onclick="nav('events')">
+            <div style="text-align:center;flex-shrink:0;min-width:36px">
+              <div style="font-family:var(--mono);font-size:8px;letter-spacing:.14em;text-transform:uppercase;color:var(--orange)">${e.start_time?new Date(e.start_time).toLocaleDateString('en-US',{month:'short'}).toUpperCase():''}</div>
+              <div style="font-family:'DM Sans',sans-serif;font-size:20px;font-weight:900;color:var(--text);line-height:1">${e.start_time?new Date(e.start_time).getDate():'?'}</div>
+            </div>
+            <div style="flex:1;min-width:0">
+              <div style="font-size:13px;font-weight:500;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${e.title||'Untitled'}</div>
+              <div style="font-size:11px;color:var(--muted)">${e.venue_name_override||'Columbus'}</div>
+            </div>
+            <div style="font-family:var(--mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;padding:3px 9px;border-radius:99px;flex-shrink:0;${e.status==='published'?'background:rgba(52,211,153,.1);color:var(--green);border:1px solid rgba(52,211,153,.25)':'background:var(--border);color:var(--muted)'}">${e.status||'draft'}</div>
+          </div>`).join('') || `<div style="padding:32px;text-align:center;color:var(--muted);font-size:13px">No upcoming events</div>`}
+      </div>
+
+      <!-- PLATFORM HEALTH -->
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px 22px">
+        <div style="font-family:'DM Sans',sans-serif;font-size:15px;font-weight:700;margin-bottom:18px">Platform Health</div>
+        <div style="display:flex;flex-direction:column;gap:14px">
+          ${[
+            {icon:'🏟️',label:'Venues active',val:approved,max:allVenues.length||1,color:'var(--orange)'},
+            {icon:'📅',label:'Events live',val:liveEvents,max:Math.max(allEvents.length,1),color:'var(--purple,#a855f7)'},
+            {icon:'🏪',label:'Vendor storefronts',val:activeVendors,max:Math.max(totalVendors,1),color:'var(--green)'},
+            {icon:'👥',label:'Total members',val:organizerCount+attendeeCount,max:500,color:'var(--blue)'},
+            {icon:'💬',label:'Open inquiries',val:newInq,max:Math.max(allInquiries.length,1),color:'var(--gold)'},
+          ].map(h=>`
+            <div style="display:flex;align-items:center;gap:12px">
+              <div style="font-size:15px;width:20px;text-align:center">${h.icon}</div>
+              <div style="flex:1">
+                <div style="font-size:12px;color:var(--sub);margin-bottom:4px">${h.label}</div>
+                <div style="height:4px;background:var(--border);border-radius:99px;overflow:hidden">
+                  <div style="height:100%;width:${Math.min(100,Math.round(h.val/h.max*100))}%;background:${h.color};border-radius:99px;transition:width .6s ease"></div>
+                </div>
+              </div>
+              <div style="font-family:var(--mono);font-size:12px;font-weight:500;color:var(--text);flex-shrink:0;min-width:28px;text-align:right">${h.val}</div>
+            </div>`).join('')}
+        </div>
+      </div>
+
+    </div>
+  `;
 }
-
 
 // ── VENUES ────────────────────────────────────────────────────
 function renderVenues(){
