@@ -39,7 +39,7 @@
   </url>
 
   <url>
-    <loc>https://cbusevents.com/signup.html?role=planner</loc>
+    <loc>https://cbusevents.com/signup.html?role=organizer</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -87,7 +87,7 @@
   </url>
 
   <url>
-    <loc>https://cbusevents.com/cbus-planner-portal.html</loc>
+    <loc>https://cbusevents.com/cbus-organizer-portal.html</loc>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
@@ -104,24 +104,24 @@
     <priority>0.5</priority>
   </url>
 
-  <!-- Event pages (3 events) — auto-generated 2026-05-19 -->
+  <!-- Event pages (3 events) — auto-generated 2026-05-20 -->
   <url>
     <loc>https://cbusevents.com/event.html?id=72b9cdec-806a-493e-bbec-11a3c5bfc63d</loc>
-    <lastmod>2026-05-07</lastmod>
+    <lastmod>2026-05-20</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
 
   <url>
     <loc>https://cbusevents.com/event.html?id=169a009e-c673-481a-a6ad-2c54e7ddc6af</loc>
-    <lastmod>2026-04-21</lastmod>
+    <lastmod>2026-05-20</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
 
   <url>
     <loc>https://cbusevents.com/event.html?id=f50316a8-c5da-4023-bc21-55c67b3d4f9b</loc>
-    <lastmod>2026-05-05</lastmod>
+    <lastmod>2026-05-20</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
