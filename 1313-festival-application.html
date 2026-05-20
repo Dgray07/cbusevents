@@ -183,6 +183,13 @@
     .footer a { color: var(--muted); text-decoration: none; }
     .footer a:hover { color: var(--orange); }
 
+    .payment-fallback { display: none; margin-top: 24px; text-align: center; }
+    .payment-fallback.visible { display: block; }
+    .payment-fallback-btn { display: inline-block; background: var(--orange); color: #fff; font-family: 'Fredoka One', cursive; font-size: 20px; letter-spacing: 0.04em; text-decoration: none; padding: 16px 36px; border-radius: 14px; box-shadow: 0 5px 0 #C0392B; transition: all 0.2s; position: relative; top: 0; }
+    .payment-fallback-btn:hover { background: #ff7f4d; top: -2px; box-shadow: 0 7px 0 #C0392B; }
+    .payment-fallback-btn:active { top: 3px; box-shadow: 0 2px 0 #C0392B; }
+    .payment-fallback-note { font-size: 12px; font-weight: 600; color: var(--muted); margin-top: 10px; }
+
     @keyframes fadeUp { to { opacity: 1; transform: translateY(0); } }
 
     .field.error input, .field.error select, .field.error textarea { border-color: var(--brick); }
@@ -387,7 +394,11 @@
       <div class="step-item"><div class="step-num">1</div>✅ Application submitted</div>
       <div class="step-item"><div class="step-num">2</div>Complete payment to confirm your spot</div>
       <div class="step-item"><div class="step-num">3</div>Spot confirmed + listing goes live</div>
-      <div class="step-item" style="opacity:0.6;font-size:12px;padding-top:4px">Redirecting to payment...</div>
+      <div class="step-item" id="redirect-status" style="opacity:0.6;font-size:12px;padding-top:4px">Redirecting to payment...</div>
+    </div>
+    <div class="payment-fallback" id="paymentFallback">
+      <a class="payment-fallback-btn" id="paymentFallbackBtn" href="#" target="_blank">Complete Payment 💳</a>
+      <p class="payment-fallback-note">Button not working? Copy this link: <span id="paymentFallbackUrl" style="color:var(--orange);word-break:break-all;"></span></p>
     </div>
   </div>
 
@@ -612,9 +623,20 @@
       const paymentLink = isTruck
         ? 'https://buy.stripe.com/5kQbJ11nObwK0SPfIcc3m0g'
         : 'https://buy.stripe.com/aFafZh7Mc9oC9pl1Rmc3m09';
+
+      // Set up fallback button immediately with correct link
+      document.getElementById('paymentFallbackBtn').href = paymentLink;
+      document.getElementById('paymentFallbackUrl').textContent = paymentLink;
+
       setTimeout(() => {
         window.location.href = paymentLink;
       }, 1500);
+
+      // Show fallback button after 4s in case redirect was blocked
+      setTimeout(() => {
+        document.getElementById('redirect-status').textContent = 'Redirect not working? Use the button below.';
+        document.getElementById('paymentFallback').classList.add('visible');
+      }, 4000);
 
     } catch(e) {
       showAuthError(e.message || 'Something went wrong. Please try again.');
