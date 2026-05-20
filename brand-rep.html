@@ -119,7 +119,7 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--font);min-hei
 .list-icon{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;}
 .list-icon.venue{background:var(--blue-dim);}
 .list-icon.vendor{background:var(--orange-dim);}
-.list-icon.planner{background:var(--gold-dim);}
+.list-icon.organizer{background:var(--gold-dim);}
 .list-icon.food{background:var(--green-dim);}
 .list-info{flex:1;min-width:0;}
 .list-name{font-size:13px;font-weight:700;color:var(--text);margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
@@ -133,7 +133,7 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--font);min-hei
 .event-card{background:var(--surface);border:1px solid var(--border-sub);border-radius:12px;padding:14px 16px;margin-bottom:10px;position:relative;overflow:hidden;}
 .event-card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;}
 .event-card.venue::before{background:var(--blue);}
-.event-card.planner::before{background:var(--gold);}
+.event-card.organizer::before{background:var(--gold);}
 .event-card.festival::before{background:var(--orange);}
 .event-top{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:8px;}
 .event-name{font-size:14px;font-weight:800;color:var(--text);line-height:1.3;}
@@ -369,7 +369,7 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--font);min-hei
         <div class="chip active" onclick="setChip(this,'all')">All</div>
         <div class="chip" onclick="setChip(this,'venue')">Venues</div>
         <div class="chip" onclick="setChip(this,'vendor')">Vendors</div>
-        <div class="chip" onclick="setChip(this,'planner')">Planners</div>
+        <div class="chip" onclick="setChip(this,'organizer')">Organizers</div>
         <div class="chip" onclick="setChip(this,'free')">Free Tier</div>
       </div>
       <div id="accountsList">
@@ -385,7 +385,7 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--font);min-hei
       <div class="pad-top"></div>
       <div class="sec">
         <div class="sec-title">Events at Your Accounts</div>
-        <div class="info-note" style="margin-bottom:14px">Events published by venues and planners you referred. Ticket revenue generates commission back to you automatically.</div>
+        <div class="info-note" style="margin-bottom:14px">Events published by venues and organizers you referred. Ticket revenue generates commission back to you automatically.</div>
         <div id="eventsList">
           <div class="page-loader"><div class="spinner"></div> Loading...</div>
         </div>
@@ -575,7 +575,7 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--font);min-hei
           <select class="form-select" id="ob-type">
             <option value="venue">Venue</option>
             <option value="vendor">Vendor</option>
-            <option value="planner">Planner</option>
+            <option value="organizer">Organizer</option>
             <option value="food_pro">Food Pro</option>
             <option value="event_staff">Event Staff</option>
           </select>
@@ -762,12 +762,12 @@ function renderAccountsList() {
     return;
   }
 
-  const iconMap = { venue:'🏛', vendor:'🎛', planner:'📋', food_pro:'🍽', event_staff:'👤' };
-  const typeClass = { venue:'venue', vendor:'vendor', planner:'planner', food_pro:'food', event_staff:'vendor' };
+  const iconMap = { venue:'🏛', vendor:'🎛', organizer:'📋', food_pro:'🍽', event_staff:'👤' };
+  const typeClass = { venue:'venue', vendor:'vendor', organizer:'organizer', food_pro:'food', event_staff:'vendor' };
 
   el.innerHTML = filtered.map(a => {
-    const comm = a.tier === 'premium' ? (a.account_type === 'venue' ? 24.75 : a.account_type === 'planner' ? 18.75 : 11.25)
-               : a.tier === 'standard' ? (a.account_type === 'venue' ? 9.75 : a.account_type === 'planner' ? 5.00 : 3.75)
+    const comm = a.tier === 'premium' ? (a.account_type === 'venue' ? 24.75 : a.account_type === 'organizer' ? 18.75 : 11.25)
+               : a.tier === 'standard' ? (a.account_type === 'venue' ? 9.75 : a.account_type === 'organizer' ? 5.00 : 3.75)
                : 0;
     const badge = a.status === 'active' ? '<span class="badge badge-green">Active</span>'
                 : a.status === 'pending' ? '<span class="badge badge-orange">Pending</span>'
@@ -859,7 +859,7 @@ async function loadEvents() {
 
   const el = document.getElementById('eventsList');
   if (!events || events.length === 0) {
-    el.innerHTML = `<div style="padding:40px;text-align:center;color:var(--sub);font-size:13px">No published events found at your accounts yet. Once venues and planners you referred publish events they will appear here.</div>`;
+    el.innerHTML = `<div style="padding:40px;text-align:center;color:var(--sub);font-size:13px">No published events found at your accounts yet. Once venues and organizers you referred publish events they will appear here.</div>`;
     return;
   }
 

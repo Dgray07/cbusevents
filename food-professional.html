@@ -1335,7 +1335,7 @@
       <div class="panel" id="panel-profile">
         <div class="page-header">
           <h1>My Profile</h1>
-          <p>This is how you appear to planners, venues, and attendees on CBUSEVENTS.</p>
+          <p>This is how you appear to organizers, venues, and attendees on CBUSEVENTS.</p>
         </div>
 
         <div class="card" style="margin-bottom:20px">
@@ -1479,7 +1479,7 @@
         <div style="margin-bottom:24px">
           <div style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.18em;text-transform:uppercase;color:var(--muted);margin-bottom:4px">Messaging</div>
           <div style="font-size:22px;font-weight:800;letter-spacing:-0.03em;margin-bottom:2px">Inbox <span id="inboxUnreadBadge" style="display:none;background:#FF6B35;color:#fff;border-radius:99px;font-size:12px;font-weight:700;padding:2px 8px;margin-left:6px;vertical-align:middle"></span></div>
-          <div style="font-size:13px;color:var(--muted)">Messages from venues, planners, and other users.</div>
+          <div style="font-size:13px;color:var(--muted)">Messages from venues, organizers, and other users.</div>
         </div>
         <div style="display:flex;height:calc(100vh - 200px);background:var(--bg2);border-radius:16px;border:1px solid var(--border);overflow:hidden">
           <div style="width:280px;border-right:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0">
@@ -2390,7 +2390,7 @@ db.auth.onAuthStateChange(async (event, session) => {
     const PORTAL_MAP = {
       venue_owner:  'https://cbusevents.com/cbus-venue-portal.html',
       vendor:       'https://cbusevents.com/cbus-vendor-portal.html',
-      planner:      'https://cbusevents.com/cbus-planner-portal.html',
+      organizer:      'https://cbusevents.com/cbus-organizer-portal.html',
       customer:     'https://cbusevents.com/customer-portal.html',
       event_staff:  'https://cbusevents.com/event-staff.html',
     };
@@ -2647,7 +2647,7 @@ async function updateOrderStatus(id, status) {
     if (order) {
       await db.from('event_alerts').insert({
         event_id: order.event_id || null,
-        planner_id: currentUser.id,
+        organizer_id: currentUser.id,
         title: 'Your order is ready!',
         message: `Hey ${order.customer_name || 'there'}, your order is ready for pickup!`,
         recipient_type: 'customer',

@@ -9,7 +9,7 @@
  * Usage (add near </body>):
  *   <script>
  *     window.CBUS_CHAT_CONFIG = {
- *       role: 'venue_owner',          // 'venue_owner' | 'vendor' | 'planner' | 'customer' | 'guest'
+ *       role: 'venue_owner',          // 'venue_owner' | 'vendor' | 'organizer' | 'customer' | 'guest'
  *       userName: 'Marcus',           // optional — personalises greeting
  *       supabaseUrl: 'https://...',
  *       supabaseKey: 'eyJ...',
@@ -56,12 +56,12 @@
         'What services are most in demand in Columbus?',
       ],
     },
-    planner: {
+    organizer: {
       color: '#a855f7',
       colorDim: 'rgba(168,85,247,0.15)',
       colorBorder: 'rgba(168,85,247,0.3)',
-      label: 'Planner Assistant',
-      greeting: `Hey${USER_NAME ? ' ' + USER_NAME : ''}! I'm your CBUSEVENTS planner assistant. I can help you find venues, connect with vendors, or answer any questions about planning your next Columbus event.`,
+      label: 'Organizer Assistant',
+      greeting: `Hey${USER_NAME ? ' ' + USER_NAME : ''}! I'm your CBUSEVENTS organizer assistant. I can help you find venues, connect with vendors, or answer any questions about planning your next Columbus event.`,
       suggestions: [
         'Find me a venue for 80 guests in Short North',
         'What vendors are available for a wedding?',
@@ -101,12 +101,12 @@
 
   // ── SYSTEM PROMPT BUILDER ────────────────────────────────────────────────────
   function buildSystemPrompt(liveData) {
-    const base = `You are an AI assistant embedded inside the CBUSEVENTS platform — Columbus, Ohio's event marketplace connecting venues, vendors, planners, and attendees. You are talking to a ${ROLE === 'guest' ? 'visitor' : ROLE.replace('_', ' ')}${USER_NAME ? ' named ' + USER_NAME : ''}. Be warm, concise, and action-oriented. Always encourage the user to take the next step on the platform. Never make up specific prices, dates, or availability — direct users to their portal dashboard for live data. For links, always use cbusevents.com as the base URL.`;
+    const base = `You are an AI assistant embedded inside the CBUSEVENTS platform — Columbus, Ohio's event marketplace connecting venues, vendors, organizers, and attendees. You are talking to a ${ROLE === 'guest' ? 'visitor' : ROLE.replace('_', ' ')}${USER_NAME ? ' named ' + USER_NAME : ''}. Be warm, concise, and action-oriented. Always encourage the user to take the next step on the platform. Never make up specific prices, dates, or availability — direct users to their portal dashboard for live data. For links, always use cbusevents.com as the base URL.`;
 
     const roleContext = {
       venue_owner: `This user owns or manages a Columbus venue. Help them maximise their listing performance, understand their plan limits, get more bookings, publish events, and grow their revenue through the platform. Key upsell: Standard ($29/mo) adds featured placement and verified badge; Premium ($79/mo) adds homepage feature, top of all listings, and flyer/merch design services.`,
-      vendor: `This user is a Columbus vendor or service provider. Help them get discovered by venues and planners, understand how proposals work, build out their profile/portfolio, and upgrade their plan. Key upsell: Standard ($29/mo) adds featured directory placement; Premium ($79/mo) adds ability to send proposals directly to event organisers and top placement.`,
-      planner: `This user is a Columbus event planner. Help them find venues, connect with vendors, publish events, and manage their workflow. Key upsell: Pro ($19/mo) unlocks full vendor directory and receiving proposals; Agency ($49/mo) adds priority venue responses and homepage feature slot.`,
+      vendor: `This user is a Columbus vendor or service provider. Help them get discovered by venues and organizers, understand how proposals work, build out their profile/portfolio, and upgrade their plan. Key upsell: Standard ($29/mo) adds featured directory placement; Premium ($79/mo) adds ability to send proposals directly to event organisers and top placement.`,
+      organizer: `This user is a Columbus event organizer. Help them find venues, connect with vendors, publish events, and manage their workflow. Key upsell: Pro ($19/mo) unlocks full vendor directory and receiving proposals; Agency ($49/mo) adds priority venue responses and homepage feature slot.`,
       customer: `This user is a Columbus event attendee. Help them discover events, find things to do, and navigate the platform. Encourage them to save venues and follow organisers for personalised recommendations.`,
       guest: `This visitor is not yet signed in. Help them understand the platform and guide them to sign up at cbusevents.com/auth.html.`,
     };

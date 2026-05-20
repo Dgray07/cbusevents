@@ -117,7 +117,7 @@ nav {
 .venue-card-hood { font-size: 11px; color: var(--muted); margin-bottom: 8px; }
 .venue-card-action { font-family: var(--mono); font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); }
 
-/* ── VENDOR / PLANNER CARDS ── */
+/* ── VENDOR / ORGANIZER CARDS ── */
 .people-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px,1fr)); gap: 12px; margin-bottom: 52px; }
 .people-card { background: var(--card); border: 1px solid var(--border); border-radius: var(--r-lg); padding: 20px; transition: all 0.2s; cursor: pointer; }
 .people-card:hover { border-color: var(--accent-border); transform: translateY(-1px); }
@@ -256,7 +256,7 @@ nav.site-nav{display:flex;align-items:center;justify-content:space-between;paddi
 <div class="filter-bar">
   <div class="filter-chip active" onclick="setTab('events',this)" role="button" tabindex="0">Events</div>
   <div class="filter-chip" onclick="setTab('venues',this)" role="button" tabindex="0">Venues</div>
-  <div class="filter-chip" onclick="setTab('people',this)" role="button" tabindex="0">Planners & Vendors</div>
+  <div class="filter-chip" onclick="setTab('people',this)" role="button" tabindex="0">Organizers & Vendors</div>
 </div>
 
 <!-- PAGE -->
@@ -281,8 +281,8 @@ nav.site-nav{display:flex;align-items:center;justify-content:space-between;paddi
   <!-- PEOPLE TAB -->
   <div id="tabPeople" style="display:none">
     <div class="s-label">Professionals</div>
-    <div class="s-title" id="peopleTitle">Planners & Vendors</div>
-    <div class="s-sub">Planners and vendors who serve this community.</div>
+    <div class="s-title" id="peopleTitle">Organizers & Vendors</div>
+    <div class="s-sub">Organizers and vendors who serve this community.</div>
     <div id="peopleGrid" class="people-grid"><div class="spinner"></div></div>
   </div>
 
@@ -473,7 +473,7 @@ function applyTheme() {
   document.getElementById('footerCommunity').textContent = community.name + ' · Columbus, Ohio';
   document.getElementById('eventsTitle').textContent  = community.name + ' Events';
   document.getElementById('venuesTitle').textContent  = community.name + ' Venues';
-  document.getElementById('peopleTitle').textContent  = community.name + ' Planners & Vendors';
+  document.getElementById('peopleTitle').textContent  = community.name + ' Organizers & Vendors';
   document.title = community.name + ' — CBUSEVENTS';
 
   // Other communities grid
@@ -588,25 +588,25 @@ async function loadPeople() {
   window._peopleLoaded = true;
   const grid = document.getElementById('peopleGrid');
 
-  const [{ data: planners }, { data: vendors }] = await Promise.all([
-    sb.from('planners').select('id,business_name,contact_name,bio,categories,rate_display,availability').contains('community_tags', [slug]).eq('is_discoverable', true).limit(6),
+  const [{ data: organizers }, { data: vendors }] = await Promise.all([
+    sb.from('organizers').select('id,business_name,contact_name,bio,categories,rate_display,availability').contains('community_tags', [slug]).eq('is_discoverable', true).limit(6),
     sb.from('vendors').select('id,business_name,name,description,category,neighborhood').contains('community_tags', [slug]).limit(6),
   ]);
 
   const people = [
-    ...(planners || []).map(p => ({ ...p, _type: 'planner' })),
+    ...(organizers || []).map(p => ({ ...p, _type: 'organizer' })),
     ...(vendors  || []).map(v => ({ ...v, _type: 'vendor'  })),
   ];
 
   if(!people.length) {
-    grid.innerHTML = '<div class="empty"><div class="empty-title">No planners or vendors yet</div><div class="empty-sub">Planners and vendors who serve this community will appear here once they opt in.</div></div>';
+    grid.innerHTML = '<div class="empty"><div class="empty-title">No organizers or vendors yet</div><div class="empty-sub">Organizers and vendors who serve this community will appear here once they opt in.</div></div>';
     return;
   }
 
   grid.innerHTML = people.map(p => {
     const name = p.business_name || p.contact_name || p.name || 'Columbus Professional';
     const initials = name.split(' ').slice(0,2).map(w => w[0]).join('').toUpperCase();
-    const type = p._type === 'planner' ? 'Event Planner' : (p.category || 'Vendor');
+    const type = p._type === 'organizer' ? 'Event Organizer' : (p.category || 'Vendor');
     const desc = p.bio || p.description || '';
     const avail = p.availability === 'available';
     return `<div class="people-card">
@@ -616,7 +616,7 @@ async function loadPeople() {
       ${desc ? `<div class="people-card-desc">${desc}</div>` : ''}
       <div class="people-card-footer">
         <div class="people-card-rate">${p.rate_display || (p.neighborhood || 'Columbus')}</div>
-        ${p._type === 'planner' ? `<div class="people-card-avail" style="color:${avail ? '#34d399' : '#fbbf24'}">${avail ? 'Available' : 'Limited'}</div>` : ''}
+        ${p._type === 'organizer' ? `<div class="people-card-avail" style="color:${avail ? '#34d399' : '#fbbf24'}">${avail ? 'Available' : 'Limited'}</div>` : ''}
       </div>
     </div>`;
   }).join('');

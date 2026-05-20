@@ -515,7 +515,7 @@ async function enterPortal(){
  const roles=(roleRows||[]).map(r=>r.role);
  window._userRoles=roles;
  if(!roles.includes('vendor')){
-   const rolePortals={venue_owner:'cbus-venue-portal.html',planner:'cbus-planner-portal.html',customer:'customer-portal.html'};
+   const rolePortals={venue_owner:'cbus-venue-portal.html',organizer:'cbus-organizer-portal.html',customer:'customer-portal.html'};
    const redirect=Object.entries(rolePortals).find(([r])=>roles.includes(r));
    if(redirect){window.location.href='https://cbusevents.com/'+redirect[1];return;}
    return;
@@ -575,27 +575,27 @@ function renderPortalSwitcher(){
  const roles=window._userRoles||[];
  const portals={
    venue_owner:{label:'Venue Portal',url:'https://cbusevents.com/cbus-venue-portal.html'},
-   planner:{label:'Planner Portal',url:'https://cbusevents.com/cbus-planner-portal.html'},
+   organizer:{label:'Organizer Portal',url:'https://cbusevents.com/cbus-organizer-portal.html'},
  };
  const links=Object.entries(portals).filter(([r])=>roles.includes(r));
  if(!links.length){
-   // Offer to add planner role
-   el.innerHTML=`<button onclick="addPlannerRoleVendor()" style="width:100%;background:rgba(255,107,53,0.06);color:var(--orange);border:1px solid rgba(255,107,53,0.2);border-radius:var(--r-md);padding:6px 10px;font-size:11px;font-weight:600;cursor:pointer;font-family:var(--font);margin-bottom:6px">+ Add Planner Access</button>`;
+   // Offer to add organizer role
+   el.innerHTML=`<button onclick="addOrganizerRoleVendor()" style="width:100%;background:rgba(255,107,53,0.06);color:var(--orange);border:1px solid rgba(255,107,53,0.2);border-radius:var(--r-md);padding:6px 10px;font-size:11px;font-weight:600;cursor:pointer;font-family:var(--font);margin-bottom:6px">+ Add Organizer Access</button>`;
    return;
  }
  el.innerHTML=links.map(([r,{label,url}])=>`<a href="${url}" style="display:block;text-align:center;padding:6px 10px;border-radius:var(--r-md);background:rgba(255,255,255,0.03);border:1px solid var(--border);color:var(--sub);font-size:11px;font-weight:600;text-decoration:none;margin-bottom:6px;font-family:var(--font)">${label} →</a>`).join('');
 }
 window.renderPortalSwitcher=renderPortalSwitcher;
 
-async function addPlannerRoleVendor(){
+async function addOrganizerRoleVendor(){
  const el=document.getElementById('portalSwitcherVendor');
  if(el)el.innerHTML=`<div style="font-size:11px;color:var(--sub);text-align:center;padding:6px">Adding...</div>`;
- await sb.from('user_roles').upsert({user_id:currentUser.id,role:'planner'},{onConflict:'user_id,role'}).catch(()=>{});
- window._userRoles=[...(window._userRoles||[]),'planner'];
+ await sb.from('user_roles').upsert({user_id:currentUser.id,role:'organizer'},{onConflict:'user_id,role'}).catch(()=>{});
+ window._userRoles=[...(window._userRoles||[]),'organizer'];
  renderPortalSwitcher();
- toast('Planner access added! Visit the Planner Portal to get started.');
+ toast('Organizer access added! Visit the Organizer Portal to get started.');
 }
-window.addPlannerRoleVendor=addPlannerRoleVendor;
+window.addOrganizerRoleVendor=addOrganizerRoleVendor;
 
 // ── PAGE NAV ──────────────────────────────────────────────────
 function showPage(p){
@@ -620,23 +620,23 @@ function showPage(p){
 
 function renderProfilePage(){
  document.getElementById('pageContent').innerHTML=`
- <div style="margin-bottom:24px"><div style="font-family:var(--mono);font-size:9px;letter-spacing:0.18em;text-transform:uppercase;color:var(--muted);margin-bottom:4px">My Profile</div><div style="font-size:22px;font-weight:800;letter-spacing:-0.03em;margin-bottom:2px">Business Profile</div><div style="font-size:13px;color:var(--sub)">How planners and venues will discover you.</div></div>
+ <div style="margin-bottom:24px"><div style="font-family:var(--mono);font-size:9px;letter-spacing:0.18em;text-transform:uppercase;color:var(--muted);margin-bottom:4px">My Profile</div><div style="font-size:22px;font-weight:800;letter-spacing:-0.03em;margin-bottom:2px">Business Profile</div><div style="font-size:13px;color:var(--sub)">How organizers and venues will discover you.</div></div>
  <div class="card" style="margin-bottom:20px"><div class="card-header"><div class="card-title">Cover Photo</div></div><div style="padding:20px 24px"><div id="profCoverPreview" style="width:100%;height:160px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-md);display:flex;align-items:center;justify-content:center;font-size:40px;margin-bottom:12px;overflow:hidden"></div><div style="display:flex;gap:10px;align-items:center"><input id="profCoverUrl" placeholder="Paste image URL..." style="flex:1" oninput="updateCoverPreview(this.value)"><label style="display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-md);padding:9px 14px;cursor:pointer;font-size:12px;font-weight:600;color:var(--sub);text-transform:none;letter-spacing:0;margin:0">Upload<input type="file" accept="image/*" style="display:none" onchange="handleCoverPhoto(event)"></label></div></div></div>
- <div class="card" style="margin-bottom:20px"><div class="card-header"><div class="card-title">Business Info</div></div><div style="padding:20px 24px"><div class="form-grid"><div class="form-field"><label>Business Name *</label><input id="profName" placeholder="Your business name"></div><div class="form-field"><label>Contact Email</label><input id="profEmail" type="email" placeholder="you@email.com"></div><div class="form-field"><label>Phone</label><input id="profPhone" placeholder="(614) 000-0000"></div><div class="form-field"><label>Website</label><input id="profWebsite" placeholder="https://"></div><div class="form-field"><label>Years in Business</label><input id="profYears" type="number" placeholder="0" min="0"></div></div><div class="form-field"><label>Bio / Description</label><textarea id="profBio" placeholder="Tell planners and venues about your business..."></textarea></div></div></div>
+ <div class="card" style="margin-bottom:20px"><div class="card-header"><div class="card-title">Business Info</div></div><div style="padding:20px 24px"><div class="form-grid"><div class="form-field"><label>Business Name *</label><input id="profName" placeholder="Your business name"></div><div class="form-field"><label>Contact Email</label><input id="profEmail" type="email" placeholder="you@email.com"></div><div class="form-field"><label>Phone</label><input id="profPhone" placeholder="(614) 000-0000"></div><div class="form-field"><label>Website</label><input id="profWebsite" placeholder="https://"></div><div class="form-field"><label>Years in Business</label><input id="profYears" type="number" placeholder="0" min="0"></div></div><div class="form-field"><label>Bio / Description</label><textarea id="profBio" placeholder="Tell organizers and venues about your business..."></textarea></div></div></div>
  <div class="card" style="margin-bottom:20px"><div class="card-header"><div class="card-title">Social Links</div></div><div style="padding:20px 24px"><div class="form-grid"><div class="form-field"><label>Instagram</label><input id="profInsta" placeholder="@handle"></div><div class="form-field"><label>TikTok</label><input id="profTiktok" placeholder="@handle"></div><div class="form-field"><label>Facebook</label><input id="profFacebook" placeholder="Page URL or name"></div><div class="form-field"><label>X / Twitter</label><input id="profTwitter" placeholder="@handle"></div></div></div></div>
  <div style="display:flex;align-items:center;gap:12px"><button class="btn btn-primary" onclick="saveProfile()">Save Profile</button><div class="form-msg" id="profMsg"></div></div>`;
 }
 
 function renderServicesPage(){
  document.getElementById('pageContent').innerHTML=`
- <div style="margin-bottom:24px"><div style="font-family:var(--mono);font-size:9px;letter-spacing:0.18em;text-transform:uppercase;color:var(--muted);margin-bottom:4px">Services</div><div style="font-size:22px;font-weight:800;letter-spacing:-0.03em;margin-bottom:2px">Your Services</div><div style="font-size:13px;color:var(--sub)">Select everything you offer so planners can find you.</div></div>
+ <div style="margin-bottom:24px"><div style="font-family:var(--mono);font-size:9px;letter-spacing:0.18em;text-transform:uppercase;color:var(--muted);margin-bottom:4px">Services</div><div style="font-size:22px;font-weight:800;letter-spacing:-0.03em;margin-bottom:2px">Your Services</div><div style="font-size:13px;color:var(--sub)">Select everything you offer so organizers can find you.</div></div>
  <div class="card" style="margin-bottom:20px"><div class="card-header"><div class="card-title">Service Categories</div></div><div style="padding:20px 24px"><div class="services-grid" id="servicesGrid"></div><div class="form-field" style="margin-top:8px"><label>Custom Service (optional)</label><input id="customService" placeholder="e.g. balloon art, face painting — comma separated"></div></div></div>
  <div style="display:flex;align-items:center;gap:12px"><button class="btn btn-primary" onclick="saveServices()">Save Services</button><div class="form-msg" id="servMsg"></div></div>`;
 }
 
 function renderPortfolioPage(){
  document.getElementById('pageContent').innerHTML=`
- <div style="margin-bottom:24px"><div style="font-family:var(--mono);font-size:9px;letter-spacing:0.18em;text-transform:uppercase;color:var(--muted);margin-bottom:4px">Portfolio</div><div style="font-size:22px;font-weight:800;letter-spacing:-0.03em;margin-bottom:2px">Portfolio Photos</div><div style="font-size:13px;color:var(--sub)">Show planners the quality of your work.</div></div>
+ <div style="margin-bottom:24px"><div style="font-family:var(--mono);font-size:9px;letter-spacing:0.18em;text-transform:uppercase;color:var(--muted);margin-bottom:4px">Portfolio</div><div style="font-size:22px;font-weight:800;letter-spacing:-0.03em;margin-bottom:2px">Portfolio Photos</div><div style="font-size:13px;color:var(--sub)">Show organizers the quality of your work.</div></div>
  <div class="card" style="margin-bottom:20px"><div class="card-header"><div class="card-title">Photos</div><button class="btn btn-primary btn-sm" onclick="document.getElementById('photoFileInput').click()">+ Upload</button></div><div style="padding:20px 24px"><div class="photo-grid" id="portfolioGrid"></div><div id="uploadProgress" style="display:none;margin-top:12px"><div style="background:var(--border);border-radius:4px;height:4px;overflow:hidden"><div id="uploadBar" style="height:100%;background:var(--orange);transition:width 0.3s;width:0%"></div></div><div id="uploadStatus" style="font-size:11px;color:var(--muted);margin-top:6px"></div></div><div style="margin-top:16px;display:flex;gap:10px"><input id="photoUrl" placeholder="Or paste an image URL..." style="flex:1"><button class="btn btn-ghost btn-sm" onclick="addPhotoByUrl()">Add URL</button></div><input type="file" id="photoFileInput" accept="image/*" multiple style="display:none" onchange="handlePhotoUpload(event)"></div></div>
  <div class="form-msg" id="portMsg"></div>`;
 }
@@ -737,7 +737,7 @@ async function loadFestivalApps(){
 
 function renderProposalsPage(){
  document.getElementById('pageContent').innerHTML=`
- <div style="margin-bottom:24px"><div style="font-family:var(--mono);font-size:9px;letter-spacing:0.18em;text-transform:uppercase;color:var(--muted);margin-bottom:4px">Growth</div><div style="font-size:22px;font-weight:800;letter-spacing:-0.03em;margin-bottom:2px">Inquiries</div><div style="font-size:13px;color:var(--sub)">Proposals you've sent to events and planners.</div></div>
+ <div style="margin-bottom:24px"><div style="font-family:var(--mono);font-size:9px;letter-spacing:0.18em;text-transform:uppercase;color:var(--muted);margin-bottom:4px">Growth</div><div style="font-size:22px;font-weight:800;letter-spacing:-0.03em;margin-bottom:2px">Inquiries</div><div style="font-size:13px;color:var(--sub)">Proposals you've sent to events and organizers.</div></div>
  <div class="card"><div id="proposalsContent" style="min-height:120px"><div class="spinner"></div></div></div>`;
 }
 
@@ -762,7 +762,7 @@ async function renderDashboard(){
  <div style="margin-bottom:8px">
    <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.18em;text-transform:uppercase;color:var(--muted);margin-bottom:4px">Welcome back</div>
    <div style="font-size:22px;font-weight:800;letter-spacing:-0.03em;margin-bottom:2px">${hasRealName?rawName:'Your Vendor Account'}</div>
-   <div style="font-size:13px;color:var(--sub)">${hasRealName?"Here's your vendor overview.":'Get your services in front of Columbus planners.'}</div>
+   <div style="font-size:13px;color:var(--sub)">${hasRealName?"Here's your vendor overview.":'Get your services in front of Columbus organizers.'}</div>
  </div>
 
  <div class="stats-grid" style="margin-top:24px">
@@ -795,7 +795,7 @@ async function renderDashboard(){
      <div><div class="card-title">Recent Inquiries</div></div>
      <button class="btn btn-ghost btn-sm" onclick="showPage('proposals')">View All</button>
    </div>
-   ${proposals.length===0?`<div class="empty-state"><div class="empty-title">No inquiries yet</div><p>Complete your profile to get discovered by Columbus planners.</p></div>`
+   ${proposals.length===0?`<div class="empty-state"><div class="empty-title">No inquiries yet</div><p>Complete your profile to get discovered by Columbus organizers.</p></div>`
      :`<div>${proposals.slice(0,3).map(p=>`<div class="proposal-row">
        <div class="proposal-dot" style="background:${p.status==='accepted'?'var(--green)':p.status==='rejected'?'var(--red)':'var(--muted)'}"></div>
        <div class="proposal-body"><div class="proposal-title">Event Inquiry</div><div class="proposal-meta">${p.status}</div></div>
@@ -1086,7 +1086,7 @@ async function loadProposals(){
 
  if(tier!=='PREMIUM'){
  el.innerHTML=`
- <div class="upgrade-gate"> <h3>Send Proposals with Premium</h3> <p>Premium vendors can browse upcoming events and send proposals directly to venues and planners. Stand out before the event is even booked.</p> <button class="btn btn-orange" onclick="showPage('plan')" style="padding:12px 28px;font-size:14px">Upgrade to Premium →</button> </div>`;
+ <div class="upgrade-gate"> <h3>Send Proposals with Premium</h3> <p>Premium vendors can browse upcoming events and send proposals directly to venues and organizers. Stand out before the event is even booked.</p> <button class="btn btn-orange" onclick="showPage('plan')" style="padding:12px 28px;font-size:14px">Upgrade to Premium →</button> </div>`;
  return;
  }
 
@@ -1144,7 +1144,7 @@ async function loadBrowseEvents(){
  <div class="event-row"> <div class="event-row-info"> <div class="event-title">${e.title}</div> <div class="event-meta"> ${e.venues?.name||'Venue'} · ${e.venues?.neighborhood||'Columbus'} · ${fmt(e.start_time)} · ${e.category||'Event'}</div> </div> <div style="flex-shrink:0;display:flex;gap:8px;align-items:center"> ${proposedIds.has(e.id)
  ?'<span class="badge-green"> Proposed</span>'
  :`<button class="btn btn-orange btn-sm" onclick="openProposalModal('${e.id}','${(e.title||'').replace(/'/g,"\\'")}','${e.venues?.name||''}')">Send Proposal</button>`}
- ${e.owner_id?`<button class="btn btn-ghost btn-sm" onclick="openMessageModal('${e.owner_id}','planner','Event Organizer')" title="Message the organizer">💬</button>`:''}
+ ${e.owner_id?`<button class="btn btn-ghost btn-sm" onclick="openMessageModal('${e.owner_id}','organizer','Event Organizer')" title="Message the organizer">💬</button>`:''}
  ${e.status==='published'?`<button class="btn btn-ghost btn-sm" onclick="openVendorShareModal('${e.id}','${(e.title||'').replace(/'/g,"\\'")}','${e.venues?.name||''}','${e.start_time?new Date(e.start_time).toLocaleDateString('en-US',{month:'short',day:'numeric'}):''}')" style="color:#FF6B35;border-color:#FF6B3540"> Share</button>`:''}
  </div> </div>`).join('');
 }
@@ -1261,7 +1261,7 @@ function renderInboxPage(){
   <div style="margin-bottom:24px">
     <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.18em;text-transform:uppercase;color:var(--muted);margin-bottom:4px">Messaging</div>
     <div style="font-size:22px;font-weight:800;letter-spacing:-0.03em;margin-bottom:2px">Inbox <span id="inboxUnreadBadge" style="display:none;background:#FF6B35;color:#fff;border-radius:99px;font-size:12px;font-weight:700;padding:2px 8px;margin-left:6px;vertical-align:middle"></span></div>
-    <div style="font-size:13px;color:var(--sub)">Messages from planners and venues.</div>
+    <div style="font-size:13px;color:var(--sub)">Messages from organizers and venues.</div>
   </div>
   <div style="display:flex;height:calc(100vh - 200px);background:var(--surface);border-radius:16px;border:1px solid var(--border);overflow:hidden">
     <div style="width:280px;border-right:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0">
@@ -1463,7 +1463,7 @@ async function renderAnalyticsPage(){
     <div style="background:var(--card);border:1px solid var(--border);border-radius:16px;padding:48px;text-align:center">
       <div style="font-size:32px;margin-bottom:16px">📊</div>
       <div style="font-weight:800;font-size:18px;margin-bottom:8px;letter-spacing:-0.02em">Analytics is a paid feature</div>
-      <div style="color:var(--sub);font-size:14px;margin-bottom:24px;max-width:360px;margin-left:auto;margin-right:auto;line-height:1.6">Upgrade to Standard or Premium to see how many planners and venues are viewing your profile.</div>
+      <div style="color:var(--sub);font-size:14px;margin-bottom:24px;max-width:360px;margin-left:auto;margin-right:auto;line-height:1.6">Upgrade to Standard or Premium to see how many organizers and venues are viewing your profile.</div>
       <button onclick="showPage('plan')" style="background:#FF6B35;color:#fff;border:none;border-radius:10px;padding:12px 28px;font-size:14px;font-weight:700;cursor:pointer;font-family:var(--font)">View Plans →</button>
     </div>`;
     return;
@@ -1506,15 +1506,15 @@ async function renderAnalyticsPage(){
   const maxVal=Math.max(...chartEntries.map(e=>e[1]),1);
 
   // Role breakdown
-  const roles={planner:0,venue:0,customer:0,anonymous:0};
+  const roles={organizer:0,venue:0,customer:0,anonymous:0};
   all30.forEach(v=>{roles[v.viewer_role||'anonymous']=(roles[v.viewer_role||'anonymous']||0)+1;});
 
   // Source breakdown
   const sources={vendors_page:0,direct:0,search:0,unknown:0};
   all30.forEach(v=>{sources[v.source||'unknown']=(sources[v.source||'unknown']||0)+1;});
 
-  const roleLabels={planner:'Planners',venue:'Venues',customer:'Attendees',anonymous:'Public'};
-  const roleColors={planner:'#FF6B35',venue:'#818cf8',customer:'#34d399',anonymous:'#7070a0'};
+  const roleLabels={organizer:'Organizers',venue:'Venues',customer:'Attendees',anonymous:'Public'};
+  const roleColors={organizer:'#FF6B35',venue:'#818cf8',customer:'#34d399',anonymous:'#7070a0'};
 
   document.getElementById('analyticsContent').innerHTML=`
   <!-- Stats row -->
@@ -1522,7 +1522,7 @@ async function renderAnalyticsPage(){
     <div class="stat-card"><div class="stat-num" style="color:#FF6B35">${all30.length}</div><div class="stat-label">Views (30 days)</div></div>
     <div class="stat-card"><div class="stat-num" style="color:var(--green)">${all7.length}</div><div class="stat-label">Views (7 days)</div></div>
     <div class="stat-card"><div class="stat-num">${(all30.length/30).toFixed(1)}</div><div class="stat-label">Daily Average</div></div>
-    <div class="stat-card"><div class="stat-num" style="color:var(--blue)">${roles.planner||0}</div><div class="stat-label">Planner Views</div></div>
+    <div class="stat-card"><div class="stat-num" style="color:var(--blue)">${roles.organizer||0}</div><div class="stat-label">Organizer Views</div></div>
   </div>
 
   <!-- Chart -->
@@ -1609,8 +1609,8 @@ function renderPlan(){
  const currentDesc=isPremium
    ?'You have full access to all vendor features including sitewide promo placement, priority search, and profile analytics.'
    :isStandard
-   ?'Your profile is discoverable by planners and venues. You can send proposals, list products, and build your reputation on the platform.'
-   :'Your profile is live on CBUSEVENTS. Upgrade to Standard to get discovered by planners actively searching Columbus vendors right now.';
+   ?'Your profile is discoverable by organizers and venues. You can send proposals, list products, and build your reputation on the platform.'
+   :'Your profile is live on CBUSEVENTS. Upgrade to Standard to get discovered by organizers actively searching Columbus vendors right now.';
 
  document.getElementById('pageContent').innerHTML=`
  <div style="margin-bottom:24px">
@@ -1634,10 +1634,10 @@ function renderPlan(){
  <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.14em;text-transform:uppercase;color:var(--muted);margin-bottom:12px">Locked on Basic</div>
  <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:28px">
    ${[
-     ['Featured in Vendor Directory','Planners searching Columbus vendors see Standard and Premium accounts first. Basic profiles don\'t appear in filtered search results.'],
+     ['Featured in Vendor Directory','Organizers searching Columbus vendors see Standard and Premium accounts first. Basic profiles don\'t appear in filtered search results.'],
      ['Send Proposals to Events','Browse upcoming events on CBUSEVENTS and pitch your services directly to the organizer - before they\'ve hired anyone.'],
      ['Vendor Storefront (My Store)','List products and services for sale on the CBUSEVENTS marketplace. Physical goods, digital downloads, packages.'],
-     ['Sitewide Promo Banner','Premium only - your business promoted across every page on cbusevents.com, seen by every planner and attendee.'],
+     ['Sitewide Promo Banner','Premium only - your business promoted across every page on cbusevents.com, seen by every organizer and attendee.'],
    ].map(([title,desc])=>`
    <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--r-lg);padding:16px;position:relative;opacity:0.72">
      <div style="position:absolute;top:10px;right:10px;font-family:var(--mono);font-size:8px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;padding:2px 7px;border-radius:var(--r-full);background:rgba(255,255,255,0.05);color:var(--muted);border:1px solid var(--border)">Locked</div>
@@ -1652,7 +1652,7 @@ function renderPlan(){
    <div>
      <div style="font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--green);margin-bottom:4px">Think About It This Way</div>
      <div style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:6px">Standard pays for itself with one inquiry. Premium pays for itself with one booking.</div>
-     <div style="font-size:12px;color:var(--sub);line-height:1.6">At <strong style="color:var(--text)">$15/mo</strong>, Standard gets your profile in front of planners actively searching Columbus vendors. One catering inquiry that converts covers Standard for months. At <strong style="color:var(--text)">$45/mo</strong>, Premium puts you first in search and adds a sitewide promo banner - one booked event covers it several times over.</div>
+     <div style="font-size:12px;color:var(--sub);line-height:1.6">At <strong style="color:var(--text)">$15/mo</strong>, Standard gets your profile in front of organizers actively searching Columbus vendors. One catering inquiry that converts covers Standard for months. At <strong style="color:var(--text)">$45/mo</strong>, Premium puts you first in search and adds a sitewide promo banner - one booked event covers it several times over.</div>
    </div>
  </div>`:''}
 
@@ -1661,10 +1661,10 @@ function renderPlan(){
  <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.14em;text-transform:uppercase;color:var(--muted);margin-bottom:12px">Premium Features You're Missing</div>
  <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:28px">
    ${[
-     ['Sitewide Promo Banner','Your business promoted across cbusevents.com - seen by every planner and attendee browsing the platform.'],
-     ['Priority Search Placement','Show up above other Standard vendors when planners search your service category.'],
-     ['Profile View Analytics','See how many planners viewed your profile, which services got clicks, and where inquiries are coming from.'],
-     ['Featured Vendor Badge','A verified badge on your profile that signals credibility to planners who don\'t know your business yet.'],
+     ['Sitewide Promo Banner','Your business promoted across cbusevents.com - seen by every organizer and attendee browsing the platform.'],
+     ['Priority Search Placement','Show up above other Standard vendors when organizers search your service category.'],
+     ['Profile View Analytics','See how many organizers viewed your profile, which services got clicks, and where inquiries are coming from.'],
+     ['Featured Vendor Badge','A verified badge on your profile that signals credibility to organizers who don\'t know your business yet.'],
    ].map(([title,desc])=>`
    <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--r-lg);padding:16px;position:relative;opacity:0.75">
      <div style="position:absolute;top:10px;right:10px;font-family:var(--mono);font-size:8px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;padding:2px 7px;border-radius:var(--r-full);background:rgba(251,191,36,0.08);color:var(--gold);border:1px solid rgba(251,191,36,0.2)">Premium</div>
@@ -1706,7 +1706,7 @@ function renderPlan(){
      <div class="plan-perks">
        <div class="plan-perk">Everything in Basic</div>
        <div class="plan-perk">Featured in vendor directory</div>
-       <div class="plan-perk">Send proposals to venues and planners</div>
+       <div class="plan-perk">Send proposals to venues and organizers</div>
        <div class="plan-perk">Browse upcoming events</div>
        <div class="plan-perk">Vendor storefront (My Store)</div>
        <div class="plan-perk" style="opacity:0.3;text-decoration:line-through">Sitewide promo banner</div>
@@ -1746,7 +1746,7 @@ function renderPlan(){
    ${[
      ['Can I cancel anytime?','Yes. Cancel before your next billing date and you won\'t be charged again. Your profile stays active on Basic after cancellation.'],
      ['How fast does my plan upgrade?','Within a few minutes of payment. Stripe notifies CBUSEVENTS automatically and your portal updates.'],
-     ['I\'m a food truck - is this worth it?','Food trucks are one of the most searched vendor categories on CBUSEVENTS. Planners look here when they need unique food for private events, corporate lunches, and pop-ups. One private event booking typically covers months of Standard.'],
+     ['I\'m a food truck - is this worth it?','Food trucks are one of the most searched vendor categories on CBUSEVENTS. Organizers look here when they need unique food for private events, corporate lunches, and pop-ups. One private event booking typically covers months of Standard.'],
      ['What\'s the difference between Standard and Premium?','Standard gets you discovered - you show up in filtered search results and can send proposals. Premium gets you prioritized - you show up first, and your business is promoted sitewide via the promo banner.'],
    ].map(([q,a],i)=>`
    <div style="border-bottom:1px solid var(--border-sub);padding:16px 20px;cursor:pointer" onclick="this.querySelector('.faq-a').style.display=this.querySelector('.faq-a').style.display==='block'?'none':'block'">
@@ -1875,7 +1875,7 @@ function vcRenderCalendar(el){
         return`<div onclick="vcSelectDay(${day})" style="min-height:80px;padding:6px 4px;border-right:1px solid var(--border-sub);border-bottom:1px solid var(--border-sub);cursor:pointer;background:${isSelected?'rgba(255,107,53,0.08)':getDayBg(day)};opacity:${isPast?0.5:1}">
           <div style="font-family:var(--mono);font-size:11px;font-weight:500;color:${isToday?'#FF6B35':'var(--sub)'};background:${isToday?'rgba(255,107,53,0.1)':'transparent'};border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center;margin-bottom:4px">${day}</div>
           ${avail?`<div style="font-size:9px;font-weight:700;color:${avail.status==='blocked'?'#f87171':avail.status==='tentative'?'#fbbf24':'#34d399'};background:rgba(255,255,255,0.04);border-radius:3px;padding:1px 4px;margin-bottom:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${avail.status}</div>`:''}
-          ${reqs.slice(0,1).map(r=>`<div style="font-size:9px;font-weight:600;color:#FF6B35;background:rgba(255,107,53,0.08);border-radius:3px;padding:1px 4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">⬤ ${r.planner_name||'Request'}</div>`).join('')}
+          ${reqs.slice(0,1).map(r=>`<div style="font-size:9px;font-weight:600;color:#FF6B35;background:rgba(255,107,53,0.08);border-radius:3px;padding:1px 4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">⬤ ${r.organizer_name||'Request'}</div>`).join('')}
           ${reqs.length>1?`<div style="font-size:9px;color:var(--muted)">+${reqs.length-1} more</div>`:''}
         </div>`;
       }).join('')}
@@ -1895,7 +1895,7 @@ function vcRenderCalendar(el){
     :selectedReqs.map(r=>`
     <div style="display:flex;align-items:flex-start;gap:12px;padding:12px 14px;background:var(--surface);border-radius:10px;border:1px solid var(--border-sub);margin-bottom:10px;flex-wrap:wrap">
       <div style="flex:1;min-width:160px">
-        <div style="font-weight:700;font-size:13px;margin-bottom:4px">${r.planner_name||r.planner_email||'Planner'}</div>
+        <div style="font-weight:700;font-size:13px;margin-bottom:4px">${r.organizer_name||r.organizer_email||'Organizer'}</div>
         <div style="font-size:11px;color:var(--sub);display:flex;flex-wrap:wrap;gap:8px">
           ${r.event_type?`<span>🎉 ${r.event_type}</span>`:''}
           ${r.guest_count?`<span>👥 ${r.guest_count} guests</span>`:''}
@@ -2001,7 +2001,7 @@ function vcOpenResponseModal(reqId){
     <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:28px;width:420px;max-width:90vw">
       <div style="font-weight:800;font-size:17px;margin-bottom:12px">Respond to Request</div>
       <div style="background:var(--card);border-radius:10px;padding:14px 16px;margin-bottom:20px">
-        <div style="font-weight:700;font-size:13px;margin-bottom:6px">${req.planner_name||req.planner_email||'Planner'}</div>
+        <div style="font-weight:700;font-size:13px;margin-bottom:6px">${req.organizer_name||req.organizer_email||'Organizer'}</div>
         <div style="font-size:12px;color:var(--sub);display:flex;flex-wrap:wrap;gap:10px;margin-bottom:${req.message?'8px':'0'}">
           <span>📅 ${new Date(req.event_date+'T00:00:00').toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric',year:'numeric'})}</span>
           ${req.event_type?`<span>🎉 ${req.event_type}</span>`:''}
@@ -2042,12 +2042,12 @@ function vcRenderRequests(el){
       <div style="font-weight:700;font-size:15px">Booking Requests</div>
       <div style="font-size:12px;color:var(--sub);margin-top:2px">${_vendorBookingRequests.length} total · ${pending.length} pending</div>
     </div>
-    ${_vendorBookingRequests.length===0?`<div style="padding:48px;text-align:center;color:var(--sub);font-size:13px">No booking requests yet. Make sure your storefront is complete so planners can find you.</div>`
+    ${_vendorBookingRequests.length===0?`<div style="padding:48px;text-align:center;color:var(--sub);font-size:13px">No booking requests yet. Make sure your storefront is complete so organizers can find you.</div>`
     :_vendorBookingRequests.map(r=>`
     <div style="padding:16px 20px;border-bottom:1px solid var(--border-sub);display:flex;align-items:flex-start;gap:16px;flex-wrap:wrap">
       <div style="flex:1;min-width:200px">
         <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
-          <span style="font-weight:700;font-size:14px">${r.planner_name||r.planner_email||'Planner'}</span>
+          <span style="font-weight:700;font-size:14px">${r.organizer_name||r.organizer_email||'Organizer'}</span>
           <span style="font-family:var(--mono);font-size:9px;text-transform:uppercase;letter-spacing:0.1em;padding:2px 8px;border-radius:20px;background:${r.status==='pending'?'rgba(255,107,53,0.12)':r.status==='approved'?'rgba(52,211,153,0.12)':'rgba(248,113,113,0.12)'};color:${r.status==='pending'?'#FF6B35':r.status==='approved'?'#34d399':'#f87171'}">${r.status}</span>
         </div>
         <div style="font-size:12px;color:var(--sub);display:flex;flex-wrap:wrap;gap:10px;margin-bottom:${r.message?'8px':'0'}">
@@ -2657,7 +2657,7 @@ async function renderListingsPage(){
     <div>
       <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.18em;text-transform:uppercase;color:var(--muted);margin-bottom:4px">Opportunities</div>
       <div style="font-size:22px;font-weight:800;letter-spacing:-0.03em">Open Vendor Spots</div>
-      <div style="font-size:13px;color:var(--sub);margin-top:4px">Vendor table spots and food truck opportunities posted by Columbus event planners.</div>
+      <div style="font-size:13px;color:var(--sub);margin-top:4px">Vendor table spots and food truck opportunities posted by Columbus event organizers.</div>
     </div>
     <div style="display:flex;gap:8px;flex-wrap:wrap">
       <select id="listings-filter" onchange="filterListings()" style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r-md);padding:8px 14px;font-size:13px;color:var(--text);cursor:pointer">
@@ -2716,7 +2716,7 @@ function renderListingCards(listings){
     <div class="card" style="padding:48px 32px;text-align:center">
       <div style="font-size:36px;margin-bottom:12px">&#128203;</div>
       <div style="font-weight:700;font-size:15px;margin-bottom:6px">No open listings right now</div>
-      <div style="font-size:13px;color:var(--sub);max-width:360px;margin:0 auto">Event planners post vendor spots here as they build their events. Check back soon or make sure your profile is complete so planners can find you.</div>
+      <div style="font-size:13px;color:var(--sub);max-width:360px;margin:0 auto">Event organizers post vendor spots here as they build their events. Check back soon or make sure your profile is complete so organizers can find you.</div>
     </div>`;
     return;
   }
@@ -2811,7 +2811,7 @@ function openApplyModal(listingId){
 
         <div style="background:rgba(255,107,53,0.06);border:1px solid rgba(255,107,53,0.15);border-radius:var(--r-md);padding:12px 14px;margin-bottom:20px">
           <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.14em;text-transform:uppercase;color:var(--orange);margin-bottom:6px">How it works</div>
-          <div style="font-size:12px;color:var(--sub);line-height:1.65">Submit your application below. The planner will review and approve or decline. If approved, you will receive a payment link to secure your spot. Spot fees are non-refundable once paid.</div>
+          <div style="font-size:12px;color:var(--sub);line-height:1.65">Submit your application below. The organizer will review and approve or decline. If approved, you will receive a payment link to secure your spot. Spot fees are non-refundable once paid.</div>
         </div>
 
         <div class="field" style="margin-bottom:14px">
@@ -2822,8 +2822,8 @@ function openApplyModal(listingId){
         </div>
 
         <div class="field" style="margin-bottom:20px">
-          <label style="font-size:12px;font-weight:600;color:var(--sub);text-transform:uppercase;letter-spacing:0.08em;font-family:var(--mono)">Message to Planner <span style="color:var(--muted);font-weight:400">(optional)</span></label>
-          <textarea id="apply-message" style="width:100%;margin-top:6px;height:90px;resize:none;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-md);padding:10px 14px;font-size:13px;color:var(--text);font-family:'DM Sans',sans-serif" placeholder="Tell the planner about what you sell, your setup, past events, etc."></textarea>
+          <label style="font-size:12px;font-weight:600;color:var(--sub);text-transform:uppercase;letter-spacing:0.08em;font-family:var(--mono)">Message to Organizer <span style="color:var(--muted);font-weight:400">(optional)</span></label>
+          <textarea id="apply-message" style="width:100%;margin-top:6px;height:90px;resize:none;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-md);padding:10px 14px;font-size:13px;color:var(--text);font-family:'DM Sans',sans-serif" placeholder="Tell the organizer about what you sell, your setup, past events, etc."></textarea>
         </div>
 
         <div style="display:flex;justify-content:flex-end;gap:10px;padding-top:4px;border-top:1px solid var(--border)">
@@ -2845,7 +2845,7 @@ async function submitApplication(listingId){
   const{error}=await sb.from('vendor_table_applications').insert({
     listing_id:listingId,
     vendor_id:vendorProfile.id,
-    planner_id:(allListings.find(l=>l.id===listingId)?.planner_id||null),
+    organizer_id:(allListings.find(l=>l.id===listingId)?.organizer_id||null),
     message:message,
     status:'pending',
   });
@@ -2858,7 +2858,7 @@ async function submitApplication(listingId){
   }
 
   closeModal();
-  toast('Application submitted! The planner will review and get back to you.','success');
+  toast('Application submitted! The organizer will review and get back to you.','success');
   await loadOpenListings();
 }
 

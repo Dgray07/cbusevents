@@ -7,7 +7,7 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Collab Board | CBUSEVENTS</title>
-<meta name="description" content="Open vendor spots, gigs, and event opportunities in Columbus. Posted by local event planners. Apply through CBUSEVENTS.">
+<meta name="description" content="Open vendor spots, gigs, and event opportunities in Columbus. Posted by local event organizers. Apply through CBUSEVENTS.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script src="https://unpkg.com/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
@@ -271,7 +271,7 @@ nav{position:sticky;top:0;z-index:100;background:rgba(250,247,242,.96);backdrop-
         <span class="icon-sun">&#9728;</span>
       </button>
       <a href="https://cbusevents.com/cbus-vendor-portal.html" class="nav-btn-ghost">Vendor Portal</a>
-      <a href="https://cbusevents.com/cbus-planner-portal.html" class="nav-btn-primary">Post a Listing</a>
+      <a href="https://cbusevents.com/cbus-organizer-portal.html" class="nav-btn-primary">Post a Listing</a>
     </div>
   </div>
 </nav>
@@ -281,7 +281,7 @@ nav{position:sticky;top:0;z-index:100;background:rgba(250,247,242,.96);backdrop-
   <div class="hero-inner">
     <div class="hero-eyebrow">Columbus Event Ecosystem</div>
     <h1 class="hero-headline">Open spots.<br><em>Real money.</em></h1>
-    <p class="hero-sub">Vendor tables, food truck spots, event staff shifts, and creative gigs posted by Columbus event planners. Apply through CBUSEVENTS and get paid through the platform.</p>
+    <p class="hero-sub">Vendor tables, food truck spots, event staff shifts, and creative gigs posted by Columbus event organizers. Apply through CBUSEVENTS and get paid through the platform.</p>
     <div class="hero-bottom">
       <div class="hero-stats">
         <div>
@@ -298,8 +298,8 @@ nav{position:sticky;top:0;z-index:100;background:rgba(250,247,242,.96);backdrop-
         </div>
       </div>
       <div class="hero-post-cta">
-        <a href="https://cbusevents.com/cbus-planner-portal.html" class="hero-post-btn">Post Vendor Spots</a>
-        <div class="hero-post-note">Planners only &bull; Free to post</div>
+        <a href="https://cbusevents.com/cbus-organizer-portal.html" class="hero-post-btn">Post Vendor Spots</a>
+        <div class="hero-post-note">Organizers only &bull; Free to post</div>
       </div>
     </div>
   </div>
@@ -368,21 +368,21 @@ nav{position:sticky;top:0;z-index:100;background:rgba(250,247,242,.96);backdrop-
           <div class="how-step-num">1</div>
           <div>
             <div class="how-step-title">Browse open spots</div>
-            <div class="how-step-desc">Planners post vendor tables, food truck spots, and event gigs here as they build Columbus events.</div>
+            <div class="how-step-desc">Organizers post vendor tables, food truck spots, and event gigs here as they build Columbus events.</div>
           </div>
         </div>
         <div class="how-step">
           <div class="how-step-num">2</div>
           <div>
             <div class="how-step-title">Apply through CBUSEVENTS</div>
-            <div class="how-step-desc">Create a free vendor profile and submit your application directly to the planner.</div>
+            <div class="how-step-desc">Create a free vendor profile and submit your application directly to the organizer.</div>
           </div>
         </div>
         <div class="how-step">
           <div class="how-step-num">3</div>
           <div>
             <div class="how-step-title">Get approved and pay</div>
-            <div class="how-step-desc">Planner reviews and approves. You receive a secure payment link to confirm your spot.</div>
+            <div class="how-step-desc">Organizer reviews and approves. You receive a secure payment link to confirm your spot.</div>
           </div>
         </div>
         <div class="how-step">
@@ -405,10 +405,10 @@ nav{position:sticky;top:0;z-index:100;background:rgba(250,247,242,.96);backdrop-
 
     <!-- POST CTA -->
     <div class="post-cta-card">
-      <div class="post-cta-label">For Event Planners</div>
+      <div class="post-cta-label">For Event Organizers</div>
       <div class="post-cta-title">Need vendors for your event? Post spots here for free.</div>
-      <a href="https://cbusevents.com/cbus-planner-portal.html" class="post-cta-btn">Post Vendor Spots</a>
-      <div class="post-cta-note">Planners only &bull; Free to post</div>
+      <a href="https://cbusevents.com/cbus-organizer-portal.html" class="post-cta-btn">Post Vendor Spots</a>
+      <div class="post-cta-note">Organizers only &bull; Free to post</div>
     </div>
 
   </aside>
@@ -496,7 +496,7 @@ function renderListings(){
     <div class="empty-state">
       <div class="empty-icon">&#128203;</div>
       <div class="empty-title">${allListings.length?'No listings match your filter':'No open listings right now'}</div>
-      <div class="empty-sub">${allListings.length?'Try a different filter or clear your search.':'Columbus event planners post vendor spots here as they build their events. Check back soon.'}</div>
+      <div class="empty-sub">${allListings.length?'Try a different filter or clear your search.':'Columbus event organizers post vendor spots here as they build their events. Check back soon.'}</div>
     </div>`;
     return;
   }
@@ -628,8 +628,8 @@ function openApply(listingId){
       <input class="form-input" id="apply-type" placeholder="e.g. Handmade candles, jerk chicken, vintage clothing..." type="text">
     </div>
     <div class="form-group">
-      <label class="form-label">Message to Planner <span style="color:var(--mist);font-weight:300">(optional)</span></label>
-      <textarea class="form-input form-textarea" id="apply-msg" placeholder="Tell the planner about your setup, past events, social media, etc."></textarea>
+      <label class="form-label">Message to Organizer <span style="color:var(--mist);font-weight:300">(optional)</span></label>
+      <textarea class="form-input form-textarea" id="apply-msg" placeholder="Tell the organizer about your setup, past events, social media, etc."></textarea>
     </div>
     <div class="modal-footer">
       <button class="btn-ghost" onclick="closeModal()">Cancel</button>
@@ -666,7 +666,7 @@ async function submitPublicApply(listingId){
   const{error}=await db.from('vendor_table_applications').insert({
     listing_id:listingId,
     vendor_id:vendor.id,
-    planner_id:listing?.planner_id||null,
+    organizer_id:listing?.organizer_id||null,
     message:`What I sell: ${type}${msg?'\n\n'+msg:''}`,
     status:'pending',
   });
@@ -679,7 +679,7 @@ async function submitPublicApply(listingId){
   }
 
   closeModal();
-  toast('Application submitted! The planner will review and reach out.','success');
+  toast('Application submitted! The organizer will review and reach out.','success');
   await loadListings();
 }
 

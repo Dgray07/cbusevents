@@ -257,7 +257,7 @@ const ADMIN_EMAILS=["info@cbusevents.com","deante90@gmail.com"];
 let currentPage='dashboard';
 let allVenues=[],allEvents=[],allInquiries=[],allDesignRequests=[],allVendors=[],allFoodPros=[],currentUser=null;
 let venueFilter='all',eventFilter='all',inquiryFilter='all';
-let plannerCount=0,attendeeCount=0;
+let organizerCount=0,attendeeCount=0;
 
 
 // ── MOBILE MENU ───────────────────────────────────────────────
@@ -275,7 +275,7 @@ const MOBILE_NAV_SECTIONS = [
   { section: 'Platform', items: [
     { id:'vendors',       label:'Vendors',       icon:'🏪' },
     { id:'foodpros',      label:'Food Pros',     icon:'🍳' },
-    { id:'planners',      label:'Planners',      icon:'📋' },
+    { id:'organizers',      label:'Organizers',      icon:'📋' },
     { id:'subscriptions', label:'Subscriptions', icon:'💳' },
     { id:'users',         label:'Users',         icon:'👤' },
     { id:'overrides',     label:'Overrides',     icon:'⚙' },
@@ -565,15 +565,15 @@ async function loadData(){
      allFoodPros=allFoodPros.map(p=>({...p,_orders:map[p.user_id]||{count:0,revenue:0,pending:0}}));
    }
  }catch(e){allFoodPros=allFoodPros.map(p=>({...p,_orders:{count:0,revenue:0,pending:0}}));}
- // Fetch planner and attendee counts — wrapped so any failure is silent
+ // Fetch organizer and attendee counts — wrapped so any failure is silent
  try{
    const[pRes,aRes]=await Promise.all([
-     sb.from('user_roles').select('*',{count:'exact',head:true}).eq('role','planner'),
+     sb.from('user_roles').select('*',{count:'exact',head:true}).eq('role','organizer'),
      sb.from('user_roles').select('*',{count:'exact',head:true}).eq('role','attendee'),
    ]);
-   plannerCount=pRes.count||0;
+   organizerCount=pRes.count||0;
    attendeeCount=aRes.count||0;
- }catch(e){plannerCount=0;attendeeCount=0;}
+ }catch(e){organizerCount=0;attendeeCount=0;}
 }
 
 // ── SHELL ─────────────────────────────────────────────────────
@@ -584,7 +584,7 @@ function renderShell(){
 
  document.getElementById('app').innerHTML=`
  <div class="sidebar"> <div class="sidebar-logo"> <div class="sidebar-logo-text">CBUS<span>EVENTS</span></div> <div class="sidebar-logo-sub">Admin Portal</div> </div> <div class="sidebar-section">Main</div> <div class="nav-item" onclick="window.location.href='https://cbusevents.com'" style="border-bottom:1px solid var(--border);margin-bottom:4px;padding-bottom:12px"> Home</div> <div class="nav-item ${currentPage==='dashboard'?'active':''}" onclick="nav('dashboard')"> Dashboard</div> <div class="nav-item ${currentPage==='venues'?'active':''}" onclick="nav('venues')"> Venues ${pendingVenues?('<span class="badge">'+pendingVenues+'</span>'):''}</div> <div class="nav-item ${currentPage==='events'?'active':''}" onclick="nav('events')"> Events</div> <div class="nav-item ${currentPage==='inquiries'?'active':''}" onclick="nav('inquiries')"> Inquiries ${newInquiries?('<span class="badge green">'+newInquiries+'</span>'):''}</div> <div class="sidebar-section">Revenue</div> <div class="nav-item ${currentPage==='revenue'?'active':''}" onclick="nav('revenue')"> Revenue</div> <div class="nav-item ${currentPage==='design'?'active':''}" onclick="nav('design')"> Design Requests ${allDesignRequests.filter(d=>d.status==='new').length?('<span class="badge">'+allDesignRequests.filter(d=>d.status==='new').length+'</span>'):''}</div> <div class="sidebar-section">Platform</div> <div class="nav-item ${currentPage==='vendors'?'active':''}" onclick="nav('vendors')"> Vendors</div> <div class="nav-item ${currentPage==='foodpros'?'active':''}" onclick="nav('foodpros')"> Food Pros <span style="background:rgba(255,255,255,0.08);color:var(--sub);border-radius:20px;padding:1px 8px;font-size:9px;font-weight:800;margin-left:auto;">${allFoodPros.length}</span></div>
- <div class="nav-item ${currentPage==='planners'?'active':''}" onclick="nav('planners')"> Planners</div> <div class="nav-item ${currentPage==='subscriptions'?'active':''}" onclick="nav('subscriptions')"> Subscriptions</div> <div class="nav-item ${currentPage==='users'?'active':''}" onclick="nav('users')"> Users</div> <div class="nav-item ${currentPage==='overrides'?'active':''}" onclick="nav('overrides')"> Overrides</div> <div class="nav-item ${currentPage==='claims'?'active':''}" onclick="nav('claims')"> Claims <span style='background:#ef4444;color:#fff;border-radius:20px;padding:1px 7px;font-size:10px;font-weight:700;margin-left:auto' id='claimsBadge' style='display:none'></span></div> <div class="nav-item ${currentPage==='externalsync'?'active':''}" onclick="nav('externalsync')"> 🌐 External Sync <span id='syncBadge' style='display:none;background:#818cf8;color:#fff;border-radius:20px;padding:1px 7px;font-size:10px;font-weight:700;margin-left:auto'></span></div>
+ <div class="nav-item ${currentPage==='organizers'?'active':''}" onclick="nav('organizers')"> Organizers</div> <div class="nav-item ${currentPage==='subscriptions'?'active':''}" onclick="nav('subscriptions')"> Subscriptions</div> <div class="nav-item ${currentPage==='users'?'active':''}" onclick="nav('users')"> Users</div> <div class="nav-item ${currentPage==='overrides'?'active':''}" onclick="nav('overrides')"> Overrides</div> <div class="nav-item ${currentPage==='claims'?'active':''}" onclick="nav('claims')"> Claims <span style='background:#ef4444;color:#fff;border-radius:20px;padding:1px 7px;font-size:10px;font-weight:700;margin-left:auto' id='claimsBadge' style='display:none'></span></div> <div class="nav-item ${currentPage==='externalsync'?'active':''}" onclick="nav('externalsync')"> 🌐 External Sync <span id='syncBadge' style='display:none;background:#818cf8;color:#fff;border-radius:20px;padding:1px 7px;font-size:10px;font-weight:700;margin-left:auto'></span></div>
  <div class="sidebar-section">Festivals</div>
  <div class="nav-item ${currentPage==='festival1313'?'active':''}" onclick="window.open('1313-festival-admin.html','_blank')" style="color:${currentPage==='festival1313'?'var(--text)':'var(--orange)'}"> 🎪 1313 Festival <span class="badge" style="background:var(--orange);color:#fff">Live</span></div>
  <div class="nav-item ${currentPage==='foodtrucks'?'active':''}" onclick="nav('foodtrucks')"> 🚚 Food Truck Prospects</div>
@@ -604,7 +604,7 @@ function nav(page){
  currentPage=page;
  document.querySelectorAll('.nav-item').forEach(el=>el.classList.remove('active'));
  document.querySelectorAll('.nav-item').forEach(el=>{if(el.textContent.trim().toLowerCase().includes(page))el.classList.add('active');});
- const title={dashboard:'Dashboard',venues:'Venues',events:'Events',inquiries:'Inquiries',revenue:'Revenue',design:'Design Requests',vendors:'Vendors',subscriptions:'Subscriptions',users:'Users',overrides:'Overrides',claims:'Event Claims',externalsync:'External Sync',blog:'Blog & SEO',planners:'Planners',outreach:'Venue Outreach',inbox:'Inbox',marketing:'Marketing Intelligence',festival1313:'1313 Festival Admin',brandreps:'Brand Reps',foodtrucks:'Food Truck Prospects'};
+ const title={dashboard:'Dashboard',venues:'Venues',events:'Events',inquiries:'Inquiries',revenue:'Revenue',design:'Design Requests',vendors:'Vendors',subscriptions:'Subscriptions',users:'Users',overrides:'Overrides',claims:'Event Claims',externalsync:'External Sync',blog:'Blog & SEO',organizers:'Organizers',outreach:'Venue Outreach',inbox:'Inbox',marketing:'Marketing Intelligence',festival1313:'1313 Festival Admin',brandreps:'Brand Reps',foodtrucks:'Food Truck Prospects'};
  const el=document.getElementById('topbarTitle');
  if(el)el.textContent=title[page]||page;
  renderPage();
@@ -619,7 +619,7 @@ async function renderPage(){
  else if(currentPage==='design')renderDesignRequests();
  else if(currentPage==='vendors')renderVendors();
  else if(currentPage==='foodpros')renderFoodPros();
- else if(currentPage==='planners')await renderPlanners();
+ else if(currentPage==='organizers')await renderOrganizers();
  else if(currentPage==='subscriptions')await renderSubscriptions();
  else if(currentPage==='users')await renderUsers();
  else if(currentPage==='overrides')renderOverrides();
@@ -948,9 +948,9 @@ function renderDashboard(){
      <div class="stat-card-label">Total Vendors</div>
      <div class="stat-card-sub" style="color:var(--sub)">${allVendors.filter(v=>v.subscription_status==='active'||v.tier==='premium'||v.tier==='standard').length} paid · ${allVendors.filter(v=>!v.subscription_status||v.subscription_status!=='active').length} free</div>
    </div>
-   <div class="stat-card" style="cursor:pointer" onclick="nav('planners')">
-     <div class="stat-card-num" style="color:var(--gold)">${plannerCount}</div>
-     <div class="stat-card-label">Planners</div>
+   <div class="stat-card" style="cursor:pointer" onclick="nav('organizers')">
+     <div class="stat-card-num" style="color:var(--gold)">${organizerCount}</div>
+     <div class="stat-card-label">Organizers</div>
      <div class="stat-card-sub" style="color:var(--sub)">Registered accounts</div>
    </div>
    <div class="stat-card" style="cursor:pointer" onclick="nav('users')">
@@ -1205,7 +1205,7 @@ async function approveVenue(id){
              <strong>${venue.name}</strong> has been approved and is now publicly listed on CBUSEVENTS.
            </p>
            <p style="color:#8888a0;font-size:14px;line-height:1.7;margin-bottom:24px">
-             Columbus event planners and attendees can now discover your venue, send booking inquiries, and see your events.
+             Columbus event organizers and attendees can now discover your venue, send booking inquiries, and see your events.
            </p>
            <a href="https://cbusevents.com/cbus-venue-portal.html" style="display:inline-block;background:#FF6B35;color:#fff;text-decoration:none;padding:12px 28px;border-radius:10px;font-weight:700;font-size:15px;margin-bottom:32px">Go to Your Venue Portal →</a>
            <div style="border-top:1px solid #25252f;padding-top:20px;color:#55556a;font-size:12px">
@@ -1625,13 +1625,13 @@ async function toggleVenueFeature(id,val){
 }
 
 // ── VENDORS ───────────────────────────────────────────────────
-async function renderPlanners(){
+async function renderOrganizers(){
  const{data:roles, error:rolesErr}=await sb.from('user_roles')
    .select('user_id, role, tier')
-   .eq('role','planner');
+   .eq('role','organizer');
 
  if(rolesErr){
-   document.getElementById('pageContent').innerHTML=`<div style="padding:40px;color:#ef4444">Error loading planners: ${rolesErr.message}</div>`;
+   document.getElementById('pageContent').innerHTML=`<div style="padding:40px;color:#ef4444">Error loading organizers: ${rolesErr.message}</div>`;
    return;
  }
 
@@ -1641,17 +1641,17 @@ async function renderPlanners(){
  // Pull emails via secure RPC function
  let emailMap={};
  if(userIds.length){
-   const{data:users, error:emailErr}=await sb.rpc('get_planner_emails',{user_ids:userIds});
-   if(emailErr) console.error('get_planner_emails error:',emailErr);
+   const{data:users, error:emailErr}=await sb.rpc('get_organizer_emails',{user_ids:userIds});
+   if(emailErr) console.error('get_organizer_emails error:',emailErr);
    (users||[]).forEach(u=>emailMap[u.id]={email:u.email,created_at:u.created_at});
  }
 
  document.getElementById('pageContent').innerHTML=`
  <div class="table-card">
    <div class="table-header">
-     <div class="table-title">Planners (${list.length})</div>
+     <div class="table-title">Organizers (${list.length})</div>
    </div>
-   ${list.length===0?'<div style="padding:40px;text-align:center;color:var(--muted)">No planners signed up yet.</div>':''}
+   ${list.length===0?'<div style="padding:40px;text-align:center;color:var(--muted)">No organizers signed up yet.</div>':''}
    <table class="data-table">
      <thead><tr>
        <th>Email</th><th>Joined</th><th>Actions</th>
@@ -1662,7 +1662,7 @@ async function renderPlanners(){
        return`<tr>
          <td><strong>${u.email||p.user_id}</strong></td>
          <td>${u.created_at?new Date(u.created_at).toLocaleDateString():'—'}</td>
-         <td><button class="btn btn-ghost btn-sm" onclick="deletePlanner('${p.user_id}')">Delete</button></td>
+         <td><button class="btn btn-ghost btn-sm" onclick="deleteOrganizer('${p.user_id}')">Delete</button></td>
        </tr>`;
      }).join('')}
      </tbody>
@@ -1670,17 +1670,17 @@ async function renderPlanners(){
  </div>`;
 }
 
-async function deletePlanner(userId){
- if(!confirm('Delete this planner?\n\nThis removes their planner profile. Cannot be undone.'))return;
+async function deleteOrganizer(userId){
+ if(!confirm('Delete this organizer?\n\nThis removes their organizer profile. Cannot be undone.'))return;
 
- const{error:e1}=await sb.from('planners').delete().eq('user_id',userId);
- if(e1)console.warn('planners:',e1.message);
+ const{error:e1}=await sb.from('organizers').delete().eq('user_id',userId);
+ if(e1)console.warn('organizers:',e1.message);
 
  const{error:e2}=await sb.from('user_roles').delete().eq('user_id',userId);
  if(e2){alert('Delete failed: '+e2.message+'\n\nCode: '+e2.code);return;}
 
- toast('Planner deleted');
- await renderPlanners();
+ toast('Organizer deleted');
+ await renderOrganizers();
 }
 
 function renderVendors(){
@@ -2047,7 +2047,7 @@ async function deleteUser(userId,email){
  // Clean up all tables
  await sb.from('vendors').delete().eq('user_id',userId).catch(()=>{});
  await sb.from('venues').delete().eq('owner_id',userId).catch(()=>{});
- await sb.from('planners').delete().eq('user_id',userId).catch(()=>{});
+ await sb.from('organizers').delete().eq('user_id',userId).catch(()=>{});
  await sb.from('customer_profiles').delete().eq('user_id',userId).catch(()=>{});
  await sb.from('user_roles').delete().eq('user_id',userId).catch(()=>{});
  // Attempt auth user delete via RPC
@@ -2099,9 +2099,9 @@ async function renderUsers(){
  const venueMap=Object.fromEntries((venues||[]).filter(v=>v.owner_id).map(v=>[v.owner_id,{email:v.email,name:v.name}]));
 
  const allRoles=roles||[];
- const roleBadge={venue_owner:'badge-orange',vendor:'badge-blue',planner:'badge-gold',customer:'badge-muted',admin:'badge-green'};
+ const roleBadge={venue_owner:'badge-orange',vendor:'badge-blue',organizer:'badge-gold',customer:'badge-muted',admin:'badge-green'};
 
- const byRole={venue_owner:[],vendor:[],planner:[],customer:[],admin:[]};
+ const byRole={venue_owner:[],vendor:[],organizer:[],customer:[],admin:[]};
  allRoles.forEach(r=>{ if(byRole[r.role]) byRole[r.role].push(r); else byRole.customer.push(r); });
 
  function userRow(u){
@@ -2116,7 +2116,7 @@ async function renderUsers(){
        <option value="customer" ${u.role==='customer'?'selected':''}>Customer</option>
        <option value="venue_owner" ${u.role==='venue_owner'?'selected':''}>Venue Owner</option>
        <option value="vendor" ${u.role==='vendor'?'selected':''}>Vendor</option>
-       <option value="planner" ${u.role==='planner'?'selected':''}>Planner</option>
+       <option value="organizer" ${u.role==='organizer'?'selected':''}>Organizer</option>
      </select></td>
      <td><button class="btn btn-danger btn-sm" onclick="deleteUser('${u.user_id}','${email.replace(/'/g,"\\'")}')">Delete</button></td>
    </tr>`;
@@ -2124,9 +2124,9 @@ async function renderUsers(){
 
  document.getElementById('pageContent').innerHTML=`
  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px">
-   ${[['venue_owner','Venue Owners','var(--orange)'],['vendor','Vendors','var(--blue)'],['planner','Planners','var(--gold)'],['customer','Attendees','var(--green)']].map(function(arr){ var role=arr[0],label=arr[1],color=arr[2]; var cnt=byRole[role]?byRole[role].length:0; return '<div class="stat-card" style="cursor:pointer;border-left:3px solid '+color+'" onclick="document.getElementById(\'tab-\'+\''+role+'\').click()"><div class="stat-card-num" style="color:'+color+'">'+cnt+'</div><div class="stat-card-label">'+label+'</div></div>'; }).join('')}
+   ${[['venue_owner','Venue Owners','var(--orange)'],['vendor','Vendors','var(--blue)'],['organizer','Organizers','var(--gold)'],['customer','Attendees','var(--green)']].map(function(arr){ var role=arr[0],label=arr[1],color=arr[2]; var cnt=byRole[role]?byRole[role].length:0; return '<div class="stat-card" style="cursor:pointer;border-left:3px solid '+color+'" onclick="document.getElementById(\'tab-\'+\''+role+'\').click()"><div class="stat-card-num" style="color:'+color+'">'+cnt+'</div><div class="stat-card-label">'+label+'</div></div>'; }).join('')}
  </div>
- ${[['venue_owner','Venue Owners'],['vendor','Vendors'],['planner','Planners'],['customer','Attendees']].map(([role,label])=>
+ ${[['venue_owner','Venue Owners'],['vendor','Vendors'],['organizer','Organizers'],['customer','Attendees']].map(([role,label])=>
    byRole[role]?.length?`
    <div class="table-card" style="margin-bottom:20px" id="filter-${role}">
      <div class="table-header"><div class="table-title">${label} (${byRole[role].length})</div></div>
@@ -3260,7 +3260,7 @@ async function viewRepAccounts(repId,repName){
   panel.innerHTML=`<div style="margin-top:24px;display:flex;align-items:center;justify-content:center;padding:40px"><div style="width:20px;height:20px;border:2px solid var(--border);border-top-color:var(--orange);border-radius:50%;animation:spin 0.7s linear infinite"></div></div>`;
   const{data:accts}=await sb.from('rep_accounts').select('*').eq('rep_id',repId).order('created_at',{ascending:false});
   const rows=accts||[];
-  const iconMap={venue:'🏛',vendor:'🎛',planner:'📋',food_pro:'🍽',event_staff:'👤'};
+  const iconMap={venue:'🏛',vendor:'🎛',organizer:'📋',food_pro:'🍽',event_staff:'👤'};
   panel.innerHTML=`
   <div style="margin-top:24px">
     <div style="font-size:11px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:10px">${repName}'s Accounts (${rows.length})</div>

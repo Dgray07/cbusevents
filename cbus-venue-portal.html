@@ -369,7 +369,7 @@ const HOME_BTN_STYLE = {display:"flex",alignItems:"center",gap:10,width:"100%",b
 
 const PORTAL_LINKS = {
   venue_owner:{label:"Venue Portal",url:"https://cbusevents.com/cbus-venue-portal.html"},
-  planner:{label:"Planner Portal",url:"https://cbusevents.com/cbus-planner-portal.html"},
+  organizer:{label:"Organizer Portal",url:"https://cbusevents.com/cbus-organizer-portal.html"},
   vendor:{label:"Vendor Portal",url:"https://cbusevents.com/cbus-vendor-portal.html"},
 };
 
@@ -378,17 +378,17 @@ function PortalSwitcher({userId}) {
   const [adding,setAdding]=React.useState(false);
   const [busy,setBusy]=React.useState(false);
 
-  const addPlannerRole=async()=>{
+  const addOrganizerRole=async()=>{
     setBusy(true);
-    await sb.from('user_roles').upsert({user_id:userId,role:'planner'},{onConflict:'user_id,role'}).catch(()=>{});
-    window._userRoles=[...roles,'planner'];
-    setRoles([...roles,'planner']);
+    await sb.from('user_roles').upsert({user_id:userId,role:'organizer'},{onConflict:'user_id,role'}).catch(()=>{});
+    window._userRoles=[...roles,'organizer'];
+    setRoles([...roles,'organizer']);
     setBusy(false);
     setAdding(false);
   };
 
   const otherPortals=Object.entries(PORTAL_LINKS).filter(([r])=>r!=='venue_owner'&&roles.includes(r));
-  const canAddPlanner=!roles.includes('planner');
+  const canAddOrganizer=!roles.includes('organizer');
 
   return(
   <div style={{padding:"12px 18px",borderTop:"1px solid var(--border-sub)"}}>
@@ -402,16 +402,16 @@ function PortalSwitcher({userId}) {
         </a>
       ))}
     </>}
-    {canAddPlanner&&!adding&&(
+    {canAddOrganizer&&!adding&&(
       <button onClick={()=>setAdding(true)} style={{width:"100%",background:"rgba(255,107,53,0.06)",color:"var(--orange)",border:"1px solid rgba(255,107,53,0.2)",borderRadius:8,padding:"7px 10px",fontSize:11,fontWeight:600,cursor:"pointer",fontFamily:"'DM Sans',sans-serif",marginBottom:6}}>
-        + Add Planner Access
+        + Add Organizer Access
       </button>
     )}
     {adding&&(
       <div style={{background:"rgba(255,107,53,0.06)",border:"1px solid rgba(255,107,53,0.2)",borderRadius:8,padding:"10px",marginBottom:6}}>
-        <div style={{fontSize:11,color:"var(--sub)",marginBottom:8,lineHeight:1.5}}>Add planner role to this account and access the Planner Portal with the same login.</div>
+        <div style={{fontSize:11,color:"var(--sub)",marginBottom:8,lineHeight:1.5}}>Add organizer role to this account and access the Organizer Portal with the same login.</div>
         <div style={{display:"flex",gap:6}}>
-          <button onClick={addPlannerRole} disabled={busy} style={{flex:1,background:"var(--orange)",color:"#fff",border:"none",borderRadius:6,padding:"6px",fontSize:11,fontWeight:700,cursor:"pointer",fontFamily:"'DM Sans',sans-serif",opacity:busy?0.7:1}}>
+          <button onClick={addOrganizerRole} disabled={busy} style={{flex:1,background:"var(--orange)",color:"#fff",border:"none",borderRadius:6,padding:"6px",fontSize:11,fontWeight:700,cursor:"pointer",fontFamily:"'DM Sans',sans-serif",opacity:busy?0.7:1}}>
             {busy?"Adding...":"Confirm"}
           </button>
           <button onClick={()=>setAdding(false)} style={{background:"rgba(255,255,255,0.04)",color:"var(--sub)",border:"1px solid var(--border)",borderRadius:6,padding:"6px 10px",fontSize:11,cursor:"pointer",fontFamily:"'DM Sans',sans-serif"}}>
@@ -472,7 +472,7 @@ function Dashboard({venue,events}) {
  const now=new Date(),week=new Date(now.getTime()+7*24*60*60*1000);
  const thisWeek=events.filter(e=>{const d=new Date(e.start_time);return d>=now&&d<=week;});
  return (
- <div> <h1 style={{fontFamily:"'DM Sans',sans-serif",fontSize:24,fontWeight:800,marginBottom:6}}>{venue?.name ? `Welcome back, ${venue.name}!` : "Welcome to CBUSEVENTS!"}</h1> <p style={{color:"var(--sub)",marginBottom:28,fontSize:14}}>{venue?.name ? "Here's your venue overview." : "Let's get your venue listed and in front of Columbus planners."}</p> <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(160px,1fr))",gap:14,marginBottom:28}}> {[
+ <div> <h1 style={{fontFamily:"'DM Sans',sans-serif",fontSize:24,fontWeight:800,marginBottom:6}}>{venue?.name ? `Welcome back, ${venue.name}!` : "Welcome to CBUSEVENTS!"}</h1> <p style={{color:"var(--sub)",marginBottom:28,fontSize:14}}>{venue?.name ? "Here's your venue overview." : "Let's get your venue listed and in front of Columbus organizers."}</p> <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(160px,1fr))",gap:14,marginBottom:28}}> {[
  {label:"Published",value:events.filter(e=>e.status==="published").length,color:"#FF6B35"},
  {label:"This Week",value:thisWeek.length,color:"var(--green)"},
  {label:"Status",value:venue?.status||"—",color:venue?.status==="approved"?"var(--green)":"#f59e0b"},
@@ -866,7 +866,7 @@ function Inquiries({venue}) {
  return (
  <div> <h2 style={{fontFamily:"'DM Sans',sans-serif",fontSize:22,fontWeight:800,marginBottom:6}}>Inquiries</h2> <p style={{color:"var(--sub)",fontSize:14,marginBottom:24}}>{items.filter(i=>i.status==="new").length} unread</p> {items.length===0&&<Card style={{textAlign:"center",padding:48}}><div style={{fontSize:40,marginBottom:12}}></div><h3 style={{fontFamily:"'DM Sans',sans-serif",fontWeight:700,marginBottom:8}}>No inquiries yet</h3><p style={{color:"var(--sub)",fontSize:14}}>Booking requests will show up here.</p></Card>}
  <div style={{display:"flex",flexDirection:"column",gap:12}}> {items.map(i=>(
- <Card key={i.id} style={{borderColor:i.status==="new"?"#FF6B35":"var(--border)",padding:18}}> <div style={{display:"flex",justifyContent:"space-between",marginBottom:8}}> <div><strong>{i.name}</strong><span style={{color:"var(--sub)",fontSize:13,marginLeft:10}}>{i.email}</span></div> <div style={{display:"flex",gap:8,alignItems:"center"}}><Badge color={i.status==="new"?"#FF6B35":"var(--muted)"}>{i.status}</Badge>{i.status==="new"&&<Btn size="sm" variant="secondary" onClick={()=>markRead(i.id)}>Mark Read</Btn>}{i.planner_id&&<Btn size="sm" variant="ghost" onClick={()=>window.startVenueConversation(i.planner_id,'planner',i.name||'Planner','Re: '+i.event_name)}>💬 Reply</Btn>}</div> </div> {i.event_date&&<div style={{fontSize:13,color:"var(--sub)",marginBottom:8}}> {i.event_date} · {i.guest_count} guests</div>}
+ <Card key={i.id} style={{borderColor:i.status==="new"?"#FF6B35":"var(--border)",padding:18}}> <div style={{display:"flex",justifyContent:"space-between",marginBottom:8}}> <div><strong>{i.name}</strong><span style={{color:"var(--sub)",fontSize:13,marginLeft:10}}>{i.email}</span></div> <div style={{display:"flex",gap:8,alignItems:"center"}}><Badge color={i.status==="new"?"#FF6B35":"var(--muted)"}>{i.status}</Badge>{i.status==="new"&&<Btn size="sm" variant="secondary" onClick={()=>markRead(i.id)}>Mark Read</Btn>}{i.organizer_id&&<Btn size="sm" variant="ghost" onClick={()=>window.startVenueConversation(i.organizer_id,'organizer',i.name||'Organizer','Re: '+i.event_name)}>💬 Reply</Btn>}</div> </div> {i.event_date&&<div style={{fontSize:13,color:"var(--sub)",marginBottom:8}}> {i.event_date} · {i.guest_count} guests</div>}
  <p style={{fontSize:14,lineHeight:1.7}}>{i.message}</p> </Card> ))}
  </div> </div> );
 }
@@ -1168,7 +1168,7 @@ function BookingCalendar({venue, events}) {
                  <div key={i} style={{display:'flex',alignItems:'center',gap:12,padding:'10px 14px',background:'var(--surface)',borderRadius:10,border:'1px solid var(--border-sub)'}}>
                    <div style={{width:8,height:8,borderRadius:'50%',flexShrink:0,background:STATUS_COLOR[item.status]||'var(--muted)'}}/>
                    <div style={{flex:1}}>
-                     <div style={{fontWeight:600,fontSize:13}}>{item._type==='booking_request'?`Booking Request · ${item.planner_name||item.planner_email||'Planner'}`:item.title||'Event'}</div>
+                     <div style={{fontWeight:600,fontSize:13}}>{item._type==='booking_request'?`Booking Request · ${item.organizer_name||item.organizer_email||'Organizer'}`:item.title||'Event'}</div>
                      <div style={{fontSize:11,color:'var(--muted)',marginTop:2}}>
                        {item._type==='booking_request'?`${item.event_type||''} · ${item.guest_count||'?'} guests · ${item.status}`:`${item.category||''} · ${item.status}`}
                      </div>
@@ -1199,7 +1199,7 @@ function BookingCalendar({venue, events}) {
                <div key={req.id} style={{padding:'16px 20px',borderBottom:'1px solid var(--border-sub)',display:'flex',alignItems:'flex-start',gap:16,flexWrap:'wrap'}}>
                  <div style={{flex:1,minWidth:200}}>
                    <div style={{display:'flex',alignItems:'center',gap:8,marginBottom:6}}>
-                     <span style={{fontWeight:700,fontSize:14}}>{req.planner_name||req.planner_email||'Planner'}</span>
+                     <span style={{fontWeight:700,fontSize:14}}>{req.organizer_name||req.organizer_email||'Organizer'}</span>
                      <span style={{fontFamily:"'DM Mono',monospace",fontSize:9,textTransform:'uppercase',letterSpacing:'0.1em',padding:'2px 8px',borderRadius:20,background:req.status==='pending'?'rgba(255,107,53,0.12)':req.status==='approved'?'rgba(52,211,153,0.12)':'rgba(248,113,113,0.12)',color:STATUS_COLOR[req.status]||'var(--muted)'}}>{req.status}</span>
                    </div>
                    <div style={{fontSize:12,color:'var(--sub)',display:'flex',flexWrap:'wrap',gap:12,marginBottom:req.message?8:0}}>
@@ -1255,7 +1255,7 @@ function BookingCalendar({venue, events}) {
        <div style={{background:'var(--surface)',border:'1px solid var(--border)',borderRadius:16,padding:28,width:420,maxWidth:'90vw'}}>
          <div style={{fontWeight:800,fontSize:17,marginBottom:4,letterSpacing:'-0.02em'}}>Respond to Request</div>
          <div style={{background:'var(--card)',borderRadius:10,padding:'12px 16px',marginBottom:20,marginTop:12}}>
-           <div style={{fontWeight:700,fontSize:13,marginBottom:4}}>{responseModal.planner_name||responseModal.planner_email}</div>
+           <div style={{fontWeight:700,fontSize:13,marginBottom:4}}>{responseModal.organizer_name||responseModal.organizer_email}</div>
            <div style={{fontSize:12,color:'var(--sub)',display:'flex',gap:12,flexWrap:'wrap'}}>
              <span>📅 {new Date(responseModal.event_date+'T00:00:00').toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric',year:'numeric'})}</span>
              {responseModal.event_type&&<span>🎉 {responseModal.event_type}</span>}
@@ -1604,7 +1604,7 @@ function Inbox({ userId }) {
   return (
     <div>
       <h1 style={{fontFamily:"'DM Sans',sans-serif",fontSize:24,fontWeight:800,marginBottom:6,letterSpacing:"-0.03em"}}>Inbox {unreadCount > 0 && <span style={{background:"#FF6B35",color:"#fff",borderRadius:99,fontSize:12,fontWeight:700,padding:"2px 8px",marginLeft:8}}>{unreadCount}</span>}</h1>
-      <p style={{color:"var(--sub)",marginBottom:24,fontSize:14}}>Messages from planners and vendors.</p>
+      <p style={{color:"var(--sub)",marginBottom:24,fontSize:14}}>Messages from organizers and vendors.</p>
       <div style={{display:"flex",height:"calc(100vh - 180px)",background:"var(--surface)",borderRadius:16,border:"1px solid var(--border)",overflow:"hidden"}}>
         <div style={{width:280,borderRight:"1px solid var(--border)",display:"flex",flexDirection:"column",flexShrink:0}}>
           <div style={{padding:"16px 16px 12px",borderBottom:"1px solid var(--border)"}}>
@@ -1717,7 +1717,7 @@ function StaffManagement({venue, userId}) {
    const {data:existing}=await sb.from('venue_staff').select('id').eq('venue_id',venue.id).eq('staff_email',inviteEmail.trim()).maybeSingle();
    if(existing){setMsg({text:'This person is already on your staff.',type:'error'});setInviting(false);return;}
    // Look up user by email
-   const {data:userRecord}=await sb.rpc('get_planner_emails',{user_ids:[]}).catch(()=>({data:null}));
+   const {data:userRecord}=await sb.rpc('get_organizer_emails',{user_ids:[]}).catch(()=>({data:null}));
    // Insert invite - staff_user_id will be null until they accept
    const {error}=await sb.from('venue_staff').insert({
      venue_id:venue.id,

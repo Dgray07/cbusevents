@@ -10,7 +10,7 @@
 
 <!-- Brand Meta Tags -->
 <meta property="og:title" content="CBUSEVENTS - Columbus Event Ecosystem">
-<meta property="og:description" content="Columbus venues, planners, vendors, and customers - all connected.">
+<meta property="og:description" content="Columbus venues, organizers, vendors, and customers - all connected.">
 <meta property="og:image" content="https://cbusevents.com/assets/cbus-shield.png">
 <meta property="og:image:width" content="1024">
 <meta property="og:image:height" content="1024">
@@ -320,10 +320,10 @@ body { background: var(--bg); color: var(--text); font-family: var(--font); disp
 .search-input::placeholder { color: var(--muted); }
 
 /* ════════════════════════
-   PLANNER DISCOVER SECTION
+   ORGANIZER DISCOVER SECTION
    The hidden wow layer
 ════════════════════════ */
-.planner-section {
+.organizer-section {
   background: var(--card);
   border: 1px solid var(--border);
   border-radius: var(--r-lg);
@@ -332,31 +332,31 @@ body { background: var(--bg); color: var(--text); font-family: var(--font); disp
   position: relative;
 }
 
-.planner-section-header {
+.organizer-section-header {
   padding: 20px 24px;
   border-bottom: 1px solid var(--border-sub);
   display: flex; align-items: flex-start; justify-content: space-between; gap: 16px;
 }
 
-.planner-discover-label {
+.organizer-discover-label {
   font-family: var(--mono);
   font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase;
   color: var(--orange); margin-bottom: 5px;
   display: flex; align-items: center; gap: 6px;
 }
-.planner-discover-label::before { content: ''; display: block; width: 5px; height: 5px; background: var(--orange); border-radius: 50%; animation: pulse 2s infinite; }
+.organizer-discover-label::before { content: ''; display: block; width: 5px; height: 5px; background: var(--orange); border-radius: 50%; animation: pulse 2s infinite; }
 
-.planner-section-title { font-size: 15px; font-weight: 700; letter-spacing: -0.02em; color: var(--text); margin-bottom: 3px; }
-.planner-section-sub { font-size: 12px; color: var(--sub); max-width: 480px; line-height: 1.5; }
+.organizer-section-title { font-size: 15px; font-weight: 700; letter-spacing: -0.02em; color: var(--text); margin-bottom: 3px; }
+.organizer-section-sub { font-size: 12px; color: var(--sub); max-width: 480px; line-height: 1.5; }
 
-.planner-grid {
+.organizer-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
   gap: 12px;
   padding: 16px;
 }
 
-.planner-card {
+.organizer-card {
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--r-lg);
@@ -364,11 +364,11 @@ body { background: var(--bg); color: var(--text); font-family: var(--font); disp
   cursor: pointer;
   transition: background 0.18s, border-color 0.18s, transform 0.18s;
 }
-.planner-card:hover { background: var(--card-hover); border-color: rgba(255,255,255,0.08); transform: translateY(-2px); }
+.organizer-card:hover { background: var(--card-hover); border-color: rgba(255,255,255,0.08); transform: translateY(-2px); }
 
-.planner-card-top { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+.organizer-card-top { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
 
-.planner-card-avatar {
+.organizer-card-avatar {
   width: 40px; height: 40px;
   border-radius: 50%;
   display: flex; align-items: center; justify-content: center;
@@ -381,16 +381,16 @@ body { background: var(--bg); color: var(--text); font-family: var(--font); disp
 .pa3 { background: var(--green-dim);  color: var(--green);  border: 1px solid var(--green-border); }
 .pa4 { background: rgba(251,191,36,0.1); color: var(--gold); border: 1px solid rgba(251,191,36,0.2); }
 
-.planner-card-name { font-weight: 700; font-size: 13px; color: var(--text); margin-bottom: 1px; letter-spacing: -0.01em; }
-.planner-card-type { font-family: var(--mono); font-size: 9px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--orange); }
+.organizer-card-name { font-weight: 700; font-size: 13px; color: var(--text); margin-bottom: 1px; letter-spacing: -0.01em; }
+.organizer-card-type { font-family: var(--mono); font-size: 9px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--orange); }
 
-.planner-card-tags { display: flex; gap: 5px; flex-wrap: wrap; margin-bottom: 10px; }
-.planner-tag { font-family: var(--mono); font-size: 9px; letter-spacing: 0.08em; color: var(--sub); background: rgba(255,255,255,0.04); border: 1px solid var(--border); padding: 2px 8px; border-radius: var(--r-full); }
+.organizer-card-tags { display: flex; gap: 5px; flex-wrap: wrap; margin-bottom: 10px; }
+.organizer-tag { font-family: var(--mono); font-size: 9px; letter-spacing: 0.08em; color: var(--sub); background: rgba(255,255,255,0.04); border: 1px solid var(--border); padding: 2px 8px; border-radius: var(--r-full); }
 
-.planner-card-footer { display: flex; align-items: center; justify-content: space-between; padding-top: 10px; border-top: 1px solid var(--border-sub); }
-.planner-card-rate { font-family: var(--mono); font-size: 11px; font-weight: 500; color: var(--text); }
-.planner-card-avail { font-family: var(--mono); font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--green); }
-.planner-card-avail.limited { color: var(--gold); }
+.organizer-card-footer { display: flex; align-items: center; justify-content: space-between; padding-top: 10px; border-top: 1px solid var(--border-sub); }
+.organizer-card-rate { font-family: var(--mono); font-size: 11px; font-weight: 500; color: var(--text); }
+.organizer-card-avail { font-family: var(--mono); font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--green); }
+.organizer-card-avail.limited { color: var(--gold); }
 
 /* ════════════════════════
    GROWTH TOOLS
@@ -544,9 +544,9 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
   </a>
 
   <div class="sidebar-section">Plan</div>
-  <a class="nav-item" href="#" onclick="showSection('planner');return false;" data-section="planner">
+  <a class="nav-item" href="#" onclick="showSection('organizer');return false;" data-section="organizer">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-    Hire a Planner
+    Hire a Organizer
   </a>
 
   <a class="nav-item" id="navRecommendations" href="#" onclick="showSection('recommendations');return false;" data-section="recommendations">
@@ -661,13 +661,13 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
       </div>
     </div>/div>
 
-    <!-- HIRE A PLANNER - Discovery layer -->
-    <div class="planner-section" id="plannerSection">
-      <div class="planner-section-header">
+    <!-- HIRE A ORGANIZER - Discovery layer -->
+    <div class="organizer-section" id="organizerSection">
+      <div class="organizer-section-header">
         <div>
-          <div class="planner-discover-label">New on CBUSEVENTS</div>
-          <div class="planner-section-title">Plan Your Own Event</div>
-          <div class="planner-section-sub">Connect with Columbus event planners who can make your idea a reality. Private parties, corporate events, weddings, brand activations and more.</div>
+          <div class="organizer-discover-label">New on CBUSEVENTS</div>
+          <div class="organizer-section-title">Plan Your Own Event</div>
+          <div class="organizer-section-sub">Connect with Columbus event organizers who can make your idea a reality. Private parties, corporate events, weddings, brand activations and more.</div>
         </div>
         <div style="display:flex;gap:8px;flex-shrink:0;">
           <div class="filter-chip active">All</div>
@@ -677,10 +677,10 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
         </div>
       </div>
 
-      <div class="planner-grid" id="plannerGrid">
+      <div class="organizer-grid" id="organizerGrid">
         <div style="padding:32px;text-align:center;color:var(--muted);grid-column:1/-1">
           <div style="width:20px;height:20px;border:2px solid var(--border);border-top-color:var(--orange);border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 10px"></div>
-          Loading planners...
+          Loading organizers...
         </div>
       </div>
     </div>
@@ -829,7 +829,7 @@ window.doAuth = async function doAuth(){
     const role=rd?.role;
     if(role==='vendor'){window.location.href='https://cbusevents.com/cbus-vendor-portal.html';return;}
     if(role==='venue_owner'){window.location.href='https://cbusevents.com/cbus-venue-portal.html';return;}
-    if(role==='planner'){window.location.href='https://cbusevents.com/cbus-planner-portal.html';return;}
+    if(role==='organizer'){window.location.href='https://cbusevents.com/cbus-organizer-portal.html';return;}
     currentUser=data.user;
     btn.disabled=false;btn.textContent='Sign In';
     hideAuthGate(data.user);
@@ -883,62 +883,62 @@ function hideAuthGate(user){
 async function loadLiveData(user){
   loadLiveEvents(user);
   loadLiveTickets(user);
-  loadLivePlanners();
+  loadLiveOrganizers();
   loadLiveRecommendations(user);
   loadLiveAlerts(user);
 }
 
-async function loadLivePlanners(){
-  const grid = document.getElementById('plannerGrid');
+async function loadLiveOrganizers(){
+  const grid = document.getElementById('organizerGrid');
   if(!grid) return;
 
-  const { data: planners, error } = await sb
-    .from('planners')
+  const { data: organizers, error } = await sb
+    .from('organizers')
     .select('id, business_name, contact_name, specialties, categories, rate_from, rate_display, availability, is_discoverable, neighborhood')
     .eq('is_discoverable', true)
     .order('created_at', { ascending: false })
     .limit(8);
 
-  if(error || !planners || planners.length === 0){
-    grid.innerHTML = '<div style="padding:32px;text-align:center;color:var(--sub);grid-column:1/-1">No planners listed yet. <a href="https://cbusevents.com" style="color:var(--orange)">Check back soon →</a></div>';
+  if(error || !organizers || organizers.length === 0){
+    grid.innerHTML = '<div style="padding:32px;text-align:center;color:var(--sub);grid-column:1/-1">No organizers listed yet. <a href="https://cbusevents.com" style="color:var(--orange)">Check back soon →</a></div>';
     return;
   }
 
   const paletteClasses = ['pa1','pa2','pa3','pa4'];
-  grid.innerHTML = planners.map((p, i) => {
-    const name = p.business_name || p.contact_name || 'Columbus Planner';
+  grid.innerHTML = organizers.map((p, i) => {
+    const name = p.business_name || p.contact_name || 'Columbus Organizer';
     const initials = name.split(' ').map(w => w[0]).join('').substring(0,2).toUpperCase();
     const tags = (Array.isArray(p.specialties) && p.specialties.length ? p.specialties : (Array.isArray(p.categories) ? p.categories : [])).slice(0,3);
-    const type = tags[0] || 'Event Planner';
+    const type = tags[0] || 'Event Organizer';
     const price = p.rate_display || (p.rate_from ? 'From $' + Number(p.rate_from).toLocaleString() : 'Contact for Pricing');
     const avail = (p.availability || '').toLowerCase() === 'limited' ? 'limited' : '';
     const availText = avail === 'limited' ? 'Limited' : 'Available';
-    const href = 'https://cbusevents.com/planner-portal.html';
+    const href = 'https://cbusevents.com/organizer-portal.html';
     const palette = paletteClasses[i % paletteClasses.length];
-    return '<div class="planner-card" onclick="window.open(\'https://cbusevents.com\',\'_blank\')" style="cursor:pointer">'
-      + '<div class="planner-card-top">'
-      + '<div class="planner-card-avatar ' + palette + '">' + initials + '</div>'
-      + '<div><div class="planner-card-name">' + name + '</div>'
-      + '<div class="planner-card-type">' + type + '</div></div>'
+    return '<div class="organizer-card" onclick="window.open(\'https://cbusevents.com\',\'_blank\')" style="cursor:pointer">'
+      + '<div class="organizer-card-top">'
+      + '<div class="organizer-card-avatar ' + palette + '">' + initials + '</div>'
+      + '<div><div class="organizer-card-name">' + name + '</div>'
+      + '<div class="organizer-card-type">' + type + '</div></div>'
       + '</div>'
-      + (tags.length ? '<div class="planner-card-tags">' + tags.map(t => '<span class="planner-tag">' + t + '</span>').join('') + '</div>' : '')
-      + '<div class="planner-card-footer">'
-      + '<span class="planner-card-rate">' + price + '</span>'
-      + '<span class="planner-card-avail ' + avail + '">' + availText + '</span>'
+      + (tags.length ? '<div class="organizer-card-tags">' + tags.map(t => '<span class="organizer-tag">' + t + '</span>').join('') + '</div>' : '')
+      + '<div class="organizer-card-footer">'
+      + '<span class="organizer-card-rate">' + price + '</span>'
+      + '<span class="organizer-card-avail ' + avail + '">' + availText + '</span>'
       + '</div></div>';
   }).join('');
 
   // Wire filter chips
-  document.querySelectorAll('#plannerSection .filter-chip').forEach(chip => {
+  document.querySelectorAll('#organizerSection .filter-chip').forEach(chip => {
     chip.addEventListener('click', function(){
-      document.querySelectorAll('#plannerSection .filter-chip').forEach(c => c.classList.remove('active'));
+      document.querySelectorAll('#organizerSection .filter-chip').forEach(c => c.classList.remove('active'));
       this.classList.add('active');
       const filter = this.textContent.trim().toLowerCase();
-      document.querySelectorAll('#plannerGrid .planner-card').forEach(card => {
+      document.querySelectorAll('#organizerGrid .organizer-card').forEach(card => {
         if(filter === 'all'){
           card.style.display = '';
         } else {
-          const tags = card.querySelectorAll('.planner-tag');
+          const tags = card.querySelectorAll('.organizer-tag');
           const match = Array.from(tags).some(t => t.textContent.toLowerCase().includes(filter));
           card.style.display = match ? '' : 'none';
         }
@@ -1132,7 +1132,7 @@ const SECTION_TITLES = {
   dashboard:       'My Dashboard',
   saved:           'Saved Events',
   tickets:         'My Tickets',
-  planner:         'Hire a Planner',
+  organizer:         'Hire a Organizer',
   recommendations: 'Recommended For You',
   alerts:          'Priority Alerts',
 };
@@ -1167,7 +1167,7 @@ window.showSection = function showSection(section) {
   const sectionMap = {
     saved:           document.getElementById('savedSection'),
     tickets:         document.getElementById('ticketsSection'),
-    planner:         document.getElementById('plannerSection'),
+    organizer:         document.getElementById('organizerSection'),
     recommendations: document.getElementById('featureRec'),
     alerts:          document.getElementById('featureAlerts'),
   };
@@ -1344,7 +1344,7 @@ async function declineInboxRequest(reqId,convoId){
 document.addEventListener('DOMContentLoaded', function() {
   document.querySelectorAll('.filter-chip').forEach(chip => {
     chip.addEventListener('click', function() {
-      const parent = this.closest('.planner-section-header, .filter-row');
+      const parent = this.closest('.organizer-section-header, .filter-row');
       if (parent) parent.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
       this.classList.add('active');
     });

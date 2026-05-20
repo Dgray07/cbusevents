@@ -888,7 +888,7 @@ body {
 
     <div id="signup-form" style="display:none">
       <h2 class="auth-title">Join as Event Staff.</h2>
-      <p class="auth-sub">Get discovered by Columbus venues, planners, and event organizers looking to hire.</p>
+      <p class="auth-sub">Get discovered by Columbus venues, organizers, and event organizers looking to hire.</p>
       <div class="two-col">
         <div class="field"><label>First Name</label><input type="text" id="su-first" placeholder="First"></div>
         <div class="field"><label>Last Name</label><input type="text" id="su-last" placeholder="Last"></div>
@@ -1008,7 +1008,7 @@ body {
             <div class="quick-icon">👤</div>
             <div>
               <div class="quick-label">Edit Profile</div>
-              <div class="quick-sub">How planners see you</div>
+              <div class="quick-sub">How organizers see you</div>
             </div>
           </div>
         </div>
@@ -1022,7 +1022,7 @@ body {
             <div class="empty-state">
               <div class="ei">📭</div>
               <h3>No bookings yet</h3>
-              <p>Complete your profile and set your availability<br>to start getting discovered by event planners.</p>
+              <p>Complete your profile and set your availability<br>to start getting discovered by event organizers.</p>
             </div>
           </div>
         </div>
@@ -1046,7 +1046,7 @@ body {
           <div class="empty-state">
             <div class="ei">📅</div>
             <h3>No bookings yet</h3>
-            <p>Once venues or planners send you a booking request, it will appear here.</p>
+            <p>Once venues or organizers send you a booking request, it will appear here.</p>
           </div>
         </div>
       </div>
@@ -1055,7 +1055,7 @@ body {
       <div class="panel" id="panel-availability">
         <div class="page-header">
           <h1>Availability</h1>
-          <p>Mark the dates you're available to work. Planners and venues filter by this.</p>
+          <p>Mark the dates you're available to work. Organizers and venues filter by this.</p>
         </div>
 
         <div class="card">
@@ -1091,7 +1091,7 @@ body {
           <div class="toggle-row">
             <div>
               <div class="toggle-label">Available for last-minute bookings</div>
-              <div class="toggle-sub">Planners can book you within 48 hours</div>
+              <div class="toggle-sub">Organizers can book you within 48 hours</div>
             </div>
             <button class="toggle on" onclick="toggleSwitch(this)"></button>
           </div>
@@ -1134,14 +1134,14 @@ body {
 
         <div class="card">
           <div class="card-header"><div class="card-title">Why credentials matter</div></div>
-          <p style="font-size:13px;color:var(--sub);line-height:1.6">Verified credentials move you to the top of search results when planners and venues filter for licensed staff. A bartender with a visible TIPS certification or liquor license gets booked first.</p>
+          <p style="font-size:13px;color:var(--sub);line-height:1.6">Verified credentials move you to the top of search results when organizers and venues filter for licensed staff. A bartender with a visible TIPS certification or liquor license gets booked first.</p>
         </div>
 
         <div class="cred-list" id="cred-list">
           <div class="empty-state">
             <div class="ei">🪪</div>
             <h3>No credentials yet</h3>
-            <p>Add your certifications, licenses, and training to stand out when planners are searching.</p>
+            <p>Add your certifications, licenses, and training to stand out when organizers are searching.</p>
           </div>
         </div>
       </div>
@@ -1150,7 +1150,7 @@ body {
       <div class="panel" id="panel-profile">
         <div class="page-header">
           <h1>My Profile</h1>
-          <p>How you appear to venues and planners searching for staff.</p>
+          <p>How you appear to venues and organizers searching for staff.</p>
         </div>
 
         <div class="card">
@@ -1169,7 +1169,7 @@ body {
                 <div class="profile-role-tag" id="preview-role">EVENT STAFF</div>
               </div>
             </div>
-            <div id="preview-bio" style="font-size:13px;color:var(--sub);line-height:1.5;margin-bottom:12px">Add a bio so planners know what you bring to the table.</div>
+            <div id="preview-bio" style="font-size:13px;color:var(--sub);line-height:1.5;margin-bottom:12px">Add a bio so organizers know what you bring to the table.</div>
           </div>
         </div>
 
@@ -1200,7 +1200,7 @@ body {
           </div>
           <div class="field">
             <label>Bio</label>
-            <textarea id="profile-bio" rows="4" placeholder="Years of experience, types of events you've worked, what makes you reliable..." oninput="document.getElementById('preview-bio').textContent=this.value||'Add a bio so planners know what you bring to the table.'"></textarea>
+            <textarea id="profile-bio" rows="4" placeholder="Years of experience, types of events you've worked, what makes you reliable..." oninput="document.getElementById('preview-bio').textContent=this.value||'Add a bio so organizers know what you bring to the table.'"></textarea>
           </div>
           <div class="two-col">
             <div class="field">
@@ -1265,7 +1265,7 @@ body {
 
       <!-- INBOX PANEL -->
       <div class="panel" id="panel-inbox">
-        <div class="page-header"><h1>Inbox</h1><p>Messages from venues and planners.</p></div>
+        <div class="page-header"><h1>Inbox</h1><p>Messages from venues and organizers.</p></div>
         <div style="display:flex;height:calc(100vh - 200px);background:var(--bg2);border-radius:16px;border:1px solid var(--border);overflow:hidden">
           <div style="width:280px;border-right:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0">
             <div style="padding:14px 14px 10px;border-bottom:1px solid var(--border);display:flex;gap:6px">
@@ -1472,7 +1472,7 @@ async function loadCredentials() {
 function renderCredentials() {
   const list = document.getElementById('cred-list');
   if (!credentials.length) {
-    list.innerHTML = `<div class="empty-state"><div class="ei">🪪</div><h3>No credentials yet</h3><p>Add your certifications, licenses, and training to stand out when planners are searching.</p></div>`;
+    list.innerHTML = `<div class="empty-state"><div class="ei">🪪</div><h3>No credentials yet</h3><p>Add your certifications, licenses, and training to stand out when organizers are searching.</p></div>`;
     return;
   }
   const typeLabels = {
@@ -1550,7 +1550,7 @@ async function loadBookings() {
 function renderBookings(list) {
   const el = document.getElementById('bookings-list');
   if (!list.length) {
-    el.innerHTML = `<div class="empty-state"><div class="ei">📅</div><h3>No bookings yet</h3><p>Once venues or planners send you a booking request, it will appear here.</p></div>`;
+    el.innerHTML = `<div class="empty-state"><div class="ei">📅</div><h3>No bookings yet</h3><p>Once venues or organizers send you a booking request, it will appear here.</p></div>`;
     return;
   }
   el.innerHTML = list.map(b => {
@@ -1889,7 +1889,7 @@ db.auth.onAuthStateChange(async (event, session) => {
     const PORTAL_MAP = {
       venue_owner:       'https://cbusevents.com/cbus-venue-portal.html',
       vendor:            'https://cbusevents.com/cbus-vendor-portal.html',
-      planner:           'https://cbusevents.com/cbus-planner-portal.html',
+      organizer:           'https://cbusevents.com/cbus-organizer-portal.html',
       customer:          'https://cbusevents.com/customer-portal.html',
       food_professional: 'https://cbusevents.com/food-professional.html',
     };

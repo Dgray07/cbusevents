@@ -122,9 +122,9 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
         <div class="role-btn-name">Vendor</div>
         <div class="role-btn-sub">Vendor Portal</div>
       </button>
-      <button class="role-btn" data-role="planner" onclick="selectRole('planner',this)">
-        <div class="role-btn-name">Event Planner</div>
-        <div class="role-btn-sub">Planner Portal</div>
+      <button class="role-btn" data-role="organizer" onclick="selectRole('organizer',this)">
+        <div class="role-btn-name">Event Organizer</div>
+        <div class="role-btn-sub">Organizer Portal</div>
       </button>
       <button class="role-btn" data-role="customer" onclick="selectRole('customer',this)">
         <div class="role-btn-name">Customer</div>
@@ -191,7 +191,7 @@ const sb = supabase.createClient(SB_URL, SB_KEY);
 const PORTAL_URLS = {
   venue_owner:       'https://cbusevents.com/cbus-venue-portal.html',
   vendor:            'https://cbusevents.com/cbus-vendor-portal.html',
-  planner:           'https://cbusevents.com/cbus-planner-portal.html',
+  organizer:           'https://cbusevents.com/cbus-organizer-portal.html',
   customer:          'https://cbusevents.com/customer-portal.html',
   admin:             'https://cbusevents.com/cbus-admin.html',
   food_professional: 'https://cbusevents.com/food-professional.html',

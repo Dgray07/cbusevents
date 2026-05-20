@@ -15,7 +15,7 @@ const STATIC_PAGES = [
   { path: '/signup.html',                       changefreq: 'monthly', priority: '0.8' },
   { path: '/signup.html?role=venue',            changefreq: 'monthly', priority: '0.8' },
   { path: '/signup.html?role=vendor',           changefreq: 'monthly', priority: '0.8' },
-  { path: '/signup.html?role=planner',          changefreq: 'monthly', priority: '0.8' },
+  { path: '/signup.html?role=organizer',          changefreq: 'monthly', priority: '0.8' },
   { path: '/signup.html?role=attendee',         changefreq: 'monthly', priority: '0.7' },
   { path: '/community.html',                    changefreq: 'weekly',  priority: '0.7' },
   { path: '/community.html?c=black-columbus',   changefreq: 'weekly',  priority: '0.7' },
@@ -23,7 +23,7 @@ const STATIC_PAGES = [
   { path: '/community.html?c=lgbtq-columbus',   changefreq: 'weekly',  priority: '0.7' },
   { path: '/community.html?c=arts-creative',    changefreq: 'weekly',  priority: '0.7' },
   { path: '/community.html?c=osu-campus',       changefreq: 'weekly',  priority: '0.7' },
-  { path: '/cbus-planner-portal.html',          changefreq: 'monthly', priority: '0.5' },
+  { path: '/cbus-organizer-portal.html',          changefreq: 'monthly', priority: '0.5' },
   { path: '/cbus-venue-portal.html',            changefreq: 'monthly', priority: '0.5' },
   { path: '/cbus-vendor-portal.html',           changefreq: 'monthly', priority: '0.5' },
 ];

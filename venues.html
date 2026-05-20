@@ -263,7 +263,7 @@ nav.site-nav{display:flex;align-items:center;justify-content:space-between;paddi
   <div class="nav-links"><a href="https://cbusevents.com" class="nav-link">Home</a>
     <a href="https://cbusevents.com/venues.html" class="nav-link active">Venues</a>
     <a href="https://cbusevents.com/vendors.html" class="nav-link">Vendors</a>
-    <a href="https://cbusevents.com/planners.html" class="nav-link">Planners</a>
+    <a href="https://cbusevents.com/organizers.html" class="nav-link">Organizers</a>
     <a href="https://cbusevents.com/blog.html" class="nav-link">Blog</a></div>
   <div class="nav-right"><button class="theme-toggle" onclick="CBUSTheme.toggle()" title="Toggle dark mode" aria-label="Toggle dark mode"><span class="theme-icon-moon">&#9790;</span><span class="theme-icon-sun">&#9728;</span></button> <a href="https://cbusevents.com/cbus-venue-portal.html" class="nav-btn-ghost">Sign In</a>
     <a href="https://cbusevents.com/signup.html?role=venue" class="nav-btn-primary">List Your Venue</a></div>
@@ -273,7 +273,7 @@ nav.site-nav{display:flex;align-items:center;justify-content:space-between;paddi
   <a href="https://cbusevents.com" class="nav-mobile-link">Home</a>
   <a href="https://cbusevents.com/venues.html" class="nav-mobile-link active">Venues</a>
   <a href="https://cbusevents.com/vendors.html" class="nav-mobile-link">Vendors</a>
-  <a href="https://cbusevents.com/planners.html" class="nav-mobile-link">Planners</a>
+  <a href="https://cbusevents.com/organizers.html" class="nav-mobile-link">Organizers</a>
   <a href="https://cbusevents.com/blog.html" class="nav-mobile-link">Blog</a>
   <div class="nav-mobile-divider"></div>
   <a href="https://cbusevents.com/signup.html?role=venue" class="nav-mobile-link nav-mobile-cta">List Your Venue</a>
@@ -371,8 +371,8 @@ if(window.location.search.includes('tab=list'))switchTab('list');
     <div class="list-hero">
       <div class="list-hero-text">
         <div class="list-eyebrow">For Venue Owners</div>
-        <h2 class="list-title">Columbus planners are<br>searching for your space.</h2>
-        <p class="list-sub">Every event planner, corporate organizer, and group looking for a Columbus venue starts their search here. Get your space in front of them before they book somewhere else.</p>
+        <h2 class="list-title">Columbus organizers are<br>searching for your space.</h2>
+        <p class="list-sub">Every event organizer, corporate organizer, and group looking for a Columbus venue starts their search here. Get your space in front of them before they book somewhere else.</p>
         <div class="list-btns">
           <a href="https://cbusevents.com/signup.html?role=venue" class="btn-list-primary">List Your Venue Free →</a>
           <a href="https://cbusevents.com/cbus-venue-portal.html" class="btn-list-ghost">Sign In to Portal</a>
@@ -380,8 +380,8 @@ if(window.location.search.includes('tab=list'))switchTab('list');
       </div>
       <div class="list-stats" id="listStats">
         <div class="list-stat">
-          <div class="list-stat-num" id="statPlanners">500+</div>
-          <div class="list-stat-label">Active Planners</div>
+          <div class="list-stat-num" id="statOrganizers">500+</div>
+          <div class="list-stat-label">Active Organizers</div>
         </div>
         <div class="list-stat">
           <div class="list-stat-num" id="statEvents">—</div>
@@ -400,12 +400,12 @@ if(window.location.search.includes('tab=list'))switchTab('list');
         <div class="feature-item">
           <div class="feature-accent"></div>
           <div class="feature-item-title">Get Discovered</div>
-          <div class="feature-item-desc">Your venue appears when planners search Columbus spaces. Premium listings surface first.</div>
+          <div class="feature-item-desc">Your venue appears when organizers search Columbus spaces. Premium listings surface first.</div>
         </div>
         <div class="feature-item">
           <div class="feature-accent"></div>
           <div class="feature-item-title">Receive Inquiries</div>
-          <div class="feature-item-desc">Planners send booking requests directly through your listing. Manage everything from your portal.</div>
+          <div class="feature-item-desc">Organizers send booking requests directly through your listing. Manage everything from your portal.</div>
         </div>
         <div class="feature-item">
           <div class="feature-accent"></div>
@@ -415,7 +415,7 @@ if(window.location.search.includes('tab=list'))switchTab('list');
         <div class="feature-item">
           <div class="feature-accent"></div>
           <div class="feature-item-title">Showcase Your Space</div>
-          <div class="feature-item-desc">Photos, capacity, amenities, and neighborhood all visible to planners before they reach out.</div>
+          <div class="feature-item-desc">Photos, capacity, amenities, and neighborhood all visible to organizers before they reach out.</div>
         </div>
         <div class="feature-item">
           <div class="feature-accent"></div>
@@ -504,7 +504,7 @@ if(window.location.search.includes('tab=list'))switchTab('list');
         <div>
           <div style="font-family:'Playfair Display',serif;font-size:20px;font-weight:900;letter-spacing:-0.5px;margin-bottom:6px;">CBUS<span style="color:#FF6B35;">EVENTS</span></div>
           <div style="font-family:'DM Mono',monospace;font-size:10px;color:rgba(245,242,237,0.4);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:4px;">Inaugural Season 2026 &nbsp;·&nbsp; Columbus, Ohio</div>
-          <div style="font-size:12px;color:rgba(245,242,237,0.4);margin-top:6px;max-width:260px;line-height:1.6;">The Columbus event ecosystem connecting venues, vendors, planners and attendees.</div>
+          <div style="font-size:12px;color:rgba(245,242,237,0.4);margin-top:6px;max-width:260px;line-height:1.6;">The Columbus event ecosystem connecting venues, vendors, organizers and attendees.</div>
         </div>
         <div style="display:flex;gap:48px;flex-wrap:wrap;">
           <div>
@@ -657,7 +657,7 @@ function openModal(id){
         ${amenities?`<div class="modal-amenities">${amenities}</div>`:''}
         ${v.website?`<div style="margin-bottom:16px"><a href="${v.website}" target="_blank" style="font-size:12px;color:var(--orange)">${v.website} →</a></div>`:''}
         <button class="modal-cta" onclick="goToInquiry('${v.id}')">Send Booking Inquiry</button>
-        <div class="modal-cta-sub">Sign in or create a free planner account to send an inquiry</div>
+        <div class="modal-cta-sub">Sign in or create a free organizer account to send an inquiry</div>
       </div>
     </div>
   </div>`;
@@ -669,12 +669,12 @@ async function goToInquiry(venueId){
   const {data:{session}}=await sb.auth.getSession();
   if(!session){
     localStorage.setItem('pendingVenueBooking', JSON.stringify({venueId, returnTo:'venues'}));
-    window.location.href='https://cbusevents.com/signup.html?role=planner';
+    window.location.href='https://cbusevents.com/signup.html?role=organizer';
     return;
   }
   const {data:roles}=await sb.from('user_roles').select('role').eq('user_id',session.user.id);
-  const isPlanner=(roles||[]).some(r=>r.role==='planner'||r.role==='customer');
-  if(!isPlanner){alert('Please sign in with a planner account to send booking requests.');return;}
+  const isOrganizer=(roles||[]).some(r=>r.role==='organizer'||r.role==='customer');
+  if(!isOrganizer){alert('Please sign in with a organizer account to send booking requests.');return;}
   const existing=document.querySelector('.modal-body');
   if(!existing)return;
   existing.innerHTML+=`
@@ -722,9 +722,9 @@ async function submitVenueBooking(venueId){
   if(btn){btn.textContent='Sending...';btn.disabled=true;}
   const {error}=await sb.from('booking_requests').insert({
     venue_id:venueId,
-    planner_id:session.user.id,
-    planner_name:session.user.user_metadata?.full_name||session.user.email.split('@')[0],
-    planner_email:session.user.email,
+    organizer_id:session.user.id,
+    organizer_name:session.user.user_metadata?.full_name||session.user.email.split('@')[0],
+    organizer_email:session.user.email,
     event_date:date,
     event_type:document.getElementById('bkType')?.value||null,
     guest_count:parseInt(document.getElementById('bkGuests')?.value)||null,

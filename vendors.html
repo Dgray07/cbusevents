@@ -218,7 +218,7 @@ nav.site-nav{display:flex;align-items:center;justify-content:space-between;paddi
   <div class="nav-links"><a href="https://cbusevents.com" class="nav-link">Home</a>
     <a href="https://cbusevents.com/venues.html" class="nav-link">Venues</a>
     <a href="https://cbusevents.com/vendors.html" class="nav-link active">Vendors</a>
-    <a href="https://cbusevents.com/planners.html" class="nav-link">Planners</a>
+    <a href="https://cbusevents.com/organizers.html" class="nav-link">Organizers</a>
     <a href="https://cbusevents.com/blog.html" class="nav-link">Blog</a></div>
   <div class="nav-right"><button class="theme-toggle" onclick="CBUSTheme.toggle()" title="Toggle dark mode" aria-label="Toggle dark mode"><span class="theme-icon-moon">&#9790;</span><span class="theme-icon-sun">&#9728;</span></button> <a href="https://cbusevents.com/cbus-vendor-portal.html" class="nav-btn-ghost">Sign In</a>
     <a href="https://cbusevents.com/signup.html?role=vendor" class="nav-btn-primary">List Your Business</a></div>
@@ -228,7 +228,7 @@ nav.site-nav{display:flex;align-items:center;justify-content:space-between;paddi
   <a href="https://cbusevents.com" class="nav-mobile-link">Home</a>
   <a href="https://cbusevents.com/venues.html" class="nav-mobile-link">Venues</a>
   <a href="https://cbusevents.com/vendors.html" class="nav-mobile-link active">Vendors</a>
-  <a href="https://cbusevents.com/planners.html" class="nav-mobile-link">Planners</a>
+  <a href="https://cbusevents.com/organizers.html" class="nav-mobile-link">Organizers</a>
   <a href="https://cbusevents.com/blog.html" class="nav-mobile-link">Blog</a>
   <div class="nav-mobile-divider"></div>
   <a href="https://cbusevents.com/signup.html?role=vendor" class="nav-mobile-link nav-mobile-cta">List Your Business</a>
@@ -275,7 +275,7 @@ nav.site-nav{display:flex;align-items:center;justify-content:space-between;paddi
 <div class="list-banner">
   <div class="list-banner-inner">
     <div>
-      <div class="list-banner-text">Are you a Columbus vendor? <span>Get in front of planners searching right now.</span></div>
+      <div class="list-banner-text">Are you a Columbus vendor? <span>Get in front of organizers searching right now.</span></div>
       <div class="list-banner-sub">Free to list. Upgrade when you're ready to grow.</div>
     </div>
     <a href="https://cbusevents.com/signup.html?role=vendor" class="list-banner-btn">List Your Business →</a>
@@ -446,12 +446,12 @@ async function goToInquiry(vendorId){
   const {data:{session}}=await sb.auth.getSession();
   if(!session){
     localStorage.setItem('pendingVendorBooking', JSON.stringify({vendorId, returnTo:'vendors'}));
-    window.location.href='https://cbusevents.com/signup.html?role=planner';
+    window.location.href='https://cbusevents.com/signup.html?role=organizer';
     return;
   }
   const {data:roles}=await sb.from('user_roles').select('role').eq('user_id',session.user.id);
-  const isPlanner=(roles||[]).some(r=>r.role==='planner'||r.role==='customer');
-  if(!isPlanner){alert('Please sign in with a planner account to send booking requests.');return;}
+  const isOrganizer=(roles||[]).some(r=>r.role==='organizer'||r.role==='customer');
+  if(!isOrganizer){alert('Please sign in with a organizer account to send booking requests.');return;}
   const existing=document.querySelector('.modal-body');
   if(!existing)return;
   existing.innerHTML+=`
@@ -513,9 +513,9 @@ async function submitVendorBooking(vendorId){
   if(btn){btn.textContent='Sending...';btn.disabled=true;}
   const {error}=await sb.from('vendor_booking_requests').insert({
     vendor_id:vendorId,
-    planner_id:session.user.id,
-    planner_name:session.user.user_metadata?.full_name||session.user.email.split('@')[0],
-    planner_email:session.user.email,
+    organizer_id:session.user.id,
+    organizer_name:session.user.user_metadata?.full_name||session.user.email.split('@')[0],
+    organizer_email:session.user.email,
     event_date:date,
     event_type:document.getElementById('bkType')?.value||null,
     guest_count:parseInt(document.getElementById('bkGuests')?.value)||null,
