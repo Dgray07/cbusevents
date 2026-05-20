@@ -451,8 +451,51 @@ async function renderProfile(){
  // Load existing profile
  const{data}=await sb.from('customer_profiles').select('*').eq('user_id',currentUser.id).maybeSingle() ?? {data:{}};
  organizerProfile=data||{};
+ const avatarUrl = organizerProfile.avatar_url || '';
+ const avatarInitial = (organizerProfile.display_name||currentUser.email||'O')[0].toUpperCase();
  document.getElementById('app').innerHTML=`
- <div class="page"> <div class="section-title">My Profile</div> <div class="section-sub" style="margin-bottom:24px">Your public profile and social links</div> <div class="card" style="max-width:600px;padding:28px;display:flex;flex-direction:column;gap:14px"> <div class="field"><label>Display Name</label><input id="pName" value="${organizerProfile.display_name||''}" placeholder="Your name or company"/></div> <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px"> <div class="field"><label>Email</label><input id="pEmail" value="${currentUser.email||''}" disabled style="opacity:0.5"/></div> <div class="field"><label>Phone</label><input id="pPhone" value="${organizerProfile.phone||''}" placeholder="(614) 555-0000"/></div> </div> <div class="field"><label>Website</label><input id="pWebsite" value="${organizerProfile.website||''}" placeholder="https://yoursite.com"/></div> <div style="height:1px;background:var(--border);margin:4px 0"></div> <div style="font-family:'DM Sans',sans-serif;font-weight:700;font-size:13px;color:var(--sub);text-transform:uppercase;letter-spacing:1px"> Social Media</div> <div style="color:var(--sub);font-size:13px;margin-top:-8px">Link your accounts — share your events to your followers with one click.</div> <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px"> <div class="field"><label>Instagram</label><input id="pInsta" value="${organizerProfile.instagram||''}" placeholder="@yourhandle"/></div> <div class="field"><label>TikTok</label><input id="pTiktok" value="${organizerProfile.tiktok||''}" placeholder="@yourhandle"/></div> <div class="field"><label>Facebook Page URL</label><input id="pFacebook" value="${organizerProfile.facebook||''}" placeholder="https://facebook.com/yourpage"/></div> <div class="field"><label>X / Twitter</label><input id="pTwitter" value="${organizerProfile.twitter||''}" placeholder="@yourhandle"/></div> </div> <div id="profileMsg" style="color:var(--green);font-size:13px;min-height:18px"></div> <button class="btn btn-primary" onclick="saveOrganizerProfile()" style="align-self:flex-start;padding:10px 24px">Save Profile →</button> </div> </div>`;
+ <div class="page">
+   <div class="section-title">My Profile</div>
+   <div class="section-sub" style="margin-bottom:24px">Your public organizer profile and social links</div>
+   <div class="card" style="max-width:600px;padding:28px;display:flex;flex-direction:column;gap:14px">
+
+     <!-- AVATAR UPLOAD -->
+     <div style="display:flex;align-items:center;gap:20px;padding-bottom:18px;border-bottom:1px solid var(--border)">
+       <div id="avatarPreview" style="width:80px;height:80px;border-radius:50%;overflow:hidden;flex-shrink:0;background:var(--orange);display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:900;color:white;border:3px solid var(--border);cursor:pointer;position:relative" onclick="document.getElementById('avatarInput').click()">
+         ${avatarUrl ? \`<img src="\${avatarUrl}" style="width:100%;height:100%;object-fit:cover">\` : avatarInitial}
+         <div style="position:absolute;inset:0;background:rgba(0,0,0,0);display:flex;align-items:center;justify-content:center;transition:background 0.15s;border-radius:50%" onmouseover="this.style.background='rgba(0,0,0,0.35)'" onmouseout="this.style.background='rgba(0,0,0,0)'">
+           <span style="color:white;font-size:18px;opacity:0">&#9998;</span>
+         </div>
+       </div>
+       <div>
+         <div style="font-weight:600;font-size:14px;color:var(--text);margin-bottom:4px">Profile Photo</div>
+         <div style="font-size:12px;color:var(--sub);margin-bottom:10px">JPG or PNG, max 2MB. Shown on your public organizer profile.</div>
+         <button class="btn btn-ghost btn-sm" onclick="document.getElementById('avatarInput').click()" style="font-size:12px;padding:6px 14px">Upload Photo</button>
+         ${avatarUrl ? \`<button class="btn btn-ghost btn-sm" onclick="removeAvatar()" style="font-size:12px;padding:6px 14px;margin-left:6px;color:var(--red)">Remove</button>\` : ''}
+         <input type="file" id="avatarInput" accept="image/jpeg,image/png,image/webp" style="display:none" onchange="uploadAvatar(this)">
+         <div id="avatarMsg" style="font-size:12px;margin-top:8px;min-height:16px"></div>
+       </div>
+     </div>
+
+     <div class="field"><label>Display Name</label><input id="pName" value="${organizerProfile.display_name||''}" placeholder="Your name or company"/></div>
+     <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+       <div class="field"><label>Email</label><input id="pEmail" value="${currentUser.email||''}" disabled style="opacity:0.5"/></div>
+       <div class="field"><label>Phone</label><input id="pPhone" value="${organizerProfile.phone||''}" placeholder="(614) 555-0000"/></div>
+     </div>
+     <div class="field"><label>Website</label><input id="pWebsite" value="${organizerProfile.website||''}" placeholder="https://yoursite.com"/></div>
+     <div style="height:1px;background:var(--border);margin:4px 0"></div>
+     <div style="font-family:'DM Sans',sans-serif;font-weight:700;font-size:13px;color:var(--sub);text-transform:uppercase;letter-spacing:1px">Social Media</div>
+     <div style="color:var(--sub);font-size:13px;margin-top:-8px">Link your accounts — share your events to your followers with one click.</div>
+     <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+       <div class="field"><label>Instagram</label><input id="pInsta" value="${organizerProfile.instagram||''}" placeholder="@yourhandle"/></div>
+       <div class="field"><label>TikTok</label><input id="pTiktok" value="${organizerProfile.tiktok||''}" placeholder="@yourhandle"/></div>
+       <div class="field"><label>Facebook Page URL</label><input id="pFacebook" value="${organizerProfile.facebook||''}" placeholder="https://facebook.com/yourpage"/></div>
+       <div class="field"><label>X / Twitter</label><input id="pTwitter" value="${organizerProfile.twitter||''}" placeholder="@yourhandle"/></div>
+     </div>
+     <div id="profileMsg" style="color:var(--green);font-size:13px;min-height:18px"></div>
+     <button class="btn btn-primary" onclick="saveOrganizerProfile()" style="align-self:flex-start;padding:10px 24px">Save Profile →</button>
+   </div>
+ </div>`;
 }
 
 async function saveOrganizerProfile(){
@@ -2875,6 +2918,67 @@ async function updateVTApp(appId,status,listingId,eventName){
   }
 
   await viewVendorTableApps(listingId,eventName);
+}
+
+
+// ── AVATAR UPLOAD ─────────────────────────────────────────────
+async function uploadAvatar(input){
+  const file = input.files[0];
+  if(!file) return;
+  if(file.size > 2 * 1024 * 1024){
+    document.getElementById('avatarMsg').style.color='var(--red)';
+    document.getElementById('avatarMsg').textContent='Image must be under 2MB';
+    return;
+  }
+  const msg = document.getElementById('avatarMsg');
+  msg.style.color='var(--sub)';
+  msg.textContent='Uploading...';
+
+  const ext = file.name.split('.').pop();
+  const path = `${currentUser.id}/avatar.${ext}`;
+
+  const { error: upErr } = await sb.storage
+    .from('profile-photos')
+    .upload(path, file, { upsert: true, contentType: file.type });
+
+  if(upErr){
+    msg.style.color='var(--red)';
+    msg.textContent='Upload failed: ' + upErr.message;
+    return;
+  }
+
+  const { data: urlData } = sb.storage.from('profile-photos').getPublicUrl(path);
+  const publicUrl = urlData.publicUrl + '?t=' + Date.now(); // cache bust
+
+  const { error: dbErr } = await sb.from('customer_profiles')
+    .upsert({ user_id: currentUser.id, avatar_url: urlData.publicUrl, updated_at: new Date().toISOString() }, { onConflict: 'user_id' });
+
+  if(dbErr){
+    msg.style.color='var(--red)';
+    msg.textContent='Saved photo but could not update profile: ' + dbErr.message;
+    return;
+  }
+
+  organizerProfile.avatar_url = urlData.publicUrl;
+
+  // Update preview
+  const preview = document.getElementById('avatarPreview');
+  if(preview) preview.innerHTML = `<img src="${publicUrl}" style="width:100%;height:100%;object-fit:cover">`;
+
+  msg.style.color='var(--green)';
+  msg.textContent='✓ Photo updated!';
+  setTimeout(()=>{ if(document.getElementById('avatarMsg')) document.getElementById('avatarMsg').textContent=''; }, 3000);
+}
+
+async function removeAvatar(){
+  if(!confirm('Remove your profile photo?')) return;
+  const { error } = await sb.from('customer_profiles')
+    .update({ avatar_url: null, updated_at: new Date().toISOString() })
+    .eq('user_id', currentUser.id);
+  if(error){ toast('Could not remove photo','error'); return; }
+  organizerProfile.avatar_url = null;
+  renderProfile();
+  toast('Profile photo removed');
 }
 
 </script>
