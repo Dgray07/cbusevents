@@ -2061,16 +2061,46 @@ function renderDashboard(){
 
  const activeEvent=myEvents[0];
 
- sb.from('vendor_table_applications')
-   .select('*')
-   .eq('event_id', activeEvent.id)
-   .order('created_at',{ascending:false})
-   .then(({data:apps})=>{
-     const applications=apps||[];
+ // festival_applications uses: business_name, first_name, last_name, email, fee, status, applicant_type, category
+ // Normalize to a common shape regardless of which table we pull from
+ function normalizeApp(a, source){
+   if(source==='festival'){
+     return {
+       id: a.id,
+       business_name: a.business_name || (a.first_name+' '+(a.last_name||'')).trim(),
+       vendor_type: a.category || a.applicant_type || 'Vendor',
+       spot_type: a.applicant_type==='food_truck'||a.applicant_type==='food_professional'?'food_truck':'table',
+       email: a.email,
+       status: a.status || 'pending',
+       payment_status: a.fee>0&&a.status==='approved'?'paid':'unpaid',
+       spot_fee: a.fee || 0,
+       created_at: a.created_at,
+     };
+   }
+   return a;
+ }
+
+ // Try festival_applications first (event_id column), fall back to fetching by event name
+ const festivalQuery = activeEvent.id
+   ? sb.from('festival_applications').select('*').eq('event_id', activeEvent.id).order('created_at',{ascending:false})
+   : sb.from('festival_applications').select('*').order('created_at',{ascending:false});
+
+ festivalQuery
+   .then(({data:apps, error})=>{
+     // If event_id not set yet on rows, pull all festival apps as fallback
+     let raw = apps||[];
+     if(!raw.length && !error){
+       return sb.from('festival_applications').select('*').order('created_at',{ascending:false})
+         .then(({data:all})=>{ raw=all||[]; return raw; });
+     }
+     return raw;
+   })
+   .then((raw)=>{
+     const applications=(raw||[]).map(a=>normalizeApp(a,'festival'));
      const confirmed=applications.filter(a=>a.status==='approved'||a.status==='confirmed').length;
      const pending=applications.filter(a=>a.status==='pending').length;
-     const feesCollected=applications.filter(a=>a.payment_status==='paid').reduce((s,a)=>s+(a.spot_fee||0),0);
-     const feesPending=applications.filter(a=>a.payment_status!=='paid'&&(a.status==='approved'||a.status==='pending')).reduce((s,a)=>s+(a.spot_fee||0),0);
+     const feesCollected=applications.filter(a=>a.status==='approved'||a.status==='confirmed').reduce((s,a)=>s+(a.spot_fee||0),0);
+     const feesPending=applications.filter(a=>a.status==='pending').reduce((s,a)=>s+(a.spot_fee||0),0);
 
      function statusBadge(status){
        if(status==='approved'||status==='confirmed') return '<span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:99px;background:rgba(52,211,153,0.1);color:var(--green);border:1px solid rgba(52,211,153,0.25)">Approved</span>';
@@ -2122,12 +2152,12 @@ function renderDashboard(){
      };
 
      window.approveVendorApp=async function(id){
-       await sb.from('vendor_table_applications').update({status:'approved'}).eq('id',id);
+       await sb.from('festival_applications').update({status:'approved'}).eq('id',id);
        toast('Application approved');nav('dashboard');
      };
      window.rejectVendorApp=async function(id){
        if(!confirm('Reject this application?'))return;
-       await sb.from('vendor_table_applications').update({status:'rejected'}).eq('id',id);
+       await sb.from('festival_applications').update({status:'rejected'}).eq('id',id);
        toast('Application rejected');nav('dashboard');
      };
      window.sendPaymentLink=function(id,email){
