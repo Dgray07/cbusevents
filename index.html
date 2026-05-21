@@ -1212,19 +1212,31 @@ function feedCardHTML(e,idx){
   const venueName=e.venue_name_override||(e.venues&&e.venues.name)||e.venue_name||'Columbus Venue';
   const tonight=isTonight(e.start_time);
   const icon=FEED_ICONS[idx%FEED_ICONS.length];
-  const img=e.cover_image_url?`<img src="${e.cover_image_url}" alt="${e.title}" loading="lazy" onerror="this.parentNode.innerHTML='<div class=feed-card-img-placeholder>${icon}</div>'">`:`<div class="feed-card-img-placeholder">${icon}</div>`;
-  const price=e.is_free?'<span class="feed-card-price free">Free</span>':(e.price_min?`<span class="feed-card-price paid">From ${e.price_min}</span>`:'');
-  const srcBadge=e.source_type==='external'?`<span class="feed-ext-badge">${e.source||'Columbus'}</span>`:'<span class="feed-source-badge">CBUS Events</span>';
-  const clickFn=e._festival_url?`window.location.href='${e._festival_url}'`:e.source_type==='external'?`window.open('${e.ticket_url||'#'}','_blank')`:`openEventModal('${e.id}')`;
-  return `<div class="feed-card" onclick="${clickFn}" role="button" tabindex="0">
-    <div class="feed-card-img">${img}${tonight?'<div class="feed-tonight-badge">Tonight</div>':''}${e.is_free?'<div class="feed-free-badge">Free</div>':''}</div>
-    <div class="feed-card-body">
-      <div class="feed-card-top"><span class="feed-card-cat">${e.category||'Event'}</span>${srcBadge}</div>
-      <div class="feed-card-title">${e.title}</div>
-      <div class="feed-card-venue">📍 ${venueName}</div>
-      <div class="feed-card-footer"><span class="feed-card-date">${fmt(e.start_time)}${fmtTime(e.start_time)?' · '+fmtTime(e.start_time):''}</span>${price}</div>
-    </div>
-  </div>`;
+  const img=e.cover_image_url
+    ?'<img src="'+e.cover_image_url+'" alt="'+e.title+'" loading="lazy" onerror="this.parentNode.innerHTML=\'<div class=feed-card-img-placeholder>'+icon+'</div>\'">'
+    :'<div class="feed-card-img-placeholder">'+icon+'</div>';
+  const price=e.is_free
+    ?'<span class="feed-card-price free">Free</span>'
+    :(e.price_min?'<span class="feed-card-price paid">From $'+e.price_min+'</span>':'');
+  const srcBadge=e.source_type==='external'
+    ?'<span class="feed-ext-badge">'+(e.source||'Columbus')+'</span>'
+    :'<span class="feed-source-badge">CBUS Events</span>';
+  const clickFn=e._festival_url
+    ?'window.location.href=\''+e._festival_url+'\''
+    :e.source_type==='external'
+      ?'window.open(\''+(e.ticket_url||'#')+'\',\'_blank\')'
+      :'openEventModal(\''+e.id+'\')';
+  const todayBadge=tonight?'<div class="feed-tonight-badge">Tonight</div>':'';
+  const freeBadge=e.is_free?'<div class="feed-free-badge">Free</div>':'';
+  const timeStr=fmt(e.start_time)+(fmtTime(e.start_time)?' · '+fmtTime(e.start_time):'');
+  return '<div class="feed-card" onclick="'+clickFn+'" role="button" tabindex="0">'
+    +'<div class="feed-card-img">'+img+todayBadge+freeBadge+'</div>'
+    +'<div class="feed-card-body">'
+    +'<div class="feed-card-top"><span class="feed-card-cat">'+(e.category||'Event')+'</span>'+srcBadge+'</div>'
+    +'<div class="feed-card-title">'+e.title+'</div>'
+    +'<div class="feed-card-venue">📍 '+venueName+'</div>'
+    +'<div class="feed-card-footer"><span class="feed-card-date">'+timeStr+'</span>'+price+'</div>'
+    +'</div></div>';
 }
 
 function renderFeed(){
@@ -1293,26 +1305,37 @@ function calLoadMore(){calPage++;renderCalendar();}
 function calPostHTML(e,idx){
   const icon=FEED_ICONS[idx%FEED_ICONS.length];
   const liked=userLikes.has(e.id);
-  const img=e.cover_image_url?`<img src="${e.cover_image_url}" alt="${e.title}" loading="lazy" onerror="this.style.display='none'">`:`<div class="cal-post-img-placeholder">${icon}</div>`;
+  const img=e.cover_image_url
+    ?'<img src="'+e.cover_image_url+'" alt="'+e.title+'" loading="lazy" onerror="this.style.display=\'none\'">'
+    :'<div class="cal-post-img-placeholder">'+icon+'</div>';
   const srcLabel={ticketmaster:'Ticketmaster',eventbrite:'Eventbrite',rss:'Columbus Underground',manual:'Columbus'}[e.source]||e.source||'Columbus';
-  const price=e.is_free?'<span style="color:#30d693;font-weight:700;font-size:11px">Free</span>':(e.price_min?`<span style="font-size:11px">From ${e.price_min}</span>`:'');
-  return `<div class="cal-post" id="calpost-${e.id}">
-    <div class="cal-post-inner">
-      <div class="cal-post-img">${img}</div>
-      <div class="cal-post-body">
-        <div class="cal-post-top"><span class="cal-post-cat">${e.category||'Event'}</span><span class="cal-post-source">${srcLabel}</span></div>
-        <div class="cal-post-title" title="${e.title}">${e.title}</div>
-        <div class="cal-post-meta"><span>📍 ${e.venue_name||'Columbus'}</span><span>🕐 ${fmt(e.start_time)}${fmtTime(e.start_time)?' · '+fmtTime(e.start_time):''}</span>${price}</div>
-      </div>
-    </div>
-    <div class="cal-post-actions">
-      <button class="cal-action-btn${liked?' liked':''}" onclick="toggleCalLike('${e.id}',this)"><span>${liked?'❤️':'🤍'}</span><span class="cal-count" id="likecount-${e.id}">${e.like_count||0}</span></button>
-      <button class="cal-action-btn" onclick="toggleCalComments('${e.id}')"><span>💬</span><span class="cal-count" id="commentcount-${e.id}">${e.comment_count||0}</span> Comments</button>
-      ${e.ticket_url?`<button class="cal-action-btn" onclick="window.open('${e.ticket_url}','_blank')">🎟 Tickets</button>`:''}
-    </div>
-    <div class="cal-comments-drawer" id="comments-${e.id}"><div id="commentslist-${e.id}"></div>${currentUser?`<div class="cal-comment-input-row"><input class="cal-comment-input" id="commentinput-${e.id}" placeholder="Add a comment..." maxlength="500" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();submitComment('${e.id}');}"><button class="cal-comment-submit" onclick="submitComment('${e.id}')">Post</button></div>`:'<div style="text-align:center;padding:12px 0;font-size:13px;color:#55556a"><a href="https://cbusevents.com/signup.html" style="color:var(--flame);font-weight:600">Join free</a> to comment</div>'}</div>
-    <div class="cal-post-claim"><button class="cal-claim-link" onclick="openClaimModal('${e.id}','${e.title.replace(/'/g,\"\\'\")}')">Is this your event? Claim it</button></div>
-  </div>`;
+  const price=e.is_free
+    ?'<span style="color:#30d693;font-weight:700;font-size:11px">Free</span>'
+    :(e.price_min?'<span style="font-size:11px">From $'+e.price_min+'</span>':'');
+  const ticketBtn=e.ticket_url
+    ?'<button class="cal-action-btn" onclick="window.open(\''+e.ticket_url+'\',\'_blank\')">🎟 Tickets</button>'
+    :'';
+  const commentForm=currentUser
+    ?'<div class="cal-comment-input-row"><input class="cal-comment-input" id="commentinput-'+e.id+'" placeholder="Add a comment..." maxlength="500" onkeydown="if(event.key===\'Enter\'&&!event.shiftKey){event.preventDefault();submitComment(\''+e.id+'\');}"><button class="cal-comment-submit" onclick="submitComment(\''+e.id+'\')">Post</button></div>'
+    :'<div style="text-align:center;padding:12px 0;font-size:13px;color:#55556a"><a href="https://cbusevents.com/signup.html" style="color:var(--flame);font-weight:600">Join free</a> to comment</div>';
+  const safeTitle=e.title.replace(/'/g,"\\'");
+  const timeStr=fmt(e.start_time)+(fmtTime(e.start_time)?' · '+fmtTime(e.start_time):'');
+  return '<div class="cal-post" id="calpost-'+e.id+'">'
+    +'<div class="cal-post-inner">'
+    +'<div class="cal-post-img">'+img+'</div>'
+    +'<div class="cal-post-body">'
+    +'<div class="cal-post-top"><span class="cal-post-cat">'+(e.category||'Event')+'</span><span class="cal-post-source">'+srcLabel+'</span></div>'
+    +'<div class="cal-post-title" title="'+e.title+'">'+e.title+'</div>'
+    +'<div class="cal-post-meta"><span>📍 '+(e.venue_name||'Columbus')+'</span><span>🕐 '+timeStr+'</span>'+price+'</div>'
+    +'</div></div>'
+    +'<div class="cal-post-actions">'
+    +'<button class="cal-action-btn'+(liked?' liked':'')+'" onclick="toggleCalLike(\''+e.id+'\',this)"><span>'+(liked?'❤️':'🤍')+'</span><span class="cal-count" id="likecount-'+e.id+'">'+(e.like_count||0)+'</span></button>'
+    +'<button class="cal-action-btn" onclick="toggleCalComments(\''+e.id+'\')"><span>💬</span><span class="cal-count" id="commentcount-'+e.id+'">'+(e.comment_count||0)+'</span> Comments</button>'
+    +ticketBtn
+    +'</div>'
+    +'<div class="cal-comments-drawer" id="comments-'+e.id+'"><div id="commentslist-'+e.id+'"></div>'+commentForm+'</div>'
+    +'<div class="cal-post-claim"><button class="cal-claim-link" onclick="openClaimModal(\''+e.id+'\',\''+safeTitle+'\')">Is this your event? Claim it</button></div>'
+    +'</div>';
 }
 
 function renderCalendar(){
