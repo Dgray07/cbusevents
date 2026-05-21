@@ -15,14 +15,34 @@
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-font-smoothing:antialiased;}
 :root{
-  --bg:#080810;--surface:#0f0f1a;--card:#141420;--card-hover:#18182a;
-  --border:#1e1e2e;--border-sub:#191928;--text:#f0f0fa;--sub:#7070a0;--muted:#40405a;
-  --orange:#FF6B35;--orange-dim:rgba(255,107,53,0.1);--orange-border:rgba(255,107,53,0.25);
-  --green:#34d399;--green-dim:rgba(52,211,153,0.1);--green-border:rgba(52,211,153,0.2);
-  --red:#f87171;--blue:#818cf8;--blue-dim:rgba(129,140,248,0.1);--blue-border:rgba(129,140,248,0.2);
-  --gold:#fbbf24;--font:'DM Sans',sans-serif;--mono:'DM Mono',monospace;
+  --bg:#050508;
+  --surface:#0f0f1c;
+  --card:#1c1c30;
+  --card-hover:#222238;
+  --border:rgba(255,255,255,0.09);
+  --border-sub:rgba(255,255,255,0.06);
+  --border-mid:rgba(255,255,255,0.15);
+  --text:#f4f4ff;
+  --sub:#8888b0;
+  --muted:#44445a;
+  --orange:#FF6B35;
+  --orange-dim:rgba(255,107,53,0.12);
+  --orange-border:rgba(255,107,53,0.28);
+  --green:#30d693;
+  --green-dim:rgba(48,214,147,0.1);
+  --green-border:rgba(48,214,147,0.2);
+  --red:#f47171;
+  --blue:#7c8cf8;
+  --blue-dim:rgba(124,140,248,0.1);
+  --blue-border:rgba(124,140,248,0.2);
+  --gold:#f5bc30;
+  --font:'DM Sans',sans-serif;
+  --mono:'DM Mono',monospace;
   --r-sm:8px;--r-md:10px;--r-lg:14px;--r-xl:16px;--r-full:9999px;
-  --sidebar-w:230px;
+  --sidebar-w:210px;
+  --shadow-sm:0 4px 20px rgba(0,0,0,0.8),0 0 0 1px rgba(255,255,255,0.08);
+  --shadow-md:0 8px 32px rgba(0,0,0,0.85),0 0 0 1px rgba(255,255,255,0.1);
+  --shadow-lg:0 20px 60px rgba(0,0,0,0.9),0 0 0 1px rgba(255,255,255,0.11);
 }
 html{scroll-behavior:smooth;}
 body{background:var(--bg);color:var(--text);font-family:var(--font);display:flex;min-height:100vh;}
@@ -39,24 +59,23 @@ label{display:block;font-family:var(--mono);font-size:10px;font-weight:700;lette
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
 
 /* ── SIDEBAR ── */
-.sidebar{width:var(--sidebar-w);flex-shrink:0;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;position:sticky;top:0;height:100vh;overflow-y:auto;z-index:10;}
+.sidebar{width:var(--sidebar-w);flex-shrink:0;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;position:sticky;top:0;height:100vh;overflow-y:auto;z-index:10;box-shadow:1px 0 0 rgba(255,255,255,0.04);}
 .sidebar::-webkit-scrollbar{width:0;}
-.sidebar-logo{padding:28px 22px 22px;border-bottom:1px solid var(--border-sub);position:relative;}
-.sidebar-logo::after{content:'';position:absolute;bottom:0;left:22px;right:22px;height:1px;background:linear-gradient(90deg,var(--orange),transparent);opacity:0.4;}
-.sidebar-logo-text{font-weight:900;font-size:17px;letter-spacing:-0.05em;text-transform:uppercase;}
+.sidebar-logo{padding:16px 16px 14px;border-bottom:1px solid var(--border);}
+.sidebar-logo-text{font-weight:800;font-size:15px;letter-spacing:-0.04em;text-transform:uppercase;}
 .sidebar-logo-text span{color:var(--orange);}
 .sidebar-logo-sub{font-family:var(--mono);font-size:9px;letter-spacing:0.16em;text-transform:uppercase;color:var(--muted);margin-top:3px;}
-.sidebar-vendor{padding:16px 22px;border-bottom:1px solid var(--border-sub);}
-.vendor-initials{width:40px;height:40px;background:linear-gradient(135deg,#080818,#181840);border-radius:var(--r-md);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;color:var(--blue);margin-bottom:8px;border:1px solid var(--blue-border);font-family:var(--mono);}
-.vendor-name{font-weight:700;font-size:13px;color:var(--text);margin-bottom:2px;letter-spacing:-0.02em;}
+.sidebar-vendor{padding:12px 14px;border-bottom:1px solid var(--border);}
+.vendor-initials{width:36px;height:36px;background:rgba(124,140,248,0.12);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;color:var(--blue);margin-bottom:8px;border:1px solid var(--blue-border);font-family:var(--mono);overflow:hidden;}
+.vendor-name{font-weight:700;font-size:12px;color:var(--text);margin-bottom:2px;letter-spacing:-0.01em;}
 .vendor-tier{display:inline-flex;align-items:center;gap:5px;font-family:var(--mono);font-size:9px;letter-spacing:0.12em;text-transform:uppercase;padding:3px 10px;border-radius:var(--r-full);margin-top:2px;}
 .tier-free{background:rgba(255,255,255,0.04);color:var(--muted);border:1px solid var(--border);}
 .tier-standard{background:var(--orange-dim);color:var(--orange);border:1px solid var(--orange-border);}
 .tier-premium{background:rgba(251,191,36,0.1);color:var(--gold);border:1px solid rgba(251,191,36,0.2);}
-.sidebar-section{padding:18px 22px 6px;font-size:9px;color:var(--muted);font-weight:700;letter-spacing:0.15em;text-transform:uppercase;}
-.nav-item{display:flex;align-items:center;gap:10px;padding:8px 14px 8px 18px;margin:1px 8px;border-radius:var(--r-md);cursor:pointer;font-size:13px;font-weight:500;color:var(--sub);transition:all 0.18s;border-left:2px solid transparent;background:none;width:calc(100% - 16px);text-align:left;}
-.nav-item:hover{background:rgba(255,255,255,0.04);color:var(--text);border-left-color:var(--muted);}
-.nav-item.active{background:linear-gradient(135deg,rgba(255,107,53,0.1),rgba(255,107,53,0.04));color:var(--text);border-left-color:var(--orange);font-weight:600;}
+.sidebar-section{padding:14px 16px 4px;font-size:9px;color:var(--muted);font-weight:700;letter-spacing:0.14em;text-transform:uppercase;}
+.nav-item{display:flex;align-items:center;gap:8px;padding:7px 12px 7px 16px;cursor:pointer;font-size:12px;font-weight:500;color:var(--sub);transition:all 0.14s;border-left:2px solid transparent;background:none;width:100%;text-align:left;}
+.nav-item:hover{background:rgba(255,255,255,0.04);color:var(--text);}
+.nav-item.active{background:rgba(255,107,53,0.08);color:var(--orange);border-left-color:var(--orange);font-weight:600;}
 .nav-item svg{width:15px;height:15px;flex-shrink:0;opacity:0.65;}
 .nav-item.active svg{opacity:1;}
 .sidebar-bottom{margin-top:auto;padding:18px;border-top:1px solid var(--border-sub);}
@@ -66,7 +85,7 @@ label{display:block;font-family:var(--mono);font-size:10px;font-weight:700;lette
 
 /* ── MAIN ── */
 .main{flex:1;overflow-x:hidden;display:flex;flex-direction:column;}
-.topbar{position:sticky;top:0;z-index:50;background:rgba(8,8,16,0.88);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 36px;height:60px;}
+.topbar{position:sticky;top:0;z-index:50;background:rgba(20,20,36,0.96);-webkit-backdrop-filter:blur(24px) saturate(180%);backdrop-filter:blur(24px) saturate(180%);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 28px;height:56px;}
 .topbar-title{font-size:16px;font-weight:700;letter-spacing:-0.03em;}
 .topbar-right{display:flex;align-items:center;gap:10px;}
 .content{padding:32px 36px;animation:fadeUp 0.3s ease;flex:1;}
@@ -304,8 +323,13 @@ label{display:block;font-family:var(--mono);font-size:10px;font-weight:700;lette
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
     Analytics
   </button>
+  <button class="nav-item" id="nav-collaborate" onclick="showPage('collaborate')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+    Collaborate
+    <span id="collabVendorBadge" style="display:none;margin-left:auto;background:var(--orange);color:#fff;border-radius:var(--r-full);padding:1px 7px;font-size:9px;font-weight:800">New</span>
+  </button>
   <div class="sidebar-bottom">
-    <div class="sidebar-plan-badge" id="planBadge">Basic</div>
+    <div id="vendorPublicProfileLink" style="margin-bottom:8px"></div>
     <div id="portalSwitcherVendor" style="margin-bottom:8px"></div>
     <button class="btn-signout" onclick="doSignOut()">Sign Out</button>
   </div>
@@ -317,6 +341,7 @@ label{display:block;font-family:var(--mono);font-size:10px;font-weight:700;lette
     <div class="topbar-title" id="topbarTitle">Dashboard</div>
     <div class="topbar-right"><button class="theme-toggle" onclick="CBUSTheme.toggle()" title="Toggle dark mode" aria-label="Toggle dark mode"><span class="theme-icon-moon">&#9790;</span><span class="theme-icon-sun">&#9728;</span></button> 
       <button class="btn btn-ghost btn-sm" onclick="window.open('https://cbusevents.com','_blank')">View Site</button>
+      <button class="btn btn-ghost btn-sm" style="color:var(--orange);border-color:var(--orange-border)" onclick="openVendorPublicProfile()">My Public Profile ↗</button>
       <button class="nav-item" id="nav-plan" onclick="showPage('plan')" style="margin:0;width:auto;padding:7px 14px;border-radius:var(--r-md)">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
         Plan
@@ -604,6 +629,7 @@ function showPage(p){
  document.querySelectorAll('.mobile-nav-btn').forEach(el=>el.classList.remove('active'));
  document.getElementById('mnav-'+p)?.classList.add('active');
  if(p==='profile'){renderProfilePage();prefillProfile();}
+ else if(p==='collaborate'){renderVendorCollaborate();}
  else if(p==='services'){renderServicesPage();renderServicesGrid();}
  else if(p==='portfolio'){renderPortfolioPage();renderPortfolioGrid();}
  else if(p==='proposals'){renderProposalsPage();loadProposals();}
@@ -2543,6 +2569,179 @@ window.saveServices       = saveServices;
 window.addPhotoByUrl      = addPhotoByUrl;
 window.handlePhotoUpload  = handlePhotoUpload;
 window.handleCoverPhoto   = handleCoverPhoto;
+
+function openVendorPublicProfile(){
+  const slug=vendorProfile?.slug||vendorProfile?.id;
+  if(slug) window.open('https://cbusevents.com/vendor-storefront.html?id='+slug,'_blank');
+  else toast('Complete your profile first to get a public page','error');
+}
+
+async function renderVendorCollaborate(){
+  document.getElementById('topbarTitle').textContent='Collaborate';
+  document.getElementById('pageContent').innerHTML=`
+  <div style="margin-bottom:20px">
+    <div style="font-size:22px;font-weight:800;letter-spacing:-0.03em;margin-bottom:4px">Collaborator Board</div>
+    <div style="font-size:13px;color:var(--sub)">Connect with Columbus organizers, find gigs, and grow your network.</div>
+  </div>
+  <div style="display:flex;gap:0;background:var(--surface);border-radius:10px;padding:4px;margin-bottom:20px;border:1px solid var(--border)">
+    <button id="vcollabTabFeed" onclick="switchVCollabTab('feed')" style="flex:1;padding:8px 0;border-radius:7px;font-size:13px;font-weight:600;border:none;cursor:pointer;font-family:var(--font);background:var(--card);color:var(--text);box-shadow:var(--shadow-sm);transition:all 0.15s">Community Feed</button>
+    <button id="vcollabTabGigs" onclick="switchVCollabTab('gigs')" style="flex:1;padding:8px 0;border-radius:7px;font-size:13px;font-weight:600;border:none;cursor:pointer;font-family:var(--font);background:transparent;color:var(--sub);transition:all 0.15s">Gig Board</button>
+  </div>
+  <div id="vcollabContent"></div>`;
+  loadVCollabFeed();
+}
+
+function switchVCollabTab(tab){
+  const f=document.getElementById('vcollabTabFeed');
+  const g=document.getElementById('vcollabTabGigs');
+  if(f&&g){
+    f.style.background=tab==='feed'?'var(--card)':'transparent';
+    f.style.color=tab==='feed'?'var(--text)':'var(--sub)';
+    f.style.boxShadow=tab==='feed'?'var(--shadow-sm)':'none';
+    g.style.background=tab==='gigs'?'var(--card)':'transparent';
+    g.style.color=tab==='gigs'?'var(--text)':'var(--sub)';
+    g.style.boxShadow=tab==='gigs'?'var(--shadow-sm)':'none';
+  }
+  if(tab==='feed') loadVCollabFeed();
+  else loadVCollabGigs();
+}
+
+async function loadVCollabFeed(){
+  const el=document.getElementById('vcollabContent');
+  if(!el)return;
+  el.innerHTML='<div style="color:var(--muted);font-size:13px;text-align:center;padding:32px">Loading...</div>';
+  let posts=[];
+  try{const r=await sb.from('collab_posts').select('*').order('created_at',{ascending:false}).limit(20);posts=r.data||[];}catch(e){}
+  if(!posts.length){
+    el.innerHTML=`<div style="text-align:center;padding:52px;color:var(--sub)">
+      <div style="font-size:36px;margin-bottom:12px">🤝</div>
+      <div style="font-size:17px;font-weight:700;margin-bottom:6px;color:var(--text)">Nothing posted yet</div>
+      <div style="font-size:13px;margin-bottom:20px">Be the first to share with the Columbus community.</div>
+      <button class="btn btn-primary btn-sm" onclick="openVCollabPost()">Write something</button>
+    </div>`;
+    return;
+  }
+  el.innerHTML=posts.map(p=>{
+    const ago=vcTimeAgo(p.created_at);
+    const roleColor={organizer:'var(--orange)',vendor:'var(--blue)',venue_owner:'var(--green)',food_professional:'var(--gold)'}[p.role]||'var(--sub)';
+    const roleLabel={organizer:'Organizer',vendor:'Vendor',venue_owner:'Venue',food_professional:'Food Pro'}[p.role]||p.role;
+    const init=(p.display_name||'?')[0].toUpperCase();
+    return `<div style="background:var(--card);border:1px solid var(--border);border-radius:14px;box-shadow:var(--shadow-sm);padding:18px 20px;margin-bottom:12px">
+      <div style="display:flex;align-items:flex-start;gap:12px;margin-bottom:12px">
+        <a href="/organizer-profile.html?id=${p.user_id}" target="_blank" style="width:36px;height:36px;border-radius:50%;background:${roleColor}20;border:1px solid ${roleColor}40;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;color:${roleColor};flex-shrink:0;text-decoration:none">${init}</a>
+        <div style="flex:1">
+          <div style="font-size:13px;font-weight:700">${p.display_name||'Anonymous'}</div>
+          <div style="display:flex;gap:6px;margin-top:2px">
+            <span style="font-size:10px;font-weight:700;padding:1px 7px;border-radius:99px;background:${roleColor}15;color:${roleColor};border:1px solid ${roleColor}30">${roleLabel}</span>
+            <span style="font-size:11px;color:var(--muted)">${ago}</span>
+          </div>
+        </div>
+      </div>
+      <div style="font-size:14px;color:var(--text);line-height:1.65">${p.body}</div>
+      <div style="margin-top:12px;padding-top:10px;border-top:1px solid var(--border);font-size:12px;color:var(--muted)">♥ ${p.likes||0}</div>
+    </div>`;
+  }).join('');
+}
+
+async function loadVCollabGigs(){
+  const el=document.getElementById('vcollabContent');
+  if(!el)return;
+  el.innerHTML='<div style="color:var(--muted);font-size:13px;text-align:center;padding:32px">Loading gigs...</div>';
+  let gigs=[];
+  try{const r=await sb.from('collab_gigs').select('*').eq('status','open').order('created_at',{ascending:false});gigs=r.data||[];}catch(e){}
+  if(!gigs.length){
+    el.innerHTML='<div style="text-align:center;padding:40px;color:var(--muted);font-size:13px">No open gigs yet. Check back soon.</div>';
+    return;
+  }
+  el.innerHTML=gigs.map(g=>{
+    const catColor={photography:'var(--blue)',dj:'var(--gold)',staffing:'var(--green)',catering:'var(--orange)',design:'#c084fc',videography:'var(--blue)',other:'var(--sub)'}[g.category?.toLowerCase()]||'var(--sub)';
+    const ago=vcTimeAgo(g.created_at);
+    const isOwn=g.poster_id===currentUser?.id;
+    return `<div style="background:var(--card);border:1px solid var(--border);border-radius:14px;box-shadow:var(--shadow-sm);padding:18px 20px;margin-bottom:10px">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:8px">
+        <div>
+          <div style="font-size:15px;font-weight:700;margin-bottom:4px">${g.title}</div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:99px;background:${catColor}15;color:${catColor};border:1px solid ${catColor}30">${g.category}</span>
+            ${g.pay?`<span style="font-size:11px;color:var(--green);font-weight:600">${g.pay}</span>`:''}
+            ${g.event_date?`<span style="font-size:11px;color:var(--muted)">${new Date(g.event_date).toLocaleDateString('en-US',{month:'short',day:'numeric'})}</span>`:''}
+          </div>
+        </div>
+        <span style="font-size:10px;font-weight:700;padding:3px 10px;border-radius:99px;background:rgba(48,214,147,0.1);color:var(--green);border:1px solid rgba(48,214,147,0.25);flex-shrink:0">Open</span>
+      </div>
+      <div style="font-size:13px;color:var(--sub);line-height:1.6;margin-bottom:12px">${g.description}</div>
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
+        <div style="font-size:11px;color:var(--muted)">Posted by ${g.poster_name} · ${ago} · ${g.applications||0} applicants</div>
+        ${!isOwn?`<button onclick="applyToVGig('${g.id}')" class="btn btn-primary btn-sm">Apply</button>`:'<span style="font-size:11px;color:var(--muted)">Your gig</span>'}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+async function applyToVGig(gigId){
+  const name=vendorProfile?.business_name||currentUser?.email.split('@')[0]||'Vendor';
+  const msg=prompt('Add a quick message with your application (optional):');
+  if(msg===null)return;
+  try{
+    const r=await sb.from('collab_gig_applications').insert({gig_id:gigId,applicant_id:currentUser.id,display_name:name,role:'vendor',message:msg||null});
+    if(r.error&&r.error.code==='23505'){toast('You already applied to this gig','error');return;}
+    if(r.error){toast('Error applying','error');return;}
+  }catch(e){toast('Error applying','error');return;}
+  toast('Application sent!');
+  loadVCollabGigs();
+}
+
+function openVCollabPost(){
+  const name=vendorProfile?.business_name||currentUser?.email.split('@')[0]||'Vendor';
+  const modal=document.getElementById('modalContainer')||document.body;
+  const div=document.createElement('div');
+  div.id='vcollabPostModal';
+  div.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,0.8);z-index:500;display:flex;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(8px)';
+  div.innerHTML=`<div style="background:var(--card);border:1px solid var(--border);border-radius:18px;box-shadow:var(--shadow-lg);width:100%;max-width:500px;overflow:hidden">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:18px 22px;border-bottom:1px solid var(--border)">
+      <div style="font-size:16px;font-weight:700">Share with the community</div>
+      <button onclick="document.getElementById('vcollabPostModal').remove()" style="background:none;border:none;color:var(--sub);font-size:20px;cursor:pointer">&times;</button>
+    </div>
+    <div style="padding:22px">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
+        <div style="width:34px;height:34px;border-radius:50%;background:var(--blue-dim);border:1px solid var(--blue-border);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;color:var(--blue)">${name[0].toUpperCase()}</div>
+        <div style="font-size:13px;font-weight:600">${name}</div>
+      </div>
+      <textarea id="vcollabBody" placeholder="Share an update, availability, or anything useful for Columbus organizers..." style="width:100%;min-height:110px;background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:10px;padding:12px 14px;color:var(--text);font-size:14px;line-height:1.6;resize:none;font-family:var(--font)"></textarea>
+      <div id="vcollabErr" style="color:var(--red);font-size:12px;margin-top:6px;display:none"></div>
+    </div>
+    <div style="padding:14px 22px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:8px">
+      <button onclick="document.getElementById('vcollabPostModal').remove()" class="btn btn-ghost btn-sm">Cancel</button>
+      <button onclick="submitVCollabPost()" class="btn btn-primary btn-sm">Post</button>
+    </div>
+  </div>`;
+  document.body.appendChild(div);
+}
+
+async function submitVCollabPost(){
+  const body=document.getElementById('vcollabBody')?.value.trim();
+  const errEl=document.getElementById('vcollabErr');
+  if(!body){if(errEl){errEl.textContent='Write something first.';errEl.style.display='block';}return;}
+  const name=vendorProfile?.business_name||currentUser?.email.split('@')[0]||'Vendor';
+  try{
+    const r=await sb.from('collab_posts').insert({user_id:currentUser.id,role:'vendor',display_name:name,body});
+    if(r.error){if(errEl){errEl.textContent='Error: '+(r.error.message||'Try again');errEl.style.display='block';}return;}
+  }catch(e){if(errEl){errEl.textContent='Error posting';errEl.style.display='block';}return;}
+  document.getElementById('vcollabPostModal')?.remove();
+  toast('Posted!');
+  if(document.getElementById('vcollabContent')) loadVCollabFeed();
+}
+
+function vcTimeAgo(dt){
+  if(!dt)return'';
+  const s=Math.floor((Date.now()-new Date(dt))/1000);
+  if(s<60)return'just now';
+  if(s<3600)return Math.floor(s/60)+'m ago';
+  if(s<86400)return Math.floor(s/3600)+'h ago';
+  if(s<604800)return Math.floor(s/86400)+'d ago';
+  return new Date(dt).toLocaleDateString('en-US',{month:'short',day:'numeric'});
+}
+
 window.renderProfilePage  = renderProfilePage;
 window.renderServicesPage = renderServicesPage;
 window.renderPortfolioPage= renderPortfolioPage;
