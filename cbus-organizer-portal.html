@@ -14,28 +14,28 @@
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;}
 :root{
-  --bg:#08080f;
-  --surface:#0d0d18;
-  --card:#111120;
-  --card-hover:#161628;
-  --border:rgba(255,255,255,0.07);
-  --border-mid:rgba(255,255,255,0.11);
-  --text:#f2f2fa;
-  --sub:#7878a0;
-  --muted:#3a3a58;
+  --bg:#050508;
+  --surface:#0f0f1c;
+  --card:#1c1c30;
+  --card-hover:#222238;
+  --border:rgba(255,255,255,0.09);
+  --border-mid:rgba(255,255,255,0.15);
+  --text:#f4f4ff;
+  --sub:#8888b0;
+  --muted:#44445a;
   --orange:#FF6B35;
   --orange-dim:rgba(255,107,53,0.12);
-  --orange-glow:rgba(255,107,53,0.25);
+  --orange-glow:rgba(255,107,53,0.28);
   --green:#30d693;
   --red:#f47171;
   --blue:#7c8cf8;
   --gold:#f5bc30;
   --font:'DM Sans',sans-serif;
   --mono:'DM Mono',monospace;
-  --shadow-sm:0 1px 3px rgba(0,0,0,0.5),0 0 0 1px rgba(255,255,255,0.05);
-  --shadow-md:0 4px 16px rgba(0,0,0,0.6),0 0 0 1px rgba(255,255,255,0.06);
-  --shadow-lg:0 12px 40px rgba(0,0,0,0.7),0 0 0 1px rgba(255,255,255,0.07);
-  --shadow-orange:0 4px 20px rgba(255,107,53,0.35);
+  --shadow-sm:0 4px 20px rgba(0,0,0,0.8),0 0 0 1px rgba(255,255,255,0.08);
+  --shadow-md:0 8px 32px rgba(0,0,0,0.85),0 0 0 1px rgba(255,255,255,0.1);
+  --shadow-lg:0 20px 60px rgba(0,0,0,0.9),0 0 0 1px rgba(255,255,255,0.11);
+  --shadow-orange:0 4px 20px rgba(255,107,53,0.4);
   --radius-sm:10px;
   --radius-md:14px;
   --radius-lg:18px;
@@ -52,7 +52,7 @@ input,textarea,select{font-family:var(--font);}
 /* ── NAV ──────────────────────────────────────────────────── */
 nav{
   position:sticky;top:0;z-index:200;
-  background:rgba(8,8,15,0.92);
+  background:rgba(20,20,36,0.96);
   -webkit-backdrop-filter:blur(24px) saturate(180%);
   backdrop-filter:blur(24px) saturate(180%);
   border-bottom:1px solid var(--border);
@@ -123,6 +123,14 @@ nav{
 
 /* ── LAYOUT ───────────────────────────────────────────────── */
 .page{padding:32px 40px;animation:fadeUp 0.25s ease;max-width:1040px;margin:0 auto;}
+
+/* ── INNER CARD SURFACE (third layer) ─────────────────────── */
+.card-inner-surface{
+  background:#242440;
+  border:1px solid rgba(255,255,255,0.08);
+  border-radius:10px;
+  box-shadow:0 2px 8px rgba(0,0,0,0.5);
+}
 
 /* ── SURFACE CARDS ────────────────────────────────────────── */
 .card{
@@ -2170,7 +2178,7 @@ function renderDashboard(){
        const isApproved=a.status==='approved'||a.status==='confirmed';
        const isRejected=a.status==='rejected';
        const fee=a.spot_fee||0;
-       return `<div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px 16px;margin-bottom:8px">
+       return `<div style="background:#242440;border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:14px 16px;margin-bottom:8px;box-shadow:0 2px 8px rgba(0,0,0,0.5)">
          <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:8px">
            <div>
              <div style="font-size:13px;font-weight:700">${a.business_name||a.applicant_name||'Applicant'}</div>
@@ -2222,7 +2230,7 @@ function renderDashboard(){
 
      document.getElementById('app').innerHTML=`
      <div class="page">
-       <div style="background:linear-gradient(135deg,#130800 0%,#1a0f02 50%,#0b0b0f 100%);border:1px solid var(--border);border-radius:16px;padding:22px 26px;margin-bottom:16px">
+       <div style="background:linear-gradient(135deg,#1a0e00 0%,#1c1030 60%,#0d0d1a 100%);border:1px solid var(--border);border-radius:16px;padding:22px 26px;margin-bottom:16px">
          <div style="font-size:10px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--orange);margin-bottom:8px">Your event</div>
          <div style="font-size:22px;font-weight:800;margin-bottom:4px">${activeEvent.title||'Untitled Event'}</div>
          <div style="font-size:13px;color:var(--sub)">
