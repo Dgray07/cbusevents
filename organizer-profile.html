@@ -153,19 +153,14 @@ async function init(){
   currentUser=session?.user||null;
 
   // Load all data in parallel
-  const[profileRes,eventsRes,postsRes,followerRes,followingRes]=await Promise.all([
-    sb.from('organizer_profiles').select('*').eq('user_id',profileUserId).maybeSingle().catch(()=>({data:null})),
-    sb.from('events').select('*').or('owner_id.eq.'+profileUserId+',organizer_id.eq.'+profileUserId).eq('status','published').order('start_time',{ascending:false}).limit(6).catch(()=>({data:[]})),
-    sb.from('collab_posts').select('*').eq('user_id',profileUserId).order('created_at',{ascending:false}).limit(5).catch(()=>({data:[]})),
-    sb.from('profile_follows').select('id',{count:'exact',head:true}).eq('following_id',profileUserId).catch(()=>({count:0})),
-    currentUser?sb.from('profile_follows').select('id').eq('follower_id',currentUser.id).eq('following_id',profileUserId).maybeSingle().catch(()=>({data:null})):{data:null},
-  ]);
+  let profile=null,events=[],posts=[],followerCount=0;
+  isFollowing=false;
 
-  const profile=profileRes.data;
-  const events=eventsRes.data||[];
-  const posts=postsRes.data||[];
-  const followerCount=followerRes.count||0;
-  isFollowing=!!(followingRes?.data);
+  try{const r=await sb.from('organizer_profiles').select('*').eq('user_id',profileUserId).maybeSingle();profile=r.data;}catch(e){}
+  try{const r=await sb.from('events').select('*').or('owner_id.eq.'+profileUserId+',organizer_id.eq.'+profileUserId).eq('status','published').order('start_time',{ascending:false}).limit(6);events=r.data||[];}catch(e){}
+  try{const r=await sb.from('collab_posts').select('*').eq('user_id',profileUserId).order('created_at',{ascending:false}).limit(5);posts=r.data||[];}catch(e){}
+  try{const r=await sb.from('profile_follows').select('id',{count:'exact',head:true}).eq('following_id',profileUserId);followerCount=r.count||0;}catch(e){}
+  if(currentUser){try{const r=await sb.from('profile_follows').select('id').eq('follower_id',currentUser.id).eq('following_id',profileUserId).maybeSingle();isFollowing=!!r.data;}catch(e){}}
 
   // Get display name - fall back to user metadata via RPC or email
   let displayName=profile?.display_name||profile?.full_name||'Organizer';
@@ -271,14 +266,14 @@ async function toggleFollow(){
     btn.className='btn btn-primary btn-sm btn-follow';
     toast('Unfollowed');
   } else {
-    await sb.from('profile_follows').insert({follower_id:currentUser.id,following_id:profileUserId}).catch(()=>{});
+    try{await sb.from('profile_follows').insert({follower_id:currentUser.id,following_id:profileUserId});}catch(e){}
     isFollowing=true;
     btn.textContent='Following';
     btn.className='btn btn-ghost btn-sm btn-follow';
     toast('Following!');
   }
   // Refresh follower count
-  const{count}=await sb.from('profile_follows').select('id',{count:'exact',head:true}).eq('following_id',profileUserId).catch(()=>({count:0}));
+  let count=0; try{const r=await sb.from('profile_follows').select('id',{count:'exact',head:true}).eq('following_id',profileUserId);count=r.count||0;}catch(e){}
   const statEl=document.querySelector('.profile-stat-num');
   if(statEl)statEl.textContent=count||0;
 }
