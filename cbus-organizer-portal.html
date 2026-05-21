@@ -2386,7 +2386,7 @@ async function loadCollabFeed(){
   const el=document.getElementById('collabContent');
   if(!el)return;
   el.innerHTML='<div style="color:var(--muted);font-size:13px;text-align:center;padding:32px">Loading feed...</div>';
-  const{data:posts}=await sb.from('collab_posts').select('*').order('created_at',{ascending:false}).limit(20).catch(()=>({data:[]}));
+  let posts=[],_pErr; try{const r=await sb.from('collab_posts').select('*').order('created_at',{ascending:false}).limit(20);posts=r.data||[];}catch(e){posts=[];}
   const list=posts||[];
   if(!list.length){
     el.innerHTML=`
@@ -2437,7 +2437,7 @@ async function loadCollabGigs(){
   const cats=['All','Photography','DJ','Staffing','Catering','Design','Videography','Other'];
   let activeGigCat='All';
 
-  const{data:gigs}=await sb.from('collab_gigs').select('*').eq('status','open').order('created_at',{ascending:false}).catch(()=>({data:[]}));
+  let gigs=[]; try{const r=await sb.from('collab_gigs').select('*').eq('status','open').order('created_at',{ascending:false});gigs=r.data||[];}catch(e){gigs=[];}
   const list=gigs||[];
 
   function renderGigList(filter){
@@ -2501,7 +2501,7 @@ function timeAgoCollab(dt){
 }
 
 async function likePost(id,btn){
-  const{error}=await sb.from('collab_post_likes').insert({post_id:id,user_id:currentUser.id}).catch(e=>({error:e}));
+  let likeError=null; try{const r=await sb.from('collab_post_likes').insert({post_id:id,user_id:currentUser.id});likeError=r.error;}catch(e){likeError=e;} const error=likeError;
   if(!error){
     await sb.from('collab_posts').update({likes:sb.rpc('increment')}).eq('id',id).catch(()=>{});
     const num=btn.querySelector('span')||btn;
@@ -2516,7 +2516,7 @@ async function applyToGig(gigId){
   const role=(window._userRoles||['organizer'])[0];
   const msg=prompt('Add a quick message with your application (optional):');
   if(msg===null)return;
-  const{error}=await sb.from('collab_gig_applications').insert({gig_id:gigId,applicant_id:currentUser.id,display_name:name,role,message:msg||null}).catch(e=>({error:e}));
+  let applyError=null; try{const r=await sb.from('collab_gig_applications').insert({gig_id:gigId,applicant_id:currentUser.id,display_name:name,role,message:msg||null});applyError=r.error;}catch(e){applyError=e;} const error=applyError;
   if(error&&error.code==='23505'){toast('You already applied to this gig');return;}
   if(error){toast('Error applying. Try again.','error');return;}
   await sb.from('collab_gigs').update({applications:sb.rpc('increment')}).eq('id',gigId).catch(()=>{});
@@ -2562,7 +2562,7 @@ async function submitCollabPost(){
   if(!body){if(errEl){errEl.textContent='Write something first.';errEl.style.display='block';}return;}
   const name=currentUser.user_metadata?.full_name||currentUser.email.split('@')[0];
   const role=(window._userRoles||['organizer'])[0];
-  const{error}=await sb.from('collab_posts').insert({user_id:currentUser.id,role,display_name:name,body}).catch(e=>({error:e}));
+  let postError=null; try{const r=await sb.from('collab_posts').insert({user_id:currentUser.id,role,display_name:name,body});postError=r.error;}catch(e){postError=e;} const error=postError;
   if(error){if(errEl){errEl.textContent='Error posting. Try again.';errEl.style.display='block';}return;}
   closeModal();
   toast('Posted to the community!');
@@ -2606,7 +2606,7 @@ async function submitGig(){
   const errEl=document.getElementById('gigErr');
   if(!title||!desc){if(errEl){errEl.textContent='Title and description are required.';errEl.style.display='block';}return;}
   const name=currentUser.user_metadata?.full_name||currentUser.email.split('@')[0];
-  const{error}=await sb.from('collab_gigs').insert({poster_id:currentUser.id,poster_name:name,poster_role:'organizer',title,description:desc,category:cat,pay,event_date:date}).catch(e=>({error:e}));
+  let gigError=null; try{const r=await sb.from('collab_gigs').insert({poster_id:currentUser.id,poster_name:name,poster_role:'organizer',title,description:desc,category:cat,pay,event_date:date});gigError=r.error;}catch(e){gigError=e;} const error=gigError;
   if(error){if(errEl){errEl.textContent='Error posting gig. Try again.';errEl.style.display='block';}return;}
   closeModal();
   toast('Gig posted!');
@@ -2617,10 +2617,9 @@ async function submitGig(){
 async function loadCollabWidget(){
   const el=document.getElementById('collabWidgetBody');
   if(!el)return;
-  const{data:posts}=await sb.from('collab_posts').select('*').order('created_at',{ascending:false}).limit(3).catch(()=>({data:[]}));
-  const{data:gigs}=await sb.from('collab_gigs').select('id,title,category,pay').eq('status','open').order('created_at',{ascending:false}).limit(2).catch(()=>({data:[]}));
+  let posts=[]; try{const r=await sb.from('collab_posts').select('*').order('created_at',{ascending:false}).limit(3);posts=r.data||[];}catch(e){posts=[];}
+  let gigList=[]; try{const r=await sb.from('collab_gigs').select('id,title,category,pay').eq('status','open').order('created_at',{ascending:false}).limit(2);gigList=r.data||[];}catch(e){gigList=[];}
   const list=posts||[];
-  const gigList=gigs||[];
   if(!list.length&&!gigList.length){
     el.innerHTML=`<div style="text-align:center;padding:16px;color:var(--muted);font-size:13px">No activity yet. <button onclick="nav('collaborate')" style="background:none;border:none;color:var(--orange);font-weight:600;cursor:pointer;font-size:13px;font-family:var(--font)">Be the first to post</button></div>`;
     return;
