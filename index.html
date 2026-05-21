@@ -338,6 +338,111 @@ footer{background:var(--ink);color:var(--cream);padding:56px 48px 32px;}
 .footer-socials a{font-family:var(--mono);font-size:8px;letter-spacing:0.16em;text-transform:uppercase;color:rgba(250,247,242,0.28);transition:color 0.18s;}
 .footer-socials a:hover{color:var(--flame);}
 
+
+/* ── EVENTS FEED (from original) ─────────────────────────── */
+.feed-section-wrap{padding:72px 48px;background:#08080f;border-bottom:1px solid rgba(255,255,255,0.09);}
+[data-theme="light"] .feed-section-wrap{background:#f5f3ef;border-bottom-color:var(--rule);}
+.feed-header{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px;}
+.feed-eyebrow{font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:0.2em;text-transform:uppercase;color:var(--flame);margin-bottom:7px;display:flex;align-items:center;gap:7px;}
+.feed-live-dot{width:6px;height:6px;border-radius:50%;background:var(--flame);animation:blink 2s infinite;flex-shrink:0;}
+.feed-title{font-family:var(--display);font-size:clamp(24px,3vw,36px);font-weight:900;letter-spacing:-0.02em;color:#f4f4ff;margin-bottom:0;}
+[data-theme="light"] .feed-title{color:var(--ink);}
+.feed-title span{color:var(--flame);}
+.feed-primary-tabs{display:flex;gap:8px;margin-bottom:20px;border-bottom:1px solid rgba(255,255,255,0.09);padding-bottom:0;}
+[data-theme="light"] .feed-primary-tabs{border-bottom-color:var(--rule);}
+.feed-primary-tab{display:flex;align-items:center;gap:7px;font-family:var(--font);font-size:14px;font-weight:700;padding:10px 20px;border-radius:10px 10px 0 0;background:none;border:none;border-bottom:2px solid transparent;color:#8888b0;cursor:pointer;transition:all 0.18s;position:relative;bottom:-1px;}
+[data-theme="light"] .feed-primary-tab{color:var(--mist);}
+.feed-primary-tab:hover{color:#f4f4ff;}
+[data-theme="light"] .feed-primary-tab:hover{color:var(--ink);}
+.feed-primary-tab.active{color:var(--flame);border-bottom-color:var(--flame);background:rgba(255,107,53,0.08);}
+.feed-primary-tab-badge{background:var(--flame);color:#fff;font-family:var(--mono);font-size:9px;font-weight:800;padding:2px 7px;border-radius:20px;margin-left:2px;}
+.feed-time-tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:20px;}
+.feed-time-tab{font-family:var(--mono);font-size:10px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;padding:7px 16px;border-radius:9999px;border:1px solid rgba(255,255,255,0.09);background:#1c1c30;color:#8888b0;cursor:pointer;transition:all 0.15s;}
+[data-theme="light"] .feed-time-tab{background:white;border-color:var(--rule);color:var(--sub);}
+.feed-time-tab:hover{border-color:var(--flame);color:var(--flame);}
+.feed-time-tab.active{background:var(--flame);color:#fff;border-color:var(--flame);}
+.feed-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px;}
+.feed-card{background:#1c1c30;border:1px solid rgba(255,255,255,0.09);border-radius:14px;overflow:hidden;cursor:pointer;transition:all 0.2s;display:flex;flex-direction:column;}
+[data-theme="light"] .feed-card{background:white;border-color:#e0ddd8;}
+.feed-card:hover{border-color:var(--flame);transform:translateY(-2px);box-shadow:0 8px 28px rgba(0,0,0,0.4);}
+.feed-card-img{height:140px;position:relative;overflow:hidden;background:#0f0f1c;flex-shrink:0;}
+.feed-card-img img{width:100%;height:100%;object-fit:cover;}
+.feed-card-img-placeholder{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:40px;background:linear-gradient(135deg,rgba(255,107,53,0.06),rgba(129,140,248,0.04));}
+.feed-card-body{padding:14px 16px;flex:1;display:flex;flex-direction:column;gap:4px;}
+.feed-card-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;}
+.feed-card-cat{font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:var(--flame);}
+.feed-source-badge{font-family:var(--mono);font-size:8px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;padding:2px 7px;border-radius:4px;background:rgba(255,107,53,0.1);color:var(--flame);border:1px solid rgba(255,107,53,0.25);}
+.feed-ext-badge{font-family:var(--mono);font-size:8px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;padding:2px 7px;border-radius:4px;background:rgba(255,255,255,0.05);color:#8888b0;border:1px solid rgba(255,255,255,0.09);}
+.feed-card-title{font-family:var(--font);font-weight:700;font-size:14px;color:#f4f4ff;line-height:1.3;}
+[data-theme="light"] .feed-card-title{color:var(--ink);}
+.feed-card-venue{font-size:11px;color:#55556a;}
+[data-theme="light"] .feed-card-venue{color:var(--mist);}
+.feed-card-footer{display:flex;align-items:center;justify-content:space-between;margin-top:8px;}
+.feed-card-date{font-family:var(--mono);font-size:10px;color:#8888b0;}
+[data-theme="light"] .feed-card-date{color:var(--sub);}
+.feed-card-price.free{color:#30d693;font-size:11px;font-weight:700;}
+.feed-card-price.paid{color:#f4f4ff;font-size:11px;font-weight:700;}
+[data-theme="light"] .feed-card-price.paid{color:var(--ink);}
+.feed-tonight-badge{position:absolute;top:10px;left:10px;background:var(--flame);color:#fff;font-family:var(--mono);font-size:8px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:3px 8px;border-radius:4px;}
+.feed-free-badge{position:absolute;top:10px;right:10px;background:rgba(0,0,0,0.65);color:#fff;font-family:var(--mono);font-size:8px;font-weight:700;padding:3px 8px;border-radius:4px;}
+.feed-empty{text-align:center;padding:52px 20px;color:#8888b0;grid-column:1/-1;}
+.feed-empty-icon{font-size:36px;margin-bottom:12px;}
+.feed-load-more{display:block;width:100%;margin-top:20px;padding:13px;background:#1c1c30;border:1px solid rgba(255,255,255,0.09);border-radius:10px;font-family:var(--mono);font-size:10px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:#8888b0;cursor:pointer;transition:all 0.15s;}
+[data-theme="light"] .feed-load-more{background:white;border-color:var(--rule);color:var(--sub);}
+.feed-load-more:hover{border-color:var(--flame);color:var(--flame);}
+.cal-toolbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px;}
+.cal-sort-row{display:flex;align-items:center;gap:6px;}
+.cal-sort-btn{font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;padding:5px 12px;border-radius:9999px;background:none;border:1px solid rgba(255,255,255,0.09);color:#8888b0;cursor:pointer;transition:all 0.15s;}
+[data-theme="light"] .cal-sort-btn{border-color:var(--rule);color:var(--mist);}
+.cal-sort-btn.active,.cal-sort-btn:hover{border-color:var(--flame);color:var(--flame);}
+#calendarFeed{display:flex;flex-direction:column;gap:12px;}
+.cal-post{background:#1c1c30;border:1px solid rgba(255,255,255,0.09);border-radius:14px;overflow:hidden;transition:border-color 0.2s;}
+[data-theme="light"] .cal-post{background:white;border-color:#e0ddd8;}
+.cal-post:hover{border-color:rgba(255,255,255,0.15);}
+.cal-post-inner{display:flex;gap:0;}
+.cal-post-img{width:120px;flex-shrink:0;position:relative;overflow:hidden;background:#0f0f1c;min-height:100px;}
+.cal-post-img img{width:100%;height:100%;object-fit:cover;position:absolute;inset:0;}
+.cal-post-img-placeholder{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:32px;position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,107,53,0.06),rgba(129,140,248,0.04));}
+.cal-post-body{flex:1;padding:14px 16px;display:flex;flex-direction:column;gap:4px;min-width:0;}
+.cal-post-top{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.cal-post-cat{font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:var(--flame);}
+.cal-post-source{font-family:var(--mono);font-size:8px;padding:2px 7px;border-radius:4px;background:rgba(255,255,255,0.05);color:#8888b0;border:1px solid rgba(255,255,255,0.09);text-transform:uppercase;letter-spacing:0.08em;font-weight:700;}
+[data-theme="light"] .cal-post-source{background:rgba(0,0,0,0.04);color:var(--mist);border-color:var(--rule);}
+.cal-post-title{font-family:var(--font);font-weight:700;font-size:15px;color:#f4f4ff;line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+[data-theme="light"] .cal-post-title{color:var(--ink);}
+.cal-post-meta{font-size:12px;color:#55556a;display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+[data-theme="light"] .cal-post-meta{color:var(--mist);}
+.cal-post-actions{display:flex;align-items:center;gap:0;border-top:1px solid rgba(255,255,255,0.06);}
+[data-theme="light"] .cal-post-actions{border-top-color:var(--rule);}
+.cal-action-btn{flex:1;display:flex;align-items:center;justify-content:center;gap:6px;padding:10px 8px;background:none;border:none;border-right:1px solid rgba(255,255,255,0.06);font-family:var(--font);font-size:12px;font-weight:600;color:#8888b0;cursor:pointer;transition:all 0.15s;}
+[data-theme="light"] .cal-action-btn{border-right-color:var(--rule);color:var(--mist);}
+.cal-action-btn:last-child{border-right:none;}
+.cal-action-btn:hover{background:rgba(255,255,255,0.04);color:#f4f4ff;}
+[data-theme="light"] .cal-action-btn:hover{background:var(--flame-l);color:var(--ink);}
+.cal-action-btn.liked{color:#ef4444;}
+.cal-count{font-family:var(--mono);font-size:11px;font-weight:700;}
+.cal-comments-drawer{border-top:1px solid rgba(255,255,255,0.06);background:#0f0f1c;padding:0;max-height:0;overflow:hidden;transition:max-height 0.3s ease,padding 0.2s;}
+[data-theme="light"] .cal-comments-drawer{background:var(--lk-bg);border-top-color:var(--rule);}
+.cal-comments-drawer.open{max-height:400px;padding:14px 16px;overflow-y:auto;}
+.cal-comment-item{display:flex;gap:10px;margin-bottom:12px;}
+.cal-comment-avatar{width:28px;height:28px;border-radius:50%;background:rgba(255,107,53,0.12);border:1px solid rgba(255,107,53,0.28);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--flame);flex-shrink:0;}
+.cal-comment-bubble{flex:1;background:#1c1c30;border:1px solid rgba(255,255,255,0.07);border-radius:0 10px 10px 10px;padding:8px 12px;}
+[data-theme="light"] .cal-comment-bubble{background:white;border-color:#e0ddd8;}
+.cal-comment-author{font-size:12px;font-weight:700;color:#f4f4ff;margin-bottom:2px;}
+[data-theme="light"] .cal-comment-author{color:var(--ink);}
+.cal-comment-body{font-size:13px;color:#c8c8e0;line-height:1.5;}
+[data-theme="light"] .cal-comment-body{color:var(--ash);}
+.cal-comment-time{font-family:var(--mono);font-size:9px;color:#55556a;margin-top:4px;}
+.cal-comment-input-row{display:flex;gap:8px;margin-top:8px;}
+.cal-comment-input{flex:1;background:#1c1c30;border:1px solid rgba(255,255,255,0.09);border-radius:8px;padding:8px 12px;color:#f4f4ff;font-size:13px;outline:none;}
+[data-theme="light"] .cal-comment-input{background:white;border-color:var(--rule);color:var(--ink);}
+.cal-comment-input:focus{border-color:var(--flame);}
+.cal-comment-submit{background:var(--flame);color:#fff;border:none;border-radius:8px;padding:8px 14px;font-family:var(--mono);font-size:10px;font-weight:700;letter-spacing:0.1em;cursor:pointer;}
+.cal-post-claim{padding:8px 16px;border-top:1px solid rgba(255,255,255,0.04);}
+.cal-claim-link{font-family:var(--mono);font-size:9px;letter-spacing:0.1em;text-transform:uppercase;color:#55556a;background:none;border:none;cursor:pointer;transition:color 0.15s;}
+.cal-claim-link:hover{color:var(--flame);}
+@media(max-width:768px){.feed-section-wrap{padding:48px 24px;}.feed-grid{grid-template-columns:1fr;}.cal-post-img{width:80px;}}
+
 /* ── DARK MODE ────────────────────────────── */
 [data-theme="dark"]{
   --cream:#050508;--warm:#08080f;--ink:#f4f4ff;--ash:#c8c8e0;--sub:#8888b0;--mist:#55556a;
@@ -413,15 +518,53 @@ footer{background:var(--ink);color:var(--cream);padding:56px 48px 32px;}
     <a href="https://cbusevents.com" class="nav-logo">CBUS<span>EVENTS</span></a>
     <ul class="nav-links">
       <li><a href="https://cbusevents.com/events.html">Events</a></li>
-      <li><a href="#feed-section">Scene</a></li>
-      <li><a href="#collab-section">Collab Board</a></li>
       <li><a href="https://cbusevents.com/venues.html">Venues</a></li>
       <li><a href="https://cbusevents.com/vendors.html">Vendors</a></li>
+      <li><a href="https://cbusevents.com/marketplace.html" style="color:var(--flame)">Marketplace</a></li>
+      <li style="position:relative" id="columbusDropdown">
+        <button onclick="toggleColumbusMenu()" style="display:flex;align-items:center;gap:4px;font-family:var(--mono);font-size:9px;letter-spacing:0.2em;text-transform:uppercase;color:var(--ash);background:none;border:none;cursor:pointer;padding:0;transition:color 0.18s" onmouseover="this.style.color='var(--flame)'" onmouseout="this.style.color='var(--ash)'">Columbus ▾</button>
+        <div id="columbusMenu" style="display:none;position:absolute;top:calc(100% + 8px);left:0;background:white;border:1px solid var(--rule);border-radius:12px;padding:8px;min-width:210px;box-shadow:0 16px 40px rgba(0,0,0,0.12);z-index:300">
+          <a href="https://cbusevents.com/gallery-hop.html" style="display:flex;align-items:center;gap:10px;padding:9px 14px;border-radius:8px;font-size:13px;font-weight:600;color:var(--ink);text-decoration:none;transition:background 0.15s" onmouseover="this.style.background='var(--flame-l)'" onmouseout="this.style.background='transparent'">
+            <div style="width:6px;height:6px;border-radius:50%;background:var(--flame);flex-shrink:0"></div>
+            <div><div style="font-weight:600;font-size:13px">Gallery Hop</div><div style="font-size:11px;color:var(--mist);margin-top:1px">Every first Friday · Short North</div></div>
+          </a>
+          <div style="height:1px;background:var(--rule);margin:4px 8px"></div>
+          <a href="https://cbusevents.com/blog.html" style="display:block;padding:8px 14px;border-radius:8px;font-size:13px;color:var(--sub);text-decoration:none;transition:background 0.15s" onmouseover="this.style.background='var(--flame-l)'" onmouseout="this.style.background='transparent'">Columbus Blog</a>
+          <div style="height:1px;background:var(--rule);margin:4px 8px"></div>
+          <div style="padding:5px 14px 3px;font-family:var(--mono);font-size:8px;letter-spacing:0.14em;text-transform:uppercase;color:var(--mist)">Communities</div>
+          <a href="https://cbusevents.com/community.html?c=black-columbus" style="display:block;padding:7px 14px;border-radius:8px;font-size:13px;color:var(--sub);text-decoration:none" onmouseover="this.style.background='var(--flame-l)'" onmouseout="this.style.background='transparent'">Black Columbus</a>
+          <a href="https://cbusevents.com/community.html?c=latino-columbus" style="display:block;padding:7px 14px;border-radius:8px;font-size:13px;color:var(--sub);text-decoration:none" onmouseover="this.style.background='var(--flame-l)'" onmouseout="this.style.background='transparent'">Latino Columbus</a>
+          <a href="https://cbusevents.com/community.html?c=lgbtq-columbus" style="display:block;padding:7px 14px;border-radius:8px;font-size:13px;color:var(--sub);text-decoration:none" onmouseover="this.style.background='var(--flame-l)'" onmouseout="this.style.background='transparent'">LGBTQ+ Columbus</a>
+          <a href="https://cbusevents.com/communities.html" style="display:block;padding:7px 14px;border-radius:8px;font-size:13px;font-weight:600;color:var(--flame);text-decoration:none" onmouseover="this.style.background='var(--flame-l)'" onmouseout="this.style.background='transparent'">All Communities →</a>
+        </div>
+      </li>
     </ul>
-    <div class="nav-right" id="navRight">
-      <button id="themeToggle" onclick="toggleTheme()" aria-label="Toggle dark mode" title="Toggle dark mode" style="width:34px;height:34px;border-radius:50%;background:none;border:1px solid var(--rule);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:15px;transition:border-color 0.2s;flex-shrink:0" onmouseover="this.style.borderColor='var(--flame)'" onmouseout="this.style.borderColor='var(--rule)'">☀️</button>
-      <a href="https://cbusevents.com/cbus-organizer-portal.html" class="nav-signin">Sign In</a>
-      <a href="https://cbusevents.com/signup.html" class="nav-join">Join Free</a>
+    <div style="display:flex;align-items:center;gap:10px">
+      <button id="themeToggle" onclick="toggleTheme()" aria-label="Toggle dark mode" title="Toggle dark mode" style="width:34px;height:34px;border-radius:50%;background:none;border:1.5px solid var(--rule);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:15px;flex-shrink:0;transition:border-color 0.18s" onmouseover="this.style.borderColor='var(--flame)'" onmouseout="this.style.borderColor='var(--rule)'">🌙</button>
+      <div style="position:relative" id="joinDropdown">
+        <button onclick="toggleJoinMenu()" style="font-family:var(--mono);font-size:9px;letter-spacing:0.16em;text-transform:uppercase;color:var(--ash);background:none;border:none;cursor:pointer;transition:color 0.18s;display:flex;align-items:center;gap:4px" onmouseover="this.style.color='var(--flame)'" onmouseout="this.style.color='var(--ash)'">Join ▾</button>
+        <div id="joinMenu" style="display:none;position:absolute;top:calc(100% + 8px);right:0;background:white;border:1px solid var(--rule);border-radius:12px;padding:8px;min-width:200px;box-shadow:0 16px 40px rgba(0,0,0,0.12);z-index:300">
+          <a href="https://cbusevents.com/signup.html?role=venue" style="display:block;padding:9px 14px;border-radius:8px;font-size:13px;color:var(--sub);text-decoration:none;transition:background 0.15s" onmouseover="this.style.background='var(--flame-l)'" onmouseout="this.style.background='transparent'">List Your Venue</a>
+          <a href="https://cbusevents.com/signup.html?role=vendor" style="display:block;padding:9px 14px;border-radius:8px;font-size:13px;color:var(--sub);text-decoration:none;transition:background 0.15s" onmouseover="this.style.background='var(--flame-l)'" onmouseout="this.style.background='transparent'">List Your Services</a>
+          <a href="https://cbusevents.com/signup.html?role=organizer" style="display:block;padding:9px 14px;border-radius:8px;font-size:13px;color:var(--sub);text-decoration:none;transition:background 0.15s" onmouseover="this.style.background='var(--flame-l)'" onmouseout="this.style.background='transparent'">Event Organizers</a>
+          <div style="height:1px;background:var(--rule);margin:4px 8px"></div>
+          <a href="https://cbusevents.com/signup.html?role=attendee" style="display:block;padding:9px 14px;border-radius:8px;font-size:13px;color:var(--sub);text-decoration:none;transition:background 0.15s" onmouseover="this.style.background='var(--flame-l)'" onmouseout="this.style.background='transparent'">Find Events</a>
+          <a href="https://cbusevents.com/sales-landing.html" style="display:block;padding:9px 14px;border-radius:8px;font-size:13px;font-weight:600;color:var(--flame);text-decoration:none;transition:background 0.15s" onmouseover="this.style.background='var(--flame-l)'" onmouseout="this.style.background='transparent'">Brands &amp; Sponsors</a>
+        </div>
+      </div>
+      <div style="position:relative" id="signinDropdown">
+        <button onclick="toggleSigninMenu()" class="nav-join" style="display:flex;align-items:center;gap:5px">Sign In ▾</button>
+        <div id="signinMenu" style="display:none;position:absolute;top:calc(100% + 8px);right:0;background:white;border:1px solid var(--rule);border-radius:12px;padding:8px;min-width:210px;box-shadow:0 16px 40px rgba(0,0,0,0.12);z-index:300">
+          <div style="padding:5px 14px 8px;font-family:var(--mono);font-size:8px;letter-spacing:0.14em;text-transform:uppercase;color:var(--mist)">Sign in as</div>
+          <a href="https://cbusevents.com/cbus-venue-portal.html" style="display:flex;align-items:center;justify-content:space-between;padding:9px 14px;border-radius:8px;font-size:13px;font-weight:600;color:var(--ink);text-decoration:none;transition:background 0.15s" onmouseover="this.style.background='var(--flame-l)'" onmouseout="this.style.background='transparent'">Venue Owner<span style="font-family:var(--mono);font-size:9px;color:var(--mist)">Portal</span></a>
+          <a href="https://cbusevents.com/cbus-vendor-portal.html" style="display:flex;align-items:center;justify-content:space-between;padding:9px 14px;border-radius:8px;font-size:13px;font-weight:600;color:var(--ink);text-decoration:none;transition:background 0.15s" onmouseover="this.style.background='var(--flame-l)'" onmouseout="this.style.background='transparent'">Vendor<span style="font-family:var(--mono);font-size:9px;color:var(--mist)">Portal</span></a>
+          <a href="https://cbusevents.com/cbus-organizer-portal.html" style="display:flex;align-items:center;justify-content:space-between;padding:9px 14px;border-radius:8px;font-size:13px;font-weight:600;color:var(--ink);text-decoration:none;transition:background 0.15s" onmouseover="this.style.background='var(--flame-l)'" onmouseout="this.style.background='transparent'">Event Organizer<span style="font-family:var(--mono);font-size:9px;color:var(--mist)">Portal</span></a>
+          <a href="https://cbusevents.com/food-professional.html" style="display:flex;align-items:center;justify-content:space-between;padding:9px 14px;border-radius:8px;font-size:13px;font-weight:600;color:var(--ink);text-decoration:none;transition:background 0.15s" onmouseover="this.style.background='var(--flame-l)'" onmouseout="this.style.background='transparent'">Food Professional<span style="font-family:var(--mono);font-size:9px;color:var(--mist)">Portal</span></a>
+          <a href="https://cbusevents.com/event-staff.html" style="display:flex;align-items:center;justify-content:space-between;padding:9px 14px;border-radius:8px;font-size:13px;font-weight:600;color:var(--ink);text-decoration:none;transition:background 0.15s" onmouseover="this.style.background='var(--flame-l)'" onmouseout="this.style.background='transparent'">Event Staff<span style="font-family:var(--mono);font-size:9px;color:var(--mist)">Portal</span></a>
+          <div style="height:1px;background:var(--rule);margin:4px 8px"></div>
+          <a href="https://cbusevents.com/customer-portal.html" style="display:flex;align-items:center;justify-content:space-between;padding:9px 14px;border-radius:8px;font-size:13px;font-weight:600;color:var(--flame);text-decoration:none;transition:background 0.15s" onmouseover="this.style.background='var(--flame-l)'" onmouseout="this.style.background='transparent'">Customer Account<span style="font-family:var(--mono);font-size:9px;color:var(--mist)">Free</span></a>
+        </div>
+      </div>
     </div>
   </div>
 </nav>
@@ -594,6 +737,94 @@ footer{background:var(--ink);color:var(--cream);padding:56px 48px 32px;}
     <span class="link-dark" style="cursor:pointer" onclick="window.location.href='https://cbusevents.com/events.html'">See all events →</span>
   </div>
 </div>
+
+
+<!-- WHAT'S HAPPENING / EVENTS FEED -->
+<div class="feed-section-wrap" id="liveFeedSection">
+  <div class="feed-header">
+    <div>
+      <div class="feed-eyebrow"><span class="feed-live-dot"></span>Columbus, Ohio</div>
+      <h2 class="feed-title" id="feedMainTitle">What's Happening <span>Tonight</span></h2>
+    </div>
+    <a href="https://cbusevents.com/events.html" style="background:none;border:none;cursor:pointer;color:var(--flame);font-family:var(--mono);font-size:10px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;text-decoration:none">View All &rarr;</a>
+  </div>
+
+  <div class="feed-primary-tabs">
+    <button class="feed-primary-tab active" id="tabEvents" onclick="switchFeedTab('events')">
+      <span class="feed-primary-tab-icon">🎟</span> Events
+    </button>
+    <button class="feed-primary-tab" id="tabCalendar" onclick="switchFeedTab('calendar')">
+      <span class="feed-primary-tab-icon">📍</span> Columbus Calendar
+      <span class="feed-primary-tab-badge" id="calendarBadge" style="display:none"></span>
+    </button>
+  </div>
+
+  <div id="feedEventsPanel">
+    <div class="feed-time-tabs" id="feedTimeTabs">
+      <button class="feed-time-tab active" data-filter="tonight" onclick="setFeedFilter('tonight',this)">Tonight</button>
+      <button class="feed-time-tab" data-filter="tomorrow" onclick="setFeedFilter('tomorrow',this)">Tomorrow</button>
+      <button class="feed-time-tab" data-filter="weekend" onclick="setFeedFilter('weekend',this)">This Weekend</button>
+      <button class="feed-time-tab" data-filter="week" onclick="setFeedFilter('week',this)">This Week</button>
+      <button class="feed-time-tab" data-filter="all" onclick="setFeedFilter('all',this)">All Upcoming</button>
+    </div>
+    <div class="feed-grid" id="liveFeedGrid">
+      <div class="feed-empty"><div class="feed-empty-icon">📅</div><div>Loading events...</div></div>
+    </div>
+    <button class="feed-load-more" id="feedLoadMore" style="display:none" onclick="feedLoadMore()">Load More Events</button>
+  </div>
+
+  <div id="feedCalendarPanel" style="display:none">
+    <div class="cal-toolbar">
+      <div class="feed-time-tabs" style="margin-bottom:0">
+        <button class="feed-time-tab active" data-cal="all" onclick="setCalFilter('all',this)">All</button>
+        <button class="feed-time-tab" data-cal="tonight" onclick="setCalFilter('tonight',this)">Tonight</button>
+        <button class="feed-time-tab" data-cal="weekend" onclick="setCalFilter('weekend',this)">Weekend</button>
+        <button class="feed-time-tab" data-cal="trending" onclick="setCalFilter('trending',this)">🔥 Trending</button>
+      </div>
+      <div class="cal-sort-row">
+        <span style="font-family:var(--mono);font-size:9px;color:#55556a;letter-spacing:0.1em;text-transform:uppercase">Sort:</span>
+        <button class="cal-sort-btn active" onclick="setCalSort('date',this)">Date</button>
+        <button class="cal-sort-btn" onclick="setCalSort('popular',this)">Most Liked</button>
+      </div>
+    </div>
+    <div id="calendarFeed">
+      <div class="feed-empty"><div class="feed-empty-icon">🗓</div><div>Loading Columbus Calendar...</div></div>
+    </div>
+    <button class="feed-load-more" id="calLoadMore" style="display:none" onclick="calLoadMore()">Load More</button>
+  </div>
+</div>
+
+<!-- CLAIM MODAL -->
+<div id="claimModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:600;align-items:center;justify-content:center;padding:20px" onclick="if(event.target===this)closeClaimModal()">
+  <div style="background:#1c1c30;border:1px solid rgba(255,255,255,0.12);border-radius:18px;max-width:460px;width:100%;padding:32px;position:relative">
+    <button onclick="closeClaimModal()" style="position:absolute;top:16px;right:16px;background:none;border:none;color:#8888b0;font-size:20px;cursor:pointer;line-height:1">✕</button>
+    <div style="font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:var(--flame);margin-bottom:8px">Claim This Event</div>
+    <div id="claimEventTitle" style="font-family:var(--display);font-size:18px;font-weight:900;margin-bottom:20px;line-height:1.2;color:#f4f4ff"></div>
+    <div id="claimFormBody">
+      <div style="margin-bottom:14px">
+        <label style="font-size:12px;color:#8888b0;font-weight:600;display:block;margin-bottom:6px">Your role</label>
+        <select id="claimRole" style="width:100%;background:#111128;border:1px solid rgba(255,255,255,0.09);border-radius:10px;padding:10px 13px;color:#f4f4ff;font-size:14px;outline:none">
+          <option value="">Select role...</option>
+          <option value="organizer">Event Organizer / Promoter</option>
+          <option value="venue">Venue Owner</option>
+          <option value="artist">Artist / Performer</option>
+          <option value="other">Other</option>
+        </select>
+      </div>
+      <div style="margin-bottom:14px">
+        <label style="font-size:12px;color:#8888b0;font-weight:600;display:block;margin-bottom:6px">Your email</label>
+        <input id="claimEmail" type="email" placeholder="you@email.com" style="width:100%;background:#111128;border:1px solid rgba(255,255,255,0.09);border-radius:10px;padding:10px 13px;color:#f4f4ff;font-size:14px;outline:none">
+      </div>
+      <div style="margin-bottom:18px">
+        <label style="font-size:12px;color:#8888b0;font-weight:600;display:block;margin-bottom:6px">Note (optional)</label>
+        <textarea id="claimNote" placeholder="Any additional details..." style="width:100%;background:#111128;border:1px solid rgba(255,255,255,0.09);border-radius:10px;padding:10px 13px;color:#f4f4ff;font-size:14px;outline:none;resize:none;min-height:70px"></textarea>
+      </div>
+      <button onclick="submitClaim()" style="width:100%;background:var(--flame);color:#fff;border:none;border-radius:10px;padding:13px;font-family:var(--mono);font-size:11px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;cursor:pointer">Submit Claim</button>
+      <div id="claimStatus" style="margin-top:10px;font-size:13px;text-align:center"></div>
+    </div>
+  </div>
+</div>
+
 
 <!-- COMMUNITY FEED -->
 <section class="feed-section" id="feed-section">
@@ -943,9 +1174,266 @@ const SB_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZ
 const sb=supabase.createClient(SB_URL,SB_KEY);
 const EDGE_FN_URL="https://toblgvatvsjljbqogzsv.supabase.co/functions/v1/email-capture";
 
-// ── THEME ─────────────────────────────────────────────────────
+
+// EVENTS STATE + FEED
+let allEvents=[],allVenues=[],allVendors=[],currentUser=null;
+const FEED_PAGE_SIZE=8;
+let feedFilter='tonight',feedPage=0,feedAllEvents=[],activeFeedTab='events';
+let calFilter='all',calSort='date',calPage=0,calEvents=[],userLikes=new Set();
+let openCommentId=null,claimTargetId=null;
+const FEED_ICONS=['🎵','🎭','🍕','🎤','🎨','🥂','🎪','🎶','🏆','🌆'];
+
+function fmt(dt){if(!dt)return'';return new Date(dt).toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric',timeZone:'America/New_York'});}
+function fmtTime(dt){if(!dt)return'';return new Date(dt).toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit',timeZone:'America/New_York'});}
+function isTonight(dt){const d=new Date(dt),n=new Date();return d>=new Date(n.getFullYear(),n.getMonth(),n.getDate())&&d<new Date(n.getFullYear(),n.getMonth(),n.getDate()+1);}
+function isTomorrow(dt){const d=new Date(dt),n=new Date();return d>=new Date(n.getFullYear(),n.getMonth(),n.getDate()+1)&&d<new Date(n.getFullYear(),n.getMonth(),n.getDate()+2);}
+function isThisWeekend(dt){const d=new Date(dt),n=new Date();const toFri=(5-n.getDay()+7)%7;const fri=new Date(n.getFullYear(),n.getMonth(),n.getDate()+toFri);const sun=new Date(n.getFullYear(),n.getMonth(),n.getDate()+toFri+2,23,59,59);return d>=fri&&d<=sun;}
+function isThisWeek7(dt){const d=new Date(dt),n=new Date();return d>=n&&d<=new Date(n.getTime()+7*24*60*60*1000);}
+
+function switchFeedTab(tab){
+  activeFeedTab=tab;
+  document.getElementById('tabEvents').classList.toggle('active',tab==='events');
+  document.getElementById('tabCalendar').classList.toggle('active',tab==='calendar');
+  document.getElementById('feedEventsPanel').style.display=tab==='events'?'':'none';
+  document.getElementById('feedCalendarPanel').style.display=tab==='calendar'?'':'none';
+  const titleEl=document.getElementById('feedMainTitle');
+  if(tab==='calendar'){if(titleEl)titleEl.innerHTML='Columbus <span>Calendar</span>';if(!calEvents.length)loadCalendarEvents();}
+  else{const titles={tonight:'Tonight',tomorrow:'Tomorrow',weekend:'This Weekend',week:'This Week',all:'Upcoming'};if(titleEl)titleEl.innerHTML='What\'s Happening <span>'+(titles[feedFilter]||'Soon')+'</span>';}
+}
+
+function getFeedFiltered(){
+  const pool=feedAllEvents.filter(e=>new Date(e.start_time)>=new Date());
+  if(feedFilter==='tonight')return pool.filter(e=>isTonight(e.start_time));
+  if(feedFilter==='tomorrow')return pool.filter(e=>isTomorrow(e.start_time));
+  if(feedFilter==='weekend')return pool.filter(e=>isThisWeekend(e.start_time));
+  if(feedFilter==='week')return pool.filter(e=>isThisWeek7(e.start_time));
+  return pool;
+}
+
+function setFeedFilter(f,btn){
+  feedFilter=f;feedPage=0;
+  document.querySelectorAll('.feed-time-tab').forEach(t=>t.classList.remove('active'));
+  if(btn)btn.classList.add('active');
+  const titles={tonight:'Tonight',tomorrow:'Tomorrow',weekend:'This Weekend',week:'This Week',all:'Upcoming'};
+  const titleEl=document.getElementById('feedMainTitle');
+  if(titleEl)titleEl.innerHTML='What\'s Happening <span>'+(titles[f]||'Soon')+'</span>';
+  renderFeed();
+}
+
+function feedCardHTML(e,idx){
+  const venueName=e.venue_name_override||(e.venues&&e.venues.name)||e.venue_name||'Columbus Venue';
+  const tonight=isTonight(e.start_time);
+  const icon=FEED_ICONS[idx%FEED_ICONS.length];
+  const img=e.cover_image_url?`<img src="${e.cover_image_url}" alt="${e.title}" loading="lazy" onerror="this.parentNode.innerHTML='<div class=feed-card-img-placeholder>${icon}</div>'">`:`<div class="feed-card-img-placeholder">${icon}</div>`;
+  const price=e.is_free?'<span class="feed-card-price free">Free</span>':(e.price_min?`<span class="feed-card-price paid">From ${e.price_min}</span>`:'');
+  const srcBadge=e.source_type==='external'?`<span class="feed-ext-badge">${e.source||'Columbus'}</span>`:'<span class="feed-source-badge">CBUS Events</span>';
+  const clickFn=e._festival_url?`window.location.href='${e._festival_url}'`:e.source_type==='external'?`window.open('${e.ticket_url||'#'}','_blank')`:`openEventModal('${e.id}')`;
+  return `<div class="feed-card" onclick="${clickFn}" role="button" tabindex="0">
+    <div class="feed-card-img">${img}${tonight?'<div class="feed-tonight-badge">Tonight</div>':''}${e.is_free?'<div class="feed-free-badge">Free</div>':''}</div>
+    <div class="feed-card-body">
+      <div class="feed-card-top"><span class="feed-card-cat">${e.category||'Event'}</span>${srcBadge}</div>
+      <div class="feed-card-title">${e.title}</div>
+      <div class="feed-card-venue">📍 ${venueName}</div>
+      <div class="feed-card-footer"><span class="feed-card-date">${fmt(e.start_time)}${fmtTime(e.start_time)?' · '+fmtTime(e.start_time):''}</span>${price}</div>
+    </div>
+  </div>`;
+}
+
+function renderFeed(){
+  const grid=document.getElementById('liveFeedGrid');
+  const loadBtn=document.getElementById('feedLoadMore');
+  if(!grid)return;
+  let filtered=getFeedFiltered();
+  if(!filtered.length&&feedFilter!=='all'){
+    const order=['tonight','tomorrow','weekend','week','all'];
+    for(const f of order.slice(order.indexOf(feedFilter)+1)){
+      const prev=feedFilter;feedFilter=f;filtered=getFeedFiltered();
+      if(filtered.length){
+        document.querySelectorAll('.feed-time-tab').forEach(t=>t.classList.toggle('active',t.dataset.filter===f));
+        const titles={tonight:'Tonight',tomorrow:'Tomorrow',weekend:'This Weekend',week:'This Week',all:'Upcoming'};
+        const el=document.getElementById('feedMainTitle');
+        if(el)el.innerHTML='What\'s Happening <span>'+(titles[f]||'Soon')+'</span>';
+        break;
+      }
+      feedFilter=prev;
+    }
+  }
+  const page=filtered.slice(0,(feedPage+1)*FEED_PAGE_SIZE);
+  if(!filtered.length){
+    grid.innerHTML=`<div class="feed-empty"><div class="feed-empty-icon">📅</div><div style="font-weight:600;margin-bottom:4px">No upcoming events yet</div><div style="font-size:13px;margin-top:4px">Be the first to <a href="https://cbusevents.com/signup.html" style="color:var(--flame);font-weight:600">post an event</a></div></div>`;
+    if(loadBtn)loadBtn.style.display='none';return;
+  }
+  grid.innerHTML=page.map((e,i)=>feedCardHTML(e,i)).join('');
+  if(loadBtn)loadBtn.style.display=page.length<filtered.length?'block':'none';
+}
+
+function feedLoadMore(){feedPage++;renderFeed();}
+
+function initFeed(){
+  feedAllEvents=(allEvents||[]).map(e=>({...e,source_type:'native'}));
+  if(!feedAllEvents.some(e=>e.title&&e.title.includes('1313'))){
+    feedAllEvents.unshift({id:'festival-1313',title:'1313 Festival',category:'Festival',start_time:'2026-06-13T11:00:00',end_time:'2026-06-13T20:00:00',is_free:true,_festival_url:'https://cbusevents.com/1313-festival-event.html',venues:{name:'1313 E. Broad St'},source_type:'native',is_boosted:true});
+  }
+  feedAllEvents.sort((a,b)=>new Date(a.start_time)-new Date(b.start_time));
+  renderFeed();
+  sb.from('external_events').select('id',{count:'exact',head:true}).eq('status','active').then(({count})=>{if(count>0){const b=document.getElementById('calendarBadge');if(b){b.textContent=count;b.style.display='';}}}).catch(()=>{});
+}
+
+async function loadCalendarEvents(){
+  const feed=document.getElementById('calendarFeed');
+  if(feed)feed.innerHTML='<div class="feed-empty"><div class="feed-empty-icon">🗓</div><div>Loading Columbus Calendar...</div></div>';
+  try{
+    const{data,error}=await sb.from('external_events').select('*').eq('status','active').gte('start_time',new Date().toISOString()).order('start_time',{ascending:true}).limit(100);
+    if(error)throw error;
+    calEvents=data||[];calPage=0;renderCalendar();
+  }catch(e){
+    if(feed)feed.innerHTML='<div class="feed-empty"><div class="feed-empty-icon">📡</div><div style="font-weight:600">Columbus Calendar syncing</div><div style="font-size:13px;margin-top:4px">External events load in progress</div></div>';
+  }
+}
+
+function getCalFiltered(){
+  let pool=[...calEvents];
+  if(calFilter==='tonight')pool=pool.filter(e=>isTonight(e.start_time));
+  if(calFilter==='weekend')pool=pool.filter(e=>isThisWeekend(e.start_time));
+  if(calFilter==='trending'||calSort==='popular')pool=[...pool].sort((a,b)=>b.like_count-a.like_count);
+  return pool;
+}
+function setCalFilter(f,btn){calFilter=f;calPage=0;document.querySelectorAll('[data-cal]').forEach(t=>t.classList.remove('active'));if(btn)btn.classList.add('active');renderCalendar();}
+function setCalSort(s,btn){calSort=s;calPage=0;document.querySelectorAll('.cal-sort-btn').forEach(t=>t.classList.remove('active'));if(btn)btn.classList.add('active');renderCalendar();}
+function calLoadMore(){calPage++;renderCalendar();}
+
+function calPostHTML(e,idx){
+  const icon=FEED_ICONS[idx%FEED_ICONS.length];
+  const liked=userLikes.has(e.id);
+  const img=e.cover_image_url?`<img src="${e.cover_image_url}" alt="${e.title}" loading="lazy" onerror="this.style.display='none'">`:`<div class="cal-post-img-placeholder">${icon}</div>`;
+  const srcLabel={ticketmaster:'Ticketmaster',eventbrite:'Eventbrite',rss:'Columbus Underground',manual:'Columbus'}[e.source]||e.source||'Columbus';
+  const price=e.is_free?'<span style="color:#30d693;font-weight:700;font-size:11px">Free</span>':(e.price_min?`<span style="font-size:11px">From ${e.price_min}</span>`:'');
+  return `<div class="cal-post" id="calpost-${e.id}">
+    <div class="cal-post-inner">
+      <div class="cal-post-img">${img}</div>
+      <div class="cal-post-body">
+        <div class="cal-post-top"><span class="cal-post-cat">${e.category||'Event'}</span><span class="cal-post-source">${srcLabel}</span></div>
+        <div class="cal-post-title" title="${e.title}">${e.title}</div>
+        <div class="cal-post-meta"><span>📍 ${e.venue_name||'Columbus'}</span><span>🕐 ${fmt(e.start_time)}${fmtTime(e.start_time)?' · '+fmtTime(e.start_time):''}</span>${price}</div>
+      </div>
+    </div>
+    <div class="cal-post-actions">
+      <button class="cal-action-btn${liked?' liked':''}" onclick="toggleCalLike('${e.id}',this)"><span>${liked?'❤️':'🤍'}</span><span class="cal-count" id="likecount-${e.id}">${e.like_count||0}</span></button>
+      <button class="cal-action-btn" onclick="toggleCalComments('${e.id}')"><span>💬</span><span class="cal-count" id="commentcount-${e.id}">${e.comment_count||0}</span> Comments</button>
+      ${e.ticket_url?`<button class="cal-action-btn" onclick="window.open('${e.ticket_url}','_blank')">🎟 Tickets</button>`:''}
+    </div>
+    <div class="cal-comments-drawer" id="comments-${e.id}"><div id="commentslist-${e.id}"></div>${currentUser?`<div class="cal-comment-input-row"><input class="cal-comment-input" id="commentinput-${e.id}" placeholder="Add a comment..." maxlength="500" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();submitComment('${e.id}');}"><button class="cal-comment-submit" onclick="submitComment('${e.id}')">Post</button></div>`:'<div style="text-align:center;padding:12px 0;font-size:13px;color:#55556a"><a href="https://cbusevents.com/signup.html" style="color:var(--flame);font-weight:600">Join free</a> to comment</div>'}</div>
+    <div class="cal-post-claim"><button class="cal-claim-link" onclick="openClaimModal('${e.id}','${e.title.replace(/'/g,\"\\'\")}')">Is this your event? Claim it</button></div>
+  </div>`;
+}
+
+function renderCalendar(){
+  const feed=document.getElementById('calendarFeed');
+  const loadBtn=document.getElementById('calLoadMore');
+  if(!feed)return;
+  const filtered=getCalFiltered();
+  const page=filtered.slice(0,(calPage+1)*FEED_PAGE_SIZE);
+  if(!filtered.length){feed.innerHTML=`<div class="feed-empty"><div class="feed-empty-icon">📡</div><div style="font-weight:600;margin-bottom:4px">No events found</div><div style="font-size:13px">Try a different filter</div></div>`;if(loadBtn)loadBtn.style.display='none';return;}
+  feed.innerHTML=page.map((e,i)=>calPostHTML(e,i)).join('');
+  if(loadBtn)loadBtn.style.display=page.length<filtered.length?'block':'none';
+}
+
+async function toggleCalLike(eventId,btn){
+  if(!currentUser){window.location.href='https://cbusevents.com/signup.html';return;}
+  const liked=userLikes.has(eventId);
+  const countEl=document.getElementById('likecount-'+eventId);
+  const current=parseInt(countEl?.textContent||'0');
+  if(liked){userLikes.delete(eventId);btn.classList.remove('liked');btn.querySelector('span').textContent='🤍';if(countEl)countEl.textContent=Math.max(0,current-1);}
+  else{userLikes.add(eventId);btn.classList.add('liked');btn.querySelector('span').textContent='❤️';if(countEl)countEl.textContent=current+1;}
+  try{if(liked){await sb.from('external_event_likes').delete().eq('external_event_id',eventId).eq('user_id',currentUser.id);}else{await sb.from('external_event_likes').insert({external_event_id:eventId,user_id:currentUser.id});}}
+  catch(e){if(liked){userLikes.add(eventId);}else{userLikes.delete(eventId);}renderCalendar();}
+}
+
+async function toggleCalComments(eventId){
+  const drawer=document.getElementById('comments-'+eventId);
+  if(!drawer)return;
+  const isOpen=drawer.classList.contains('open');
+  document.querySelectorAll('.cal-comments-drawer.open').forEach(d=>d.classList.remove('open'));
+  if(isOpen){openCommentId=null;return;}
+  openCommentId=eventId;drawer.classList.add('open');await loadComments(eventId);
+}
+
+async function loadComments(eventId){
+  const list=document.getElementById('commentslist-'+eventId);
+  if(!list)return;
+  list.innerHTML='<div style="font-size:12px;color:#55556a;padding:4px 0">Loading...</div>';
+  try{
+    const{data}=await sb.from('external_event_comments').select('*,profiles:user_id(full_name,email)').eq('external_event_id',eventId).eq('is_flagged',false).order('created_at',{ascending:true}).limit(50);
+    if(!data?.length){list.innerHTML='<div style="font-size:12px;color:#55556a;padding:4px 0">No comments yet. Be the first.</div>';return;}
+    list.innerHTML=(data||[]).map(c=>{
+      const name=c.profiles?.full_name||c.profiles?.email?.split('@')[0]||'Anonymous';
+      return `<div class="cal-comment-item"><div class="cal-comment-avatar">${name.charAt(0).toUpperCase()}</div><div class="cal-comment-bubble"><div class="cal-comment-author">${name}</div><div class="cal-comment-body">${c.body}</div></div></div>`;
+    }).join('');
+  }catch(e){list.innerHTML='<div style="font-size:12px;color:#55556a">Could not load comments.</div>';}
+}
+
+async function submitComment(eventId){
+  if(!currentUser){window.location.href='https://cbusevents.com/signup.html';return;}
+  const input=document.getElementById('commentinput-'+eventId);
+  const body=input?.value?.trim();if(!body)return;
+  input.value='';input.disabled=true;
+  try{await sb.from('external_event_comments').insert({external_event_id:eventId,user_id:currentUser.id,body});const c=document.getElementById('commentcount-'+eventId);if(c)c.textContent=parseInt(c.textContent||'0')+1;await loadComments(eventId);}
+  catch(e){input.value=body;}finally{input.disabled=false;input.focus();}
+}
+
+function openClaimModal(eventId,eventTitle){
+  claimTargetId=eventId;
+  const modal=document.getElementById('claimModal');
+  const titleEl=document.getElementById('claimEventTitle');
+  const status=document.getElementById('claimStatus');
+  if(titleEl)titleEl.textContent=eventTitle;if(status)status.innerHTML='';
+  const emailInput=document.getElementById('claimEmail');
+  if(emailInput&&currentUser)emailInput.value=currentUser.email||'';
+  if(modal)modal.style.display='flex';
+}
+function closeClaimModal(){const modal=document.getElementById('claimModal');if(modal)modal.style.display='none';claimTargetId=null;}
+async function submitClaim(){
+  const role=document.getElementById('claimRole')?.value;
+  const email=document.getElementById('claimEmail')?.value?.trim();
+  const note=document.getElementById('claimNote')?.value?.trim();
+  const status=document.getElementById('claimStatus');
+  if(!role){if(status)status.innerHTML='<span style="color:var(--flame)">Please select your role.</span>';return;}
+  if(!email||!email.includes('@')){if(status)status.innerHTML='<span style="color:var(--flame)">Enter a valid email.</span>';return;}
+  if(status)status.innerHTML='<span style="color:#8888b0">Submitting...</span>';
+  try{await sb.from('event_claims').insert({external_event_id:claimTargetId,claimant_user_id:currentUser?.id||null,claimant_email:email,claimant_role:role,note:note||null,status:'pending'});if(status)status.innerHTML='<span style="color:#30d693">✓ Claim submitted! We\'ll review and reach out within 24 hours.</span>';setTimeout(closeClaimModal,2500);}
+  catch(e){if(status)status.innerHTML='<span style="color:var(--flame)">Something went wrong. Try again.</span>';}
+}
+
+// Event modal stub (opens events page)
+function openEventModal(id){window.location.href='https://cbusevents.com/events.html';}
+
+
+// NAV DROPDOWNS
+function toggleColumbusMenu(){
+  const m=document.getElementById('columbusMenu');
+  if(m)m.style.display=m.style.display==='none'?'block':'none';
+}
+function toggleJoinMenu(){
+  const m=document.getElementById('joinMenu');
+  if(m)m.style.display=m.style.display==='none'?'block':'none';
+}
+function toggleSigninMenu(){
+  const m=document.getElementById('signinMenu');
+  if(m)m.style.display=m.style.display==='none'?'block':'none';
+}
+document.addEventListener('click',function(e){
+  ['columbusDropdown','joinDropdown','signinDropdown'].forEach(id=>{
+    const wrap=document.getElementById(id);
+    if(wrap&&!wrap.contains(e.target)){
+      const menu=wrap.querySelector('[id$="Menu"]');
+      if(menu)menu.style.display='none';
+    }
+  });
+});
+
+// THEME
 (function(){
-  const stored=localStorage.getItem('cbusevents_theme')||'light';
+  const stored=localStorage.getItem('cbusevents_theme')||'dark';
   applyTheme(stored);
 })();
 function applyTheme(t){
@@ -953,13 +1441,20 @@ function applyTheme(t){
   localStorage.setItem('cbusevents_theme',t);
   const btn=document.getElementById('themeToggle');
   if(btn)btn.textContent=t==='dark'?'☀️':'🌙';
+  // Update dropdown backgrounds for dark mode
+  const dropBg=t==='dark'?'#1c1c30':'white';
+  const dropBorder=t==='dark'?'rgba(255,255,255,0.09)':'var(--rule)';
+  ['columbusMenu','joinMenu','signinMenu'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el){el.style.background=dropBg;el.style.borderColor=dropBorder;}
+  });
 }
 function toggleTheme(){
   const current=document.documentElement.getAttribute('data-theme')||'light';
   applyTheme(current==='dark'?'light':'dark');
 }
 
-// ── DATEBAR DATE ───────────────────────────────────────────────
+// DATEBAR DATE
 (function(){
   const el=document.getElementById('datebar-date');
   if(el){
@@ -968,29 +1463,30 @@ function toggleTheme(){
   }
 })();
 
-// ── REVEAL OBSERVER ───────────────────────────────────────────
+// REVEAL OBSERVER
 const revealObs=new IntersectionObserver(entries=>{
   entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('in');});
 },{threshold:0.07,rootMargin:'0px 0px -24px 0px'});
 document.querySelectorAll('.reveal').forEach(el=>revealObs.observe(el));
 
-// ── NAV AUTH ─────────────────────────────────────────────────
+// NAV AUTH
 async function initNavAuth(){
   try{
     const{data:{session}}=await sb.auth.getSession();
-    const navRight=document.getElementById('navRight');
-    if(!navRight)return;
+    const signinDrop=document.getElementById('signinDropdown');
+    const joinDrop=document.getElementById('joinDropdown');
     if(session?.user){
       const{data:roleData}=await sb.from('user_roles').select('role').eq('user_id',session.user.id).maybeSingle();
       const role=roleData?.role||'customer';
       const portalUrls={venue_owner:'https://cbusevents.com/cbus-venue-portal.html',vendor:'https://cbusevents.com/cbus-vendor-portal.html',organizer:'https://cbusevents.com/cbus-organizer-portal.html',customer:'https://cbusevents.com/customer-portal.html'};
       const portalLabels={venue_owner:'Venue Portal',vendor:'Vendor Portal',organizer:'Organizer Portal',customer:'My Account'};
-      navRight.innerHTML=`<a href="${portalUrls[role]||portalUrls.customer}" class="nav-portal">${portalLabels[role]||'My Account'} &rarr;</a><button onclick="sb.auth.signOut().then(()=>window.location.reload())" style="font-family:var(--mono);font-size:9px;letter-spacing:0.14em;text-transform:uppercase;color:var(--mist);background:none;border:none;cursor:pointer;padding:0;">Sign Out</button>`;
+      if(signinDrop) signinDrop.innerHTML=`<a href="${portalUrls[role]||portalUrls.customer}" class="nav-join" style="font-size:12px">${portalLabels[role]||'My Account'}</a>`;
+      if(joinDrop) joinDrop.innerHTML=`<button onclick="sb.auth.signOut().then(()=>window.location.reload())" style="font-family:var(--mono);font-size:9px;letter-spacing:0.14em;text-transform:uppercase;color:var(--mist);background:none;border:none;cursor:pointer;padding:0;">Sign Out</button>`;
     }
   }catch(e){console.warn('Nav auth error:',e);}
 }
 
-// ── LOAD LIVE DATA ────────────────────────────────────────────
+// LOAD LIVE DATA
 async function loadLiveData(){
   try{
     // Parallel: events, gigs, follower count for Deante
@@ -1000,7 +1496,10 @@ async function loadLiveData(){
       sb.from('profile_follows').select('id',{count:'exact',head:true}).eq('following_id','dcae39de-9265-4d67-b8be-5d0ca599069b'),
     ]);
 
-    const events=eventsRes.data||[];
+    allEvents=eventsRes.data||[];
+    const events=allEvents;
+    // Init the events feed with live data
+    initFeed();
     const gigs=gigsRes.data||[];
     const followerCount=followRes.count||0;
 
@@ -1131,7 +1630,7 @@ function timeAgo(dt){
   return new Date(dt).toLocaleDateString('en-US',{month:'short',day:'numeric'});
 }
 
-// ── EMAIL CAPTURE ─────────────────────────────────────────────
+// EMAIL CAPTURE
 async function submitCapture(source){
   const input=document.getElementById('captureEmail');
   const status=document.getElementById('captureStatus');
@@ -1156,7 +1655,7 @@ async function submitCapture(source){
   }
 }
 
-// ── INIT ─────────────────────────────────────────────────────
+// INIT
 initNavAuth();
 loadLiveData();
 </script>
