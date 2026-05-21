@@ -594,10 +594,9 @@ footer{background:var(--ink);color:var(--cream);padding:56px 48px 32px;}
         </div>
       </div>
       <div class="hero-stats">
-        <div><div class="stat-num" id="stat-venues">15<sup>+</sup></div><div class="stat-lbl">Active Venues</div></div>
-        <div><div class="stat-num" id="stat-vendors">23<sup>+</sup></div><div class="stat-lbl">Local Vendors</div></div>
-        <div><div class="stat-num" id="stat-events">5</div><div class="stat-lbl">Events Live</div></div>
-        <div><div class="stat-num">312<sup>+</sup></div><div class="stat-lbl">Members</div></div>
+        <div><div class="stat-num" id="stat-venues">—</div><div class="stat-lbl">Active Venues</div></div>
+        <div><div class="stat-num" id="stat-vendors">—</div><div class="stat-lbl">Local Vendors</div></div>
+        <div><div class="stat-num" id="stat-events">—</div><div class="stat-lbl">Events Live</div></div>
       </div>
     </div>
     <div class="hero-right">
@@ -859,7 +858,7 @@ footer{background:var(--ink);color:var(--cream);padding:56px 48px 32px;}
           <button class="vtp-apply" onclick="window.location.href='https://cbusevents.com/1313-festival-event.html'">Apply for a Table</button>
         </div>
         <div class="lk-divider"></div>
-        <div class="lk-foot"><span class="lk-count" id="feed-post1-likes">34 reactions</span><div class="lk-actions"><button class="lk-btn">&#128079; Like</button><button class="lk-btn">&#128172; Comment</button></div></div>
+        <div class="lk-foot"><span class="lk-count" id="feed-post1-likes">0 reactions</span><div class="lk-actions"><button class="lk-btn">&#128079; Like</button><button class="lk-btn">&#128172; Comment</button></div></div>
       </div>
 
       <!-- POST 2: New event broadcast -->
@@ -882,7 +881,7 @@ footer{background:var(--ink);color:var(--cream);padding:56px 48px 32px;}
           <button class="eb-cta" onclick="window.location.href='https://cbusevents.com/1313-festival-event.html'">Get Tickets</button>
         </div>
         <div class="lk-divider" style="margin-top:12px"></div>
-        <div class="lk-foot"><span class="lk-count">58 interested</span><div class="lk-actions"><button class="lk-btn">&#128197; Interested</button><button class="lk-btn">&#128172; Share</button></div></div>
+        <div class="lk-foot"><span class="lk-count">0 interested</span><div class="lk-actions"><button class="lk-btn">&#128197; Interested</button><button class="lk-btn">&#128172; Share</button></div></div>
       </div>
 
       <!-- POST 3: Vendor claims spot - loads from collab_posts -->
@@ -898,7 +897,7 @@ footer{background:var(--ink);color:var(--cream);padding:56px 48px 32px;}
         </div>
         <div class="lk-body">Just claimed my vendor spot at the <strong>Short North Rooftop Dinner Series</strong> through CBUSEVENTS. Third event booked through the platform this summer. Planners — my profile is live. <span class="lk-tag">#ColumbusFood</span> <span class="lk-tag">#VendorLife</span></div>
         <div class="lk-divider"></div>
-        <div class="lk-foot"><span class="lk-count">29 reactions</span><div class="lk-actions"><button class="lk-btn">&#128079; Congrats</button><button class="lk-btn">&#128172; Comment</button></div></div>
+        <div class="lk-foot"><span class="lk-count">0 reactions</span><div class="lk-actions"><button class="lk-btn">&#128079; Congrats</button><button class="lk-btn">&#128172; Comment</button></div></div>
       </div>
 
       <!-- POST 4: Venue announces availability -->
@@ -922,7 +921,7 @@ footer{background:var(--ink);color:var(--cream);padding:56px 48px 32px;}
           <button class="eb-cta" style="background:var(--gold)" onclick="window.location.href='https://cbusevents.com/venues.html'">View Profile</button>
         </div>
         <div class="lk-divider" style="margin-top:12px"></div>
-        <div class="lk-foot"><span class="lk-count">17 reactions</span><div class="lk-actions"><button class="lk-btn">&#128079; Like</button><button class="lk-btn">&#128172; Comment</button></div></div>
+        <div class="lk-foot"><span class="lk-count">0 reactions</span><div class="lk-actions"><button class="lk-btn">&#128079; Like</button><button class="lk-btn">&#128172; Comment</button></div></div>
       </div>
 
     </div>
@@ -955,24 +954,15 @@ footer{background:var(--ink);color:var(--cream);padding:56px 48px 32px;}
       </div>
 
       <div class="sb-card">
-        <div class="sb-title">Members to Follow</div>
-        <div class="follow-list" id="sidebar-members">
+        <div class="sb-title">On the Platform</div>
+        <div class="follow-list">
           <div class="follow-row">
-            <div class="follow-av av-org">D</div>
+            <div class="follow-av av-org" id="sidebar-founder-av">D</div>
             <div class="follow-info"><div class="follow-name">Deante Gray</div><div class="follow-role-lbl">Event Organizer</div></div>
             <button class="follow-btn" onclick="window.location.href='https://cbusevents.com/organizer-profile.html?id=dcae39de-9265-4d67-b8be-5d0ca599069b'">Follow</button>
           </div>
-          <div class="follow-row">
-            <div class="follow-av av-venue">V</div>
-            <div class="follow-info"><div class="follow-name">Venue 400</div><div class="follow-role-lbl">Venue, Short North</div></div>
-            <button class="follow-btn">Follow</button>
-          </div>
-          <div class="follow-row">
-            <div class="follow-av av-food">C</div>
-            <div class="follow-info"><div class="follow-name">Chef Cleo</div><div class="follow-role-lbl">Food Professional</div></div>
-            <button class="follow-btn">Follow</button>
-          </div>
         </div>
+        <div style="margin-top:12px;padding-top:10px;border-top:1px solid var(--rule);font-size:11px;color:var(--mist);font-family:var(--mono);letter-spacing:0.08em">More profiles coming as the community grows.</div>
       </div>
 
       <div class="join-sidebar">
@@ -980,9 +970,8 @@ footer{background:var(--ink);color:var(--cream);padding:56px 48px 32px;}
         <div class="join-h">Your next gig, booking, or vendor is already here.</div>
         <a href="https://cbusevents.com/signup.html" class="join-btn">Create Free Profile</a>
         <div class="join-counts">
-          <div><div class="jc-num" id="sb-member-ct">312</div><div class="jc-lbl">Members</div></div>
+          <div><div class="jc-num" id="sb-event-ct">—</div><div class="jc-lbl">Events Live</div></div>
           <div><div class="jc-num" id="sb-gig-ct">—</div><div class="jc-lbl">Open Gigs</div></div>
-          <div><div class="jc-num" id="sb-event-ct">5</div><div class="jc-lbl">Events Live</div></div>
         </div>
       </div>
     </div>
@@ -1057,9 +1046,8 @@ footer{background:var(--ink);color:var(--cream);padding:56px 48px 32px;}
       <div class="sc-role">Founder · Event Organizer · Columbus</div>
       <p class="sc-bio">Built CBUSEVENTS solo in under a week and launched March 9, 2026. Produces the 1313 Festival series at 1313 E. Broad St. Sources his entire vendor roster through the platform — vendor tables filled, staff confirmed, all managed in one place.</p>
       <div class="sc-stats">
-        <div><div class="sc-sn" id="spotlight-events">3</div><div class="sc-sl">Events Live</div></div>
-        <div><div class="sc-sn" id="spotlight-vendors">15+</div><div class="sc-sl">Vendors Placed</div></div>
-        <div><div class="sc-sn" id="spotlight-followers">0</div><div class="sc-sl">Followers</div></div>
+        <div><div class="sc-sn" id="spotlight-events">—</div><div class="sc-sl">Events Live</div></div>
+        <div><div class="sc-sn" id="spotlight-followers">—</div><div class="sc-sl">Followers</div></div>
       </div>
     </div>
 
@@ -1074,9 +1062,9 @@ footer{background:var(--ink);color:var(--cream);padding:56px 48px 32px;}
         <a href="https://cbusevents.com/signup.html?role=venue" class="btn-outline" style="text-align:center;border-color:rgba(255,255,255,0.2);color:white">List Your Venue</a>
       </div>
       <div style="margin-top:24px;display:flex;gap:20px">
-        <div><div style="font-family:var(--display);font-size:22px;font-weight:900;color:white" id="cta-members">312<sup style="font-size:12px;color:var(--flame)">+</sup></div><div style="font-family:var(--mono);font-size:7px;letter-spacing:0.14em;text-transform:uppercase;color:rgba(250,247,242,0.35);margin-top:3px">Members</div></div>
-        <div><div style="font-family:var(--display);font-size:22px;font-weight:900;color:white" id="cta-venues">15<sup style="font-size:12px;color:var(--flame)">+</sup></div><div style="font-family:var(--mono);font-size:7px;letter-spacing:0.14em;text-transform:uppercase;color:rgba(250,247,242,0.35);margin-top:3px">Venues</div></div>
-        <div><div style="font-family:var(--display);font-size:22px;font-weight:900;color:white" id="cta-gigs">0</div><div style="font-family:var(--mono);font-size:7px;letter-spacing:0.14em;text-transform:uppercase;color:rgba(250,247,242,0.35);margin-top:3px">Open Gigs</div></div>
+        <div><div style="font-family:var(--display);font-size:22px;font-weight:900;color:white" id="cta-venues">—</div><div style="font-family:var(--mono);font-size:7px;letter-spacing:0.14em;text-transform:uppercase;color:rgba(250,247,242,0.35);margin-top:3px">Venues</div></div>
+        <div><div style="font-family:var(--display);font-size:22px;font-weight:900;color:white" id="cta-events">—</div><div style="font-family:var(--mono);font-size:7px;letter-spacing:0.14em;text-transform:uppercase;color:rgba(250,247,242,0.35);margin-top:3px">Events Live</div></div>
+        <div><div style="font-family:var(--display);font-size:22px;font-weight:900;color:white" id="cta-gigs">—</div><div style="font-family:var(--mono);font-size:7px;letter-spacing:0.14em;text-transform:uppercase;color:rgba(250,247,242,0.35);margin-top:3px">Open Gigs</div></div>
       </div>
     </div>
   </div>
@@ -1489,19 +1477,37 @@ async function initNavAuth(){
 // LOAD LIVE DATA
 async function loadLiveData(){
   try{
-    // Parallel: events, gigs, follower count for Deante
-    const[eventsRes,gigsRes,followRes]=await Promise.all([
+    // Parallel: events, gigs, follower count, venue count, vendor count
+    const[eventsRes,gigsRes,followRes,venueRes,vendorRes]=await Promise.all([
       sb.from('events').select('id,title,start_time,venue_name_override,is_free,venues(name)').eq('status','published').gte('start_time',new Date().toISOString()).order('start_time',{ascending:true}).limit(5),
       sb.from('collab_gigs').select('*').eq('status','open').order('created_at',{ascending:false}).limit(6),
       sb.from('profile_follows').select('id',{count:'exact',head:true}).eq('following_id','dcae39de-9265-4d67-b8be-5d0ca599069b'),
+      sb.from('venues').select('id',{count:'exact',head:true}).eq('status','approved'),
+      sb.from('vendors').select('id',{count:'exact',head:true}),
     ]);
 
     allEvents=eventsRes.data||[];
     const events=allEvents;
-    // Init the events feed with live data
-    initFeed();
     const gigs=gigsRes.data||[];
     const followerCount=followRes.count||0;
+    const venueCount=venueRes.count||0;
+    const vendorCount=vendorRes.count||0;
+
+    // Update hero stats with real live counts
+    const statVenues=document.getElementById('stat-venues');
+    const statVendors=document.getElementById('stat-vendors');
+    if(statVenues)statVenues.innerHTML=venueCount||'—';
+    if(statVendors)statVendors.innerHTML=vendorCount||'—';
+
+    // CTA panel counts
+    const ctaVenues=document.getElementById('cta-venues');
+    const ctaEvents=document.getElementById('cta-events');
+    const ctaGigs=document.getElementById('cta-gigs');
+    if(ctaVenues)ctaVenues.textContent=venueCount||'—';
+    if(ctaGigs)ctaGigs.textContent=gigs.length||0;
+
+    // Init the events feed with live data
+    initFeed();
 
     // Update events strip if we have data
     if(events.length>0){
@@ -1536,11 +1542,12 @@ async function loadLiveData(){
           </div>`;
         }).join('');
       }
-      // Update stat
+      // Update stat elements
       const statEvts=document.getElementById('stat-events');
       if(statEvts)statEvts.textContent=events.length;
       const sbEvtCt=document.getElementById('sb-event-ct');
       if(sbEvtCt)sbEvtCt.textContent=events.length;
+      if(ctaEvents)ctaEvents.textContent=events.length;
     }
 
     // Update collab board
@@ -1567,13 +1574,11 @@ async function loadLiveData(){
       gigList.querySelectorAll('.reveal').forEach(el=>revealObs.observe(el));
     }
 
-    // Update follower count in spotlight + CTA panel
+    // Update spotlight card with real counts
     const sfEl=document.getElementById('spotlight-followers');
     if(sfEl)sfEl.textContent=followerCount;
-    const ctaGigs=document.getElementById('cta-gigs');
-    if(ctaGigs)ctaGigs.textContent=gigs.length;
-    const ctaVenues=document.getElementById('cta-venues');
-    if(ctaVenues&&events.length)ctaVenues.textContent=(eventsRes.data||[]).length||'15';
+    const spEvts=document.getElementById('spotlight-events');
+    if(spEvts)spEvts.textContent=events.length||0;
 
     // Load real avatar for spotlight
     try{
