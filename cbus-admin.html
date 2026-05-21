@@ -967,7 +967,7 @@ function renderDashboard(){
         {label:'Food pros',val:allFoodPros.length,total:null,color:'var(--gold)',click:"nav('foodpros')"},
       ].map(s=>`
         <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px 18px;cursor:pointer;transition:border-color .15s" onclick="${s.click}" onmouseover="this.style.borderColor='rgba(255,107,53,.2)'" onmouseout="this.style.borderColor='var(--border)'">
-          <div style="font-size:24px;font-weight:800;color:${s.color};line-height:1;margin-bottom:4px">${s.val}${s.total!==null?'<span style="font-size:13px;color:var(--muted);font-weight:500"> / '+s.total+'</span>':''}</div>
+          <div style="font-size:24px;font-weight:800;color:${s.color};line-height:1;margin-bottom:4px">${s.val}${s.total!=null?' <span style="font-size:13px;color:var(--muted);font-weight:500">/ '+s.total+'<\/span>':''}</div>
           <div style="font-size:11px;color:var(--sub)">${s.label}</div>
           <div style="height:3px;background:var(--border);border-radius:99px;margin-top:10px;overflow:hidden"><div style="height:100%;background:${s.color};border-radius:99px;width:${s.total?Math.min(100,Math.round(s.val/s.total*100)):100}%;transition:width .6s ease"></div></div>
         </div>`).join('')}
@@ -1058,29 +1058,6 @@ function renderDashboard(){
             </div>`).join('')}
         </div>`
       )}
-    </div>
-  `;
-        <div style="display:flex;flex-direction:column;gap:14px">
-          ${[
-            {icon:'🏟️',label:'Venues active',val:approved,max:allVenues.length||1,color:'var(--orange)'},
-            {icon:'📅',label:'Events live',val:liveEvents,max:Math.max(allEvents.length,1),color:'var(--purple,#a855f7)'},
-            {icon:'🏪',label:'Vendor storefronts',val:activeVendors,max:Math.max(totalVendors,1),color:'var(--green)'},
-            {icon:'👥',label:'Total members',val:organizerCount+attendeeCount,max:500,color:'var(--blue)'},
-            {icon:'💬',label:'Open inquiries',val:newInq,max:Math.max(allInquiries.length,1),color:'var(--gold)'},
-          ].map(h=>`
-            <div style="display:flex;align-items:center;gap:12px">
-              <div style="font-size:15px;width:20px;text-align:center">${h.icon}</div>
-              <div style="flex:1">
-                <div style="font-size:12px;color:var(--sub);margin-bottom:4px">${h.label}</div>
-                <div style="height:4px;background:var(--border);border-radius:99px;overflow:hidden">
-                  <div style="height:100%;width:${Math.min(100,Math.round(h.val/h.max*100))}%;background:${h.color};border-radius:99px;transition:width .6s ease"></div>
-                </div>
-              </div>
-              <div style="font-family:var(--mono);font-size:12px;font-weight:500;color:var(--text);flex-shrink:0;min-width:28px;text-align:right">${h.val}</div>
-            </div>`).join('')}
-        </div>
-      </div>
-
     </div>
   `;
 }
