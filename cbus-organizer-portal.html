@@ -2012,74 +2012,195 @@ async function renderBilling(){
 // ── DASHBOARD ─────────────────────────────────────────────────
 function renderDashboard(){
  const name=currentUser.user_metadata?.full_name||currentUser.email.split('@')[0];
- const newInq=myInquiries.filter(i=>i.status==='new').length;
- const hasVenue=myInquiries.length>0;
- const hasEvent=myEvents.length>0;
- const isReturning=myInquiries.length>0||myEvents.length>0;
- const profileDone=!!(currentUser.user_metadata?.full_name);
+ const firstName=name.split(' ')[0];
 
- const steps=[
-   {label:'Complete your profile',desc:'Add your name, phone, and specialty so venues know who you are.',done:profileDone,action:"nav('profile')",cta:'Set up profile'},
-   {label:'Find a venue',desc:`Browse ${allVenues.length} Columbus venues and send a booking inquiry.`,done:hasVenue,action:"nav('venues')",cta:'Browse venues'},
-   {label:'Start planning your event',desc:'Give your event a name and date. You can publish to the directory when ready.',done:hasEvent,action:'openAddEventModal()',cta:'Start planning'},
-   {label:'Find vendors',desc:'Search for caterers, DJs, photographers, and more to complete your lineup.',done:false,action:"nav('vendors')",cta:'Browse vendors'},
-   {label:'Publish and promote',desc:'List your event publicly on the Columbus directory to drive RSVPs.',done:myEvents.some(e=>e.status==="published"),action:"nav('events')",cta:'View my events'},
- ];
- const doneCount=steps.filter(s=>s.done).length;
- const pct=Math.round((doneCount/steps.length)*100);
-
- document.getElementById('app').innerHTML=`
- <div class="page">
-   <div style="margin-bottom:28px">
-     <h1 style="font-size:26px;font-weight:800;margin-bottom:4px">${isReturning?`Welcome back, ${name.split(' ')[0]}!`:`Let's plan your event, ${name.split(' ')[0]}.`}</h1>
-     <p style="color:var(--sub);font-size:14px">${isReturning?"Here's where you left off.":'Follow these steps to plan and launch your first Columbus event.'}</p>
-   </div>
-
-   <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:20px 24px;margin-bottom:20px">
-     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
-       <div style="font-weight:700;font-size:14px">Event Organizer Checklist</div>
-       <div style="font-family:'DM Mono',monospace;font-size:12px;color:var(--sub)">${doneCount}/${steps.length} complete</div>
+ if(!myEvents.length){
+   const profileDone=!!(currentUser.user_metadata?.full_name);
+   const hasVenue=myInquiries.length>0;
+   const steps=[
+     {label:'Complete your profile',desc:'Add your name, phone, and specialty so venues know who you are.',done:profileDone,action:"nav('profile')",cta:'Set up profile'},
+     {label:'Find a venue',desc:'Browse Columbus venues and send a booking inquiry.',done:hasVenue,action:"nav('venues')",cta:'Browse venues'},
+     {label:'Create your event',desc:'Give your event a name and date. Publish when ready.',done:false,action:'openAddEventModal()',cta:'Start planning'},
+     {label:'Open vendor applications',desc:'Post vendor table spots and collect spot fees through the platform.',done:false,action:"nav('vendortables')",cta:'Post spots'},
+     {label:'Publish and promote',desc:'List your event publicly on the Columbus directory.',done:false,action:"nav('events')",cta:'View events'},
+   ];
+   const doneCount=steps.filter(s=>s.done).length;
+   const pct=Math.round((doneCount/steps.length)*100);
+   document.getElementById('app').innerHTML=`
+   <div class="page">
+     <div style="margin-bottom:24px">
+       <div style="display:inline-flex;align-items:center;gap:6px;background:rgba(255,107,53,0.1);border:1px solid rgba(255,107,53,0.25);color:var(--orange);border-radius:99px;padding:4px 14px;font-size:11px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:14px">For Event Organizers</div>
+       <h1 style="font-size:clamp(22px,3vw,32px);font-weight:800;margin-bottom:6px">Let's build your event, ${firstName}.</h1>
+       <p style="color:var(--sub);font-size:14px">Follow these steps to plan and launch your first Columbus event.</p>
      </div>
-     <div style="height:6px;background:var(--border);border-radius:99px;overflow:hidden">
-       <div style="height:100%;width:${pct}%;background:var(--orange);border-radius:99px;transition:width 0.6s ease"></div>
+     <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px 22px;margin-bottom:16px">
+       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+         <span style="font-weight:700;font-size:13px">Getting started</span>
+         <span style="font-size:12px;color:var(--sub);font-family:var(--mono)">${doneCount}/${steps.length} complete</span>
+       </div>
+       <div style="height:5px;background:var(--border);border-radius:99px;overflow:hidden">
+         <div style="height:100%;width:${pct}%;background:var(--orange);border-radius:99px;transition:width 0.6s ease"></div>
+       </div>
      </div>
-   </div>
+     <div style="display:flex;flex-direction:column;gap:8px">
+       ${steps.map((s,i)=>`
+       <div onclick="${s.done?'':s.action}" style="background:var(--card);border:1px solid ${s.done?'rgba(52,211,153,0.2)':'var(--border)'};border-radius:14px;padding:16px 20px;display:flex;align-items:center;gap:14px;cursor:${s.done?'default':'pointer'};${s.done?'opacity:0.55':''}">
+         <div style="width:30px;height:30px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;${s.done?'background:rgba(52,211,153,0.12);border:1.5px solid rgba(52,211,153,0.3);color:var(--green)':'background:var(--surface);border:1.5px solid var(--border);color:var(--muted)'}">
+           ${s.done?'<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/><\/svg>':`${i+1}`}
+         </div>
+         <div style="flex:1;min-width:0">
+           <div style="font-weight:700;font-size:13px;margin-bottom:2px;${s.done?'text-decoration:line-through;color:var(--sub)':''}">${s.label}</div>
+           <div style="font-size:12px;color:var(--muted);line-height:1.5">${s.desc}</div>
+         </div>
+         ${s.done?'':`<button class="btn btn-primary btn-sm" onclick="event.stopPropagation();${s.action}" style="white-space:nowrap;flex-shrink:0">${s.cta} &rarr;</button>`}
+       </div>`).join('')}
+     </div>
+   </div>`;
+   return;
+ }
 
-   <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:28px">
-     ${steps.map((s,i)=>`
-     <div onclick="${s.done?'':s.action}" style="background:var(--card);border:1px solid ${s.done?'rgba(52,211,153,0.2)':'var(--border)'};border-radius:14px;padding:18px 20px;display:flex;align-items:center;gap:16px;cursor:${s.done?'default':'pointer'};transition:border-color 0.2s;${s.done?'opacity:0.6':''}">
-       <div style="width:32px;height:32px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-family:'DM Mono',monospace;font-size:12px;font-weight:600;${s.done?'background:rgba(52,211,153,0.12);border:1.5px solid rgba(52,211,153,0.3);color:var(--green)':'background:var(--surface);border:1.5px solid var(--border);color:var(--muted)'}">
-         ${s.done?'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>':`${i+1}`}
+ const activeEvent=myEvents[0];
+
+ sb.from('vendor_table_applications')
+   .select('*')
+   .eq('event_id', activeEvent.id)
+   .order('created_at',{ascending:false})
+   .then(({data:apps})=>{
+     const applications=apps||[];
+     const confirmed=applications.filter(a=>a.status==='approved'||a.status==='confirmed').length;
+     const pending=applications.filter(a=>a.status==='pending').length;
+     const feesCollected=applications.filter(a=>a.payment_status==='paid').reduce((s,a)=>s+(a.spot_fee||0),0);
+     const feesPending=applications.filter(a=>a.payment_status!=='paid'&&(a.status==='approved'||a.status==='pending')).reduce((s,a)=>s+(a.spot_fee||0),0);
+
+     function statusBadge(status){
+       if(status==='approved'||status==='confirmed') return '<span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:99px;background:rgba(52,211,153,0.1);color:var(--green);border:1px solid rgba(52,211,153,0.25)">Approved</span>';
+       if(status==='pending') return '<span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:99px;background:rgba(251,191,36,0.1);color:var(--gold);border:1px solid rgba(251,191,36,0.25)">Pending</span>';
+       if(status==='rejected') return '<span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:99px;background:rgba(248,113,113,0.1);color:var(--red);border:1px solid rgba(248,113,113,0.25)">Rejected</span>';
+       return '<span style="font-size:10px;padding:2px 8px;border-radius:99px;background:var(--surface);color:var(--muted)">'+status+'</span>';
+     }
+
+     function appCard(a){
+       const isPaid=a.payment_status==='paid';
+       const isApproved=a.status==='approved'||a.status==='confirmed';
+       const isRejected=a.status==='rejected';
+       const fee=a.spot_fee||0;
+       return `<div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px 16px;margin-bottom:8px">
+         <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:8px">
+           <div>
+             <div style="font-size:13px;font-weight:700">${a.business_name||a.applicant_name||'Applicant'}</div>
+             <div style="font-size:11px;color:var(--sub);margin-top:2px">${a.vendor_type||'Vendor'} &middot; ${a.spot_type==='food_truck'?'Food truck':'Table spot'}</div>
+           </div>
+           ${statusBadge(a.status)}
+         </div>
+         <div style="font-size:11px;color:var(--sub);margin-bottom:10px">
+           Spot fee: <span style="color:var(--orange);font-weight:600">$${fee}</span>
+           &nbsp;&middot;&nbsp;
+           Payment: <span style="color:${isPaid?'var(--green)':'var(--muted)'};font-weight:600">${isPaid?'Confirmed':'Unpaid'}</span>
+         </div>
+         <div style="display:flex;gap:6px;flex-wrap:wrap">
+           ${!isApproved&&!isRejected?`<button onclick="approveVendorApp('${a.id}')" style="font-size:11px;padding:5px 10px;border-radius:6px;background:rgba(52,211,153,0.1);color:var(--green);border:1px solid rgba(52,211,153,0.25);cursor:pointer;font-family:var(--font);font-weight:600">&#10003; Approve</button>`:''}
+           ${!isRejected&&!isApproved?`<button onclick="rejectVendorApp('${a.id}')" style="font-size:11px;padding:5px 10px;border-radius:6px;background:rgba(248,113,113,0.1);color:var(--red);border:1px solid rgba(248,113,113,0.25);cursor:pointer;font-family:var(--font);font-weight:600">&#10007; Reject</button>`:''}
+           ${isRejected?`<button onclick="approveVendorApp('${a.id}')" style="font-size:11px;padding:5px 10px;border-radius:6px;background:var(--surface);color:var(--sub);border:1px solid var(--border);cursor:pointer;font-family:var(--font);font-weight:600">&#8635; Reconsider</button>`:''}
+           ${isApproved&&!isPaid?`<button onclick="sendPaymentLink('${a.id}','${a.email||''}')" style="font-size:11px;padding:5px 10px;border-radius:6px;background:rgba(255,107,53,0.1);color:var(--orange);border:1px solid rgba(255,107,53,0.25);cursor:pointer;font-family:var(--font);font-weight:600">&#8594; Send payment link</button>`:''}
+           ${isPaid?`<button onclick="sendPaymentLink('${a.id}','${a.email||''}')" style="font-size:11px;padding:5px 10px;border-radius:6px;background:rgba(255,107,53,0.1);color:var(--orange);border:1px solid rgba(255,107,53,0.25);cursor:pointer;font-family:var(--font);font-weight:600">&#8594; Resend receipt</button>`:''}
+         </div>
+       </div>`;
+     }
+
+     window.filterOrgApps=function(filter){
+       document.querySelectorAll('.app-ftab').forEach(el=>{
+         const active=el.dataset.filter===filter;
+         el.style.background=active?'rgba(255,107,53,0.12)':'transparent';
+         el.style.color=active?'var(--orange)':'var(--sub)';
+         el.style.borderColor=active?'rgba(255,107,53,0.3)':'var(--border)';
+       });
+       const filtered=filter==='all'?applications:
+         filter==='food_truck'?applications.filter(a=>a.spot_type==='food_truck'):
+         applications.filter(a=>a.status===filter||(filter==='approved'&&a.status==='confirmed'));
+       const el=document.getElementById('appList');
+       if(el) el.innerHTML=filtered.length?filtered.map(appCard).join(''):`<div style="padding:32px;text-align:center;color:var(--muted);font-size:13px">No applications in this category</div>`;
+     };
+
+     window.approveVendorApp=async function(id){
+       await sb.from('vendor_table_applications').update({status:'approved'}).eq('id',id);
+       toast('Application approved');nav('dashboard');
+     };
+     window.rejectVendorApp=async function(id){
+       if(!confirm('Reject this application?'))return;
+       await sb.from('vendor_table_applications').update({status:'rejected'}).eq('id',id);
+       toast('Application rejected');nav('dashboard');
+     };
+     window.sendPaymentLink=function(id,email){
+       toast('Payment link sent'+(email?' to '+email:''));
+     };
+
+     document.getElementById('app').innerHTML=`
+     <div class="page">
+       <div style="background:linear-gradient(135deg,#130800 0%,#1a0f02 50%,#0b0b0f 100%);border:1px solid var(--border);border-radius:16px;padding:22px 26px;margin-bottom:16px">
+         <div style="font-size:10px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--orange);margin-bottom:8px">Your event</div>
+         <div style="font-size:22px;font-weight:800;margin-bottom:4px">${activeEvent.title||'Untitled Event'}</div>
+         <div style="font-size:13px;color:var(--sub)">
+           ${activeEvent.start_time?new Date(activeEvent.start_time).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}):''}
+           ${activeEvent.venue_name_override?' &middot; '+activeEvent.venue_name_override:''}
+         </div>
+         <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:16px">
+           ${[
+             {num:confirmed,label:'Confirmed vendors',color:'var(--orange)'},
+             {num:pending,label:'Pending review',color:'var(--text)'},
+             {num:'$'+feesCollected,label:'Fees collected',color:'var(--green)'},
+             {num:'$'+feesPending,label:'Awaiting payment',color:'var(--text)'},
+           ].map(s=>`
+             <div style="background:rgba(255,255,255,0.04);border-radius:10px;padding:12px 14px">
+               <div style="font-size:20px;font-weight:800;color:${s.color};margin-bottom:3px">${s.num}</div>
+               <div style="font-size:11px;color:var(--sub)">${s.label}</div>
+             </div>`).join('')}
+         </div>
        </div>
-       <div style="flex:1;min-width:0">
-         <div style="font-weight:700;font-size:14px;margin-bottom:2px;${s.done?'text-decoration:line-through;color:var(--sub)':''}">${s.label}</div>
-         <div style="font-size:12px;color:var(--muted);line-height:1.5">${s.desc}</div>
+       <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:16px">
+         <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid var(--border)">
+           <span style="font-size:14px;font-weight:700">Vendor applications</span>
+           <button class="btn btn-primary btn-sm" onclick="nav('vendortables')">+ Post spot</button>
+         </div>
+         <div style="display:flex;gap:6px;padding:10px 16px;border-bottom:1px solid var(--border);flex-wrap:wrap">
+           ${['all','pending','approved','rejected','food_truck'].map(f=>`
+             <button class="app-ftab" data-filter="${f}" onclick="filterOrgApps('${f}')" style="font-size:11px;padding:4px 12px;border-radius:99px;border:1px solid ${f==='all'?'rgba(255,107,53,0.3)':'var(--border)'};background:${f==='all'?'rgba(255,107,53,0.12)':'transparent'};color:${f==='all'?'var(--orange)':'var(--sub)'};cursor:pointer;font-family:var(--font);font-weight:600;transition:all 0.12s">
+               ${f==='food_truck'?'Food trucks':f.charAt(0).toUpperCase()+f.slice(1)}
+             </button>`).join('')}
+         </div>
+         <div id="appList" style="padding:12px 14px">
+           ${applications.length?applications.map(appCard).join(''):`<div style="padding:32px;text-align:center;color:var(--muted);font-size:13px">No vendor applications yet.<br><button class="btn btn-primary btn-sm" onclick="nav('vendortables')" style="margin-top:12px">Post your first vendor spot &rarr;</button></div>`}
+         </div>
        </div>
-       ${s.done?'':`<button class="btn btn-primary btn-sm" onclick="event.stopPropagation();${s.action}" style="white-space:nowrap;flex-shrink:0">${s.cta} &#8594;</button>`}
-     </div>`).join('')}
-   </div>
-
-   ${isReturning?`
-   <div class="stat-row" style="margin-bottom:28px">
-     <div class="stat-card"><div class="stat-num">${myInquiries.length}</div><div class="stat-label">Inquiries Sent</div></div>
-     <div class="stat-card"><div class="stat-num" style="color:${newInq?'var(--orange)':'var(--text)'}">${newInq}</div><div class="stat-label">Awaiting Response</div></div>
-     <div class="stat-card"><div class="stat-num">${myEvents.length}</div><div class="stat-label">Events Listed</div></div>
-   </div>`:''}
-
-   ${myInquiries.length?`
-   <div class="card">
-     <div class="card-header"><div class="card-title">Recent Inquiries</div><button class="btn btn-ghost btn-sm" onclick="nav('inquiries')">View All &#8594;</button></div>
-     <div class="card-body">${myInquiries.slice(0,3).map(i=>inquiryItemHTML(i)).join('')}</div>
-   </div>`:''}
-
-   ${myEvents.length?`
-   <div class="card" style="margin-top:16px">
-     <div class="card-header"><div class="card-title">My Events</div><button class="btn btn-ghost btn-sm" onclick="nav('events')">View All &#8594;</button></div>
-     <div class="card-body">${myEvents.slice(0,3).map(e=>eventItemHTML(e)).join('')}</div>
-   </div>`:''}
- </div>`;
+       ${myEvents.length>1?`
+       <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;overflow:hidden">
+         <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid var(--border)">
+           <span style="font-size:14px;font-weight:700">My other events</span>
+           <button class="btn btn-ghost btn-sm" onclick="nav('events')">View all &rarr;</button>
+         </div>
+         ${myEvents.slice(1,4).map(e=>`
+         <div style="display:flex;align-items:center;gap:12px;padding:12px 18px;border-bottom:1px solid var(--border-sub)">
+           <div style="flex:1;min-width:0">
+             <div style="font-size:13px;font-weight:600">${e.title||'Untitled'}</div>
+             <div style="font-size:11px;color:var(--muted)">${e.start_time?new Date(e.start_time).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}):'No date set'}</div>
+           </div>
+           <span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:99px;${e.status==='published'?'background:rgba(52,211,153,0.1);color:var(--green);border:1px solid rgba(52,211,153,0.25)':'background:var(--surface);color:var(--muted);border:1px solid var(--border)'}">${e.status||'draft'}</span>
+         </div>`).join('')}
+       </div>`:''}
+     </div>`;
+   }).catch(()=>{
+     document.getElementById('app').innerHTML=`
+     <div class="page">
+       <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:22px 26px;margin-bottom:16px">
+         <div style="font-size:10px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--orange);margin-bottom:8px">Your event</div>
+         <div style="font-size:22px;font-weight:800;margin-bottom:4px">${activeEvent.title||'Untitled Event'}</div>
+       </div>
+       <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px">
+         <div class="card" style="cursor:pointer" onclick="nav('events')"><div class="card-body" style="text-align:center;padding:24px"><div style="font-size:24px;margin-bottom:8px">&#128197;</div><div style="font-weight:700">My Events</div></div></div>
+         <div class="card" style="cursor:pointer" onclick="nav('vendortables')"><div class="card-body" style="text-align:center;padding:24px"><div style="font-size:24px;margin-bottom:8px">&#127978;</div><div style="font-weight:700">Vendor Tables</div></div></div>
+       </div>
+     </div>`;
+   });
 }
-
 // ── VENUES ────────────────────────────────────────────────────
 function renderVenues(){
  document.getElementById('app').innerHTML=`
