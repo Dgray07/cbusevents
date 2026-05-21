@@ -2679,41 +2679,19 @@ async function runOrganizerSmartImport(){
   btn.textContent='Analyzing...';btn.disabled=true;btn.style.opacity='0.6';
   FIELDS.forEach(id=>{const el=document.getElementById(id);if(el)el.classList.add('si-pulse');});
   try{
-    // Fetch the page HTML via a CORS proxy, then send to Claude to extract event data
-    const proxyUrl='https://api.allorigins.win/get?url='+encodeURIComponent(targetUrl);
-    const pageRes=await fetch(proxyUrl);
-    const pageJson=await pageRes.json();
-    const html=pageJson.contents||'';
-    // Strip tags to get readable text (max 8000 chars)
-    const text=html.replace(/<style[^>]*>[\s\S]*?<\/style>/gi,'')
-      .replace(/<script[^>]*>[\s\S]*?<\/script>/gi,'')
-      .replace(/<[^>]+>/g,' ')
-      .replace(/\s+/g,' ')
-      .trim()
-      .substring(0,8000);
-
-    const claudeRes=await fetch('https://api.anthropic.com/v1/messages',{
+    const {data:{session}}=await sb.auth.getSession();
+    const res=await fetch('https://toblgvatvsjljbqogzsv.supabase.co/functions/v1/smart-import',{
       method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({
-        model:'claude-sonnet-4-20250514',
-        max_tokens:500,
-        messages:[{
-          role:'user',
-          content:`Extract event details from this page text and return ONLY valid JSON with these fields: event_name, event_date (YYYY-MM-DD format), event_time (HH:MM 24h format or empty string), description (2-3 sentences max), cover_image (full image URL or empty string). Page URL: ${targetUrl}\n\nPage text:\n${text}`
-        }]
-      })
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+(session?.access_token||'')},
+      body:JSON.stringify({url:targetUrl})
     });
-    const claudeData=await claudeRes.json();
-    const raw=claudeData.content?.[0]?.text||'{}';
-    const clean=raw.replace(/```json|```/g,'').trim();
-    const data=JSON.parse(clean);
+    if(!res.ok)throw new Error('API '+res.status);
+    const data=await res.json();
     organizerPopulateEvent({
-      event_name: data.event_name||'',
-      event_date: data.event_date||'',
-      event_time: data.event_time||'',
-      description: data.description||'',
-      cover_image: data.cover_image||''
+      event_name: data.event_name||data.name||data.title||'',
+      event_date: data.event_date||data.date||data.start_date||'',
+      description: data.description||data.summary||'',
+      cover_image: data.image_url||data.cover_image||data.image||''
     });
     urlInput.style.borderColor='#1d9e75';
     setTimeout(()=>{urlInput.style.borderColor='';},2500);
