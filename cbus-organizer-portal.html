@@ -2561,9 +2561,20 @@ async function submitCollabPost(){
   const errEl=document.getElementById('collabPostErr');
   if(!body){if(errEl){errEl.textContent='Write something first.';errEl.style.display='block';}return;}
   const name=currentUser.user_metadata?.full_name||currentUser.email.split('@')[0];
-  const role=(window._userRoles||['organizer'])[0];
-  let postError=null; try{const r=await sb.from('collab_posts').insert({user_id:currentUser.id,role,display_name:name,body});postError=r.error;}catch(e){postError=e;} const error=postError;
-  if(error){if(errEl){errEl.textContent='Error posting. Try again.';errEl.style.display='block';}return;}
+  const roleVal=String((window._userRoles&&window._userRoles[0])||'organizer');
+  let postError=null;
+  try{
+    const r=await sb.from('collab_posts').insert({
+      user_id:currentUser.id,
+      role:roleVal,
+      display_name:name,
+      body:body
+    });
+    postError=r.error;
+    if(r.error)console.error('collab_posts insert error:',r.error);
+  }catch(e){postError=e;console.error('collab_posts insert exception:',e);}
+  const error=postError;
+  if(error){if(errEl){errEl.textContent='Error: '+(error.message||error.details||JSON.stringify(error));errEl.style.display='block';}return;}
   closeModal();
   toast('Posted to the community!');
   if(currentPage==='collaborate') loadCollabFeed();
