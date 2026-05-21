@@ -25,20 +25,23 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);display:flex
 @keyframes fadeIn{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
 
 /* SIDEBAR */
-.sidebar{width:230px;flex-shrink:0;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;position:sticky;top:0;height:100vh;overflow-y:auto;z-index:10;}
+.sidebar{width:210px;flex-shrink:0;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;position:sticky;top:0;height:100vh;overflow-y:auto;z-index:10;}
 .sidebar::-webkit-scrollbar{width:0;}
-.sidebar-logo{padding:28px 22px 22px;border-bottom:1px solid var(--border-sub);position:relative;}
-.sidebar-logo::after{content:'';position:absolute;bottom:0;left:22px;right:22px;height:1px;background:linear-gradient(90deg,var(--orange),transparent);opacity:0.4;}
-.sidebar-logo-text{font-family:var(--font);font-size:17px;font-weight:900;letter-spacing:-0.05em;text-transform:uppercase;}
+.sidebar-logo{padding:18px 16px 14px;border-bottom:1px solid var(--border);}
+.sidebar-logo-text{font-family:var(--font);font-size:15px;font-weight:800;letter-spacing:-0.04em;text-transform:uppercase;}
 .sidebar-logo-text span{color:var(--orange);}
-.sidebar-section{padding:20px 22px 6px;font-size:9px;color:var(--muted);font-weight:700;letter-spacing:0.15em;text-transform:uppercase;}
-.nav-item{display:flex;align-items:center;gap:10px;padding:8px 14px 8px 18px;margin:1px 8px;border-radius:10px;cursor:pointer;font-size:13px;font-weight:500;color:var(--sub);transition:all 0.18s;border-left:2px solid transparent;}
-.nav-item:hover{background:rgba(255,255,255,0.04);color:var(--text);border-left-color:var(--muted);}
-.nav-item.active{background:linear-gradient(135deg,rgba(255,107,53,0.1),rgba(255,107,53,0.04));color:var(--text);border-left-color:var(--orange);font-weight:600;}
-.nav-item .badge{background:var(--orange);color:#fff;border-radius:20px;padding:1px 8px;font-size:9px;font-weight:800;margin-left:auto;}
+.sidebar-logo-sub{font-size:10px;color:var(--muted);margin-top:2px;letter-spacing:0.06em;text-transform:uppercase;}
+.sidebar-section{padding:14px 16px 4px;font-size:9px;color:var(--muted);font-weight:700;letter-spacing:0.14em;text-transform:uppercase;}
+.nav-item{display:flex;align-items:center;gap:8px;padding:7px 12px 7px 16px;font-size:12px;font-weight:500;color:var(--sub);transition:all 0.14s;border-left:2px solid transparent;cursor:pointer;}
+.nav-item:hover{background:rgba(255,255,255,0.03);color:var(--text);}
+.nav-item.active{background:rgba(255,107,53,0.07);color:var(--orange);border-left-color:var(--orange);font-weight:600;}
+.nav-item .nav-icon{font-size:13px;opacity:0.65;flex-shrink:0;}
+.nav-item .badge{background:var(--orange);color:#fff;border-radius:20px;padding:1px 7px;font-size:9px;font-weight:800;margin-left:auto;}
 .nav-item .badge.green{background:var(--green);color:#000;}
-.sidebar-bottom{margin-top:auto;padding:18px;border-top:1px solid var(--border-sub);}
-.admin-tag{background:linear-gradient(135deg,rgba(255,107,53,0.15),rgba(255,107,53,0.06));color:var(--orange);border:1px solid rgba(255,107,53,0.25);border-radius:8px;padding:5px 10px;font-size:10px;font-weight:700;text-align:center;letter-spacing:0.08em;text-transform:uppercase;}
+.nav-item .badge.blue{background:var(--blue);color:#fff;}
+.nav-item .badge.live{background:rgba(255,107,53,0.15);color:var(--orange);border:1px solid rgba(255,107,53,0.35);}
+.sidebar-bottom{margin-top:auto;padding:14px 16px;border-top:1px solid var(--border);}
+.admin-tag{background:rgba(255,107,53,0.1);color:var(--orange);border:1px solid rgba(255,107,53,0.25);border-radius:99px;padding:4px 12px;font-size:10px;font-weight:700;text-align:center;letter-spacing:0.06em;text-transform:uppercase;}
 
 /* ── MOBILE ─────────────────────────────────────────────────── */
 @media(max-width:768px){
@@ -276,7 +279,7 @@ const MOBILE_NAV_SECTIONS = [
     { id:'vendors',       label:'Vendors',       icon:'🏪' },
     { id:'foodpros',      label:'Food Pros',     icon:'🍳' },
     { id:'organizers',      label:'Organizers',      icon:'📋' },
-    { id:'subscriptions', label:'Subscriptions', icon:'💳' },
+    { id:'transactions', label:'Transactions', icon:'💳' },
     { id:'users',         label:'Users',         icon:'👤' },
     { id:'overrides',     label:'Overrides',     icon:'⚙' },
     { id:'claims',        label:'Claims',        icon:'🔖' },
@@ -583,13 +586,36 @@ function renderShell(){
  const revenue=allVenues.filter(v=>v.tier==='standard').length*29+allVenues.filter(v=>v.tier==='premium').length*79;
 
  document.getElementById('app').innerHTML=`
- <div class="sidebar"> <div class="sidebar-logo"> <div class="sidebar-logo-text">CBUS<span>EVENTS</span></div> <div class="sidebar-logo-sub">Admin Portal</div> </div> <div class="sidebar-section">Main</div> <div class="nav-item" onclick="window.location.href='https://cbusevents.com'" style="border-bottom:1px solid var(--border);margin-bottom:4px;padding-bottom:12px"> Home</div> <div class="nav-item ${currentPage==='dashboard'?'active':''}" onclick="nav('dashboard')"> Dashboard</div> <div class="nav-item ${currentPage==='venues'?'active':''}" onclick="nav('venues')"> Venues ${pendingVenues?('<span class="badge">'+pendingVenues+'</span>'):''}</div> <div class="nav-item ${currentPage==='events'?'active':''}" onclick="nav('events')"> Events</div> <div class="nav-item ${currentPage==='inquiries'?'active':''}" onclick="nav('inquiries')"> Inquiries ${newInquiries?('<span class="badge green">'+newInquiries+'</span>'):''}</div> <div class="sidebar-section">Revenue</div> <div class="nav-item ${currentPage==='revenue'?'active':''}" onclick="nav('revenue')"> Revenue</div> <div class="nav-item ${currentPage==='design'?'active':''}" onclick="nav('design')"> Design Requests ${allDesignRequests.filter(d=>d.status==='new').length?('<span class="badge">'+allDesignRequests.filter(d=>d.status==='new').length+'</span>'):''}</div> <div class="sidebar-section">Platform</div> <div class="nav-item ${currentPage==='vendors'?'active':''}" onclick="nav('vendors')"> Vendors</div> <div class="nav-item ${currentPage==='foodpros'?'active':''}" onclick="nav('foodpros')"> Food Pros <span style="background:rgba(255,255,255,0.08);color:var(--sub);border-radius:20px;padding:1px 8px;font-size:9px;font-weight:800;margin-left:auto;">${allFoodPros.length}</span></div>
- <div class="nav-item ${currentPage==='organizers'?'active':''}" onclick="nav('organizers')"> Organizers</div> <div class="nav-item ${currentPage==='subscriptions'?'active':''}" onclick="nav('subscriptions')"> Subscriptions</div> <div class="nav-item ${currentPage==='users'?'active':''}" onclick="nav('users')"> Users</div> <div class="nav-item ${currentPage==='overrides'?'active':''}" onclick="nav('overrides')"> Overrides</div> <div class="nav-item ${currentPage==='claims'?'active':''}" onclick="nav('claims')"> Claims <span style='background:#ef4444;color:#fff;border-radius:20px;padding:1px 7px;font-size:10px;font-weight:700;margin-left:auto' id='claimsBadge' style='display:none'></span></div> <div class="nav-item ${currentPage==='externalsync'?'active':''}" onclick="nav('externalsync')"> 🌐 External Sync <span id='syncBadge' style='display:none;background:#818cf8;color:#fff;border-radius:20px;padding:1px 7px;font-size:10px;font-weight:700;margin-left:auto'></span></div>
+ <div class="sidebar"> <div class="sidebar-logo"> <div class="sidebar-logo-text">CBUS<span>EVENTS</span></div> <div class="sidebar-logo-sub">Admin Portal</div> </div>
+ <div class="sidebar-section">Main</div>
+ <div class="nav-item" onclick="window.location.href='https://cbusevents.com'"><span class="nav-icon">⌂</span> Home</div>
+ <div class="nav-item ${currentPage==='dashboard'?'active':''}" onclick="nav('dashboard')"><span class="nav-icon">▣</span> Dashboard</div>
+ <div class="nav-item ${currentPage==='venues'?'active':''}" onclick="nav('venues')"><span class="nav-icon">⬡</span> Venues ${pendingVenues?('<span class="badge">'+pendingVenues+'</span>'):''}</div>
+ <div class="nav-item ${currentPage==='events'?'active':''}" onclick="nav('events')"><span class="nav-icon">◷</span> Events</div>
+ <div class="nav-item ${currentPage==='inquiries'?'active':''}" onclick="nav('inquiries')"><span class="nav-icon">◈</span> Inquiries ${newInquiries?('<span class="badge green">'+newInquiries+'</span>'):''}</div>
+ <div class="sidebar-section">Revenue</div>
+ <div class="nav-item ${currentPage==='revenue'?'active':''}" onclick="nav('revenue')"><span class="nav-icon">◎</span> Revenue</div>
+ <div class="nav-item ${currentPage==='transactions'?'active':''}" onclick="nav('transactions')"><span class="nav-icon">⬡</span> Transactions</div>
+ <div class="nav-item ${currentPage==='design'?'active':''}" onclick="nav('design')"><span class="nav-icon">◈</span> Design Requests ${allDesignRequests.filter(d=>d.status==='new').length?('<span class="badge">'+allDesignRequests.filter(d=>d.status==='new').length+'</span>'):''}</div>
+ <div class="sidebar-section">Platform</div>
+ <div class="nav-item ${currentPage==='vendors'?'active':''}" onclick="nav('vendors')"><span class="nav-icon">◫</span> Vendors</div>
+ <div class="nav-item ${currentPage==='foodpros'?'active':''}" onclick="nav('foodpros')"><span class="nav-icon">◎</span> Food Pros <span style="background:rgba(255,255,255,0.07);color:var(--sub);border-radius:20px;padding:1px 7px;font-size:9px;font-weight:700;margin-left:auto;">${allFoodPros.length}</span></div>
+ <div class="nav-item ${currentPage==='organizers'?'active':''}" onclick="nav('organizers')"><span class="nav-icon">◉</span> Organizers</div>
+ <div class="nav-item ${currentPage==='users'?'active':''}" onclick="nav('users')"><span class="nav-icon">◯</span> Users</div>
+ <div class="nav-item ${currentPage==='overrides'?'active':''}" onclick="nav('overrides')"><span class="nav-icon">⚙</span> Overrides</div>
+ <div class="nav-item ${currentPage==='claims'?'active':''}" onclick="nav('claims')"><span class="nav-icon">⚑</span> Claims <span style='background:#ef4444;color:#fff;border-radius:20px;padding:1px 7px;font-size:10px;font-weight:700;margin-left:auto' id='claimsBadge' style='display:none'></span></div>
+ <div class="nav-item ${currentPage==='externalsync'?'active':''}" onclick="nav('externalsync')"><span class="nav-icon">↻</span> External Sync <span id='syncBadge' style='display:none;background:#818cf8;color:#fff;border-radius:20px;padding:1px 7px;font-size:10px;font-weight:700;margin-left:auto'></span></div>
  <div class="sidebar-section">Festivals</div>
- <div class="nav-item ${currentPage==='festival1313'?'active':''}" onclick="window.open('1313-festival-admin.html','_blank')" style="color:${currentPage==='festival1313'?'var(--text)':'var(--orange)'}"> 🎪 1313 Festival <span class="badge" style="background:var(--orange);color:#fff">Live</span></div>
- <div class="nav-item ${currentPage==='foodtrucks'?'active':''}" onclick="nav('foodtrucks')"> 🚚 Food Truck Prospects</div>
- <div class="sidebar-section">Sales Team</div> <div class="nav-item ${currentPage==='brandreps'?'active':''}" onclick="nav('brandreps')"> Brand Reps <span id="repAppsBadge" style="display:none" class="badge"></span></div> <div class="sidebar-section">Content</div>
- <div class="nav-item ${currentPage==='blog'?'active':''}" onclick="nav('blog')"> Blog & SEO</div> <div class="nav-item ${currentPage==='outreach'?'active':''}" onclick="nav('outreach')" style="color:${currentPage==='outreach'?'var(--text)':'var(--orange)'}"> Outreach</div> <div class="nav-item ${currentPage==='marketing'?'active':''}" onclick="nav('marketing')"> Marketing AI</div> <div class="nav-item ${currentPage==='inbox'?'active':''}" onclick="nav('inbox')"> ✉ Inbox <span id="adminInboxBadge" style="display:none;margin-left:auto;background:#FF6B35;color:#fff;border-radius:99px;padding:1px 8px;font-size:9px;font-weight:800"></span></div> <div class="sidebar-bottom"> <div class="admin-tag">Admin Access</div> <button onclick="sb.auth.signOut().then(()=>renderLogin())" style="width:100%;margin-top:10px;background:none;border:1px solid var(--border);border-radius:9px;padding:8px;color:var(--muted);font-size:12px;font-weight:600;cursor:pointer;font-family:var(--font);letter-spacing:0.02em;transition:all 0.18s;" onmouseover="this.style.color='var(--text)';this.style.borderColor='var(--muted)'" onmouseout="this.style.color='var(--muted)';this.style.borderColor='var(--border)'">Sign Out</button> </div> </div> <div class="main" id="main-content"> <div class="topbar"> <div style="display:flex;align-items:center;gap:12px"> <button id="mobileMenuBtn" onclick="toggleMobileMenu()" style="display:none;background:none;border:none;color:var(--text);font-size:22px;cursor:pointer;padding:4px;line-height:1">☰</button> <div class="topbar-title" id="topbarTitle">Dashboard</div> </div> <div class="topbar-right"><button class="theme-toggle" onclick="CBUSTheme.toggle()" title="Toggle dark mode" aria-label="Toggle dark mode"><span class="theme-icon-moon">&#9790;</span><span class="theme-icon-sun">&#9728;</span></button>  <span class="topbar-time" id="topbarTime"></span> <button class="topbar-site-btn" onclick="window.open('https://cbusevents.com','_blank')">View Site ↗</button> <button class="topbar-site-btn" onclick="window.open('https://cbusevents.com/cbus-venue-portal.html','_blank')">Venue Portal ↗</button> </div> </div> <div id="mobileMenuOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:300;" onclick="toggleMobileMenu()" style="cursor:pointer">×</div> <div id="mobileMenuDrawer" style="display:none;position:fixed;left:0;top:0;bottom:0;width:240px;background:var(--surface);border-right:1px solid var(--border);z-index:301;overflow-y:auto;padding-bottom:32px;transform:translateX(-100%);transition:transform 0.25s ease;"> <div style="padding:20px 16px 16px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center"> <div style="font-family:'DM Sans',sans-serif;font-size:17px;font-weight:800">CBUS<span style="color:#FF6B35">EVENTS</span></div> <button onclick="toggleMobileMenu()" style="background:none;border:none;color:var(--sub);font-size:20px;cursor:pointer">✕</button> </div> <div id="mobileMenuItems"></div> </div> <div class="content" id="pageContent"></div> </div> <div id="modalContainer"></div> `;
+ <div class="nav-item" onclick="window.open('1313-festival-admin.html','_blank')" style="color:var(--orange)"><span class="nav-icon">🎪</span> 1313 Festival <span class="badge live">Live</span></div>
+ <div class="nav-item ${currentPage==='foodtrucks'?'active':''}" onclick="nav('foodtrucks')"><span class="nav-icon">🚚</span> Food Trucks</div>
+ <div class="sidebar-section">Sales</div>
+ <div class="nav-item ${currentPage==='brandreps'?'active':''}" onclick="nav('brandreps')"><span class="nav-icon">★</span> Brand Reps <span id="repAppsBadge" style="display:none" class="badge"></span></div>
+ <div class="sidebar-section">Content</div>
+ <div class="nav-item ${currentPage==='blog'?'active':''}" onclick="nav('blog')"><span class="nav-icon">✎</span> Blog & SEO</div>
+ <div class="nav-item ${currentPage==='outreach'?'active':''}" onclick="nav('outreach')" style="color:${currentPage==='outreach'?'var(--text)':'var(--orange)'}"><span class="nav-icon">↗</span> Outreach</div>
+ <div class="nav-item ${currentPage==='marketing'?'active':''}" onclick="nav('marketing')"><span class="nav-icon">✦</span> Marketing AI</div>
+ <div class="nav-item ${currentPage==='inbox'?'active':''}" onclick="nav('inbox')"><span class="nav-icon">✉</span> Inbox <span id="adminInboxBadge" style="display:none;margin-left:auto;background:#FF6B35;color:#fff;border-radius:99px;padding:1px 8px;font-size:9px;font-weight:800"></span></div>
+ <div class="sidebar-bottom"> <div class="admin-tag">Admin Access</div> <button onclick="sb.auth.signOut().then(()=>renderLogin())" style="width:100%;margin-top:10px;background:none;border:1px solid var(--border);border-radius:8px;padding:7px;color:var(--muted);font-size:11px;font-weight:600;cursor:pointer;font-family:var(--font);transition:all 0.15s;" onmouseover="this.style.color='var(--text)';this.style.borderColor='var(--muted)'" onmouseout="this.style.color='var(--muted)';this.style.borderColor='var(--border)'">Sign Out</button> </div> </div> <div class="main" id="main-content"> <div class="topbar"> <div style="display:flex;align-items:center;gap:12px"> <button id="mobileMenuBtn" onclick="toggleMobileMenu()" style="display:none;background:none;border:none;color:var(--text);font-size:22px;cursor:pointer;padding:4px;line-height:1">☰</button> <div class="topbar-title" id="topbarTitle">Dashboard</div> </div> <div class="topbar-right"><button class="theme-toggle" onclick="CBUSTheme.toggle()" title="Toggle dark mode" aria-label="Toggle dark mode"><span class="theme-icon-moon">&#9790;</span><span class="theme-icon-sun">&#9728;</span></button> <span class="topbar-time" id="topbarTime"></span> <button class="topbar-site-btn" onclick="window.open('https://cbusevents.com','_blank')">View Site ↗</button> <button class="topbar-site-btn" style="color:var(--orange);border-color:rgba(255,107,53,0.3)" onclick="window.open('https://cbusevents.com/cbus-organizer-portal.html','_blank')">View as Organizer ↗</button> </div> </div> <div id="mobileMenuOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:300;" onclick="toggleMobileMenu()" style="cursor:pointer">×</div> <div id="mobileMenuDrawer" style="display:none;position:fixed;left:0;top:0;bottom:0;width:240px;background:var(--surface);border-right:1px solid var(--border);z-index:301;overflow-y:auto;padding-bottom:32px;transform:translateX(-100%);transition:transform 0.25s ease;"> <div style="padding:20px 16px 16px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center"> <div style="font-family:'DM Sans',sans-serif;font-size:17px;font-weight:800">CBUS<span style="color:#FF6B35">EVENTS</span></div> <button onclick="toggleMobileMenu()" style="background:none;border:none;color:var(--sub);font-size:20px;cursor:pointer">✕</button> </div> <div id="mobileMenuItems"></div> </div> <div class="content" id="pageContent"></div> </div> <div id="modalContainer"></div> `;
 
  // Live clock
  setInterval(()=>{
@@ -604,7 +630,7 @@ function nav(page){
  currentPage=page;
  document.querySelectorAll('.nav-item').forEach(el=>el.classList.remove('active'));
  document.querySelectorAll('.nav-item').forEach(el=>{if(el.textContent.trim().toLowerCase().includes(page))el.classList.add('active');});
- const title={dashboard:'Dashboard',venues:'Venues',events:'Events',inquiries:'Inquiries',revenue:'Revenue',design:'Design Requests',vendors:'Vendors',subscriptions:'Subscriptions',users:'Users',overrides:'Overrides',claims:'Event Claims',externalsync:'External Sync',blog:'Blog & SEO',organizers:'Organizers',outreach:'Venue Outreach',inbox:'Inbox',marketing:'Marketing Intelligence',festival1313:'1313 Festival Admin',brandreps:'Brand Reps',foodtrucks:'Food Truck Prospects'};
+ const title={dashboard:'Dashboard',venues:'Venues',events:'Events',inquiries:'Inquiries',revenue:'Revenue',design:'Design Requests',vendors:'Vendors',transactions:'Transactions',users:'Users',overrides:'Overrides',claims:'Event Claims',externalsync:'External Sync',blog:'Blog & SEO',organizers:'Organizers',outreach:'Venue Outreach',inbox:'Inbox',marketing:'Marketing Intelligence',festival1313:'1313 Festival Admin',brandreps:'Brand Reps',foodtrucks:'Food Truck Prospects'};
  const el=document.getElementById('topbarTitle');
  if(el)el.textContent=title[page]||page;
  renderPage();
@@ -620,7 +646,7 @@ async function renderPage(){
  else if(currentPage==='vendors')renderVendors();
  else if(currentPage==='foodpros')renderFoodPros();
  else if(currentPage==='organizers')await renderOrganizers();
- else if(currentPage==='subscriptions')await renderSubscriptions();
+ else if(currentPage==='transactions')await renderTransactions();
  else if(currentPage==='users')await renderUsers();
  else if(currentPage==='overrides')renderOverrides();
  else if(currentPage==='claims')renderClaims();
@@ -2166,18 +2192,188 @@ async function deleteUser(userId,email){
 }
 
 // ── SUBSCRIPTIONS ─────────────────────────────────────────────
-async function renderSubscriptions(){
- document.getElementById('pageContent').innerHTML=`<div style="color:var(--muted);padding:32px;text-align:center">Loading subscriptions…</div>`;
+// ── TRANSACTIONS ───────────────────────────────────────────────
+// Pulls live payment_intents from Stripe Connect via Supabase Edge Function
+// Falls back to local stripe_transactions table if edge function unavailable
+let _txnAll=[], _txnFilter='all', _txnSearch='';
 
- const[{data:venues},{data:vendors}]=await Promise.all([
- sb.from('venues').select('id,name,tier,subscription_tier,subscription_status,subscription_period_end,stripe_subscription_id').order('tier'),
- sb.from('vendors').select('id,business_name,subscription_tier,subscription_status,subscription_period_end,stripe_subscription_id').order('subscription_tier').then(r=>r).catch(()=>({data:[]})),
- ]);
+async function renderTransactions(){
+ document.getElementById('pageContent').innerHTML=`<div style="color:var(--muted);padding:32px;text-align:center">Loading transactions from Stripe…</div>`;
+ _txnAll=[];
 
- const renderRows=(rows,nameKey)=>(rows||[]).map(r=>`<tr> <td><strong>${r[nameKey]||'—'}</strong></td> <td><span class="badge ${(r.subscription_tier||r.tier)==='PREMIUM'||(r.subscription_tier||r.tier)==='premium'?'badge-gold':(r.subscription_tier||r.tier)==='STANDARD'||(r.subscription_tier||r.tier)==='standard'?'badge-blue':'badge-muted'}">${r.subscription_tier||r.tier||'free'}</span></td> <td><span class="badge ${r.subscription_status==='active'?'badge-green':r.subscription_status?'badge-orange':'badge-muted'}">${r.subscription_status||'—'}</span></td> <td style="color:var(--muted);font-size:12px">${r.subscription_period_end?new Date(r.subscription_period_end).toLocaleDateString():'—'}</td> <td style="font-size:11px;color:var(--muted)">${r.stripe_subscription_id?r.stripe_subscription_id.substring(0,22)+'…':'—'}</td> </tr>`).join('');
+ // Try Stripe via edge function first
+ try{
+   const{data:session}=await sb.auth.getSession();
+   const token=session?.session?.access_token;
+   const res=await fetch(`https://toblgvatvsjljbqogzsv.supabase.co/functions/v1/stripe-transactions`,{
+     headers:{Authorization:'Bearer '+token,'Content-Type':'application/json'}
+   });
+   if(res.ok){
+     const json=await res.json();
+     _txnAll=json.transactions||[];
+   }
+ }catch(e){console.warn('Edge fn unavailable, falling back to local table');}
+
+ // Fallback: pull from local stripe_transactions table
+ if(!_txnAll.length){
+   const{data:local}=await sb.from('stripe_transactions')
+     .select('*').order('created_at',{ascending:false}).limit(200)
+     .catch(()=>({data:[]}));
+   if(local&&local.length){
+     _txnAll=local.map(r=>({
+       id:r.stripe_payment_intent_id||r.id,
+       amount:r.amount,
+       platform_fee:r.platform_fee||0,
+       stripe_fee:r.stripe_fee||0,
+       status:r.status||'succeeded',
+       portal:r.portal||r.source||'platform',
+       description:r.description||r.metadata?.description||'Transaction',
+       customer_name:r.customer_name||r.metadata?.name||'—',
+       created:r.created_at,
+       currency:'usd',
+     }));
+   }
+ }
+
+ _txnFilter='all';
+ _txnSearch='';
+ _renderTxnPage();
+}
+
+function _txnPortalLabel(portal){
+ const map={festival:'Festival fee',ticketing:'Ticketing',marketplace:'Marketplace',boost:'Event boost',design:'Design request',platform:'Platform'};
+ return map[portal]||portal||'Platform';
+}
+function _txnPortalColor(portal){
+ const map={festival:'var(--orange)',ticketing:'var(--green)',marketplace:'var(--blue)',boost:'var(--gold)',design:'#c084fc',platform:'var(--sub)'};
+ return map[portal]||'var(--sub)';
+}
+function _txnStatusBadge(status){
+ if(status==='succeeded'||status==='paid')return'<span class="badge badge-green">Paid</span>';
+ if(status==='pending'||status==='processing')return'<span class="badge badge-orange">Pending</span>';
+ if(status==='refunded'||status==='partially_refunded')return'<span class="badge badge-blue">Refunded</span>';
+ if(status==='failed'||status==='canceled')return'<span class="badge badge-red">Failed</span>';
+ return`<span class="badge badge-muted">${status||'—'}</span>`;
+}
+
+function _txnFiltered(){
+ let list=_txnAll;
+ if(_txnFilter!=='all') list=list.filter(t=>t.portal===_txnFilter||(t.status===_txnFilter));
+ if(_txnSearch) list=list.filter(t=>(t.description+t.customer_name+t.id).toLowerCase().includes(_txnSearch));
+ return list;
+}
+
+function _renderTxnPage(){
+ const filtered=_txnFiltered();
+ const totalCollected=_txnAll.filter(t=>t.status==='succeeded'||t.status==='paid').reduce((s,t)=>s+(t.amount||0),0);
+ const totalPending=_txnAll.filter(t=>t.status==='pending'||t.status==='processing').reduce((s,t)=>s+(t.amount||0),0);
+ const platformFees=_txnAll.reduce((s,t)=>s+(t.platform_fee||0),0);
+ const stripeFees=_txnAll.reduce((s,t)=>s+(t.stripe_fee||0),0);
+ const fmt=n=>'$'+(n/100).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g,',');
+
+ const portals=['all','festival','ticketing','marketplace','boost','refunded','failed'];
 
  document.getElementById('pageContent').innerHTML=`
- <div class="table-card" style="margin-bottom:24px"> <div class="table-header"><div class="table-title">Venue Subscriptions (${(venues||[]).length})</div></div> <table> <thead><tr><th>Name</th><th>Tier</th><th>Status</th><th>Period End</th><th>Stripe Sub ID</th></tr></thead> <tbody>${renderRows(venues,'name')||'<tr class="empty-row"><td colspan="5">No venues</td></tr>'}</tbody> </table> </div> <div class="table-card"> <div class="table-header"><div class="table-title">Vendor Subscriptions (${(vendors||[]).length})</div></div> <table> <thead><tr><th>Business</th><th>Tier</th><th>Status</th><th>Period End</th><th>Stripe Sub ID</th></tr></thead> <tbody>${renderRows(vendors,'business_name')||'<tr class="empty-row"><td colspan="5">No vendors</td></tr>'}</tbody> </table> </div>`;
+ <div class="stat-grid" style="grid-template-columns:repeat(4,1fr)">
+   <div class="stat-card">
+     <div class="stat-card-num" style="color:var(--green)">${fmt(totalCollected)}</div>
+     <div class="stat-card-label">Total collected</div>
+     <div class="stat-card-sub">${_txnAll.filter(t=>t.status==='succeeded'||t.status==='paid').length} transactions</div>
+   </div>
+   <div class="stat-card">
+     <div class="stat-card-num" style="color:var(--gold)">${fmt(totalPending)}</div>
+     <div class="stat-card-label">Pending / processing</div>
+     <div class="stat-card-sub">${_txnAll.filter(t=>t.status==='pending'||t.status==='processing').length} open</div>
+   </div>
+   <div class="stat-card">
+     <div class="stat-card-num" style="color:var(--orange)">${fmt(platformFees)}</div>
+     <div class="stat-card-label">Platform fees earned</div>
+     <div class="stat-card-sub">Net after Stripe: ${fmt(platformFees-stripeFees)}</div>
+   </div>
+   <div class="stat-card">
+     <div class="stat-card-num" style="color:var(--sub)">${fmt(stripeFees)}</div>
+     <div class="stat-card-label">Stripe fees paid</div>
+     <div class="stat-card-sub">2.9% + $0.30 per charge</div>
+   </div>
+ </div>
+
+ <div class="table-card">
+   <div class="table-header">
+     <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+       <div class="table-title">Stripe transactions</div>
+       <span style="font-size:11px;color:var(--muted);background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:99px;padding:2px 10px">Stripe Connect</span>
+     </div>
+     <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+       <input class="search-input" placeholder="Search..." style="width:180px" oninput="_txnSearch=this.value.toLowerCase();_renderTxnTable()">
+       <button class="btn btn-ghost btn-sm" onclick="exportTxnCSV()">Export CSV</button>
+     </div>
+   </div>
+   <div class="filter-row">
+     ${portals.map(f=>`<button class="filter-chip${_txnFilter===f?' active':''}" onclick="_txnFilter='${f}';_renderTxnTable()">${f.charAt(0).toUpperCase()+f.slice(1)}</button>`).join('')}
+   </div>
+   <div id="txnTableBody"></div>
+ </div>`;
+
+ _renderTxnTable();
+}
+
+function _renderTxnTable(){
+ const filtered=_txnFiltered();
+ const fmt=n=>'$'+(n/100).toFixed(2);
+ const fmtFee=n=>n?'$'+(n/100).toFixed(2):'—';
+ const el=document.getElementById('txnTableBody');
+ if(!el)return;
+ if(!filtered.length){
+   el.innerHTML=`<div style="padding:52px;text-align:center;color:var(--muted);font-size:13px">${_txnAll.length?'No transactions match this filter':'No transactions found — connect Stripe or add records to stripe_transactions table'}</div>`;
+   return;
+ }
+ el.innerHTML=`<table>
+   <thead><tr>
+     <th>Description</th><th>Portal</th><th>Customer</th><th>Date</th>
+     <th>Amount</th><th>Platform fee</th><th>Stripe fee</th><th>Status</th><th>ID</th>
+   </tr></thead>
+   <tbody>
+   ${filtered.map(t=>`<tr>
+     <td><strong>${t.description||'—'}</strong></td>
+     <td><span style="font-size:11px;font-weight:600;color:${_txnPortalColor(t.portal)}">${_txnPortalLabel(t.portal)}</span></td>
+     <td style="color:var(--sub)">${t.customer_name||'—'}</td>
+     <td style="color:var(--muted);font-size:12px">${t.created?new Date(t.created).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}):'—'}</td>
+     <td style="font-weight:600">${fmt(t.amount||0)}</td>
+     <td style="color:var(--orange)">${fmtFee(t.platform_fee)}</td>
+     <td style="color:var(--muted)">${fmtFee(t.stripe_fee)}</td>
+     <td>${_txnStatusBadge(t.status)}</td>
+     <td style="font-family:var(--mono);font-size:10px;color:var(--muted)">${t.id?t.id.substring(0,18)+'…':'—'}</td>
+   </tr>`).join('')}
+   </tbody>
+ </table>`;
+}
+
+function exportTxnCSV(){
+ const filtered=_txnFiltered();
+ if(!filtered.length){toast('No transactions to export','error');return;}
+ const fmt=n=>(n/100).toFixed(2);
+ const headers=['ID','Description','Portal','Customer','Date','Amount ($)','Platform Fee ($)','Stripe Fee ($)','Net ($)','Status'];
+ const rows=filtered.map(t=>[
+   t.id||'',
+   (t.description||'').replace(/,/g,' '),
+   _txnPortalLabel(t.portal),
+   (t.customer_name||'').replace(/,/g,' '),
+   t.created?new Date(t.created).toLocaleDateString('en-US'):'',
+   fmt(t.amount||0),
+   fmt(t.platform_fee||0),
+   fmt(t.stripe_fee||0),
+   fmt((t.platform_fee||0)-(t.stripe_fee||0)),
+   t.status||'',
+ ]);
+ const csv=[headers,...rows].map(r=>r.join(',')).join('\n');
+ const blob=new Blob([csv],{type:'text/csv'});
+ const url=URL.createObjectURL(blob);
+ const a=document.createElement('a');
+ a.href=url;
+ a.download=`cbusevents-transactions-${new Date().toISOString().slice(0,10)}.csv`;
+ document.body.appendChild(a);a.click();document.body.removeChild(a);
+ URL.revokeObjectURL(url);
+ toast('CSV exported!');
 }
 
 // ── USERS ─────────────────────────────────────────────────────
