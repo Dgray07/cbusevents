@@ -338,7 +338,47 @@ footer{background:var(--ink);color:var(--cream);padding:56px 48px 32px;}
 .footer-socials a{font-family:var(--mono);font-size:8px;letter-spacing:0.16em;text-transform:uppercase;color:rgba(250,247,242,0.28);transition:color 0.18s;}
 .footer-socials a:hover{color:var(--flame);}
 
-/* ── RESPONSIVE ──────────────────────────── */
+/* ── DARK MODE ────────────────────────────── */
+[data-theme="dark"]{
+  --cream:#050508;--warm:#08080f;--ink:#f4f4ff;--ash:#c8c8e0;--sub:#8888b0;--mist:#55556a;
+  --rule:rgba(255,255,255,0.09);--lk-bg:#0f0f1c;
+  --flame:#FF6B35;--flame-l:rgba(255,107,53,0.1);--flame-m:rgba(255,107,53,0.2);
+  --gold:#f5bc30;--green:#30d693;--green-bg:rgba(48,214,147,0.08);--green-bd:rgba(48,214,147,0.2);
+}
+[data-theme="dark"] body{background:#050508;}
+[data-theme="dark"] nav{background:rgba(8,8,22,0.96);border-bottom-color:rgba(255,255,255,0.09);}
+[data-theme="dark"] .datebar{background:#08080f;}
+[data-theme="dark"] .lk-card{background:#1c1c30;border-color:rgba(255,255,255,0.09);}
+[data-theme="dark"] .lk-body{color:#c8c8e0;}
+[data-theme="dark"] .lk-follow-btn{background:#1c1c30;border-color:#5588cc;color:#7aadee;}
+[data-theme="dark"] .vtp{background:#111128;border-color:rgba(255,255,255,0.08);}
+[data-theme="dark"] .lk-evt-banner{background:rgba(255,107,53,0.08);border-color:rgba(255,107,53,0.2);}
+[data-theme="dark"] .lk-divider{background:rgba(255,255,255,0.07);}
+[data-theme="dark"] .lk-btn:hover{background:rgba(255,255,255,0.05);color:#f4f4ff;}
+[data-theme="dark"] .sb-card{background:#1c1c30;border-color:rgba(255,255,255,0.09);}
+[data-theme="dark"] .join-sidebar{background:var(--flame);}
+[data-theme="dark"] .how-section{background:#0d0d1a;}
+[data-theme="dark"] .how-icon{background:#1c1c30;border-color:rgba(255,255,255,0.1);}
+[data-theme="dark"] .how-icon.passive{background:#1c1c30;color:#f4f4ff;}
+[data-theme="dark"] .how-chain::before{background:rgba(255,255,255,0.09);}
+[data-theme="dark"] .ecard{background:#08080f;}
+[data-theme="dark"] .ecard:hover{background:rgba(255,107,53,0.08);}
+[data-theme="dark"] .events-grid{background:rgba(255,255,255,0.06);}
+[data-theme="dark"] .collab-section{background:#0d0d1a;}
+[data-theme="dark"] .gig-row:hover{background:rgba(255,107,53,0.07);}
+[data-theme="dark"] .gig-hd{border-bottom-color:rgba(255,255,255,0.15);}
+[data-theme="dark"] .sc{background:#0d0d1a;}
+[data-theme="dark"] .sc:hover{background:rgba(255,107,53,0.06);}
+[data-theme="dark"] .sc-bio{color:#c8c8e0;}
+[data-theme="dark"] .digest-section{background:#08080f;}
+[data-theme="dark"] .form-inp{background:#1c1c30;border-color:rgba(255,255,255,0.1);color:#f4f4ff;}
+[data-theme="dark"] .form-inp::placeholder{color:#55556a;}
+[data-theme="dark"] .form-inp:focus{border-color:var(--flame);}
+[data-theme="dark"] .spotlight-section{background:#08080f;}
+[data-theme="dark"] #themeToggle{border-color:rgba(255,255,255,0.15);}
+[data-theme="dark"] #themeToggle:hover{border-color:var(--flame)!important;}
+
+
 @media(max-width:960px){
   .nav-inner{padding:0 24px;}
   .nav-links{display:none;}
@@ -379,6 +419,7 @@ footer{background:var(--ink);color:var(--cream);padding:56px 48px 32px;}
       <li><a href="https://cbusevents.com/vendors.html">Vendors</a></li>
     </ul>
     <div class="nav-right" id="navRight">
+      <button id="themeToggle" onclick="toggleTheme()" aria-label="Toggle dark mode" title="Toggle dark mode" style="width:34px;height:34px;border-radius:50%;background:none;border:1px solid var(--rule);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:15px;transition:border-color 0.2s;flex-shrink:0" onmouseover="this.style.borderColor='var(--flame)'" onmouseout="this.style.borderColor='var(--rule)'">☀️</button>
       <a href="https://cbusevents.com/cbus-organizer-portal.html" class="nav-signin">Sign In</a>
       <a href="https://cbusevents.com/signup.html" class="nav-join">Join Free</a>
     </div>
@@ -773,44 +814,38 @@ footer{background:var(--ink);color:var(--cream);padding:56px 48px 32px;}
 </section>
 
 <!-- MEMBER SPOTLIGHT -->
+<!-- FOUNDER SPOTLIGHT + JOIN CTA -->
 <section class="spotlight-section">
-  <div class="srule"><span class="srule-lbl">Member Spotlight</span><span class="srule-line"></span></div>
-  <div class="spotlight-hd">
-    <h2 class="spotlight-h">Real people.<br><em>Real results.</em></h2>
-    <p class="spotlight-sub">Each week we spotlight a organizer, vendor, creator, or venue building their business through the platform.</p>
-  </div>
-  <div class="spot-grid">
-    <div class="sc reveal" onclick="window.location.href='https://cbusevents.com/organizer-profile.html?id=dcae39de-9265-4d67-b8be-5d0ca599069b'">
-      <div class="sc-init sc-init-1">D</div>
+  <div class="srule"><span class="srule-lbl">Built in Columbus</span><span class="srule-line"></span></div>
+
+  <!-- Single real card: Deante -->
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--rule);border:1px solid var(--rule);margin-bottom:1px">
+    <div class="sc reveal" style="cursor:pointer" onclick="window.location.href='https://cbusevents.com/organizer-profile.html?id=dcae39de-9265-4d67-b8be-5d0ca599069b'">
+      <div class="sc-init sc-init-1" id="spotlight-avatar">D</div>
       <div class="sc-name">Deante Gray</div>
-      <div class="sc-role">Event Organizer · Columbus</div>
-      <p class="sc-bio">Sources his entire vendor roster through CBUSEVENTS for every event he produces. Vendor tables filled, photographers booked, event staff confirmed — all in one place.</p>
+      <div class="sc-role">Founder · Event Organizer · Columbus</div>
+      <p class="sc-bio">Built CBUSEVENTS solo in under a week and launched March 9, 2026. Produces the 1313 Festival series at 1313 E. Broad St. Sources his entire vendor roster through the platform — vendor tables filled, staff confirmed, all managed in one place.</p>
       <div class="sc-stats">
-        <div><div class="sc-sn">3</div><div class="sc-sl">Events Live</div></div>
-        <div><div class="sc-sn">15+</div><div class="sc-sl">Vendors Placed</div></div>
+        <div><div class="sc-sn" id="spotlight-events">3</div><div class="sc-sl">Events Live</div></div>
+        <div><div class="sc-sn" id="spotlight-vendors">15+</div><div class="sc-sl">Vendors Placed</div></div>
         <div><div class="sc-sn" id="spotlight-followers">0</div><div class="sc-sl">Followers</div></div>
       </div>
     </div>
-    <div class="sc reveal">
-      <div class="sc-init sc-init-2">C</div>
-      <div class="sc-name">Chef Cleo</div>
-      <div class="sc-role">Food Professional · Columbus</div>
-      <p class="sc-bio">Built her entire summer calendar responding to organizer posts on the Collab Board. No cold outreach. Every booking came through her CBUSEVENTS profile.</p>
-      <div class="sc-stats">
-        <div><div class="sc-sn">12</div><div class="sc-sl">Events Booked</div></div>
-        <div><div class="sc-sn">$4.8k</div><div class="sc-sl">Earned</div></div>
-        <div><div class="sc-sn">5</div><div class="sc-sl">Organizers</div></div>
+
+    <!-- Join CTA panel -->
+    <div class="sc reveal" style="background:var(--ink);display:flex;flex-direction:column;justify-content:center">
+      <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.22em;text-transform:uppercase;color:rgba(255,107,53,0.8);margin-bottom:16px">Join the Ecosystem</div>
+      <div style="font-family:var(--display);font-size:clamp(26px,3vw,40px);font-weight:900;color:white;line-height:1.0;margin-bottom:16px">Your next gig,<br>booking, or<br><em style="color:var(--flame)">vendor spot</em><br>is already here.</div>
+      <p style="font-size:13px;line-height:1.7;color:rgba(250,247,242,0.5);font-weight:300;margin-bottom:28px;max-width:340px">Columbus is growing. The venues, vendors, and organizers that get in now build the authority every newcomer sees first.</p>
+      <div style="display:flex;flex-direction:column;gap:10px;max-width:260px">
+        <a href="https://cbusevents.com/signup.html?role=organizer" class="btn-primary" style="text-align:center">Join as Organizer</a>
+        <a href="https://cbusevents.com/signup.html?role=vendor" class="btn-outline" style="text-align:center;border-color:rgba(255,255,255,0.2);color:white">Join as Vendor</a>
+        <a href="https://cbusevents.com/signup.html?role=venue" class="btn-outline" style="text-align:center;border-color:rgba(255,255,255,0.2);color:white">List Your Venue</a>
       </div>
-    </div>
-    <div class="sc reveal">
-      <div class="sc-init sc-init-3">J</div>
-      <div class="sc-name">Jasmine R.</div>
-      <div class="sc-role">Photographer · Short North</div>
-      <p class="sc-bio">Four bookings this year, all sourced through the platform. Organizers find her profile, reach out directly, and pay through CBUSEVENTS.</p>
-      <div class="sc-stats">
-        <div><div class="sc-sn">8</div><div class="sc-sl">Bookings</div></div>
-        <div><div class="sc-sn">$2.4k</div><div class="sc-sl">Earned</div></div>
-        <div><div class="sc-sn">4</div><div class="sc-sl">Organizers</div></div>
+      <div style="margin-top:24px;display:flex;gap:20px">
+        <div><div style="font-family:var(--display);font-size:22px;font-weight:900;color:white" id="cta-members">312<sup style="font-size:12px;color:var(--flame)">+</sup></div><div style="font-family:var(--mono);font-size:7px;letter-spacing:0.14em;text-transform:uppercase;color:rgba(250,247,242,0.35);margin-top:3px">Members</div></div>
+        <div><div style="font-family:var(--display);font-size:22px;font-weight:900;color:white" id="cta-venues">15<sup style="font-size:12px;color:var(--flame)">+</sup></div><div style="font-family:var(--mono);font-size:7px;letter-spacing:0.14em;text-transform:uppercase;color:rgba(250,247,242,0.35);margin-top:3px">Venues</div></div>
+        <div><div style="font-family:var(--display);font-size:22px;font-weight:900;color:white" id="cta-gigs">0</div><div style="font-family:var(--mono);font-size:7px;letter-spacing:0.14em;text-transform:uppercase;color:rgba(250,247,242,0.35);margin-top:3px">Open Gigs</div></div>
       </div>
     </div>
   </div>
@@ -907,6 +942,22 @@ const SB_URL="https://toblgvatvsjljbqogzsv.supabase.co";
 const SB_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRvYmxndmF0dnNqbGpicW9nenN2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMDgwNTAsImV4cCI6MjA4NzY4NDA1MH0._WJEQPizNDiQfDXQB_DHPaQhixPGpMdmYQSmyWmm_FQ";
 const sb=supabase.createClient(SB_URL,SB_KEY);
 const EDGE_FN_URL="https://toblgvatvsjljbqogzsv.supabase.co/functions/v1/email-capture";
+
+// ── THEME ─────────────────────────────────────────────────────
+(function(){
+  const stored=localStorage.getItem('cbusevents_theme')||'light';
+  applyTheme(stored);
+})();
+function applyTheme(t){
+  document.documentElement.setAttribute('data-theme',t);
+  localStorage.setItem('cbusevents_theme',t);
+  const btn=document.getElementById('themeToggle');
+  if(btn)btn.textContent=t==='dark'?'☀️':'🌙';
+}
+function toggleTheme(){
+  const current=document.documentElement.getAttribute('data-theme')||'light';
+  applyTheme(current==='dark'?'light':'dark');
+}
 
 // ── DATEBAR DATE ───────────────────────────────────────────────
 (function(){
@@ -1017,9 +1068,22 @@ async function loadLiveData(){
       gigList.querySelectorAll('.reveal').forEach(el=>revealObs.observe(el));
     }
 
-    // Update follower count in spotlight
+    // Update follower count in spotlight + CTA panel
     const sfEl=document.getElementById('spotlight-followers');
     if(sfEl)sfEl.textContent=followerCount;
+    const ctaGigs=document.getElementById('cta-gigs');
+    if(ctaGigs)ctaGigs.textContent=gigs.length;
+    const ctaVenues=document.getElementById('cta-venues');
+    if(ctaVenues&&events.length)ctaVenues.textContent=(eventsRes.data||[]).length||'15';
+
+    // Load real avatar for spotlight
+    try{
+      const{data:opData}=await sb.from('organizer_profiles').select('avatar_url,display_name').eq('user_id','dcae39de-9265-4d67-b8be-5d0ca599069b').maybeSingle();
+      const avEl=document.getElementById('spotlight-avatar');
+      if(avEl&&opData?.avatar_url){
+        avEl.innerHTML=`<img src="${opData.avatar_url}" style="width:100%;height:100%;object-fit:cover;border-radius:50%">`;
+      }
+    }catch(e){}
 
     // Update datebar live text
     const liveEl=document.getElementById('datebar-live-txt');
