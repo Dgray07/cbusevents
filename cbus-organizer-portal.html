@@ -2396,6 +2396,91 @@ async function submitInquiry(venueId){
 }
 
 // ── ADD EVENT MODAL ───────────────────────────────────────────
+// ── VENUE TAB TOGGLE + MAPBOX GEOCODING ─────────────────────
+const MAPBOX_GEOCODE_TOKEN='pk.eyJ1IjoiY2J1c2V2ZW50cyIsImEiOiJjbW1oNWJhaDYwYnVrMnJxN3hxdGJlZmhkIn0.RtF51b0qghUlJAjHgNRdFQ';
+
+function switchVenueTab(tab){
+  const listed=document.getElementById('venuePanelListed');
+  const other=document.getElementById('venuePanelOther');
+  const btnL=document.getElementById('venueTabListed');
+  const btnO=document.getElementById('venueTabOther');
+  if(!listed||!other)return;
+  if(tab==='listed'){
+    listed.style.display='';other.style.display='none';
+    btnL.style.background='#FF6B35';btnL.style.color='#fff';
+    btnO.style.background='var(--surface)';btnO.style.color='var(--sub)';
+  } else {
+    listed.style.display='none';other.style.display='';
+    btnO.style.background='#FF6B35';btnO.style.color='#fff';
+    btnL.style.background='var(--surface)';btnL.style.color='var(--sub)';
+    setTimeout(()=>initVenuePlaces(),50);
+  }
+}
+
+function initVenuePlaces(){
+  const input=document.getElementById('evVenueAddress');
+  if(!input||input._placesInited)return;
+  input._placesInited=true;
+
+  // Dropdown container
+  let dropdown=document.getElementById('evVenueDropdown');
+  if(!dropdown){
+    dropdown=document.createElement('div');
+    dropdown.id='evVenueDropdown';
+    dropdown.style.cssText='position:absolute;z-index:999;background:var(--card);border:1px solid var(--border);border-radius:8px;width:100%;max-height:220px;overflow-y:auto;box-shadow:0 8px 24px rgba(0,0,0,0.4);display:none;top:100%;left:0;margin-top:2px';
+    input.parentElement.style.position='relative';
+    input.parentElement.appendChild(dropdown);
+  }
+
+  let debounceTimer;
+  input.addEventListener('input',()=>{
+    clearTimeout(debounceTimer);
+    const q=input.value.trim();
+    if(q.length<3){dropdown.style.display='none';return;}
+    debounceTimer=setTimeout(()=>nominatimSearch(q,dropdown,input),400);
+  });
+
+  // Close dropdown on outside click
+  document.addEventListener('click',(e)=>{
+    if(!input.contains(e.target)&&!dropdown.contains(e.target)){
+      dropdown.style.display='none';
+    }
+  });
+}
+
+async function nominatimSearch(q,dropdown,input){
+  try{
+    // Mapbox Geocoding - biased toward Columbus, Ohio
+    const url='https://api.mapbox.com/geocoding/v5/mapbox.places/'+encodeURIComponent(q)+'.json?access_token='+MAPBOX_GEOCODE_TOKEN+'&country=US&types=address,poi&proximity=-82.9988,39.9612&limit=5';
+    const res=await fetch(url);
+    const data=await res.json();
+    const features=data.features||[];
+    if(!features.length){dropdown.style.display='none';return;}
+    dropdown.innerHTML=features.map((f,i)=>`
+      <div data-idx="${i}" style="padding:10px 14px;cursor:pointer;font-size:13px;border-bottom:1px solid var(--border-sub);transition:background 0.12s"
+        onmouseover="this.style.background='var(--card-hover,#18182a)'"
+        onmouseout="this.style.background=''"
+        onclick="selectVenueResult('${f.place_name.replace(/'/g,"\\'")}',${f.geometry.coordinates[1]},${f.geometry.coordinates[0]})">
+        <div style="font-weight:600;color:var(--text)">${f.text||f.place_name.split(',')[0]}</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:2px">${f.place_name}</div>
+      </div>`).join('');
+    dropdown.style.display='block';
+  }catch(e){
+    console.warn('Mapbox geocode failed:',e);
+  }
+}
+
+function selectVenueResult(displayName,lat,lng){
+  const input=document.getElementById('evVenueAddress');
+  const latEl=document.getElementById('evVenueLat');
+  const lngEl=document.getElementById('evVenueLng');
+  const dropdown=document.getElementById('evVenueDropdown');
+  if(input)input.value=displayName;
+  if(latEl)latEl.value=lat;
+  if(lngEl)lngEl.value=lng;
+  if(dropdown)dropdown.style.display='none';
+}
+
 function openAddEventModal(editEvent){
  const ev=editEvent||null;
  const vOpts=allVenues.map(v=>'<option value="'+v.id+'"'+(ev&&ev.venue_id===v.id?' selected':'')+'>'+v.name+'</option>').join('');
@@ -2422,7 +2507,19 @@ function openAddEventModal(editEvent){
      '<div class="field"><label>Description</label><textarea id="evDesc" placeholder="Tell people what to expect..." style="min-height:80px">'+(ev?ev.description||'':'')+'</textarea></div>'+
      '<div class="field-row">'+
        '<div class="field"><label>Category</label><select id="evCat">'+catOpts+'</select></div>'+
-       '<div class="field"><label>Venue on CBUSEVENTS</label><select id="evVenue"><option value="">-- Select venue --</option>'+vOpts+'</select></div>'+
+       '<div class="field">'+
+         '<label>Venue</label>'+
+         '<div style="display:flex;gap:0;margin-bottom:8px;border:1px solid var(--border);border-radius:8px;overflow:hidden">'+
+           '<button id="venueTabListed" onclick="switchVenueTab(\'listed\')" style="flex:1;padding:7px 0;font-size:12px;font-weight:600;font-family:var(--font);border:none;cursor:pointer;background:#FF6B35;color:#fff">On CBUSEVENTS</button>'+
+           '<button id="venueTabOther" onclick="switchVenueTab(\'other\')" style="flex:1;padding:7px 0;font-size:12px;font-weight:600;font-family:var(--font);border:none;cursor:pointer;background:var(--surface);color:var(--sub)">Other / Unlisted</button>'+
+         '</div>'+
+         '<div id="venuePanelListed"><select id="evVenue"><option value="">-- Select venue --</option>'+vOpts+'</select></div>'+
+         '<div id="venuePanelOther" style="display:none">'+
+           '<input id="evVenueAddress" placeholder="Start typing address..." autocomplete="off" style="width:100%;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:9px 12px;color:var(--text);font-family:var(--font);font-size:13px;outline:none" value="'+(ev?ev.venue_name_override||'':'')+'">'+
+           '<div style="font-size:11px;color:var(--muted);margin-top:4px">Address will appear on the event listing and map.</div>'+
+           '<input id="evVenueLat" type="hidden"><input id="evVenueLng" type="hidden">'+
+         '</div>'+
+       '</div>'+
      '</div>'+
      '<div class="field-row">'+
        '<div class="field"><label>Date *</label><input id="evDate" type="date" value="'+(ev&&ev.start_time?ev.start_time.slice(0,10):'')+'"></div>'+
@@ -2489,6 +2586,11 @@ async function submitEvent(editId){
  const endTime=document.getElementById('evEndTime')?.value;
  const endDateTime=(endDate&&endTime)?new Date(endDate+'T'+endTime+':00').toISOString():null;
  const venueId=document.getElementById('evVenue')?.value||null;
+ const venueAddress=document.getElementById('evVenueAddress')?.value?.trim()||null;
+ const venueLat=document.getElementById('evVenueLat')?.value||null;
+ const venueLng=document.getElementById('evVenueLng')?.value||null;
+ // Use listed venue ID if selected, otherwise store address as venue_name_override
+ const isOtherVenue=document.getElementById('venuePanelOther')?.style.display!=='none';
  const cover=document.getElementById('evCover')?.value||null;
 
  // Collect tiers
@@ -2511,7 +2613,10 @@ async function submitEvent(editId){
    start_time:startTime.toISOString(),
    end_time:endDateTime,
    category:document.getElementById('evCat')?.value||'Other',
-   venue_id:venueId||null,
+   venue_id:isOtherVenue?null:(venueId||null),
+   venue_name_override:isOtherVenue?(venueAddress||null):null,
+   latitude:venueLat?parseFloat(venueLat):null,
+   longitude:venueLng?parseFloat(venueLng):null,
    description:document.getElementById('evDesc')?.value||null,
    cover_image_url:cover,
    price_min:isFree?null:(priceVals.length?Math.min.apply(null,priceVals):null),
