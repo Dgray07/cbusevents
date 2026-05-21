@@ -386,6 +386,7 @@ nav{
     <button class="nav-btn" id="nav-venues" onclick="nav('venues')">Find Venues</button>
     <button class="nav-btn" id="nav-vendors" onclick="nav('vendors')">Find Vendors</button>
     <button class="nav-btn" id="nav-events" onclick="nav('events')">My Events</button>
+    <button class="nav-btn" id="nav-collaborate" onclick="nav('collaborate')">Collaborate</button>
     <button class="nav-btn" id="nav-inbox" onclick="nav('inbox')">Inbox<span id="inboxNavBadge" style="display:none;background:#FF6B35;color:#fff;border-radius:99px;font-size:10px;font-weight:700;padding:1px 7px;margin-left:5px;vertical-align:middle"></span></button>
     <div class="nav-more-wrap" id="navMoreWrap">
       <button class="nav-more-btn" onclick="toggleNavMore()" id="navMoreBtn">More <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="vertical-align:-1px"><polyline points="6 9 12 15 18 9"/></svg></button>
@@ -393,7 +394,8 @@ nav{
         <button class="nav-more-item" id="nav-inquiries" onclick="nav('inquiries');closeNavMore()">My Inquiries</button>
         <button class="nav-more-item" id="nav-vendortables" onclick="nav('vendortables');closeNavMore()">Vendor Tables</button>
         <button class="nav-more-item" id="nav-payouts" onclick="nav('payouts');closeNavMore()">Payouts</button>
-        <button class="nav-more-item" id="nav-profile" onclick="nav('profile');closeNavMore()">My Profile</button>
+        <div class="nav-more-item" id="nav-profile" onclick="nav('profile');closeNavMore()">My Profile</div>
+        <button class="nav-more-item" onclick="window.open('/organizer-profile.html?id='+currentUser?.id,'_blank');closeNavMore()">View public profile ↗</button>
         <div class="nav-more-divider"></div>
         <button class="nav-more-item" onclick="window.location.href='https://cbusevents.com'">← Back to CBUSEVENTS</button>
       </div>
@@ -486,11 +488,18 @@ function openShareModal(eventId){
 // ── PROFILE PAGE ──────────────────────────────────────────────
 let organizerProfile={};
 async function renderProfile(){
- // Load existing profile
- const{data}=await sb.from('customer_profiles').select('*').eq('user_id',currentUser.id).maybeSingle() ?? {data:{}};
- organizerProfile=data||{};
+ // Load from organizer_profiles first, fall back to customer_profiles
+ const{data:opData}=await sb.from('organizer_profiles').select('*').eq('user_id',currentUser.id).maybeSingle().catch(()=>({data:{}}));
+ const{data:cpData}=await sb.from('customer_profiles').select('*').eq('user_id',currentUser.id).maybeSingle().catch(()=>({data:{}}));
+ organizerProfile={...(cpData||{}),  ...(opData||{})};
  const avatarUrl = organizerProfile.avatar_url || '';
- const avatarInitial = (organizerProfile.display_name||currentUser.email||'O')[0].toUpperCase();
+ const avatarInitial = (organizerProfile.display_name||currentUser.user_metadata?.full_name||currentUser.email||'O')[0].toUpperCase();
+
+ // Update nav avatar with real photo if available
+ const navAv = document.getElementById('navAvatarInitial');
+ if(navAv && avatarUrl){
+   navAv.innerHTML = `<img src="${avatarUrl}" style="width:100%;height:100%;object-fit:cover;border-radius:50%">`;
+ }
  document.getElementById('app').innerHTML=`
  <div class="page">
    <div class="section-title">My Profile</div>
@@ -643,6 +652,12 @@ function setLoggedInNav(){
   const nameEl=document.getElementById('navUserName');
   if(avatarEl)avatarEl.textContent=initial;
   if(nameEl)nameEl.textContent=firstName;
+  // Load real avatar from organizer_profiles async
+  sb.from('organizer_profiles').select('avatar_url').eq('user_id',currentUser.id).maybeSingle().then(({data})=>{
+    if(data?.avatar_url&&avatarEl){
+      avatarEl.innerHTML=`<img src="${data.avatar_url}" style="width:100%;height:100%;object-fit:cover;border-radius:50%">`;
+    }
+  }).catch(()=>{});
 }
 
 async function signOut(){
@@ -920,6 +935,7 @@ function nav(page){
   else if(page==='payouts')renderPayouts();
   else if(page==='inbox')renderInboxPage();
   else if(page==='vendortables')renderVendorTables();
+  else if(page==='collaborate')renderCollaborate();
 }
 
 // ── EVENT DETAIL / MANAGEMENT ────────────────────────────────
@@ -2231,20 +2247,24 @@ function renderDashboard(){
      document.getElementById('app').innerHTML=`
      <div class="page">
        <div style="background:linear-gradient(135deg,#1a0e00 0%,#1c1030 60%,#0d0d1a 100%);border:1px solid var(--border);border-radius:16px;padding:22px 26px;margin-bottom:16px">
-         <div style="font-size:10px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--orange);margin-bottom:8px">Your event</div>
+         <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:8px;flex-wrap:wrap;gap:8px">
+           <div style="font-size:10px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--orange)">Your event</div>
+           <a href="/organizer-profile.html?id=${currentUser.id}" target="_blank" style="font-size:11px;font-weight:600;color:var(--sub);border:1px solid var(--border);border-radius:99px;padding:3px 12px;text-decoration:none;transition:all 0.14s" onmouseover="this.style.color='var(--text)';this.style.borderColor='var(--border-mid)'" onmouseout="this.style.color='var(--sub)';this.style.borderColor='var(--border)'">View public profile ↗</a>
+         </div>
          <div style="font-size:22px;font-weight:800;margin-bottom:4px">${activeEvent.title||'Untitled Event'}</div>
          <div style="font-size:13px;color:var(--sub)">
            ${activeEvent.start_time?new Date(activeEvent.start_time).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}):''}
            ${activeEvent.venue_name_override?' &middot; '+activeEvent.venue_name_override:''}
          </div>
-         <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:16px">
+         <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-top:16px" id="dashStatCards">
            ${[
              {num:confirmed,label:'Confirmed vendors',color:'var(--orange)'},
              {num:pending,label:'Pending review',color:'var(--text)'},
              {num:'$'+feesCollected,label:'Fees collected',color:'var(--green)'},
              {num:'$'+feesPending,label:'Awaiting payment',color:'var(--text)'},
+             {num:'—',label:'Followers',color:'var(--blue)',id:'followerStat'},
            ].map(s=>`
-             <div style="background:rgba(255,255,255,0.04);border-radius:10px;padding:12px 14px">
+             <div style="background:rgba(255,255,255,0.04);border-radius:10px;padding:12px 14px" ${s.id?'id="'+s.id+'"':''}>
                <div style="font-size:20px;font-weight:800;color:${s.color};margin-bottom:3px">${s.num}</div>
                <div style="font-size:11px;color:var(--sub)">${s.label}</div>
              </div>`).join('')}
@@ -2280,7 +2300,29 @@ function renderDashboard(){
            <span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:99px;${e.status==='published'?'background:rgba(52,211,153,0.1);color:var(--green);border:1px solid rgba(52,211,153,0.25)':'background:var(--surface);color:var(--muted);border:1px solid var(--border)'}">${e.status||'draft'}</span>
          </div>`).join('')}
        </div>`:''}
+
+       <!-- COLLABORATE WIDGET -->
+       <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;overflow:hidden;box-shadow:var(--shadow-sm)" id="collabWidget">
+         <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid var(--border)">
+           <div>
+             <div style="font-size:14px;font-weight:700">Collaborator Board</div>
+             <div style="font-size:11px;color:var(--sub);margin-top:2px">Platform-wide gigs &amp; community</div>
+           </div>
+           <button class="btn btn-primary btn-sm" onclick="nav('collaborate')">Open &rarr;</button>
+         </div>
+         <div id="collabWidgetBody" style="padding:14px">
+           <div style="color:var(--muted);font-size:13px;text-align:center;padding:16px 0">Loading...</div>
+         </div>
+       </div>
      </div>`;
+   // Load the collab widget and follower count async after render
+   setTimeout(()=>{
+     loadCollabWidget();
+     sb.from('profile_follows').select('id',{count:'exact',head:true}).eq('following_id',currentUser.id).then(({count})=>{
+       const el=document.getElementById('followerStat');
+       if(el){const num=el.querySelector('div');if(num)num.textContent=count||0;}
+     }).catch(()=>{});
+   },100);
    }).catch(()=>{
      document.getElementById('app').innerHTML=`
      <div class="page">
@@ -2295,6 +2337,319 @@ function renderDashboard(){
      </div>`;
    });
 }
+
+// ── COLLABORATOR MARKETPLACE ──────────────────────────────────
+let _collabTab='feed';
+
+async function renderCollaborate(){
+  const name=currentUser.user_metadata?.full_name||currentUser.email.split('@')[0];
+  const initial=name[0].toUpperCase();
+  document.getElementById('app').innerHTML=`
+  <div class="page">
+    <div style="display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px">
+      <div>
+        <div class="section-title">Collaborator Board</div>
+        <div class="section-sub">Connect with Columbus creatives across every portal</div>
+      </div>
+      <button class="btn btn-primary" onclick="openCollabPost()">+ Post</button>
+    </div>
+
+    <!-- TABS -->
+    <div style="display:flex;gap:0;background:var(--surface);border-radius:10px;padding:4px;margin-bottom:20px;border:1px solid var(--border)">
+      <button id="collab-tab-feed" onclick="switchCollabTab('feed')" style="flex:1;padding:8px 0;border-radius:7px;font-size:13px;font-weight:600;border:none;cursor:pointer;font-family:var(--font);background:var(--card);color:var(--text);box-shadow:var(--shadow-sm);transition:all 0.15s">Community Feed</button>
+      <button id="collab-tab-gigs" onclick="switchCollabTab('gigs')" style="flex:1;padding:8px 0;border-radius:7px;font-size:13px;font-weight:600;border:none;cursor:pointer;font-family:var(--font);background:transparent;color:var(--sub);transition:all 0.15s">Gig Board</button>
+    </div>
+
+    <div id="collabContent"></div>
+  </div>`;
+
+  loadCollabFeed();
+}
+
+function switchCollabTab(tab){
+  _collabTab=tab;
+  const feedBtn=document.getElementById('collab-tab-feed');
+  const gigsBtn=document.getElementById('collab-tab-gigs');
+  if(feedBtn&&gigsBtn){
+    feedBtn.style.background=tab==='feed'?'var(--card)':'transparent';
+    feedBtn.style.color=tab==='feed'?'var(--text)':'var(--sub)';
+    feedBtn.style.boxShadow=tab==='feed'?'var(--shadow-sm)':'none';
+    gigsBtn.style.background=tab==='gigs'?'var(--card)':'transparent';
+    gigsBtn.style.color=tab==='gigs'?'var(--text)':'var(--sub)';
+    gigsBtn.style.boxShadow=tab==='gigs'?'var(--shadow-sm)':'none';
+  }
+  if(tab==='feed') loadCollabFeed();
+  else loadCollabGigs();
+}
+
+async function loadCollabFeed(){
+  const el=document.getElementById('collabContent');
+  if(!el)return;
+  el.innerHTML='<div style="color:var(--muted);font-size:13px;text-align:center;padding:32px">Loading feed...</div>';
+  const{data:posts}=await sb.from('collab_posts').select('*').order('created_at',{ascending:false}).limit(20).catch(()=>({data:[]}));
+  const list=posts||[];
+  if(!list.length){
+    el.innerHTML=`
+    <div style="text-align:center;padding:52px 20px">
+      <div style="font-size:36px;margin-bottom:12px">🤝</div>
+      <div style="font-size:17px;font-weight:700;margin-bottom:6px;color:var(--text)">Be the first to post</div>
+      <div style="font-size:13px;color:var(--sub);margin-bottom:20px">Share updates, opportunities, and event recaps with the Columbus creative community.</div>
+      <button class="btn btn-primary" onclick="openCollabPost()">Write something</button>
+    </div>`;
+    return;
+  }
+  el.innerHTML=list.map(p=>collabPostHTML(p)).join('');
+}
+
+function collabPostHTML(p){
+  const ago=timeAgoCollab(p.created_at);
+  const roleColor={organizer:'var(--orange)',vendor:'var(--blue)',venue_owner:'var(--green)',food_professional:'var(--gold)'}[p.role]||'var(--sub)';
+  const roleLabel={organizer:'Organizer',vendor:'Vendor',venue_owner:'Venue',food_professional:'Food Pro'}[p.role]||p.role;
+  const initial=(p.display_name||'?')[0].toUpperCase();
+  return `<div style="background:var(--card);border:1px solid var(--border);border-radius:14px;box-shadow:var(--shadow-sm);padding:18px 20px;margin-bottom:12px">
+    <div style="display:flex;align-items:flex-start;gap:12px;margin-bottom:12px">
+      <a href="/organizer-profile.html?id=${p.user_id}" target="_blank" style="width:38px;height:38px;border-radius:50%;background:${roleColor}20;border:1px solid ${roleColor}40;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;color:${roleColor};flex-shrink:0;text-decoration:none">${initial}</a>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:13px;font-weight:700;color:var(--text)">${p.display_name||'Anonymous'}</div>
+        <div style="display:flex;align-items:center;gap:6px;margin-top:2px">
+          <span style="font-size:10px;font-weight:700;padding:1px 7px;border-radius:99px;background:${roleColor}15;color:${roleColor};border:1px solid ${roleColor}30">${roleLabel}</span>
+          <span style="font-size:11px;color:var(--muted)">${ago}</span>
+        </div>
+      </div>
+    </div>
+    <div style="font-size:14px;color:var(--text);line-height:1.65;white-space:pre-wrap">${p.body}</div>
+    ${p.image_url?`<img src="${p.image_url}" style="width:100%;border-radius:10px;margin-top:12px;object-fit:cover;max-height:300px">`:''}
+    <div style="display:flex;align-items:center;gap:16px;margin-top:14px;padding-top:12px;border-top:1px solid var(--border)">
+      <button onclick="likePost('${p.id}',this)" style="background:none;border:none;color:var(--muted);font-size:12px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:5px;font-family:var(--font);transition:color 0.14s" onmouseover="this.style.color='var(--orange)'" onmouseout="this.style.color='var(--muted)'">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+        ${p.likes||0}
+      </button>
+    </div>
+  </div>`;
+}
+
+async function loadCollabGigs(){
+  const el=document.getElementById('collabContent');
+  if(!el)return;
+  el.innerHTML='<div style="color:var(--muted);font-size:13px;text-align:center;padding:32px">Loading gigs...</div>';
+
+  // Gig categories filter
+  const cats=['All','Photography','DJ','Staffing','Catering','Design','Videography','Other'];
+  let activeGigCat='All';
+
+  const{data:gigs}=await sb.from('collab_gigs').select('*').eq('status','open').order('created_at',{ascending:false}).catch(()=>({data:[]}));
+  const list=gigs||[];
+
+  function renderGigList(filter){
+    const filtered=filter==='All'?list:list.filter(g=>g.category.toLowerCase()===filter.toLowerCase());
+    if(!filtered.length) return `<div style="text-align:center;padding:40px;color:var(--muted);font-size:13px">No open gigs in this category yet.</div>`;
+    return filtered.map(g=>collabGigHTML(g)).join('');
+  }
+
+  el.innerHTML=`
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px">
+    <div style="font-size:13px;color:var(--sub)">${list.length} open gig${list.length!==1?'s':''}</div>
+    <button class="btn btn-primary btn-sm" onclick="openPostGig()">+ Post a Gig</button>
+  </div>
+  <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px">
+    ${cats.map(c=>`<button onclick="filterGigCat('${c}',this)" style="font-size:11px;padding:4px 12px;border-radius:99px;border:1px solid ${c==='All'?'var(--orange-glow)':'var(--border)'};background:${c==='All'?'var(--orange-dim)':'transparent'};color:${c==='All'?'var(--orange)':'var(--sub)'};cursor:pointer;font-family:var(--font);font-weight:600;transition:all 0.12s">${c}</button>`).join('')}
+  </div>
+  <div id="gigList">${renderGigList('All')}</div>`;
+
+  window.filterGigCat=function(cat,btn){
+    activeGigCat=cat;
+    document.querySelectorAll('[onclick^="filterGigCat"]').forEach(b=>{
+      b.style.background='transparent';b.style.color='var(--sub)';b.style.borderColor='var(--border)';
+    });
+    btn.style.background='var(--orange-dim)';btn.style.color='var(--orange)';btn.style.borderColor='var(--orange-glow)';
+    const gl=document.getElementById('gigList');
+    if(gl)gl.innerHTML=renderGigList(cat);
+  };
+}
+
+function collabGigHTML(g){
+  const ago=timeAgoCollab(g.created_at);
+  const catColor={photography:'var(--blue)',dj:'var(--gold)',staffing:'var(--green)',catering:'var(--orange)',design:'#c084fc',videography:'var(--blue)',other:'var(--sub)'}[g.category?.toLowerCase()]||'var(--sub)';
+  return `<div style="background:var(--card);border:1px solid var(--border);border-radius:14px;box-shadow:var(--shadow-sm);padding:18px 20px;margin-bottom:10px">
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:10px">
+      <div>
+        <div style="font-size:15px;font-weight:700;color:var(--text);margin-bottom:4px">${g.title}</div>
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+          <span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:99px;background:${catColor}15;color:${catColor};border:1px solid ${catColor}30">${g.category}</span>
+          ${g.pay?`<span style="font-size:11px;color:var(--green);font-weight:600">${g.pay}</span>`:''}
+          ${g.event_date?`<span style="font-size:11px;color:var(--muted)">${new Date(g.event_date).toLocaleDateString('en-US',{month:'short',day:'numeric'})}</span>`:''}
+        </div>
+      </div>
+      <span style="font-size:10px;font-weight:700;padding:3px 10px;border-radius:99px;background:rgba(48,214,147,0.1);color:var(--green);border:1px solid rgba(48,214,147,0.25);white-space:nowrap;flex-shrink:0">Open</span>
+    </div>
+    <div style="font-size:13px;color:var(--sub);line-height:1.6;margin-bottom:12px">${g.description}</div>
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
+      <div style="font-size:11px;color:var(--muted)">Posted by ${g.poster_name} &middot; ${ago} &middot; ${g.applications||0} applicant${g.applications!==1?'s':''}</div>
+      ${g.poster_id!==currentUser?.id?`<button onclick="applyToGig('${g.id}')" class="btn btn-primary btn-sm">Apply</button>`:`<button onclick="closeGig('${g.id}')" class="btn btn-ghost btn-sm">Close listing</button>`}
+    </div>
+  </div>`;
+}
+
+function timeAgoCollab(dt){
+  if(!dt)return'';
+  const s=Math.floor((Date.now()-new Date(dt))/1000);
+  if(s<60)return'just now';
+  if(s<3600)return Math.floor(s/60)+'m ago';
+  if(s<86400)return Math.floor(s/3600)+'h ago';
+  if(s<604800)return Math.floor(s/86400)+'d ago';
+  return new Date(dt).toLocaleDateString('en-US',{month:'short',day:'numeric'});
+}
+
+async function likePost(id,btn){
+  const{error}=await sb.from('collab_post_likes').insert({post_id:id,user_id:currentUser.id}).catch(e=>({error:e}));
+  if(!error){
+    await sb.from('collab_posts').update({likes:sb.rpc('increment')}).eq('id',id).catch(()=>{});
+    const num=btn.querySelector('span')||btn;
+    const current=parseInt(btn.textContent.match(/\d+/)?.[0]||'0');
+    btn.innerHTML=`<svg width="14" height="14" viewBox="0 0 24 24" fill="var(--orange)" stroke="var(--orange)" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg> ${current+1}`;
+    btn.style.color='var(--orange)';
+  }
+}
+
+async function applyToGig(gigId){
+  const name=currentUser.user_metadata?.full_name||currentUser.email.split('@')[0];
+  const role=(window._userRoles||['organizer'])[0];
+  const msg=prompt('Add a quick message with your application (optional):');
+  if(msg===null)return;
+  const{error}=await sb.from('collab_gig_applications').insert({gig_id:gigId,applicant_id:currentUser.id,display_name:name,role,message:msg||null}).catch(e=>({error:e}));
+  if(error&&error.code==='23505'){toast('You already applied to this gig');return;}
+  if(error){toast('Error applying. Try again.','error');return;}
+  await sb.from('collab_gigs').update({applications:sb.rpc('increment')}).eq('id',gigId).catch(()=>{});
+  toast('Application sent!');
+  loadCollabGigs();
+}
+
+async function closeGig(id){
+  if(!confirm('Close this gig listing?'))return;
+  await sb.from('collab_gigs').update({status:'closed'}).eq('id',id);
+  toast('Gig closed');
+  loadCollabGigs();
+}
+
+function openCollabPost(){
+  const name=currentUser.user_metadata?.full_name||currentUser.email.split('@')[0];
+  document.getElementById('modal').innerHTML=`
+  <div class="modal-overlay" onclick="if(event.target===this)closeModal()">
+    <div class="modal" style="max-width:500px">
+      <div class="modal-header">
+        <div class="modal-title">Share with the community</div>
+        <button onclick="closeModal()" style="background:none;border:none;color:var(--sub);font-size:20px;cursor:pointer">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
+          <div style="width:36px;height:36px;border-radius:50%;background:var(--orange-dim);border:1px solid var(--orange-glow);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;color:var(--orange)">${name[0].toUpperCase()}</div>
+          <div style="font-size:13px;font-weight:600">${name}</div>
+        </div>
+        <textarea id="collabPostBody" placeholder="Share an update, opportunity, event recap, or anything useful for the Columbus community..." style="width:100%;background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:10px;padding:12px 14px;color:var(--text);font-size:14px;line-height:1.6;outline:none;resize:none;min-height:120px;font-family:var(--font)"></textarea>
+        <div id="collabPostErr" style="color:var(--red);font-size:12px;margin-top:8px;display:none"></div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
+        <button class="btn btn-primary" onclick="submitCollabPost()">Post</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+async function submitCollabPost(){
+  const body=document.getElementById('collabPostBody')?.value.trim();
+  const errEl=document.getElementById('collabPostErr');
+  if(!body){if(errEl){errEl.textContent='Write something first.';errEl.style.display='block';}return;}
+  const name=currentUser.user_metadata?.full_name||currentUser.email.split('@')[0];
+  const role=(window._userRoles||['organizer'])[0];
+  const{error}=await sb.from('collab_posts').insert({user_id:currentUser.id,role,display_name:name,body}).catch(e=>({error:e}));
+  if(error){if(errEl){errEl.textContent='Error posting. Try again.';errEl.style.display='block';}return;}
+  closeModal();
+  toast('Posted to the community!');
+  if(currentPage==='collaborate') loadCollabFeed();
+}
+
+function openPostGig(){
+  const name=currentUser.user_metadata?.full_name||currentUser.email.split('@')[0];
+  const cats=['Photography','DJ','Staffing','Catering','Design','Videography','Other'];
+  document.getElementById('modal').innerHTML=`
+  <div class="modal-overlay" onclick="if(event.target===this)closeModal()">
+    <div class="modal" style="max-width:520px">
+      <div class="modal-header">
+        <div class="modal-title">Post a Gig</div>
+        <button onclick="closeModal()" style="background:none;border:none;color:var(--sub);font-size:20px;cursor:pointer">&times;</button>
+      </div>
+      <div class="modal-body" style="max-height:70vh;overflow-y:auto">
+        <div class="field"><label>Gig title *</label><input id="gigTitle" placeholder="e.g. Photographer needed for June festival"></div>
+        <div class="field-row">
+          <div class="field"><label>Category *</label><select id="gigCat">${cats.map(c=>`<option>${c}</option>`).join('')}</select></div>
+          <div class="field"><label>Pay / Compensation</label><input id="gigPay" placeholder="e.g. $200 flat, Negotiable"></div>
+        </div>
+        <div class="field"><label>Event date</label><input id="gigDate" type="date"></div>
+        <div class="field"><label>Description *</label><textarea id="gigDesc" placeholder="What you need, requirements, what they'll get..." style="min-height:100px"></textarea></div>
+        <div id="gigErr" style="color:var(--red);font-size:12px;margin-top:4px;display:none"></div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
+        <button class="btn btn-primary" onclick="submitGig()">Post Gig</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+async function submitGig(){
+  const title=document.getElementById('gigTitle')?.value.trim();
+  const desc=document.getElementById('gigDesc')?.value.trim();
+  const cat=document.getElementById('gigCat')?.value;
+  const pay=document.getElementById('gigPay')?.value.trim()||null;
+  const date=document.getElementById('gigDate')?.value||null;
+  const errEl=document.getElementById('gigErr');
+  if(!title||!desc){if(errEl){errEl.textContent='Title and description are required.';errEl.style.display='block';}return;}
+  const name=currentUser.user_metadata?.full_name||currentUser.email.split('@')[0];
+  const{error}=await sb.from('collab_gigs').insert({poster_id:currentUser.id,poster_name:name,poster_role:'organizer',title,description:desc,category:cat,pay,event_date:date}).catch(e=>({error:e}));
+  if(error){if(errEl){errEl.textContent='Error posting gig. Try again.';errEl.style.display='block';}return;}
+  closeModal();
+  toast('Gig posted!');
+  if(currentPage==='collaborate'){_collabTab='gigs';renderCollaborate();setTimeout(()=>switchCollabTab('gigs'),100);}
+}
+
+// Load collab widget on dashboard
+async function loadCollabWidget(){
+  const el=document.getElementById('collabWidgetBody');
+  if(!el)return;
+  const{data:posts}=await sb.from('collab_posts').select('*').order('created_at',{ascending:false}).limit(3).catch(()=>({data:[]}));
+  const{data:gigs}=await sb.from('collab_gigs').select('id,title,category,pay').eq('status','open').order('created_at',{ascending:false}).limit(2).catch(()=>({data:[]}));
+  const list=posts||[];
+  const gigList=gigs||[];
+  if(!list.length&&!gigList.length){
+    el.innerHTML=`<div style="text-align:center;padding:16px;color:var(--muted);font-size:13px">No activity yet. <button onclick="nav('collaborate')" style="background:none;border:none;color:var(--orange);font-weight:600;cursor:pointer;font-size:13px;font-family:var(--font)">Be the first to post</button></div>`;
+    return;
+  }
+  let html='';
+  gigList.forEach(g=>{
+    html+=`<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border)">
+      <div style="flex:1;min-width:0">
+        <div style="font-size:12px;font-weight:600;color:var(--text)">${g.title}</div>
+        <div style="font-size:10px;color:var(--muted)">${g.category}${g.pay?' · '+g.pay:''}</div>
+      </div>
+      <span style="font-size:10px;font-weight:700;padding:2px 7px;border-radius:99px;background:rgba(48,214,147,0.1);color:var(--green);border:1px solid rgba(48,214,147,0.25);flex-shrink:0;margin-left:8px">Gig</span>
+    </div>`;
+  });
+  list.forEach(p=>{
+    const roleColor={organizer:'var(--orange)',vendor:'var(--blue)',venue_owner:'var(--green)',food_professional:'var(--gold)'}[p.role]||'var(--sub)';
+    html+=`<div style="padding:8px 0;border-bottom:1px solid var(--border)">
+      <div style="display:flex;align-items:center;gap:7px;margin-bottom:4px">
+        <div style="width:22px;height:22px;border-radius:50%;background:${roleColor}20;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;color:${roleColor}">${(p.display_name||'?')[0].toUpperCase()}</div>
+        <span style="font-size:11px;font-weight:600;color:var(--text)">${p.display_name}</span>
+        <span style="font-size:10px;color:var(--muted)">${timeAgoCollab(p.created_at)}</span>
+      </div>
+      <div style="font-size:12px;color:var(--sub);line-height:1.5;padding-left:29px">${p.body.substring(0,100)}${p.body.length>100?'...':''}</div>
+    </div>`;
+  });
+  el.innerHTML=html+`<div style="padding-top:10px;text-align:center"><button onclick="nav('collaborate')" style="background:none;border:none;color:var(--orange);font-size:12px;font-weight:600;cursor:pointer;font-family:var(--font)">See all activity &rarr;</button></div>`;
+}
+
+
 // ── VENUES ────────────────────────────────────────────────────
 function renderVenues(){
  document.getElementById('app').innerHTML=`
@@ -3274,20 +3629,21 @@ async function uploadAvatar(input){
   const { data: urlData } = sb.storage.from('profile-photos').getPublicUrl(path);
   const publicUrl = urlData.publicUrl + '?t=' + Date.now(); // cache bust
 
-  const { error: dbErr } = await sb.from('customer_profiles')
+  // Write to organizer_profiles (primary) and customer_profiles (fallback)
+  await sb.from('organizer_profiles')
     .upsert({ user_id: currentUser.id, avatar_url: urlData.publicUrl, updated_at: new Date().toISOString() }, { onConflict: 'user_id' });
-
-  if(dbErr){
-    msg.style.color='var(--red)';
-    msg.textContent='Saved photo but could not update profile: ' + dbErr.message;
-    return;
-  }
+  await sb.from('customer_profiles')
+    .upsert({ user_id: currentUser.id, avatar_url: urlData.publicUrl, updated_at: new Date().toISOString() }, { onConflict: 'user_id' }).catch(()=>{});
 
   organizerProfile.avatar_url = urlData.publicUrl;
 
   // Update preview
   const preview = document.getElementById('avatarPreview');
   if(preview) preview.innerHTML = `<img src="${publicUrl}" style="width:100%;height:100%;object-fit:cover">`;
+
+  // Update nav avatar chip
+  const navAv = document.getElementById('navAvatarInitial');
+  if(navAv) navAv.innerHTML = `<img src="${publicUrl}" style="width:100%;height:100%;object-fit:cover;border-radius:50%">`;
 
   msg.style.color='var(--green)';
   msg.textContent='✓ Photo updated!';
@@ -3296,11 +3652,17 @@ async function uploadAvatar(input){
 
 async function removeAvatar(){
   if(!confirm('Remove your profile photo?')) return;
-  const { error } = await sb.from('customer_profiles')
+  await sb.from('organizer_profiles')
     .update({ avatar_url: null, updated_at: new Date().toISOString() })
     .eq('user_id', currentUser.id);
-  if(error){ toast('Could not remove photo','error'); return; }
+  await sb.from('customer_profiles')
+    .update({ avatar_url: null, updated_at: new Date().toISOString() })
+    .eq('user_id', currentUser.id).catch(()=>{});
   organizerProfile.avatar_url = null;
+  // Reset nav avatar
+  const name = currentUser.user_metadata?.full_name||currentUser.email.split('@')[0];
+  const navAv = document.getElementById('navAvatarInitial');
+  if(navAv) navAv.textContent = name[0].toUpperCase();
   renderProfile();
   toast('Profile photo removed');
 }
