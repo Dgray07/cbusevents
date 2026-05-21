@@ -904,170 +904,162 @@ async function adminCreateConvo(){
 function renderDashboard(){
   const approved=allVenues.filter(v=>v.status==='approved').length;
   const pending=allVenues.filter(v=>v.status==='pending').length;
-  const premium=allVenues.filter(v=>v.tier==='premium').length;
-  const standard=allVenues.filter(v=>v.tier==='standard').length;
   const newInq=allInquiries.filter(i=>i.status==='new').length;
   const thisWeekEvents=allEvents.filter(e=>{const d=new Date(e.start_time),n=new Date();return d>=n&&d<=new Date(n.getTime()+7*86400000);}).length;
   const liveEvents=allEvents.filter(e=>e.status==='published'||e.status==='active').length;
   const totalVendors=allVendors.length;
   const activeVendors=allVendors.filter(v=>v.storefront_active).length;
 
-  // Pending approvals HTML
+  // card style helpers
+  const card=(content,extra='')=>`<div style="background:var(--card);border:1px solid var(--border);border-radius:14px;overflow:hidden;${extra}">${content}</div>`;
+  const cardHead=(title,action='')=>`<div style="display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid var(--border)"><span style="font-size:14px;font-weight:700;letter-spacing:-0.01em">${title}</span>${action}</div>`;
+  const statBadge=(label,val,color)=>`<div style="background:var(--surface);border-radius:10px;padding:10px 14px"><div style="font-size:22px;font-weight:800;color:${color};line-height:1;margin-bottom:3px">${val}</div><div style="font-size:11px;color:var(--sub)">${label}</div></div>`;
+
+  // Pending venue rows
   const pendingVenues=allVenues.filter(v=>v.status==='pending').slice(0,5);
   const pendingRows=pendingVenues.map(v=>`
-    <div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--border-sub)">
-      <div style="width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--orange),#c84000);display:flex;align-items:center;justify-content:center;font-weight:900;font-size:13px;flex-shrink:0">${(v.name||'V')[0]}</div>
+    <div style="display:flex;align-items:center;gap:10px;padding:10px 18px;border-bottom:1px solid var(--border-sub)">
+      <div style="width:30px;height:30px;border-radius:50%;background:rgba(255,107,53,.15);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:12px;color:var(--orange);flex-shrink:0">${(v.name||'V')[0]}</div>
       <div style="flex:1;min-width:0">
         <div style="font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${v.name||'Unnamed'}</div>
-        <div style="font-family:var(--mono);font-size:9px;letter-spacing:.1em;color:var(--muted);text-transform:uppercase;margin-top:1px">${v.venue_type||'Venue'}${v.neighborhood?' · '+v.neighborhood:''}</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:1px">${v.venue_type||'Venue'}${v.neighborhood?' · '+v.neighborhood:''}</div>
       </div>
-      <div style="display:flex;gap:6px;flex-shrink:0">
+      <div style="display:flex;gap:5px;flex-shrink:0">
         <button class="btn btn-success btn-sm" onclick="approveVenue('${v.id}')">Approve</button>
         <button class="btn btn-danger btn-sm" onclick="rejectVenue('${v.id}')">✕</button>
       </div>
     </div>`).join('');
 
-  // Recent activity HTML (inquiries as proxy)
+  // Recent activity
   const recentActivity=allInquiries.slice(0,6).map(i=>`
-    <div style="display:flex;align-items:flex-start;gap:12px;padding:12px 0;border-bottom:1px solid var(--border-sub);cursor:pointer" onclick="nav('inquiries')">
-      <div style="width:30px;height:30px;border-radius:50%;background:rgba(255,107,53,.15);border:1px solid rgba(255,107,53,.3);display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;margin-top:1px">📋</div>
+    <div style="display:flex;align-items:flex-start;gap:10px;padding:11px 18px;border-bottom:1px solid var(--border-sub);cursor:pointer" onclick="nav('inquiries')">
+      <div style="width:28px;height:28px;border-radius:50%;background:rgba(255,107,53,.1);border:1px solid rgba(255,107,53,.2);display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0;margin-top:1px">📋</div>
       <div style="flex:1;min-width:0">
-        <div style="font-size:13px;color:var(--sub);line-height:1.5"><strong style="color:var(--text)">${i.name||'Anonymous'}</strong> submitted a venue inquiry for ${i.venues?.name||'a venue'}</div>
-        <div style="font-family:var(--mono);font-size:9px;letter-spacing:.1em;color:var(--muted);margin-top:3px">${new Date(i.created_at).toLocaleDateString('en-US',{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'})}</div>
+        <div style="font-size:12px;color:var(--sub);line-height:1.5"><strong style="color:var(--text)">${i.name||'Anonymous'}</strong> inquired about ${i.venues?.name||'a venue'}</div>
+        <div style="font-size:10px;color:var(--muted);margin-top:2px">${new Date(i.created_at).toLocaleDateString('en-US',{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'})}</div>
       </div>
-      <div style="font-family:var(--mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;padding:3px 10px;border-radius:99px;flex-shrink:0;${i.status==='new'?'background:rgba(255,107,53,.12);color:var(--orange);border:1px solid rgba(255,107,53,.3)':'background:var(--border);color:var(--muted)'}">${i.status}</div>
+      <span style="font-size:10px;font-weight:600;padding:2px 8px;border-radius:99px;flex-shrink:0;${i.status==='new'?'background:rgba(255,107,53,.1);color:var(--orange);border:1px solid rgba(255,107,53,.25)':'background:var(--border);color:var(--muted)'}">${i.status}</span>
     </div>`).join('') || `<div style="padding:32px;text-align:center;color:var(--muted);font-size:13px">No recent activity</div>`;
 
   document.getElementById('pageContent').innerHTML=`
 
-    <!-- REVENUE HERO -->
-    <div style="background:linear-gradient(135deg,#0f0f1a 0%,#1a0f0a 100%);border:1px solid var(--border);border-radius:14px;padding:28px 32px;margin-bottom:20px;position:relative;overflow:hidden;display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:0">
-      <div style="position:absolute;top:-60px;right:-60px;width:240px;height:240px;border-radius:50%;background:radial-gradient(circle,rgba(255,107,53,.1) 0%,transparent 70%);pointer-events:none"></div>
-
-      <div style="padding-right:28px;border-right:1px solid var(--border)">
-        <div style="font-family:var(--mono);font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);margin-bottom:10px">Platform Revenue</div>
-        <div style="font-family:'DM Sans',sans-serif;font-size:44px;font-weight:900;color:var(--text);line-height:1;margin-bottom:8px"><span style="color:var(--orange);font-size:26px">$</span>${(standard*29+premium*79).toLocaleString()}<span style="font-size:20px;color:var(--muted)">.00</span></div>
-        <div style="display:flex;align-items:center;gap:6px;font-family:var(--mono);font-size:11px;letter-spacing:.1em;color:var(--green)">▲ Subscription revenue est.</div>
-        <div style="display:flex;align-items:flex-end;gap:3px;height:36px;margin-top:14px">
-          ${[30,45,35,60,50,70,55,80,65,90,75,100].map(h=>`<div style="flex:1;height:${h}%;background:var(--orange);opacity:${h/120+0.3};border-radius:2px 2px 0 0"></div>`).join('')}
-        </div>
-      </div>
-
-      <div style="padding:0 24px;border-right:1px solid var(--border);display:flex;flex-direction:column;justify-content:center">
-        <div style="font-family:var(--mono);font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);margin-bottom:6px">Total Venues</div>
-        <div style="font-family:'DM Sans',sans-serif;font-size:28px;font-weight:900;color:var(--text);margin-bottom:4px">${allVenues.length}</div>
-        <div style="font-family:var(--mono);font-size:10px;letter-spacing:.08em;color:var(--green)">▲ ${approved} approved</div>
-      </div>
-
-      <div style="padding:0 24px;border-right:1px solid var(--border);display:flex;flex-direction:column;justify-content:center">
-        <div style="font-family:var(--mono);font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);margin-bottom:6px">Live Events</div>
-        <div style="font-family:'DM Sans',sans-serif;font-size:28px;font-weight:900;color:var(--text);margin-bottom:4px">${liveEvents}</div>
-        <div style="font-family:var(--mono);font-size:10px;letter-spacing:.08em;color:var(--sub)">${thisWeekEvents} this week</div>
-      </div>
-
-      <div style="padding:0 24px;display:flex;flex-direction:column;justify-content:center">
-        <div style="font-family:var(--mono);font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);margin-bottom:6px">Open Inquiries</div>
-        <div style="font-family:'DM Sans',sans-serif;font-size:28px;font-weight:900;color:${newInq?'var(--orange)':'var(--text)'};margin-bottom:4px">${newInq}</div>
-        <div style="font-family:var(--mono);font-size:10px;letter-spacing:.08em;color:var(--sub)">${allInquiries.length} total</div>
-      </div>
+    <!-- TOP STAT ROW -->
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:18px">
+      ${[
+        {label:'Total collected',val:'View →',color:'var(--green)',click:"nav('transactions')",sub:'See transactions'},
+        {label:'Live events',val:liveEvents,color:'var(--orange)',click:"nav('events')",sub:thisWeekEvents+' this week'},
+        {label:'Active organizers',val:organizerCount,color:'var(--blue)',click:"nav('organizers')",sub:totalVendors+' vendors'},
+        {label:'Open inquiries',val:newInq,color:newInq?'var(--orange)':'var(--text)',click:"nav('inquiries')",sub:allInquiries.length+' total'},
+      ].map(s=>`
+        <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px 20px;cursor:pointer;transition:border-color .15s" onclick="${s.click}" onmouseover="this.style.borderColor='rgba(255,107,53,.3)'" onmouseout="this.style.borderColor='var(--border)'">
+          <div style="font-size:28px;font-weight:800;color:${s.color};line-height:1;margin-bottom:6px">${s.val}</div>
+          <div style="font-size:12px;font-weight:600;color:var(--text);margin-bottom:3px">${s.label}</div>
+          <div style="font-size:11px;color:var(--muted)">${s.sub}</div>
+        </div>`).join('')}
     </div>
 
-    <!-- ROLE STATS ROW -->
-    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px">
+    <!-- PLATFORM STATS ROW -->
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:18px">
       ${[
-        {icon:'🏟️',label:'Organizers',val:organizerCount,color:'var(--gold)',click:"nav('organizers')"},
-        {icon:'🏪',label:'Vendors',val:totalVendors,color:'var(--blue)',click:"nav('vendors')"},
-        {icon:'👥',label:'Attendees',val:attendeeCount,color:'var(--green)',click:"nav('users')"},
-        {icon:'⭐',label:'Premium Venues',val:premium,color:'var(--orange)',click:"nav('venues')"},
+        {label:'Venues live',val:approved,total:allVenues.length,color:'var(--orange)',click:"nav('venues')"},
+        {label:'Vendors',val:totalVendors,total:allVendors.length,color:'var(--blue)',click:"nav('vendors')"},
+        {label:'Attendees',val:attendeeCount,total:null,color:'var(--green)',click:"nav('users')"},
+        {label:'Food pros',val:allFoodPros.length,total:null,color:'var(--gold)',click:"nav('foodpros')"},
       ].map(s=>`
-        <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:18px 20px;cursor:pointer;transition:border-color .15s" onclick="${s.click}" onmouseover="this.style.borderColor='var(--border-sub)'" onmouseout="this.style.borderColor='var(--border)'">
-          <div style="font-size:20px;margin-bottom:10px">${s.icon}</div>
-          <div style="font-family:'DM Sans',sans-serif;font-size:26px;font-weight:900;color:${s.color};line-height:1;margin-bottom:4px">${s.val}</div>
-          <div style="font-family:var(--mono);font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted)">${s.label}</div>
+        <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px 18px;cursor:pointer;transition:border-color .15s" onclick="${s.click}" onmouseover="this.style.borderColor='rgba(255,107,53,.2)'" onmouseout="this.style.borderColor='var(--border)'">
+          <div style="font-size:24px;font-weight:800;color:${s.color};line-height:1;margin-bottom:4px">${s.val}${s.total!==null?'<span style="font-size:13px;color:var(--muted);font-weight:500"> / '+s.total+'</span>':''}</div>
+          <div style="font-size:11px;color:var(--sub)">${s.label}</div>
+          <div style="height:3px;background:var(--border);border-radius:99px;margin-top:10px;overflow:hidden"><div style="height:100%;background:${s.color};border-radius:99px;width:${s.total?Math.min(100,Math.round(s.val/s.total*100)):100}%;transition:width .6s ease"></div></div>
         </div>`).join('')}
     </div>
 
     <!-- MAIN GRID -->
-    <div style="display:grid;grid-template-columns:1fr 320px;gap:20px;margin-bottom:20px">
+    <div style="display:grid;grid-template-columns:1fr 300px;gap:16px;margin-bottom:16px">
 
       <!-- LIVE ACTIVITY -->
-      <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden">
-        <div style="padding:16px 22px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between">
-          <div style="font-family:'DM Sans',sans-serif;font-size:15px;font-weight:700">Live Activity</div>
-          <div style="display:flex;align-items:center;gap:7px;font-family:var(--mono);font-size:10px;letter-spacing:.12em;color:var(--green)">
-            <div style="width:6px;height:6px;border-radius:50%;background:var(--green);animation:spin 0s linear;box-shadow:0 0 6px var(--green)"></div>
-            Live
-          </div>
-        </div>
-        <div style="padding:0 22px">${recentActivity}</div>
-        <div style="padding:14px 22px;border-top:1px solid var(--border)">
-          <button class="btn btn-ghost btn-sm" onclick="nav('inquiries')">View all activity →</button>
-        </div>
-      </div>
+      ${card(
+        cardHead('Live activity','<div style="display:flex;align-items:center;gap:6px;font-size:10px;font-weight:600;color:var(--green)"><div style="width:6px;height:6px;border-radius:50%;background:var(--green)"></div>Live</div>')
+        + recentActivity
+        + `<div style="padding:12px 18px;border-top:1px solid var(--border)"><button class="btn btn-ghost btn-sm" onclick="nav('inquiries')">View all →</button></div>`
+      )}
 
-      <!-- RIGHT COLUMN -->
+      <!-- RIGHT COL -->
       <div style="display:flex;flex-direction:column;gap:14px">
 
         <!-- PENDING APPROVALS -->
-        <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden">
-          <div style="padding:14px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between">
-            <div style="font-family:'DM Sans',sans-serif;font-size:14px;font-weight:700">Pending Approvals</div>
-            ${pending?`<span style="background:var(--orange);color:white;font-family:var(--mono);font-size:9px;font-weight:600;padding:2px 9px;border-radius:99px">${pending}</span>`:''}
-          </div>
-          <div style="padding:0 18px">
-            ${pendingRows || `<div style="padding:20px 0;text-align:center;color:var(--muted);font-size:13px">All caught up ✓</div>`}
-          </div>
-          ${pending?`<div style="padding:12px 18px;border-top:1px solid var(--border)"><button class="btn btn-ghost btn-sm" onclick="nav('venues')">View all venues →</button></div>`:''}
-        </div>
+        ${card(
+          cardHead('Pending approvals', pending?`<span style="background:var(--orange);color:#fff;font-size:9px;font-weight:800;padding:2px 8px;border-radius:99px">${pending}</span>`:'')
+          + (pendingRows || `<div style="padding:20px 18px;text-align:center;color:var(--muted);font-size:12px">All caught up ✓</div>`)
+          + (pending?`<div style="padding:10px 18px;border-top:1px solid var(--border)"><button class="btn btn-ghost btn-sm" onclick="nav('venues')">View all →</button></div>`:'')
+        )}
 
         <!-- QUICK ACTIONS -->
-        <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px 18px">
-          <div style="font-family:'DM Sans',sans-serif;font-size:14px;font-weight:700;margin-bottom:12px">Quick Actions</div>
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+        ${card(
+          cardHead('Quick actions')
+          + `<div style="padding:12px 14px;display:grid;grid-template-columns:1fr 1fr;gap:8px">
             ${[
-              {icon:'⭐',label:'Feature Event',click:"nav('events')"},
-              {icon:'📰',label:'Scene Report',click:"nav('blog')"},
-              {icon:'💰',label:'View Revenue',click:"nav('revenue')"},
-              {icon:'📣',label:'Send Bulk Email',click:"nav('email')"},
-              {icon:'🎯',label:'Boost Listing',click:"nav('marketing')"},
-              {icon:'📊',label:'Analytics',click:"nav('analytics')"},
+              {icon:'📅',label:'Events',click:"nav('events')"},
+              {icon:'💳',label:'Transactions',click:"nav('transactions')"},
+              {icon:'💰',label:'Revenue',click:"nav('revenue')"},
+              {icon:'✦',label:'Marketing AI',click:"nav('marketing')"},
+              {icon:'✎',label:'Blog & SEO',click:"nav('blog')"},
+              {icon:'↗',label:'Outreach',click:"nav('outreach')"},
             ].map(a=>`
-              <button onclick="${a.click}" style="background:var(--card-hover,#18182a);border:1px solid var(--border);border-radius:8px;padding:11px;cursor:pointer;text-align:left;transition:border-color .15s;font-family:var(--font)" onmouseover="this.style.borderColor='rgba(255,107,53,.3)'" onmouseout="this.style.borderColor='var(--border)'">
-                <div style="font-size:16px;margin-bottom:5px">${a.icon}</div>
-                <div style="font-size:12px;font-weight:500;color:var(--text);line-height:1.3">${a.label}</div>
+              <button onclick="${a.click}" style="background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:10px;cursor:pointer;text-align:left;transition:all .14s;font-family:var(--font)" onmouseover="this.style.borderColor='rgba(255,107,53,.3)';this.style.background='var(--card-hover,#18182a)'" onmouseout="this.style.borderColor='var(--border)';this.style.background='var(--surface)'">
+                <div style="font-size:14px;margin-bottom:4px">${a.icon}</div>
+                <div style="font-size:11px;font-weight:600;color:var(--text)">${a.label}</div>
               </button>`).join('')}
-          </div>
-        </div>
-
+          </div>`
+        )}
       </div>
     </div>
 
-    <!-- BOTTOM STATS -->
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+    <!-- BOTTOM: UPCOMING EVENTS + PLATFORM HEALTH -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
 
-      <!-- TOP EVENTS -->
-      <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden">
-        <div style="padding:16px 22px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between">
-          <div style="font-family:'DM Sans',sans-serif;font-size:15px;font-weight:700">Upcoming Events</div>
-          <button class="btn btn-ghost btn-sm" onclick="nav('events')">View all →</button>
-        </div>
-        ${allEvents.slice(0,5).map(e=>`
-          <div style="padding:12px 22px;border-bottom:1px solid var(--border-sub);display:flex;align-items:center;gap:14px;cursor:pointer" onclick="nav('events')">
-            <div style="text-align:center;flex-shrink:0;min-width:36px">
-              <div style="font-family:var(--mono);font-size:8px;letter-spacing:.14em;text-transform:uppercase;color:var(--orange)">${e.start_time?new Date(e.start_time).toLocaleDateString('en-US',{month:'short'}).toUpperCase():''}</div>
-              <div style="font-family:'DM Sans',sans-serif;font-size:20px;font-weight:900;color:var(--text);line-height:1">${e.start_time?new Date(e.start_time).getDate():'?'}</div>
+      <!-- UPCOMING EVENTS -->
+      ${card(
+        cardHead('Upcoming events',`<button class="btn btn-ghost btn-sm" onclick="nav('events')">View all →</button>`)
+        + (allEvents.slice(0,5).map(e=>`
+          <div style="display:flex;align-items:center;gap:12px;padding:11px 18px;border-bottom:1px solid var(--border-sub);cursor:pointer" onclick="nav('events')">
+            <div style="text-align:center;flex-shrink:0;min-width:32px">
+              <div style="font-size:8px;font-weight:700;text-transform:uppercase;color:var(--orange);letter-spacing:.1em">${e.start_time?new Date(e.start_time).toLocaleDateString('en-US',{month:'short'}).toUpperCase():''}</div>
+              <div style="font-size:20px;font-weight:800;color:var(--text);line-height:1">${e.start_time?new Date(e.start_time).getDate():'?'}</div>
             </div>
             <div style="flex:1;min-width:0">
-              <div style="font-size:13px;font-weight:500;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${e.title||'Untitled'}</div>
+              <div style="font-size:13px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${e.title||'Untitled'}</div>
               <div style="font-size:11px;color:var(--muted)">${e.venue_name_override||'Columbus'}</div>
             </div>
-            <div style="font-family:var(--mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;padding:3px 9px;border-radius:99px;flex-shrink:0;${e.status==='published'?'background:rgba(52,211,153,.1);color:var(--green);border:1px solid rgba(52,211,153,.25)':'background:var(--border);color:var(--muted)'}">${e.status||'draft'}</div>
-          </div>`).join('') || `<div style="padding:32px;text-align:center;color:var(--muted);font-size:13px">No upcoming events</div>`}
-      </div>
+            <span style="font-size:10px;font-weight:600;padding:2px 8px;border-radius:99px;flex-shrink:0;${e.status==='published'?'background:rgba(52,211,153,.1);color:var(--green);border:1px solid rgba(52,211,153,.2)':'background:var(--border);color:var(--muted)'}">${e.status||'draft'}</span>
+          </div>`).join('') || `<div style="padding:32px;text-align:center;color:var(--muted);font-size:13px">No upcoming events</div>`)
+      )}
 
       <!-- PLATFORM HEALTH -->
-      <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px 22px">
-        <div style="font-family:'DM Sans',sans-serif;font-size:15px;font-weight:700;margin-bottom:18px">Platform Health</div>
+      ${card(
+        cardHead('Platform health')
+        + `<div style="padding:18px">
+          ${[
+            {label:'Venues active',val:approved,max:Math.max(allVenues.length,1),color:'var(--orange)'},
+            {label:'Events live',val:liveEvents,max:Math.max(allEvents.length,1),color:'var(--blue)'},
+            {label:'Vendor storefronts',val:activeVendors,max:Math.max(totalVendors,1),color:'var(--green)'},
+            {label:'Members total',val:organizerCount+attendeeCount,max:500,color:'var(--gold)'},
+            {label:'Open inquiries',val:newInq,max:Math.max(allInquiries.length,1),color:newInq?'var(--orange)':'var(--muted)'},
+          ].map(h=>`
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
+              <div style="flex:1">
+                <div style="display:flex;justify-content:space-between;margin-bottom:4px">
+                  <span style="font-size:12px;color:var(--sub)">${h.label}</span>
+                  <span style="font-size:12px;font-weight:600;color:var(--text)">${h.val}</span>
+                </div>
+                <div style="height:4px;background:var(--border);border-radius:99px;overflow:hidden">
+                  <div style="height:100%;width:${Math.min(100,Math.round(h.val/h.max*100))}%;background:${h.color};border-radius:99px;transition:width .6s ease"></div>
+                </div>
+              </div>
+            </div>`).join('')}
+        </div>`
+      )}
+    </div>
+  `;
         <div style="display:flex;flex-direction:column;gap:14px">
           ${[
             {icon:'🏟️',label:'Venues active',val:approved,max:allVenues.length||1,color:'var(--orange)'},
