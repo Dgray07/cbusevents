@@ -613,16 +613,16 @@ footer{background:#1a1612;color:var(--cream);padding:56px 48px 32px;}
         <div class="hf-cta">Get Details</div>
       </a>
       <div class="hero-mini-row" id="hero-mini-events">
-        <div class="event-mini" onclick="window.location.href='https://cbusevents.com/events.html'">
-          <div class="em-date">Jun 21</div>
-          <div class="em-name">Franklinton Art Crawl</div>
-          <div class="em-venue">Franklinton Arts District</div>
-        </div>
-        <div class="event-mini" onclick="window.location.href='https://cbusevents.com/events.html'">
-          <div class="em-date">Jun 28</div>
-          <div class="em-name">Short North Rooftop Series</div>
-          <div class="em-venue">Venue 400, Short North</div>
-        </div>
+        <a class="event-mini" href="https://cbusevents.com/exhibit-of-expression.html" style="text-decoration:none;display:block;">
+          <div class="em-date">Now Open</div>
+          <div class="em-name">Poet x Artist Sign Up</div>
+          <div class="em-venue">Exhibit of Expression</div>
+        </a>
+        <a class="event-mini" href="https://cbusevents.com/1313-festival-application.html" style="text-decoration:none;display:block;">
+          <div class="em-date">June 13</div>
+          <div class="em-name">Food Truck &amp; Vendor Sign Up</div>
+          <div class="em-venue">1313 Festival</div>
+        </a>
       </div>
     </div>
   </div>
@@ -1445,11 +1445,16 @@ async function submitClaim(){
 
 // Event modal stub (opens events page)
 function openEventModal(id){
-  // Route to specific event page if available, otherwise events directory
   if(!id){window.location.href='https://cbusevents.com/events.html';return;}
   if(id==='festival-1313'||id==='1313-festival'){window.location.href='https://cbusevents.com/1313-festival-event.html';return;}
-  // For native events, link to events page with the event ID as param
-  window.location.href='https://cbusevents.com/events.html?event='+id;
+  // Check for a ticket_url or event_url on the event object itself
+  const evt=(feedAllEvents||[]).find(e=>e.id===id);
+  if(evt){
+    if(evt.ticket_url){window.open(evt.ticket_url,'_blank');return;}
+    if(evt.event_url){window.open(evt.event_url,'_blank');return;}
+  }
+  // Fallback: events directory
+  window.location.href='https://cbusevents.com/events.html';
 }
 
 
@@ -1576,7 +1581,9 @@ async function loadLiveData(){
           const day=d.getDate();
           const venue=e.venue_name_override||e.venues?.name||'Columbus';
           const isFree=e.is_free;
-          return `<div class="ecard reveal" onclick="window.location.href='https://cbusevents.com/events.html'">
+          const ecardDest=e.ticket_url||e.event_url||'https://cbusevents.com/events.html';
+          const ecardTarget=e.ticket_url||e.event_url?`window.open('${ecardDest}','_blank')`:`window.location.href='${ecardDest}'`;
+          return `<div class="ecard reveal" onclick="${ecardTarget}" style="cursor:pointer">
             <div class="ec-mo">${mo}</div><div class="ec-day">${day}</div>
             <div class="ec-name">${e.title||'Untitled'}</div>
             <div class="ec-venue-sm">${venue}</div>
@@ -1593,7 +1600,9 @@ async function loadLiveData(){
           const mo=d.toLocaleDateString('en-US',{month:'short'}).toUpperCase();
           const day=d.getDate();
           const venue=e.venue_name_override||e.venues?.name||'Columbus';
-          return `<div class="sb-evt" onclick="window.location.href='https://cbusevents.com/events.html'">
+          const sbDest=e.ticket_url||e.event_url||'https://cbusevents.com/events.html';
+          const sbTarget=e.ticket_url||e.event_url?`window.open('${sbDest}','_blank')`:`window.location.href='${sbDest}'`;
+          return `<div class="sb-evt" onclick="${sbTarget}" style="cursor:pointer">
             <div class="sb-date"><div class="sb-mo">${mo}</div><div class="sb-day">${day}</div></div>
             <div><div class="sb-name">${e.title||'Untitled'}</div><div class="sb-venue-sm">${venue}</div></div>
           </div>`;
