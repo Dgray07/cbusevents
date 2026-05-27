@@ -225,7 +225,7 @@
         <div class="type-check"></div>
         <span class="type-emoji">🚚</span>
         <div class="type-label">Food Truck</div>
-        <div class="type-price">$125 <span style="font-size:12px;font-weight:600;color:var(--orange) </span></div>
+        <div class="type-price">$125 <span style="font-size:12px;font-weight:600;color:var(--orange)">until May 20</span></div>
         <div class="type-desc">Full festival day. Listing + promo on CBUS Events included.</div>
       </label>
       <label class="type-card" id="card-vendor">
@@ -394,7 +394,7 @@
       <div class="step-item"><div class="step-num">1</div>✅ Application submitted</div>
       <div class="step-item"><div class="step-num">2</div>Complete payment to confirm your spot</div>
       <div class="step-item"><div class="step-num">3</div>Spot confirmed + listing goes live</div>
-      <div class="step-item" id="redirect-status" style="opacity:0.6;font-size:12px;padding-top:4px">Redirecting to payment...</div>
+      <div class="step-item" id="redirect-status" style="opacity:0.6;font-size:12px;padding-top:4px">If you were not redirected automatically, use the button below.</div>
     </div>
     <div class="payment-fallback" id="paymentFallback">
       <a class="payment-fallback-btn" id="paymentFallbackBtn" href="#" target="_blank">Complete Payment 💳</a>
@@ -613,30 +613,24 @@
 
       await submitApplication(userId);
 
-      document.getElementById('authModal').classList.remove('visible');
-      document.getElementById('appForm').style.display = 'none';
-      document.getElementById('successScreen').classList.add('visible');
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-
-      // Redirect to Stripe payment link after 1.5s
+      // Determine payment link before closing modal
       const isTruck = pendingFormData.applicant_type === 'food_truck';
       const paymentLink = isTruck
         ? 'https://buy.stripe.com/5kQbJ11nObwK0SPfIcc3m0g'
         : 'https://buy.stripe.com/aFafZh7Mc9oC9pl1Rmc3m09';
 
-      // Set up fallback button immediately with correct link
+      document.getElementById('authModal').classList.remove('visible');
+      document.getElementById('appForm').style.display = 'none';
+      document.getElementById('successScreen').classList.add('visible');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+
+      // Set up fallback button immediately
       document.getElementById('paymentFallbackBtn').href = paymentLink;
       document.getElementById('paymentFallbackUrl').textContent = paymentLink;
+      document.getElementById('paymentFallback').classList.add('visible');
 
-      setTimeout(() => {
-        window.location.href = paymentLink;
-      }, 1500);
-
-      // Show fallback button after 4s in case redirect was blocked
-      setTimeout(() => {
-        document.getElementById('redirect-status').textContent = 'Redirect not working? Use the button below.';
-        document.getElementById('paymentFallback').classList.add('visible');
-      }, 4000);
+      // Redirect immediately — must happen synchronously within the user gesture chain
+      window.location.href = paymentLink;
 
     } catch(e) {
       showAuthError(e.message || 'Something went wrong. Please try again.');
