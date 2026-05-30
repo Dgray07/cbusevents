@@ -616,6 +616,12 @@ function clearMarkers() {
 function addMarker(event, index, locked) {
   if (!event.coords) return;
 
+  // Guard against missing/NaN coordinates — a single bad pin must not
+  // crash the whole results render (Mapbox throws on Invalid LngLat).
+  const lng = Number(event.coords.lng);
+  const lat = Number(event.coords.lat);
+  if (!Number.isFinite(lng) || !Number.isFinite(lat)) return;
+
   const el = document.createElement('div');
   el.style.cssText = `
     width: 28px; height: 28px;
@@ -649,11 +655,11 @@ function addMarker(event, index, locked) {
     `);
 
   const marker = new mapboxgl.Marker(el)
-    .setLngLat([event.coords.lng, event.coords.lat])
+    .setLngLat([lng, lat])
     .setPopup(popup)
     .addTo(map);
 
-  markers.push(marker);
+  markers[index] = marker;
 }
 
 // ============================================================
@@ -781,25 +787,30 @@ function renderResults(events) {
   html += `</div>`;
   panel.innerHTML = html;
 
-  // Fit map to visible markers
-  if (markers.length > 0) {
-    const bounds = new mapboxgl.LngLatBounds();
-    events.forEach(e => {
-      if (e.coords) bounds.extend([e.coords.lng, e.coords.lat]);
-    });
-    if (!bounds.isEmpty()) {
-      map.fitBounds(bounds, { padding: 60, maxZoom: 14 });
-    }
+  // Fit map to whatever pins actually have valid coordinates
+  const bounds = new mapboxgl.LngLatBounds();
+  events.forEach(e => {
+    if (!e || !e.coords) return;
+    const lng = Number(e.coords.lng), lat = Number(e.coords.lat);
+    if (Number.isFinite(lng) && Number.isFinite(lat)) bounds.extend([lng, lat]);
+  });
+  if (!bounds.isEmpty()) {
+    map.fitBounds(bounds, { padding: 60, maxZoom: 14 });
   }
 
-  // Card click = open popup on map
-  document.querySelectorAll('.event-card:not(.locked)').forEach((card, i) => {
+  // Card click = open popup on map (keyed by the card's real event index)
+  document.querySelectorAll('.event-card:not(.locked)').forEach((card) => {
     card.addEventListener('click', () => {
       document.querySelectorAll('.event-card').forEach(c => c.classList.remove('active'));
       card.classList.add('active');
-      if (markers[i] && events[i]?.coords) {
-        map.flyTo({ center: [events[i].coords.lng, events[i].coords.lat], zoom: 14, duration: 800 });
-        markers[i].togglePopup();
+      const idx = Number(card.dataset.index);
+      const ev = events[idx];
+      const mk = markers[idx];
+      if (!ev || !mk || !ev.coords) return;
+      const lng = Number(ev.coords.lng), lat = Number(ev.coords.lat);
+      if (Number.isFinite(lng) && Number.isFinite(lat)) {
+        map.flyTo({ center: [lng, lat], zoom: 14, duration: 800 });
+        mk.togglePopup();
       }
     });
   });
