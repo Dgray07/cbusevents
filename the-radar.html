@@ -2,8 +2,9 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-  <link rel="stylesheet" href="/theme.css">
-  <script src="/theme.js"></script>
+  <!-- The Radar is intentionally a permanent dark UI (Mapbox dark + cream text).
+       The global theme.css/theme.js is deliberately NOT loaded here, since it was
+       forcing light-mode styles onto the inputs and hiding typed text. -->
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>The Radar — CBUSEVENTS</title>
@@ -118,7 +119,9 @@
     border: 1px solid var(--border);
     border-radius: 8px;
     padding: 11px 14px 11px 38px;
-    color: var(--cream);
+    color: #f5f0e8 !important;
+    -webkit-text-fill-color: #f5f0e8;
+    caret-color: var(--orange);
     font-family: 'DM Sans', sans-serif;
     font-size: 14px;
     outline: none;
@@ -127,6 +130,10 @@
 
   .search-input:focus { border-color: var(--orange); }
   .search-input::placeholder { color: var(--muted); }
+
+  /* Keep selects readable too, in case of any inherited theme colors */
+  .filter-select { color: #f5f0e8 !important; }
+  .filter-select option { background: var(--surface); color: #f5f0e8; }
 
   .filter-select {
     background: var(--surface);
@@ -161,43 +168,85 @@
 
   .search-btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
+  /* DATE CONTEXT STRIP */
+  .date-strip {
+    background: var(--dark);
+    border-bottom: 1px solid var(--border);
+    padding: 8px 18px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.04em;
+  }
+  .date-today {
+    color: var(--orange);
+    font-weight: 500;
+    text-transform: uppercase;
+  }
+  .date-sep { color: var(--border); }
+  .date-range { color: var(--muted2); }
+
   /* MAIN LAYOUT */
   .radar-body {
     display: grid;
     grid-template-columns: 380px 1fr;
-    height: calc(100vh - 115px);
+    height: calc(100vh - 152px);
   }
 
   @media (max-width: 768px) {
     .radar-header { padding: 12px 16px; }
     .radar-title { font-size: 22px; }
     .radar-eyebrow { display: none; }
-    .search-section { padding: 10px 12px; gap: 6px; }
-    .search-input { font-size: 16px; }
-    .filter-select { font-size: 12px; padding: 10px 8px; }
-    .search-btn { padding: 10px 14px; font-size: 13px; }
+
+    /* Search controls as a clean 2-col grid instead of a cramped wrap row */
+    .search-section {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      padding: 12px;
+    }
+    .search-input-wrap { grid-column: 1 / -1; min-width: 0; }
+    .search-input { font-size: 16px; } /* 16px stops iOS from zooming on focus */
+    .filter-select {
+      font-size: 13px;
+      padding: 11px 10px;
+      width: 100%;
+      min-width: 0;
+    }
+    .search-btn {
+      grid-column: 1 / -1;
+      justify-content: center;
+      padding: 13px;
+      font-size: 15px;
+    }
+
+    .date-strip { padding: 8px 12px; }
+
     .radar-body {
       display: flex;
       flex-direction: column;
       height: auto;
-      min-height: calc(100vh - 100px);
+      min-height: 0;
     }
-    #map {
-      height: 260px;
-      order: -1;
-      width: 100%;
-      flex-shrink: 0;
-    }
+    /* Results lead on mobile, map sits below for context */
     .events-panel {
-      order: 1;
+      order: 0;
       height: auto;
       overflow-y: visible;
       border-right: none;
+    }
+    #map {
+      order: 1;
+      height: 300px;
+      width: 100%;
+      flex-shrink: 0;
       border-top: 1px solid var(--border);
     }
-    .events-list { padding: 8px; gap: 6px; }
-    .event-card { padding: 12px 14px; }
-    .event-name { font-size: 14px; }
+    .events-list { padding: 10px; gap: 8px; }
+    .event-card { padding: 13px 15px; }
+    .event-name { font-size: 15px; }
   }
 
   /* EVENT LIST PANEL */
@@ -490,6 +539,8 @@
     <option value="sports">Sports & Fitness</option>
   </select>
   <select class="filter-select" id="dateFilter">
+    <option value="today">Today</option>
+    <option value="tomorrow">Tomorrow</option>
     <option value="this weekend">This Weekend</option>
     <option value="this week" selected>This Week</option>
     <option value="next 2 weeks">Next 2 Weeks</option>
@@ -501,6 +552,13 @@
     </svg>
     Search
   </button>
+</div>
+
+<!-- DATE CONTEXT STRIP -->
+<div class="date-strip">
+  <span class="date-today" id="dateToday">Today</span>
+  <span class="date-sep">·</span>
+  <span class="date-range" id="dateRangeLabel">Showing: This Week</span>
 </div>
 
 <!-- BODY -->
@@ -673,9 +731,11 @@ function renderResults(events) {
   const visibleCount = loggedIn ? events.length : FREE_PREVIEW_COUNT;
   const lockedCount = loggedIn ? 0 : Math.max(0, events.length - FREE_PREVIEW_COUNT);
 
+  const rangeLabel = DATE_LABELS[document.getElementById('dateFilter').value] || '';
+
   let html = `
     <div class="panel-meta">
-      <span class="panel-count">${events.length} events found</span>
+      <span class="panel-count">${events.length} event${events.length === 1 ? '' : 's'}${rangeLabel ? ' · ' + rangeLabel : ''}</span>
       <span class="panel-hint">${loggedIn ? 'All results' : `${FREE_PREVIEW_COUNT} of ${events.length} shown`}</span>
     </div>
     <div class="events-list">
@@ -759,6 +819,31 @@ function renderCard(event, index, locked) {
     </div>
   `;
 }
+
+// ============================================================
+// DATE CONTEXT
+// ============================================================
+const DATE_LABELS = {
+  'today': 'Today only',
+  'tomorrow': 'Tomorrow only',
+  'this weekend': 'This Weekend',
+  'this week': 'This Week',
+  'next 2 weeks': 'Next 2 Weeks',
+  'this month': 'This Month',
+};
+
+function updateDateStrip() {
+  const now = new Date();
+  const todayStr = now.toLocaleDateString('en-US', {
+    weekday: 'short', month: 'short', day: 'numeric'
+  });
+  const range = document.getElementById('dateFilter').value;
+  document.getElementById('dateToday').textContent = 'Today: ' + todayStr;
+  document.getElementById('dateRangeLabel').textContent = 'Showing: ' + (DATE_LABELS[range] || range);
+}
+
+document.getElementById('dateFilter').addEventListener('change', updateDateStrip);
+updateDateStrip();
 
 // Enter key to search
 document.getElementById('searchInput').addEventListener('keydown', e => {
