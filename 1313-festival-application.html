@@ -83,6 +83,14 @@
     .type-card.active .type-check { background: var(--orange); border-color: var(--orange); }
     .type-card.active .type-check::after { content: ''; width: 8px; height: 8px; background: #fff; border-radius: 50%; }
 
+    /* SOLD OUT state */
+    .type-card.sold-out { cursor: not-allowed; opacity: 0.6; filter: grayscale(0.8); border-color: var(--border); background: var(--surface); box-shadow: 0 4px 0 var(--border); }
+    .type-card.sold-out:hover { transform: none; box-shadow: 0 4px 0 var(--border); }
+    .type-card.sold-out .type-check { display: none; }
+    .type-card.sold-out .type-price { color: var(--muted); }
+    .sold-out-ribbon { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; pointer-events: none; }
+    .sold-out-ribbon span { font-family: 'Fredoka One', cursive; font-size: 20px; letter-spacing: 0.1em; color: var(--brick); background: rgba(255,255,255,0.9); padding: 6px 16px; border-radius: 10px; transform: rotate(-8deg); border: 2px solid var(--brick); }
+
     .form-card { background: var(--surface); border: 2px solid var(--border); border-radius: 20px; padding: 28px 24px; margin-bottom: 20px; box-shadow: 0 4px 0 var(--border); opacity: 0; transform: translateY(16px); animation: fadeUp 0.5s ease 0.2s forwards; }
 
     .section-label { font-family: 'Fredoka One', cursive; font-size: 16px; color: var(--brick); margin-bottom: 18px; display: flex; align-items: center; gap: 8px; }
@@ -225,12 +233,12 @@
         <div class="type-check"></div>
         <span class="type-emoji">🚚</span>
         <div class="type-label">Food Truck</div>
-        <div class="type-price">$125 <span style="font-size:12px;font-weight:600;color:var(--orange)">until May 20</span></div>
+        <div class="type-price">$125</div>
         <div class="type-desc">Full festival day. Listing + promo on CBUS Events included.</div>
       </label>
-      <label class="type-card" id="card-vendor">
-        <input type="radio" name="applicant_type" value="vendor" onchange="handleTypeChange('vendor')"/>
-        <div class="type-check"></div>
+      <label class="type-card sold-out" id="card-vendor">
+        <input type="radio" name="applicant_type" value="vendor" disabled/>
+        <div class="sold-out-ribbon"><span>SOLD OUT</span></div>
         <span class="type-emoji">⛺</span>
         <div class="type-label">Vendor Table</div>
         <div class="type-price">$75</div>
@@ -286,14 +294,6 @@
               <option value="vegan">Vegan / Vegetarian</option>
               <option value="seafood">Seafood</option>
               <option value="other_food">Other Food</option>
-            </optgroup>
-            <optgroup label="Vendor">
-              <option value="art">Art / Prints</option>
-              <option value="jewelry">Jewelry / Accessories</option>
-              <option value="clothing">Clothing / Apparel</option>
-              <option value="handmade">Handmade / Crafts</option>
-              <option value="beauty">Beauty / Wellness</option>
-              <option value="other_vendor">Other</option>
             </optgroup>
           </select>
           <span class="error-msg">Required</span>
