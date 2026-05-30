@@ -364,7 +364,7 @@ function AuthPage() {
 }
 
 // Sidebar
-const NAV = [{key:"dashboard",icon:"⊞",label:"Dashboard"},{key:"venue",icon:"",label:"My Venue"},{key:"events",icon:"",label:"Events"},{key:"calendar",icon:"",label:"Booking Calendar"},{key:"earnings",icon:"",label:"Earnings"},{key:"payouts",icon:"$",label:"Payouts"},{key:"inquiries",icon:"",label:"Inquiries"},{key:"inbox",icon:"✉",label:"Inbox"},{key:"staff",icon:"👥",label:"Staff"},{key:"plan",icon:"⭐",label:"Plan & Billing"}];
+const NAV = [{key:"dashboard",icon:"⊞",label:"Dashboard"},{key:"venue",icon:"",label:"My Venue"},{key:"events",icon:"",label:"Events"},{key:"calendar",icon:"",label:"Booking Calendar"},{key:"earnings",icon:"",label:"Earnings"},{key:"payouts",icon:"$",label:"Payouts"},{key:"inquiries",icon:"",label:"Inquiries"},{key:"inbox",icon:"✉",label:"Inbox"},{key:"staff",icon:"👥",label:"Staff"},{key:"jobs",icon:"📋",label:"Job Postings"},{key:"features",icon:"⚡",label:"Features"}];
 const HOME_BTN_STYLE = {display:"flex",alignItems:"center",gap:10,width:"100%",background:"transparent",color:"var(--sub)",border:"1px solid transparent",borderRadius:10,padding:"10px 12px",cursor:"pointer",fontSize:13,fontFamily:"'DM Sans',sans-serif",fontWeight:400,marginBottom:2,textAlign:"left",transition:"color 0.15s"};
 
 const PORTAL_LINKS = {
@@ -720,7 +720,7 @@ function TicketTierBuilder({tiers,setTiers,isFree}){
   );
 }
 
-function EventModal({event,venueId,venueTier,currentEventCount,onClose,onSave}) {
+function EventModal({event,venueId,onClose,onSave}) {
  const {user}=useAuth();
  const blank={title:"",description:"",category:"Other",start_time:"",end_time:"",is_free:false,price_min:"",price_max:"",cover_image_url:"",status:"draft"};
  const [f,setF]=useState(event?{...event,start_time:event.start_time?new Date(event.start_time).toISOString().slice(0,16):"",end_time:event.end_time?new Date(event.end_time).toISOString().slice(0,16):""}:blank);
@@ -757,11 +757,6 @@ function EventModal({event,venueId,venueTier,currentEventCount,onClose,onSave}) 
  if(!f.title.trim()){setErr("Title required.");return;}
  if(!f.start_time){setErr("Start time required.");return;}
  if(!f.is_free&&tiers.some(t=>!t.name||t.price==="")){setErr("Each ticket tier needs a name and price.");return;}
- if(!event?.id){
-   const tier=venueTier||"free";
-   const limit=tier==="premium"?null:tier==="standard"?20:4;
-   if(limit!==null&&currentEventCount>=limit){setErr(`Your ${tier} plan is limited to ${limit} events. Upgrade to add more.`);return;}
- }
  setBusy(true);setErr("");
  const priceValues=tiers.filter(t=>t.price!=="").map(t=>parseFloat(t.price));
  const payload={
@@ -828,22 +823,8 @@ function EventsManager({venue,events,onRefresh}) {
  const del=async id=>{if(!confirm("Delete this event?"))return;await sb.from("events").delete().eq("id",id);onRefresh();};
  return (
  <div> {(()=>{
- const tier=venue?.tier||"free";
- const limit=tier==="premium"?null:tier==="standard"?20:4;
- const atLimit=limit!==null&&events.length>=limit;
  return(
- <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:16,flexWrap:"wrap",gap:12}}> <div> <h2 style={{fontFamily:"'DM Sans',sans-serif",fontSize:22,fontWeight:800}}>Events</h2> <p style={{color:"var(--sub)",fontSize:14,marginTop:4}}> {events.length}{limit!==null?` / ${limit}`:""} events
- {tier==="premium"&&<span style={{color:"#f59e0b",marginLeft:6,fontSize:12}}> Unlimited</span>}
- </p> </div> <div style={{display:"flex",gap:8,alignItems:"center"}}> {atLimit&&<span style={{fontSize:12,color:"#FF6B35",background:"#FF6B3515",border:"1px solid #FF6B3530",borderRadius:6,padding:"4px 10px"}}>Limit reached</span>}
- <Btn onClick={()=>setModal("new")} disabled={!venue||atLimit}>+ New Event</Btn> </div> </div> );
- })()}
- {(()=>{
- const tier=venue?.tier||"free";
- const limit=tier==="premium"?null:tier==="standard"?20:4;
- const atLimit=limit!==null&&events.length>=limit;
- if(!atLimit)return null;
- return(
- <div style={{background:"linear-gradient(135deg,#1a0800,#200d00)",border:"1px solid #FF6B3540",borderRadius:14,padding:18,marginBottom:20,display:"flex",justifyContent:"space-between",alignItems:"center",gap:12,flexWrap:"wrap"}}> <div> <div style={{fontWeight:700,marginBottom:4}}> You've hit your {tier==="free"?"Free (4 events)":"Standard (20 events)"} limit</div> <div style={{color:"var(--sub)",fontSize:13}}>{tier==="free"?"Upgrade to Standard for 20 events, or Premium for unlimited.":"Upgrade to Premium for unlimited events + hero placement + flyer design."}</div> </div> <Btn onClick={()=>window.location.href=tier==="free"?PAYMENT_LINK_STANDARD:PAYMENT_LINK_PREMIUM} variant="primary" size="sm">Upgrade Now →</Btn> </div> );
+ <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:16,flexWrap:"wrap",gap:12}}> <div> <h2 style={{fontFamily:"'DM Sans',sans-serif",fontSize:22,fontWeight:800}}>Events</h2> <p style={{color:"var(--sub)",fontSize:14,marginTop:4}}>{events.length} events</p> </div> <div style={{display:"flex",gap:8,alignItems:"center"}}> <Btn onClick={()=>setModal("new")} disabled={!venue}>+ New Event</Btn> </div> </div> );
  })()}
  {!venue&&<Card style={{textAlign:"center",padding:40}}><p style={{color:"var(--sub)"}}>Set up your venue first.</p></Card>}
  {venue&&events.length===0&&<Card style={{textAlign:"center",padding:48,borderStyle:"dashed"}}><div style={{fontSize:40,marginBottom:12}}></div><h3 style={{fontFamily:"'DM Sans',sans-serif",fontWeight:700,marginBottom:8}}>No events yet</h3><p style={{color:"var(--sub)",fontSize:14,marginBottom:16}}>Add events to get discovered by Columbus event-goers.</p><Btn onClick={()=>setModal("new")}>+ Add First Event</Btn></Card>}
@@ -851,7 +832,7 @@ function EventsManager({venue,events,onRefresh}) {
  <Card key={e.id} style={{display:"flex",alignItems:"center",gap:14,padding:14}}> {e.cover_image_url?<img src={e.cover_image_url} alt="" style={{width:56,height:56,borderRadius:10,objectFit:"cover",flexShrink:0}} onError={ev=>ev.target.style.display="none"}/>:<div style={{width:56,height:56,borderRadius:10,background:"var(--surface)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:22,flexShrink:0}}></div>}
  <div style={{flex:1,minWidth:0}}> <div style={{fontWeight:600,fontSize:14,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{e.title}</div> <div style={{color:"var(--sub)",fontSize:12,marginTop:2}}>{e.start_time?new Date(e.start_time).toLocaleDateString("en-US",{weekday:"short",month:"short",day:"numeric",year:"numeric"}):"No date"} · {e.category}</div> </div> <div style={{display:"flex",gap:8,alignItems:"center",flexShrink:0}}> <Badge color={e.status==="published"?"var(--green)":e.status==="cancelled"?"#ef4444":"var(--muted)"}>{e.status}</Badge> <Btn size="sm" variant="secondary" onClick={()=>setModal(e)}>Edit</Btn> {e.status==="published"&&<Btn size="sm" onClick={()=>setShareEvent(e)} style={{background:"#FF6B3520",color:"#FF6B35",border:"1px solid #FF6B3540"}}>Share</Btn>}
  <Btn size="sm" variant="danger" onClick={()=>del(e.id)}>Del</Btn> </div> </Card> ))}
- </div> {modal&&<EventModal event={modal==="new"?null:modal} venueId={venue?.id} venueTier={venue?.tier||"free"} currentEventCount={events.length} onClose={()=>setModal(null)} onSave={onRefresh}/>}
+ </div> {modal&&<EventModal event={modal==="new"?null:modal} venueId={venue?.id} onClose={()=>setModal(null)} onSave={onRefresh}/>}
  {shareEvent&&<SharePanel event={shareEvent} venue={venue} onClose={()=>setShareEvent(null)}/>}
  </div> );
 }
@@ -872,8 +853,55 @@ function Inquiries({venue}) {
 }
 
 // Stripe config
-const PAYMENT_LINK_STANDARD="https://buy.stripe.com/9B64gz8Qg1Wa6d93Zuc3m03";
-const PAYMENT_LINK_PREMIUM="https://buy.stripe.com/cNi8wPc2sfN030X7bGc3m04";
+// Feature subscription checker - replaces all isPremium/tier logic
+async function checkFeature(userId, featureKey) {
+  const { data } = await sb.from('feature_subscriptions')
+    .select('status, current_period_end')
+    .eq('user_id', userId)
+    .eq('feature_key', featureKey)
+    .eq('status', 'active')
+    .maybeSingle();
+  if (!data) return false;
+  if (data.current_period_end && new Date(data.current_period_end) < new Date()) return false;
+  return true;
+}
+
+// Stripe Customer Portal - opens self-service cancellation
+async function openBillingPortal(userId) {
+  const { data: customer } = await sb.from('stripe_customers')
+    .select('stripe_customer_id').eq('user_id', userId).maybeSingle();
+  if (!customer?.stripe_customer_id) { alert('No billing account found.'); return; }
+  const { data, error } = await sb.functions.invoke('create-portal-session', {
+    body: { customer_id: customer.stripe_customer_id, return_url: window.location.href }
+  });
+  if (error || !data?.url) { alert('Could not open billing portal. Contact info@cbusevents.com'); return; }
+  window.open(data.url, '_blank');
+}
+
+// Job posting Stripe checkout
+async function checkoutJobPosting(userId, planType, resourceId = null) {
+  const priceId = planType === 'monthly'
+    ? 'price_1Tcbb1EJ9u0llGXrV4MM9wVR'
+    : 'price_1TcbbwEJ9u0llGXrKVUXsvjZ';
+  const { data: customer } = await sb.from('stripe_customers')
+    .select('stripe_customer_id').eq('user_id', userId).maybeSingle();
+  const { data, error } = await sb.functions.invoke('create-checkout-session', {
+    body: {
+      price_id: priceId,
+      user_id: userId,
+      customer_id: customer?.stripe_customer_id || null,
+      mode: planType === 'monthly' ? 'subscription' : 'payment',
+      success_url: window.location.href + '?feature=job_posting&success=1',
+      cancel_url: window.location.href,
+      metadata: {
+        resource_type: 'job_post',
+        resource_id: resourceId || '',
+      }
+    }
+  });
+  if (error || !data?.url) { alert('Could not start checkout. Try again.'); return; }
+  window.location.href = data.url;
+}
 
 
 
@@ -885,7 +913,6 @@ function MarketingServices({venue}) {
  const [sent,setSent]=React.useState(false);
  const [err,setErr]=React.useState("");
  const tier=venue?.tier||"free";
- const isPremium=tier==="premium";
 
  const submit=async()=>{
  if(!details.trim()){setErr("Please describe what you need.");return;}
@@ -906,9 +933,7 @@ function MarketingServices({venue}) {
  };
 
  return(
- <div style={{background:"linear-gradient(135deg,#130800,#1a0f00)",border:`2px solid ${isPremium?"#FF6B3550":"var(--border)"}`,borderRadius:14,padding:24,marginTop:24}}> <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:16}}> <div> <div style={{fontFamily:"'DM Sans',sans-serif",fontWeight:800,fontSize:16,marginBottom:4}}> Marketing Services</div> <div style={{color:"var(--sub)",fontSize:13}}>Custom designs for your venue & events</div> </div> {isPremium&&<span style={{background:"#FF6B3520",color:"#FF6B35",border:"1px solid #FF6B3540",borderRadius:20,padding:"3px 10px",fontSize:11,fontWeight:700}}> Premium</span>}
- </div> {!isPremium?(
- <div style={{textAlign:"center",padding:"24px 0"}}> <div style={{fontSize:32,marginBottom:10}}></div> <div style={{fontWeight:600,marginBottom:8}}>Premium exclusive</div> <div style={{color:"var(--sub)",fontSize:13,marginBottom:16,lineHeight:1.6}}>Upgrade to Premium to request custom flyer design and branded merch — printed and shipped by CBUSEVENTS.</div> <Btn onClick={()=>window.location.href=PAYMENT_LINK_PREMIUM}>Upgrade to Premium →</Btn> </div> ):(
+ <div style={{background:"linear-gradient(135deg,#130800,#1a0f00)",border:"2px solid #FF6B3550",borderRadius:14,padding:24,marginTop:24}}> <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:16}}> <div> <div style={{fontFamily:"'DM Sans',sans-serif",fontWeight:800,fontSize:16,marginBottom:4}}>Marketing Services</div> <div style={{color:"var(--sub)",fontSize:13}}>Custom designs for your venue & events</div> </div> </div>
  <div> {sent&&<div style={{background:"rgba(52,211,153,0.08)",color:"var(--green)",border:"1px solid #1a4a24",borderRadius:10,padding:"10px 14px",fontSize:14,marginBottom:14}}> Request sent! We'll reach out within 24 hours.</div>}
  {err&&<div style={{background:"rgba(248,113,113,0.08)",color:"#ef4444",border:"1px solid #4a1010",borderRadius:10,padding:"10px 14px",fontSize:14,marginBottom:14}}> {err}</div>}
  <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12,marginBottom:16}}> <div
@@ -922,7 +947,7 @@ function MarketingServices({venue}) {
  placeholder={type==="flyer"?"e.g. Comedy Night flyer, Feb 28, 9pm, dark theme with our logo...":"e.g. 20 black tees with our venue logo on front, size M-XL..."}
  style={{width:"100%",background:"var(--bg)",border:"1px solid var(--border)",borderRadius:10,padding:"10px 14px",color:"var(--text)",fontFamily:"'DM Sans',sans-serif",fontSize:14,minHeight:80,resize:"vertical",outline:"none",marginBottom:12}}
  /> <Btn onClick={submit} disabled={busy}>{busy?"Sending...":"Send Request →"}</Btn> </div> )}
- </div> )}
+ </div>
  </div> );
 }
 
@@ -1283,11 +1308,9 @@ function Earnings({venue}) {
  const [orders, setOrders] = React.useState([]);
  const [ledger, setLedger] = React.useState([]);
  const [busy, setBusy] = React.useState(true);
- const tier = venue?.tier||"free";
- const isPaid = tier==="standard"||tier==="premium";
 
  React.useEffect(()=>{
-   if(!venue?.id||!isPaid){setBusy(false);return;}
+   if(!venue?.id){setBusy(false);return;}
    Promise.all([
      sb.from("orders")
        .select("*")
@@ -1304,24 +1327,12 @@ function Earnings({venue}) {
      setLedger(ledgerRes.data||[]);
      setBusy(false);
    });
- },[venue?.id, isPaid]);
+ },[venue?.id]);
 
  if(!venue) return (
    <div>
      <h2 style={{fontFamily:"'DM Sans',sans-serif",fontSize:22,fontWeight:800,marginBottom:6}}>Earnings</h2>
      <Card style={{textAlign:"center",padding:48}}><p style={{color:"var(--sub)"}}>Set up your venue first.</p></Card>
-   </div>
- );
-
- if(!isPaid) return (
-   <div>
-     <h2 style={{fontFamily:"'DM Sans',sans-serif",fontSize:22,fontWeight:800,marginBottom:6}}>Earnings</h2>
-     <Card style={{textAlign:"center",padding:48,borderColor:"rgba(255,107,53,0.3)"}}>
-       <div style={{fontSize:40,marginBottom:16}}>💰</div>
-       <div style={{fontWeight:800,fontSize:18,marginBottom:8}}>Unlock Revenue Share</div>
-       <div style={{color:"var(--sub)",fontSize:14,maxWidth:400,margin:"0 auto 24px",lineHeight:1.7}}>Standard and Premium venues earn 25% of the platform fee on every ticket sold at their venue. Upgrade to start earning.</div>
-       <Btn onClick={()=>window.open(PAYMENT_LINK_STANDARD,"_blank")}>Upgrade to Standard →</Btn>
-     </Card>
    </div>
  );
 
@@ -1411,13 +1422,10 @@ async function venueGetAuthToken(){
 function VenuePayouts({venue}){
  const [status,setStatus]=React.useState(null);
  const [busy,setBusy]=React.useState(true);
- const tier=venue?.tier||'free';
- const isPaid=tier==='standard'||tier==='premium';
 
  React.useEffect(()=>{
-   if(!isPaid){setBusy(false);return;}
-   checkStatus();
- },[isPaid]);
+   if(venue?.id) checkStatus();
+ },[venue?.id]);
 
  async function checkStatus(){
    setBusy(true);
@@ -1466,16 +1474,6 @@ function VenuePayouts({venue}){
    React.createElement('h2',{style:{fontFamily:"'DM Sans',sans-serif",fontSize:22,fontWeight:800,marginBottom:6}},'Payouts'),
    React.createElement(Card,{style:{textAlign:'center',padding:48}},
      React.createElement('p',{style:{color:'var(--sub)'}},'Set up your venue first.')
-   )
- );
-
- if(!isPaid) return React.createElement('div',null,
-   React.createElement('h2',{style:{fontFamily:"'DM Sans',sans-serif",fontSize:22,fontWeight:800,marginBottom:6}},'Payouts'),
-   React.createElement(Card,{style:{textAlign:'center',padding:48,borderColor:'rgba(255,107,53,0.3)'}},
-     React.createElement('div',{style:{fontSize:40,marginBottom:16}},'💰'),
-     React.createElement('div',{style:{fontWeight:800,fontSize:18,marginBottom:8}},'Unlock Ticket Payouts'),
-     React.createElement('div',{style:{color:'var(--sub)',fontSize:14,maxWidth:400,margin:'0 auto 24px',lineHeight:1.7}},'Upgrade to Standard or Premium to connect your Stripe account and receive ticket sale payouts directly to your bank.'),
-     React.createElement(Btn,{onClick:()=>window.open(PAYMENT_LINK_STANDARD,'_blank')},'Upgrade to Standard →')
    )
  );
 
@@ -1693,8 +1691,6 @@ function StaffManagement({venue, userId}) {
  const [inviteRole, setInviteRole] = React.useState('staff');
  const [inviting, setInviting] = React.useState(false);
  const [msg, setMsg] = React.useState({text:'',type:''});
- const isPremium = venue?.tier==='premium';
- const STAFF_LIMIT = 2;
 
  React.useEffect(()=>{
    if(venue?.id) loadStaff();
@@ -1709,16 +1705,9 @@ function StaffManagement({venue, userId}) {
 
  async function inviteStaff(){
    if(!inviteEmail.trim()){setMsg({text:'Enter an email address.',type:'error'});return;}
-   if(!isPremium){setMsg({text:'Staff accounts require a Premium plan.',type:'error'});return;}
-   const activeStaff=staff.filter(s=>s.status!=='removed');
-   if(activeStaff.length>=STAFF_LIMIT){setMsg({text:`You've reached the ${STAFF_LIMIT} staff limit on Premium. Contact us to add unlimited staff for $25/mo.`,type:'error'});return;}
    setInviting(true);
-   // Check if user exists
-   const {data:existing}=await sb.from('venue_staff').select('id').eq('venue_id',venue.id).eq('staff_email',inviteEmail.trim()).maybeSingle();
-   if(existing){setMsg({text:'This person is already on your staff.',type:'error'});setInviting(false);return;}
-   // Look up user by email
-   const {data:userRecord}=await sb.rpc('get_organizer_emails',{user_ids:[]}).catch(()=>({data:null}));
-   // Insert invite - staff_user_id will be null until they accept
+   const existing=await sb.from('venue_staff').select('id').eq('venue_id',venue.id).eq('staff_email',inviteEmail.trim()).maybeSingle();
+   if(existing.data){setMsg({text:'This person is already on your staff.',type:'error'});setInviting(false);return;}
    const {error}=await sb.from('venue_staff').insert({
      venue_id:venue.id,
      owner_id:userId,
@@ -1745,28 +1734,15 @@ function StaffManagement({venue, userId}) {
 
  const activeStaff=staff.filter(s=>s.status!=='removed');
 
- if(!isPremium) return (
-   <div>
-     <h1 style={{fontFamily:"'DM Sans',sans-serif",fontSize:24,fontWeight:800,letterSpacing:"-0.03em",marginBottom:6}}>Staff & Access</h1>
-     <p style={{color:"var(--sub)",fontSize:14,marginBottom:24}}>Add team members to help manage your venue.</p>
-     <div style={{background:"var(--card)",border:"1px solid var(--border)",borderRadius:16,padding:48,textAlign:"center"}}>
-       <div style={{fontSize:32,marginBottom:16}}>👥</div>
-       <div style={{fontWeight:800,fontSize:18,marginBottom:8,letterSpacing:"-0.02em"}}>Staff Access is a Premium Feature</div>
-       <div style={{color:"var(--sub)",fontSize:14,marginBottom:24,maxWidth:360,margin:"0 auto 24px",lineHeight:1.6}}>Upgrade to Premium to add up to 2 staff members who can manage events, bookings, and inquiries on your behalf.</div>
-       <button onClick={()=>{}} style={{background:"#FF6B35",color:"#fff",border:"none",borderRadius:10,padding:"12px 28px",fontSize:14,fontWeight:700,cursor:"pointer",fontFamily:"'DM Sans',sans-serif"}}>Upgrade to Premium →</button>
-     </div>
-   </div>
- );
-
  return (
  <div>
    <h1 style={{fontFamily:"'DM Sans',sans-serif",fontSize:24,fontWeight:800,letterSpacing:"-0.03em",marginBottom:6}}>Staff & Access</h1>
-   <p style={{color:"var(--sub)",fontSize:14,marginBottom:24}}>Manage who can access your venue portal. Premium includes {STAFF_LIMIT} staff accounts.</p>
+   <p style={{color:"var(--sub)",fontSize:14,marginBottom:24}}>Manage who can access your venue portal.</p>
 
    {/* Invite form */}
    <div style={{background:"var(--card)",border:"1px solid var(--border)",borderRadius:14,padding:24,marginBottom:20}}>
      <div style={{fontWeight:700,fontSize:15,marginBottom:4}}>Invite Staff Member</div>
-     <div style={{fontSize:13,color:"var(--sub)",marginBottom:16}}>{activeStaff.length}/{STAFF_LIMIT} staff slots used{activeStaff.length>=STAFF_LIMIT?' · <a href="mailto:info@cbusevents.com" style="color:#FF6B35">Contact us for unlimited ($25/mo)</a>':''}</div>
+     <div style={{fontSize:13,color:"var(--sub)",marginBottom:16}}>{activeStaff.length} staff member{activeStaff.length!==1?'s':''} active</div>
      <div style={{display:"grid",gridTemplateColumns:"1fr auto auto",gap:10,alignItems:"flex-end"}}>
        <div>
          <label style={{fontSize:12,color:"var(--sub)",display:"block",marginBottom:6,fontWeight:600}}>Email Address</label>
@@ -1779,7 +1755,7 @@ function StaffManagement({venue, userId}) {
            <option value="manager">Manager</option>
          </select>
        </div>
-       <button onClick={inviteStaff} disabled={inviting||activeStaff.length>=STAFF_LIMIT} style={{background:"#FF6B35",color:"#fff",border:"none",borderRadius:8,padding:"9px 20px",fontSize:13,fontWeight:700,cursor:"pointer",fontFamily:"'DM Sans',sans-serif",opacity:inviting||activeStaff.length>=STAFF_LIMIT?0.5:1,height:38}}>
+       <button onClick={inviteStaff} disabled={inviting} style={{background:"#FF6B35",color:"#fff",border:"none",borderRadius:8,padding:"9px 20px",fontSize:13,fontWeight:700,cursor:"pointer",fontFamily:"'DM Sans',sans-serif",opacity:inviting?0.5:1,height:38}}>
          {inviting?'Inviting...':'Invite'}
        </button>
      </div>
@@ -1855,74 +1831,222 @@ function StaffManagement({venue, userId}) {
  );
 }
 
-function PlanBilling({venue}) {
- const cur=venue?.tier||"free";
- const [loading,setLoading]=React.useState(null);
- const [err,setErr]=React.useState(null);
+// Job Postings Component
+function JobPostings({venue, userId}) {
+  const [jobs, setJobs] = React.useState([]);
+  const [busy, setBusy] = React.useState(true);
+  const [hasMonthly, setHasMonthly] = React.useState(false);
+  const [modal, setModal] = React.useState(false);
+  const [form, setForm] = React.useState({title:'',description:'',role_type:'',event_date:'',shift_start:'',shift_end:'',pay_rate:'',spots_available:1,location:''});
+  const [saving, setSaving] = React.useState(false);
+  const [err, setErr] = React.useState('');
 
- const plans=[
- {id:"free", name:"Free", price:0, priceId:null, perks:["1 venue listing","Up to 4 events/month","Basic search placement","Public venue page"]},
- {id:"standard",name:"Standard", price:39, priceId:"standard", perks:["Up to 20 events/month","Priority search placement","Inquiry inbox enabled","Email support","Analytics dashboard","Featured in venue directory"]},
- {id:"premium", name:"Premium", price:99, priceId:"premium", perks:["Unlimited events","Top of all search results","Homepage feature slot","Multi-account access","Staff management tools","Ticket revenue share (25% of platform fee)","Geolocation promotions","Dedicated support"]},
- ];
+  React.useEffect(()=>{
+    if(!venue?.id){setBusy(false);return;}
+    Promise.all([
+      sb.from('job_posts').select('*').eq('venue_id',venue.id).order('created_at',{ascending:false}),
+      checkFeature(userId,'job_posting_monthly'),
+    ]).then(([postsRes, monthly])=>{
+      setJobs(postsRes.data||[]);
+      setHasMonthly(monthly);
+      setBusy(false);
+    });
+  },[venue?.id,userId]);
 
- const checkout=(plan)=>{
- if(!plan.priceId)return;
- const links={standard:PAYMENT_LINK_STANDARD,premium:PAYMENT_LINK_PREMIUM};
- const url=links[plan.id];
- if(!url)return;
- window.open(url,'_blank');
- };
+  const set = k => e => setForm(p=>({...p,[k]:e.target.value}));
 
- // Handle return from Stripe — auto-update tier
- React.useEffect(()=>{
- const p=new URLSearchParams(window.location.search);
- if(p.get("upgrade")==="success"&&venue?.id){
-   // Get tier from param or hash fallback
-   const hashTier=window.location.hash.replace('#tier=','');
-   const newTier=p.get("tier")||hashTier||"standard";
-   // Write tier to Supabase immediately
-   sb.from("venues").update({
-     tier:newTier,
-     subscription_status:"active",
-     subscription_tier:newTier.toUpperCase(),
-   }).eq("id",venue.id).then(({error})=>{
-     if(!error){
-       // Reload venue data to reflect new tier
-       sb.from("venues").select("*").eq("id",venue.id).single().then(({data})=>{
-         if(data) setVenue(data);
-       });
-     }
-   });
-   window.history.replaceState({},"",window.location.pathname);
- }
- },[venue?.id]);
+  async function saveJob(payType){
+    if(!form.title.trim()){setErr('Job title is required.');return;}
+    setSaving(true); setErr('');
+    // Create draft job post first
+    const {data:job, error}=await sb.from('job_posts').insert({
+      venue_id: venue.id,
+      user_id: userId,
+      title: form.title,
+      description: form.description,
+      role_type: form.role_type,
+      event_date: form.event_date||null,
+      shift_start: form.shift_start||null,
+      shift_end: form.shift_end||null,
+      pay_rate: form.pay_rate,
+      spots_available: parseInt(form.spots_available)||1,
+      location: form.location||venue.address||'Columbus, OH',
+      status: hasMonthly ? 'active' : 'draft',
+      payment_type: payType,
+      published_at: hasMonthly ? new Date().toISOString() : null,
+      expires_at: hasMonthly ? new Date(Date.now()+30*24*60*60*1000).toISOString() : null,
+    }).select().single();
+    if(error){setErr('Error: '+error.message);setSaving(false);return;}
+    if(hasMonthly){
+      // Already has monthly sub - post goes live immediately
+      setJobs(p=>[job,...p]);
+      setModal(false);
+      setSaving(false);
+    } else {
+      // Send to Stripe checkout with job post ID
+      await checkoutJobPosting(userId, payType, job.id);
+    }
+  }
 
- const upgraded=new URLSearchParams(window.location.search).get("upgrade")==="success";
+  if(busy) return <Spin/>;
+  if(!venue) return <Card style={{textAlign:'center',padding:48}}><p style={{color:'var(--sub)'}}>Set up your venue first.</p></Card>;
 
- return (
- <div> <h2 style={{fontFamily:"'DM Sans',sans-serif",fontSize:22,fontWeight:800,marginBottom:6}}>Plan & Billing</h2> <p style={{color:"var(--sub)",fontSize:14,marginBottom:upgraded?16:32}}>Current plan: <strong style={{color:"#f59e0b"}}>{cur[0].toUpperCase()+cur.slice(1)}</strong></p> {upgraded&&<div style={{background:"rgba(52,211,153,0.08)",border:"1px solid #1a4a24",borderRadius:10,padding:"14px 18px",marginBottom:28,display:"flex",alignItems:"center",gap:10,color:"var(--green)",fontSize:14,fontWeight:600}}> Upgrade successful! Your plan will be activated within a minute.
- </div>}
+  return (
+    <div>
+      <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start',marginBottom:24,flexWrap:'wrap',gap:12}}>
+        <div>
+          <h1 style={{fontFamily:"'DM Sans',sans-serif",fontSize:24,fontWeight:800,letterSpacing:'-0.03em',marginBottom:4}}>Job Postings</h1>
+          <p style={{color:'var(--sub)',fontSize:14}}>Post staff positions for your events. {hasMonthly?<span style={{color:'var(--green)'}}>Unlimited monthly plan active.</span>:<span>Pay per post ($10) or subscribe for unlimited ($49/mo).</span>}</p>
+        </div>
+        <Btn onClick={()=>{setModal(true);setErr('');}}>+ Post a Job</Btn>
+      </div>
 
- {err&&<div style={{background:"rgba(248,113,113,0.08)",border:"1px solid #4a1a1a",borderRadius:10,padding:"12px 16px",marginBottom:20,color:"#ef4444",fontSize:13}}> {err}</div>}
+      {jobs.length===0&&<Card style={{textAlign:'center',padding:48,borderStyle:'dashed'}}>
+        <div style={{fontSize:40,marginBottom:12}}>📋</div>
+        <h3 style={{fontFamily:"'DM Sans',sans-serif",fontWeight:700,marginBottom:8}}>No job posts yet</h3>
+        <p style={{color:'var(--sub)',fontSize:14,marginBottom:16}}>Post bartenders, servers, security, hosts, and more.</p>
+        <Btn onClick={()=>setModal(true)}>Post First Job</Btn>
+      </Card>}
 
- <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(220px,1fr))",gap:20}}> {plans.map(p=>{const active=p.id===cur;const isLoading=loading===p.id;return(
- <div key={p.id} style={{background:active?"var(--card)":"var(--surface)",border:`1.5px solid ${active?"#FF6B35":"var(--border)"}`,borderRadius:14,padding:24,position:"relative",marginTop:16}}> {active&&<div style={{position:"absolute",top:-12,left:"50%",transform:"translateX(-50%)",background:"#FF6B35",color:"#fff",borderRadius:20,padding:"2px 14px",fontSize:11,fontWeight:700,whiteSpace:"nowrap"}}>CURRENT</div>}
- {p.id==="premium"&&!active&&<div style={{position:"absolute",top:-12,left:"50%",transform:"translateX(-50%)",background:"#f59e0b",color:"#000",borderRadius:20,padding:"2px 14px",fontSize:11,fontWeight:700,whiteSpace:"nowrap"}}>MOST POPULAR</div>}
- <h3 style={{fontFamily:"'DM Sans',sans-serif",fontWeight:800,fontSize:20,marginBottom:4}}>{p.name}</h3> <div style={{marginBottom:18}}> <span style={{fontFamily:"'DM Sans',sans-serif",fontSize:32,fontWeight:800,color:p.price===0?"var(--text)":"#FF6B35"}}>{p.price===0?"Free":`$${p.price}`}</span> {p.price>0&&<span style={{color:"var(--sub)",fontSize:13}}>/mo</span>}
- </div> <div style={{display:"flex",flexDirection:"column",gap:8,marginBottom:22}}> {p.perks.map(k=><div key={k} style={{display:"flex",gap:8,fontSize:13,color:"var(--sub)"}}><span style={{color:"var(--green)"}}></span>{k}</div>)}
- </div> {active
- ?<Btn variant="ghost" style={{width:"100%"}} disabled>Current Plan</Btn> :p.price===0
- ?<Btn variant="ghost" style={{width:"100%",opacity:0.5}} disabled>Downgrade</Btn> :<Btn style={{width:"100%",opacity:isLoading?0.7:1}} variant={p.id==="premium"?"primary":"secondary"} onClick={()=>checkout(p)} disabled={!!loading}> {isLoading?"Redirecting to Stripe...":"Upgrade Now →"}
- </Btn> }
- </div> );})}
- </div> <div style={{marginTop:32,padding:20,background:"var(--surface)",border:"1px solid var(--border)",borderRadius:14}}> <h4 style={{fontWeight:700,fontSize:14,marginBottom:8}}>Billing & Cancellation</h4> <p style={{color:"var(--sub)",fontSize:13,lineHeight:1.7}}>Subscriptions are billed monthly and can be cancelled anytime. After upgrading, your tier is activated automatically within 1–2 minutes via Stripe webhook. To manage or cancel your subscription, contact <a href="mailto:info@cbusevents.com" style={{color:"#FF6B35"}}>info@cbusevents.com</a>.</p> </div> <MarketingServices venue={venue}/> </div> );
+      <div style={{display:'flex',flexDirection:'column',gap:10}}>
+        {jobs.map(j=>(
+          <Card key={j.id} style={{padding:18}}>
+            <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start',flexWrap:'wrap',gap:10}}>
+              <div>
+                <div style={{fontWeight:700,fontSize:15,marginBottom:3}}>{j.title}</div>
+                <div style={{fontSize:12,color:'var(--sub)'}}>{j.role_type&&j.role_type+' · '}{j.pay_rate&&j.pay_rate+' · '}{j.spots_available} spot{j.spots_available!==1?'s':''}</div>
+              </div>
+              <Badge color={j.status==='active'?'var(--green)':j.status==='expired'?'var(--muted)':'#fbbf24'}>{j.status}</Badge>
+            </div>
+            {j.description&&<p style={{fontSize:13,color:'var(--sub)',marginTop:10,lineHeight:1.6}}>{j.description}</p>}
+          </Card>
+        ))}
+      </div>
+
+      {modal&&(
+        <div style={{position:'fixed',inset:0,background:'rgba(0,0,0,0.85)',zIndex:300,display:'flex',alignItems:'center',justifyContent:'center',padding:20}} onClick={e=>{if(e.target===e.currentTarget){setModal(false);}}}>
+          <div style={{background:'var(--card)',border:'1px solid var(--border)',borderRadius:20,padding:32,width:'100%',maxWidth:520,maxHeight:'90vh',overflowY:'auto'}}>
+            <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:20}}>
+              <div style={{fontFamily:"'DM Sans',sans-serif",fontSize:18,fontWeight:800}}>New Job Post</div>
+              <button onClick={()=>setModal(false)} style={{background:'none',border:'none',color:'var(--sub)',fontSize:20,cursor:'pointer'}}>✕</button>
+            </div>
+            {err&&<div style={{background:'rgba(248,113,113,0.08)',color:'#f87171',border:'1px solid rgba(248,113,113,0.2)',borderRadius:8,padding:'10px 14px',marginBottom:16,fontSize:13}}>{err}</div>}
+            <Field label="Job Title *"><input value={form.title} onChange={set('title')} placeholder="Bartender for Private Event"/></Field>
+            <Field label="Role Type"><input value={form.role_type} onChange={set('role_type')} placeholder="Bartender, Server, Security, Host..."/></Field>
+            <Field label="Description"><textarea value={form.description} onChange={set('description')} placeholder="What does this role involve? Any requirements?"/></Field>
+            <Grid2>
+              <Field label="Event Date"><input type="date" value={form.event_date} onChange={set('event_date')}/></Field>
+              <Field label="Spots Available"><input type="number" min="1" value={form.spots_available} onChange={set('spots_available')}/></Field>
+              <Field label="Shift Start"><input type="time" value={form.shift_start} onChange={set('shift_start')}/></Field>
+              <Field label="Shift End"><input type="time" value={form.shift_end} onChange={set('shift_end')}/></Field>
+            </Grid2>
+            <Field label="Pay Rate"><input value={form.pay_rate} onChange={set('pay_rate')} placeholder="$15/hr, $200 flat, Negotiable"/></Field>
+            <Field label="Location"><input value={form.location} onChange={set('location')} placeholder={venue.address||'Columbus, OH'}/></Field>
+            <div style={{borderTop:'1px solid var(--border)',paddingTop:20,marginTop:8}}>
+              {hasMonthly?(
+                <Btn onClick={()=>saveJob('subscription')} disabled={saving} size="lg" style={{width:'100%'}}>{saving?'Posting...':'Publish Job Post'}</Btn>
+              ):(
+                <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:12}}>
+                  <div>
+                    <Btn onClick={()=>saveJob('per_post')} disabled={saving} style={{width:'100%'}} variant="secondary">{saving?'...':'Post for $10'}</Btn>
+                    <div style={{fontSize:11,color:'var(--muted)',textAlign:'center',marginTop:4}}>Active 30 days</div>
+                  </div>
+                  <div>
+                    <Btn onClick={()=>saveJob('monthly')} disabled={saving} style={{width:'100%'}}>{saving?'...':'Subscribe $49/mo'}</Btn>
+                    <div style={{fontSize:11,color:'var(--muted)',textAlign:'center',marginTop:4}}>Unlimited posts</div>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// Features Component - replaces Plan & Billing
+function Features({venue, userId}) {
+  const [subs, setSubs] = React.useState([]);
+  const [busy, setBusy] = React.useState(true);
+
+  React.useEffect(()=>{
+    sb.from('feature_subscriptions')
+      .select('*')
+      .eq('user_id', userId)
+      .eq('status','active')
+      .then(({data})=>{setSubs(data||[]);setBusy(false);});
+  },[userId]);
+
+  const features = [
+    {
+      key:'job_posting_monthly',
+      name:'Job Posting - Unlimited',
+      price:'$49/mo',
+      desc:'Post unlimited staff job listings for your events. Listings stay active for 30 days and appear in the staff portal.',
+      icon:'📋',
+    },
+    {
+      key:'email_marketing',
+      name:'Email Marketing Tools',
+      price:'$29/mo',
+      desc:'Send branded emails to your event attendees and followers. Includes templates, scheduling, and analytics.',
+      icon:'✉️',
+    },
+  ];
+
+  const activeSub = key => subs.find(s=>s.feature_key===key);
+
+  if(busy) return <Spin/>;
+
+  return (
+    <div>
+      <h2 style={{fontFamily:"'DM Sans',sans-serif",fontSize:22,fontWeight:800,marginBottom:6}}>Features</h2>
+      <p style={{color:'var(--sub)',fontSize:14,marginBottom:28}}>Add paid features to your venue account. Cancel anytime from the billing portal.</p>
+
+      <div style={{display:'flex',flexDirection:'column',gap:16,marginBottom:32}}>
+        {features.map(f=>{
+          const sub = activeSub(f.key);
+          return (
+            <Card key={f.key} style={{display:'flex',alignItems:'center',gap:20,flexWrap:'wrap'}}>
+              <div style={{fontSize:32,flexShrink:0}}>{f.icon}</div>
+              <div style={{flex:1,minWidth:200}}>
+                <div style={{fontWeight:700,fontSize:15,marginBottom:3}}>{f.name}</div>
+                <div style={{fontSize:13,color:'var(--sub)',lineHeight:1.6,marginBottom:6}}>{f.desc}</div>
+                {sub&&<div style={{fontSize:11,color:'var(--green)',fontFamily:"'DM Mono',monospace",letterSpacing:'0.08em'}}>
+                  ACTIVE · renews {new Date(sub.current_period_end).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})}
+                  {sub.cancel_at_period_end&&' · cancels at period end'}
+                </div>}
+              </div>
+              <div style={{flexShrink:0}}>
+                {sub?(
+                  <Btn variant="ghost" onClick={()=>openBillingPortal(userId)}>Manage / Cancel</Btn>
+                ):(
+                  <div style={{textAlign:'center'}}>
+                    <Btn onClick={()=>{
+                      if(f.key==='job_posting_monthly') checkoutJobPosting(userId,'monthly');
+                    }}>{f.price} - Subscribe</Btn>
+                  </div>
+                )}
+              </div>
+            </Card>
+          );
+        })}
+      </div>
+
+      <Card style={{background:'var(--surface)'}}>
+        <h4 style={{fontWeight:700,fontSize:14,marginBottom:8}}>One-time Purchases</h4>
+        <p style={{color:'var(--sub)',fontSize:13,lineHeight:1.7,marginBottom:16}}>Some features are available per-use without a subscription. Job posts can be purchased individually for $10/post (active 30 days). Social media announcements are $35 per post - request one from the social announcements section.</p>
+        <Btn variant="secondary" onClick={()=>openBillingPortal(userId)}>Open Billing Portal</Btn>
+      </Card>
+    </div>
+  );
 }
 
 // Portal Shell
 function Portal() {
  const {user,profile}=useAuth();
- const initPage = ['standard','premium'].includes(new URLSearchParams(window.location.search).get('upgrade')) ? 'plan' : 'dashboard';
+ const initPage = 'dashboard';
  const [page,setPage]=useState(initPage);
  const [venue,setVenue]=useState(null);
  const [events,setEvents]=useState([]);
@@ -1959,7 +2083,8 @@ function Portal() {
  const isManager=staffRole==='manager';
  const filteredNav=NAV.filter(n=>{
    if(n.key==='staff') return isOwner;
-   if(n.key==='plan') return isOwner;
+   if(n.key==='jobs') return isOwner;
+   if(n.key==='features') return isOwner;
    if(n.key==='payouts') return isOwner||isManager;
    if(n.key==='earnings') return isOwner||isManager;
    return true;
@@ -1980,7 +2105,8 @@ function Portal() {
        {page==="inquiries"&&<Inquiries venue={venue}/>}
        {page==="inbox"&&<Inbox userId={user?.id}/>}
        {page==="staff"&&<StaffManagement venue={venue} userId={user?.id}/>}
-       {page==="plan"&&<PlanBilling venue={venue}/>}
+       {page==="jobs"&&<JobPostings venue={venue} userId={user?.id}/>}
+       {page==="features"&&<Features venue={venue} userId={user?.id}/>}
      </>}
    </main>
  </div>
