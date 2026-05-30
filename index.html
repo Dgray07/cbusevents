@@ -548,7 +548,7 @@ footer{background:#1a1612;color:var(--cream);padding:56px 48px 32px;}
           <a href="https://cbusevents.com/signup.html?role=vendor" style="display:block;padding:9px 14px;border-radius:8px;font-size:13px;color:var(--sub);text-decoration:none;transition:background 0.15s" onmouseover="this.style.background='var(--flame-l)'" onmouseout="this.style.background='transparent'">List Your Services</a>
           <a href="https://cbusevents.com/signup.html?role=organizer" style="display:block;padding:9px 14px;border-radius:8px;font-size:13px;color:var(--sub);text-decoration:none;transition:background 0.15s" onmouseover="this.style.background='var(--flame-l)'" onmouseout="this.style.background='transparent'">Event Organizers</a>
           <div style="height:1px;background:var(--rule);margin:4px 8px"></div>
-          <a href="https://cbusevents.com/signup.html?role=attendee" style="display:block;padding:9px 14px;border-radius:8px;font-size:13px;color:var(--sub);text-decoration:none;transition:background 0.15s" onmouseover="this.style.background='var(--flame-l)'" onmouseout="this.style.background='transparent'">Find Events</a>
+          <a href="https://cbusevents.com/signup.html?role=customer" style="display:block;padding:9px 14px;border-radius:8px;font-size:13px;color:var(--sub);text-decoration:none;transition:background 0.15s" onmouseover="this.style.background='var(--flame-l)'" onmouseout="this.style.background='transparent'">Find Events</a>
           <a href="https://cbusevents.com/sales-landing.html" style="display:block;padding:9px 14px;border-radius:8px;font-size:13px;font-weight:600;color:var(--flame);text-decoration:none;transition:background 0.15s" onmouseover="this.style.background='var(--flame-l)'" onmouseout="this.style.background='transparent'">Brands &amp; Sponsors</a>
         </div>
       </div>
@@ -571,7 +571,7 @@ footer{background:#1a1612;color:var(--cream);padding:56px 48px 32px;}
 
 <!-- DATEBAR -->
 <div class="datebar">
-  <span class="datebar-date" id="datebar-date">Thursday, May 21, 2026</span>
+  <span class="datebar-date" id="datebar-date"></span>
   <span class="datebar-sep">·</span>
   <span class="datebar-tag">Columbus Event Ecosystem</span>
   <div class="datebar-live">
@@ -1522,8 +1522,24 @@ async function initNavAuth(){
     if(session?.user){
       const{data:roleData}=await sb.from('user_roles').select('role').eq('user_id',session.user.id).maybeSingle();
       const role=roleData?.role||'customer';
-      const portalUrls={venue_owner:'https://cbusevents.com/cbus-venue-portal.html',vendor:'https://cbusevents.com/cbus-vendor-portal.html',organizer:'https://cbusevents.com/cbus-organizer-portal.html',customer:'https://cbusevents.com/customer-portal.html'};
-      const portalLabels={venue_owner:'Venue Portal',vendor:'Vendor Portal',organizer:'Organizer Portal',customer:'My Account'};
+      const portalUrls={
+        venue_owner:      'https://cbusevents.com/cbus-venue-portal.html',
+        vendor:           'https://cbusevents.com/cbus-vendor-portal.html',
+        organizer:        'https://cbusevents.com/cbus-organizer-portal.html',
+        food_professional:'https://cbusevents.com/food-professional.html',
+        event_staff:      'https://cbusevents.com/event-staff.html',
+        sales_rep:        'https://cbusevents.com/brand-rep.html',
+        customer:         'https://cbusevents.com/customer-portal.html',
+      };
+      const portalLabels={
+        venue_owner:      'Venue Portal',
+        vendor:           'Vendor Portal',
+        organizer:        'Organizer Portal',
+        food_professional:'Food Pro Portal',
+        event_staff:      'Staff Portal',
+        sales_rep:        'Rep Portal',
+        customer:         'My Account',
+      };
       if(signinDrop) signinDrop.innerHTML=`<a href="${portalUrls[role]||portalUrls.customer}" class="nav-join" style="font-size:12px">${portalLabels[role]||'My Account'}</a>`;
       if(joinDrop) joinDrop.innerHTML=`<button onclick="sb.auth.signOut().then(()=>window.location.reload())" style="font-family:var(--mono);font-size:9px;letter-spacing:0.14em;text-transform:uppercase;color:var(--mist);background:none;border:none;cursor:pointer;padding:0;">Sign Out</button>`;
     }
@@ -1621,12 +1637,12 @@ async function loadLiveData(){
         const cat=g.category?.toLowerCase()||'other';
         const pillClass=catColor[cat]||'p-vendor';
         const dateStr=g.event_date?new Date(g.event_date).toLocaleDateString('en-US',{month:'short',day:'numeric'}):'TBA';
-        return `<div class="gig-row reveal" onclick="window.location.href='https://cbusevents.com/cbus-vendor-portal.html'">
+        return `<div class="gig-row reveal" onclick="window.location.href='https://cbusevents.com/collab-board.html'">
           <div><span class="pill ${pillClass}">${g.category||'Gig'}</span></div>
           <div><div class="gig-title">${g.title}</div><div class="gig-sub">Posted by ${g.poster_name||'Organizer'} · ${g.location||'Columbus, OH'}</div></div>
           <div><div class="gig-pay">${g.pay||'Negotiable'}</div><div class="gig-pay-unit">Pay</div></div>
           <div class="gig-date-val">${dateStr}</div>
-          <div><button class="gig-apply" onclick="event.stopPropagation();window.location.href='https://cbusevents.com/cbus-vendor-portal.html'">Apply</button></div>
+          <div><button class="gig-apply" onclick="event.stopPropagation();window.location.href='https://cbusevents.com/collab-board.html'">Apply</button></div>
         </div>`;
       }).join('');
       gigList.querySelectorAll('.reveal').forEach(el=>revealObs.observe(el));
