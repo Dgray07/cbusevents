@@ -1522,19 +1522,21 @@ document.addEventListener('DOMContentLoaded',function(){
 
 // ── FEATURED SPOTS ──────────────────────────────────────────
 async function loadFeaturedSpots(){
+  let spots=[];
   try{
     const res=await fetch(SB_URL+'/rest/v1/featured_spots?active=eq.true&order=featured_order.asc&select=*',{
       headers:{apikey:SB_KEY,Authorization:'Bearer '+SB_KEY}
     });
-    const spots=await res.json();
-    if(!Array.isArray(spots))return;
-
-    const lateNight=spots.filter(s=>s.section==='late_night');
-    const afterEvent=spots.filter(s=>s.section==='after_event');
-
-    renderSpots('lateNightContainer',lateNight,'&#127839;');
-    renderSpots('afterEventContainer',afterEvent,'&#127867;');
+    const data=await res.json();
+    if(Array.isArray(data))spots=data;
   }catch(e){console.log('Featured spots error:',e);}
+
+  // Always render, even on error/404, so the sections never hang on "Loading..."
+  const lateNight=spots.filter(s=>s.section==='late_night');
+  const afterEvent=spots.filter(s=>s.section==='after_event');
+
+  renderSpots('lateNightContainer',lateNight,'&#127839;');
+  renderSpots('afterEventContainer',afterEvent,'&#127867;');
 }
 
 function renderSpots(containerId,spots,fallbackIcon){
