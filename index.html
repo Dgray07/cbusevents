@@ -1444,11 +1444,19 @@ async function submitClaim(){
 }
 
 // Event modal stub (opens events page)
+// Returns the dedicated page for the 1313 Festival, otherwise the generic event detail page.
+function festivalEventURL(e){
+  if(e&&((e.title&&e.title.includes('1313'))||e.id==='festival-1313'||e.id==='1313-festival')){
+    return 'https://cbusevents.com/1313-festival-event.html';
+  }
+  return 'https://cbusevents.com/event.html?id='+(e&&e.id);
+}
+
 function openEventModal(id){
   if(!id){document.getElementById('liveFeedSection').scrollIntoView({behavior:'smooth'});return;}
-  if(id==='festival-1313'||id==='1313-festival'){window.location.href='https://cbusevents.com/1313-festival-event.html';return;}
-  // Route to the full event detail page with the event ID
-  window.location.href='https://cbusevents.com/event.html?id='+id;
+  // Look up the loaded event so the 1313 Festival routes to its created page even with a real Supabase UUID.
+  const evt=(feedAllEvents||[]).find(e=>e.id===id)||{id};
+  window.location.href=festivalEventURL(evt);
 }
 
 
@@ -1591,7 +1599,7 @@ async function loadLiveData(){
           const day=d.getDate();
           const venue=e.venue_name_override||e.venues?.name||'Columbus';
           const isFree=e.is_free;
-          const ecardTarget=`window.location.href='https://cbusevents.com/event.html?id=${e.id}'`;
+          const ecardTarget=`window.location.href='${festivalEventURL(e)}'`;
           return `<div class="ecard reveal" onclick="${ecardTarget}" style="cursor:pointer">
             <div class="ec-mo">${mo}</div><div class="ec-day">${day}</div>
             <div class="ec-name">${e.title||'Untitled'}</div>
@@ -1609,7 +1617,7 @@ async function loadLiveData(){
           const mo=d.toLocaleDateString('en-US',{month:'short'}).toUpperCase();
           const day=d.getDate();
           const venue=e.venue_name_override||e.venues?.name||'Columbus';
-          const sbTarget=`window.location.href='https://cbusevents.com/event.html?id=${e.id}'`;
+          const sbTarget=`window.location.href='${festivalEventURL(e)}'`;
           return `<div class="sb-evt" onclick="${sbTarget}" style="cursor:pointer">
             <div class="sb-date"><div class="sb-mo">${mo}</div><div class="sb-day">${day}</div></div>
             <div><div class="sb-name">${e.title||'Untitled'}</div><div class="sb-venue-sm">${venue}</div></div>
