@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CBUS Events Raffle</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@400;500;700&family=DM+Mono:wght@400;500&display=swap');
+
+  :root {
+    --ink: #080810;
+    --cream: #F4EDE0;
+    --orange: #FF6B35;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: var(--ink);
+    color: var(--cream);
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 32px 20px;
+    overflow-x: hidden;
+  }
+  .kicker {
+    font-family: 'DM Mono', monospace;
+    text-transform: uppercase;
+    letter-spacing: 0.25em;
+    font-size: 12px;
+    color: var(--orange);
+    margin-bottom: 8px;
+  }
+  h1 {
+    font-family: 'Playfair Display', serif;
+    font-weight: 900;
+    font-size: clamp(32px, 7vw, 56px);
+    line-height: 1;
+    text-align: center;
+    margin-bottom: 28px;
+  }
+  .stage {
+    width: 100%;
+    max-width: 640px;
+    background: rgba(244,237,224,0.04);
+    border: 1px solid rgba(244,237,224,0.15);
+    border-radius: 20px;
+    padding: 40px 28px;
+    text-align: center;
+    margin-bottom: 24px;
+    position: relative;
+    min-height: 200px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+  .label {
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    opacity: 0.6;
+    margin-bottom: 16px;
+  }
+  .display-name {
+    font-family: 'Playfair Display', serif;
+    font-weight: 900;
+    font-size: clamp(36px, 9vw, 72px);
+    line-height: 1.05;
+    min-height: 1.1em;
+    transition: opacity 0.1s;
+    word-break: break-word;
+  }
+  .display-name.winner { color: var(--orange); }
+  .display-name.spinning { opacity: 0.85; }
+  .count {
+    font-family: 'DM Mono', monospace;
+    font-size: 13px;
+    opacity: 0.5;
+    margin-top: 16px;
+  }
+  .controls {
+    width: 100%;
+    max-width: 640px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+  button {
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 700;
+    font-size: 17px;
+    padding: 18px;
+    border: none;
+    border-radius: 14px;
+    cursor: pointer;
+    transition: transform 0.1s, opacity 0.2s;
+  }
+  button:active { transform: scale(0.98); }
+  button:disabled { opacity: 0.35; cursor: not-allowed; }
+  .btn-draw {
+    background: var(--orange);
+    color: var(--ink);
+  }
+  .btn-secondary {
+    background: transparent;
+    color: var(--cream);
+    border: 1px solid rgba(244,237,224,0.3);
+  }
+  textarea {
+    width: 100%;
+    max-width: 640px;
+    min-height: 120px;
+    background: rgba(244,237,224,0.05);
+    border: 1px solid rgba(244,237,224,0.2);
+    border-radius: 14px;
+    color: var(--cream);
+    font-family: 'DM Mono', monospace;
+    font-size: 14px;
+    padding: 16px;
+    margin-bottom: 14px;
+    resize: vertical;
+  }
+  textarea::placeholder { color: rgba(244,237,224,0.4); }
+  input[type="text"] {
+    width: 100%;
+    max-width: 640px;
+    background: rgba(244,237,224,0.05);
+    border: 1px solid rgba(244,237,224,0.2);
+    border-radius: 14px;
+    color: var(--cream);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    padding: 14px 16px;
+    margin-bottom: 14px;
+  }
+  input[type="text"]::placeholder { color: rgba(244,237,224,0.4); }
+  .setup-label {
+    width: 100%;
+    max-width: 640px;
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    opacity: 0.6;
+    margin-bottom: 10px;
+    text-align: left;
+  }
+  .winners-list {
+    width: 100%;
+    max-width: 640px;
+    margin-top: 28px;
+  }
+  .winners-list h2 {
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    opacity: 0.6;
+    margin-bottom: 14px;
+  }
+  .winner-row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px 18px;
+    background: rgba(255,107,53,0.08);
+    border: 1px solid rgba(255,107,53,0.3);
+    border-radius: 12px;
+    margin-bottom: 10px;
+    animation: slideIn 0.4s ease;
+  }
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .winner-num {
+    font-family: 'DM Mono', monospace;
+    color: var(--orange);
+    font-size: 14px;
+    font-weight: 500;
+  }
+  .winner-name {
+    font-family: 'Playfair Display', serif;
+    font-weight: 700;
+    font-size: 20px;
+  }
+  .corner {
+    position: absolute;
+    width: 14px;
+    height: 14px;
+    border-color: var(--orange);
+    border-style: solid;
+    border-width: 0;
+  }
+  .corner.tl { top: 14px; left: 14px; border-top-width: 2px; border-left-width: 2px; }
+  .corner.br { bottom: 14px; right: 14px; border-bottom-width: 2px; border-right-width: 2px; }
+  .hidden { display: none; }
+</style>
+</head>
+<body>
+  <div class="kicker" id="kicker">CBUS Events</div>
+  <h1 id="raffleTitle">Raffle</h1>
+
+  <div id="setup">
+    <div class="setup-label">Event name (shown above)</div>
+    <input type="text" id="eventNameInput" placeholder="e.g. 1313 Food & Arts Festival">
+
+    <div class="setup-label">Raffle name</div>
+    <input type="text" id="raffleNameInput" placeholder="e.g. Dessert Raffle">
+
+    <div class="setup-label">Paste entrants (one name per line)</div>
+    <textarea id="entriesInput" placeholder="Maria Lopez&#10;James Chen&#10;Aaliyah Brooks&#10;..."></textarea>
+
+    <div class="setup-label">Exclude these names (optional, one per line)</div>
+    <textarea id="excludeInput" placeholder="Organizer, co-hosts, vendors..." style="min-height:80px;"></textarea>
+
+    <div class="controls">
+      <button class="btn-draw" onclick="loadEntries()">Load Entrants</button>
+    </div>
+  </div>
+
+  <div id="drawArea" class="hidden">
+    <div class="stage">
+      <span class="corner tl"></span>
+      <span class="corner br"></span>
+      <div class="label" id="stageLabel">Ready to draw</div>
+      <div class="display-name" id="displayName">—</div>
+      <div class="count" id="count"></div>
+    </div>
+    <div class="controls">
+      <button class="btn-draw" id="drawBtn" onclick="draw()">Draw a Winner</button>
+      <button class="btn-secondary" onclick="reset()">Reset Everything</button>
+    </div>
+    <div class="winners-list hidden" id="winnersList">
+      <h2>Winners</h2>
+      <div id="winnersContainer"></div>
+    </div>
+  </div>
+
+<script>
+  let pool = [];
+  let winners = [];
+  let spinning = false;
+
+  function loadEntries() {
+    // Apply organizer-set event + raffle names to the header.
+    const evName = document.getElementById('eventNameInput').value.trim();
+    const raffleName = document.getElementById('raffleNameInput').value.trim();
+    if (evName) document.getElementById('kicker').textContent = evName;
+    if (raffleName) document.getElementById('raffleTitle').textContent = raffleName;
+
+    const raw = document.getElementById('entriesInput').value;
+    const names = raw.split('\n').map(s => s.trim()).filter(Boolean);
+
+    // Build exclusion set from the optional exclude box (case-insensitive).
+    const blockRaw = document.getElementById('excludeInput').value;
+    const blockSet = new Set(
+      blockRaw.split('\n').map(s => s.trim().toLowerCase()).filter(Boolean)
+    );
+
+    // De-dupe (case-insensitive, keeps first occurrence's original casing)
+    // and remove excluded names.
+    const seen = new Set();
+    pool = [];
+    let removedDupes = 0, removedBlocked = 0;
+    for (const n of names) {
+      const key = n.toLowerCase();
+      if (blockSet.has(key)) { removedBlocked++; continue; }
+      if (seen.has(key)) { removedDupes++; continue; }
+      seen.add(key);
+      pool.push(n);
+    }
+
+    if (pool.length === 0) { alert('No eligible names after filtering.'); return; }
+    winners = [];
+    document.getElementById('setup').classList.add('hidden');
+    document.getElementById('drawArea').classList.remove('hidden');
+    updateCount();
+  }
+
+  function updateCount() {
+    document.getElementById('count').textContent =
+      pool.length + ' entrant' + (pool.length === 1 ? '' : 's') + ' remaining';
+    document.getElementById('drawBtn').disabled = pool.length === 0;
+    if (pool.length === 0) {
+      document.getElementById('drawBtn').textContent = 'All winners drawn';
+    }
+  }
+
+  function draw() {
+    if (spinning || pool.length === 0) return;
+    spinning = true;
+    document.getElementById('drawBtn').disabled = true;
+    document.getElementById('stageLabel').textContent = 'Drawing...';
+    const nameEl = document.getElementById('displayName');
+    nameEl.classList.remove('winner');
+    nameEl.classList.add('spinning');
+
+    let ticks = 0;
+    const totalTicks = 28;
+    let delay = 40;
+
+    function tick() {
+      nameEl.textContent = pool[Math.floor(Math.random() * pool.length)];
+      ticks++;
+      if (ticks < totalTicks) {
+        if (ticks > totalTicks * 0.6) delay += 18; // slow down for suspense
+        setTimeout(tick, delay);
+      } else {
+        const idx = Math.floor(Math.random() * pool.length);
+        const winner = pool.splice(idx, 1)[0];
+        winners.push(winner);
+        nameEl.textContent = winner;
+        nameEl.classList.remove('spinning');
+        nameEl.classList.add('winner');
+        document.getElementById('stageLabel').textContent = 'Winner!';
+        addWinnerRow(winner);
+        updateCount();
+        spinning = false;
+      }
+    }
+    tick();
+  }
+
+  function addWinnerRow(name) {
+    document.getElementById('winnersList').classList.remove('hidden');
+    const row = document.createElement('div');
+    row.className = 'winner-row';
+    row.innerHTML = '<span class="winner-num">#' + winners.length +
+      '</span><span class="winner-name">' + name + '</span>';
+    document.getElementById('winnersContainer').appendChild(row);
+  }
+
+  function reset() {
+    if (!confirm('Clear all winners and entrants?')) return;
+    pool = []; winners = []; spinning = false;
+    document.getElementById('entriesInput').value = '';
+    document.getElementById('excludeInput').value = '';
+    document.getElementById('eventNameInput').value = '';
+    document.getElementById('raffleNameInput').value = '';
+    document.getElementById('kicker').textContent = 'CBUS Events';
+    document.getElementById('raffleTitle').textContent = 'Raffle';
+    document.getElementById('winnersContainer').innerHTML = '';
+    document.getElementById('winnersList').classList.add('hidden');
+    document.getElementById('displayName').textContent = '—';
+    document.getElementById('displayName').classList.remove('winner');
+    document.getElementById('stageLabel').textContent = 'Ready to draw';
+    document.getElementById('count').textContent = '';
+    document.getElementById('drawArea').classList.add('hidden');
+    document.getElementById('setup').classList.remove('hidden');
+  }
+</script>
+</body>
+</html>
