@@ -1,0 +1,222 @@
+/* ============================================================
+   CBUSEVENTS - MASTER STYLESHEET
+   The homepage is the canon. Every internal page links this file.
+   Change a token here, every page updates.
+   ------------------------------------------------------------
+   Sections:
+     1. Fonts
+     2. Reset
+     3. Tokens (:root)
+     4. Base
+     5. Shell        (nav, footer, section, rule, band)
+     6. Type helpers (eyebrow, headings, labels)
+     7. Buttons
+     8. Cards
+     9. Badges + pills (role badges live here)
+    10. Avatars + presence row   <- the signature
+    11. Event card + list row
+    12. Forms
+    13. Utilities
+   ============================================================ */
+
+/* 1. FONTS ------------------------------------------------- */
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700;1,900&family=DM+Sans:wght@300;400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap');
+
+/* 2. RESET ------------------------------------------------- */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-font-smoothing:antialiased;}
+img{display:block;max-width:100%;}
+a{text-decoration:none;color:inherit;}
+button{font-family:inherit;cursor:pointer;border:none;background:none;}
+
+/* 3. TOKENS ------------------------------------------------ */
+:root{
+  /* surfaces */
+  --cream:#faf7f2;        /* page background */
+  --warm:#fffcf8;         /* raised warm surface */
+  --paper:#ffffff;        /* cards on cream */
+  --ink-deep:#15110d;     /* dark bands, footer, recap, radar */
+
+  /* text */
+  --ink:#1a1612;          /* primary */
+  --ash:#4a4540;          /* secondary */
+  --sub:#6b6560;          /* tertiary */
+  --mist:#9a948c;         /* hint / meta */
+  --on-dark:#faf7f2;      /* text on ink-deep */
+  --on-dark-dim:rgba(250,247,242,0.55);
+
+  /* lines */
+  --rule:#e8e2d8;
+  --rule-dark:rgba(250,247,242,0.12);
+
+  /* brand */
+  --flame:#FF6B35;        /* action + accent. used sparingly */
+  --flame-press:#e85a20;
+  --flame-l:#fff0ea;
+  --flame-m:#ffd4be;
+
+  /* role accents (badges, avatars) */
+  --role-organizer:#FF6B35;
+  --role-venue:#c8963e;
+  --role-vendor:#1a6b40;
+  --role-food:#D85A30;
+  --role-staff:#185FA5;
+  --role-customer:#534AB7;
+
+  /* status */
+  --gold:#c8963e;
+  --green:#1a6b40; --green-bg:#edf7f2; --green-bd:#b0dfc4;
+
+  /* type */
+  --display:'Playfair Display',Georgia,serif;
+  --font:'DM Sans',system-ui,sans-serif;
+  --mono:'DM Mono',ui-monospace,monospace;
+
+  /* radius */
+  --r-sm:7px; --r-md:9px; --r-lg:12px; --r-pill:20px;
+
+  /* shadow */
+  --sh1:0 1px 4px rgba(0,0,0,.06),0 1px 2px rgba(0,0,0,.04);
+  --sh2:0 4px 20px rgba(0,0,0,.10),0 2px 8px rgba(0,0,0,.05);
+  --sh3:0 12px 40px rgba(0,0,0,.16),0 4px 16px rgba(0,0,0,.07);
+
+  /* layout */
+  --pad-x:48px;           /* desktop horizontal page padding */
+  --maxw:1200px;
+}
+@media(max-width:680px){ :root{ --pad-x:20px; } }
+
+/* 4. BASE -------------------------------------------------- */
+html{scroll-behavior:smooth;}
+body{background:var(--cream);color:var(--ink);font-family:var(--font);font-weight:300;line-height:1.6;overflow-x:hidden;}
+
+/* 5. SHELL ------------------------------------------------- */
+/* nav: same hallway on every page */
+.cb-nav{position:sticky;top:0;z-index:200;background:rgba(250,247,242,0.97);
+  -webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px);border-bottom:1px solid var(--rule);}
+.cb-nav-inner{display:flex;align-items:center;justify-content:space-between;
+  padding:0 var(--pad-x);height:60px;max-width:var(--maxw);margin:0 auto;}
+.cb-logo{font-family:var(--display);font-weight:900;font-size:18px;letter-spacing:0.04em;color:var(--ink);}
+.cb-logo span{color:var(--flame);}
+
+/* footer */
+.cb-footer{background:var(--ink-deep);color:var(--on-dark);padding:40px var(--pad-x);}
+.cb-footer a{color:var(--on-dark-dim);}
+.cb-footer a:hover{color:var(--flame);}
+
+/* section: the standard internal-page content block */
+.cb-section{padding:32px var(--pad-x);max-width:var(--maxw);margin:0 auto;
+  border-bottom:1px solid var(--rule);}
+
+/* band: the dark rhythm break (recap, radar, anything "live") */
+.cb-band{background:var(--ink-deep);color:var(--on-dark);padding:32px var(--pad-x);}
+.cb-band .cb-h1,.cb-band .cb-h2,.cb-band .cb-h3{color:var(--on-dark);}
+
+/* section rule: the eyebrow + hairline header on every block */
+.cb-rule{display:flex;align-items:center;gap:12px;margin-bottom:20px;}
+.cb-rule-label{font-family:var(--mono);font-size:10px;letter-spacing:0.2em;
+  text-transform:uppercase;color:var(--ink);white-space:nowrap;}
+.cb-band .cb-rule-label{color:var(--on-dark);}
+.cb-rule-line{flex:1;height:1px;background:var(--rule);}
+.cb-band .cb-rule-line{background:var(--rule-dark);}
+
+/* 6. TYPE HELPERS ----------------------------------------- */
+.cb-eyebrow{font-family:var(--mono);font-size:10px;letter-spacing:0.24em;
+  text-transform:uppercase;color:var(--flame);display:inline-flex;align-items:center;gap:7px;}
+.cb-h1{font-family:var(--display);font-weight:900;font-size:clamp(36px,5vw,56px);
+  line-height:0.95;letter-spacing:-0.02em;color:var(--ink);}
+.cb-h2{font-family:var(--display);font-weight:900;font-size:clamp(24px,3vw,34px);
+  line-height:1.05;letter-spacing:-0.01em;color:var(--ink);}
+.cb-h3{font-family:var(--display);font-weight:700;font-size:18px;line-height:1.1;color:var(--ink);}
+.cb-h1 em,.cb-h2 em{font-style:italic;color:var(--flame);}
+.cb-label{font-family:var(--mono);font-size:9px;letter-spacing:0.18em;
+  text-transform:uppercase;color:var(--mist);}
+.cb-lead{font-size:15px;line-height:1.6;color:var(--ash);font-weight:300;max-width:46ch;}
+.cb-meta{font-size:11px;color:var(--mist);}
+
+/* 7. BUTTONS ---------------------------------------------- */
+.cb-btn{display:inline-block;background:var(--flame);color:#fff;font-family:var(--mono);
+  font-size:11px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;
+  padding:12px 22px;border-radius:var(--r-sm);transition:background .18s;}
+.cb-btn:hover{background:var(--flame-press);}
+.cb-btn-outline{display:inline-block;border:1.5px solid var(--rule);color:var(--ink);
+  font-family:var(--mono);font-size:11px;letter-spacing:0.14em;text-transform:uppercase;
+  padding:11px 20px;border-radius:var(--r-sm);transition:border-color .18s,color .18s;}
+.cb-btn-outline:hover{border-color:var(--flame);color:var(--flame);}
+.cb-band .cb-btn-outline{border-color:var(--rule-dark);color:var(--on-dark);}
+.cb-btn-sm{padding:9px 15px;font-size:10px;}
+
+/* 8. CARDS ------------------------------------------------ */
+.cb-card{background:var(--paper);border:0.5px solid var(--rule);border-radius:var(--r-md);
+  padding:14px;transition:border-color .15s;}
+.cb-card:hover{border-color:var(--flame-m);}
+.cb-card-dark{background:var(--ink-deep);color:var(--on-dark);border-radius:var(--r-md);padding:14px;}
+
+/* 9. BADGES + PILLS --------------------------------------- */
+/* role badge: identity travels with the person into every room */
+.cb-badge{display:inline-block;font-family:var(--mono);font-size:9px;font-weight:500;
+  letter-spacing:0.08em;text-transform:uppercase;padding:2px 8px;border-radius:5px;
+  background:var(--flame-l);color:var(--flame-press);}
+.cb-badge.organizer{background:#fff0ea;color:#c2410c;}
+.cb-badge.venue{background:#f7efdd;color:#8a6418;}
+.cb-badge.vendor{background:#e8f3ec;color:#155e34;}
+.cb-badge.food{background:#faece7;color:#993c1d;}
+.cb-badge.staff{background:#e6f1fb;color:#0c447c;}
+.cb-badge.customer{background:#eeedfe;color:#3c3489;}
+
+/* pill: filter chips */
+.cb-pill{display:inline-flex;align-items:center;gap:5px;font-family:var(--mono);font-size:10px;
+  letter-spacing:0.08em;text-transform:uppercase;color:var(--ash);background:var(--paper);
+  border:0.5px solid var(--rule);padding:7px 13px;border-radius:var(--r-pill);cursor:pointer;}
+.cb-pill.active{background:var(--flame);color:#fff;border-color:var(--flame);}
+
+/* 10. AVATARS + PRESENCE (the signature) ------------------ */
+.cb-av{border-radius:50%;display:flex;align-items:center;justify-content:center;
+  font-weight:500;font-size:11px;border:2px solid var(--cream);flex-shrink:0;
+  background:var(--role-customer);color:#EEEDFE;width:32px;height:32px;}
+.cb-av.organizer{background:var(--role-organizer);color:#fff;}
+.cb-av.venue{background:var(--role-venue);color:#fff;}
+.cb-av.vendor{background:var(--role-vendor);color:#e8f3ec;}
+.cb-av.food{background:var(--role-food);color:#faece7;}
+.cb-av.staff{background:var(--role-staff);color:#e6f1fb;}
+.cb-av-sm{width:24px;height:24px;font-size:9px;}
+/* stack: overlapping faces = "who's going" */
+.cb-av-stack{display:flex;}
+.cb-av-stack .cb-av:not(:first-child){margin-left:-8px;}
+/* presence row: faces + count, the recurring social unit */
+.cb-presence{display:flex;align-items:center;gap:8px;}
+.cb-presence-count{font-size:11px;color:var(--sub);}
+.cb-presence-count strong{color:var(--ink);font-weight:500;}
+
+/* 11. EVENT CARD + LIST ROW ------------------------------- */
+.cb-event-row{display:flex;align-items:center;gap:14px;background:var(--paper);
+  border:0.5px solid var(--rule);border-radius:var(--r-md);padding:12px 14px;}
+.cb-event-date{text-align:center;flex-shrink:0;width:38px;}
+.cb-event-date .mo{font-family:var(--mono);font-size:9px;color:var(--flame);text-transform:uppercase;}
+.cb-event-date .day{font-family:var(--display);font-size:22px;font-weight:900;line-height:1;}
+.cb-event-name{font-family:var(--display);font-size:16px;font-weight:700;line-height:1.1;}
+
+/* 12. FORMS ----------------------------------------------- */
+.cb-field{margin-bottom:14px;}
+.cb-field-label{display:block;font-size:12px;font-weight:500;color:var(--ash);margin-bottom:6px;}
+.cb-input,.cb-select,.cb-textarea{width:100%;background:var(--paper);border:0.5px solid var(--rule);
+  border-radius:var(--r-sm);padding:10px 13px;font-family:var(--font);font-size:14px;color:var(--ink);
+  outline:none;transition:border-color .15s;}
+.cb-input:focus,.cb-select:focus,.cb-textarea:focus{border-color:var(--flame);}
+.cb-textarea{resize:vertical;min-height:80px;}
+
+/* 13. UTILITIES ------------------------------------------- */
+.cb-stack{display:flex;flex-direction:column;}
+.cb-row{display:flex;align-items:center;}
+.cb-grid-2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;}
+.cb-grid-3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;}
+.cb-grid-4{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;}
+@media(max-width:680px){
+  .cb-grid-3,.cb-grid-4{grid-template-columns:repeat(2,minmax(0,1fr));}
+}
+.cb-divider{height:1px;background:var(--rule);border:none;}
+.cb-flame{color:var(--flame);}
+.cb-mt-s{margin-top:8px;} .cb-mt-m{margin-top:16px;} .cb-mt-l{margin-top:24px;}
+.cb-gap-s{gap:8px;} .cb-gap-m{gap:14px;}
+
+/* reduced motion */
+@media(prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important;}}
