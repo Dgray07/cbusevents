@@ -577,47 +577,105 @@ footer{background:#1a1612;color:var(--cream);padding:56px 48px 32px;}
 </div>
 
 <!-- HERO -->
+<style>
+  .hero-est{background:var(--paper,#fff);border:0.5px solid var(--rule);border-radius:12px;padding:18px;margin-top:18px;box-shadow:var(--sh2);}
+  .he-label{font-family:var(--mono);font-size:9px;letter-spacing:0.18em;text-transform:uppercase;color:var(--flame);margin-bottom:10px;}
+  .he-inrow{display:flex;align-items:center;gap:8px;border:1.5px solid var(--rule);border-radius:9px;padding:10px 14px;transition:border-color .15s;}
+  .he-inrow:focus-within{border-color:var(--flame);}
+  .he-dollar{font-family:var(--display);font-size:22px;font-weight:700;color:var(--ink);}
+  .he-input{border:none;outline:none;background:transparent;font-family:var(--display);font-size:22px;font-weight:700;color:var(--ink);width:90px;}
+  .he-per{font-size:12px;color:var(--mist);margin-left:auto;}
+  .he-out{font-size:13px;color:var(--ash);margin-top:12px;line-height:1.55;}
+  .he-out strong{color:var(--ink);font-weight:600;}
+  .he-toggle{background:none;border:none;color:var(--flame);font-family:var(--mono);font-size:10px;letter-spacing:0.06em;text-transform:uppercase;cursor:pointer;margin-top:10px;padding:0;}
+  .he-total{margin-top:12px;padding-top:12px;border-top:1px solid var(--rule);}
+  .he-totrow{display:flex;align-items:center;justify-content:space-between;font-size:12px;color:var(--ash);margin-bottom:8px;}
+  .he-qty{width:84px;border:0.5px solid var(--rule);border-radius:7px;padding:6px 10px;font-family:var(--font);font-size:14px;color:var(--ink);outline:none;text-align:right;background:var(--paper,#fff);}
+  .he-totout{font-size:13px;color:var(--ash);}
+  .he-cta{display:block;text-align:center;margin-top:14px;}
+  .he-fine{font-family:var(--mono);font-size:8px;color:var(--mist);text-align:center;margin-top:10px;letter-spacing:0.04em;}
+  .hero-search{background:var(--paper,#fff);border:0.5px solid var(--rule);border-radius:14px;padding:24px;display:flex;flex-direction:column;justify-content:center;min-height:260px;box-shadow:var(--sh2);}
+  .hs-label{font-family:var(--mono);font-size:9px;letter-spacing:0.18em;text-transform:uppercase;color:var(--flame);margin-bottom:8px;}
+  .hs-h{font-family:var(--display);font-size:26px;font-weight:900;color:var(--ink);line-height:1.05;margin-bottom:16px;}
+  .hs-form{display:flex;gap:8px;}
+  .hs-input{flex:1;background:var(--cream);border:0.5px solid var(--rule);border-radius:9px;padding:12px 14px;font-family:var(--font);font-size:14px;color:var(--ink);outline:none;transition:border-color .15s;}
+  .hs-input:focus{border-color:var(--flame);}
+  .hs-btn{background:var(--flame);color:#fff;border:none;border-radius:9px;padding:0 16px;font-size:18px;cursor:pointer;}
+  .hs-chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px;}
+  .hs-chip{font-family:var(--mono);font-size:10px;letter-spacing:0.05em;text-transform:uppercase;color:var(--ash);background:var(--cream);border:0.5px solid var(--rule);border-radius:20px;padding:7px 13px;text-decoration:none;transition:border-color .15s,color .15s;}
+  .hs-chip:hover{border-color:var(--flame);color:var(--flame);}
+</style>
 <section class="hero">
   <div class="hero-grid">
     <div class="hero-left">
-      <div>
-        <div class="hero-label">Columbus, Ohio &middot; the local scene</div>
-        <h1 class="hero-h1">See who's<br><em>going out.</em></h1>
-        <p class="hero-sub">Every event in the city, the people going, and the vendors who show up. CBUSEVENTS is where Columbus makes plans together.</p>
-        <div class="hero-btns">
-          <a href="#liveFeedSection" class="btn-primary">Explore Events</a>
-          <a href="https://cbusevents.com/signup.html" class="btn-outline">Join Free</a>
+      <div class="hero-label">For organizers</div>
+      <h1 class="hero-h1">Columbus events<br><em>run through here.</em></h1>
+      <p class="hero-sub">Lower all-in ticketing fees, Stripe included. Play with the numbers, then add your event.</p>
+      <div class="hero-est">
+        <div class="he-label">Ticketing estimator</div>
+        <div class="he-inrow">
+          <span class="he-dollar">$</span>
+          <input id="he-price" class="he-input" type="number" value="30" min="0" step="1" aria-label="Ticket price">
+          <span class="he-per">per ticket</span>
         </div>
-      </div>
-      <div class="hero-stats">
-        <div><div class="stat-num" id="stat-venues">&mdash;</div><div class="stat-lbl">Active Venues</div></div>
-        <div><div class="stat-num" id="stat-vendors">&mdash;</div><div class="stat-lbl">Local Vendors</div></div>
-        <div><div class="stat-num" id="stat-events">&mdash;</div><div class="stat-lbl">Events Live</div></div>
+        <div class="he-out">You keep <strong id="he-keep">$0.00</strong> per ticket, <strong id="he-diff" style="color:var(--flame)">$0.00</strong> less in fees than typical platforms.</div>
+        <button class="he-toggle" id="he-toggle" type="button">See it across a full event &#9662;</button>
+        <div class="he-total" id="he-total" style="display:none">
+          <div class="he-totrow"><span>Tickets sold</span><input id="he-qty" class="he-qty" type="number" value="200" min="0" step="1" aria-label="Tickets sold"></div>
+          <div class="he-totout">You save <strong id="he-save" style="color:var(--flame)">$0.00</strong> in fees on this event.</div>
+        </div>
+        <a href="https://cbusevents.com/signup.html" class="btn-primary he-cta">Add your event</a>
+        <div class="he-fine">5.9% + $1 all-in, Stripe included. Free events stay free.</div>
       </div>
     </div>
     <div class="hero-right">
-      <a href="#liveFeedSection" class="hero-featured" id="hero-featured" style="text-decoration:none">
-        <div class="hf-glow"></div>
-        <div class="hf-badge"><div class="hf-dot"></div>Featured</div>
-        <div class="hf-title">What's on in Columbus</div>
-        <div class="hf-meta"><span>Explore this week's events</span></div>
-        <div class="hf-cta">Explore Events</div>
-      </a>
-      <div class="hero-mini-row" id="hero-mini-events">
-        <a class="event-mini" href="#liveFeedSection" style="text-decoration:none;display:block;">
-          <div class="em-date">This week</div>
-          <div class="em-name">See what's happening</div>
-          <div class="em-venue">Columbus, OH</div>
-        </a>
-        <a class="event-mini" href="https://cbusevents.com/signup.html" style="text-decoration:none;display:block;">
-          <div class="em-date">Free</div>
-          <div class="em-name">Create your profile</div>
-          <div class="em-venue">Join the scene</div>
-        </a>
+      <div class="hero-search">
+        <div class="hs-label">Find your night</div>
+        <div class="hs-h">What's on in Columbus?</div>
+        <form id="hs-form" class="hs-form">
+          <input id="hs-q" class="hs-input" type="text" placeholder="Search events, venues, neighborhoods..." aria-label="Search events">
+          <button class="hs-btn" type="submit" aria-label="Search">&#8594;</button>
+        </form>
+        <div class="hs-chips">
+          <a href="the-radar.html?when=tonight" class="hs-chip">Tonight</a>
+          <a href="the-radar.html?when=weekend" class="hs-chip">This weekend</a>
+          <a href="the-radar.html?free=1" class="hs-chip">Free</a>
+          <a href="the-radar.html" class="hs-chip">Open the Radar &#8594;</a>
+        </div>
       </div>
     </div>
   </div>
 </section>
+<script>
+(function(){
+  var price=document.getElementById('he-price');
+  if(price){
+    var keepEl=document.getElementById('he-keep'),diffEl=document.getElementById('he-diff'),
+        saveEl=document.getElementById('he-save'),qty=document.getElementById('he-qty');
+    var m=function(n){return '$'+(Math.round(n*100)/100).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});};
+    var calc=function(){
+      var p=parseFloat(price.value)||0;
+      var cb=p>0?p*0.059+1:0;
+      var cp=p>0?(p*0.037+1.30)+(p*0.029+0.30):0;
+      keepEl.textContent=m(Math.max(p-cb,0));
+      diffEl.textContent=m(Math.max(cp-cb,0));
+      var q=parseInt(qty&&qty.value)||0;
+      if(saveEl)saveEl.textContent=m(Math.max((cp-cb)*q,0));
+    };
+    price.addEventListener('input',calc);
+    if(qty)qty.addEventListener('input',calc);
+    var tog=document.getElementById('he-toggle'),tot=document.getElementById('he-total');
+    if(tog&&tot)tog.addEventListener('click',function(){tot.style.display='block';tog.style.display='none';});
+    calc();
+  }
+  var form=document.getElementById('hs-form');
+  if(form)form.addEventListener('submit',function(e){
+    e.preventDefault();
+    var q=document.getElementById('hs-q').value.trim();
+    window.location.href='the-radar.html'+(q?('?q='+encodeURIComponent(q)):'');
+  });
+})();
+</script>
 
 <!-- TICKER -->
 <div class="ticker" id="ticker-wrap">
