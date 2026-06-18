@@ -76,8 +76,9 @@ nav{
 
 /* ── HERO GRID ───────────────────────────── */
 .hero{border-bottom:1px solid var(--rule);}
-.hero-grid{display:grid;grid-template-columns:1fr 460px;}
-.hero-left{padding:56px 48px;border-right:1px solid var(--rule);display:flex;flex-direction:column;justify-content:center;min-height:72vh;}
+.hero-head{padding:52px 48px 30px;border-bottom:1px solid var(--rule);}
+.hero-grid{display:grid;grid-template-columns:1fr 1fr;}
+.hero-left{padding:40px 48px;border-right:1px solid var(--rule);display:flex;flex-direction:column;}
 .hero-label{font-family:var(--mono);font-size:9px;letter-spacing:0.24em;text-transform:uppercase;color:var(--flame);margin-bottom:18px;}
 .hero-h1{font-family:var(--display);font-size:clamp(52px,6.5vw,88px);font-weight:900;line-height:0.91;letter-spacing:-0.02em;color:var(--ink);margin-bottom:20px;}
 .hero-h1 em{font-style:italic;color:var(--flame);}
@@ -93,7 +94,7 @@ nav{
 .stat-lbl{font-family:var(--mono);font-size:8px;letter-spacing:0.18em;text-transform:uppercase;color:var(--mist);margin-top:5px;}
 
 /* ── HERO RIGHT ──────────────────────────── */
-.hero-right{display:flex;flex-direction:column;justify-content:center;padding:48px 44px;}
+.hero-right{display:flex;flex-direction:column;padding:40px 48px;}
 .hero-featured{flex:1;background:var(--flame);padding:28px;display:flex;flex-direction:column;justify-content:flex-end;position:relative;overflow:hidden;cursor:pointer;transition:filter 0.2s;min-height:260px;}
 .hero-featured:hover{filter:brightness(1.05);}
 .hf-glow{position:absolute;inset:0;background:radial-gradient(ellipse at 80% 20%,rgba(255,255,255,0.08) 0%,transparent 55%);}
@@ -483,13 +484,28 @@ footer{background:#1a1612;color:var(--cream);padding:56px 48px 32px;}
   .nav-inner{padding:0 24px;}
   .nav-links{display:none;}
   .datebar{padding:8px 24px;}
-  .hero-grid{grid-template-columns:1fr;}
-  .hero-left{min-height:auto;padding:24px 24px 32px;order:0;}
-  /* mobile: search above the estimator, estimator collapsed */
-  .hero-right{display:flex;order:-1;padding:32px 24px 0;}
-  .hero-search{min-height:0;padding:18px;}
-  .hero-est{margin-top:14px;}
-  .he-toggle,.he-total{display:none;}
+  /* mobile: two mini cards side by side, equal height */
+  .hero-head{padding:26px 18px 14px;}
+  .hero-h1{font-size:36px;}
+  .hero-sub{font-size:13px;margin-bottom:0;max-width:none;}
+  .hero-grid{grid-template-columns:1fr 1fr;gap:10px;padding:0 16px 22px;align-items:stretch;}
+  .hero-left{min-height:auto;padding:0;border-right:none;display:flex;}
+  .hero-right{padding:0;display:flex;}
+  .hero-est,.hero-search{margin-top:0;width:100%;display:flex;flex-direction:column;}
+  .hero-est{padding:13px;}
+  .hero-search{min-height:0;padding:13px;}
+  .he-toggle,.he-total,.he-per,.he-fine,.he-out-full,.hs-chips{display:none;}
+  .he-out-mini{display:block;}
+  .he-label,.hs-label{font-size:8px;letter-spacing:0.1em;margin-bottom:7px;}
+  .he-inrow{padding:8px 10px;}
+  .he-dollar,.he-input{font-size:18px;}
+  .he-input{width:54px;}
+  .he-out{font-size:11px;margin-top:8px;line-height:1.45;}
+  .he-cta{margin-top:auto;padding:10px 6px;font-size:8px;letter-spacing:0.05em;}
+  .hs-h{font-size:15px;line-height:1.12;margin-bottom:10px;}
+  .hs-form{gap:6px;}
+  .hs-input{padding:9px 10px;font-size:12px;}
+  .hs-btn{padding:0 11px;font-size:14px;}
   .how-section,.feed-section,.collab-section,.spotlight-section,.digest-section,footer{padding:48px 24px;}
   .events-strip{padding:0 24px;}
   .how-chain{grid-template-columns:1fr 1fr;gap:24px;}
@@ -582,7 +598,7 @@ footer{background:#1a1612;color:var(--cream);padding:56px 48px 32px;}
 
 <!-- HERO -->
 <style>
-  .hero-est{background:var(--paper,#fff);border:0.5px solid var(--rule);border-radius:12px;padding:18px;margin-top:18px;box-shadow:var(--sh2);}
+  .hero-est{background:var(--paper,#fff);border:0.5px solid var(--rule);border-radius:12px;padding:18px;margin-top:0;box-shadow:var(--sh2);}
   .he-label{font-family:var(--mono);font-size:9px;letter-spacing:0.18em;text-transform:uppercase;color:var(--flame);margin-bottom:10px;}
   .he-inrow{display:flex;align-items:center;gap:8px;border:1.5px solid var(--rule);border-radius:9px;padding:10px 14px;transition:border-color .15s;}
   .he-inrow:focus-within{border-color:var(--flame);}
@@ -590,6 +606,7 @@ footer{background:#1a1612;color:var(--cream);padding:56px 48px 32px;}
   .he-input{border:none;outline:none;background:transparent;font-family:var(--display);font-size:22px;font-weight:700;color:var(--ink);width:90px;}
   .he-per{font-size:12px;color:var(--mist);margin-left:auto;}
   .he-out{font-size:13px;color:var(--ash);margin-top:12px;line-height:1.55;}
+  .he-out-mini{display:none;}
   .he-out strong{color:var(--ink);font-weight:600;}
   .he-toggle{background:none;border:none;color:var(--flame);font-family:var(--mono);font-size:10px;letter-spacing:0.06em;text-transform:uppercase;cursor:pointer;margin-top:10px;padding:0;}
   .he-total{margin-top:12px;padding-top:12px;border-top:1px solid var(--rule);}
@@ -610,11 +627,13 @@ footer{background:#1a1612;color:var(--cream);padding:56px 48px 32px;}
   .hs-chip:hover{border-color:var(--flame);color:var(--flame);}
 </style>
 <section class="hero">
+  <div class="hero-head">
+    <div class="hero-label">For organizers</div>
+    <h1 class="hero-h1">Columbus events<br><em>run through here.</em></h1>
+    <p class="hero-sub">Lower all-in ticketing fees, Stripe included. Play with the numbers, then add your event.</p>
+  </div>
   <div class="hero-grid">
     <div class="hero-left">
-      <div class="hero-label">For organizers</div>
-      <h1 class="hero-h1">Columbus events<br><em>run through here.</em></h1>
-      <p class="hero-sub">Lower all-in ticketing fees, Stripe included. Play with the numbers, then add your event.</p>
       <div class="hero-est">
         <div class="he-label">Ticketing estimator</div>
         <div class="he-inrow">
@@ -622,7 +641,7 @@ footer{background:#1a1612;color:var(--cream);padding:56px 48px 32px;}
           <input id="he-price" class="he-input" type="number" value="30" min="0" step="1" aria-label="Ticket price">
           <span class="he-per">per ticket</span>
         </div>
-        <div class="he-out">You keep <strong id="he-keep">$0.00</strong> per ticket, <strong id="he-diff" style="color:var(--flame)">$0.00</strong> less in fees than typical platforms.</div>
+        <div class="he-out"><span class="he-out-full">You keep <strong id="he-keep">$0.00</strong> per ticket, <strong id="he-diff" style="color:var(--flame)">$0.00</strong> less in fees than typical platforms.</span><span class="he-out-mini"><strong id="he-keep-m">$0.00</strong>/ticket, <strong id="he-diff-m" style="color:var(--flame)">$0.00</strong> less</span></div>
         <button class="he-toggle" id="he-toggle" type="button">See it across a full event &#9662;</button>
         <div class="he-total" id="he-total" style="display:none">
           <div class="he-totrow"><span>Tickets sold</span><input id="he-qty" class="he-qty" type="number" value="200" min="0" step="1" aria-label="Tickets sold"></div>
@@ -655,7 +674,8 @@ footer{background:#1a1612;color:var(--cream);padding:56px 48px 32px;}
   var price=document.getElementById('he-price');
   if(price){
     var keepEl=document.getElementById('he-keep'),diffEl=document.getElementById('he-diff'),
-        saveEl=document.getElementById('he-save'),qty=document.getElementById('he-qty');
+        saveEl=document.getElementById('he-save'),qty=document.getElementById('he-qty'),
+        keepM=document.getElementById('he-keep-m'),diffM=document.getElementById('he-diff-m');
     var m=function(n){return '$'+(Math.round(n*100)/100).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});};
     var calc=function(){
       var p=parseFloat(price.value)||0;
@@ -663,6 +683,8 @@ footer{background:#1a1612;color:var(--cream);padding:56px 48px 32px;}
       var cp=p>0?(p*0.037+1.30)+(p*0.029+0.30):0;
       keepEl.textContent=m(Math.max(p-cb,0));
       diffEl.textContent=m(Math.max(cp-cb,0));
+      if(keepM)keepM.textContent=m(Math.max(p-cb,0));
+      if(diffM)diffM.textContent=m(Math.max(cp-cb,0));
       var q=parseInt(qty&&qty.value)||0;
       if(saveEl)saveEl.textContent=m(Math.max((cp-cb)*q,0));
     };
