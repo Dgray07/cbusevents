@@ -484,8 +484,12 @@ footer{background:#1a1612;color:var(--cream);padding:56px 48px 32px;}
   .nav-links{display:none;}
   .datebar{padding:8px 24px;}
   .hero-grid{grid-template-columns:1fr;}
-  .hero-left{min-height:auto;padding:40px 24px 32px;}
-  .hero-right{display:none;}
+  .hero-left{min-height:auto;padding:24px 24px 32px;order:0;}
+  /* mobile: search above the estimator, estimator collapsed */
+  .hero-right{display:flex;order:-1;padding:32px 24px 0;}
+  .hero-search{min-height:0;padding:18px;}
+  .hero-est{margin-top:14px;}
+  .he-toggle,.he-total{display:none;}
   .how-section,.feed-section,.collab-section,.spotlight-section,.digest-section,footer{padding:48px 24px;}
   .events-strip{padding:0 24px;}
   .how-chain{grid-template-columns:1fr 1fr;gap:24px;}
