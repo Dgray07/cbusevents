@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+  <link rel="stylesheet" href="/cbus.css">
   <link rel="stylesheet" href="/theme.css">
   <script src="/theme.js"></script>
 
@@ -258,17 +259,7 @@ nav.site-nav{display:flex;align-items:center;justify-content:space-between;paddi
 <body>
 
 <!-- NAV -->
-<nav class="site-nav">
-  <a href="https://cbusevents.com" class="nav-logo">CBUS<span>EVENTS</span></a>
-  <div class="nav-links"><a href="https://cbusevents.com" class="nav-link">Home</a>
-    <a href="https://cbusevents.com/venues.html" class="nav-link active">Venues</a>
-    <a href="https://cbusevents.com/vendors.html" class="nav-link">Vendors</a>
-    <a href="https://cbusevents.com/organizers.html" class="nav-link">Organizers</a>
-    <a href="https://cbusevents.com/blog.html" class="nav-link">Blog</a></div>
-  <div class="nav-right"><button class="theme-toggle" onclick="CBUSTheme.toggle()" title="Toggle dark mode" aria-label="Toggle dark mode"><span class="theme-icon-moon">&#9790;</span><span class="theme-icon-sun">&#9728;</span></button> <a href="https://cbusevents.com/cbus-venue-portal.html" class="nav-btn-ghost">Sign In</a>
-    <a href="https://cbusevents.com/signup.html?role=venue" class="nav-btn-primary">List Your Venue</a></div>
-  <button class="nav-hamburger" id="siteNavHamburger" aria-label="Menu"><span></span><span></span><span></span></button>
-</nav>
+<div id="cb-nav"></div>
 <div class="site-mobile-menu" id="siteMobileMenu">
   <a href="https://cbusevents.com" class="nav-mobile-link">Home</a>
   <a href="https://cbusevents.com/venues.html" class="nav-mobile-link active">Venues</a>
@@ -497,51 +488,7 @@ if(window.location.search.includes('tab=list'))switchTab('list');
 </section>
 
 </div><!-- /view-list -->
-<footer>
-  <div style="background:#080810;border-top:1px solid rgba(255,255,255,0.07);padding:32px;max-width:100%;">
-    <div style="max-width:1280px;margin:0 auto;">
-      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:32px;flex-wrap:wrap;margin-bottom:28px;">
-        <div>
-          <div style="font-family:'Playfair Display',serif;font-size:20px;font-weight:900;letter-spacing:-0.5px;margin-bottom:6px;">CBUS<span style="color:#FF6B35;">EVENTS</span></div>
-          <div style="font-family:'DM Mono',monospace;font-size:10px;color:rgba(245,242,237,0.4);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:4px;">Inaugural Season 2026 &nbsp;·&nbsp; Columbus, Ohio</div>
-          <div style="font-size:12px;color:rgba(245,242,237,0.4);margin-top:6px;max-width:260px;line-height:1.6;">The Columbus event ecosystem connecting venues, vendors, organizers and attendees.</div>
-        </div>
-        <div style="display:flex;gap:48px;flex-wrap:wrap;">
-          <div>
-            <div style="font-family:'DM Mono',monospace;font-size:9px;color:#FF6B35;letter-spacing:2px;text-transform:uppercase;margin-bottom:10px;">Discover</div>
-            <div style="display:flex;flex-direction:column;gap:7px;">
-              <a href="https://cbusevents.com/attendees.html" style="font-size:12px;color:rgba(245,242,237,0.5);text-decoration:none;">Browse events</a>
-              <a href="https://cbusevents.com/venues.html" style="font-size:12px;color:rgba(245,242,237,0.5);text-decoration:none;">Find a venue</a>
-              <a href="https://cbusevents.com/communities.html" style="font-size:12px;color:rgba(245,242,237,0.5);text-decoration:none;">Communities</a>
-              <a href="https://cbusevents.com/gallery-hop.html" style="font-size:12px;color:rgba(245,242,237,0.5);text-decoration:none;">Gallery Hop</a>
-            </div>
-          </div>
-          <div>
-            <div style="font-family:'DM Mono',monospace;font-size:9px;color:#FF6B35;letter-spacing:2px;text-transform:uppercase;margin-bottom:10px;">Join</div>
-            <div style="display:flex;flex-direction:column;gap:7px;">
-              <a href="https://cbusevents.com/signup.html?role=venue" style="font-size:12px;color:rgba(245,242,237,0.5);text-decoration:none;">List your venue</a>
-              <a href="https://cbusevents.com/signup.html?role=vendor" style="font-size:12px;color:rgba(245,242,237,0.5);text-decoration:none;">List your services</a>
-              <a href="https://cbusevents.com/1313-festival-event.html" style="font-size:12px;color:#FF6B35;text-decoration:none;font-weight:600;">1313 Festival — June 13 &#8599;</a>
-              <a href="https://cbusevents.com/sales-landing.html" style="font-size:12px;color:rgba(245,242,237,0.5);text-decoration:none;">Brand Ambassador program</a>
-            </div>
-          </div>
-          <div>
-            <div style="font-family:'DM Mono',monospace;font-size:9px;color:#FF6B35;letter-spacing:2px;text-transform:uppercase;margin-bottom:10px;">Legal</div>
-            <div style="display:flex;flex-direction:column;gap:7px;">
-              <a href="https://cbusevents.com/privacy.html" style="font-size:12px;color:rgba(245,242,237,0.5);text-decoration:none;">Privacy policy</a>
-              <a href="https://cbusevents.com/terms.html" style="font-size:12px;color:rgba(245,242,237,0.5);text-decoration:none;">Terms of service</a>
-              <a href="https://cbusevents.com/privacy.html#cookies" style="font-size:12px;color:rgba(245,242,237,0.5);text-decoration:none;">Cookie notice</a>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div style="border-top:1px solid rgba(255,255,255,0.07);padding-top:20px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
-        <div style="font-family:'DM Mono',monospace;font-size:10px;color:rgba(245,242,237,0.3);letter-spacing:0.5px;">&#169; 2026 CBUSEVENTS &nbsp;·&nbsp; Columbus, Ohio &nbsp;·&nbsp; Made for Columbus</div>
-        <a href="https://cbusevents.com/cbus-admin.html" style="font-family:'DM Mono',monospace;font-size:10px;color:rgba(245,242,237,0.2);text-decoration:none;letter-spacing:1px;">Admin</a>
-      </div>
-    </div>
-  </div>
-</footer>
+<div id="cb-footer"></div>
 
 <div id="modalContainer"></div>
 
@@ -846,5 +793,7 @@ async function submitVenuesCapture() {
 }
 </script>
 
+
+<script src="/cbus-shell.js" defer></script>
 </body>
 </html>

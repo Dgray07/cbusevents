@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+  <link rel="stylesheet" href="/cbus.css">
   <link rel="stylesheet" href="/theme.css">
   <script src="/theme.js"></script>
 
@@ -213,17 +214,7 @@ nav.site-nav{display:flex;align-items:center;justify-content:space-between;paddi
 </head>
 <body>
 
-<nav class="site-nav">
-  <a href="https://cbusevents.com" class="nav-logo">CBUS<span>EVENTS</span></a>
-  <div class="nav-links"><a href="https://cbusevents.com" class="nav-link">Home</a>
-    <a href="https://cbusevents.com/venues.html" class="nav-link">Venues</a>
-    <a href="https://cbusevents.com/vendors.html" class="nav-link active">Vendors</a>
-    <a href="https://cbusevents.com/organizers.html" class="nav-link">Organizers</a>
-    <a href="https://cbusevents.com/blog.html" class="nav-link">Blog</a></div>
-  <div class="nav-right"><button class="theme-toggle" onclick="CBUSTheme.toggle()" title="Toggle dark mode" aria-label="Toggle dark mode"><span class="theme-icon-moon">&#9790;</span><span class="theme-icon-sun">&#9728;</span></button> <a href="https://cbusevents.com/cbus-vendor-portal.html" class="nav-btn-ghost">Sign In</a>
-    <a href="https://cbusevents.com/signup.html?role=vendor" class="nav-btn-primary">List Your Business</a></div>
-  <button class="nav-hamburger" id="siteNavHamburger" aria-label="Menu"><span></span><span></span><span></span></button>
-</nav>
+<div id="cb-nav"></div>
 <div class="site-mobile-menu" id="siteMobileMenu">
   <a href="https://cbusevents.com" class="nav-mobile-link">Home</a>
   <a href="https://cbusevents.com/venues.html" class="nav-mobile-link">Venues</a>
@@ -582,5 +573,8 @@ window.setFilter=setFilter;window.handleSearch=handleSearch;window.handleSort=ha
 })();
 </script>
 
+
+<div id="cb-footer"></div>
+<script src="/cbus-shell.js" defer></script>
 </body>
 </html>

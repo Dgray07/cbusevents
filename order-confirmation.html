@@ -243,6 +243,17 @@ async function init(){
         .order('created_at',{ascending:true});
       tickets=tix||[];
     }
+
+    // Fallback: the event ticket flow can write tickets that carry the
+    // session id directly, with no orders row. Look them up so this page
+    // is canonical for every purchase (merged from the retired ticket-success).
+    if(!tickets.length){
+      const{data:tix2}=await sb.from('tickets')
+        .select('*,events(id,title,start_time,venues(name))')
+        .eq('stripe_session_id',sessionId)
+        .order('created_at',{ascending:true});
+      tickets=tix2||[];
+    }
   }
   // Load by order_id
   else if(orderId){
