@@ -625,6 +625,8 @@ footer{background:#1a1612;color:var(--cream);padding:56px 48px 32px;}
   .hs-chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px;}
   .hs-chip{font-family:var(--mono);font-size:10px;letter-spacing:0.05em;text-transform:uppercase;color:var(--ash);background:var(--cream);border:0.5px solid var(--rule);border-radius:20px;padding:7px 13px;text-decoration:none;transition:border-color .15s,color .15s;}
   .hs-chip:hover{border-color:var(--flame);color:var(--flame);}
+  /* re-assert mobile estimate swap: must come after the .he-out-mini base rule above to win on source order */
+  @media(max-width:960px){.he-out-full{display:none;}.he-out-mini{display:block;}}
 </style>
 <section class="hero">
   <div class="hero-head">
