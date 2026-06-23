@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <link rel="stylesheet" href="/theme.css">
 <script src="/theme.js"></script>
-<title id="pageTitle">Event - CBUSEVENTS</title>
+<title id="pageTitle">PREVIEW - Kindness Conference - CBUSEVENTS</title>
 <meta name="description" id="pageDesc" content="Columbus event on CBUSEVENTS">
 <meta property="og:title" id="ogTitle" content="CBUSEVENTS Event">
 <meta property="og:description" id="ogDesc" content="Columbus event on CBUSEVENTS">
@@ -363,6 +363,54 @@ footer{margin-top:64px;border-top:1px solid var(--border);padding:40px 24px;text
   <div class="f-copy">&copy; 2026 CBUSEVENTS &middot; Columbus, Ohio</div>
 </footer>
 
+<script>
+/* PREVIEW STUB — mock data so the page renders without Supabase. Not used in production. */
+history.replaceState({}, '', location.pathname + '?id=preview');
+(function(){
+  var MOCK_EVENT={
+    id:'preview',
+    title:'Kindness Conference',
+    category:'Conference',
+    description:"A one-day gathering for building kindness, connection, practical support and community.\n\nSo many of us are isolated, feeling overwhelmed, and lacking the genuine human community that actually helps people survive hard times. This day is a step toward changing that.\n\nThe day includes interactive workshops, community art, resource sharing, lunch together, and practical tools for building safe and kind community, plus a real chance to build lasting in-person friendships and supportive connections.",
+    start_time:'2026-07-18T08:30:00-04:00',
+    end_time:'2026-07-18T17:00:00-04:00',
+    venue_name_override:'The Junto',
+    venues:null,
+    is_free:false,
+    is_third_party:false,
+    price_min:1,
+    price_max:150,
+    cover_image_url:'https://images.unsplash.com/photo-1529156069898-49953e39b3ac?q=80&w=1000'
+  };
+  var MOCK_TIERS=[
+    {id:'t1',name:'General Admission',price:110,description:'Full conference access, workshops, community art, and lunch together.',quantity_remaining:38},
+    {id:'t2',name:'CE Professional Admission',price:150,description:'Includes Continuing Education (CE) credits, Ohio CSWMFT Board.',quantity_remaining:12},
+    {id:'t3',name:'Pay What You Can',price:1,description:'Accessible entry so finances never prevent community.',quantity_remaining:null}
+  ];
+  function makeQuery(table){
+    var state={single:false,limit:false};
+    var handler={
+      get:function(t,prop){
+        if(prop==='then'){
+          var data;
+          if(table==='events') data = state.limit ? [] : MOCK_EVENT;
+          else if(table==='ticket_tiers') data = MOCK_TIERS;
+          else data=[];
+          return function(res){ return res({data:data,error:null}); };
+        }
+        if(prop==='insert') return function(){ return Promise.resolve({error:null}); };
+        return function(){ if(prop==='single')state.single=true; if(prop==='limit')state.limit=true; return new Proxy({},handler); };
+      }
+    };
+    return new Proxy({},handler);
+  }
+  var mockClient={
+    from:function(table){ return makeQuery(table); },
+    auth:{ getSession:function(){ return Promise.resolve({data:{session:null}}); } }
+  };
+  window.supabase={ createClient:function(){ return mockClient; } };
+})();
+</script>
 <script>
 const SB_URL = "https://toblgvatvsjljbqogzsv.supabase.co";
 const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRvYmxndmF0dnNqbGpicW9nenN2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMDgwNTAsImV4cCI6MjA4NzY4NDA1MH0._WJEQPizNDiQfDXQB_DHPaQhixPGpMdmYQSmyWmm_FQ";
