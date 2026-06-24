@@ -1453,6 +1453,9 @@ async function openAddEvent(){
   document.getElementById('ee-cover-preview').style.display='none';
   document.getElementById('ee-status').value='published';
   document.getElementById('ee-venue-override').value='';
+  document.getElementById('ee-lat').value='';
+  document.getElementById('ee-lng').value='';
+  document.getElementById('ee-stripe-account').value='';
   document.getElementById('ee-msg').textContent='';
   // Populate venue dropdown
   const sel=document.getElementById('ee-venue');
@@ -1477,6 +1480,9 @@ async function openEditEvent(id){
   document.getElementById('ee-cover').value=e.cover_image_url||'';
   document.getElementById('ee-status').value=e.status||'published';
   document.getElementById('ee-venue-override').value=e.venue_name_override||'';
+  document.getElementById('ee-lat').value=(e.latitude!=null?e.latitude:'');
+  document.getElementById('ee-lng').value=(e.longitude!=null?e.longitude:'');
+  document.getElementById('ee-stripe-account').value=e.stripe_account_id||'';
   document.getElementById('ee-msg').textContent='';
   const prev=document.getElementById('ee-cover-preview');
   if(e.cover_image_url){prev.src=e.cover_image_url;prev.style.display='block';}
@@ -1486,7 +1492,7 @@ async function openEditEvent(id){
   // Load existing ticket tiers
   adminTiers = [];
   const { data: existingTiers } = await sb.from('ticket_tiers').select('*').eq('event_id', id).order('price', { ascending: true });
-  adminTiers = (existingTiers || []).map(t => ({ id: t.id, name: t.name, price: t.price, capacity: t.capacity || '' }));
+  adminTiers = (existingTiers || []).map(t => ({ id: t.id, name: t.name, price: t.price, capacity: t.capacity || '', pwyc: !!t.is_pwyc }));
   renderAdminTiers();
   document.getElementById('eventEditModal').style.display='block';
 }
@@ -1501,20 +1507,25 @@ function renderAdminTiers() {
     return;
   }
   list.innerHTML = adminTiers.map((t, i) => `
-    <div style="display:grid;grid-template-columns:1fr 80px 80px 32px;gap:8px;align-items:center;background:#1a1a2a;border:1px solid #25252f;border-radius:8px;padding:10px 12px;">
+    <div style="display:grid;grid-template-columns:1fr 70px 60px 96px 28px;gap:7px;align-items:center;background:#1a1a2a;border:1px solid #25252f;border-radius:8px;padding:10px 12px;">
       <input value="${t.name}" placeholder="Tier name (e.g. General)" oninput="adminTiers[${i}].name=this.value"
         style="background:#0d0d18;border:1px solid #25252f;border-radius:6px;padding:6px 8px;color:#f0f0fa;font-size:13px;font-family:'DM Sans',sans-serif;outline:none;"/>
-      <input value="${t.price}" placeholder="Price" type="number" min="0" step="0.01" oninput="adminTiers[${i}].price=this.value"
+      <input value="${t.price}" placeholder="${t.pwyc?'Min $':'Price'}" type="number" min="0" step="0.01" oninput="adminTiers[${i}].price=this.value"
         style="background:#0d0d18;border:1px solid #25252f;border-radius:6px;padding:6px 8px;color:#f0f0fa;font-size:13px;font-family:'DM Sans',sans-serif;outline:none;"/>
       <input value="${t.capacity}" placeholder="Cap" type="number" min="1" oninput="adminTiers[${i}].capacity=this.value"
         style="background:#0d0d18;border:1px solid #25252f;border-radius:6px;padding:6px 8px;color:#f0f0fa;font-size:13px;font-family:'DM Sans',sans-serif;outline:none;"/>
+      <select onchange="adminTiers[${i}].pwyc=(this.value==='pwyc');renderAdminTiers()"
+        style="background:#0d0d18;border:1px solid #25252f;border-radius:6px;padding:6px 6px;color:#f0f0fa;font-size:12px;font-family:'DM Sans',sans-serif;outline:none;">
+        <option value="fixed" ${t.pwyc?'':'selected'}>Fixed</option>
+        <option value="pwyc" ${t.pwyc?'selected':''}>PWYC</option>
+      </select>
       <button onclick="adminTiers.splice(${i},1);renderAdminTiers()"
         style="background:rgba(239,68,68,0.1);color:#ef4444;border:1px solid rgba(239,68,68,0.2);border-radius:6px;padding:4px 8px;cursor:pointer;font-size:14px;font-weight:700;">×</button>
     </div>`).join('');
 }
 
 function addAdminTier() {
-  adminTiers.push({ name: '', price: '', capacity: '' });
+  adminTiers.push({ name: '', price: '', capacity: '', pwyc: false });
   renderAdminTiers();
   // Focus the new name input
   const inputs = document.querySelectorAll('#ee-tiers-list input');
@@ -1588,7 +1599,19 @@ async function saveEventEdit(){
         price: parseFloat(t.price) || 0,
         capacity: t.capacity ? parseInt(t.capacity) : null,
       }));
-      const { error: tierErr } = await sb.from('ticket_tiers').insert(tierRows);
+      // Try enriched insert (PWYC). Falls back to base columns if migration not yet run.
+      let tierErr = null;
+      const enriched = tierRows.map((r, idx) => ({
+        ...r,
+        is_pwyc: !!validTiers[idx].pwyc,
+        min_price: validTiers[idx].pwyc ? (parseFloat(validTiers[idx].price) || 1) : null,
+      }));
+      let resp = await sb.from('ticket_tiers').insert(enriched);
+      if (resp.error) {
+        resp = await sb.from('ticket_tiers').insert(tierRows);
+        if (!resp.error) console.warn('PWYC columns missing — saved tiers without them. Run the migration to enable Pay What You Can.');
+        tierErr = resp.error;
+      }
       if (tierErr) { msg.style.color='#ef4444'; msg.textContent='Tiers error: '+tierErr.message; return; }
       // Update event is_free and price_min to match tiers
       const minTierPrice = Math.min(...validTiers.map(t => parseFloat(t.price) || 0));
@@ -1597,6 +1620,21 @@ async function saveEventEdit(){
         price_min: minTierPrice,
         price_max: Math.max(...validTiers.map(t => parseFloat(t.price) || 0)),
       }).eq('id', savedEventId);
+    }
+  }
+
+  // Extended fields (guarded so a missing column never breaks the core save)
+  if (savedEventId) {
+    const lat = parseFloat(document.getElementById('ee-lat').value);
+    const lng = parseFloat(document.getElementById('ee-lng').value);
+    if (!isNaN(lat) && !isNaN(lng)) {
+      const { error: geoErr } = await sb.from('events').update({ latitude: lat, longitude: lng }).eq('id', savedEventId);
+      if (geoErr) console.warn('latitude/longitude not saved:', geoErr.message);
+    }
+    const acct = document.getElementById('ee-stripe-account').value.trim();
+    if (acct) {
+      const { error: acctErr } = await sb.from('events').update({ stripe_account_id: acct }).eq('id', savedEventId);
+      if (acctErr) console.warn('stripe_account_id not saved (run migration):', acctErr.message);
     }
   }
 
@@ -3677,10 +3715,14 @@ async function createRepManual(){
       <div class="field"><label for="ee-venue">Venue (linked)</label>
         <select id="ee-venue" class="form-input"></select>
       </div>
-      <div class="field"><label for="ee-venue-override" style="display:flex;align-items:center;gap:6px;">Venue Name Override <span style="font-size:10px;color:var(--muted);font-weight:400;font-family:var(--mono);">Use for festival/popup locations not in venue list</span></label><input id="ee-venue-override" class="form-input" placeholder="e.g. 1313 E Broad St"/></div>
+      <div class="field"><label for="ee-venue-override" style="display:flex;align-items:center;gap:6px;">Venue Name Override <span style="font-size:10px;color:var(--muted);font-weight:400;font-family:var(--mono);">Name + full address for locations not in venue list</span></label><input id="ee-venue-override" class="form-input" placeholder="e.g. The Junto, 77 Belle St, Columbus, OH 43215"/></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+        <div class="field"><label for="ee-lat" style="display:flex;align-items:center;gap:6px;">Latitude <span style="font-size:10px;color:var(--muted);font-weight:400;font-family:var(--mono);">optional, precise map/rideshare</span></label><input id="ee-lat" class="form-input" placeholder="39.9588"/></div>
+        <div class="field"><label for="ee-lng">Longitude</label><input id="ee-lng" class="form-input" placeholder="-83.0058"/></div>
+      </div>
       <div class="field"><label for="ee-category">Category</label>
         <select id="ee-category" class="form-input">
-          <option>Nightlife</option><option>Comedy</option><option>Music</option><option>Food & Drink</option><option>Arts</option><option>Sports</option><option>Networking</option><option>Other</option>
+          <option>Nightlife</option><option>Comedy</option><option>Music</option><option>Food & Drink</option><option>Arts</option><option>Sports</option><option>Networking</option><option>Conference</option><option>Community</option><option>Wellness</option><option>Other</option>
         </select>
       </div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
@@ -3701,6 +3743,10 @@ async function createRepManual(){
       </div>
       <div class="field"><label for="ee-status">Status</label>
         <select id="ee-status" class="form-input"><option value="published">Published</option><option value="draft">Draft</option></select>
+      </div>
+      <div class="field">
+        <label for="ee-stripe-account" style="display:flex;align-items:center;gap:6px;">Organizer Stripe Account <span style="font-size:10px;color:var(--muted);font-weight:400;font-family:var(--mono);">acct_... routes ticket payouts to the organizer. Leave blank until approved.</span></label>
+        <input id="ee-stripe-account" class="form-input" placeholder="acct_xxxxxxxxxxxxxxxx"/>
       </div>
       <!-- TICKET TIERS -->
       <div class="field">
