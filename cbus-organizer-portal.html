@@ -2924,7 +2924,7 @@ function selectVenueResult(displayName,lat,lng){
 function openAddEventModal(editEvent){
  const ev=editEvent||null;
  const vOpts=allVenues.map(v=>'<option value="'+v.id+'"'+(ev&&ev.venue_id===v.id?' selected':'')+'>'+v.name+'</option>').join('');
- const cats=['Networking','Comedy','Concert','Party','Corporate','Festival','Charity','Sports','Arts','Food & Drink','Other'];
+ const cats=['Music','Nightlife','Comedy','Arts','Food & Drink','Festival','Sports','Networking','Conference','Community','Wellness','Charity','Family','Other'];
  const catOpts=cats.map(c=>'<option'+(ev&&ev.category===c?' selected':'')+'>'+c+'</option>').join('');
  let tiersHtml='';
  if(ev&&ev._tiers&&ev._tiers.length){tiersHtml=ev._tiers.map(function(t,i){return buildTierRow(i,t);}).join('');}
