@@ -532,7 +532,7 @@ footer{background:#1a1612;color:var(--cream);padding:56px 48px 32px;}
   <div class="nav-inner">
     <a href="https://cbusevents.com" class="nav-logo">CBUS<span>EVENTS</span></a>
     <ul class="nav-links">
-      <li><a href="#liveFeedSection">Events</a></li>
+      <li><a href="#cbx-rail-tonight">Events</a></li>
       <li><a href="https://cbusevents.com/the-radar.html">The Radar</a></li>
       <li><a href="https://cbusevents.com/venues.html">Venues</a></li>
       <li><a href="https://cbusevents.com/vendors.html">Vendors</a></li>
@@ -708,7 +708,7 @@ footer{background:#1a1612;color:var(--cream);padding:56px 48px 32px;}
 <!-- TICKER -->
 <div class="ticker" id="ticker-wrap">
   <div class="ticker-track" id="ticker-track">
-    <span class="ticker-item">1313 Festival recap now live <span class="ticker-sep">·</span></span>
+    <span class="ticker-item">Fresh clips from recent nights <span class="ticker-sep">·</span></span>
     <span class="ticker-item">Find your weekend on CBUSEVENTS <span class="ticker-sep">·</span></span>
     <span class="ticker-item">United by Events <span class="ticker-sep">·</span></span>
     <span class="ticker-item">Franklinton Art Crawl · Jun 21 <span class="ticker-sep">·</span></span>
@@ -716,7 +716,7 @@ footer{background:#1a1612;color:var(--cream);padding:56px 48px 32px;}
     <span class="ticker-item">Short North Rooftop Series · Jun 28 <span class="ticker-sep">·</span></span>
     <span class="ticker-item">Exhibit of Expression · Jul 19 <span class="ticker-sep">·</span></span>
     <span class="ticker-item">King-Lincoln Block Experience · Aug 2 <span class="ticker-sep">·</span></span>
-    <span class="ticker-item">1313 Festival recap now live <span class="ticker-sep">·</span></span>
+    <span class="ticker-item">Fresh clips from recent nights <span class="ticker-sep">·</span></span>
     <span class="ticker-item">Find your weekend on CBUSEVENTS <span class="ticker-sep">·</span></span>
     <span class="ticker-item">United by Events <span class="ticker-sep">·</span></span>
     <span class="ticker-item">Franklinton Art Crawl · Jun 21 <span class="ticker-sep">·</span></span>
@@ -727,176 +727,233 @@ footer{background:#1a1612;color:var(--cream);padding:56px 48px 32px;}
   </div>
 </div>
 
-<!-- IN CASE YOU MISSED IT: 1313 RECAP -->
-<section style="background:var(--ink-deep);padding:32px 48px">
-  <div style="max-width:1200px;margin:0 auto">
-    <div style="display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-bottom:6px;flex-wrap:wrap">
-      <span style="font-family:var(--mono);font-size:10px;letter-spacing:0.22em;text-transform:uppercase;color:var(--flame)">In case you missed it</span>
-      <span style="font-family:var(--mono);font-size:10px;color:rgba(250,247,242,0.5)">21 vendors &middot; June 13</span>
+<!-- ===== BROWSE THEATER (below hero) ===== -->
+<section class="cbx-theater">
+<style>
+.cbx-theater{background:var(--ink-deep);background-image:radial-gradient(60% 60% at 12% 0%,rgba(255,107,53,.06) 0%,transparent 60%),radial-gradient(50% 50% at 92% 30%,rgba(200,150,62,.05) 0%,transparent 55%);color:var(--on-dark);padding:0 0 64px;overflow:hidden;}
+.cbx-theater .cbx-rev{opacity:0;transform:translateY(18px);transition:opacity .6s ease,transform .6s ease;}
+.cbx-theater .cbx-rev.cbx-in{opacity:1;transform:none;}
+/* marquee */
+.cbx-theater .marquee{position:relative;height:74vh;min-height:500px;max-height:720px;overflow:hidden;display:flex;align-items:flex-end;}
+.cbx-theater .mq-reel{position:absolute;inset:0;z-index:0;background:#0d0a07;}
+.cbx-theater .mq-frame{position:absolute;inset:0;opacity:0;transform:scale(1.04);will-change:opacity,transform;animation:cbxcycle 24s infinite;}
+.cbx-theater .mq-frame.f1{animation-delay:0s;background:radial-gradient(60% 80% at 25% 30%,rgba(255,107,53,.55),transparent 60%),radial-gradient(50% 70% at 80% 70%,rgba(200,150,62,.40),transparent 55%),linear-gradient(120deg,#2a1408,#0d0a07);}
+.cbx-theater .mq-frame.f2{animation-delay:6s;background:radial-gradient(55% 75% at 70% 25%,rgba(83,74,183,.45),transparent 60%),radial-gradient(60% 80% at 20% 75%,rgba(255,107,53,.40),transparent 55%),linear-gradient(200deg,#1a1030,#0d0a07);}
+.cbx-theater .mq-frame.f3{animation-delay:12s;background:radial-gradient(60% 70% at 50% 35%,rgba(26,107,64,.45),transparent 60%),radial-gradient(45% 60% at 85% 80%,rgba(200,150,62,.45),transparent 55%),linear-gradient(160deg,#0a2018,#0d0a07);}
+.cbx-theater .mq-frame.f4{animation-delay:18s;background:radial-gradient(65% 80% at 30% 70%,rgba(216,90,48,.50),transparent 60%),radial-gradient(50% 60% at 75% 25%,rgba(255,107,53,.45),transparent 55%),linear-gradient(220deg,#2a1810,#0d0a07);}
+@keyframes cbxcycle{0%{opacity:0;transform:scale(1.04);}4%{opacity:1;}21%{opacity:1;transform:scale(1.12);}25%{opacity:0;transform:scale(1.13);}100%{opacity:0;}}
+.cbx-theater .mq-sweep{position:absolute;inset:0;background:linear-gradient(105deg,transparent 30%,rgba(255,255,255,.06) 48%,transparent 66%);transform:translateX(-30%);animation:cbxsweep 9s ease-in-out infinite;}
+@keyframes cbxsweep{0%,100%{transform:translateX(-30%);}50%{transform:translateX(30%);}}
+.cbx-theater .mq-noise{position:absolute;inset:0;opacity:.5;mix-blend-mode:overlay;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.5'/%3E%3C/svg%3E");}
+.cbx-theater .mq-scrim{position:absolute;inset:0;z-index:1;background:linear-gradient(transparent 35%,rgba(10,8,6,.55) 70%,rgba(13,10,7,.94) 100%),linear-gradient(90deg,rgba(13,10,7,.7),transparent 55%);}
+.cbx-theater .mq-content{position:relative;z-index:2;max-width:1280px;margin:0 auto;width:100%;padding:0 var(--pad-x,48px) 56px;}
+.cbx-theater .mq-eyebrow{font-family:var(--mono);font-size:10px;letter-spacing:.26em;text-transform:uppercase;color:#fff;display:flex;align-items:center;gap:9px;margin-bottom:18px;}
+.cbx-theater .mq-eyebrow .dot{width:6px;height:6px;border-radius:50%;background:var(--flame);animation:cbxping 2s infinite;}
+@keyframes cbxping{0%{box-shadow:0 0 0 0 rgba(255,107,53,.55);}70%{box-shadow:0 0 0 9px rgba(255,107,53,0);}100%{box-shadow:0 0 0 0 rgba(255,107,53,0);}}
+.cbx-theater .mq-h{font-family:var(--display);font-weight:900;font-size:clamp(44px,7vw,86px);line-height:.96;letter-spacing:-.025em;color:#fff;max-width:15ch;text-shadow:0 2px 30px rgba(0,0,0,.5);}
+.cbx-theater .mq-h em{font-style:italic;color:var(--flame);}
+.cbx-theater .mq-sub{font-family:var(--mono);font-size:13px;letter-spacing:.03em;color:rgba(255,255,255,.78);margin-top:22px;max-width:48ch;line-height:1.7;}
+.cbx-theater .mq-cta{display:flex;gap:12px;margin-top:30px;flex-wrap:wrap;}
+.cbx-theater .mq-btn{font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;padding:15px 28px;border-radius:8px;transition:transform .18s,background .18s,border-color .18s;text-decoration:none;display:inline-block;}
+.cbx-theater .mq-btn.primary{background:var(--flame);color:#fff;}
+.cbx-theater .mq-btn.primary:hover{background:var(--flame-press,#e85a20);transform:translateY(-2px);}
+.cbx-theater .mq-btn.ghost{border:1px solid rgba(255,255,255,.35);color:#fff;}
+.cbx-theater .mq-btn.ghost:hover{border-color:#fff;transform:translateY(-2px);}
+.cbx-theater .mq-reelnote{position:absolute;top:24px;right:var(--pad-x,48px);z-index:2;font-family:var(--mono);font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.6);display:flex;align-items:center;gap:7px;}
+.cbx-theater .mq-reelnote .rn-play{color:var(--flame);font-size:11px;}
+/* rails */
+.cbx-theater .rail{position:relative;margin-top:46px;}
+.cbx-theater .rail-hd{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;padding:0 var(--pad-x,48px);max-width:1280px;margin:0 auto 16px;}
+.cbx-theater .rail-titles{display:flex;flex-direction:column;gap:6px;}
+.cbx-theater .rail-eyebrow{font-family:var(--mono);font-size:9px;letter-spacing:.22em;text-transform:uppercase;color:rgba(250,247,242,.55);display:flex;align-items:center;gap:8px;}
+.cbx-theater .rail-eyebrow .dot{width:5px;height:5px;border-radius:50%;background:var(--flame);animation:cbxpulse 2s infinite;}
+.cbx-theater .rail-t{font-family:var(--display);font-weight:900;font-size:clamp(22px,2.6vw,30px);line-height:1;letter-spacing:-.01em;color:#fff;}
+.cbx-theater .rail-t em{font-style:italic;color:var(--flame);}
+.cbx-theater .rail-all{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:rgba(250,247,242,.55);text-decoration:none;white-space:nowrap;transition:color .18s;flex-shrink:0;padding-bottom:4px;}
+.cbx-theater .rail-all:hover{color:var(--flame);}
+.cbx-theater .rail-wrap{position:relative;}
+.cbx-theater .rail-vp{display:flex;gap:16px;overflow-x:auto;scroll-behavior:smooth;scroll-snap-type:x proximity;padding:6px var(--pad-x,48px) 10px;max-width:1280px;margin:0 auto;scrollbar-width:none;-ms-overflow-style:none;}
+.cbx-theater .rail-vp::-webkit-scrollbar{display:none;}
+.cbx-theater .rail-vp>*{scroll-snap-align:start;flex:0 0 auto;}
+.cbx-theater .rail-fade{position:absolute;top:0;bottom:10px;width:64px;pointer-events:none;z-index:3;opacity:0;transition:opacity .25s;}
+.cbx-theater .rail-fade.l{left:0;background:linear-gradient(90deg,var(--ink-deep),transparent);}
+.cbx-theater .rail-fade.r{right:0;background:linear-gradient(270deg,var(--ink-deep),transparent);}
+.cbx-theater .rail-wrap.has-l .rail-fade.l{opacity:1;}
+.cbx-theater .rail-wrap.has-r .rail-fade.r{opacity:1;}
+.cbx-theater .rail-arrow{position:absolute;top:50%;transform:translateY(-50%);z-index:5;width:40px;height:40px;border-radius:50%;background:rgba(20,16,12,.82);border:1px solid var(--rule-dark,rgba(250,247,242,.12));color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);transition:background .18s,opacity .2s,border-color .18s;opacity:0;}
+.cbx-theater .rail-wrap:hover .rail-arrow{opacity:1;}
+.cbx-theater .rail-arrow:hover{background:var(--flame);border-color:var(--flame);}
+.cbx-theater .rail-arrow.prev{left:12px;}.cbx-theater .rail-arrow.next{right:12px;}
+@media(hover:none){.cbx-theater .rail-arrow{display:none;}}
+/* poster */
+.cbx-theater .poster{position:relative;width:236px;height:330px;border-radius:12px;overflow:hidden;background:linear-gradient(158deg,#241a13 0%,#15110d 88%);text-decoration:none;color:#fff;display:block;border:1px solid rgba(250,247,242,.07);transition:transform .28s cubic-bezier(.2,.7,.2,1),border-color .2s,box-shadow .28s;}
+.cbx-theater .poster.tone-flame{background:radial-gradient(120% 90% at 80% 8%,rgba(255,107,53,.22),transparent 55%),linear-gradient(158deg,#2a1810 0%,#15110d 86%);}
+.cbx-theater .poster.tone-gold{background:radial-gradient(120% 90% at 80% 8%,rgba(200,150,62,.18),transparent 55%),linear-gradient(158deg,#241d12 0%,#15110d 86%);}
+.cbx-theater .poster.tone-green{background:radial-gradient(120% 90% at 80% 8%,rgba(26,107,64,.20),transparent 55%),linear-gradient(158deg,#13201a 0%,#15110d 86%);}
+.cbx-theater .poster:hover{transform:translateY(-7px);border-color:rgba(255,107,53,.55);box-shadow:0 18px 40px rgba(0,0,0,.5);}
+.cbx-theater .po-num{position:absolute;top:-22px;right:2px;font-family:var(--display);font-weight:900;font-size:148px;line-height:1;color:rgba(250,247,242,.06);user-select:none;}
+.cbx-theater .po-corner{position:absolute;width:13px;height:13px;border:1.5px solid rgba(250,247,242,.18);z-index:2;}
+.cbx-theater .po-corner.tl{top:14px;left:14px;border-right:none;border-bottom:none;}
+.cbx-theater .po-corner.br{bottom:14px;right:14px;border-left:none;border-top:none;}
+.cbx-theater .po-noise{position:absolute;inset:0;opacity:.5;mix-blend-mode:overlay;pointer-events:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.4'/%3E%3C/svg%3E");}
+.cbx-theater .po-chip{position:absolute;top:18px;left:18px;z-index:3;font-family:var(--mono);font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:#fff;background:rgba(20,16,12,.55);border:1px solid var(--rule-dark,rgba(250,247,242,.12));padding:5px 9px;border-radius:6px;-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);}
+.cbx-theater .po-tag{position:absolute;top:18px;right:18px;z-index:3;font-family:var(--mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;padding:5px 9px;border-radius:6px;}
+.cbx-theater .po-tag.free{color:#bfe6d2;background:rgba(26,107,64,.32);border:1px solid rgba(26,107,64,.5);}
+.cbx-theater .po-tag.paid{color:#fff;background:rgba(20,16,12,.5);border:1px solid var(--rule-dark,rgba(250,247,242,.12));}
+.cbx-theater .po-body{position:absolute;left:0;right:0;bottom:0;z-index:3;padding:20px 18px 18px;background:linear-gradient(transparent,rgba(10,8,6,.86) 58%);}
+.cbx-theater .po-title{font-family:var(--display);font-weight:900;font-size:19px;line-height:1.08;letter-spacing:-.01em;margin-bottom:7px;}
+.cbx-theater .po-meta{font-family:var(--mono);font-size:9px;letter-spacing:.06em;color:rgba(250,247,242,.55);display:flex;gap:7px;flex-wrap:wrap;}
+.cbx-theater .po-meta .sep{opacity:.5;}
+.cbx-theater .po-cta{margin-top:13px;opacity:0;max-height:0;overflow:hidden;transform:translateY(6px);transition:.26s;font-family:var(--mono);font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:#fff;background:var(--flame);text-align:center;padding:9px;border-radius:7px;}
+.cbx-theater .poster:hover .po-cta{opacity:1;max-height:44px;transform:none;}
+/* reel */
+.cbx-theater .reel{position:relative;width:172px;aspect-ratio:9/16;border-radius:12px;overflow:hidden;text-decoration:none;background:linear-gradient(165deg,#2a1d12,#15110d);border:1px solid rgba(250,247,242,.08);display:flex;align-items:flex-end;transition:transform .26s cubic-bezier(.2,.7,.2,1),border-color .2s;}
+.cbx-theater .reel:nth-child(3n+1){background:linear-gradient(165deg,#2a1810,#120b07);}
+.cbx-theater .reel:nth-child(3n+2){background:linear-gradient(165deg,#1a1030,#0f0b14);}
+.cbx-theater .reel:nth-child(3n+3){background:linear-gradient(165deg,#0f2018,#0a120d);}
+.cbx-theater .reel:hover{transform:translateY(-6px) scale(1.015);border-color:rgba(255,107,53,.5);}
+.cbx-theater .rl-shine{position:absolute;inset:0;background:linear-gradient(115deg,transparent 35%,rgba(255,255,255,.10) 50%,transparent 65%);transform:translateY(40%);animation:cbxshine 4.5s ease-in-out infinite;}
+.cbx-theater .reel:nth-child(2n) .rl-shine{animation-delay:1.4s;}
+.cbx-theater .reel:nth-child(3n) .rl-shine{animation-delay:2.6s;}
+@keyframes cbxshine{0%,100%{transform:translateY(45%);opacity:.5;}50%{transform:translateY(-45%);opacity:1;}}
+.cbx-theater .rl-play{position:absolute;top:14px;left:14px;color:rgba(255,255,255,.92);font-size:15px;filter:drop-shadow(0 1px 4px rgba(0,0,0,.5));}
+.cbx-theater .rl-shop{position:absolute;top:12px;right:12px;font-family:var(--mono);font-size:8px;letter-spacing:.1em;text-transform:uppercase;background:var(--flame);color:#fff;padding:3px 7px;border-radius:5px;}
+.cbx-theater .rl-cap{position:relative;z-index:1;width:100%;padding:14px 12px;font-family:var(--mono);font-size:9.5px;letter-spacing:.02em;color:#fff;background:linear-gradient(transparent,rgba(8,6,4,.85));}
+/* neighborhood tile */
+.cbx-theater .hood{position:relative;width:300px;height:178px;border-radius:12px;overflow:hidden;text-decoration:none;color:#fff;background:linear-gradient(135deg,#241a13,#15110d);border:1px solid rgba(250,247,242,.07);transition:transform .28s cubic-bezier(.2,.7,.2,1),border-color .2s;display:flex;flex-direction:column;justify-content:flex-end;padding:18px;}
+.cbx-theater .hood:hover{transform:translateY(-6px);border-color:rgba(255,107,53,.5);}
+.cbx-theater .hood::before{content:"";position:absolute;inset:0;background:var(--hue,rgba(255,107,53,.10));mix-blend-mode:screen;}
+.cbx-theater .hood-name{position:relative;font-family:var(--display);font-weight:900;font-size:24px;line-height:1;letter-spacing:-.01em;}
+.cbx-theater .hood-count{position:relative;font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:rgba(250,247,242,.55);margin-top:8px;}
+.cbx-theater .hood-arrow{position:absolute;top:16px;right:16px;font-size:15px;color:rgba(250,247,242,.55);transition:color .2s,transform .2s;}
+.cbx-theater .hood:hover .hood-arrow{color:var(--flame);transform:translateX(2px);}
+/* profile card */
+.cbx-theater .prof{width:212px;border-radius:12px;background:#1d1711;border:1px solid rgba(250,247,242,.07);padding:18px;text-decoration:none;color:#fff;transition:transform .26s cubic-bezier(.2,.7,.2,1),border-color .2s;display:flex;flex-direction:column;}
+.cbx-theater .prof:hover{transform:translateY(-6px);border-color:rgba(255,107,53,.45);}
+.cbx-theater .prof-av{width:50px;height:50px;border-radius:13px;display:flex;align-items:center;justify-content:center;font-family:var(--display);font-weight:900;font-size:22px;color:#fff;margin-bottom:14px;}
+.cbx-theater .av-venue{background:var(--role-venue,#c8963e);}.cbx-theater .av-vendor{background:var(--role-vendor,#1a6b40);color:#e8f3ec;}
+.cbx-theater .prof-name{font-family:var(--display);font-weight:700;font-size:16px;line-height:1.15;margin-bottom:8px;}
+.cbx-theater .prof-chip{align-self:flex-start;font-family:var(--mono);font-size:8px;letter-spacing:.12em;text-transform:uppercase;padding:3px 8px;border-radius:5px;margin-bottom:12px;}
+.cbx-theater .chip-venue{color:#f0d9a8;background:rgba(200,150,62,.16);}
+.cbx-theater .chip-vendor{color:#a8e0c0;background:rgba(26,107,64,.18);}
+.cbx-theater .prof-meta{font-family:var(--mono);font-size:10px;color:rgba(250,247,242,.55);line-height:1.6;margin-top:auto;}
+.cbx-theater .prof-cta{margin-top:14px;font-family:var(--mono);font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:rgba(250,247,242,.55);border:1px solid var(--rule-dark,rgba(250,247,242,.12));text-align:center;padding:9px;border-radius:7px;transition:.2s;}
+.cbx-theater .prof:hover .prof-cta{color:var(--flame);border-color:rgba(255,107,53,.5);}
+/* gig card */
+.cbx-theater .gig{width:262px;border-radius:12px;background:#1d1711;border:1px solid rgba(250,247,242,.07);padding:18px;text-decoration:none;color:#fff;transition:transform .26s cubic-bezier(.2,.7,.2,1),border-color .2s;display:flex;flex-direction:column;gap:12px;}
+.cbx-theater .gig:hover{transform:translateY(-6px);border-color:rgba(255,107,53,.45);}
+.cbx-theater .gig-pill{align-self:flex-start;font-family:var(--mono);font-size:8px;letter-spacing:.12em;text-transform:uppercase;padding:4px 9px;border-radius:20px;}
+.cbx-theater .gp-vendor{color:#a8e0c0;background:rgba(26,107,64,.18);}
+.cbx-theater .gp-staff{color:#bcd9f5;background:rgba(24,95,165,.18);}
+.cbx-theater .gp-dj{color:#d4c8ff;background:rgba(83,74,183,.20);}
+.cbx-theater .gp-photo{color:#f3c4b0;background:rgba(216,90,48,.16);}
+.cbx-theater .gp-food{color:#f3c4b0;background:rgba(216,90,48,.16);}
+.cbx-theater .gig-title{font-family:var(--display);font-weight:700;font-size:16px;line-height:1.2;}
+.cbx-theater .gig-sub{font-family:var(--mono);font-size:9px;color:rgba(250,247,242,.55);}
+.cbx-theater .gig-row{display:flex;align-items:flex-end;justify-content:space-between;margin-top:auto;padding-top:12px;border-top:1px solid var(--rule-dark,rgba(250,247,242,.12));}
+.cbx-theater .gig-pay{font-family:var(--display);font-weight:900;font-size:20px;color:var(--flame);line-height:1;}
+.cbx-theater .gig-pay span{font-family:var(--mono);font-size:8px;letter-spacing:.1em;text-transform:uppercase;color:rgba(250,247,242,.55);display:block;margin-top:4px;}
+.cbx-theater .gig-date{font-family:var(--mono);font-size:10px;color:rgba(250,247,242,.55);text-align:right;}
+.cbx-theater .gig-apply{font-family:var(--mono);font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:#fff;background:var(--flame);text-align:center;padding:10px;border-radius:7px;transition:background .18s;}
+.cbx-theater .gig:hover .gig-apply{background:var(--flame-press,#e85a20);}
+@keyframes cbxpulse{0%,100%{opacity:1;}50%{opacity:.3;}}
+@media(max-width:680px){
+.cbx-theater .marquee{height:72vh;min-height:440px;}.cbx-theater .mq-content{padding-bottom:38px;}.cbx-theater .mq-reelnote{display:none;}
+.cbx-theater .poster{width:172px;height:250px;}.cbx-theater .po-num{font-size:108px;top:-14px;}.cbx-theater .po-title{font-size:16px;}
+.cbx-theater .hood{width:230px;height:148px;}.cbx-theater .prof{width:176px;}.cbx-theater .gig{width:230px;}.cbx-theater .reel{width:132px;}.cbx-theater .rail{margin-top:38px;}
+}
+@media(prefers-reduced-motion:reduce){.cbx-theater .mq-frame.f1{opacity:1;animation:none;}.cbx-theater .mq-frame.f2,.cbx-theater .mq-frame.f3,.cbx-theater .mq-frame.f4{display:none;}.cbx-theater .mq-sweep,.cbx-theater .rl-shine{display:none;}.cbx-theater .cbx-rev{opacity:1;transform:none;}}
+</style>
+
+  <!-- marquee -->
+  <div class="marquee">
+    <div class="mq-reel" aria-hidden="true"><div class="mq-frame f1"></div><div class="mq-frame f2"></div><div class="mq-frame f3"></div><div class="mq-frame f4"></div><div class="mq-sweep"></div><div class="mq-noise"></div></div>
+    <div class="mq-scrim"></div>
+    <div class="mq-content">
+      <div class="mq-eyebrow"><span class="dot"></span>Live in Columbus</div>
+      <h2 class="mq-h">Find the whole scene <em>in one place.</em></h2>
+      <p class="mq-sub">Venues, vendors, organizers and every night out. United here.</p>
+      <div class="mq-cta"><a href="#cbx-rail-tonight" class="mq-btn primary">Start browsing &darr;</a><a href="https://cbusevents.com/the-radar.html" class="mq-btn ghost">Open the Radar</a></div>
     </div>
-    <div style="font-family:var(--display);font-size:clamp(24px,3vw,32px);font-weight:900;color:var(--cream);line-height:1.05">1313 Festival</div>
-    <div style="font-size:13px;color:rgba(250,247,242,0.5);margin-bottom:18px">Sat Jun 13 &middot; 1313 E. Broad St. &middot; the platform's first live event</div>
-    <div id="recap-clips" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:10px">
-      <!-- JS fills this from the clips table. Honest empty state shows until then. -->
-      <div style="grid-column:1/-1;display:flex;align-items:center;justify-content:space-between;gap:14px;background:rgba(255,255,255,0.04);border:0.5px solid rgba(250,247,242,0.12);border-radius:10px;padding:18px 20px;flex-wrap:wrap">
-        <div style="display:flex;align-items:center;gap:12px">
-          <div style="width:38px;height:38px;border-radius:9px;background:rgba(255,107,53,0.15);display:flex;align-items:center;justify-content:center;color:var(--flame);font-size:16px">&#9654;</div>
-          <div>
-            <div style="font-size:14px;font-weight:500;color:var(--cream)">Clips from the day are being added.</div>
-            <div style="font-size:12px;color:rgba(250,247,242,0.5)">Were you there? Share your clip and tag the vendors you found.</div>
-          </div>
-        </div>
-        <div style="display:flex;gap:10px;flex-wrap:wrap">
-          <a href="https://cbusevents.com/1313-festival-event.html" style="font-family:var(--mono);font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--cream);border:0.5px solid rgba(250,247,242,0.2);padding:11px 16px;border-radius:7px;text-decoration:none">Relive the day</a>
-          <a href="https://cbusevents.com/signup.html" style="font-family:var(--mono);font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:#fff;background:var(--flame);padding:11px 16px;border-radius:7px;text-decoration:none">Add your clip</a>
-        </div>
+    <div class="mq-reelnote"><span class="rn-play">&#9654;</span> Real nights, uploaded by the city</div>
+  </div>
+
+  <!-- TONIGHT -->
+  <div class="rail cbx-rev" id="cbx-rail-tonight">
+    <div class="rail-hd"><div class="rail-titles"><div class="rail-eyebrow"><span class="dot"></span>Live now</div><div class="rail-t">Happening <em>tonight</em></div></div><a href="https://cbusevents.com/the-radar.html?when=tonight" class="rail-all">See all &rarr;</a></div>
+    <div class="rail-wrap" data-rail><span class="rail-fade l"></span><span class="rail-fade r"></span><button class="rail-arrow prev" data-dir="-1" aria-label="Scroll left">&#8249;</button><button class="rail-arrow next" data-dir="1" aria-label="Scroll right">&#8250;</button>
+      <div class="rail-vp" id="cbx-tonight">
+        <a class="poster tone-flame" href="https://cbusevents.com/the-radar.html"><div class="po-noise"></div><span class="po-corner tl"></span><span class="po-corner br"></span><div class="po-chip">Loading</div><div class="po-body"><div class="po-title">Loading tonight...</div><div class="po-meta"><span>Columbus</span></div></div></a>
       </div>
     </div>
   </div>
+
+  <!-- RECENT NIGHTS -->
+  <div class="rail cbx-rev">
+    <div class="rail-hd"><div class="rail-titles"><div class="rail-eyebrow"><span class="dot"></span>Straight from the floor</div><div class="rail-t">Recent <em>nights</em></div></div><a href="https://cbusevents.com/signup.html" class="rail-all">Add your clip &rarr;</a></div>
+    <div class="rail-wrap" data-rail><span class="rail-fade l"></span><span class="rail-fade r"></span><button class="rail-arrow prev" data-dir="-1" aria-label="Scroll left">&#8249;</button><button class="rail-arrow next" data-dir="1" aria-label="Scroll right">&#8250;</button>
+      <div class="rail-vp" id="cbx-reels">
+        <a class="reel" href="https://cbusevents.com/signup.html"><span class="rl-shine"></span><span class="rl-play">&#9654;</span><span class="rl-cap">Clips from recent nights, add yours</span></a>
+        <a class="reel" href="https://cbusevents.com/signup.html"><span class="rl-shine"></span><span class="rl-play">&#9654;</span><span class="rl-cap">Tag the vendors you found</span></a>
+        <a class="reel" href="https://cbusevents.com/signup.html"><span class="rl-shine"></span><span class="rl-play">&#9654;</span><span class="rl-cap">Show the city your night</span></a>
+      </div>
+    </div>
+  </div>
+
+  <!-- THIS WEEKEND -->
+  <div class="rail cbx-rev">
+    <div class="rail-hd"><div class="rail-titles"><div class="rail-eyebrow">Fri &ndash; Sun</div><div class="rail-t">This <em>weekend</em></div></div><a href="https://cbusevents.com/the-radar.html?when=weekend" class="rail-all">See all &rarr;</a></div>
+    <div class="rail-wrap" data-rail><span class="rail-fade l"></span><span class="rail-fade r"></span><button class="rail-arrow prev" data-dir="-1" aria-label="Scroll left">&#8249;</button><button class="rail-arrow next" data-dir="1" aria-label="Scroll right">&#8250;</button>
+      <div class="rail-vp" id="cbx-weekend">
+        <a class="poster" href="https://cbusevents.com/the-radar.html"><div class="po-noise"></div><span class="po-corner tl"></span><span class="po-corner br"></span><div class="po-chip">Soon</div><div class="po-body"><div class="po-title">Weekend events loading...</div><div class="po-meta"><span>Columbus</span></div></div></a>
+      </div>
+    </div>
+  </div>
+
+  <!-- BY NEIGHBORHOOD -->
+  <div class="rail cbx-rev">
+    <div class="rail-hd"><div class="rail-titles"><div class="rail-eyebrow">Browse the map</div><div class="rail-t">By <em>neighborhood</em></div></div><a href="https://cbusevents.com/the-radar.html" class="rail-all">All areas &rarr;</a></div>
+    <div class="rail-wrap" data-rail><span class="rail-fade l"></span><span class="rail-fade r"></span><button class="rail-arrow prev" data-dir="-1" aria-label="Scroll left">&#8249;</button><button class="rail-arrow next" data-dir="1" aria-label="Scroll right">&#8250;</button>
+      <div class="rail-vp" id="cbx-hoods">
+        <a class="hood" style="--hue:rgba(255,107,53,0.12)" href="https://cbusevents.com/the-radar.html"><span class="po-corner tl"></span><span class="hood-arrow">&rarr;</span><div class="hood-name">Short North</div><div class="hood-count">Browse area</div></a>
+        <a class="hood" style="--hue:rgba(200,150,62,0.12)" href="https://cbusevents.com/the-radar.html"><span class="po-corner tl"></span><span class="hood-arrow">&rarr;</span><div class="hood-name">Franklinton</div><div class="hood-count">Browse area</div></a>
+        <a class="hood" style="--hue:rgba(26,107,64,0.12)" href="https://cbusevents.com/the-radar.html"><span class="po-corner tl"></span><span class="hood-arrow">&rarr;</span><div class="hood-name">Olde Towne East</div><div class="hood-count">Browse area</div></a>
+      </div>
+    </div>
+  </div>
+
+  <!-- THE SPACES -->
+  <div class="rail cbx-rev">
+    <div class="rail-hd"><div class="rail-titles"><div class="rail-eyebrow">Venues taking bookings</div><div class="rail-t">The <em>spaces</em></div></div><a href="https://cbusevents.com/venues.html" class="rail-all">All venues &rarr;</a></div>
+    <div class="rail-wrap" data-rail><span class="rail-fade l"></span><span class="rail-fade r"></span><button class="rail-arrow prev" data-dir="-1" aria-label="Scroll left">&#8249;</button><button class="rail-arrow next" data-dir="1" aria-label="Scroll right">&#8250;</button>
+      <div class="rail-vp" id="cbx-spaces">
+        <a class="prof" href="https://cbusevents.com/venues.html"><div class="prof-av av-venue">V</div><div class="prof-name">Loading venues...</div><span class="prof-chip chip-venue">Venue</span><div class="prof-meta">Columbus</div><div class="prof-cta">View space</div></a>
+      </div>
+    </div>
+  </div>
+
+  <!-- THE MAKERS -->
+  <div class="rail cbx-rev">
+    <div class="rail-hd"><div class="rail-titles"><div class="rail-eyebrow">Vendors &amp; food pros</div><div class="rail-t">The <em>makers</em></div></div><a href="https://cbusevents.com/vendors.html" class="rail-all">All makers &rarr;</a></div>
+    <div class="rail-wrap" data-rail><span class="rail-fade l"></span><span class="rail-fade r"></span><button class="rail-arrow prev" data-dir="-1" aria-label="Scroll left">&#8249;</button><button class="rail-arrow next" data-dir="1" aria-label="Scroll right">&#8250;</button>
+      <div class="rail-vp" id="cbx-makers">
+        <a class="prof" href="https://cbusevents.com/vendors.html"><div class="prof-av av-vendor">M</div><div class="prof-name">Loading makers...</div><span class="prof-chip chip-vendor">Vendor</span><div class="prof-meta">Columbus</div><div class="prof-cta">View shop</div></a>
+      </div>
+    </div>
+  </div>
+
+  <!-- OPEN SPOTS -->
+  <div class="rail cbx-rev">
+    <div class="rail-hd"><div class="rail-titles"><div class="rail-eyebrow"><span class="dot"></span>Hiring &amp; open tables</div><div class="rail-t">Open <em>spots</em></div></div><a href="https://cbusevents.com/collab-board.html" class="rail-all">Collab board &rarr;</a></div>
+    <div class="rail-wrap" data-rail><span class="rail-fade l"></span><span class="rail-fade r"></span><button class="rail-arrow prev" data-dir="-1" aria-label="Scroll left">&#8249;</button><button class="rail-arrow next" data-dir="1" aria-label="Scroll right">&#8250;</button>
+      <div class="rail-vp" id="cbx-spots">
+        <a class="gig" href="https://cbusevents.com/collab-board.html"><span class="gig-pill gp-vendor">Open</span><div class="gig-title">Open spots loading...</div><div class="gig-sub">Columbus</div><div class="gig-row"><div class="gig-pay">&mdash;<span>Pay</span></div><div class="gig-date">TBA</div></div><div class="gig-apply">Apply</div></a>
+      </div>
+    </div>
+  </div>
+
 </section>
 
-<!-- HOW IT WORKS -->
-<section class="how-section">
-  <div class="srule"><span class="srule-lbl">How It Works</span><span class="srule-line"></span></div>
-  <h2 class="how-h">Internal connections.<br><em>External experiences.</em></h2>
-  <p class="how-sub">Every Columbus event you attend was built by people connecting behind the scenes. CBUSEVENTS is where those connections happen, and where the results go public.</p>
-  <div class="how-chain">
-    <div class="how-step reveal">
-      <div class="how-icon active">V</div>
-      <div class="how-step-role">Venue</div>
-      <div class="how-step-action">Opens the Space</div>
-      <div class="how-step-desc">Lists availability, capacity, and event types they support</div>
-    </div>
-    <div class="how-step reveal">
-      <div class="how-icon active">O</div>
-      <div class="how-step-role">Organizer</div>
-      <div class="how-step-action">Builds the Event</div>
-      <div class="how-step-desc">Selects the venue, fills vendor tables, books creators and staff</div>
-    </div>
-    <div class="how-step reveal">
-      <div class="how-icon passive">C</div>
-      <div class="how-step-role">Creators + Vendors</div>
-      <div class="how-step-action">Claim Their Spot</div>
-      <div class="how-step-desc">Apply for vendor tables and gigs through the Collab Board</div>
-    </div>
-    <div class="how-step reveal">
-      <div class="how-icon passive">E</div>
-      <div class="how-step-role">Event</div>
-      <div class="how-step-action">Goes Live Publicly</div>
-      <div class="how-step-desc">Tickets and event page broadcast to all of Columbus</div>
-    </div>
-    <div class="how-step reveal">
-      <div class="how-icon passive">A</div>
-      <div class="how-step-role">Attendees</div>
-      <div class="how-step-action">Show Up</div>
-      <div class="how-step-desc">Discover, buy tickets, and experience what the ecosystem built</div>
-    </div>
-  </div>
-  <div class="how-footer">
-    <p class="how-footer-txt">Every role on CBUSEVENTS has a specific job in the chain. <strong>Organizers are the connective tissue.</strong> Venues provide the space. Vendors and creators fill the experience. Attendees are the audience. The platform makes all of it findable, bookable, and payable in one place.</p>
-    <a href="https://cbusevents.com/signup.html" class="btn-primary">See How to Join</a>
-  </div>
-</section>
-
-<!-- UPCOMING EVENTS STRIP -->
-<div class="events-strip">
-  <div class="strip-hd">
-    <span class="strip-lbl">Upcoming Events</span>
-    <span class="strip-all" onclick="document.getElementById('liveFeedSection').scrollIntoView({behavior:'smooth'})">View Full Calendar →</span>
-  </div>
-  <div class="events-grid" id="events-strip-grid">
-    <!-- Populated by JS, fallback below -->
-    <div class="ecard reveal" onclick="window.location.href='https://cbusevents.com/1313-festival-event.html'">
-      <div class="ec-mo">Jun</div><div class="ec-day">13</div>
-      <div class="ec-name">1313 Festival</div>
-      <div class="ec-venue-sm">1313 E. Broad St.</div>
-      <span class="ec-tag free">Free</span>
-    </div>
-    <div class="ecard reveal" onclick="document.getElementById('liveFeedSection').scrollIntoView({behavior:'smooth'})">
-      <div class="ec-mo">Jun</div><div class="ec-day">21</div>
-      <div class="ec-name">Franklinton Art Crawl</div>
-      <div class="ec-venue-sm">Franklinton Arts District</div>
-      <span class="ec-tag">Tickets</span>
-    </div>
-    <div class="ecard reveal" onclick="document.getElementById('liveFeedSection').scrollIntoView({behavior:'smooth'})">
-      <div class="ec-mo">Jun</div><div class="ec-day">28</div>
-      <div class="ec-name">Short North Rooftop Series</div>
-      <div class="ec-venue-sm">Venue 400</div>
-      <span class="ec-tag">Tickets</span>
-    </div>
-    <div class="ecard reveal" onclick="document.getElementById('liveFeedSection').scrollIntoView({behavior:'smooth'})">
-      <div class="ec-mo">Jul</div><div class="ec-day">19</div>
-      <div class="ec-name">Exhibit of Expression Vol. 2</div>
-      <div class="ec-venue-sm">Columbus, TBA</div>
-      <span class="ec-tag free">Free</span>
-    </div>
-    <div class="ecard reveal" onclick="document.getElementById('liveFeedSection').scrollIntoView({behavior:'smooth'})">
-      <div class="ec-mo">Aug</div><div class="ec-day">02</div>
-      <div class="ec-name">King-Lincoln Block Experience</div>
-      <div class="ec-venue-sm">King-Lincoln District</div>
-      <span class="ec-tag">Tickets</span>
-    </div>
-  </div>
-  <div class="strip-foot">
-    <span class="link-dark" style="cursor:pointer" onclick="document.getElementById('liveFeedSection').scrollIntoView({behavior:'smooth'})">See all events →</span>
-  </div>
-</div>
-
-
-<!-- WHAT'S HAPPENING / EVENTS FEED -->
-<div class="feed-section-wrap" id="liveFeedSection">
-  <div class="feed-header">
-    <div>
-      <div class="feed-eyebrow"><span class="feed-live-dot"></span>Columbus, Ohio</div>
-      <h2 class="feed-title" id="feedMainTitle">What's Happening <span>Tonight</span></h2>
-    </div>
-    <a href="https://cbusevents.com/the-radar.html" style="background:none;border:none;cursor:pointer;color:var(--flame);font-family:var(--mono);font-size:10px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;text-decoration:none">📡 Open The Radar &rarr;</a>
-  </div>
-
-  <div class="feed-primary-tabs">
-    <button class="feed-primary-tab active" id="tabEvents" onclick="switchFeedTab('events')">
-      <span class="feed-primary-tab-icon">🎟</span> Events
-    </button>
-    <button class="feed-primary-tab" id="tabCalendar" onclick="switchFeedTab('calendar')">
-      <span class="feed-primary-tab-icon">📍</span> Columbus Calendar
-      <span class="feed-primary-tab-badge" id="calendarBadge" style="display:none"></span>
-    </button>
-  </div>
-
-  <div id="feedEventsPanel">
-    <div class="feed-time-tabs" id="feedTimeTabs">
-      <button class="feed-time-tab active" data-filter="tonight" onclick="setFeedFilter('tonight',this)">Tonight</button>
-      <button class="feed-time-tab" data-filter="tomorrow" onclick="setFeedFilter('tomorrow',this)">Tomorrow</button>
-      <button class="feed-time-tab" data-filter="weekend" onclick="setFeedFilter('weekend',this)">This Weekend</button>
-      <button class="feed-time-tab" data-filter="week" onclick="setFeedFilter('week',this)">This Week</button>
-      <button class="feed-time-tab" data-filter="all" onclick="setFeedFilter('all',this)">All Upcoming</button>
-    </div>
-    <div class="feed-grid" id="liveFeedGrid">
-      <div class="feed-empty"><div class="feed-empty-icon">📅</div><div>Loading events...</div></div>
-    </div>
-    <button class="feed-load-more" id="feedLoadMore" style="display:none" onclick="feedLoadMore()">Load More Events</button>
-  </div>
-
-  <div id="feedCalendarPanel" style="display:none">
-    <div class="cal-toolbar">
-      <div class="feed-time-tabs" style="margin-bottom:0">
-        <button class="feed-time-tab active" data-cal="all" onclick="setCalFilter('all',this)">All</button>
-        <button class="feed-time-tab" data-cal="tonight" onclick="setCalFilter('tonight',this)">Tonight</button>
-        <button class="feed-time-tab" data-cal="weekend" onclick="setCalFilter('weekend',this)">Weekend</button>
-        <button class="feed-time-tab" data-cal="trending" onclick="setCalFilter('trending',this)">🔥 Trending</button>
-      </div>
-      <div class="cal-sort-row">
-        <span style="font-family:var(--mono);font-size:9px;color:#55556a;letter-spacing:0.1em;text-transform:uppercase">Sort:</span>
-        <button class="cal-sort-btn active" onclick="setCalSort('date',this)">Date</button>
-        <button class="cal-sort-btn" onclick="setCalSort('popular',this)">Most Liked</button>
-      </div>
-    </div>
-    <div id="calendarFeed">
-      <div class="feed-empty"><div class="feed-empty-icon">🗓</div><div>Loading Columbus Calendar...</div></div>
-    </div>
-    <button class="feed-load-more" id="calLoadMore" style="display:none" onclick="calLoadMore()">Load More</button>
-  </div>
-</div>
 
 <!-- CLAIM MODAL -->
 <div id="claimModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:600;align-items:center;justify-content:center;padding:20px" onclick="if(event.target===this)closeClaimModal()">
@@ -959,25 +1016,25 @@ footer{background:#1a1612;color:var(--cream);padding:56px 48px 32px;}
       <div class="sb-card">
         <div class="sb-title">Upcoming Events</div>
         <div id="sidebar-events">
-          <div class="sb-evt" onclick="window.location.href='https://cbusevents.com/1313-festival-event.html'">
+          <div class="sb-evt" onclick="window.location.href='https://cbusevents.com/collab-board.html'">
             <div class="sb-date"><div class="sb-mo">Jun</div><div class="sb-day">13</div></div>
-            <div><div class="sb-name">1313 Festival</div><div class="sb-venue-sm">1313 E. Broad St.</div></div>
+            <div><div class="sb-name">Summer Pop-Up</div><div class="sb-venue-sm">Columbus</div></div>
           </div>
-          <div class="sb-evt" onclick="document.getElementById('liveFeedSection').scrollIntoView({behavior:'smooth'})">
+          <div class="sb-evt" onclick="document.getElementById('cbx-rail-tonight').scrollIntoView({behavior:'smooth'})">
             <div class="sb-date"><div class="sb-mo">Jun</div><div class="sb-day">21</div></div>
             <div><div class="sb-name">Franklinton Art Crawl</div><div class="sb-venue-sm">Franklinton District</div></div>
           </div>
-          <div class="sb-evt" onclick="document.getElementById('liveFeedSection').scrollIntoView({behavior:'smooth'})">
+          <div class="sb-evt" onclick="document.getElementById('cbx-rail-tonight').scrollIntoView({behavior:'smooth'})">
             <div class="sb-date"><div class="sb-mo">Jun</div><div class="sb-day">28</div></div>
             <div><div class="sb-name">Short North Rooftop</div><div class="sb-venue-sm">Venue 400</div></div>
           </div>
-          <div class="sb-evt" onclick="document.getElementById('liveFeedSection').scrollIntoView({behavior:'smooth'})">
+          <div class="sb-evt" onclick="document.getElementById('cbx-rail-tonight').scrollIntoView({behavior:'smooth'})">
             <div class="sb-date"><div class="sb-mo">Jul</div><div class="sb-day">19</div></div>
             <div><div class="sb-name">Exhibit of Expression</div><div class="sb-venue-sm">Columbus, TBA</div></div>
           </div>
         </div>
         <div style="margin-top:12px;padding-top:10px;border-top:1px solid var(--rule)">
-          <span class="link-dark" style="cursor:pointer;font-size:10px" onclick="document.getElementById('liveFeedSection').scrollIntoView({behavior:'smooth'})">View full calendar →</span>
+          <span class="link-dark" style="cursor:pointer;font-size:10px" onclick="document.getElementById('cbx-rail-tonight').scrollIntoView({behavior:'smooth'})">View full calendar →</span>
         </div>
       </div>
 
@@ -1006,61 +1063,6 @@ footer{background:#1a1612;color:var(--cream);padding:56px 48px 32px;}
   </div>
 </section>
 
-<!-- COLLAB BOARD -->
-<section class="collab-section" id="collab-section">
-  <div class="srule"><span class="srule-lbl">Collab Board</span><span class="srule-line"></span></div>
-  <div class="collab-top">
-    <h2 class="collab-h">Open spots.<br><em>Real opportunities.</em></h2>
-    <div class="collab-right">
-      <div class="srule-badge" style="margin-bottom:8px"><div class="srule-badge-dot"></div><span class="srule-badge-txt">Updating live</span></div>
-      <div class="open-ct" id="collab-open-ct">—</div>
-      <div class="open-lbl">Open Opportunities</div>
-    </div>
-  </div>
-  <div class="gig-hd">
-    <div class="ghc">Type</div>
-    <div class="ghc">Opportunity</div>
-    <div class="ghc">Pay / Fee</div>
-    <div class="ghc">Event Date</div>
-    <div class="ghc"></div>
-  </div>
-  <div id="collab-gig-list">
-    <!-- Fallback rows shown until JS loads -->
-    <div class="gig-row reveal" onclick="window.location.href='https://cbusevents.com/cbus-vendor-portal.html'">
-      <div><span class="pill p-vendor">Vendor Table</span></div>
-      <div><div class="gig-title">3 Vendor Spots at 1313 Festival</div><div class="gig-sub">Posted by Deante Gray · 1313 E. Broad St.</div></div>
-      <div><div class="gig-pay">$75</div><div class="gig-pay-unit">Spot fee</div></div>
-      <div class="gig-date-val">Jun 13</div>
-      <div><button class="gig-apply" onclick="event.stopPropagation();window.location.href='https://cbusevents.com/1313-festival-event.html'">Claim Spot</button></div>
-    </div>
-    <div class="gig-row reveal" onclick="window.location.href='https://cbusevents.com/cbus-vendor-portal.html'">
-      <div><span class="pill p-staff">Event Staff</span></div>
-      <div><div class="gig-title">Check-in + Ticketing Staff, 1313 Fest</div><div class="gig-sub">Posted by 1313 Organizer · 1313 E. Broad St.</div></div>
-      <div><div class="gig-pay">$120</div><div class="gig-pay-unit">Day rate</div></div>
-      <div class="gig-date-val">Jun 13</div>
-      <div><button class="gig-apply" onclick="event.stopPropagation()">Apply</button></div>
-    </div>
-    <div class="gig-row reveal" onclick="window.location.href='https://cbusevents.com/cbus-vendor-portal.html'">
-      <div><span class="pill p-photo">Photographer</span></div>
-      <div><div class="gig-title">Event Photographer, Franklinton Art Crawl</div><div class="gig-sub">Posted by Event Planner · Franklinton</div></div>
-      <div><div class="gig-pay">$300</div><div class="gig-pay-unit">Flat rate</div></div>
-      <div class="gig-date-val">Jun 21</div>
-      <div><button class="gig-apply" onclick="event.stopPropagation()">Apply</button></div>
-    </div>
-    <div class="gig-row reveal" onclick="window.location.href='https://cbusevents.com/cbus-vendor-portal.html'">
-      <div><span class="pill p-dj">DJ / Music</span></div>
-      <div><div class="gig-title">DJ for King-Lincoln Block Experience</div><div class="gig-sub">Posted by Amara J. · King-Lincoln District</div></div>
-      <div><div class="gig-pay">$400</div><div class="gig-pay-unit">Flat rate</div></div>
-      <div class="gig-date-val">Aug 2</div>
-      <div><button class="gig-apply" onclick="event.stopPropagation()">Apply</button></div>
-    </div>
-  </div>
-  <div class="collab-foot">
-    <a href="https://cbusevents.com/cbus-organizer-portal.html" class="link-dark">View All Opportunities →</a>
-    <a href="https://cbusevents.com/cbus-organizer-portal.html" class="link-org">Post an Opportunity →</a>
-  </div>
-</section>
-
 <!-- MEMBER SPOTLIGHT -->
 <!-- FOUNDER SPOTLIGHT + JOIN CTA -->
 <section class="spotlight-section">
@@ -1072,7 +1074,7 @@ footer{background:#1a1612;color:var(--cream);padding:56px 48px 32px;}
       <div class="sc-init sc-init-1" id="spotlight-avatar">D</div>
       <div class="sc-name">Deante Gray</div>
       <div class="sc-role">Founder · Event Organizer · Columbus</div>
-      <p class="sc-bio">Built CBUSEVENTS solo in under a week and launched March 9, 2026. Produces the 1313 Festival series at 1313 E. Broad St. Sources his entire vendor roster through the platform. Vendor tables filled, staff confirmed, all managed in one place.</p>
+      <p class="sc-bio">Built CBUSEVENTS solo in under a week and launched March 9, 2026. Sources his entire vendor roster through the platform. Vendor tables filled, staff confirmed, all managed in one place.</p>
       <div class="sc-stats">
         <div><div class="sc-sn" id="spotlight-events">—</div><div class="sc-sl">Events Live</div></div>
         <div><div class="sc-sn" id="spotlight-followers">—</div><div class="sc-sl">Followers</div></div>
@@ -1155,11 +1157,11 @@ footer{background:#1a1612;color:var(--cream);padding:56px 48px 32px;}
     <div>
       <div class="footer-col-title">Discover</div>
       <ul class="footer-links">
-        <li><a href="#liveFeedSection">All Events</a></li>
+        <li><a href="#cbx-rail-tonight">All Events</a></li>
         <li><a href="https://cbusevents.com/the-radar.html">The Radar</a></li>
         <li><a href="https://cbusevents.com/venues.html">Columbus Venues</a></li>
         <li><a href="https://cbusevents.com/vendors.html">Vendor Directory</a></li>
-        <li><a href="https://cbusevents.com/1313-festival-event.html">1313 Festival</a></li>
+        <li><a href="https://cbusevents.com/collab-board.html">Summer Pop-Up</a></li>
         <li><a href="https://cbusevents.com/gallery-hop.html">Gallery Hop Guide</a></li>
       </ul>
     </div>
@@ -1442,17 +1444,14 @@ async function submitClaim(){
 }
 
 // Event modal stub (opens events page)
-// Returns the dedicated page for the 1313 Festival, otherwise the generic event detail page.
+// Returns the dedicated page for the Summer Pop-Up, otherwise the generic event detail page.
 function festivalEventURL(e){
-  if(e&&((e.title&&e.title.includes('1313'))||e.id==='festival-1313'||e.id==='1313-festival')){
-    return 'https://cbusevents.com/1313-festival-event.html';
-  }
   return 'https://cbusevents.com/event.html?id='+(e&&e.id);
 }
 
 function openEventModal(id){
-  if(!id){document.getElementById('liveFeedSection').scrollIntoView({behavior:'smooth'});return;}
-  // Look up the loaded event so the 1313 Festival routes to its created page even with a real Supabase UUID.
+  if(!id){document.getElementById('cbx-rail-tonight').scrollIntoView({behavior:'smooth'});return;}
+  // Look up the loaded event so the Summer Pop-Up routes to its created page even with a real Supabase UUID.
   const evt=(feedAllEvents||[]).find(e=>e.id===id)||{id};
   window.location.href=festivalEventURL(evt);
 }
@@ -1585,7 +1584,7 @@ async function loadLiveData(){
     if(ctaGigs)ctaGigs.textContent=gigs.length||0;
 
     // Init the events feed with live data
-    initFeed();
+    if(document.getElementById('liveFeedGrid'))initFeed();
 
     // Update events strip if we have data
     if(events.length>0){
@@ -1783,6 +1782,104 @@ async function loadRecapClips(){
   }catch(err){console.warn('recap clips',err);}
 }
 loadRecapClips();
+
+/* ===== BROWSE THEATER · live data ===== */
+(function(){
+  if(typeof sb==='undefined')return;
+  var hoodName={};
+  function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]);});}
+  function evUrl(e){return (typeof festivalEventURL==='function')?festivalEventURL(e):('https://cbusevents.com/event.html?id='+e.id);}
+  function fill(id,html){var el=document.getElementById(id);if(el&&html)el.innerHTML=html;}
+  function dnum(t){return new Date(t).getDate();}
+  function dchip(t){var d=new Date(t);return d.toLocaleDateString('en-US',{weekday:'short'})+' '+d.toLocaleDateString('en-US',{month:'short',day:'numeric'});}
+  function dfull(t){return new Date(t).toLocaleDateString('en-US',{month:'short',day:'numeric'});}
+  function poster(e,i){
+    var tones=['','tone-flame','tone-gold','tone-green'],tone=tones[i%4];
+    var venue=e.venue_name_override||(e.venues&&e.venues.name)||'Columbus';
+    var hood=e.neighborhood_slug?(hoodName[e.neighborhood_slug]||''):'';
+    var tag=e.is_free?'<div class="po-tag free">Free</div>':'<div class="po-tag paid">Tickets</div>';
+    return '<a class="poster '+tone+'" href="'+evUrl(e)+'"><div class="po-noise"></div><div class="po-num">'+dnum(e.start_time)+'</div><span class="po-corner tl"></span><span class="po-corner br"></span><div class="po-chip">'+dchip(e.start_time)+'</div>'+tag+'<div class="po-body"><div class="po-title">'+esc(e.title||'Event')+'</div><div class="po-meta"><span>'+dfull(e.start_time)+'</span><span class="sep">&middot;</span><span>'+esc(venue)+'</span>'+(hood?'<span class="sep">&middot;</span><span>'+esc(hood)+'</span>':'')+'</div><div class="po-cta">'+(e.is_free?'Get Details':'Get Tickets')+'</div></div></a>';
+  }
+  async function loadTheater(){
+    try{
+      try{var nh=await sb.from('neighborhoods').select('slug,display_name,featured');(nh.data||[]).forEach(function(n){hoodName[n.slug]=n.display_name;});}catch(_){}
+      var ev=await sb.from('events').select('id,title,start_time,venue_name_override,is_free,neighborhood_slug,venues(name)').eq('status','published').gte('start_time',new Date().toISOString()).order('start_time',{ascending:true}).limit(40);
+      var POOL=ev.data||[];
+      if(POOL.length){
+        var endToday=new Date();endToday.setHours(23,59,59,999);
+        var tonight=POOL.filter(function(e){return new Date(e.start_time)<=endToday;});
+        if(!tonight.length)tonight=POOL.slice(0,8);
+        fill('cbx-tonight',tonight.slice(0,12).map(poster).join(''));
+        var weekend=POOL.filter(function(e){var d=new Date(e.start_time).getDay();return d===5||d===6||d===0;});
+        fill('cbx-weekend',(weekend.length?weekend:POOL).slice(0,12).map(poster).join(''));
+        var counts={};POOL.forEach(function(e){if(e.neighborhood_slug)counts[e.neighborhood_slug]=(counts[e.neighborhood_slug]||0)+1;});
+        var hues=['rgba(255,107,53,0.12)','rgba(200,150,62,0.12)','rgba(26,107,64,0.12)','rgba(83,74,183,0.12)','rgba(24,95,165,0.12)','rgba(216,90,48,0.12)'];
+        var hoodHTML=Object.keys(counts).sort(function(a,b){return counts[b]-counts[a];}).map(function(slug,i){
+          return '<a class="hood" style="--hue:'+hues[i%6]+'" href="https://cbusevents.com/the-radar.html?neighborhood='+slug+'"><span class="po-corner tl"></span><span class="hood-arrow">&rarr;</span><div class="hood-name">'+esc(hoodName[slug]||slug)+'</div><div class="hood-count">'+counts[slug]+' event'+(counts[slug]>1?'s':'')+'</div></a>';
+        }).join('');
+        if(hoodHTML)fill('cbx-hoods',hoodHTML);
+      }
+    }catch(e){console.warn('theater events',e);}
+
+    try{
+      var vn=await sb.from('venues').select('*').eq('status','approved').limit(12);
+      var vs=vn.data||[];
+      if(vs.length)fill('cbx-spaces',vs.map(function(v){
+        var nm=v.name||'Venue',init=(nm[0]||'V').toUpperCase();
+        var meta=[v.venue_type||v.type||'Venue'];if(v.capacity)meta.push('up to '+v.capacity);
+        return '<a class="prof" href="https://cbusevents.com/venues.html"><div class="prof-av av-venue">'+esc(init)+'</div><div class="prof-name">'+esc(nm)+'</div><span class="prof-chip chip-venue">Venue</span><div class="prof-meta">'+esc(meta.join(' &middot; '))+'</div><div class="prof-cta">View space</div></a>';
+      }).join(''));
+    }catch(e){console.warn('theater venues',e);}
+
+    try{
+      var vd=await sb.from('vendors').select('id,business_name,name,category,is_featured').order('is_featured',{ascending:false}).limit(12);
+      var vm=vd.data||[];
+      if(vm.length)fill('cbx-makers',vm.map(function(v){
+        var nm=v.business_name||v.name||'Vendor',init=(nm[0]||'V').toUpperCase();
+        return '<a class="prof" href="https://cbusevents.com/vendors.html"><div class="prof-av av-vendor">'+esc(init)+'</div><div class="prof-name">'+esc(nm)+'</div><span class="prof-chip chip-vendor">'+esc(v.category||'Vendor')+'</span><div class="prof-meta">Columbus</div><div class="prof-cta">View shop</div></a>';
+      }).join(''));
+    }catch(e){console.warn('theater vendors',e);}
+
+    try{
+      var gg=await sb.from('collab_gigs').select('*').eq('status','open').order('created_at',{ascending:false}).limit(12);
+      var gs=gg.data||[];
+      if(gs.length){
+        var pm={photography:'gp-photo',dj:'gp-dj',staffing:'gp-staff',catering:'gp-food',vendor:'gp-vendor',other:'gp-vendor'};
+        fill('cbx-spots',gs.map(function(g){
+          var cat=(g.category||'other').toLowerCase(),pc=pm[cat]||'gp-vendor';
+          var dt=g.event_date?new Date(g.event_date).toLocaleDateString('en-US',{month:'short',day:'numeric'}):'TBA';
+          return '<a class="gig" href="https://cbusevents.com/collab-board.html"><span class="gig-pill '+pc+'">'+esc(g.category||'Gig')+'</span><div class="gig-title">'+esc(g.title||'Open spot')+'</div><div class="gig-sub">'+esc(g.location||'Columbus')+'</div><div class="gig-row"><div class="gig-pay">'+esc(g.pay||'Negotiable')+'<span>Pay</span></div><div class="gig-date">'+dt+'</div></div><div class="gig-apply">Apply</div></a>';
+        }).join(''));
+      }
+    }catch(e){console.warn('theater gigs',e);}
+
+    try{
+      var cl=await sb.from('clips').select('id,type,video_url,thumbnail_url,product_url,caption').eq('status','approved').order('created_at',{ascending:false}).limit(12);
+      var cs=cl.data||[];
+      if(cs.length)fill('cbx-reels',cs.map(function(c){
+        var href=c.product_url||c.video_url||'#';
+        var thumb=c.thumbnail_url?('background-image:url('+c.thumbnail_url+');background-size:cover;background-position:center;'):'';
+        var shop=(c.type==='vendor'&&c.product_url)?'<span class="rl-shop">Shop</span>':'';
+        return '<a class="reel" href="'+href+'" target="_blank" rel="noopener" style="'+thumb+'"><span class="rl-shine"></span>'+shop+'<span class="rl-play">&#9654;</span><span class="rl-cap">'+esc(c.caption||'Columbus')+'</span></a>';
+      }).join(''));
+    }catch(e){console.warn('theater clips',e);}
+
+    initRails();
+  }
+  function initRails(){
+    document.querySelectorAll('.cbx-theater [data-rail]').forEach(function(wrap){
+      var vp=wrap.querySelector('.rail-vp');if(!vp)return;
+      function sync(){var max=vp.scrollWidth-vp.clientWidth-2;wrap.classList.toggle('has-l',vp.scrollLeft>4);wrap.classList.toggle('has-r',vp.scrollLeft<max);}
+      vp.addEventListener('scroll',sync,{passive:true});window.addEventListener('resize',sync);
+      wrap.querySelectorAll('.rail-arrow').forEach(function(btn){btn.addEventListener('click',function(){vp.scrollBy({left:(+btn.dataset.dir)*vp.clientWidth*0.82,behavior:'smooth'});});});
+      sync();
+    });
+    var io=new IntersectionObserver(function(es){es.forEach(function(x){if(x.isIntersecting){x.target.classList.add('cbx-in');io.unobserve(x.target);}});},{threshold:0.1});
+    document.querySelectorAll('.cbx-theater .cbx-rev').forEach(function(el){io.observe(el);});
+  }
+  loadTheater();
+})();
+
 </script>
 </body>
 </html>
