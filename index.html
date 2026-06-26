@@ -731,6 +731,14 @@ footer{background:#1a1612;color:var(--cream);padding:56px 48px 32px;}
 <section class="cbx-theater">
 <style>
 .cbx-theater{background:var(--ink-deep);background-image:radial-gradient(60% 60% at 12% 0%,rgba(255,107,53,.06) 0%,transparent 60%),radial-gradient(50% 50% at 92% 30%,rgba(200,150,62,.05) 0%,transparent 55%);color:var(--on-dark);padding:0 0 64px;overflow:hidden;}
+/* Light mode: browse theater sits on solid white (the marquee hero and the cinematic tiles keep their dark treatment) */
+[data-theme="light"] .cbx-theater{background:#fff;background-image:none;color:var(--ink);}
+[data-theme="light"] .cbx-theater .rail-t{color:var(--ink);}
+[data-theme="light"] .cbx-theater .rail-eyebrow{color:var(--mist);}
+[data-theme="light"] .cbx-theater .rail-all{color:var(--mist);}
+[data-theme="light"] .cbx-theater .rail-all:hover{color:var(--flame);}
+[data-theme="light"] .cbx-theater .rail-fade.l{background:linear-gradient(90deg,#fff,transparent);}
+[data-theme="light"] .cbx-theater .rail-fade.r{background:linear-gradient(270deg,#fff,transparent);}
 .cbx-theater .cbx-rev{opacity:0;transform:translateY(18px);transition:opacity .6s ease,transform .6s ease;}
 .cbx-theater .cbx-rev.cbx-in{opacity:1;transform:none;}
 /* marquee */
