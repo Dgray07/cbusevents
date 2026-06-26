@@ -1037,7 +1037,7 @@ function renderEventDetailTab(eventId){
  });
 
  if(eventDetailTab==='overview') el.innerHTML=renderEdtOverview(e,publicUrl);
- else if(eventDetailTab==='vendors') el.innerHTML=renderEdtVendors(vendors,eventId);
+ else if(eventDetailTab==='vendors'){ el.innerHTML=renderEdtVendors(vendors,eventId,e); loadEventVendorTables(eventId); }
  else if(eventDetailTab==='budget') el.innerHTML=renderEdtBudget(budget,totalBudget,totalActual,eventId);
  else if(eventDetailTab==='guests') el.innerHTML=renderEdtGuests(guests,e);
  else if(eventDetailTab==='marketing') el.innerHTML=renderEdtMarketing(e,publicUrl);
@@ -1075,12 +1075,22 @@ function renderEdtOverview(e,publicUrl){
  </div>`;
 }
 
-function renderEdtVendors(vendors,eventId){
+function renderEdtVendors(vendors,eventId,e){
  const statusColor={confirmed:'badge-green',pending:'badge-orange',declined:'badge-muted'};
  return`
+ <div class="card" style="padding:18px 20px;margin-bottom:20px">
+   <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap;margin-bottom:14px">
+     <div>
+       <div style="font-weight:700;font-size:15px;margin-bottom:3px">Vendor Tables for this event</div>
+       <div style="font-size:12px;color:var(--sub);max-width:440px">Post open vendor table spots for this event. They appear on the CBUSEVENTS homepage and vendors apply and pay through the platform.</div>
+     </div>
+     <button class="btn btn-primary btn-sm" style="flex-shrink:0" onclick="postEventVendorTable()">+ Post Vendor Spots</button>
+   </div>
+   <div id="edtVtList"><div class="spinner"></div></div>
+ </div>
  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
    <div style="font-size:14px;color:var(--sub)">${vendors.length} vendor${vendors.length!==1?'s':''} contacted</div>
-   <button class="btn btn-primary btn-sm" onclick="nav('vendors')">+ Find Vendors</button>
+   <button class="btn btn-ghost btn-sm" onclick="nav('vendors')">+ Find Vendors</button>
  </div>
  ${vendors.length?vendors.map(v=>`
  <div class="card" style="padding:16px 20px;margin-bottom:10px;display:flex;align-items:center;gap:16px;flex-wrap:wrap">
@@ -1104,6 +1114,81 @@ function renderEdtVendors(vendors,eventId){
    <p style="font-size:13px;margin-bottom:16px">Browse the vendor directory and send inquiries</p>
    <button class="btn btn-primary" onclick="nav('vendors')">Find Vendors &#8594;</button>
  </div>`}`;
+}
+
+function postEventVendorTable(){
+ const e=window._edtData&&window._edtData.e;
+ if(!e){openVendorTableModal();return;}
+ const dateStr=e.start_time?new Date(e.start_time).toLocaleDateString('en-CA'):'';
+ openVendorTableModal(null,{
+   event_id:e.id,
+   event_name:e.title||'',
+   event_date:dateStr,
+   event_location:(e.venues&&e.venues.name)||e.venue_name_override||''
+ });
+}
+
+async function loadEventVendorTables(eventId){
+ const el=document.getElementById('edtVtList');
+ if(!el)return;
+ let listings=[],err=null;
+ try{
+   const r=await sb.from('vendor_table_listings')
+     .select('*, vendor_table_applications(id,status)')
+     .eq('event_id',eventId).eq('organizer_id',currentUser.id)
+     .order('created_at',{ascending:false});
+   listings=r.data||[];err=r.error;
+ }catch(ex){err=ex;}
+
+ if(err){
+   const needsMigration=/event_id/.test(err.message||'');
+   el.innerHTML=`<div style="font-size:12px;color:var(--muted);padding:12px 0">Could not load vendor table listings.${needsMigration?' Add the <code>event_id</code> column to <code>vendor_table_listings</code> in Supabase to enable this.':''}</div>`;
+   return;
+ }
+
+ if(!listings.length){
+   el.innerHTML=`<div style="border:1px dashed var(--border);border-radius:12px;padding:22px;text-align:center;color:var(--muted);font-size:13px">No vendor table spots posted for this event yet.<br><button class="btn btn-primary btn-sm" style="margin-top:12px" onclick="postEventVendorTable()">+ Post your first vendor spots</button></div>`;
+   return;
+ }
+
+ el.innerHTML=listings.map(l=>{
+   const apps=l.vendor_table_applications||[];
+   const pending=apps.filter(a=>a.status==='pending').length;
+   const approved=apps.filter(a=>a.status==='approved').length;
+   const isActive=l.is_active;
+   const deadline=l.deadline?new Date(l.deadline+'T00:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric'}):'No deadline';
+   const fee=l.spot_fee!=null?parseFloat(l.spot_fee).toFixed(2):'0.00';
+   const safeName=(l.event_name||'').replace(/'/g,"\\'");
+   return `
+   <div style="border:1px solid var(--border);border-radius:12px;padding:14px 16px;margin-bottom:10px;background:var(--surface)">
+     <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap">
+       <div style="min-width:0">
+         <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:5px">
+           <span style="font-weight:700;font-size:14px">${l.event_name||'Vendor table'}</span>
+           <span style="font-family:var(--mono);font-size:9px;letter-spacing:0.1em;text-transform:uppercase;padding:3px 9px;border-radius:99px;${isActive?'background:var(--green-dim);color:var(--green);border:1px solid var(--green-border)':'background:rgba(255,255,255,0.04);color:var(--muted);border:1px solid var(--border)'}">${isActive?'Live on homepage':'Closed'}</span>
+         </div>
+         <div style="font-family:var(--mono);font-size:10px;letter-spacing:0.08em;color:var(--muted);display:flex;gap:14px;flex-wrap:wrap">
+           <span>${l.spots_remaining} / ${l.total_spots} spots left</span>
+           <span>$${fee} per spot</span>
+           <span>Deadline: ${deadline}</span>
+           ${pending?`<span style="color:var(--orange)">${pending} pending</span>`:''}
+           ${approved?`<span style="color:var(--green)">${approved} approved</span>`:''}
+         </div>
+       </div>
+       <div style="display:flex;gap:6px;flex-shrink:0;flex-wrap:wrap">
+         <button class="btn btn-ghost btn-sm" onclick="openVendorTableModal('${l.id}')">Edit</button>
+         <button class="btn btn-ghost btn-sm" onclick="viewVendorTableApps('${l.id}','${safeName}')">Applications${apps.length?` <span style="background:var(--orange);color:white;border-radius:99px;font-size:10px;font-weight:700;padding:1px 7px;margin-left:2px">${apps.length}</span>`:''}</button>
+         <button class="btn btn-ghost btn-sm" onclick="toggleListingActive('${l.id}',${!isActive})">${isActive?'Close':'Reopen'}</button>
+         <button class="btn btn-danger btn-sm" onclick="deleteVendorTableListing('${l.id}')">Delete</button>
+       </div>
+     </div>
+   </div>`;
+ }).join('');
+}
+
+function refreshVendorTableViews(){
+ if(document.getElementById('vtListings'))loadVendorTableListings();
+ if(document.getElementById('edtVtList')&&currentEventId)loadEventVendorTables(currentEventId);
 }
 
 function renderEdtBudget(budget,totalBudget,totalActual,eventId){
@@ -3356,7 +3441,7 @@ async function loadVendorTableListings(){
   }).join('');
 }
 
-function openVendorTableModal(listingId=null){
+function openVendorTableModal(listingId=null,prefill=null){
   document.getElementById('modalContainer').style.display='flex';
   document.getElementById('modalContainer').innerHTML=`
   <div class="modal-overlay" onclick="if(event.target===this)closeModal()">
@@ -3368,16 +3453,19 @@ function openVendorTableModal(listingId=null){
       <div class="modal-body" id="vtFormWrap"><div class="spinner"></div></div>
     </div>
   </div>`;
-  loadVendorTableForm(listingId);
+  loadVendorTableForm(listingId,prefill);
 }
 
-async function loadVendorTableForm(listingId){
+async function loadVendorTableForm(listingId,prefill){
   const wrap=document.getElementById('vtFormWrap');
   let listing=null;
   if(listingId){
     const{data}=await sb.from('vendor_table_listings').select('*').eq('id',listingId).maybeSingle();
     listing=data;
+  }else if(prefill){
+    listing={event_name:prefill.event_name,event_date:prefill.event_date,event_location:prefill.event_location};
   }
+  const prefillEventId=(!listingId&&prefill)?prefill.event_id:'';
 
   const vendorTypes=['Food Vendor','Food Truck','Artisan / Craft','Apparel / Merchandise','Beauty / Wellness','Nonprofit / Community','Pop-up Retail','Art / Photography','Other'];
   const selectedTypes=listing?.vendor_types_wanted||[];
@@ -3430,6 +3518,7 @@ async function loadVendorTableForm(listingId){
       <label>Description / Requirements</label>
       <textarea id="vt-desc" style="height:80px;resize:none" placeholder="What types of vendors are you looking for? Any requirements?">${listing?.requirements||listing?.description||''}</textarea>
     </div>
+    <input type="hidden" id="vt-event-id" value="${prefillEventId||listing?.event_id||''}" />
     <div style="display:flex;justify-content:flex-end;gap:10px;padding-top:4px;border-top:1px solid var(--border)">
       <button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
       <button class="btn btn-primary" onclick="saveVendorTableListing('${listingId||''}')">${listingId?'Save Changes':'Post Listing'}</button>
@@ -3453,6 +3542,8 @@ async function saveVendorTableListing(listingId){
   const fee=parseFloat(document.getElementById('vt-fee').value)||0;
   const desc=document.getElementById('vt-desc').value.trim();
   const types=[...document.querySelectorAll('[id^="vttype-"]:checked')].map(el=>el.value);
+  const eventIdEl=document.getElementById('vt-event-id');
+  const eventId=eventIdEl&&eventIdEl.value?eventIdEl.value:null;
 
   if(!eventName)return toast('Event name is required','error');
   if(!eventDate)return toast('Event date is required','error');
@@ -3472,18 +3563,23 @@ async function saveVendorTableListing(listingId){
     vendor_types_wanted:types.length?types:null,
     is_active:true,
   };
+  if(eventId)payload.event_id=eventId;
 
-  let error;
-  if(listingId){
-    ({error}=await sb.from('vendor_table_listings').update(payload).eq('id',listingId));
-  } else {
-    ({error}=await sb.from('vendor_table_listings').insert(payload));
+  async function persist(p){
+    if(listingId)return sb.from('vendor_table_listings').update(p).eq('id',listingId);
+    return sb.from('vendor_table_listings').insert(p);
+  }
+  let{error}=await persist(payload);
+  // If the event_id column hasn't been added in Supabase yet, save without it so posting still works.
+  if(error&&/event_id/.test(error.message||'')){
+    const {event_id,...rest}=payload;
+    ({error}=await persist(rest));
   }
 
   if(error){toast('Error saving listing: '+error.message,'error');return;}
   toast(listingId?'Listing updated!':'Listing posted! Vendors can now apply.','success');
   closeModal();
-  await loadVendorTableListings();
+  refreshVendorTableViews();
 }
 
 async function deleteVendorTableListing(id){
@@ -3491,14 +3587,14 @@ async function deleteVendorTableListing(id){
   const{error}=await sb.from('vendor_table_listings').delete().eq('id',id);
   if(error){toast('Error deleting listing','error');return;}
   toast('Listing deleted');
-  await loadVendorTableListings();
+  refreshVendorTableViews();
 }
 
 async function toggleListingActive(id,active){
   const{error}=await sb.from('vendor_table_listings').update({is_active:active}).eq('id',id);
   if(error){toast('Error updating listing','error');return;}
   toast(active?'Listing reopened':'Listing closed');
-  await loadVendorTableListings();
+  refreshVendorTableViews();
 }
 
 async function viewVendorTableApps(listingId,eventName){

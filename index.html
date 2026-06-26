@@ -1841,16 +1841,41 @@ loadRecapClips();
     }catch(e){console.warn('theater vendors',e);}
 
     try{
+      // Vendor tables posted by organizers (vendor_table_listings) surface first in this rail
+      var vtCards=[];
+      try{
+        var today=new Date().toISOString().slice(0,10);
+        var vt=await sb.from('vendor_table_listings')
+          .select('id,event_name,event_location,event_date,spot_fee,spots_remaining,vendor_types_wanted')
+          .eq('is_active',true).gt('spots_remaining',0).gte('event_date',today)
+          .order('event_date',{ascending:true}).limit(12);
+        var vl=vt.data||[];
+        vtCards=vl.map(function(l){
+          var d=l.event_date?new Date(l.event_date+'T00:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric'}):'TBA';
+          var feeN=l.spot_fee!=null?Number(l.spot_fee):null;
+          var fee=feeN!=null?('$'+(feeN%1===0?feeN:feeN.toFixed(2))):'TBA';
+          var left=(l.spots_remaining!=null)?(l.spots_remaining+' left'):'';
+          var loc=esc(l.event_location||'Columbus');
+          var sub=left?(loc+' &middot; '+left):loc;
+          var type=(l.vendor_types_wanted&&l.vendor_types_wanted.length)?l.vendor_types_wanted[0]:'Vendor Table';
+          return '<a class="gig" href="https://cbusevents.com/cbus-vendor-portal.html?listing='+encodeURIComponent(l.id)+'"><span class="gig-pill gp-vendor">'+esc(type)+'</span><div class="gig-title">'+esc(l.event_name||'Vendor table')+'</div><div class="gig-sub">'+sub+'</div><div class="gig-row"><div class="gig-pay">'+esc(fee)+'<span>Per table</span></div><div class="gig-date">'+d+'</div></div><div class="gig-apply">Apply for table</div></a>';
+        });
+      }catch(e){console.warn('theater vendor tables',e);}
+
+      var gigCards=[];
       var gg=await sb.from('collab_gigs').select('*').eq('status','open').order('created_at',{ascending:false}).limit(12);
       var gs=gg.data||[];
       if(gs.length){
         var pm={photography:'gp-photo',dj:'gp-dj',staffing:'gp-staff',catering:'gp-food',vendor:'gp-vendor',other:'gp-vendor'};
-        fill('cbx-spots',gs.map(function(g){
+        gigCards=gs.map(function(g){
           var cat=(g.category||'other').toLowerCase(),pc=pm[cat]||'gp-vendor';
           var dt=g.event_date?new Date(g.event_date).toLocaleDateString('en-US',{month:'short',day:'numeric'}):'TBA';
           return '<a class="gig" href="https://cbusevents.com/collab-board.html"><span class="gig-pill '+pc+'">'+esc(g.category||'Gig')+'</span><div class="gig-title">'+esc(g.title||'Open spot')+'</div><div class="gig-sub">'+esc(g.location||'Columbus')+'</div><div class="gig-row"><div class="gig-pay">'+esc(g.pay||'Negotiable')+'<span>Pay</span></div><div class="gig-date">'+dt+'</div></div><div class="gig-apply">Apply</div></a>';
-        }).join(''));
+        });
       }
+
+      var spotCards=vtCards.concat(gigCards).slice(0,16);
+      if(spotCards.length)fill('cbx-spots',spotCards.join(''));
     }catch(e){console.warn('theater gigs',e);}
 
     try{
