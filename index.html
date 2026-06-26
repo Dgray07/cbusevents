@@ -873,19 +873,6 @@ footer{background:#1a1612;color:var(--cream);padding:56px 48px 32px;}
 @media(prefers-reduced-motion:reduce){.cbx-theater .mq-frame.f1{opacity:1;animation:none;}.cbx-theater .mq-frame.f2,.cbx-theater .mq-frame.f3,.cbx-theater .mq-frame.f4{display:none;}.cbx-theater .mq-sweep,.cbx-theater .rl-shine{display:none;}.cbx-theater .cbx-rev{opacity:1;transform:none;}}
 </style>
 
-  <!-- marquee -->
-  <div class="marquee">
-    <div class="mq-reel" aria-hidden="true"><div class="mq-frame f1"></div><div class="mq-frame f2"></div><div class="mq-frame f3"></div><div class="mq-frame f4"></div><div class="mq-sweep"></div><div class="mq-noise"></div></div>
-    <div class="mq-scrim"></div>
-    <div class="mq-content">
-      <div class="mq-eyebrow"><span class="dot"></span>Live in Columbus</div>
-      <h2 class="mq-h">Find the whole scene <em>in one place.</em></h2>
-      <p class="mq-sub">Venues, vendors, organizers and every night out. United here.</p>
-      <div class="mq-cta"><a href="#cbx-rail-tonight" class="mq-btn primary">Start browsing &darr;</a><a href="https://cbusevents.com/the-radar.html" class="mq-btn ghost">Open the Radar</a></div>
-    </div>
-    <div class="mq-reelnote"><span class="rn-play">&#9654;</span> Real nights, uploaded by the city</div>
-  </div>
-
   <!-- TONIGHT -->
   <div class="rail cbx-rev" id="cbx-rail-tonight">
     <div class="rail-hd"><div class="rail-titles"><div class="rail-eyebrow"><span class="dot"></span>Live now</div><div class="rail-t">Happening <em>tonight</em></div></div><a href="https://cbusevents.com/the-radar.html?when=tonight" class="rail-all">See all &rarr;</a></div>
@@ -1796,7 +1783,10 @@ loadRecapClips();
   if(typeof sb==='undefined')return;
   var hoodName={};
   function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]);});}
-  function evUrl(e){return (typeof festivalEventURL==='function')?festivalEventURL(e):('https://cbusevents.com/event.html?id='+e.id);}
+  function evUrl(e){
+    if(e&&e._external)return e._ticket_url||'https://cbusevents.com/the-radar.html';
+    return (typeof festivalEventURL==='function')?festivalEventURL(e):('https://cbusevents.com/event.html?id='+e.id);
+  }
   function fill(id,html){var el=document.getElementById(id);if(el&&html)el.innerHTML=html;}
   function dnum(t){return new Date(t).getDate();}
   function dchip(t){var d=new Date(t);return d.toLocaleDateString('en-US',{weekday:'short'})+' '+d.toLocaleDateString('en-US',{month:'short',day:'numeric'});}
@@ -1806,13 +1796,21 @@ loadRecapClips();
     var venue=e.venue_name_override||(e.venues&&e.venues.name)||'Columbus';
     var hood=e.neighborhood_slug?(hoodName[e.neighborhood_slug]||''):'';
     var tag=e.is_free?'<div class="po-tag free">Free</div>':'<div class="po-tag paid">Tickets</div>';
-    return '<a class="poster '+tone+'" href="'+evUrl(e)+'"><div class="po-noise"></div><div class="po-num">'+dnum(e.start_time)+'</div><span class="po-corner tl"></span><span class="po-corner br"></span><div class="po-chip">'+dchip(e.start_time)+'</div>'+tag+'<div class="po-body"><div class="po-title">'+esc(e.title||'Event')+'</div><div class="po-meta"><span>'+dfull(e.start_time)+'</span><span class="sep">&middot;</span><span>'+esc(venue)+'</span>'+(hood?'<span class="sep">&middot;</span><span>'+esc(hood)+'</span>':'')+'</div><div class="po-cta">'+(e.is_free?'Get Details':'Get Tickets')+'</div></div></a>';
+    var openAttr=(e._external&&e._ticket_url)?' target="_blank" rel="noopener"':'';
+    return '<a class="poster '+tone+'" href="'+evUrl(e)+'"'+openAttr+'><div class="po-noise"></div><div class="po-num">'+dnum(e.start_time)+'</div><span class="po-corner tl"></span><span class="po-corner br"></span><div class="po-chip">'+dchip(e.start_time)+'</div>'+tag+'<div class="po-body"><div class="po-title">'+esc(e.title||'Event')+'</div><div class="po-meta"><span>'+dfull(e.start_time)+'</span><span class="sep">&middot;</span><span>'+esc(venue)+'</span>'+(hood?'<span class="sep">&middot;</span><span>'+esc(hood)+'</span>':'')+'</div><div class="po-cta">'+(e.is_free?'Get Details':'Get Tickets')+'</div></div></a>';
   }
   async function loadTheater(){
     try{
       try{var nh=await sb.from('neighborhoods').select('slug,display_name,featured');(nh.data||[]).forEach(function(n){hoodName[n.slug]=n.display_name;});}catch(_){}
-      var ev=await sb.from('events').select('id,title,start_time,venue_name_override,is_free,neighborhood_slug,venues(name)').eq('status','published').gte('start_time',new Date().toISOString()).order('start_time',{ascending:true}).limit(40);
-      var POOL=ev.data||[];
+      var nowISO=new Date().toISOString();
+      var ev=await sb.from('events').select('id,title,start_time,venue_name_override,is_free,neighborhood_slug,venues(name)').eq('status','published').gte('start_time',nowISO).order('start_time',{ascending:true}).limit(40);
+      var INTERNAL=ev.data||[];
+      var EXTERNAL=[];
+      try{
+        var exq=await sb.from('external_events').select('*').eq('status','active').gte('start_time',nowISO).order('start_time',{ascending:true}).limit(60);
+        EXTERNAL=(exq.data||[]).map(function(x){return {id:x.id,title:x.title,start_time:x.start_time,venue_name_override:x.venue_name||null,is_free:x.is_free,neighborhood_slug:x.neighborhood_slug||null,_external:true,_ticket_url:x.ticket_url||''};});
+      }catch(_){}
+      var POOL=INTERNAL.concat(EXTERNAL).sort(function(a,b){return new Date(a.start_time)-new Date(b.start_time);});
       if(POOL.length){
         var endToday=new Date();endToday.setHours(23,59,59,999);
         var tonight=POOL.filter(function(e){return new Date(e.start_time)<=endToday;});
