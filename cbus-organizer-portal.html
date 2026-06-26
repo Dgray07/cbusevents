@@ -461,6 +461,73 @@ function closeModal(){
   if(m2)m2.innerHTML='';
 }
 
+// ── FOLLOWERS ─────────────────────────────────────────────────
+function openFollowersModal(){
+  const mc=document.getElementById('modalContainer');
+  if(!mc)return;
+  mc.innerHTML=`
+  <div class="modal-overlay" onclick="if(event.target===this)closeModal()">
+    <div class="modal" style="max-width:520px">
+      <div class="modal-header">
+        <div class="modal-title">Your followers</div>
+        <button onclick="closeModal()" style="background:none;border:none;color:var(--sub);font-size:22px;cursor:pointer;line-height:1">&#215;</button>
+      </div>
+      <div class="modal-body" id="followersBody"><div class="spinner"></div></div>
+    </div>
+  </div>`;
+  loadFollowersList();
+}
+
+async function loadFollowersList(){
+  const body=document.getElementById('followersBody');
+  if(!body)return;
+  const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+  let follows=[],err=null;
+  try{
+    const r=await sb.from('profile_follows').select('follower_id,created_at').eq('following_id',currentUser.id).order('created_at',{ascending:false});
+    follows=r.data||[];err=r.error;
+  }catch(e){err=e;}
+
+  if(err){
+    body.innerHTML=`<div style="padding:24px;text-align:center;color:var(--muted);font-size:13px">Could not load your followers right now. If this keeps happening, the followers table may need a read policy for organizers.</div>`;
+    return;
+  }
+  if(!follows.length){
+    body.innerHTML=`<div style="padding:30px;text-align:center;color:var(--muted);font-size:13px">No followers yet.<br><span style="font-size:12px">Share your organizer profile and events to grow your audience.</span></div>`;
+    return;
+  }
+
+  // Resolve follower identities from both organizer and customer profiles
+  const ids=[...new Set(follows.map(f=>f.follower_id).filter(Boolean))];
+  const profMap={};
+  if(ids.length){
+    const [op,cp]=await Promise.all([
+      sb.from('organizer_profiles').select('user_id,display_name,full_name,avatar_url').in('user_id',ids).then(r=>r.data||[]).catch(()=>[]),
+      sb.from('customer_profiles').select('user_id,display_name,full_name,avatar_url').in('user_id',ids).then(r=>r.data||[]).catch(()=>[])
+    ]);
+    [...cp,...op].forEach(p=>{ if(p&&p.user_id) profMap[p.user_id]={...(profMap[p.user_id]||{}),...p}; });
+  }
+
+  body.innerHTML=`<div style="font-size:12px;color:var(--sub);margin-bottom:12px">${follows.length} ${follows.length===1?'person follows':'people follow'} you</div>`+
+    follows.map(f=>{
+      const p=profMap[f.follower_id]||{};
+      const name=esc(p.display_name||p.full_name||'Columbus member');
+      const initial=(name[0]||'?').toUpperCase();
+      const av=p.avatar_url
+        ? `<img src="${esc(p.avatar_url)}" alt="" style="width:40px;height:40px;border-radius:50%;object-fit:cover;flex-shrink:0">`
+        : `<div style="width:40px;height:40px;border-radius:50%;background:var(--orange);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;flex-shrink:0">${initial}</div>`;
+      const since=f.created_at?new Date(f.created_at).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}):'';
+      return `<div style="display:flex;align-items:center;gap:12px;padding:10px 2px;border-bottom:1px solid var(--border-sub)">
+        ${av}
+        <div style="flex:1;min-width:0">
+          <div style="font-size:14px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${name}</div>
+          ${since?`<div style="font-size:11px;color:var(--muted)">Followed ${since}</div>`:''}
+        </div>
+      </div>`;
+    }).join('');
+}
+
 // ── AUTH ──────────────────────────────────────────────────────
 
 // ── SOCIAL SHARE MODAL ────────────────────────────────────────
@@ -2358,11 +2425,11 @@ function renderDashboard(){
              {num:pending,label:'Pending review',color:'var(--text)'},
              {num:'$'+feesCollected,label:'Fees collected',color:'var(--green)'},
              {num:'$'+feesPending,label:'Awaiting payment',color:'var(--text)'},
-             {num:'—',label:'Followers',color:'var(--blue)',id:'followerStat'},
+             {num:'—',label:'Followers',color:'var(--blue)',id:'followerStat',click:'openFollowersModal()'},
            ].map(s=>`
-             <div style="background:rgba(255,255,255,0.04);border-radius:10px;padding:12px 14px" ${s.id?'id="'+s.id+'"':''}>
+             <div style="background:rgba(255,255,255,0.04);border-radius:10px;padding:12px 14px${s.click?';cursor:pointer':''}" ${s.id?'id="'+s.id+'"':''} ${s.click?'onclick="'+s.click+'" title="View followers"':''}>
                <div style="font-size:20px;font-weight:800;color:${s.color};margin-bottom:3px">${s.num}</div>
-               <div style="font-size:11px;color:var(--sub)">${s.label}</div>
+               <div style="font-size:11px;color:var(--sub)">${s.label}${s.click?' &rsaquo;':''}</div>
              </div>`).join('')}
          </div>
        </div>
