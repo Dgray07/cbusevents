@@ -4,7 +4,7 @@
 <script>if(window.self!==window.top){window.stop();}</script>
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"CBUSEVENTS","url":"https://cbusevents.com","description":"Columbus Ohio event platform connecting venues, organizers, vendors, and customers","potentialAction":{"@type":"SearchAction","target":"https://cbusevents.com/?search={search_term_string}","query-input":"required name=search_term_string"}}</script>
 <meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
 <title>CBUSEVENTS - Columbus's Event Ecosystem</title>
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-P70BRSL5E5"></script>
 <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-P70BRSL5E5');</script>
@@ -524,6 +524,64 @@ footer{background:#1a1612;color:var(--cream);padding:56px 48px 32px;}
   .collab-right{text-align:left;}
 }
 </style>
+<style>
+/* ===== iPhone / mobile optimization ===== */
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%;}
+body{-webkit-tap-highlight-color:rgba(0,0,0,0);}
+.cbx-theater .rail-vp{-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain;}
+.nav-burger{display:none;}
+#mobileMenu{display:none;}
+@media(max-width:960px){
+  .nav-acct{display:none;}
+  .nav-burger{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;width:40px;height:40px;border-radius:10px;background:none;border:1.5px solid var(--rule);cursor:pointer;flex-shrink:0;padding:0;}
+  .nav-burger span{display:block;width:18px;height:2px;background:var(--ink);border-radius:2px;transition:background .18s;}
+  #mobileMenu{position:absolute;top:100%;left:0;right:0;background:var(--cream);border-top:1px solid var(--rule);border-bottom:1px solid var(--rule);box-shadow:0 18px 44px rgba(0,0,0,0.22);z-index:250;max-height:calc(100vh - 60px);overflow-y:auto;-webkit-overflow-scrolling:touch;padding:8px 0 16px;}
+  .mm-sec{padding:13px 22px 4px;font-family:var(--mono);font-size:8px;letter-spacing:0.18em;text-transform:uppercase;color:var(--mist);}
+  .mm-link{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 22px;font-size:15px;font-weight:600;color:var(--ink);text-decoration:none;}
+  .mm-link.sub{font-size:14px;font-weight:500;color:var(--sub);padding:12px 22px;}
+  .mm-link .mm-tag{font-family:var(--mono);font-size:9px;letter-spacing:0.06em;color:var(--mist);font-weight:500;white-space:nowrap;}
+  .mm-link:active{background:var(--flame-l);}
+  .mm-div{height:1px;background:var(--rule);margin:6px 14px;}
+  /* prevent iOS focus-zoom: inputs must be >=16px */
+  .hs-input,.form-inp{font-size:16px;}
+  /* rails hug the screen edges on phones */
+  .cbx-theater{--pad-x:18px;}
+}
+@media(max-width:430px){
+  .nav-inner{padding:0 16px;}
+  .datebar{padding:8px 16px;gap:12px;}
+  .hero-grid{padding:0 12px 18px;gap:8px;}
+  .how-section,.feed-section,.collab-section,.spotlight-section,.digest-section,footer{padding:44px 16px;}
+}
+</style>
+<style>
+/* ===== iPhone refinements: safe areas, dynamic viewport, input zoom ===== */
+@supports(padding:max(0px)){
+  .nav-inner{padding-left:max(48px,env(safe-area-inset-left));padding-right:max(48px,env(safe-area-inset-right));}
+  .datebar{padding-left:max(48px,env(safe-area-inset-left));padding-right:max(48px,env(safe-area-inset-right));}
+  footer{padding-bottom:calc(32px + env(safe-area-inset-bottom));}
+}
+/* modals clear the notch and home indicator */
+#claimModal{padding-top:max(20px,env(safe-area-inset-top));padding-bottom:max(20px,env(safe-area-inset-bottom));}
+@media(max-width:960px){
+  /* iOS focus-zoom guard for the remaining sub-16px inputs */
+  .he-qty,.cal-comment-input{font-size:16px;}
+  /* dynamic viewport height so Safari's collapsing toolbar can't clip the open menu */
+  #mobileMenu{max-height:calc(100dvh - 60px);}
+  @supports(padding:max(0px)){
+    .nav-inner{padding-left:max(24px,env(safe-area-inset-left));padding-right:max(24px,env(safe-area-inset-right));}
+    .datebar{padding-left:max(24px,env(safe-area-inset-left));padding-right:max(24px,env(safe-area-inset-right));}
+    #mobileMenu{padding-bottom:calc(16px + env(safe-area-inset-bottom));}
+    .cbx-theater{--pad-x:max(18px,env(safe-area-inset-left));}
+  }
+}
+@media(max-width:430px){
+  @supports(padding:max(0px)){
+    .nav-inner{padding-left:max(16px,env(safe-area-inset-left));padding-right:max(16px,env(safe-area-inset-right));}
+    .datebar{padding-left:max(16px,env(safe-area-inset-left));padding-right:max(16px,env(safe-area-inset-right));}
+  }
+}
+</style>
 </head>
 <body>
 
@@ -969,7 +1027,7 @@ footer{background:#1a1612;color:var(--cream);padding:56px 48px 32px;}
       </div>
       <div style="margin-bottom:14px">
         <label style="font-size:12px;color:#8888b0;font-weight:600;display:block;margin-bottom:6px">Your email</label>
-        <input id="claimEmail" type="email" placeholder="you@email.com" style="width:100%;background:#111128;border:1px solid rgba(255,255,255,0.09);border-radius:10px;padding:10px 13px;color:#f4f4ff;font-size:14px;outline:none">
+        <input id="claimEmail" type="email" placeholder="you@email.com" style="width:100%;background:#111128;border:1px solid rgba(255,255,255,0.09);border-radius:10px;padding:10px 13px;color:#f4f4ff;font-size:16px;outline:none">
       </div>
       <div style="margin-bottom:18px">
         <label style="font-size:12px;color:#8888b0;font-weight:600;display:block;margin-bottom:6px">Note (optional)</label>
