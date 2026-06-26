@@ -858,6 +858,8 @@ body{-webkit-tap-highlight-color:rgba(0,0,0,0);}
 .cbx-theater .poster.tone-green{background:radial-gradient(120% 90% at 80% 8%,rgba(26,107,64,.20),transparent 55%),linear-gradient(158deg,#13201a 0%,#15110d 86%);}
 .cbx-theater .poster:hover{transform:translateY(-7px);border-color:rgba(255,107,53,.55);box-shadow:0 18px 40px rgba(0,0,0,.5);}
 .cbx-theater .po-num{position:absolute;top:-22px;right:2px;font-family:var(--display);font-weight:900;font-size:148px;line-height:1;color:rgba(250,247,242,.06);user-select:none;}
+.cbx-theater .po-img{position:absolute;inset:0;z-index:0;background-size:cover;background-position:center;background-repeat:no-repeat;background-color:#15110d;}
+.cbx-theater .po-img::after{content:'';position:absolute;inset:0;background:linear-gradient(180deg,rgba(10,8,6,.30) 0%,transparent 26%,transparent 48%,rgba(10,8,6,.82) 100%);}
 .cbx-theater .po-corner{position:absolute;width:13px;height:13px;border:1.5px solid rgba(250,247,242,.18);z-index:2;}
 .cbx-theater .po-corner.tl{top:14px;left:14px;border-right:none;border-bottom:none;}
 .cbx-theater .po-corner.br{bottom:14px;right:14px;border-left:none;border-top:none;}
@@ -1855,18 +1857,28 @@ loadRecapClips();
     var hood=e.neighborhood_slug?(hoodName[e.neighborhood_slug]||''):'';
     var tag=e.is_free?'<div class="po-tag free">Free</div>':'<div class="po-tag paid">Tickets</div>';
     var openAttr=(e._external&&e._ticket_url)?' target="_blank" rel="noopener"':'';
-    return '<a class="poster '+tone+'" href="'+evUrl(e)+'"'+openAttr+'><div class="po-noise"></div><div class="po-num">'+dnum(e.start_time)+'</div><span class="po-corner tl"></span><span class="po-corner br"></span><div class="po-chip">'+dchip(e.start_time)+'</div>'+tag+'<div class="po-body"><div class="po-title">'+esc(e.title||'Event')+'</div><div class="po-meta"><span>'+dfull(e.start_time)+'</span><span class="sep">&middot;</span><span>'+esc(venue)+'</span>'+(hood?'<span class="sep">&middot;</span><span>'+esc(hood)+'</span>':'')+'</div><div class="po-cta">'+(e.is_free?'Get Details':'Get Tickets')+'</div></div></a>';
+    var img=e.cover_image_url||'';
+    var safeImg=String(img).replace(/'/g,'%27').replace(/"/g,'%22');
+    var art=img
+      ? '<div class="po-img" style="background-image:url(\''+safeImg+'\')"></div>'
+      : '<div class="po-noise"></div><div class="po-num">'+dnum(e.start_time)+'</div>';
+    var cls='poster'+(img?' has-img':'')+(tone?' '+tone:'');
+    return '<a class="'+cls+'" href="'+evUrl(e)+'"'+openAttr+'>'+art+'<span class="po-corner tl"></span><span class="po-corner br"></span><div class="po-chip">'+dchip(e.start_time)+'</div>'+tag+'<div class="po-body"><div class="po-title">'+esc(e.title||'Event')+'</div><div class="po-meta"><span>'+dfull(e.start_time)+'</span><span class="sep">&middot;</span><span>'+esc(venue)+'</span>'+(hood?'<span class="sep">&middot;</span><span>'+esc(hood)+'</span>':'')+'</div><div class="po-cta">'+(e.is_free?'Get Details':'Get Tickets')+'</div></div></a>';
   }
   async function loadTheater(){
     try{
       try{var nh=await sb.from('neighborhoods').select('slug,display_name,featured');(nh.data||[]).forEach(function(n){hoodName[n.slug]=n.display_name;});}catch(_){}
       var nowISO=new Date().toISOString();
-      var ev=await sb.from('events').select('id,title,start_time,venue_name_override,is_free,neighborhood_slug,venues(name)').eq('status','published').gte('start_time',nowISO).order('start_time',{ascending:true}).limit(40);
+      var evSel='id,title,start_time,venue_name_override,is_free,neighborhood_slug,cover_image_url,venues(name)';
+      var ev=await sb.from('events').select(evSel).eq('status','published').gte('start_time',nowISO).order('start_time',{ascending:true}).limit(40);
+      if(ev.error&&/cover_image_url/.test(ev.error.message||'')){
+        ev=await sb.from('events').select('id,title,start_time,venue_name_override,is_free,neighborhood_slug,venues(name)').eq('status','published').gte('start_time',nowISO).order('start_time',{ascending:true}).limit(40);
+      }
       var INTERNAL=ev.data||[];
       var EXTERNAL=[];
       try{
         var exq=await sb.from('external_events').select('*').eq('status','active').gte('start_time',nowISO).order('start_time',{ascending:true}).limit(60);
-        EXTERNAL=(exq.data||[]).map(function(x){return {id:x.id,title:x.title,start_time:x.start_time,venue_name_override:x.venue_name||null,is_free:x.is_free,neighborhood_slug:x.neighborhood_slug||null,_external:true,_ticket_url:x.ticket_url||''};});
+        EXTERNAL=(exq.data||[]).map(function(x){return {id:x.id,title:x.title,start_time:x.start_time,venue_name_override:x.venue_name||null,is_free:x.is_free,neighborhood_slug:x.neighborhood_slug||null,cover_image_url:x.cover_image_url||'',_external:true,_ticket_url:x.ticket_url||''};});
       }catch(_){}
       var POOL=INTERNAL.concat(EXTERNAL).sort(function(a,b){return new Date(a.start_time)-new Date(b.start_time);});
       if(POOL.length){
