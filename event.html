@@ -162,6 +162,7 @@ html[data-theme="dark"] .hero-blur{opacity:.4;}
 .rideshare-disclaimer{font-size:11px;color:var(--muted);line-height:1.5;margin-top:14px;}
 
 .more-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(158px,1fr));gap:16px;}
+.more-section-full{grid-column:1 / -1;margin-top:8px;}
 .more-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;cursor:pointer;
   transition:border-color .15s,transform .12s,box-shadow .15s;}
 .more-card:hover{border-color:var(--orange-border);transform:translateY(-2px);box-shadow:var(--shadow-sm);}
@@ -315,11 +316,6 @@ footer{margin-top:64px;border-top:1px solid var(--border);padding:40px 24px;text
           <div class="rideshare-disclaimer">Estimates based on distance. Actual fares vary by time, demand, and traffic. Prices shown in USD.</div>
         </div>
       </div>
-
-      <div id="moreSection" style="display:none">
-        <div class="section-label">More events in Columbus</div>
-        <div class="more-grid" id="moreGrid"></div>
-      </div>
     </div>
 
     <aside class="event-sidebar">
@@ -335,6 +331,11 @@ footer{margin-top:64px;border-top:1px solid var(--border);padding:40px 24px;text
       </div>
       <div class="quick-info-card" id="quickInfo"></div>
     </aside>
+
+    <div id="moreSection" class="more-section-full" style="display:none">
+      <div class="section-label">More events in Columbus</div>
+      <div class="more-grid" id="moreGrid"></div>
+    </div>
   </div>
 
   <div id="loadingState" style="padding:80px 20px;text-align:center">
