@@ -84,7 +84,7 @@ nav{
 .hero-grid{display:grid;grid-template-columns:1fr 1fr;}
 .hero-left{padding:40px 48px;border-right:1px solid var(--rule);display:flex;flex-direction:column;}
 .hero-label{font-family:var(--mono);font-size:9px;letter-spacing:0.24em;text-transform:uppercase;color:var(--flame);margin-bottom:18px;}
-.hero-h1{font-family:var(--display);font-size:clamp(52px,6.5vw,88px);font-weight:900;line-height:0.91;letter-spacing:-0.02em;color:var(--ink);margin-bottom:20px;}
+.hero-h1{font-family:'DM Sans',sans-serif;font-size:clamp(52px,6.5vw,88px);font-weight:900;line-height:0.92;letter-spacing:-0.035em;color:var(--ink);margin-bottom:20px;}
 .hero-h1 em{font-style:italic;color:var(--flame);}
 .hero-sub{font-size:16px;line-height:1.7;color:var(--ash);max-width:440px;margin-bottom:32px;font-weight:300;}
 .hero-btns{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:0;}
@@ -99,6 +99,44 @@ nav{
 
 /* ── HERO RIGHT ──────────────────────────── */
 .hero-right{display:flex;flex-direction:column;padding:40px 48px;}
+
+/* ── HERO V2: search-lead + intent routing ──────── */
+.hero-grid-v2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,0.95fr);gap:18px;align-items:stretch;padding:0 48px 40px;}
+.hero-search-lead{padding:32px 30px;display:flex;flex-direction:column;justify-content:center;}
+.hero-routes{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.hero-route{display:flex;align-items:center;gap:13px;padding:18px 16px;background:rgba(255,255,255,0.03);border:1px solid var(--rule,rgba(255,255,255,0.1));border-radius:14px;transition:border-color .16s,transform .12s,background .16s;}
+.hero-route:hover{border-color:var(--flame);transform:translateY(-2px);background:rgba(255,107,53,0.06);}
+.hero-route-ic{font-size:22px;flex-shrink:0;line-height:1;}
+.hero-route-txt{min-width:0;flex:1;}
+.hero-route-t{font-weight:700;font-size:14px;color:var(--ink);line-height:1.2;}
+.hero-route-s{font-size:11px;color:var(--ash,#9a98a8);margin-top:3px;line-height:1.3;}
+.hero-route-arr{color:var(--mist,#6b6b8a);font-size:15px;transition:color .16s,transform .16s;flex-shrink:0;}
+.hero-route:hover .hero-route-arr{color:var(--flame);transform:translateX(3px);}
+@media(max-width:880px){
+  .hero-grid-v2{grid-template-columns:1fr;padding:0 22px 30px;gap:14px;}
+  .hero-routes{grid-template-columns:1fr 1fr;}
+  .hero-search-lead{padding:22px 18px;}
+}
+@media(max-width:520px){.hero-routes{grid-template-columns:1fr;}}
+
+/* ── FLOATING ESTIMATOR WIDGET ──────────── */
+.est-widget{position:fixed;right:20px;bottom:20px;z-index:500;display:flex;flex-direction:column;align-items:flex-end;gap:10px;}
+.est-pill{display:flex;align-items:center;gap:8px;background:var(--ink,#15131f);color:#fff;border:1px solid var(--flame);font-family:var(--mono,'DM Mono',monospace);font-size:11px;font-weight:600;letter-spacing:0.04em;padding:12px 18px;border-radius:100px;box-shadow:0 8px 28px rgba(0,0,0,0.35);transition:transform .14s,box-shadow .14s;}
+.est-pill:hover{transform:translateY(-2px);box-shadow:0 12px 34px rgba(0,0,0,0.45);}
+.est-pill-dot{width:7px;height:7px;border-radius:50%;background:var(--flame);animation:blink 2s infinite;flex-shrink:0;}
+.est-pill-arr{color:var(--flame);}
+.est-widget.open .est-pill{display:none;}
+.est-panel{position:relative;width:320px;max-width:calc(100vw - 40px);background:var(--cream,#fff);border:1px solid var(--rule,rgba(0,0,0,0.1));border-radius:16px;padding:22px 20px 18px;box-shadow:0 20px 50px rgba(0,0,0,0.3);animation:estUp .22s ease both;}
+@keyframes estUp{from{opacity:0;transform:translateY(12px);}to{opacity:1;transform:none;}}
+.est-close{position:absolute;top:12px;right:14px;font-size:20px;line-height:1;color:var(--mist,#6b6b8a);background:none;border:none;cursor:pointer;}
+.est-close:hover{color:var(--ink);}
+@media(max-width:520px){
+  .est-widget{right:12px;bottom:12px;left:12px;align-items:stretch;}
+  .est-pill{justify-content:center;}
+  .est-panel{width:100%;max-width:none;}
+}
+
+/* ── LEGACY HERO RIGHT (featured) ──────────────────────────── */
 .hero-featured{flex:1;background:var(--flame);padding:28px;display:flex;flex-direction:column;justify-content:flex-end;position:relative;overflow:hidden;cursor:pointer;transition:filter 0.2s;min-height:260px;}
 .hero-featured:hover{filter:brightness(1.05);}
 .hf-glow{position:absolute;inset:0;background:radial-gradient(ellipse at 80% 20%,rgba(255,255,255,0.08) 0%,transparent 55%);}
@@ -692,47 +730,73 @@ body{-webkit-tap-highlight-color:rgba(0,0,0,0);}
 </style>
 <section class="hero">
   <div class="hero-head">
-    <div class="hero-label">For organizers</div>
-    <h1 class="hero-h1">Columbus events<br><em>run through here.</em></h1>
-    <p class="hero-sub">Lower all-in ticketing fees, Stripe included. Play with the numbers, then add your event.</p>
+    <div class="hero-label">Columbus, Ohio</div>
+    <h1 class="hero-h1">Everything <em>happening</em><br>in Columbus.</h1>
+    <p class="hero-sub">Discover events, find venues, hire vendors, or host your own. The whole Columbus event scene, in one place.</p>
   </div>
-  <div class="hero-grid">
-    <div class="hero-left">
-      <div class="hero-est">
-        <div class="he-label">Ticketing estimator</div>
-        <div class="he-inrow">
-          <span class="he-dollar">$</span>
-          <input id="he-price" class="he-input" type="number" value="30" min="0" step="1" aria-label="Ticket price">
-          <span class="he-per">per ticket</span>
-        </div>
-        <div class="he-out"><span class="he-out-full">You keep <strong id="he-keep">$0.00</strong> per ticket, <strong id="he-diff" style="color:var(--flame)">$0.00</strong> less in fees than typical platforms.</span><span class="he-out-mini"><strong id="he-keep-m">$0.00</strong>/ticket, <strong id="he-diff-m" style="color:var(--flame)">$0.00</strong> less</span></div>
-        <button class="he-toggle" id="he-toggle" type="button">See it across a full event &#9662;</button>
-        <div class="he-total" id="he-total" style="display:none">
-          <div class="he-totrow"><span>Tickets sold</span><input id="he-qty" class="he-qty" type="number" value="200" min="0" step="1" aria-label="Tickets sold"></div>
-          <div class="he-totout">You save <strong id="he-save" style="color:var(--flame)">$0.00</strong> in fees on this event.</div>
-        </div>
-        <a href="cbus-organizer-portal.html?action=add-event" class="btn-primary he-cta">Add your event</a>
-        <div class="he-fine">5.9% + $1 all-in, Stripe included. Free events stay free.</div>
+  <div class="hero-grid hero-grid-v2">
+    <div class="hero-search hero-search-lead">
+      <div class="hs-label">Find your night</div>
+      <div class="hs-h">What are you looking for?</div>
+      <form id="hs-form" class="hs-form">
+        <input id="hs-q" class="hs-input" type="text" placeholder="Search events, venues, neighborhoods..." aria-label="Search events">
+        <button class="hs-btn" type="submit" aria-label="Search">&#8594;</button>
+      </form>
+      <div class="hs-chips">
+        <a href="events.html?when=tonight" class="hs-chip">Tonight</a>
+        <a href="events.html?when=weekend" class="hs-chip">This weekend</a>
+        <a href="events.html?price=free" class="hs-chip">Free</a>
+        <a href="events.html" class="hs-chip">Browse all &#8594;</a>
       </div>
     </div>
-    <div class="hero-right">
-      <div class="hero-search">
-        <div class="hs-label">Find your night</div>
-        <div class="hs-h">What's on in Columbus?</div>
-        <form id="hs-form" class="hs-form">
-          <input id="hs-q" class="hs-input" type="text" placeholder="Search events, venues, neighborhoods..." aria-label="Search events">
-          <button class="hs-btn" type="submit" aria-label="Search">&#8594;</button>
-        </form>
-        <div class="hs-chips">
-          <a href="events.html?when=tonight" class="hs-chip">Tonight</a>
-          <a href="events.html?when=weekend" class="hs-chip">This weekend</a>
-          <a href="events.html?price=free" class="hs-chip">Free</a>
-          <a href="the-radar.html" class="hs-chip">Open the Radar &#8594;</a>
-        </div>
-      </div>
+    <div class="hero-routes">
+      <a class="hero-route" href="events.html">
+        <div class="hero-route-ic">🎟</div>
+        <div class="hero-route-txt"><div class="hero-route-t">Find something to do</div><div class="hero-route-s">Browse events &amp; buy tickets</div></div>
+        <span class="hero-route-arr">&rarr;</span>
+      </a>
+      <a class="hero-route" href="cbus-organizer-portal.html?action=add-event">
+        <div class="hero-route-ic">📣</div>
+        <div class="hero-route-txt"><div class="hero-route-t">Host an event</div><div class="hero-route-s">List it &amp; sell tickets in minutes</div></div>
+        <span class="hero-route-arr">&rarr;</span>
+      </a>
+      <a class="hero-route" href="venues.html">
+        <div class="hero-route-ic">🏛</div>
+        <div class="hero-route-txt"><div class="hero-route-t">Book a venue</div><div class="hero-route-s">Spaces taking bookings now</div></div>
+        <span class="hero-route-arr">&rarr;</span>
+      </a>
+      <a class="hero-route" href="vendors.html">
+        <div class="hero-route-ic">🤝</div>
+        <div class="hero-route-txt"><div class="hero-route-t">Hire a vendor</div><div class="hero-route-s">Food, photo, sound &amp; more</div></div>
+        <span class="hero-route-arr">&rarr;</span>
+      </a>
     </div>
   </div>
 </section>
+
+<!-- Floating organizer estimator: collapsed pill that expands to the calculator -->
+<div id="estWidget" class="est-widget">
+  <button id="estPill" class="est-pill" type="button" aria-expanded="false">
+    <span class="est-pill-dot"></span> Organizer? See your payout <span class="est-pill-arr">&rarr;</span>
+  </button>
+  <div id="estPanel" class="est-panel" hidden>
+    <button id="estClose" class="est-close" type="button" aria-label="Close">&times;</button>
+    <div class="he-label">Ticketing estimator</div>
+    <div class="he-inrow">
+      <span class="he-dollar">$</span>
+      <input id="he-price" class="he-input" type="number" value="30" min="0" step="1" aria-label="Ticket price">
+      <span class="he-per">per ticket</span>
+    </div>
+    <div class="he-out"><span class="he-out-full">You keep <strong id="he-keep">$0.00</strong> per ticket, <strong id="he-diff" style="color:var(--flame)">$0.00</strong> less in fees than typical platforms.</span><span class="he-out-mini"><strong id="he-keep-m">$0.00</strong>/ticket, <strong id="he-diff-m" style="color:var(--flame)">$0.00</strong> less</span></div>
+    <button class="he-toggle" id="he-toggle" type="button">See it across a full event &#9662;</button>
+    <div class="he-total" id="he-total" style="display:none">
+      <div class="he-totrow"><span>Tickets sold</span><input id="he-qty" class="he-qty" type="number" value="200" min="0" step="1" aria-label="Tickets sold"></div>
+      <div class="he-totout">You save <strong id="he-save" style="color:var(--flame)">$0.00</strong> in fees on this event.</div>
+    </div>
+    <a href="cbus-organizer-portal.html?action=add-event" class="btn-primary he-cta">Add your event</a>
+    <div class="he-fine">5.9% + $1 all-in, Stripe included. Free events stay free.</div>
+  </div>
+</div>
 <script>
 (function(){
   var price=document.getElementById('he-price');
@@ -758,6 +822,13 @@ body{-webkit-tap-highlight-color:rgba(0,0,0,0);}
     if(tog&&tot)tog.addEventListener('click',function(){tot.style.display='block';tog.style.display='none';});
     calc();
   }
+  // floating widget expand/collapse
+  var pill=document.getElementById('estPill'),panel=document.getElementById('estPanel'),
+      closeBtn=document.getElementById('estClose'),wrap=document.getElementById('estWidget');
+  function openEst(){panel.hidden=false;wrap.classList.add('open');pill.setAttribute('aria-expanded','true');}
+  function closeEst(){panel.hidden=true;wrap.classList.remove('open');pill.setAttribute('aria-expanded','false');}
+  if(pill)pill.addEventListener('click',function(){panel.hidden?openEst():closeEst();});
+  if(closeBtn)closeBtn.addEventListener('click',closeEst);
   var form=document.getElementById('hs-form');
   if(form)form.addEventListener('submit',function(e){
     e.preventDefault();
