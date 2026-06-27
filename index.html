@@ -1022,15 +1022,11 @@ body{-webkit-tap-highlight-color:rgba(0,0,0,0);}
     </div>
   </div>
 
-  <!-- RECENT NIGHTS -->
-  <div class="rail cbx-rev">
-    <div class="rail-hd"><div class="rail-titles"><div class="rail-eyebrow"><span class="dot"></span>Straight from the floor</div><div class="rail-t">Recent <em>nights</em></div></div><button type="button" class="rail-all" onclick="openClipUpload()" style="cursor:pointer">Share your clip &rarr;</button></div>
-    <div class="rail-wrap" data-rail><span class="rail-fade l"></span><span class="rail-fade r"></span><button class="rail-arrow prev" data-dir="-1" aria-label="Scroll left">&#8249;</button><button class="rail-arrow next" data-dir="1" aria-label="Scroll right">&#8250;</button>
-      <div class="rail-vp" id="cbx-reels">
-        <a class="reel" href="https://cbusevents.com/signup.html"><span class="rl-shine"></span><span class="rl-play">&#9654;</span><span class="rl-cap">Clips from recent nights, add yours</span></a>
-        <a class="reel" href="https://cbusevents.com/signup.html"><span class="rl-shine"></span><span class="rl-play">&#9654;</span><span class="rl-cap">Tag the vendors you found</span></a>
-        <a class="reel" href="https://cbusevents.com/signup.html"><span class="rl-shine"></span><span class="rl-play">&#9654;</span><span class="rl-cap">Show the city your night</span></a>
-      </div>
+  <!-- CITY PULSE -->
+  <div class="rail cbx-rev" id="cbx-rail-tonight">
+    <div class="rail-hd"><div class="rail-titles"><div class="rail-eyebrow"><span class="dot"></span>Straight from the floor</div><div class="rail-t">City <em>pulse</em></div></div><button type="button" class="rail-all" onclick="openPostComposer()" style="cursor:pointer">Post to the feed &rarr;</button></div>
+    <div class="pulse-feed" id="pulseFeed">
+      <div class="pulse-skel"></div><div class="pulse-skel"></div><div class="pulse-skel"></div>
     </div>
   </div>
 
@@ -1903,8 +1899,7 @@ populateHero();
 async function loadRecapClips(){
   try{
     if(typeof sb==='undefined')return;
-    let{data:clips,error:clErr}=await sb.from('clips').select('id,type,video_url,thumbnail_url,product_url,caption,event_id,creator_handle,creator_url').eq('status','approved').order('created_at',{ascending:false}).limit(8);
-    if(clErr){({data:clips}=await sb.from('clips').select('id,type,video_url,thumbnail_url,product_url,caption').eq('status','approved').order('created_at',{ascending:false}).limit(8));}
+    const{data:clips}=await sb.from('clips').select('id,type,video_url,thumbnail_url,product_url,caption,event_id,creator_handle,creator_url').eq('status','approved').order('created_at',{ascending:false}).limit(8);
     if(!clips||!clips.length)return;
     const box=document.getElementById('recap-clips');
     if(!box)return;
@@ -2034,30 +2029,9 @@ loadRecapClips();
       if(spotCards.length)fill('cbx-spots',spotCards.join(''));
     }catch(e){console.warn('theater gigs',e);}
 
-    function renderEmptyClips(){
-      fill('cbx-reels','<button type="button" class="reel reel-empty" onclick="openClipUpload()"><span class="rl-play">&#9654;</span><span class="rl-cap">Be the first to share a clip from your night &rarr;</span></button>');
-      var er=document.getElementById('cbx-reels');
-      if(er){var b=er.querySelector('.reel-empty');if(b)b.addEventListener('click',function(){openClipUpload();});}
-    }
     try{
-      var cl=await sb.from('clips').select('id,type,video_url,thumbnail_url,product_url,caption,event_id,creator_handle,creator_url').eq('status','approved').order('created_at',{ascending:false}).limit(12);
-      if(cl.error){
-        cl=await sb.from('clips').select('id,type,video_url,thumbnail_url,product_url,caption').eq('status','approved').order('created_at',{ascending:false}).limit(12);
-      }
-      var cs=cl.data||[];
-      window._clips=cs;
-      var reelRail=document.getElementById('cbx-reels');
-      if(cs.length){
-        fill('cbx-reels',cs.map(function(c,idx){
-          var thumb=c.thumbnail_url?('background-image:url('+c.thumbnail_url+');background-size:cover;background-position:center;'):'';
-          var shop=(c.type==='vendor'&&c.product_url)?'<span class="rl-shop">Shop</span>':'';
-          return '<button type="button" class="reel" data-clip="'+idx+'" style="'+thumb+'"><span class="rl-shine"></span>'+shop+'<span class="rl-play">&#9654;</span><span class="rl-cap">'+esc(c.caption||'Columbus')+'</span></button>';
-        }).join(''));
-        if(reelRail){reelRail.querySelectorAll('.reel').forEach(function(btn){btn.addEventListener('click',function(){openClipPlayer(parseInt(btn.dataset.clip));});});}
-      }else{
-        renderEmptyClips();
-      }
-    }catch(e){console.warn('theater clips',e);renderEmptyClips();}
+      await loadPulseFeed();
+    }catch(e){console.warn('pulse feed',e);}
 
     initRails();
   }
@@ -2090,201 +2064,164 @@ loadRecapClips();
 
 </script>
 
-<!-- Fullscreen clip player (TikTok-style) -->
-<div id="clipPlayer" class="clip-player" hidden>
-  <button class="cp-close" id="cpClose" aria-label="Close">&times;</button>
-  <button class="cp-nav cp-prev" id="cpPrev" aria-label="Previous clip">&#8249;</button>
-  <button class="cp-nav cp-next" id="cpNext" aria-label="Next clip">&#8250;</button>
-  <div class="cp-stage" id="cpStage"></div>
-  <div class="cp-meta" id="cpMeta"></div>
-</div>
+<!-- City Pulse feed styles -->
 <style>
-.clip-player{position:fixed;inset:0;z-index:9000;background:rgba(5,4,8,0.96);display:flex;align-items:center;justify-content:center;}
-.clip-player[hidden]{display:none;}
-.cp-stage{position:relative;width:min(440px,calc(100vw - 32px));aspect-ratio:9/16;max-height:calc(100vh - 40px);background:#000;border-radius:16px;overflow:hidden;display:flex;align-items:center;justify-content:center;}
-.cp-stage video,.cp-stage iframe{width:100%;height:100%;border:0;object-fit:cover;background:#000;}
-.cp-meta{position:absolute;left:50%;transform:translateX(-50%);bottom:max(22px,env(safe-area-inset-bottom));width:min(440px,calc(100vw - 32px));padding:0 18px;color:#fff;pointer-events:none;}
-.cp-meta-cap{font-family:var(--font);font-size:15px;font-weight:600;line-height:1.3;text-shadow:0 1px 6px rgba(0,0,0,0.7);margin-bottom:8px;}
-.cp-creator,.cp-creator-plain{display:inline-block;font-family:var(--mono);font-size:12px;font-weight:700;letter-spacing:0.04em;color:#fff;text-shadow:0 1px 6px rgba(0,0,0,0.8);margin-bottom:6px;pointer-events:auto;}
-.cp-creator{color:var(--flame);}
-.cp-meta a{pointer-events:auto;display:inline-block;font-family:var(--mono);font-size:11px;letter-spacing:0.1em;text-transform:uppercase;background:var(--flame);color:#080810;font-weight:700;padding:9px 16px;border-radius:100px;}
-.cp-close{position:absolute;top:18px;right:20px;z-index:2;width:40px;height:40px;border-radius:50%;background:rgba(255,255,255,0.12);color:#fff;font-size:24px;line-height:1;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(6px);}
-.cp-nav{position:absolute;top:50%;transform:translateY(-50%);z-index:2;width:46px;height:46px;border-radius:50%;background:rgba(255,255,255,0.1);color:#fff;font-size:24px;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(6px);transition:background 0.15s;}
-.cp-nav:hover{background:rgba(255,255,255,0.22);}
-.cp-prev{left:max(14px,calc(50vw - 290px));}
-.cp-next{right:max(14px,calc(50vw - 290px));}
-.cp-unmute{position:absolute;bottom:80px;left:50%;transform:translateX(-50%);z-index:2;font-family:var(--mono);font-size:11px;letter-spacing:0.08em;text-transform:uppercase;background:rgba(0,0,0,0.55);color:#fff;padding:8px 16px;border-radius:100px;backdrop-filter:blur(6px);display:flex;align-items:center;gap:6px;}
-@media(max-width:560px){.cp-nav{display:none;}.cp-stage{border-radius:0;width:100vw;height:100vh;max-height:none;aspect-ratio:auto;}}
+.pulse-feed{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;}
+.pulse-skel{height:160px;border-radius:14px;background:rgba(255,255,255,0.04);animation:pulseFade 1.4s ease-in-out infinite;}
+@keyframes pulseFade{0%,100%{opacity:0.4;}50%{opacity:0.75;}}
+.pulse-card{position:relative;background:rgba(255,255,255,0.03);border:1px solid var(--rule,rgba(255,255,255,0.1));border-radius:14px;overflow:hidden;display:flex;flex-direction:column;}
+.pulse-card-img{width:100%;aspect-ratio:16/10;object-fit:cover;background:rgba(255,255,255,0.04);display:block;}
+.pulse-card-body{padding:14px 15px 13px;display:flex;flex-direction:column;gap:8px;}
+.pulse-card-head{display:flex;align-items:center;gap:9px;}
+.pulse-av{width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,var(--flame),#c8963e);display:flex;align-items:center;justify-content:center;color:#080810;font-weight:800;font-size:13px;flex-shrink:0;font-family:var(--font);}
+.pulse-who{min-width:0;flex:1;}
+.pulse-name{font-weight:700;font-size:13px;color:var(--ink);line-height:1.2;}
+.pulse-name a{color:var(--flame);}
+.pulse-time{font-family:var(--mono,monospace);font-size:10px;color:var(--mist,#6b6b8a);letter-spacing:0.04em;margin-top:1px;}
+.pulse-text{font-size:14px;line-height:1.45;color:var(--sub,#444);white-space:pre-wrap;word-break:break-word;}
+.pulse-foot{display:flex;align-items:center;gap:14px;margin-top:2px;}
+.pulse-tag{font-family:var(--mono,monospace);font-size:10px;letter-spacing:0.06em;text-transform:uppercase;color:var(--flame);background:rgba(255,107,53,0.1);padding:4px 9px;border-radius:100px;}
+.pulse-report{font-family:var(--mono,monospace);font-size:10px;letter-spacing:0.04em;color:var(--mist,#6b6b8a);background:none;border:none;cursor:pointer;margin-left:auto;padding:2px 4px;}
+.pulse-report:hover{color:#ef4444;}
+.pulse-empty{grid-column:1/-1;text-align:center;padding:46px 20px;border:1.5px dashed rgba(255,107,53,0.4);border-radius:14px;background:linear-gradient(165deg,rgba(255,107,53,0.06),transparent);}
+.pulse-empty-t{font-weight:700;font-size:16px;color:var(--ink);margin-bottom:6px;}
+.pulse-empty-s{font-size:13px;color:var(--ash,#6b6b8a);margin-bottom:16px;}
+.pulse-empty button{background:var(--flame);color:#fff;font-family:var(--mono,monospace);font-size:11px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;padding:11px 20px;border-radius:100px;border:none;cursor:pointer;}
+@media(max-width:560px){.pulse-feed{grid-template-columns:1fr;}}
+
+/* composer modal (reuses cu- pattern) */
+.pc-overlay{position:fixed;inset:0;z-index:9100;background:rgba(5,4,8,0.9);display:flex;align-items:center;justify-content:center;padding:18px;}
+.pc-overlay[hidden]{display:none;}
+.pc-modal{position:relative;width:100%;max-width:440px;background:var(--cream,#fff);border-radius:18px;padding:26px 24px 22px;box-shadow:0 24px 60px rgba(0,0,0,0.4);max-height:90vh;overflow-y:auto;}
+.pc-close{position:absolute;top:14px;right:16px;font-size:24px;line-height:1;color:var(--mist,#6b6b8a);background:none;border:none;cursor:pointer;}
+.pc-title{font-family:'DM Sans',sans-serif;font-weight:900;font-size:23px;letter-spacing:-0.02em;color:var(--ink);margin-bottom:4px;}
+.pc-sub{font-size:13px;color:var(--ash,#6b6b8a);margin-bottom:16px;line-height:1.4;}
+.pc-text{width:100%;min-height:90px;padding:13px 14px;border:1px solid var(--rule,rgba(0,0,0,0.14));border-radius:10px;font-size:14px;font-family:inherit;margin-bottom:10px;resize:vertical;background:var(--surface,#fff);color:var(--ink);}
+.pc-text:focus{outline:none;border-color:var(--flame);}
+.pc-photo-row{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
+.pc-photo-btn{font-family:var(--mono,monospace);font-size:11px;font-weight:700;letter-spacing:0.04em;color:var(--flame);background:rgba(255,107,53,0.1);border:1px solid rgba(255,107,53,0.3);border-radius:8px;padding:9px 14px;cursor:pointer;}
+.pc-photo-name{font-size:12px;color:var(--sub,#55556a);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.pc-input{width:100%;padding:11px 14px;border:1px solid var(--rule,rgba(0,0,0,0.14));border-radius:10px;font-size:14px;font-family:inherit;margin-bottom:10px;background:var(--surface,#fff);color:var(--ink);}
+.pc-input:focus{outline:none;border-color:var(--flame);}
+.pc-msg{font-size:13px;margin:2px 0 10px;min-height:18px;}
+.pc-submit{width:100%;background:var(--flame,#FF6B35);color:#fff;font-family:var(--mono,monospace);font-size:12px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;padding:14px;border-radius:10px;border:none;cursor:pointer;}
+.pc-submit:disabled{opacity:0.6;cursor:default;}
+.pc-fine{font-family:var(--mono,monospace);font-size:9px;color:var(--mist,#6b6b8a);text-align:center;margin-top:10px;letter-spacing:0.02em;line-height:1.4;}
 </style>
-<script>
-(function(){
-  var player=document.getElementById('clipPlayer'),stage=document.getElementById('cpStage'),
-      meta=document.getElementById('cpMeta'),closeBtn=document.getElementById('cpClose'),
-      prevBtn=document.getElementById('cpPrev'),nextBtn=document.getElementById('cpNext');
-  var current=-1;
 
-  function ytId(url){var m=url.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|shorts\/))([\w-]{11})/);return m?m[1]:null;}
-  function vimeoId(url){var m=url.match(/vimeo\.com\/(?:video\/)?(\d+)/);return m?m[1]:null;}
-  function isMp4(url){return /\.(mp4|webm|mov)(\?|$)/i.test(url);}
-
-  function buildStage(clip){
-    var url=clip.video_url||'';
-    var yt=ytId(url),vm=vimeoId(url);
-    if(isMp4(url)){
-      return '<video src="'+esc(url)+'" autoplay muted loop playsinline></video>'+
-        '<button class="cp-unmute" id="cpUnmute" type="button">&#128263; Tap for sound</button>';
-    }
-    if(yt){
-      return '<iframe src="https://www.youtube.com/embed/'+yt+'?autoplay=1&playsinline=1&rel=0" allow="autoplay; encrypted-media" allowfullscreen></iframe>';
-    }
-    if(vm){
-      return '<iframe src="https://player.vimeo.com/video/'+vm+'?autoplay=1&playsinline=1" allow="autoplay; fullscreen" allowfullscreen></iframe>';
-    }
-    // unknown/external (IG, TikTok) — show thumb + open original
-    var bg=clip.thumbnail_url?'style="background-image:url('+esc(clip.thumbnail_url)+');background-size:cover;background-position:center"':'';
-    return '<div '+bg+' style="width:100%;height:100%;display:flex;align-items:center;justify-content:center">'+
-      '<a href="'+esc(url)+'" target="_blank" rel="noopener" style="font-family:var(--mono);font-size:12px;letter-spacing:0.08em;text-transform:uppercase;background:var(--flame);color:#080810;font-weight:700;padding:12px 20px;border-radius:100px">Watch on original &rarr;</a></div>';
-  }
-
-  function show(i){
-    var clips=window._clips||[];
-    if(i<0||i>=clips.length)return;
-    current=i;
-    var clip=clips[i];
-    stage.innerHTML=buildStage(clip);
-    var capHtml='';
-    if(clip.creator_handle){
-      var handle=esc(clip.creator_handle).replace(/^@/,'');
-      if(clip.creator_url){capHtml+='<a class="cp-creator" href="'+esc(clip.creator_url)+'" target="_blank" rel="noopener">@'+handle+'</a>';}
-      else{capHtml+='<div class="cp-creator-plain">@'+handle+'</div>';}
-    }
-    capHtml+='<div class="cp-meta-cap">'+esc(clip.caption||'')+'</div>';
-    if(clip.type==='vendor'&&clip.product_url){capHtml+='<a href="'+esc(clip.product_url)+'" target="_blank" rel="noopener">Shop this &rarr;</a>';}
-    else if(clip.event_id){capHtml+='<a href="event.html?id='+esc(clip.event_id)+'">View event &rarr;</a>';}
-    meta.innerHTML=capHtml;
-    var unmute=document.getElementById('cpUnmute');
-    if(unmute){var v=stage.querySelector('video');unmute.addEventListener('click',function(){if(v){v.muted=false;v.play();}unmute.style.display='none';});}
-    prevBtn.style.visibility=i>0?'visible':'hidden';
-    nextBtn.style.visibility=i<clips.length-1?'visible':'hidden';
-  }
-  function open(i){player.hidden=false;document.body.style.overflow='hidden';show(i);}
-  function close(){player.hidden=true;document.body.style.overflow='';stage.innerHTML='';current=-1;}
-  window.openClipPlayer=open;
-
-  closeBtn.addEventListener('click',close);
-  prevBtn.addEventListener('click',function(){show(current-1);});
-  nextBtn.addEventListener('click',function(){show(current+1);});
-  player.addEventListener('click',function(e){if(e.target===player)close();});
-  document.addEventListener('keydown',function(e){
-    if(player.hidden)return;
-    if(e.key==='Escape')close();
-    else if(e.key==='ArrowRight'||e.key==='ArrowDown')show(current+1);
-    else if(e.key==='ArrowLeft'||e.key==='ArrowUp')show(current-1);
-  });
-  // swipe up/down on touch to advance
-  var ty=null;
-  stage.addEventListener('touchstart',function(e){ty=e.touches[0].clientY;},{passive:true});
-  stage.addEventListener('touchend',function(e){
-    if(ty===null)return;var dy=e.changedTouches[0].clientY-ty;
-    if(dy<-60)show(current+1);else if(dy>60)show(current-1);
-    ty=null;
-  },{passive:true});
-})();
-</script>
-
-<!-- Share a clip — upload modal -->
-<div id="clipUpload" class="cu-overlay" hidden>
-  <div class="cu-modal">
-    <button class="cu-close" id="cuClose" aria-label="Close">&times;</button>
-    <div class="cu-title">Share your clip</div>
-    <div class="cu-sub">Show the city your night. Clips are reviewed before they go live.</div>
-    <div id="cuBody">
-      <label class="cu-drop" id="cuDrop">
-        <input id="cuFile" type="file" accept="video/*" hidden>
-        <span id="cuDropTxt">Tap to choose a video<br><span class="cu-hint">Up to 50MB · keep it under a minute</span></span>
-      </label>
-      <input id="cuHandle" class="cu-input" type="text" placeholder="Your @handle (Instagram, TikTok...)" autocomplete="off">
-      <input id="cuUrl" class="cu-input" type="url" placeholder="Link to your profile (optional)">
-      <input id="cuCaption" class="cu-input" type="text" placeholder="Caption — where was this?">
-      <div id="cuMsg" class="cu-msg"></div>
-      <button id="cuSubmit" class="cu-submit" type="button">Submit clip</button>
-      <div class="cu-fine">By submitting you confirm you have the right to share this video.</div>
+<!-- City Pulse composer -->
+<div id="postComposer" class="pc-overlay" hidden>
+  <div class="pc-modal">
+    <button class="pc-close" id="pcClose" aria-label="Close">&times;</button>
+    <div class="pc-title">Post to the city pulse</div>
+    <div class="pc-sub">Share what's happening — a moment, a tip, a shoutout. Posts go live right away.</div>
+    <div id="pcBody">
+      <textarea id="pcText" class="pc-text" placeholder="What's happening in Columbus right now?"></textarea>
+      <div class="pc-photo-row">
+        <button type="button" class="pc-photo-btn" onclick="document.getElementById('pcFile').click()">Add photo</button>
+        <input id="pcFile" type="file" accept="image/*" hidden>
+        <span class="pc-photo-name" id="pcPhotoName"></span>
+      </div>
+      <input id="pcHandle" class="pc-input" type="text" placeholder="Your name or @handle">
+      <div id="pcMsg" class="pc-msg"></div>
+      <button id="pcSubmit" class="pc-submit" type="button">Post</button>
+      <div class="pc-fine">Be kind. Posts that break community trust get removed.</div>
     </div>
   </div>
 </div>
-<style>
-.cu-overlay{position:fixed;inset:0;z-index:9100;background:rgba(5,4,8,0.9);display:flex;align-items:center;justify-content:center;padding:18px;}
-.cu-overlay[hidden]{display:none;}
-.cu-modal{position:relative;width:100%;max-width:400px;background:var(--cream,#fff);border-radius:18px;padding:26px 24px 22px;box-shadow:0 24px 60px rgba(0,0,0,0.4);max-height:90vh;overflow-y:auto;}
-.cu-close{position:absolute;top:14px;right:16px;font-size:24px;line-height:1;color:var(--mist,#6b6b8a);background:none;border:none;cursor:pointer;}
-.cu-title{font-family:'DM Sans',sans-serif;font-weight:900;font-size:24px;letter-spacing:-0.02em;color:var(--ink);margin-bottom:6px;}
-.cu-sub{font-size:13px;color:var(--ash,#6b6b8a);margin-bottom:18px;line-height:1.4;}
-.cu-drop{display:flex;align-items:center;justify-content:center;text-align:center;min-height:120px;border:1.5px dashed var(--rule,rgba(0,0,0,0.18));border-radius:12px;padding:18px;cursor:pointer;font-size:14px;color:var(--sub,#55556a);margin-bottom:12px;transition:border-color 0.15s;}
-.cu-drop:hover{border-color:var(--flame);}
-.cu-drop.has-file{border-style:solid;border-color:var(--flame);color:var(--flame);font-weight:600;}
-.cu-hint{font-family:var(--mono,monospace);font-size:11px;color:var(--mist,#6b6b8a);}
-.cu-input{width:100%;padding:12px 14px;border:1px solid var(--rule,rgba(0,0,0,0.14));border-radius:10px;font-size:14px;font-family:inherit;margin-bottom:10px;background:var(--surface,#fff);color:var(--ink);}
-.cu-input:focus{outline:none;border-color:var(--flame);}
-.cu-msg{font-size:13px;margin:4px 0 10px;min-height:18px;}
-.cu-submit{width:100%;background:var(--flame,#FF6B35);color:#fff;font-family:var(--mono,monospace);font-size:12px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;padding:14px;border-radius:10px;border:none;cursor:pointer;transition:filter 0.15s;}
-.cu-submit:hover{filter:brightness(1.05);}
-.cu-submit:disabled{opacity:0.6;cursor:default;}
-.cu-fine{font-family:var(--mono,monospace);font-size:9px;color:var(--mist,#6b6b8a);text-align:center;margin-top:10px;letter-spacing:0.02em;line-height:1.4;}
-</style>
+
 <script>
 (function(){
-  var overlay=document.getElementById('clipUpload'),body=document.getElementById('cuBody'),
-      fileInput=document.getElementById('cuFile'),drop=document.getElementById('cuDrop'),
-      dropTxt=document.getElementById('cuDropTxt'),handle=document.getElementById('cuHandle'),
-      urlIn=document.getElementById('cuUrl'),caption=document.getElementById('cuCaption'),
-      msg=document.getElementById('cuMsg'),submit=document.getElementById('cuSubmit'),
-      closeBtn=document.getElementById('cuClose');
-  var chosen=null;
-  var MAX=50*1024*1024;
+  function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
+  function timeAgo(iso){try{var s=Math.floor((Date.now()-new Date(iso).getTime())/1000);if(s<60)return 'just now';var m=Math.floor(s/60);if(m<60)return m+'m ago';var h=Math.floor(m/60);if(h<24)return h+'h ago';var d=Math.floor(h/24);return d+'d ago';}catch(e){return '';}}
+  function initials(name){var n=(name||'?').replace(/^@/,'').trim();return (n[0]||'?').toUpperCase();}
 
-  window.openClipUpload=function(){overlay.hidden=false;document.body.style.overflow='hidden';};
+  window.loadPulseFeed=async function(){
+    var feed=document.getElementById('pulseFeed');
+    if(!feed||typeof sb==='undefined')return;
+    var r=await sb.from('community_posts')
+      .select('id,display_name,content,image_url,post_type,linked_event_id,created_at')
+      .eq('is_visible',true)
+      .order('created_at',{ascending:false})
+      .limit(18);
+    var posts=r.data||[];
+    if(!posts.length){
+      feed.innerHTML='<div class="pulse-empty"><div class="pulse-empty-t">The pulse is quiet right now</div><div class="pulse-empty-s">Be the first to post what\u2019s happening in Columbus tonight.</div><button type="button" onclick="openPostComposer()">Start the conversation</button></div>';
+      return;
+    }
+    feed.innerHTML=posts.map(function(p){
+      var name=p.display_name||'Someone';
+      var img=p.image_url?'<img class="pulse-card-img" src="'+esc(p.image_url)+'" alt="" loading="lazy">':'';
+      var tag=p.linked_event_id?'<a class="pulse-tag" href="event.html?id='+esc(p.linked_event_id)+'">View event</a>':'';
+      return '<div class="pulse-card" data-pid="'+esc(p.id)+'">'+img+
+        '<div class="pulse-card-body">'+
+          '<div class="pulse-card-head"><div class="pulse-av">'+esc(initials(name))+'</div>'+
+            '<div class="pulse-who"><div class="pulse-name">'+esc(name)+'</div><div class="pulse-time">'+esc(timeAgo(p.created_at))+'</div></div></div>'+
+          (p.content?'<div class="pulse-text">'+esc(p.content)+'</div>':'')+
+          '<div class="pulse-foot">'+tag+'<button class="pulse-report" type="button" onclick="reportPost(\''+esc(p.id)+'\',this)">Report</button></div>'+
+        '</div></div>';
+    }).join('');
+  };
+
+  // Report: increments a flag; soft-hide handled by you. Here we just record + thank.
+  window.reportPost=async function(id,btn){
+    if(typeof sb==='undefined')return;
+    btn.textContent='Reported';btn.disabled=true;btn.style.color='var(--mist)';
+    try{await sb.from('post_reports').insert({post_id:id});}catch(e){/* table optional */}
+  };
+
+  // Composer
+  var overlay=document.getElementById('postComposer'),body=document.getElementById('pcBody'),
+      txt=document.getElementById('pcText'),fileIn=document.getElementById('pcFile'),
+      photoName=document.getElementById('pcPhotoName'),handle=document.getElementById('pcHandle'),
+      msg=document.getElementById('pcMsg'),submit=document.getElementById('pcSubmit'),
+      closeBtn=document.getElementById('pcClose');
+  var chosen=null;var MAX=10*1024*1024;
+  // crude profanity/spam guard — blocks the most obvious before it posts
+  var BLOCK=/\b(nigger|faggot|kike|spic|chink|retard|rape|kill yourself|kys)\b/i;
+
+  window.openPostComposer=function(){overlay.hidden=false;document.body.style.overflow='hidden';};
   function close(){overlay.hidden=true;document.body.style.overflow='';}
   closeBtn.addEventListener('click',close);
   overlay.addEventListener('click',function(e){if(e.target===overlay)close();});
 
-  fileInput.addEventListener('change',function(){
-    var f=fileInput.files&&fileInput.files[0];if(!f)return;
-    if(f.size>MAX){msg.style.color='#ef4444';msg.textContent='Video must be under 50MB.';chosen=null;return;}
-    if(!/^video\//.test(f.type)){msg.style.color='#ef4444';msg.textContent='Please choose a video file.';chosen=null;return;}
-    chosen=f;msg.textContent='';
-    drop.classList.add('has-file');
-    dropTxt.innerHTML=f.name+'<br><span class="cu-hint">Tap to choose a different video</span>';
+  fileIn.addEventListener('change',function(){
+    var f=fileIn.files&&fileIn.files[0];if(!f)return;
+    if(f.size>MAX){msg.style.color='#ef4444';msg.textContent='Photo must be under 10MB.';chosen=null;photoName.textContent='';return;}
+    if(!/^image\//.test(f.type)){msg.style.color='#ef4444';msg.textContent='Please choose an image.';chosen=null;return;}
+    chosen=f;msg.textContent='';photoName.textContent=f.name;
   });
 
   submit.addEventListener('click',async function(){
-    if(!chosen){msg.style.color='#ef4444';msg.textContent='Choose a video first.';return;}
-    if(!handle.value.trim()){msg.style.color='#ef4444';msg.textContent='Add your @handle so you get credit.';return;}
+    var content=txt.value.trim();
+    if(!content&&!chosen){msg.style.color='#ef4444';msg.textContent='Add a few words or a photo.';return;}
+    if(BLOCK.test(content)){msg.style.color='#ef4444';msg.textContent='That post can\u2019t go up. Keep it community-friendly.';return;}
     if(typeof sb==='undefined'){msg.style.color='#ef4444';msg.textContent='Still loading, try again in a moment.';return;}
-    // require sign-in for accountability
     var sess=await sb.auth.getSession();
     var user=sess&&sess.data&&sess.data.session&&sess.data.session.user;
-    if(!user){msg.style.color='#ef4444';msg.innerHTML='Please <a href="signup.html" style="color:var(--flame);text-decoration:underline">sign in</a> to share a clip.';return;}
-
-    submit.disabled=true;msg.style.color='var(--sub)';msg.textContent='Uploading...';
+    if(!user){msg.style.color='#ef4444';msg.innerHTML='Please <a href="signup.html" style="color:var(--flame);text-decoration:underline">sign in</a> to post.';return;}
+    submit.disabled=true;msg.style.color='var(--sub)';msg.textContent='Posting...';
     try{
-      var ext=(chosen.name.split('.').pop()||'mp4').toLowerCase();
-      var path=user.id+'/'+Date.now()+'.'+ext;
-      var up=await sb.storage.from('clips').upload(path,chosen,{upsert:true,contentType:chosen.type});
-      if(up.error){msg.style.color='#ef4444';msg.textContent='Upload failed: '+up.error.message;submit.disabled=false;return;}
-      var pub=sb.storage.from('clips').getPublicUrl(path);
-      var videoUrl=pub.data.publicUrl;
-      var h=handle.value.trim();if(h[0]!=='@')h='@'+h;
-      var ins=await sb.from('clips').insert({
+      var imageUrl=null;
+      if(chosen){
+        var ext=(chosen.name.split('.').pop()||'jpg').toLowerCase();
+        var path=user.id+'/'+Date.now()+'.'+ext;
+        var up=await sb.storage.from('attachments').upload(path,chosen,{upsert:true,contentType:chosen.type});
+        if(up.error){msg.style.color='#ef4444';msg.textContent='Photo upload failed: '+up.error.message;submit.disabled=false;return;}
+        imageUrl=sb.storage.from('attachments').getPublicUrl(path).data.publicUrl;
+      }
+      var name=handle.value.trim()||(user.email?user.email.split('@')[0]:'Someone');
+      var ins=await sb.from('community_posts').insert({
         user_id:user.id,
-        video_url:videoUrl,
-        caption:caption.value.trim()||null,
-        creator_handle:h,
-        creator_url:urlIn.value.trim()||null,
-        status:'pending',
-        type:'attendee'
+        display_name:name,
+        content:content||null,
+        image_url:imageUrl,
+        post_type:'pulse',
+        is_visible:true
       });
-      if(ins.error){msg.style.color='#ef4444';msg.textContent='Could not save: '+ins.error.message;submit.disabled=false;return;}
-      body.innerHTML='<div style="text-align:center;padding:24px 8px"><div style="font-size:34px;margin-bottom:12px">&#127881;</div><div style="font-weight:700;font-size:17px;color:var(--ink);margin-bottom:6px">Clip submitted</div><div style="font-size:13px;color:var(--sub,#55556a);line-height:1.5">Thanks! We review clips before they go live. Keep an eye on the homepage.</div></div>';
+      if(ins.error){msg.style.color='#ef4444';msg.textContent='Could not post: '+ins.error.message;submit.disabled=false;return;}
+      body.innerHTML='<div style="text-align:center;padding:22px 8px"><div style="font-size:32px;margin-bottom:10px">&#128227;</div><div style="font-weight:700;font-size:17px;color:var(--ink);margin-bottom:6px">You\u2019re on the feed</div><div style="font-size:13px;color:var(--sub,#55556a);line-height:1.5">Your post is live. Refresh to see it in the pulse.</div></div>';
+      if(window.loadPulseFeed)setTimeout(window.loadPulseFeed,800);
     }catch(err){msg.style.color='#ef4444';msg.textContent='Something went wrong. Try again.';submit.disabled=false;}
   });
 })();
