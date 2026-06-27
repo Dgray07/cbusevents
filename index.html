@@ -2217,6 +2217,7 @@ loadRecapClips();
         content:content||null,
         image_url:imageUrl,
         post_type:'pulse',
+        role:'attendee',
         is_visible:true
       });
       if(ins.error){msg.style.color='#ef4444';msg.textContent='Could not post: '+ins.error.message;submit.disabled=false;return;}
