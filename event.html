@@ -625,7 +625,8 @@ function renderTickets(event, tiers) {
           <div class="free-badge-sub">No ticket required to attend</div>
         </div>
       </div>
-      <button class="btn-ticketmaster" style="background:var(--surface);color:var(--orange);border:1px solid var(--orange-border)" onclick="copyLink()">Share This Event</button>`;
+      <button class="btn-ticketmaster" onclick="addToCalendar()">Add to Calendar</button>
+      <button class="btn-ticketmaster" style="background:var(--surface);color:var(--orange);border:1px solid var(--orange-border);margin-top:8px" onclick="copyLink()">Share This Event</button>`;
     return;
   }
 
@@ -1024,23 +1025,49 @@ if (!params.get('id') && params.get('event')) {
     var card=document.querySelector('.ticket-card')||cardBody;
     if(card){ card.scrollIntoView({behavior:'smooth',block:'center'}); setTimeout(flashCard,420); }
   }
+  // Build a Google Calendar "add event" link from the current event.
+  function buildCalendarUrl(){
+    try{
+      var e=currentEvent; if(!e||!e.start_time) return null;
+      function z(d){ return new Date(d).toISOString().replace(/[-:]/g,'').replace(/\.\d{3}/,''); }
+      var start=z(e.start_time);
+      var end=e.end_time?z(e.end_time):z(new Date(new Date(e.start_time).getTime()+2*60*60*1000));
+      var loc='';
+      if(e.venues&&e.venues.name){ loc=e.venues.name+(e.venues.address?', '+e.venues.address:''); }
+      else if(e.venue_name_override){ loc=e.venue_name_override; }
+      var params=new URLSearchParams({
+        action:'TEMPLATE',
+        text:e.title||'Event',
+        dates:start+'/'+end,
+        details:(e.description||'').slice(0,300)+'\n\nvia CBUSEVENTS',
+        location:loc
+      });
+      return 'https://www.google.com/calendar/render?'+params.toString();
+    }catch(err){ return null; }
+  }
+  function addToCalendar(){
+    var url=buildCalendarUrl();
+    if(url){ window.open(url,'_blank','noopener'); }
+    else { scrollToTickets(); }
+  }
+  window.addToCalendar=addToCalendar;
   function setupSticky(){
     if(stickyReady||!ready()) return;
-    var label='', sub='Secure checkout';
+    var label='', sub='Secure checkout', btnLabel='Get tickets', isFreeEvent=false;
     try{
       if(typeof currentEvent!=='undefined' && currentEvent && currentEvent.is_third_party){
-        label='Get tickets'; sub='Via '+(currentEvent.ticket_source||'partner');
+        label='Get tickets'; sub='Via '+(currentEvent.ticket_source||'partner'); btnLabel='Get tickets';
       } else if(typeof currentEvent!=='undefined' && currentEvent && currentEvent.is_free){
-        label='Free event'; sub='No ticket required';
+        label='Free event'; sub='No ticket required'; btnLabel='Add to calendar'; isFreeEvent=true;
       } else if(window._eventTiers){
         var ps=Object.values(window._eventTiers).map(function(t){return t.price;}).filter(function(p){return p>0;});
-        if(ps.length){ label='From $'+Math.min.apply(null,ps); }
-        else { label='Free'; sub='No ticket required'; }
+        if(ps.length){ label='From $'+Math.min.apply(null,ps); btnLabel='Get tickets'; }
+        else { label='Free'; sub='No ticket required'; btnLabel='Add to calendar'; isFreeEvent=true; }
       }
     }catch(e){}
     if(priceEl) priceEl.textContent=label||'Get tickets';
     if(subEl) subEl.textContent=sub;
-    if(btn) btn.addEventListener('click',scrollToTickets);
+    if(btn){ btn.textContent=btnLabel; btn.addEventListener('click', isFreeEvent?addToCalendar:scrollToTickets); }
     stickyReady=true;
 
     var desc=document.getElementById('eventDesc');
