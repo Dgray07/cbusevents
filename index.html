@@ -21,6 +21,10 @@
 <meta name="twitter:title" content="CBUSEVENTS - Columbus's Event Ecosystem">
 <meta name="twitter:image" content="https://cbusevents.com/assets/cbus-shield.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://toblgvatvsjljbqogzsv.supabase.co">
+<link rel="preconnect" href="https://cdn.jsdelivr.net">
+<link rel="preload" as="script" href="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js">
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700;1,900&family=DM+Sans:wght@300;400;500;600;700;800;900&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/cbus.css?v=1">
 <style>
@@ -797,8 +801,9 @@ body{-webkit-tap-highlight-color:rgba(0,0,0,0);}
 [data-theme="light"] .cbx-theater .rail-all:hover{color:var(--flame);}
 [data-theme="light"] .cbx-theater .rail-fade.l{background:linear-gradient(90deg,#fff,transparent);}
 [data-theme="light"] .cbx-theater .rail-fade.r{background:linear-gradient(270deg,#fff,transparent);}
-.cbx-theater .cbx-rev{opacity:0;transform:translateY(18px);transition:opacity .6s ease,transform .6s ease;}
-.cbx-theater .cbx-rev.cbx-in{opacity:1;transform:none;}
+.cbx-theater .cbx-rev{opacity:1;transform:none;transition:opacity .6s ease,transform .6s ease;}
+.cbx-theater.cbx-anim-ready .cbx-rev{opacity:0;transform:translateY(18px);}
+.cbx-theater.cbx-anim-ready .cbx-rev.cbx-in{opacity:1;transform:none;}
 /* marquee */
 .cbx-theater .marquee{position:relative;height:74vh;min-height:500px;max-height:720px;overflow:hidden;display:flex;align-items:flex-end;}
 .cbx-theater .mq-reel{position:absolute;inset:0;z-index:0;background:#0d0a07;}
@@ -1975,9 +1980,22 @@ loadRecapClips();
       wrap.querySelectorAll('.rail-arrow').forEach(function(btn){btn.addEventListener('click',function(){vp.scrollBy({left:(+btn.dataset.dir)*vp.clientWidth*0.82,behavior:'smooth'});});});
       sync();
     });
+  }
+  // Reveal animation runs early and independently of data loading, so the
+  // page is never gated on Supabase. Rails are visible by default (CSS);
+  // this only adds the slide-up flourish when JS is ready promptly.
+  function initRevealAnim(){
+    var theater=document.querySelector('.cbx-theater');
+    if(!theater||!('IntersectionObserver' in window)) return;
+    theater.classList.add('cbx-anim-ready');
     var io=new IntersectionObserver(function(es){es.forEach(function(x){if(x.isIntersecting){x.target.classList.add('cbx-in');io.unobserve(x.target);}});},{threshold:0.1});
     document.querySelectorAll('.cbx-theater .cbx-rev').forEach(function(el){io.observe(el);});
+    // Safety net: if anything prevents the observer from firing, force all
+    // rails visible after 1.2s so content can never stay hidden.
+    setTimeout(function(){document.querySelectorAll('.cbx-theater .cbx-rev:not(.cbx-in)').forEach(function(el){el.classList.add('cbx-in');});},1200);
   }
+  if(document.readyState!=='loading'){initRevealAnim();}
+  else{document.addEventListener('DOMContentLoaded',initRevealAnim);}
   loadTheater();
 })();
 
