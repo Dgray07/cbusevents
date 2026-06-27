@@ -963,6 +963,9 @@ body{-webkit-tap-highlight-color:rgba(0,0,0,0);}
 .cbx-theater .rl-play{position:absolute;top:14px;left:14px;color:rgba(255,255,255,.92);font-size:15px;filter:drop-shadow(0 1px 4px rgba(0,0,0,.5));}
 .cbx-theater .rl-shop{position:absolute;top:12px;right:12px;font-family:var(--mono);font-size:8px;letter-spacing:.1em;text-transform:uppercase;background:var(--flame);color:#fff;padding:3px 7px;border-radius:5px;}
 .cbx-theater .rl-cap{position:relative;z-index:1;width:100%;padding:14px 12px;font-family:var(--mono);font-size:9.5px;letter-spacing:.02em;color:#fff;background:linear-gradient(transparent,rgba(8,6,4,.85));}
+.cbx-theater .reel-empty{border:1.5px dashed rgba(255,107,53,.5);background:linear-gradient(165deg,rgba(255,107,53,.12),rgba(15,11,7,.6));cursor:pointer;flex-direction:column;align-items:center;justify-content:center;}
+.cbx-theater .reel-empty .rl-cap{background:none;text-align:center;color:#FF6B35;font-weight:700;}
+.cbx-theater .reel-empty .rl-play{position:static;font-size:22px;color:#FF6B35;margin-bottom:6px;}
 /* neighborhood tile */
 .cbx-theater .hood{position:relative;width:300px;height:178px;border-radius:12px;overflow:hidden;text-decoration:none;color:#fff;background:linear-gradient(135deg,#241a13,#15110d);border:1px solid rgba(250,247,242,.07);transition:transform .28s cubic-bezier(.2,.7,.2,1),border-color .2s;display:flex;flex-direction:column;justify-content:flex-end;padding:18px;}
 .cbx-theater .hood:hover{transform:translateY(-6px);border-color:rgba(255,107,53,.5);}
@@ -2043,8 +2046,9 @@ loadRecapClips();
         }).join(''));
         if(reelRail){reelRail.querySelectorAll('.reel').forEach(function(btn){btn.addEventListener('click',function(){openClipPlayer(parseInt(btn.dataset.clip));});});}
       }else{
-        var reelSection=reelRail&&reelRail.closest('.rail');
-        if(reelSection)reelSection.style.display='none';
+        fill('cbx-reels','<button type="button" class="reel reel-empty" onclick="openClipUpload()"><span class="rl-play">&#9654;</span><span class="rl-cap">Be the first to share a clip from your night &rarr;</span></button>');
+        var er=document.getElementById('cbx-reels');
+        if(er){var b=er.querySelector('.reel-empty');if(b)b.addEventListener('click',function(){openClipUpload();});}
       }
     }catch(e){console.warn('theater clips',e);}
 
