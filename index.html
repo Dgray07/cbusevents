@@ -2214,10 +2214,10 @@ loadRecapClips();
       var ins=await sb.from('community_posts').insert({
         user_id:user.id,
         display_name:name,
-        content:content||null,
+        content:content||' ',
         image_url:imageUrl,
-        post_type:'pulse',
-        role:'attendee',
+        post_type:'update',
+        role:'creator',
         is_visible:true
       });
       if(ins.error){msg.style.color='#ef4444';msg.textContent='Could not post: '+ins.error.message;submit.disabled=false;return;}
