@@ -2930,6 +2930,55 @@ function eventItemHTML(e){
    +'</div></div>';
 }
 
+// Upload an event cover image to Supabase Storage, then put the public URL
+// into the evCover field (which saveEvent already reads). Replaces the old
+// paste-a-link-only flow so organizers can upload a photo directly.
+async function uploadEventCover(input){
+  const file = input.files && input.files[0];
+  if(!file) return;
+  const msg = document.getElementById('evCoverMsg');
+  if(file.size > 5 * 1024 * 1024){
+    msg.style.color = '#ef4444';
+    msg.textContent = 'Image must be under 5MB';
+    input.value = '';
+    return;
+  }
+  msg.style.color = 'var(--muted)';
+  msg.textContent = 'Uploading...';
+
+  const ext = (file.name.split('.').pop() || 'jpg').toLowerCase();
+  const uid = (currentUser && currentUser.id) ? currentUser.id : 'anon';
+  const path = `${uid}/${Date.now()}.${ext}`;
+
+  const { error: upErr } = await sb.storage
+    .from('event-covers')
+    .upload(path, file, { upsert: true, contentType: file.type });
+
+  if(upErr){
+    msg.style.color = '#ef4444';
+    msg.textContent = 'Upload failed: ' + upErr.message;
+    return;
+  }
+
+  const { data: urlData } = sb.storage.from('event-covers').getPublicUrl(path);
+  const publicUrl = urlData.publicUrl;
+
+  document.getElementById('evCover').value = publicUrl;
+  const prev = document.getElementById('evCoverPreview');
+  prev.src = publicUrl;
+  prev.style.display = 'block';
+  msg.style.color = '#22c55e';
+  msg.textContent = 'Uploaded';
+}
+
+// Keep the preview in sync if someone pastes a URL manually.
+function syncCoverPreview(){
+  const url = document.getElementById('evCover').value.trim();
+  const prev = document.getElementById('evCoverPreview');
+  if(url){ prev.src = url; prev.style.display = 'block'; }
+  else { prev.style.display = 'none'; }
+}
+
 async function editEvent(id){
  const e=myEvents.find(function(x){return x.id===id;});
  if(!e)return;
@@ -3121,7 +3170,15 @@ function openAddEventModal(editEvent){
        '<div class="field"><label>End Date</label><input id="evEndDate" type="date" value="'+(ev&&ev.end_time?ev.end_time.slice(0,10):'')+'"></div>'+
        '<div class="field"><label>End Time</label><input id="evEndTime" type="time" value="'+(ev&&ev.end_time?ev.end_time.slice(11,16):'')+'"></div>'+
      '</div>'+
-     '<div class="field"><label>Cover Image URL</label><input id="evCover" placeholder="https://... paste an image link" value="'+(ev?ev.cover_image_url||'':'')+'"></div>'+
+     '<div class="field"><label>Cover Image</label>'+
+       '<div style="display:flex;gap:8px;align-items:center;margin-bottom:8px">'+
+         '<button type="button" onclick="document.getElementById(\'evCoverFile\').click()" style="background:#FF6B3520;color:#FF6B35;border:1px solid #FF6B3540;border-radius:6px;padding:8px 14px;font-size:13px;font-weight:700;cursor:pointer;font-family:\'Inter\',sans-serif;white-space:nowrap">Upload photo</button>'+
+         '<span id="evCoverMsg" style="font-size:12px;color:var(--muted)"></span>'+
+       '</div>'+
+       '<input id="evCoverFile" type="file" accept="image/*" style="display:none" onchange="uploadEventCover(this)">'+
+       '<img id="evCoverPreview" src="'+(ev&&ev.cover_image_url?ev.cover_image_url:'')+'" style="'+(ev&&ev.cover_image_url?'':'display:none;')+'max-width:100%;max-height:160px;border-radius:8px;border:1px solid var(--border);margin-bottom:8px;object-fit:cover">'+
+       '<input id="evCover" placeholder="...or paste an image link" value="'+(ev?ev.cover_image_url||'':'')+'" oninput="syncCoverPreview()" style="font-size:12px">'+
+     '</div>'+
      '<div style="height:1px;background:var(--border);margin:16px 0"></div>'+
      '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">'+
        '<div><div style="font-family:\'Inter\',sans-serif;font-weight:700;font-size:13px">Ticket Tiers</div>'+
