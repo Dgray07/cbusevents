@@ -1903,7 +1903,8 @@ populateHero();
 async function loadRecapClips(){
   try{
     if(typeof sb==='undefined')return;
-    const{data:clips}=await sb.from('clips').select('id,type,video_url,thumbnail_url,product_url,caption,event_id,creator_handle,creator_url').eq('status','approved').order('created_at',{ascending:false}).limit(8);
+    let{data:clips,error:clErr}=await sb.from('clips').select('id,type,video_url,thumbnail_url,product_url,caption,event_id,creator_handle,creator_url').eq('status','approved').order('created_at',{ascending:false}).limit(8);
+    if(clErr){({data:clips}=await sb.from('clips').select('id,type,video_url,thumbnail_url,product_url,caption').eq('status','approved').order('created_at',{ascending:false}).limit(8));}
     if(!clips||!clips.length)return;
     const box=document.getElementById('recap-clips');
     if(!box)return;
@@ -2033,8 +2034,16 @@ loadRecapClips();
       if(spotCards.length)fill('cbx-spots',spotCards.join(''));
     }catch(e){console.warn('theater gigs',e);}
 
+    function renderEmptyClips(){
+      fill('cbx-reels','<button type="button" class="reel reel-empty" onclick="openClipUpload()"><span class="rl-play">&#9654;</span><span class="rl-cap">Be the first to share a clip from your night &rarr;</span></button>');
+      var er=document.getElementById('cbx-reels');
+      if(er){var b=er.querySelector('.reel-empty');if(b)b.addEventListener('click',function(){openClipUpload();});}
+    }
     try{
       var cl=await sb.from('clips').select('id,type,video_url,thumbnail_url,product_url,caption,event_id,creator_handle,creator_url').eq('status','approved').order('created_at',{ascending:false}).limit(12);
+      if(cl.error){
+        cl=await sb.from('clips').select('id,type,video_url,thumbnail_url,product_url,caption').eq('status','approved').order('created_at',{ascending:false}).limit(12);
+      }
       var cs=cl.data||[];
       window._clips=cs;
       var reelRail=document.getElementById('cbx-reels');
@@ -2046,11 +2055,9 @@ loadRecapClips();
         }).join(''));
         if(reelRail){reelRail.querySelectorAll('.reel').forEach(function(btn){btn.addEventListener('click',function(){openClipPlayer(parseInt(btn.dataset.clip));});});}
       }else{
-        fill('cbx-reels','<button type="button" class="reel reel-empty" onclick="openClipUpload()"><span class="rl-play">&#9654;</span><span class="rl-cap">Be the first to share a clip from your night &rarr;</span></button>');
-        var er=document.getElementById('cbx-reels');
-        if(er){var b=er.querySelector('.reel-empty');if(b)b.addEventListener('click',function(){openClipUpload();});}
+        renderEmptyClips();
       }
-    }catch(e){console.warn('theater clips',e);}
+    }catch(e){console.warn('theater clips',e);renderEmptyClips();}
 
     initRails();
   }
