@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+  <link rel="stylesheet" href="/cbus.css">
+  <link rel="stylesheet" href="/theme.css">
+  <script src="/theme.js"></script>
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title id="metaTitle">Venue — CBUSEVENTS</title>
+<meta name="description" id="metaDesc" content="Browse and book Columbus event venues through CBUSEVENTS.">
+<meta property="og:title" id="ogTitle" content="Columbus Venue — CBUSEVENTS">
+<meta property="og:description" id="ogDesc" content="Book the space direct or let CBUS Events produce your event end to end.">
+<meta property="og:image" id="ogImage" content="https://cbusevents.com/social-share.jpg">
+<meta property="og:type" content="business.business">
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-P70BRSL5E5"></script>
+<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-P70BRSL5E5');</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700;9..40,800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<style>
+:root{
+  --bg:#080810;--surface:#0d0d1a;--card:#0f0f1e;--card-hover:#131325;
+  --border:rgba(255,255,255,0.07);--border-mid:rgba(255,255,255,0.11);
+  --orange:#FF6B35;--orange-soft:rgba(255,107,53,0.1);--orange-glow:rgba(255,107,53,0.22);
+  --text:#eeeef8;--text-dim:#7878a0;--text-faint:#3a3a58;
+  --green:#34d399;--gold:#fbbf24;
+  --mono:'DM Mono',monospace;--sans:'DM Sans',sans-serif;
+}
+*{box-sizing:border-box;}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);margin:0;-webkit-font-smoothing:antialiased;}
+a{text-decoration:none;color:inherit;}
+img{display:block;max-width:100%;}
+
+.crumb{max-width:1200px;margin:0 auto;padding:20px 32px 0;}
+.crumb a{font-family:var(--mono);font-size:12px;letter-spacing:0.06em;color:var(--text-dim);transition:color 0.15s;}
+.crumb a:hover{color:var(--orange);}
+
+.vhero{max-width:1200px;margin:16px auto 0;padding:0 32px;}
+.vhero-cover{position:relative;height:400px;border-radius:20px;overflow:hidden;background:linear-gradient(135deg,#1a0e2e,#0f0f1e);display:flex;align-items:flex-end;}
+.vhero-cover img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;}
+.vhero-glyph{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:110px;opacity:0.16;}
+.vhero-scrim{position:absolute;inset:0;background:linear-gradient(to top,rgba(8,8,16,0.94) 0%,rgba(8,8,16,0.25) 55%,transparent 100%);}
+.vhero-content{position:relative;padding:34px 38px;width:100%;}
+.vhero-tags{display:flex;gap:10px;align-items:center;margin-bottom:14px;flex-wrap:wrap;}
+.vtag{font-family:var(--mono);font-size:10px;font-weight:500;letter-spacing:0.1em;text-transform:uppercase;padding:5px 12px;border-radius:100px;}
+.vtag-type{background:var(--orange-soft);color:var(--orange);border:1px solid var(--orange-glow);}
+.vtag-cap{background:rgba(0,0,0,0.5);color:rgba(255,255,255,0.85);border:1px solid var(--border-mid);backdrop-filter:blur(6px);}
+.vtag-fs{background:rgba(52,211,153,0.14);color:var(--green);border:1px solid rgba(52,211,153,0.3);display:flex;align-items:center;gap:6px;}
+.vtag-fs::before{content:'';width:5px;height:5px;border-radius:50%;background:var(--green);}
+.vhero-name{font-family:var(--sans);font-size:44px;font-weight:800;letter-spacing:-0.03em;line-height:1.05;color:#fff;margin:0;}
+.vhero-hood{font-size:15px;color:#c0c0d4;margin-top:10px;display:flex;align-items:center;gap:6px;}
+
+.vwrap{max-width:1200px;margin:0 auto;padding:36px 32px 0;display:grid;grid-template-columns:1fr 360px;gap:40px;align-items:start;}
+.vmain{min-width:0;}
+.vsection{margin-bottom:38px;}
+.vsection h2{font-family:var(--sans);font-size:22px;font-weight:800;letter-spacing:-0.02em;margin:0 0 14px;}
+.vsection p{font-size:15px;line-height:1.7;color:#c8c8dc;margin:0;}
+.vtag-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px;}
+.pill{font-size:12px;padding:6px 14px;border-radius:100px;background:rgba(255,255,255,0.04);border:1px solid var(--border);color:var(--text-dim);}
+
+.book-opts{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+.book-opt{padding:20px;border-radius:14px;border:1px solid var(--border);background:var(--surface);}
+.book-opt.on{border-color:var(--orange-glow);background:linear-gradient(150deg,rgba(255,107,53,0.06),var(--surface));}
+.book-opt-label{font-family:var(--mono);font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--orange);margin-bottom:10px;}
+.book-opt h3{font-family:var(--sans);font-size:17px;font-weight:800;margin:0 0 8px;color:var(--text);}
+.book-opt p{font-size:13px;line-height:1.6;color:var(--text-dim);margin:0;}
+
+.amen-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;}
+.amen{display:flex;align-items:center;gap:10px;font-size:14px;color:#c8c8dc;padding:12px 14px;background:var(--surface);border:1px solid var(--border);border-radius:10px;}
+.amen::before{content:'✓';color:var(--green);font-weight:700;}
+
+.map-box{border-radius:14px;overflow:hidden;border:1px solid var(--border);background:linear-gradient(135deg,#0d1420,#0f0f1e);padding:26px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;}
+.map-loc{font-size:15px;color:var(--text);display:flex;align-items:center;gap:8px;}
+.map-cta{font-family:var(--mono);font-size:12px;letter-spacing:0.06em;color:var(--orange);border:1px solid var(--orange-glow);background:var(--orange-soft);padding:10px 18px;border-radius:8px;}
+
+.vside{position:sticky;top:82px;}
+.inquiry{background:var(--card);border:1px solid var(--border-mid);border-radius:18px;padding:24px;}
+.inquiry h3{font-family:var(--sans);font-size:20px;font-weight:800;margin:0 0 4px;}
+.inquiry-sub{font-size:12.5px;color:var(--text-dim);margin:0 0 20px;line-height:1.5;}
+.field{margin-bottom:12px;}
+.field label{display:block;font-family:var(--mono);font-size:10px;letter-spacing:0.08em;text-transform:uppercase;color:var(--text-faint);margin-bottom:6px;}
+.field input,.field textarea,.field select{width:100%;background:var(--surface);border:1px solid var(--border);border-radius:9px;padding:11px 13px;color:var(--text);font-family:var(--sans);font-size:14px;outline:none;transition:border-color 0.15s;}
+.field input:focus,.field textarea:focus,.field select:focus{border-color:var(--orange-glow);}
+.field textarea{resize:vertical;min-height:70px;}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.inquiry-btn{width:100%;margin-top:8px;padding:14px;background:var(--orange);color:#fff;font-family:var(--sans);font-weight:700;font-size:15px;border:none;border-radius:10px;cursor:pointer;transition:opacity 0.15s;}
+.inquiry-btn:hover{opacity:0.92;}
+.inquiry-btn:disabled{opacity:0.6;cursor:default;}
+.inquiry-note{font-size:11px;color:var(--text-faint);text-align:center;margin-top:12px;line-height:1.5;}
+.inquiry-status{font-size:12px;min-height:16px;margin-top:6px;color:#f87171;}
+
+.skeleton{opacity:0.5;}
+@keyframes pulse{0%,100%{opacity:0.4;}50%{opacity:0.7;}}
+.loading-block{animation:pulse 1.4s ease-in-out infinite;}
+
+@media(max-width:900px){
+  .vwrap{grid-template-columns:1fr;}
+  .vside{position:static;}
+  .vhero-name{font-size:32px;}
+  .vhero-cover{height:300px;}
+  .book-opts{grid-template-columns:1fr;}
+}
+@media(max-width:560px){
+  .vhero,.vwrap,.crumb{padding-left:20px;padding-right:20px;}
+  .amen-grid{grid-template-columns:1fr;}
+}
+</style>
+</head>
+<body>
+
+<!-- NAV (injected) -->
+<div id="cb-nav"></div>
+<div class="site-mobile-menu" id="siteMobileMenu">
+  <a href="https://cbusevents.com" class="nav-mobile-link">Home</a>
+  <a href="https://cbusevents.com/venues.html" class="nav-mobile-link active">Venues</a>
+  <a href="https://cbusevents.com/vendors.html" class="nav-mobile-link">Vendors</a>
+  <a href="https://cbusevents.com/organizers.html" class="nav-mobile-link">Organizers</a>
+  <a href="https://cbusevents.com/blog.html" class="nav-mobile-link">Blog</a>
+</div>
+
+<div class="crumb"><a href="https://cbusevents.com/venues.html">← All Columbus venues</a></div>
+
+<div id="venueContent">
+  <!-- Filled by JS -->
+  <div class="vhero"><div class="vhero-cover loading-block"></div></div>
+</div>
+
+<div id="cb-footer"></div>
+
+<script>
+const sb=supabase.createClient(
+  'https://toblgvatvsjljbqogzsv.supabase.co',
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRvYmxndmF0dnNqbGpicW9nenN2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMDgwNTAsImV4cCI6MjA4NzY4NDA1MH0._WJEQPizNDiQfDXQB_DHPaQhixPGpMdmYQSmyWmm_FQ'
+);
+
+const VENUE_ICONS={'bar':'🍹','lounge':'🍹','nightlife':'🎵','restaurant':'🍽','food':'🍽','event':'🎪','space':'🎪','rooftop':'🌆','comedy':'😂','concert':'🎸','music':'🎸','gallery':'🎨','art':'🎨','outdoor':'🌿','hotel':'🏨','historic':'🏛'};
+function getIcon(v){const t=(v.venue_type||'').toLowerCase();for(const[k,ic] of Object.entries(VENUE_ICONS)){if(t.includes(k))return ic;}return '📍';}
+function esc(s){return (s==null?'':String(s)).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
+
+let VENUE=null;
+
+function getId(){return new URLSearchParams(location.search).get('id');}
+
+function setMeta(v){
+  const loc=v.neighborhood||v.city||'Columbus';
+  const cap=v.capacity?`Up to ${v.capacity} guests. `:'';
+  document.getElementById('metaTitle').textContent=`${v.name} — ${loc} venue | CBUSEVENTS`;
+  document.title=`${v.name} — ${loc} venue | CBUSEVENTS`;
+  const desc=`${cap}Book ${v.name} in ${loc}, or let CBUS Events produce the whole event.`;
+  document.getElementById('metaDesc').setAttribute('content',desc);
+  document.getElementById('ogTitle').setAttribute('content',`${v.name} — ${loc}`);
+  document.getElementById('ogDesc').setAttribute('content',desc);
+  if(v.cover_image_url)document.getElementById('ogImage').setAttribute('content',v.cover_image_url);
+}
+
+function renderVenue(v){
+  const icon=getIcon(v);
+  const loc=v.neighborhood||v.city||'Columbus, OH';
+  const cover=v.cover_image_url
+    ? `<img src="${esc(v.cover_image_url)}" alt="${esc(v.name)}">`
+    : `<div class="vhero-glyph">${icon}</div>`;
+  const fsTag=v.full_service?`<span class="vtag vtag-fs">Full-service available</span>`:'';
+  const capTag=v.capacity?`<span class="vtag vtag-cap">Up to ${v.capacity} guests</span>`:'';
+  const tags=(v.tags||[]).map(t=>`<span class="pill">${esc(t)}</span>`).join('');
+  const amenities=(v.amenities||[]).map(a=>`<div class="amen">${esc(a)}</div>`).join('');
+  const mapQuery=encodeURIComponent(`${v.name}, ${loc}, Columbus OH`);
+
+  // Full-service door only when this venue offers it
+  const fsDoor=v.full_service
+    ? `<div class="book-opt on"><div class="book-opt-label">Full-service</div><h3>Let us run it</h3><p>CBUS Events handles production, staffing, and vendor tables end to end — every booth managed from both sides. You show up to a finished event.</p></div>`
+    : `<div class="book-opt"><div class="book-opt-label">Full-service</div><h3>Ask about production</h3><p>Want it handled? CBUS Events can staff, market, and run the event for you. Mention it in your inquiry.</p></div>`;
+
+  document.getElementById('venueContent').innerHTML=`
+  <header class="vhero">
+    <div class="vhero-cover">
+      ${cover}
+      <div class="vhero-scrim"></div>
+      <div class="vhero-content">
+        <div class="vhero-tags">
+          <span class="vtag vtag-type">${esc(v.venue_type||'Venue')}</span>
+          ${capTag}${fsTag}
+        </div>
+        <h1 class="vhero-name">${esc(v.name)}</h1>
+        <div class="vhero-hood">📍 ${esc(loc)}</div>
+      </div>
+    </div>
+  </header>
+
+  <div class="vwrap">
+    <div class="vmain">
+      ${v.description?`<section class="vsection"><h2>About the space</h2><p>${esc(v.description)}</p>${tags?`<div class="vtag-row">${tags}</div>`:''}</section>`:(tags?`<section class="vsection"><h2>Good for</h2><div class="vtag-row">${tags}</div></section>`:'')}
+
+      <section class="vsection">
+        <h2>Ways to book</h2>
+        <div class="book-opts">
+          <div class="book-opt"><div class="book-opt-label">Direct</div><h3>Book the room</h3><p>Send an inquiry and coordinate your date with the space. You bring the plan, they provide the venue.</p></div>
+          ${fsDoor}
+        </div>
+      </section>
+
+      ${amenities?`<section class="vsection"><h2>Amenities</h2><div class="amen-grid">${amenities}</div></section>`:''}
+
+      <section class="vsection">
+        <h2>Where it is</h2>
+        <div class="map-box">
+          <div class="map-loc">📍 ${esc(loc)}${v.city&&v.neighborhood?`, ${esc(v.city)}`:''}</div>
+          <a class="map-cta" href="https://www.google.com/maps/search/?api=1&query=${mapQuery}" target="_blank" rel="noopener">Get directions →</a>
+        </div>
+      </section>
+
+      ${v.website?`<section class="vsection"><h2>More</h2><a style="color:var(--orange);font-size:14px" href="${esc(v.website)}" target="_blank" rel="noopener">${esc(v.website)} →</a></section>`:''}
+    </div>
+
+    <aside class="vside">
+      <div class="inquiry">
+        <h3>Send an inquiry</h3>
+        <p class="inquiry-sub">Tell the CBUS team about your event. We'll confirm availability and options.</p>
+        <div id="inquiryForm">
+          <div class="field"><label>Event date</label><input id="bkDate" type="date" min="${new Date().toISOString().split('T')[0]}"></div>
+          <div class="field-row">
+            <div class="field"><label>Event type</label>
+              <select id="bkType"><option value="">Select...</option><option>Wedding</option><option>Birthday</option><option>Corporate</option><option>Baby Shower</option><option>Anniversary</option><option>Graduation</option><option>Holiday Party</option><option>Networking</option><option>Concert</option><option>Pop-Up</option><option>Other</option></select>
+            </div>
+            <div class="field"><label>Guests</label><input id="bkGuests" type="number" min="1" placeholder="e.g. 75"></div>
+          </div>
+          <div class="field"><label>Message</label><textarea id="bkMsg" placeholder="A few words about the event..."></textarea></div>
+          <div class="inquiry-status" id="bkStatus"></div>
+          <button class="inquiry-btn" id="bkSubmit" onclick="sendInquiry()">Send Inquiry</button>
+          <p class="inquiry-note">Free to inquire. Sign in as an organizer to send. No booking is confirmed until CBUS follows up.</p>
+        </div>
+      </div>
+    </aside>
+  </div>`;
+}
+
+function renderNotFound(){
+  document.getElementById('venueContent').innerHTML=`
+  <div class="vwrap" style="grid-template-columns:1fr;">
+    <div style="text-align:center;padding:80px 20px;">
+      <div style="font-size:40px;margin-bottom:12px">🔍</div>
+      <h2 style="font-family:var(--sans);font-size:24px;margin:0 0 8px">Venue not found</h2>
+      <p style="color:var(--text-dim);margin:0 0 24px">This venue may have been removed or the link is incomplete.</p>
+      <a href="https://cbusevents.com/venues.html" style="font-family:var(--mono);font-size:12px;letter-spacing:0.06em;text-transform:uppercase;color:#fff;background:var(--orange);padding:12px 24px;border-radius:8px">Browse all venues →</a>
+    </div>
+  </div>`;
+}
+
+// ── INQUIRY (reuses booking_requests flow + organizer auth gating) ──
+async function sendInquiry(){
+  const status=document.getElementById('bkStatus');
+  const btn=document.getElementById('bkSubmit');
+  const date=document.getElementById('bkDate')?.value;
+  status.style.color='#f87171';
+  if(!date){status.textContent='Please select an event date.';return;}
+
+  const {data:{session}}=await sb.auth.getSession();
+  if(!session){
+    localStorage.setItem('pendingVenueBooking', JSON.stringify({venueId:VENUE.id, returnTo:'venue', id:VENUE.id}));
+    window.location.href='https://cbusevents.com/signup.html?role=organizer';
+    return;
+  }
+  const {data:roles}=await sb.from('user_roles').select('role').eq('user_id',session.user.id);
+  const isOrganizer=(roles||[]).some(r=>r.role==='organizer'||r.role==='customer');
+  if(!isOrganizer){status.textContent='Sign in with an organizer account to send inquiries.';return;}
+
+  btn.textContent='Sending...';btn.disabled=true;
+  const {error}=await sb.from('booking_requests').insert({
+    venue_id:VENUE.id,
+    organizer_id:session.user.id,
+    organizer_name:session.user.user_metadata?.full_name||session.user.email.split('@')[0],
+    organizer_email:session.user.email,
+    event_date:date,
+    event_type:document.getElementById('bkType')?.value||null,
+    guest_count:parseInt(document.getElementById('bkGuests')?.value)||null,
+    message:document.getElementById('bkMsg')?.value||null,
+  });
+  if(error){
+    status.textContent='Could not send. Please try again.';
+    btn.textContent='Send Inquiry';btn.disabled=false;
+    return;
+  }
+  document.getElementById('inquiryForm').innerHTML=`
+  <div style="text-align:center;padding:20px 0">
+    <div style="width:44px;height:44px;border-radius:50%;background:rgba(52,211,153,0.15);border:1px solid rgba(52,211,153,0.4);display:flex;align-items:center;justify-content:center;margin:0 auto 14px;color:#34d399;font-size:22px">✓</div>
+    <div style="font-family:var(--sans);font-size:19px;font-weight:800;margin-bottom:6px">Inquiry sent</div>
+    <div style="font-size:13px;color:var(--text-dim);line-height:1.6">The CBUS team will reach out about ${esc(VENUE.name)} soon.</div>
+  </div>`;
+}
+window.sendInquiry=sendInquiry;
+
+// ── LOAD ──
+(async()=>{
+  const id=getId();
+  if(!id){renderNotFound();return;}
+  const {data,error}=await sb.from('venues')
+    .select('id,name,venue_type,neighborhood,city,capacity,description,cover_image_url,tags,amenities,phone,website,created_at,full_service')
+    .eq('id',id).maybeSingle();
+  // full_service may not exist as a column yet; retry without it if the select errors
+  let v=data;
+  if(error){
+    const retry=await sb.from('venues')
+      .select('id,name,venue_type,neighborhood,city,capacity,description,cover_image_url,tags,amenities,phone,website,created_at')
+      .eq('id',id).maybeSingle();
+    v=retry.data;
+  }
+  if(!v){renderNotFound();return;}
+  VENUE=v;
+  setMeta(v);
+  renderVenue(v);
+})();
+</script>
+
+<!-- mobile menu init -->
+<script>
+(function(){
+  var btn=document.getElementById('siteNavHamburger');
+  var menu=document.getElementById('siteMobileMenu');
+  if(!btn||!menu)return;
+  btn.addEventListener('click',function(e){e.stopPropagation();btn.classList.toggle('open');menu.classList.toggle('open');document.body.style.overflow=menu.classList.contains('open')?'hidden':'';});
+  document.addEventListener('keydown',function(e){if(e.key==='Escape'){btn.classList.remove('open');menu.classList.remove('open');document.body.style.overflow='';}});
+  menu.querySelectorAll('.nav-mobile-link').forEach(function(a){a.addEventListener('click',function(){btn.classList.remove('open');menu.classList.remove('open');document.body.style.overflow='';});});
+})();
+</script>
+
+<script src="/cbus-shell.js" defer></script>
+</body>
+</html>

@@ -80,8 +80,7 @@ nav{position:sticky;top:0;z-index:200;height:60px;display:flex;align-items:cente
 .venue-card:hover .card-cover img{transform:scale(1.04);}
 .card-cover-placeholder{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:44px;opacity:0.3;}
 .card-cover-gradient{position:absolute;inset:0;background:linear-gradient(to top,rgba(15,15,30,0.8) 0%,transparent 55%);}
-.card-tier-badge{position:absolute;top:12px;right:12px;font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;padding:3px 9px;border-radius:100px;}
-.badge-premium{background:rgba(251,191,36,0.15);color:var(--gold);border:1px solid rgba(251,191,36,0.3);}
+
 .badge-standard{background:var(--orange-soft);color:var(--orange);border:1px solid var(--orange-glow);}
 .card-capacity{position:absolute;bottom:12px;left:12px;font-family:var(--mono);font-size:10px;font-weight:600;color:rgba(255,255,255,0.7);background:rgba(0,0,0,0.5);padding:3px 9px;border-radius:100px;backdrop-filter:blur(4px);}
 
@@ -254,6 +253,29 @@ nav.site-nav{display:flex;align-items:center;justify-content:space-between;paddi
   .featured-section{padding:20px 20px 0;}
   .featured-grid{grid-template-columns:1fr;}
 }
+
+/* ── RAILS (default organizer browse) ── */
+.venue-rails{max-width:1280px;margin:0 auto;padding:8px 0 24px;}
+.venue-rail{margin-top:36px;}
+.rail-head{display:flex;align-items:baseline;gap:12px;padding:0 32px;margin-bottom:14px;}
+.rail-title{font-family:var(--sans);font-size:22px;font-weight:800;letter-spacing:-0.02em;color:var(--text);}
+.rail-meta{font-family:var(--mono);font-size:11px;color:var(--text-faint);letter-spacing:0.06em;}
+.rail-track{display:flex;gap:18px;overflow-x:auto;padding:4px 32px 12px;scroll-snap-type:x mandatory;scrollbar-width:none;}
+.rail-track::-webkit-scrollbar{display:none;}
+.rail-track > .venue-card{scroll-snap-align:start;flex:0 0 300px;}
+.card-fs-tag{position:absolute;top:12px;right:12px;font-family:var(--mono);font-size:9px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;padding:4px 10px;border-radius:100px;background:rgba(52,211,153,0.14);color:var(--green);border:1px solid rgba(52,211,153,0.3);display:flex;align-items:center;gap:5px;}
+.card-fs-tag::before{content:'';width:5px;height:5px;border-radius:50%;background:var(--green);}
+.owner-strip{max-width:1280px;margin:24px auto 0;padding:0 32px;}
+.owner-strip-inner{border:1px solid var(--border);border-radius:16px;padding:24px 30px;display:flex;align-items:center;justify-content:space-between;gap:24px;flex-wrap:wrap;background:linear-gradient(120deg,rgba(255,107,53,0.05),transparent 60%);}
+.owner-strip b{font-size:18px;font-weight:800;color:var(--text);}
+.owner-strip p{font-size:13px;color:var(--text-dim);margin-top:4px;}
+.owner-strip a{font-family:var(--mono);font-size:12px;font-weight:500;letter-spacing:0.06em;text-transform:uppercase;color:#fff;padding:11px 22px;border-radius:8px;background:var(--orange);white-space:nowrap;text-decoration:none;}
+@media(max-width:560px){
+  .rail-head{padding-left:20px;padding-right:20px;}
+  .rail-track{padding-left:20px;padding-right:20px;}
+  .rail-track > .venue-card{flex:0 0 260px;}
+  .owner-strip{padding-left:20px;padding-right:20px;}
+}
 </style>
 </head>
 <body>
@@ -272,34 +294,7 @@ nav.site-nav{display:flex;align-items:center;justify-content:space-between;paddi
 
 <!-- PAGE HEADER -->
 
-<!-- AUDIENCE SWITCHER -->
-<div style="background:var(--surface);border-bottom:1px solid var(--border);padding:0 32px;">
-  <div style="max-width:1280px;margin:0 auto;display:flex;gap:0;">
-    <button id="tab-find" onclick="switchTab('find')" style="padding:14px 24px;font-family:var(--mono);font-size:11px;letter-spacing:1.5px;text-transform:uppercase;background:none;border:none;border-bottom:2px solid var(--orange);color:var(--text);cursor:pointer;font-weight:600;">Find a Venue</button>
-    <button id="tab-list" onclick="switchTab('list')" style="padding:14px 24px;font-family:var(--mono);font-size:11px;letter-spacing:1.5px;text-transform:uppercase;background:none;border:none;border-bottom:2px solid transparent;color:var(--text-dim,rgba(245,242,237,0.45));cursor:pointer;">List Your Venue</button>
-  </div>
-</div>
-<script>
-function switchTab(t){
-  var tabFind=document.getElementById('tab-find');
-  var tabList=document.getElementById('tab-list');
-  var findView=document.getElementById('view-find');
-  var listView=document.getElementById('view-list');
-  if(!tabFind||!tabList||!findView||!listView)return;
-  if(t==='find'){
-    tabFind.style.borderBottomColor='var(--orange)';tabFind.style.color='var(--text)';
-    tabList.style.borderBottomColor='transparent';tabList.style.color='rgba(245,242,237,0.45)';
-    findView.style.display='';listView.style.display='none';
-  } else {
-    tabList.style.borderBottomColor='var(--orange)';tabList.style.color='var(--text)';
-    tabFind.style.borderBottomColor='transparent';tabFind.style.color='rgba(245,242,237,0.45)';
-    listView.style.display='';findView.style.display='none';
-  }
-}
-// Auto-switch to list tab if ?tab=list in URL
-if(window.location.search.includes('tab=list'))switchTab('list');
-</script>
-<div id="view-find">
+<!-- PAGE HEADER -->
 <div class="page-head">
   <div>
     <div class="page-eyebrow">Columbus Event Venues</div>
@@ -339,129 +334,27 @@ if(window.location.search.includes('tab=list'))switchTab('list');
 </div>
 
 
-<!-- FEATURED VENUES -->
-<div class="featured-section" id="featuredSection" style="display:none">
-  <div class="featured-label">Featured Venues</div>
-  <div class="featured-grid" id="featuredGrid"></div>
+<!-- RAILS (default browse: by capacity + neighborhood) -->
+<div class="venue-rails" id="venueRails">
+  <div class="grid-loading" style="padding:60px 32px"><div class="spinner"></div> Loading venues...</div>
 </div>
 
-<!-- VENUE GRID -->
-<div class="marketplace-grid" id="venueGrid">
-  <div class="grid-loading"><div class="spinner"></div> Loading venues...</div>
+<!-- RESULTS GRID (shown when searching or filtering) -->
+<div class="marketplace-grid" id="venueGrid" style="display:none"></div>
+
+<!-- SECONDARY: venue-owner nudge (full pitch lives on /list-your-venue.html) -->
+<div class="owner-strip">
+  <div class="owner-strip-inner">
+    <div>
+      <b>Own a space in Columbus?</b>
+      <p>List it free and let organizers find you.</p>
+    </div>
+    <a href="https://cbusevents.com/list-your-venue.html">List Your Venue →</a>
+  </div>
 </div>
 
 <!-- DIVIDER -->
 <div class="section-divider"><div class="divider-line"></div></div>
-
-</div><!-- /view-find -->
-<div id="view-list" style="display:none;">
-<!-- LIST YOUR VENUE CTA SECTION -->
-<div class="list-section">
-  <div class="list-section-inner">
-
-    <div class="list-hero">
-      <div class="list-hero-text">
-        <div class="list-eyebrow">For Venue Owners</div>
-        <h2 class="list-title">Columbus organizers are<br>searching for your space.</h2>
-        <p class="list-sub">Every event organizer, corporate organizer, and group looking for a Columbus venue starts their search here. Get your space in front of them before they book somewhere else.</p>
-        <div class="list-btns">
-          <a href="https://cbusevents.com/signup.html?role=venue" class="btn-list-primary">List Your Venue Free →</a>
-          <a href="https://cbusevents.com/cbus-venue-portal.html" class="btn-list-ghost">Sign In to Portal</a>
-        </div>
-      </div>
-      <div class="list-stats" id="listStats">
-        <div class="list-stat">
-          <div class="list-stat-num" id="statOrganizers">500+</div>
-          <div class="list-stat-label">Active Organizers</div>
-        </div>
-        <div class="list-stat">
-          <div class="list-stat-num" id="statEvents">—</div>
-          <div class="list-stat-label">Events Hosted</div>
-        </div>
-        <div class="list-stat">
-          <div class="list-stat-num">Free</div>
-          <div class="list-stat-label">To Start</div>
-        </div>
-      </div>
-    </div>
-
-    <div class="features-section">
-      <div class="features-label">What you get</div>
-      <div class="features-grid">
-        <div class="feature-item">
-          <div class="feature-accent"></div>
-          <div class="feature-item-title">Get Discovered</div>
-          <div class="feature-item-desc">Your venue appears when organizers search Columbus spaces. Premium listings surface first.</div>
-        </div>
-        <div class="feature-item">
-          <div class="feature-accent"></div>
-          <div class="feature-item-title">Receive Inquiries</div>
-          <div class="feature-item-desc">Organizers send booking requests directly through your listing. Manage everything from your portal.</div>
-        </div>
-        <div class="feature-item">
-          <div class="feature-accent"></div>
-          <div class="feature-item-title">Sell Tickets</div>
-          <div class="feature-item-desc">Publish events and sell tickets through CBUSEVENTS. Earn 25% of the platform fee on every sale.</div>
-        </div>
-        <div class="feature-item">
-          <div class="feature-accent"></div>
-          <div class="feature-item-title">Showcase Your Space</div>
-          <div class="feature-item-desc">Photos, capacity, amenities, and neighborhood all visible to organizers before they reach out.</div>
-        </div>
-        <div class="feature-item">
-          <div class="feature-accent"></div>
-          <div class="feature-item-title">Booking Calendar</div>
-          <div class="feature-item-desc">See all your events and inquiries in one place. Set availability and manage requests without a spreadsheet.</div>
-        </div>
-        <div class="feature-item">
-          <div class="feature-accent"></div>
-          <div class="feature-item-title">Track Performance</div>
-          <div class="feature-item-desc">Profile views, inquiry rates, ticket revenue, and event attendance all in your earnings dashboard.</div>
-        </div>
-      </div>
-    </div>
-
-    <div class="pricing-strip" style="position:relative;">
-      <div class="price-divider"></div>
-      <div class="price-divider-2"></div>
-      <div class="price-item free">
-        <div class="price-name">Basic</div>
-        <div class="price-amount">Free</div>
-        <div class="price-period">always included</div>
-        <div class="price-perks">
-          <div class="price-perk">Venue listing and profile</div>
-          <div class="price-perk">Receive inquiries</div>
-          <div class="price-perk">Up to 4 events/month</div>
-        </div>
-      </div>
-      <div class="price-item standard">
-        <div class="price-name">Standard</div>
-        <div class="price-amount">$39<span style="font-size:14px;font-weight:400;color:var(--text-dim)">/mo</span></div>
-        <div class="price-period">cancel anytime</div>
-        <div class="price-perks">
-          <div class="price-perk">Everything in Basic</div>
-          <div class="price-perk">Priority search placement</div>
-          <div class="price-perk">Up to 20 events/month</div>
-          <div class="price-perk">Analytics dashboard</div>
-        </div>
-      </div>
-      <div class="price-item premium">
-        <div class="price-name">Premium</div>
-        <div class="price-amount">$99<span style="font-size:14px;font-weight:400;color:var(--text-dim)">/mo</span></div>
-        <div class="price-period">cancel anytime</div>
-        <div class="price-perks">
-          <div class="price-perk">Unlimited events</div>
-          <div class="price-perk">Homepage feature slot</div>
-          <div class="price-perk">Ticket revenue share</div>
-          <div class="price-perk">Staff management</div>
-        </div>
-      </div>
-    </div>
-
-  </div>
-</div>
-
-
 <!-- ── EMAIL CAPTURE ─────────────────────────────────────────────────── -->
 <section style="max-width:1280px;margin:0 auto 0;padding:0 32px 56px">
   <div style="background:linear-gradient(135deg,#0d0800 0%,#1a0f00 50%,#0d0d1a 100%);border:1px solid rgba(255,107,53,0.2);border-radius:18px;padding:48px 52px;display:flex;justify-content:space-between;align-items:center;gap:40px;flex-wrap:wrap" id="emailCaptureSection">
@@ -487,7 +380,6 @@ if(window.location.search.includes('tab=list'))switchTab('list');
   </div>
 </section>
 
-</div><!-- /view-list -->
 <div id="cb-footer"></div>
 
 <div id="modalContainer"></div>
@@ -532,44 +424,78 @@ function filtered(){
   });
 }
 
+function isBrowsing(){ return activeFilter==='all' && !searchQuery; }
+
 function render(){
-  const list=filtered();
   document.getElementById('resultCount').textContent=`${all.length} venues in Columbus`;
-  document.getElementById('sortLabel').textContent=`${list.length} result${list.length!==1?'s':''}`;
-
-  // Featured section - show Premium + admin-featured when no filter/search active
-  const featuredSection=document.getElementById('featuredSection');
-  const featuredGrid=document.getElementById('featuredGrid');
-  const showFeatured=activeFilter==='all'&&!searchQuery;
-  const featured=all.filter(v=>v.is_featured||(v.tier||v.subscription_tier||'').toUpperCase()==='PREMIUM');
-  if(showFeatured&&featured.length){
-    featuredSection.style.display='';
-    featuredGrid.innerHTML=featured.map((v,i)=>venueCard(v,i,true)).join('');
-  } else {
-    featuredSection.style.display='none';
-  }
-
+  const rails=document.getElementById('venueRails');
   const grid=document.getElementById('venueGrid');
-  if(!list.length){
-    grid.innerHTML=`<div class="grid-empty"><div class="grid-empty-icon">🔍</div><div class="grid-empty-title">No venues found</div><div class="grid-empty-sub">Try a different search or filter</div></div>`;
+  const sortRow=document.querySelector('.sort-row');
+
+  if(isBrowsing()){
+    rails.style.display='';
+    grid.style.display='none';
+    if(sortRow)sortRow.style.display='none';
+    buildRails();
     return;
   }
-  grid.innerHTML=list.map((v,i)=>venueCard(v,i)).join('');
+
+  // search / filter active → flat results grid
+  rails.style.display='none';
+  grid.style.display='';
+  if(sortRow)sortRow.style.display='';
+  const list=filtered();
+  document.getElementById('sortLabel').textContent=`${list.length} result${list.length!==1?'s':''}`;
+  grid.innerHTML = list.length
+    ? list.map((v,i)=>venueCard(v,i)).join('')
+    : `<div class="grid-empty"><div class="grid-empty-icon">🔍</div><div class="grid-empty-title">No venues found</div><div class="grid-empty-sub">Try a different search or filter</div></div>`;
 }
 
-function venueCard(v,i,isFeaturedSection=false){
-  const tier=(v.tier||v.subscription_tier||'').toUpperCase();
+function railHTML(title,meta,list){
+  if(!list.length)return '';
+  return `<section class="venue-rail">
+    <div class="rail-head"><span class="rail-title">${title}</span><span class="rail-meta">${meta}</span></div>
+    <div class="rail-track">${list.map((v,i)=>venueCard(v,i)).join('')}</div>
+  </section>`;
+}
+
+function buildRails(){
+  const rails=document.getElementById('venueRails');
+  if(!all.length){
+    rails.innerHTML=`<div class="grid-empty" style="padding:60px 32px"><div class="grid-empty-icon">🔍</div><div class="grid-empty-title">No venues yet</div><div class="grid-empty-sub">Check back soon.</div></div>`;
+    return;
+  }
+  const cap=v=>v.capacity||0;
+  const intimate=all.filter(v=>cap(v)>0&&cap(v)<=50);
+  const mid=all.filter(v=>cap(v)>50&&cap(v)<=100);
+  const large=all.filter(v=>cap(v)>100);
+
+  // neighborhood rails, built from the data (2+ venues), top 4 by count
+  const hoods={};
+  all.forEach(v=>{const h=(v.neighborhood||'').trim();if(h){(hoods[h]=hoods[h]||[]).push(v);}});
+  const hoodRails=Object.entries(hoods)
+    .filter(([h,list])=>list.length>=2)
+    .sort((a,b)=>b[1].length-a[1].length)
+    .slice(0,4)
+    .map(([h,list])=>railHTML(h,list.length+' venues',list)).join('');
+
+  rails.innerHTML =
+    railHTML('Mid-size events','50–100 guests',mid) +
+    railHTML('Large productions','100+ guests',large) +
+    railHTML('Intimate gatherings','up to 50 guests',intimate) +
+    hoodRails;
+}
+
+function venueCard(v,i){
   const icon=getIcon(v);
   const delay=Math.min(i*35,400);
-  const tierBadge=tier==='PREMIUM'?`<div class="card-tier-badge badge-premium">Premium</div>`:tier==='STANDARD'?`<div class="card-tier-badge badge-standard">Standard</div>`:'';
-  const featuredBadge=isFeaturedSection&&v.is_featured?`<div class="featured-badge">⭐ Featured</div>`:'';
   const cover=v.cover_image_url?`<img src="${v.cover_image_url}" alt="${v.name}" loading="lazy">`:`<div class="card-cover-placeholder">${icon}</div>`;
   const capBadge=v.capacity?`<div class="card-capacity">Up to ${v.capacity}</div>`:'';
+  const fsTag=v.full_service?`<div class="card-fs-tag">Full-service</div>`:'';
   const tags=(v.tags||[]).slice(0,3).map(t=>`<span class="card-tag">${t}</span>`).join('');
-  const cardClass=isFeaturedSection?'featured-card':'venue-card';
   return `
-  <div class="${cardClass}" style="animation-delay:${delay}ms" onclick="openModal('${v.id}')">
-    <div class="card-cover">${cover}<div class="card-cover-gradient"></div>${tierBadge}${featuredBadge}${capBadge}</div>
+  <div class="venue-card" style="animation-delay:${delay}ms" onclick="location.href='https://cbusevents.com/venue.html?id=${v.id}'">
+    <div class="card-cover">${cover}<div class="card-cover-gradient"></div>${fsTag}${capBadge}</div>
     <div class="card-body">
       <div class="card-type">${v.venue_type||'Venue'}</div>
       <div class="card-name">${v.name}</div>
@@ -578,121 +504,16 @@ function venueCard(v,i,isFeaturedSection=false){
       ${tags?`<div class="card-tags">${tags}</div>`:''}
       <div class="card-footer">
         <div class="card-meta">${v.capacity?`Up to ${v.capacity} guests`:''}</div>
-        <div class="card-cta">Send Inquiry</div>
+        <div class="card-cta">View venue</div>
       </div>
     </div>
   </div>`;
 }
 
-function openModal(id){
-  const v=all.find(x=>x.id===id);if(!v)return;
-  const icon=getIcon(v);
-  const tier=(v.tier||v.subscription_tier||'').toUpperCase();
-  const cover=v.cover_image_url?`<img src="${v.cover_image_url}" alt="${v.name}">`:`<div class="modal-cover-placeholder">${icon}</div>`;
-  const tierBadge=tier==='PREMIUM'?`<span style="font-family:var(--mono);font-size:9px;font-weight:700;padding:3px 9px;border-radius:100px;background:rgba(251,191,36,0.12);color:var(--gold);border:1px solid rgba(251,191,36,0.25)">Premium</span>`:tier==='STANDARD'?`<span style="font-family:var(--mono);font-size:9px;font-weight:700;padding:3px 9px;border-radius:100px;background:var(--orange-soft);color:var(--orange);border:1px solid var(--orange-glow)">Standard</span>`:'';
-  const pills=[v.neighborhood&&`<span class="modal-pill">📍 ${v.neighborhood}</span>`,v.capacity&&`<span class="modal-pill">👥 Up to ${v.capacity}</span>`,v.phone&&`<span class="modal-pill">📞 ${v.phone}</span>`].filter(Boolean).join('');
-  const amenities=(v.amenities||[]).map(a=>`<span class="modal-amenity">${a}</span>`).join('');
-  document.getElementById('modalContainer').innerHTML=`
-  <div class="modal-overlay" onclick="if(event.target===this)closeModal()">
-    <div class="modal">
-      <div class="modal-cover">${cover}<button class="modal-close" onclick="closeModal()">✕</button></div>
-      <div class="modal-body">
-        <div class="modal-type">${v.venue_type||'Venue'} ${tierBadge}</div>
-        <div class="modal-name">${v.name}</div>
-        ${pills?`<div class="modal-pills">${pills}</div>`:''}
-        ${v.description?`<p class="modal-desc">${v.description}</p>`:''}
-        ${amenities?`<div class="modal-amenities">${amenities}</div>`:''}
-        ${v.website?`<div style="margin-bottom:16px"><a href="${v.website}" target="_blank" style="font-size:12px;color:var(--orange)">${v.website} →</a></div>`:''}
-        <button class="modal-cta" onclick="goToInquiry('${v.id}')">Send Booking Inquiry</button>
-        <div class="modal-cta-sub">Sign in or create a free organizer account to send an inquiry</div>
-      </div>
-    </div>
-  </div>`;
-}
-
-function closeModal(){document.getElementById('modalContainer').innerHTML='';}
-
-async function goToInquiry(venueId){
-  const {data:{session}}=await sb.auth.getSession();
-  if(!session){
-    localStorage.setItem('pendingVenueBooking', JSON.stringify({venueId, returnTo:'venues'}));
-    window.location.href='https://cbusevents.com/signup.html?role=organizer';
-    return;
-  }
-  const {data:roles}=await sb.from('user_roles').select('role').eq('user_id',session.user.id);
-  const isOrganizer=(roles||[]).some(r=>r.role==='organizer'||r.role==='customer');
-  if(!isOrganizer){alert('Please sign in with a organizer account to send booking requests.');return;}
-  const existing=document.querySelector('.modal-body');
-  if(!existing)return;
-  existing.innerHTML+=`
-  <div id="bookingForm" style="margin-top:0;border-top:1px solid rgba(255,255,255,0.08);padding-top:20px">
-    <div style="font-family:'DM Mono',monospace;font-size:9px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--text-faint);margin-bottom:14px">Booking Request</div>
-    <div style="display:flex;flex-direction:column;gap:12px">
-      <div>
-        <label style="font-size:11px;color:var(--text-dim);display:block;margin-bottom:5px;font-weight:600">Event Date *</label>
-        <input id="bkDate" type="date" min="${new Date().toISOString().split('T')[0]}" style="width:100%;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:9px 12px;color:#f0f0fa;font-size:13px;font-family:'DM Sans',sans-serif">
-      </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-        <div>
-          <label style="font-size:11px;color:var(--text-dim);display:block;margin-bottom:5px;font-weight:600">Event Type</label>
-          <select id="bkType" style="width:100%;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:9px 12px;color:#f0f0fa;font-size:13px;font-family:'DM Sans',sans-serif">
-            <option value="">Select...</option>
-            <option>Wedding</option><option>Birthday</option><option>Corporate</option>
-            <option>Baby Shower</option><option>Anniversary</option><option>Graduation</option>
-            <option>Holiday Party</option><option>Networking</option><option>Concert</option>
-            <option>Pop-Up</option><option>Other</option>
-          </select>
-        </div>
-        <div>
-          <label style="font-size:11px;color:var(--text-dim);display:block;margin-bottom:5px;font-weight:600">Guest Count</label>
-          <input id="bkGuests" type="number" placeholder="e.g. 75" min="1" style="width:100%;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:9px 12px;color:#f0f0fa;font-size:13px;font-family:'DM Sans',sans-serif">
-        </div>
-      </div>
-      <div>
-        <label style="font-size:11px;color:var(--text-dim);display:block;margin-bottom:5px;font-weight:600">Message</label>
-        <textarea id="bkMsg" placeholder="Tell the venue about your event, any special requirements..." rows="3" style="width:100%;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:9px 12px;color:#f0f0fa;font-size:13px;font-family:'DM Sans',sans-serif;resize:none"></textarea>
-      </div>
-      <div id="bkStatus" style="font-size:12px;min-height:16px;color:#34d399"></div>
-      <button onclick="submitVenueBooking('${venueId}')" style="width:100%;padding:13px;background:#FF6B35;color:#fff;font-weight:700;font-size:14px;border-radius:10px;border:none;cursor:pointer;font-family:'DM Sans',sans-serif">Send Booking Request →</button>
-    </div>
-  </div>`;
-  document.querySelector('.modal').scrollTo({top:9999,behavior:'smooth'});
-}
-
-async function submitVenueBooking(venueId){
-  const date=document.getElementById('bkDate')?.value;
-  const status=document.getElementById('bkStatus');
-  if(!date){if(status){status.textContent='Please select an event date.';status.style.color='#f87171';}return;}
-  const {data:{session}}=await sb.auth.getSession();
-  if(!session)return;
-  const btn=document.querySelector('#bookingForm button');
-  if(btn){btn.textContent='Sending...';btn.disabled=true;}
-  const {error}=await sb.from('booking_requests').insert({
-    venue_id:venueId,
-    organizer_id:session.user.id,
-    organizer_name:session.user.user_metadata?.full_name||session.user.email.split('@')[0],
-    organizer_email:session.user.email,
-    event_date:date,
-    event_type:document.getElementById('bkType')?.value||null,
-    guest_count:parseInt(document.getElementById('bkGuests')?.value)||null,
-    message:document.getElementById('bkMsg')?.value||null,
-  });
-  if(error){
-    if(status){status.textContent='Error sending request. Please try again.';status.style.color='#f87171';}
-    if(btn){btn.textContent='Send Booking Request →';btn.disabled=false;}
-    return;
-  }
-  document.getElementById('bookingForm').innerHTML=`
-  <div style="text-align:center;padding:24px 0">
-    <div style="font-size:32px;margin-bottom:12px">✓</div>
-    <div style="font-weight:800;font-size:16px;margin-bottom:6px">Request Sent!</div>
-    <div style="font-size:13px;color:var(--text-dim)">The venue will review your request and respond soon.</div>
-  </div>`;
-}
 function setFilter(cat,btn){activeFilter=cat;document.querySelectorAll('.filter-chip').forEach(b=>b.classList.remove('active'));btn.classList.add('active');render();}
 function handleSearch(val){searchQuery=val.trim();render();}
 function handleSort(val){sortMode=val;render();}
-window.setFilter=setFilter;window.handleSearch=handleSearch;window.handleSort=handleSort;window.openModal=openModal;window.closeModal=closeModal;window.goToInquiry=goToInquiry;
+window.setFilter=setFilter;window.handleSearch=handleSearch;window.handleSort=handleSort;
 
 (async()=>{
   // Load venues
@@ -706,17 +527,8 @@ window.setFilter=setFilter;window.handleSearch=handleSearch;window.handleSort=ha
     all=data;
   }
 
-  all.sort((a,b)=>tRank(a)-tRank(b)||new Date(b.created_at||0)-new Date(a.created_at||0));
+  all.sort((a,b)=>new Date(b.created_at||0)-new Date(a.created_at||0));
   render();
-
-  // Load event count for CTA stats
-  const{data:eCount}=await sb.from('events').select('id',{count:'exact',head:true});
-  if(eCount!==null){
-    const el=document.getElementById('statEvents');
-    if(el)el.textContent=(all.length||0)+'+'||'—';
-  }
-  const evEl=document.getElementById('statEvents');
-  if(evEl&&all.length)evEl.textContent=all.length+'+';
 })();
 </script>
 
