@@ -1951,10 +1951,10 @@ loadRecapClips();
     try{
       try{var nh=await sb.from('neighborhoods').select('slug,display_name,featured');(nh.data||[]).forEach(function(n){hoodName[n.slug]=n.display_name;});}catch(_){}
       var nowISO=new Date().toISOString();
-      var evSel='id,title,start_time,venue_name_override,is_free,neighborhood_slug,cover_image_url,organizer_id,venues(name)';
+      var evSel='id,title,start_time,venue_name_override,is_free,neighborhood_slug,cover_image_url,organizer_id,owner_id,venues(name)';
       var ev=await sb.from('events').select(evSel).eq('status','published').gte('start_time',nowISO).order('start_time',{ascending:true}).limit(40);
       if(ev.error&&/cover_image_url/.test(ev.error.message||'')){
-        ev=await sb.from('events').select('id,title,start_time,venue_name_override,is_free,neighborhood_slug,organizer_id,venues(name)').eq('status','published').gte('start_time',nowISO).order('start_time',{ascending:true}).limit(40);
+        ev=await sb.from('events').select('id,title,start_time,venue_name_override,is_free,neighborhood_slug,organizer_id,owner_id,venues(name)').eq('status','published').gte('start_time',nowISO).order('start_time',{ascending:true}).limit(40);
       }
       var INTERNAL=ev.data||[];
       var EXTERNAL=[];
@@ -1971,7 +1971,7 @@ loadRecapClips();
         var weekend=POOL.filter(function(e){var d=new Date(e.start_time).getDay();return d===5||d===6||d===0;});
         fill('cbx-weekend',(weekend.length?weekend:POOL).slice(0,12).map(poster).join(''));
         var OURS_ID='dcae39de-9265-4d67-b8be-5d0ca599069b';
-        var ours=POOL.filter(function(e){return e.organizer_id===OURS_ID;});
+        var ours=POOL.filter(function(e){return e.organizer_id===OURS_ID||e.owner_id===OURS_ID;});
         var oursRail=document.getElementById('cbx-rail-ours'),oursEmpty=document.getElementById('cbx-ours-empty');
         if(ours.length){
           fill('cbx-ours',ours.slice(0,12).map(poster).join(''));
