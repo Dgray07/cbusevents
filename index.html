@@ -1022,11 +1022,18 @@ body{-webkit-tap-highlight-color:rgba(0,0,0,0);}
     </div>
   </div>
 
-  <!-- CITY PULSE -->
-  <div class="rail cbx-rev" id="cbx-rail-tonight">
-    <div class="rail-hd"><div class="rail-titles"><div class="rail-eyebrow"><span class="dot"></span>Straight from the floor</div><div class="rail-t">City <em>pulse</em></div></div><button type="button" class="rail-all" onclick="openPostComposer()" style="cursor:pointer">Post to the feed &rarr;</button></div>
-    <div class="pulse-feed" id="pulseFeed">
-      <div class="pulse-skel"></div><div class="pulse-skel"></div><div class="pulse-skel"></div>
+  <!-- OUR EVENTS -->
+  <div class="rail cbx-rev" id="cbx-rail-ours">
+    <div class="rail-hd"><div class="rail-titles"><div class="rail-eyebrow"><span class="dot"></span>Produced by CBUSEVENTS</div><div class="rail-t">Our <em>events</em></div></div><a href="https://cbusevents.com/organizer-profile.html?id=dcae39de-9265-4d67-b8be-5d0ca599069b" class="rail-all">See all &rarr;</a></div>
+    <div class="rail-wrap" data-rail><span class="rail-fade l"></span><span class="rail-fade r"></span><button class="rail-arrow prev" data-dir="-1" aria-label="Scroll left">&#8249;</button><button class="rail-arrow next" data-dir="1" aria-label="Scroll right">&#8250;</button>
+      <div class="rail-vp" id="cbx-ours">
+        <a class="poster tone-flame" href="https://cbusevents.com/organizer-profile.html?id=dcae39de-9265-4d67-b8be-5d0ca599069b"><div class="po-noise"></div><span class="po-corner tl"></span><span class="po-corner br"></span><div class="po-chip">Loading</div><div class="po-body"><div class="po-title">Loading our events...</div><div class="po-meta"><span>Columbus</span></div></div></a>
+      </div>
+    </div>
+    <div class="pulse-empty" id="cbx-ours-empty" hidden>
+      <div class="pulse-empty-t">Next one&rsquo;s in the works</div>
+      <div class="pulse-empty-s">Follow along for the next CBUSEVENTS production.</div>
+      <button type="button" onclick="window.location.href='https://cbusevents.com/organizer-profile.html?id=dcae39de-9265-4d67-b8be-5d0ca599069b'">Follow CBUSEVENTS</button>
     </div>
   </div>
 
@@ -1944,10 +1951,10 @@ loadRecapClips();
     try{
       try{var nh=await sb.from('neighborhoods').select('slug,display_name,featured');(nh.data||[]).forEach(function(n){hoodName[n.slug]=n.display_name;});}catch(_){}
       var nowISO=new Date().toISOString();
-      var evSel='id,title,start_time,venue_name_override,is_free,neighborhood_slug,cover_image_url,venues(name)';
+      var evSel='id,title,start_time,venue_name_override,is_free,neighborhood_slug,cover_image_url,organizer_id,venues(name)';
       var ev=await sb.from('events').select(evSel).eq('status','published').gte('start_time',nowISO).order('start_time',{ascending:true}).limit(40);
       if(ev.error&&/cover_image_url/.test(ev.error.message||'')){
-        ev=await sb.from('events').select('id,title,start_time,venue_name_override,is_free,neighborhood_slug,venues(name)').eq('status','published').gte('start_time',nowISO).order('start_time',{ascending:true}).limit(40);
+        ev=await sb.from('events').select('id,title,start_time,venue_name_override,is_free,neighborhood_slug,organizer_id,venues(name)').eq('status','published').gte('start_time',nowISO).order('start_time',{ascending:true}).limit(40);
       }
       var INTERNAL=ev.data||[];
       var EXTERNAL=[];
@@ -1963,6 +1970,15 @@ loadRecapClips();
         fill('cbx-tonight',tonight.slice(0,12).map(poster).join(''));
         var weekend=POOL.filter(function(e){var d=new Date(e.start_time).getDay();return d===5||d===6||d===0;});
         fill('cbx-weekend',(weekend.length?weekend:POOL).slice(0,12).map(poster).join(''));
+        var OURS_ID='dcae39de-9265-4d67-b8be-5d0ca599069b';
+        var ours=POOL.filter(function(e){return e.organizer_id===OURS_ID;});
+        var oursRail=document.getElementById('cbx-rail-ours'),oursEmpty=document.getElementById('cbx-ours-empty');
+        if(ours.length){
+          fill('cbx-ours',ours.slice(0,12).map(poster).join(''));
+        }else if(oursRail&&oursEmpty){
+          var wrap=oursRail.querySelector('.rail-wrap');if(wrap)wrap.style.display='none';
+          oursEmpty.hidden=false;
+        }
         var counts={};POOL.forEach(function(e){if(e.neighborhood_slug)counts[e.neighborhood_slug]=(counts[e.neighborhood_slug]||0)+1;});
         var hues=['rgba(255,107,53,0.12)','rgba(200,150,62,0.12)','rgba(26,107,64,0.12)','rgba(83,74,183,0.12)','rgba(24,95,165,0.12)','rgba(216,90,48,0.12)'];
         var hoodHTML=Object.keys(counts).sort(function(a,b){return counts[b]-counts[a];}).map(function(slug,i){
