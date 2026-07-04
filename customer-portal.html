@@ -893,9 +893,9 @@ async function loadLiveOrganizers(){
   if(!grid) return;
 
   const { data: organizers, error } = await sb
-    .from('organizers')
-    .select('id, business_name, contact_name, specialties, categories, rate_from, rate_display, availability, is_discoverable, neighborhood')
-    .eq('is_discoverable', true)
+    .from('profiles')
+    .select('id, business_name, full_name, avatar_url, role, created_at, organizer_profiles(bio, instagram, website, city)')
+    .eq('role', 'organizer')
     .order('created_at', { ascending: false })
     .limit(8);
 
@@ -906,13 +906,11 @@ async function loadLiveOrganizers(){
 
   const paletteClasses = ['pa1','pa2','pa3','pa4'];
   grid.innerHTML = organizers.map((p, i) => {
-    const name = p.business_name || p.contact_name || 'Columbus Organizer';
+    const op = Array.isArray(p.organizer_profiles) ? p.organizer_profiles[0] : p.organizer_profiles;
+    const name = p.business_name || p.full_name || 'Columbus Organizer';
     const initials = name.split(' ').map(w => w[0]).join('').substring(0,2).toUpperCase();
-    const tags = (Array.isArray(p.specialties) && p.specialties.length ? p.specialties : (Array.isArray(p.categories) ? p.categories : [])).slice(0,3);
-    const type = tags[0] || 'Event Organizer';
-    const price = p.rate_display || (p.rate_from ? 'From $' + Number(p.rate_from).toLocaleString() : 'Contact for Pricing');
-    const avail = (p.availability || '').toLowerCase() === 'limited' ? 'limited' : '';
-    const availText = avail === 'limited' ? 'Limited' : 'Available';
+    const city = (op && op.city) ? op.city : '';
+    const type = city ? city : 'Event Organizer';
     const href = 'https://cbusevents.com/organizer-portal.html';
     const palette = paletteClasses[i % paletteClasses.length];
     return '<div class="organizer-card" onclick="window.open(\'https://cbusevents.com\',\'_blank\')" style="cursor:pointer">'
@@ -921,11 +919,7 @@ async function loadLiveOrganizers(){
       + '<div><div class="organizer-card-name">' + name + '</div>'
       + '<div class="organizer-card-type">' + type + '</div></div>'
       + '</div>'
-      + (tags.length ? '<div class="organizer-card-tags">' + tags.map(t => '<span class="organizer-tag">' + t + '</span>').join('') + '</div>' : '')
-      + '<div class="organizer-card-footer">'
-      + '<span class="organizer-card-rate">' + price + '</span>'
-      + '<span class="organizer-card-avail ' + avail + '">' + availText + '</span>'
-      + '</div></div>';
+      + '</div>';
   }).join('');
 
   // Wire filter chips
@@ -1627,8 +1621,13 @@ async function estimateRide(){
 document.getElementById('rideDestination')?.addEventListener('keydown',e=>{if(e.key==='Enter')estimateRide();});
 
 // Load spots after auth check
+// DISABLED 2026-07-04: featured_spots table doesn't exist yet in Supabase.
+// Re-enable this once the table is built (see loadFeaturedSpots() above for expected columns:
+// section, name, neighborhood, category, badge, description, hours).
 document.addEventListener('DOMContentLoaded',function(){
-  setTimeout(loadFeaturedSpots,1000);
+  renderSpots('lateNightContainer',[],'&#127839;');
+  renderSpots('afterEventContainer',[],'&#127867;');
+  // setTimeout(loadFeaturedSpots,1000);
 });
 
 </script>
