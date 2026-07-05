@@ -1437,7 +1437,7 @@ async function saveBudgetItem(eventId){
  if(!item){document.getElementById('bErr').textContent='Item name required';document.getElementById('bErr').style.display='block';return;}
  const{error}=await sb.from('event_budget').insert({
    event_id:eventId,
-   organizer_id:currentUser.id,
+   planner_id:currentUser.id,
    item,
    category:document.getElementById('bCat').value,
    estimated:parseFloat(document.getElementById('bEst').value)||0,
