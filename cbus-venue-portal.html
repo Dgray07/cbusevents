@@ -460,7 +460,6 @@ function Sidebar({active,setActive,profile,userId,navItems,staffRole}) {
      ))}
    </nav>
    <div style={{padding:18,borderTop:"1px solid var(--border-sub)"}}>
-     <div style={{background:"linear-gradient(135deg,rgba(255,107,53,0.15),rgba(255,107,53,0.06))",border:"1px solid rgba(255,107,53,0.25)",borderRadius:8,padding:"6px 10px",fontSize:10,fontWeight:700,textAlign:"center",letterSpacing:"0.08em",textTransform:"uppercase",color:"#FF6B35",marginBottom:10}}>Standard · $39/mo</div>
      <button onClick={()=>sb.auth.signOut()} style={{width:"100%",background:"rgba(255,255,255,0.04)",color:"var(--sub)",border:"1px solid var(--border)",borderRadius:10,padding:"8px",fontSize:12,fontWeight:700,cursor:"pointer",fontFamily:"'DM Sans',sans-serif"}}>Sign Out</button>
    </div>
    {userId&&<PortalSwitcher userId={userId}/>}
@@ -476,7 +475,6 @@ function Dashboard({venue,events}) {
  {label:"Published",value:events.filter(e=>e.status==="published").length,color:"#FF6B35"},
  {label:"This Week",value:thisWeek.length,color:"var(--green)"},
  {label:"Status",value:venue?.status||"—",color:venue?.status==="approved"?"var(--green)":"#f59e0b"},
- {label:"Plan",value:venue?.tier?venue.tier[0].toUpperCase()+venue.tier.slice(1):"Free",color:"#f59e0b"},
  ].map(s=>(
  <Card key={s.label} style={{padding:18}}> <div style={{fontFamily:"'DM Mono',monospace",fontSize:28,fontWeight:500,color:s.color,marginBottom:6,letterSpacing:"-0.02em",lineHeight:1}}>{s.value}</div> <div style={{color:"var(--sub)",fontSize:12}}>{s.label}</div> </Card> ))}
  </div> {!venue && (
@@ -852,37 +850,9 @@ function Inquiries({venue}) {
  </div> </div> );
 }
 
-// Stripe config
-// Feature subscription checker - replaces all isPremium/tier logic
-async function checkFeature(userId, featureKey) {
-  const { data } = await sb.from('feature_subscriptions')
-    .select('status, current_period_end')
-    .eq('user_id', userId)
-    .eq('feature_key', featureKey)
-    .eq('status', 'active')
-    .maybeSingle();
-  if (!data) return false;
-  if (data.current_period_end && new Date(data.current_period_end) < new Date()) return false;
-  return true;
-}
-
-// Stripe Customer Portal - opens self-service cancellation
-async function openBillingPortal(userId) {
-  const { data: customer } = await sb.from('stripe_customers')
-    .select('stripe_customer_id').eq('user_id', userId).maybeSingle();
-  if (!customer?.stripe_customer_id) { alert('No billing account found.'); return; }
-  const { data, error } = await sb.functions.invoke('create-portal-session', {
-    body: { customer_id: customer.stripe_customer_id, return_url: window.location.href }
-  });
-  if (error || !data?.url) { alert('Could not open billing portal. Contact info@cbusevents.com'); return; }
-  window.open(data.url, '_blank');
-}
-
-// Job posting Stripe checkout
+// Job posting Stripe checkout (one-time, $10/post)
 async function checkoutJobPosting(userId, planType, resourceId = null) {
-  const priceId = planType === 'monthly'
-    ? 'price_1Tcbb1EJ9u0llGXrV4MM9wVR'
-    : 'price_1TcbbwEJ9u0llGXrKVUXsvjZ';
+  const priceId = 'price_1TcbbwEJ9u0llGXrKVUXsvjZ';
   const { data: customer } = await sb.from('stripe_customers')
     .select('stripe_customer_id').eq('user_id', userId).maybeSingle();
   const { data, error } = await sb.functions.invoke('create-checkout-session', {
@@ -890,7 +860,7 @@ async function checkoutJobPosting(userId, planType, resourceId = null) {
       price_id: priceId,
       user_id: userId,
       customer_id: customer?.stripe_customer_id || null,
-      mode: planType === 'monthly' ? 'subscription' : 'payment',
+      mode: 'payment',
       success_url: window.location.href + '?feature=job_posting&success=1',
       cancel_url: window.location.href,
       metadata: {
@@ -905,14 +875,13 @@ async function checkoutJobPosting(userId, planType, resourceId = null) {
 
 
 
-// Marketing Services (Premium)
+// Marketing Services
 function MarketingServices({venue}) {
  const [type,setType]=React.useState(null);
  const [details,setDetails]=React.useState("");
  const [busy,setBusy]=React.useState(false);
  const [sent,setSent]=React.useState(false);
  const [err,setErr]=React.useState("");
- const tier=venue?.tier||"free";
 
  const submit=async()=>{
  if(!details.trim()){setErr("Please describe what you need.");return;}
@@ -938,7 +907,7 @@ function MarketingServices({venue}) {
  {err&&<div style={{background:"rgba(248,113,113,0.08)",color:"#ef4444",border:"1px solid #4a1010",borderRadius:10,padding:"10px 14px",fontSize:14,marginBottom:14}}> {err}</div>}
  <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12,marginBottom:16}}> <div
  onClick={()=>setType(type==="flyer"?null:"flyer")}
- style={{background:type==="flyer"?"#FF6B3515":"var(--surface)",border:`1.5px solid ${type==="flyer"?"#FF6B35":"var(--border)"}`,borderRadius:14,padding:18,cursor:"pointer",transition:"all 0.15s"}}> <div style={{fontSize:28,marginBottom:8}}></div> <div style={{fontWeight:700,marginBottom:4}}>Flyer Design</div> <div style={{color:"var(--sub)",fontSize:12,lineHeight:1.5}}>Custom event flyers for social media & print</div> <div style={{color:"var(--green)",fontSize:11,fontWeight:600,marginTop:8}}>Included with Premium</div> </div> <div
+ style={{background:type==="flyer"?"#FF6B3515":"var(--surface)",border:`1.5px solid ${type==="flyer"?"#FF6B35":"var(--border)"}`,borderRadius:14,padding:18,cursor:"pointer",transition:"all 0.15s"}}> <div style={{fontSize:28,marginBottom:8}}></div> <div style={{fontWeight:700,marginBottom:4}}>Flyer Design</div> <div style={{color:"var(--sub)",fontSize:12,lineHeight:1.5}}>Custom event flyers for social media & print</div> <div style={{color:"var(--green)",fontSize:11,fontWeight:600,marginTop:8}}>Included, free</div> </div> <div
  onClick={()=>setType(type==="merch"?null:"merch")}
  style={{background:type==="merch"?"#FF6B3515":"var(--surface)",border:`1.5px solid ${type==="merch"?"#FF6B35":"var(--border)"}`,borderRadius:14,padding:18,cursor:"pointer",transition:"all 0.15s"}}> <div style={{fontSize:28,marginBottom:8}}></div> <div style={{fontWeight:700,marginBottom:4}}>Merch Design</div> <div style={{color:"var(--sub)",fontSize:12,lineHeight:1.5}}>Custom branded shirts, hats & more on demand</div> <div style={{color:"#f59e0b",fontSize:11,fontWeight:600,marginTop:8}}>Heat press printed</div> </div> </div> {type&&(
  <div> <label style={{display:"block",fontSize:13,color:"var(--sub)",marginBottom:6}}>Tell us what you need for your {type==="flyer"?"flyer":"merch"} *</label> <textarea
@@ -1835,7 +1804,6 @@ function StaffManagement({venue, userId}) {
 function JobPostings({venue, userId}) {
   const [jobs, setJobs] = React.useState([]);
   const [busy, setBusy] = React.useState(true);
-  const [hasMonthly, setHasMonthly] = React.useState(false);
   const [modal, setModal] = React.useState(false);
   const [form, setForm] = React.useState({title:'',description:'',role_type:'',event_date:'',shift_start:'',shift_end:'',pay_rate:'',spots_available:1,location:''});
   const [saving, setSaving] = React.useState(false);
@@ -1843,14 +1811,11 @@ function JobPostings({venue, userId}) {
 
   React.useEffect(()=>{
     if(!venue?.id){setBusy(false);return;}
-    Promise.all([
-      sb.from('job_posts').select('*').eq('venue_id',venue.id).order('created_at',{ascending:false}),
-      checkFeature(userId,'job_posting_monthly'),
-    ]).then(([postsRes, monthly])=>{
-      setJobs(postsRes.data||[]);
-      setHasMonthly(monthly);
-      setBusy(false);
-    });
+    sb.from('job_posts').select('*').eq('venue_id',venue.id).order('created_at',{ascending:false})
+      .then(({data})=>{
+        setJobs(data||[]);
+        setBusy(false);
+      });
   },[venue?.id,userId]);
 
   const set = k => e => setForm(p=>({...p,[k]:e.target.value}));
@@ -1871,21 +1836,14 @@ function JobPostings({venue, userId}) {
       pay_rate: form.pay_rate,
       spots_available: parseInt(form.spots_available)||1,
       location: form.location||venue.address||'Columbus, OH',
-      status: hasMonthly ? 'active' : 'draft',
+      status: 'draft',
       payment_type: payType,
-      published_at: hasMonthly ? new Date().toISOString() : null,
-      expires_at: hasMonthly ? new Date(Date.now()+30*24*60*60*1000).toISOString() : null,
+      published_at: null,
+      expires_at: null,
     }).select().single();
     if(error){setErr('Error: '+error.message);setSaving(false);return;}
-    if(hasMonthly){
-      // Already has monthly sub - post goes live immediately
-      setJobs(p=>[job,...p]);
-      setModal(false);
-      setSaving(false);
-    } else {
-      // Send to Stripe checkout with job post ID
-      await checkoutJobPosting(userId, payType, job.id);
-    }
+    // Send to Stripe checkout with job post ID
+    await checkoutJobPosting(userId, payType, job.id);
   }
 
   if(busy) return <Spin/>;
@@ -1896,7 +1854,7 @@ function JobPostings({venue, userId}) {
       <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start',marginBottom:24,flexWrap:'wrap',gap:12}}>
         <div>
           <h1 style={{fontFamily:"'DM Sans',sans-serif",fontSize:24,fontWeight:800,letterSpacing:'-0.03em',marginBottom:4}}>Job Postings</h1>
-          <p style={{color:'var(--sub)',fontSize:14}}>Post staff positions for your events. {hasMonthly?<span style={{color:'var(--green)'}}>Unlimited monthly plan active.</span>:<span>Pay per post ($10) or subscribe for unlimited ($49/mo).</span>}</p>
+          <p style={{color:'var(--sub)',fontSize:14}}>Post staff positions for your events. Pay per post ($10, active 30 days).</p>
         </div>
         <Btn onClick={()=>{setModal(true);setErr('');}}>+ Post a Job</Btn>
       </div>
@@ -1943,20 +1901,8 @@ function JobPostings({venue, userId}) {
             <Field label="Pay Rate"><input value={form.pay_rate} onChange={set('pay_rate')} placeholder="$15/hr, $200 flat, Negotiable"/></Field>
             <Field label="Location"><input value={form.location} onChange={set('location')} placeholder={venue.address||'Columbus, OH'}/></Field>
             <div style={{borderTop:'1px solid var(--border)',paddingTop:20,marginTop:8}}>
-              {hasMonthly?(
-                <Btn onClick={()=>saveJob('subscription')} disabled={saving} size="lg" style={{width:'100%'}}>{saving?'Posting...':'Publish Job Post'}</Btn>
-              ):(
-                <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:12}}>
-                  <div>
-                    <Btn onClick={()=>saveJob('per_post')} disabled={saving} style={{width:'100%'}} variant="secondary">{saving?'...':'Post for $10'}</Btn>
-                    <div style={{fontSize:11,color:'var(--muted)',textAlign:'center',marginTop:4}}>Active 30 days</div>
-                  </div>
-                  <div>
-                    <Btn onClick={()=>saveJob('monthly')} disabled={saving} style={{width:'100%'}}>{saving?'...':'Subscribe $49/mo'}</Btn>
-                    <div style={{fontSize:11,color:'var(--muted)',textAlign:'center',marginTop:4}}>Unlimited posts</div>
-                  </div>
-                </div>
-              )}
+              <Btn onClick={()=>saveJob('per_post')} disabled={saving} size="lg" style={{width:'100%'}}>{saving?'...':'Post for $10'}</Btn>
+              <div style={{fontSize:11,color:'var(--muted)',textAlign:'center',marginTop:4}}>Active 30 days</div>
             </div>
           </div>
         </div>
@@ -1965,79 +1911,16 @@ function JobPostings({venue, userId}) {
   );
 }
 
-// Features Component - replaces Plan & Billing
+// Features - one-time paid add-ons (no subscriptions)
 function Features({venue, userId}) {
-  const [subs, setSubs] = React.useState([]);
-  const [busy, setBusy] = React.useState(true);
-
-  React.useEffect(()=>{
-    sb.from('feature_subscriptions')
-      .select('*')
-      .eq('user_id', userId)
-      .eq('status','active')
-      .then(({data})=>{setSubs(data||[]);setBusy(false);});
-  },[userId]);
-
-  const features = [
-    {
-      key:'job_posting_monthly',
-      name:'Job Posting - Unlimited',
-      price:'$49/mo',
-      desc:'Post unlimited staff job listings for your events. Listings stay active for 30 days and appear in the staff portal.',
-      icon:'📋',
-    },
-    {
-      key:'email_marketing',
-      name:'Email Marketing Tools',
-      price:'$29/mo',
-      desc:'Send branded emails to your event attendees and followers. Includes templates, scheduling, and analytics.',
-      icon:'✉️',
-    },
-  ];
-
-  const activeSub = key => subs.find(s=>s.feature_key===key);
-
-  if(busy) return <Spin/>;
-
   return (
     <div>
       <h2 style={{fontFamily:"'DM Sans',sans-serif",fontSize:22,fontWeight:800,marginBottom:6}}>Features</h2>
-      <p style={{color:'var(--sub)',fontSize:14,marginBottom:28}}>Add paid features to your venue account. Cancel anytime from the billing portal.</p>
-
-      <div style={{display:'flex',flexDirection:'column',gap:16,marginBottom:32}}>
-        {features.map(f=>{
-          const sub = activeSub(f.key);
-          return (
-            <Card key={f.key} style={{display:'flex',alignItems:'center',gap:20,flexWrap:'wrap'}}>
-              <div style={{fontSize:32,flexShrink:0}}>{f.icon}</div>
-              <div style={{flex:1,minWidth:200}}>
-                <div style={{fontWeight:700,fontSize:15,marginBottom:3}}>{f.name}</div>
-                <div style={{fontSize:13,color:'var(--sub)',lineHeight:1.6,marginBottom:6}}>{f.desc}</div>
-                {sub&&<div style={{fontSize:11,color:'var(--green)',fontFamily:"'DM Mono',monospace",letterSpacing:'0.08em'}}>
-                  ACTIVE · renews {new Date(sub.current_period_end).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})}
-                  {sub.cancel_at_period_end&&' · cancels at period end'}
-                </div>}
-              </div>
-              <div style={{flexShrink:0}}>
-                {sub?(
-                  <Btn variant="ghost" onClick={()=>openBillingPortal(userId)}>Manage / Cancel</Btn>
-                ):(
-                  <div style={{textAlign:'center'}}>
-                    <Btn onClick={()=>{
-                      if(f.key==='job_posting_monthly') checkoutJobPosting(userId,'monthly');
-                    }}>{f.price} - Subscribe</Btn>
-                  </div>
-                )}
-              </div>
-            </Card>
-          );
-        })}
-      </div>
+      <p style={{color:'var(--sub)',fontSize:14,marginBottom:28}}>Paid add-ons for your venue account, purchased per use.</p>
 
       <Card style={{background:'var(--surface)'}}>
         <h4 style={{fontWeight:700,fontSize:14,marginBottom:8}}>One-time Purchases</h4>
-        <p style={{color:'var(--sub)',fontSize:13,lineHeight:1.7,marginBottom:16}}>Some features are available per-use without a subscription. Job posts can be purchased individually for $10/post (active 30 days). Social media announcements are $35 per post - request one from the social announcements section.</p>
-        <Btn variant="secondary" onClick={()=>openBillingPortal(userId)}>Open Billing Portal</Btn>
+        <p style={{color:'var(--sub)',fontSize:13,lineHeight:1.7}}>Job posts can be purchased individually for $10/post (active 30 days) from the Job Postings page. Social media announcements are $35 per post - request one from the social announcements section.</p>
       </Card>
     </div>
   );

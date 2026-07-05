@@ -583,7 +583,6 @@ async function loadData(){
 function renderShell(){
  const pendingVenues=allVenues.filter(v=>v.status==='pending').length;
  const newInquiries=allInquiries.filter(i=>i.status==='new').length;
- const revenue=allVenues.filter(v=>v.tier==='standard').length*29+allVenues.filter(v=>v.tier==='premium').length*79;
 
  document.getElementById('app').innerHTML=`
  <div class="sidebar"> <div class="sidebar-logo"> <div class="sidebar-logo-text">CBUS<span>EVENTS</span></div> <div class="sidebar-logo-sub">Admin Portal</div> </div>
@@ -594,7 +593,6 @@ function renderShell(){
  <div class="nav-item ${currentPage==='events'?'active':''}" onclick="nav('events')"><span class="nav-icon">◷</span> Events</div>
  <div class="nav-item ${currentPage==='inquiries'?'active':''}" onclick="nav('inquiries')"><span class="nav-icon">◈</span> Inquiries ${newInquiries?('<span class="badge green">'+newInquiries+'</span>'):''}</div>
  <div class="sidebar-section">Revenue</div>
- <div class="nav-item ${currentPage==='revenue'?'active':''}" onclick="nav('revenue')"><span class="nav-icon">◎</span> Revenue</div>
  <div class="nav-item ${currentPage==='transactions'?'active':''}" onclick="nav('transactions')"><span class="nav-icon">⬡</span> Transactions</div>
  <div class="nav-item ${currentPage==='design'?'active':''}" onclick="nav('design')"><span class="nav-icon">◈</span> Design Requests ${allDesignRequests.filter(d=>d.status==='new').length?('<span class="badge">'+allDesignRequests.filter(d=>d.status==='new').length+'</span>'):''}</div>
  <div class="sidebar-section">Platform</div>
@@ -641,7 +639,6 @@ async function renderPage(){
  else if(currentPage==='venues')renderVenues();
  else if(currentPage==='events')renderEvents();
  else if(currentPage==='inquiries')renderInquiries();
- else if(currentPage==='revenue')renderRevenue();
  else if(currentPage==='design')renderDesignRequests();
  else if(currentPage==='vendors')renderVendors();
  else if(currentPage==='foodpros')renderFoodPros();
@@ -1000,7 +997,6 @@ function renderDashboard(){
             ${[
               {icon:'📅',label:'Events',click:"nav('events')"},
               {icon:'💳',label:'Transactions',click:"nav('transactions')"},
-              {icon:'💰',label:'Revenue',click:"nav('revenue')"},
               {icon:'✦',label:'Marketing AI',click:"nav('marketing')"},
               {icon:'✎',label:'Blog & SEO',click:"nav('blog')"},
               {icon:'↗',label:'Outreach',click:"nav('outreach')"},
@@ -1064,7 +1060,7 @@ function renderDashboard(){
 
 // ── VENUES ────────────────────────────────────────────────────
 function renderVenues(){
- const filters={all:allVenues,pending:allVenues.filter(v=>v.status==='pending'),approved:allVenues.filter(v=>v.status==='approved'),premium:allVenues.filter(v=>v.tier==='premium'),standard:allVenues.filter(v=>v.tier==='standard')};
+ const filters={all:allVenues,pending:allVenues.filter(v=>v.status==='pending'),approved:allVenues.filter(v=>v.status==='approved')};
  const filtered=filters[venueFilter]||allVenues;
 
  document.getElementById('pageContent').innerHTML=`
@@ -1080,7 +1076,7 @@ function renderVenues(){
      </div>
    </div>
    <div class="filter-row">
-     ${['all','pending','approved','premium','standard'].map(f=>`
+     ${['all','pending','approved'].map(f=>`
      <button class="filter-chip${venueFilter===f?' active':''}" onclick="venueFilter='${f}';renderVenues()">${f.charAt(0).toUpperCase()+f.slice(1)} (${(filters[f]||[]).length})</button>`).join('')}
    </div>
    <div id="venueListBody" style="padding:8px 16px 16px;display:flex;flex-direction:column;gap:8px;">
@@ -1093,7 +1089,6 @@ function renderVenueCards2(venues){
  if(!venues||!venues.length)return'<div style="text-align:center;padding:52px;color:var(--muted);font-size:13px;">No venues found</div>';
  return venues.map(function(v){
    var statusClass=v.status==='approved'?'badge-green':v.status==='pending'?'badge-orange':'badge-red';
-   var tierClass=v.tier==='premium'?'badge-gold':v.tier==='standard'?'badge-blue':'badge-muted';
    var borderColor=v.status==='pending'?'rgba(251,191,36,0.2)':v.status==='approved'?'rgba(52,211,153,0.12)':'var(--border)';
    var website=v.website?(' · <a href="'+v.website+'" target="_blank" style="color:var(--orange);text-decoration:none;">'+v.website.replace('https://','').replace('www.','').split('/')[0]+'</a>'):'';
    var featured=v.is_featured?'<span style="color:var(--gold);font-size:11px;"> ⭐</span>':'';
@@ -1107,11 +1102,9 @@ function renderVenueCards2(venues){
      +'</div>'
      +'<div style="display:flex;gap:6px;align-items:center;flex-shrink:0;">'
        +'<span class="badge '+statusClass+'">'+v.status+'</span>'
-       +'<span class="badge '+tierClass+'">'+(v.tier||'free')+'</span>'
      +'</div>'
      +'<div style="display:flex;gap:5px;flex-shrink:0;">'
        +approvBtn
-       +'<button class="btn btn-ghost btn-sm" onclick="openTierModal(\''+v.id+'\')">Tier</button>'
        +'<button class="btn btn-ghost btn-sm" onclick="toggleVenueFeature(\''+v.id+'\','+(!v.is_featured)+')">'+(v.is_featured?'Unfeature':'⭐ Feature')+'</button>'
        +'<button class="btn btn-ghost btn-sm" onclick="openEditVenue(\''+v.id+'\')">Edit</button>'
        +'<button class="btn btn-danger btn-sm" onclick="deleteVenue(\''+v.id+'\',\''+safeName+'\')">Delete</button>'
@@ -1128,11 +1121,10 @@ function renderVenueCards(venues){
    <div class="v-card-meta">
      ${v.venue_type||'—'} &nbsp;·&nbsp; ${v.neighborhood||'—'}<br>
      <span class="badge ${v.status==='approved'?'badge-green':v.status==='pending'?'badge-orange':'badge-red'}" style="margin-right:4px">${v.status}</span>
-     <span class="badge ${v.tier==='premium'?'badge-gold':v.tier==='standard'?'badge-blue':'badge-muted'}">${v.tier||'free'}</span>
    </div>
    <div class="v-card-actions">
      ${v.status==='pending'?`<button class="btn btn-success btn-sm" onclick="approveVenue('${v.id}')">Approve</button>`:''}
-     ${v.status!=='rejected'?`<button class="btn btn-ghost btn-sm" onclick="openTierModal('${v.id}')">Tier</button>`:''}
+     ${v.status!=='rejected'?'':''}
      <button class="btn btn-ghost btn-sm" onclick="toggleVenueFeature('${v.id}',${v.is_featured?'false':'true'})">${v.is_featured?'Unfeature':'Feature'}</button>
      <button class="btn btn-danger btn-sm" onclick="deleteVenue('${v.id}','${v.name.replace(/'/g,"\'")}')">Delete</button>
    </div>
@@ -1259,22 +1251,6 @@ function renderInquiries(){
    <div class="filter-row">`+filterBtns+`</div>
    <div style="padding:8px 16px 16px;display:flex;flex-direction:column;gap:8px;">`+cards+`</div>
  </div>`;
-}
-
-// ── REVENUE ───────────────────────────────────────────────────
-function renderRevenue(){
- const standard=allVenues.filter(v=>v.tier==='standard').length;
- const premium=allVenues.filter(v=>v.tier==='premium').length;
- const free=allVenues.filter(v=>!v.tier||v.tier==='free').length;
- const mrr=standard*29+premium*79;
- const arr=mrr*12;
-
- document.getElementById('pageContent').innerHTML=`
- <div class="stat-grid"> <div class="stat-card"> <div class="stat-card-num" style="color:var(--green)">$${mrr}</div> <div class="stat-card-label">Monthly Recurring Revenue</div> <div class="stat-card-sub" style="color:var(--sub)">MRR</div> </div> <div class="stat-card"> <div class="stat-card-num" style="color:var(--green)">$${arr.toLocaleString()}</div> <div class="stat-card-label">Annual Run Rate</div> <div class="stat-card-sub" style="color:var(--sub)">ARR</div> </div> <div class="stat-card"> <div class="stat-card-icon">⭐</div> <div class="stat-card-num" style="color:var(--gold)">${premium}</div> <div class="stat-card-label">Premium Venues</div> <div class="stat-card-sub" style="color:var(--sub)">$${premium*79}/mo</div> </div> <div class="stat-card"> <div class="stat-card-num" style="color:var(--blue)">${standard}</div> <div class="stat-card-label">Standard Venues</div> <div class="stat-card-sub" style="color:var(--sub)">$${standard*29}/mo</div> </div> </div> <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px"> <div class="table-card"> <div class="table-header"><div class="table-title">Revenue Breakdown</div></div> <div style="padding:24px"> <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;padding-bottom:14px;border-bottom:1px solid var(--border)"> <div><div style="font-weight:600">Premium Plan</div><div style="font-size:12px;color:var(--sub)">${premium} venues × $79/mo</div></div> <div style="font-family:'DM Sans',sans-serif;font-size:20px;font-weight:800;color:var(--gold)">$${premium*79}</div> </div> <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;padding-bottom:14px;border-bottom:1px solid var(--border)"> <div><div style="font-weight:600">Standard Plan</div><div style="font-size:12px;color:var(--sub)">${standard} venues × $29/mo</div></div> <div style="font-family:'DM Sans',sans-serif;font-size:20px;font-weight:800;color:var(--blue)">$${standard*29}</div> </div> <div style="display:flex;justify-content:space-between;align-items:center"> <div><div style="font-weight:700">Total MRR</div></div> <div style="font-family:'DM Sans',sans-serif;font-size:24px;font-weight:800;color:var(--green)">$${mrr}</div> </div> </div> </div> <div class="table-card"> <div class="table-header"><div class="table-title">Plan Distribution</div></div> <div style="padding:24px"> ${[{label:'Free',count:free,color:'var(--muted)'},{label:'Standard',count:standard,color:'var(--blue)'},{label:'Premium',count:premium,color:'var(--gold)'}].map(p=>`
- <div style="margin-bottom:16px"> <div style="display:flex;justify-content:space-between;margin-bottom:5px"> <span style="font-size:13px;font-weight:500">${p.label}</span> <span style="font-size:13px;color:var(--sub)">${p.count} venues</span> </div> <div style="height:6px;background:var(--border);border-radius:3px;overflow:hidden"> <div style="height:100%;background:${p.color};border-radius:3px;width:${allVenues.length?Math.round(p.count/allVenues.length*100):0}%;transition:width 0.5s ease"></div> </div> </div>`).join('')}
- <div style="margin-top:20px;padding-top:16px;border-top:1px solid var(--border)"> <div style="font-size:12px;color:var(--muted);margin-bottom:4px">Revenue to goal ($1,000/mo)</div> <div style="height:8px;background:var(--border);border-radius:4px;overflow:hidden"> <div style="height:100%;background:var(--green);border-radius:4px;width:${Math.min(mrr/10,100)}%;transition:width 0.5s ease"></div> </div> <div style="font-size:12px;color:var(--sub);margin-top:4px">${mrr}/1000 — ${Math.round(mrr/10)}% to goal</div> </div> </div> </div> </div> <div class="table-card" style="margin-top:20px"> <div class="table-header"><div class="table-title">Paying Venues</div></div> <table> <thead><tr><th>Venue</th><th>Plan</th><th>Monthly Value</th><th>Type</th><th>Actions</th></tr></thead> <tbody> ${allVenues.filter(v=>v.tier==='premium'||v.tier==='standard').map(v=>`
- <tr> <td><strong>${v.name}</strong></td> <td><span class="badge ${v.tier==='premium'?'badge-gold':'badge-blue'}">${v.tier}</span></td> <td style="color:var(--green);font-weight:600">$${v.tier==='premium'?79:29}/mo</td> <td style="color:var(--sub)">${v.venue_type||'—'}</td> <td><button class="btn btn-ghost btn-sm" onclick="openTierModal('${v.id}')">Change Plan</button></td> </tr>`).join('')||'<tr class="empty-row"><td colspan="5">No paying venues yet — time to hustle! </td></tr>'}
- </tbody> </table> </div> `;
 }
 
 // ── ACTIONS ───────────────────────────────────────────────────
@@ -1677,24 +1653,9 @@ function viewInquiry(id){
  if(i.status==='new')markRead(id);
 }
 
-function openTierModal(id){
- const v=allVenues.find(x=>x.id===id);
- if(!v)return;
- document.getElementById('modalContainer').innerHTML=`
- <div class="modal-overlay" onclick="if(event.target===this)closeModal()"> <div class="modal"> <div class="modal-header"> <div class="modal-title">Change Plan — ${v.name}</div> <button onclick="closeModal()" style="background:none;border:none;color:var(--sub);font-size:18px;cursor:pointer"></button> </div> <div class="modal-body"> <div class="field"> <label for="tierSelect">Plan Tier</label> <select id="tierSelect"> <option value="free" ${v.tier==='free'||!v.tier?'selected':''}>Free</option> <option value="standard" ${v.tier==='standard'?'selected':''}>Standard ($29/mo)</option> <option value="premium" ${v.tier==='premium'?'selected':''}>Premium ($79/mo)</option> </select> </div> <div class="field"> <label for="statusSelect">Status</label> <select id="statusSelect"> <option value="approved" ${v.status==='approved'?'selected':''}>Approved</option> <option value="pending" ${v.status==='pending'?'selected':''}>Pending</option> <option value="rejected" ${v.status==='rejected'?'selected':''}>Rejected</option> </select> </div> </div> <div class="modal-footer"> <button class="btn btn-primary" onclick="saveTier('${id}')">Save Changes</button> <button class="btn btn-ghost" onclick="closeModal()">Cancel</button> </div> </div> </div>`;
-}
-
-async function saveTier(id){
- const tier=document.getElementById('tierSelect').value;
- const status=document.getElementById('statusSelect').value;
- const{error}=await sb.from('venues').update({tier,status}).eq('id',id);
- if(error){toast('Error: '+error.message,'error');return;}
- closeModal();await loadData();renderShell();toast(' Venue updated!');
-}
-
 function openAddVenueModal(){
  document.getElementById('modalContainer').innerHTML=`
- <div class="modal-overlay" onclick="if(event.target===this)closeModal()"> <div class="modal"> <div class="modal-header"> <div class="modal-title">Add Venue Manually</div> <button onclick="closeModal()" style="background:none;border:none;color:var(--sub);font-size:18px;cursor:pointer"></button> </div> <div class="modal-body"> <div class="field"><label for="avName">Venue Name *</label><input id="avName" placeholder="e.g. The Basement"></div> <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px"> <div class="field"><label for="avType">Type</label><input id="avType" placeholder="e.g. Bar & Grill"></div> <div class="field"><label for="avHood">Neighborhood</label><input id="avHood" placeholder="e.g. Short North"></div> </div> <div class="field"><label for="avDesc">Description</label><textarea id="avDesc" placeholder="Brief description..."></textarea></div> <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px"> <div class="field"><label for="avTier">Plan</label><select id="avTier"><option value="free">Free</option><option value="standard">Standard</option><option value="premium">Premium</option></select></div> <div class="field"><label for="avStatus">Status</label><select id="avStatus"><option value="approved">Approved</option><option value="pending">Pending</option></select></div> </div> </div> <div class="modal-footer"> <button class="btn btn-primary" onclick="addVenue()">Add Venue →</button> <button class="btn btn-ghost" onclick="closeModal()">Cancel</button> </div> </div> </div>`;
+ <div class="modal-overlay" onclick="if(event.target===this)closeModal()"> <div class="modal"> <div class="modal-header"> <div class="modal-title">Add Venue Manually</div> <button onclick="closeModal()" style="background:none;border:none;color:var(--sub);font-size:18px;cursor:pointer"></button> </div> <div class="modal-body"> <div class="field"><label for="avName">Venue Name *</label><input id="avName" placeholder="e.g. The Basement"></div> <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px"> <div class="field"><label for="avType">Type</label><input id="avType" placeholder="e.g. Bar & Grill"></div> <div class="field"><label for="avHood">Neighborhood</label><input id="avHood" placeholder="e.g. Short North"></div> </div> <div class="field"><label for="avDesc">Description</label><textarea id="avDesc" placeholder="Brief description..."></textarea></div> <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px"> <div class="field"><label for="avStatus">Status</label><select id="avStatus"><option value="approved">Approved</option><option value="pending">Pending</option></select></div> </div> </div> <div class="modal-footer"> <button class="btn btn-primary" onclick="addVenue()">Add Venue →</button> <button class="btn btn-ghost" onclick="closeModal()">Cancel</button> </div> </div> </div>`;
 }
 
 async function addVenue(){
@@ -1704,7 +1665,6 @@ async function addVenue(){
  name,venue_type:document.getElementById('avType').value||null,
  neighborhood:document.getElementById('avHood').value||null,
  description:document.getElementById('avDesc').value||null,
- tier:document.getElementById('avTier').value,
  status:document.getElementById('avStatus').value,
  city:'Columbus',state:'OH',
  });
@@ -1824,7 +1784,7 @@ function renderVendors(){
    <div class="table-header">
      <div>
        <div class="table-title">All Vendors</div>
-       <div class="table-title-sub">${allVendors.length} total &nbsp;·&nbsp; ${allVendors.filter(v=>v.subscription_status==='active'||v.tier==='premium'||v.tier==='standard').length} paid</div>
+       <div class="table-title-sub">${allVendors.length} total</div>
      </div>
      <input class="search-input" placeholder="Search vendors..." oninput="searchVendors(this.value)" style="width:220px;">
    </div>
@@ -1857,11 +1817,6 @@ function renderVendors(){
        <div class="field"><label for="ve-instagram">Instagram</label><input id="ve-instagram" class="form-input" placeholder="@handle"/></div>
      </div>
      <div class="field"><label for="ve-website">Website</label><input id="ve-website" class="form-input"/></div>
-     <div class="field"><label for="ve-tier">Subscription Tier</label>
-       <select id="ve-tier" class="form-input">
-         <option value="">FREE</option><option value="STANDARD">STANDARD</option><option value="PREMIUM">PREMIUM</option><option value="FOUNDING">FOUNDING</option>
-       </select>
-     </div>
      <div style="display:flex;gap:10px;margin-top:22px;">
        <button onclick="closeVendorEdit()" class="btn btn-ghost" style="flex:1;">Cancel</button>
        <button onclick="saveVendorEdit()" class="btn btn-primary" style="flex:2;">Save Changes →</button>
@@ -1873,13 +1828,9 @@ function renderVendors(){
 function renderVendorCards(vendors){
  if(!vendors.length)return'<div style="text-align:center;padding:52px;color:var(--muted);font-size:13px;">No vendors found</div>';
  return vendors.map(function(v){
-   var tierClass=v.subscription_tier==='PREMIUM'||v.tier==='premium'?'badge-gold':v.subscription_tier==='STANDARD'||v.tier==='standard'?'badge-blue':'badge-muted';
-   var tierLabel=v.subscription_tier||v.tier||'FREE';
-   var subClass=v.subscription_status==='active'?'badge-green':'badge-muted';
    var name=v.business_name||v.name||'Unnamed Vendor';
    var cat=v.category||null;
    var catPill=cat?('<span style="display:inline-block;background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:20px;padding:3px 11px;font-size:11px;font-weight:500;color:var(--sub);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:140px;">'+cat+'</span>'):'<span style="color:var(--muted);font-size:12px;">&mdash;</span>';
-   var subBadge=v.subscription_status?('<span class="badge '+subClass+'">'+v.subscription_status+'</span>'):'';
    var promoBtn='<button class="btn '+(v.admin_promoted?'btn-ghost':'btn-success')+' btn-sm" onclick="toggleVendorPromo(\''+v.id+'\','+(!v.admin_promoted)+')">'+(v.admin_promoted?'Unpromo':'&#9733; Promo')+'</button>';
    var featureBtn='<button class="btn '+(v.is_featured?'btn-ghost':'btn-success')+' btn-sm" onclick="toggleVendorFeature(\''+v.id+'\','+(!v.is_featured)+')">'+(v.is_featured?'Unfeature':'⭐ Feature')+'</button>';
    var safeName=(v.business_name||v.name||'this vendor').replace(/'/g,"\\'");
@@ -1891,8 +1842,6 @@ function renderVendorCards(vendors){
      +'</div>'
      +'<div style="flex-shrink:0;min-width:0;max-width:140px;">'+catPill+'</div>'
      +'<div style="display:flex;gap:6px;flex-shrink:0;align-items:center;">'
-       +'<span class="badge '+tierClass+'">'+tierLabel+'</span>'
-       +subBadge
      +'</div>'
      +'<div style="display:flex;gap:6px;flex-shrink:0;">'
        +featureBtn
@@ -2123,7 +2072,6 @@ async function openEditVendor(id){
  document.getElementById('ve-phone').value=v.phone||'';
  document.getElementById('ve-website').value=v.website||'';
  document.getElementById('ve-instagram').value=v.instagram||'';
- document.getElementById('ve-tier').value=v.subscription_tier||'';
  modal.style.display='flex';
 }
 
@@ -2142,7 +2090,6 @@ async function saveVendorEdit(){
    phone:document.getElementById('ve-phone').value.trim()||null,
    website:document.getElementById('ve-website').value.trim()||null,
    instagram:document.getElementById('ve-instagram').value.trim()||null,
-   subscription_tier:document.getElementById('ve-tier').value||null,
    updated_at:new Date().toISOString(),
  };
  console.log('Saving vendor:', editingVendorId, updates);
@@ -2198,7 +2145,6 @@ async function deleteUser(userId,email){
  await renderUsers();
 }
 
-// ── SUBSCRIPTIONS ─────────────────────────────────────────────
 // ── TRANSACTIONS ───────────────────────────────────────────────
 // Pulls live payment_intents from Stripe Connect via Supabase Edge Function
 // Falls back to local stripe_transactions table if edge function unavailable
@@ -3293,7 +3239,7 @@ function openFTEmailModal(id){
   _ftActiveId = id;
   document.getElementById('ftEmailTo').value = p.email;
   document.getElementById('ftEmailSubject').value = `Join the 1313 Festival - Vendor Spot Available ($75)`;
-  document.getElementById('ftEmailBody').value = `Hi ${p.name} team,\n\nI'm Deante Gray, founder of CBUSEVENTS - a Columbus event ecosystem connecting venues, vendors, food trucks, and attendees across the city.\n\nI'm reaching out because we're building out our vendor lineup for the 1313 Festival Series, kicking off with our inaugural event "End of Spring" on June 13, 2026 at 1313 E. Broad St.\n\nFood truck spots are $175 for the event. Participants who join the festival also receive 3 months of complimentary Premium membership on the CBUSEVENTS platform, and if you convert to a paying Premium member, your spot fee is waived at all future CBUSEVENTS events.\n\nWould love to have you be part of the inaugural festival. Reply here or apply at cbusevents.com.\n\nDeante Gray\nFounder, CBUSEVENTS\ninfo@cbusevents.com`;
+  document.getElementById('ftEmailBody').value = `Hi ${p.name} team,\n\nI'm Deante Gray, founder of CBUSEVENTS - a Columbus event ecosystem connecting venues, vendors, food trucks, and attendees across the city.\n\nI'm reaching out because we're building out our vendor lineup for the 1313 Festival Series, kicking off with our inaugural event "End of Spring" on June 13, 2026 at 1313 E. Broad St.\n\nFood truck spots are $175 for the event.\n\nWould love to have you be part of the inaugural festival. Reply here or apply at cbusevents.com.\n\nDeante Gray\nFounder, CBUSEVENTS\ninfo@cbusevents.com`;
   const modal = document.getElementById('ftEmailModal');
   if(modal) modal.style.display = 'flex';
 }

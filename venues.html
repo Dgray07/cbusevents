@@ -81,7 +81,6 @@ nav{position:sticky;top:0;z-index:200;height:60px;display:flex;align-items:cente
 .card-cover-placeholder{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:44px;opacity:0.3;}
 .card-cover-gradient{position:absolute;inset:0;background:linear-gradient(to top,rgba(15,15,30,0.8) 0%,transparent 55%);}
 
-.badge-standard{background:var(--orange-soft);color:var(--orange);border:1px solid var(--orange-glow);}
 .card-capacity{position:absolute;bottom:12px;left:12px;font-family:var(--mono);font-size:10px;font-weight:600;color:rgba(255,255,255,0.7);background:rgba(0,0,0,0.5);padding:3px 9px;border-radius:100px;backdrop-filter:blur(4px);}
 
 .card-body{padding:18px 20px 20px;flex:1;display:flex;flex-direction:column;gap:8px;}
@@ -162,22 +161,7 @@ nav{position:sticky;top:0;z-index:200;height:60px;display:flex;align-items:cente
 .feature-item-desc{font-size:12px;color:var(--text-dim);line-height:1.5;}
 .feature-accent{width:24px;height:2px;background:var(--orange);border-radius:2px;margin-bottom:12px;}
 
-/* PRICING STRIP */
-.pricing-strip{border-top:1px solid rgba(255,255,255,0.06);margin:0 56px;padding:32px 0;display:grid;grid-template-columns:repeat(3,1fr);gap:12px;position:relative;z-index:1;}
-.price-item{text-align:center;padding:20px;}
-.price-name{font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;margin-bottom:8px;}
-.price-item.free .price-name{color:var(--text-dim);}
-.price-item.standard .price-name{color:var(--orange);}
-.price-item.premium .price-name{color:var(--gold);}
-.price-amount{font-size:26px;font-weight:800;letter-spacing:-0.03em;line-height:1;margin-bottom:4px;}
-.price-item.free .price-amount{color:var(--text-dim);}
-.price-item.standard .price-amount{color:var(--orange);}
-.price-item.premium .price-amount{color:var(--gold);}
-.price-period{font-size:11px;color:var(--text-faint);margin-bottom:14px;}
-.price-perks{display:flex;flex-direction:column;gap:6px;text-align:left;max-width:180px;margin:0 auto;}
-.price-perk{font-size:12px;color:var(--text-dim);display:flex;gap:7px;align-items:flex-start;}
-.price-perk::before{content:'✓';font-size:10px;color:var(--green);flex-shrink:0;margin-top:1px;}
-.price-divider{position:absolute;top:32px;left:33.33%;width:1px;height:calc(100% - 64px);background:rgba(255,255,255,0.06);}
+
 .price-divider-2{position:absolute;top:32px;left:66.66%;width:1px;height:calc(100% - 64px);background:rgba(255,255,255,0.06);}
 
 /* FOOTER */
@@ -196,7 +180,6 @@ footer{border-top:1px solid var(--border);padding:28px 32px;display:flex;justify
   .list-stats{flex-direction:row;}
   .features-section{padding:0 28px 36px;}
   .features-grid{grid-template-columns:1fr 1fr;}
-  .pricing-strip{margin:0 28px;grid-template-columns:1fr;}
   .price-divider,.price-divider-2{display:none;}
 }
 @media(max-width:560px){
@@ -390,8 +373,7 @@ const sb=supabase.createClient(
   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRvYmxndmF0dnNqbGpicW9nenN2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMDgwNTAsImV4cCI6MjA4NzY4NDA1MH0._WJEQPizNDiQfDXQB_DHPaQhixPGpMdmYQSmyWmm_FQ'
 );
 
-const TIER_RANK={PREMIUM:0,STANDARD:1,FREE:2,'':3};
-const tRank=v=>(v.is_featured?-1:0)+( TIER_RANK[(v.tier||v.subscription_tier||'').toUpperCase()]??3);
+const tRank=v=>v.is_featured?-1:0;
 
 const VENUE_ICONS={'bar':'🍹','lounge':'🍹','nightlife':'🎵','restaurant':'🍽','food':'🍽','event':'🎪','space':'🎪','rooftop':'🌆','comedy':'😂','concert':'🎸','music':'🎸','gallery':'🎨','art':'🎨','outdoor':'🌿','hotel':'🏨','historic':'🏛'};
 
@@ -517,11 +499,11 @@ window.setFilter=setFilter;window.handleSearch=handleSearch;window.handleSort=ha
 
 (async()=>{
   // Load venues
-  const{data,error}=await sb.from('venues').select('id,name,venue_type,neighborhood,city,capacity,description,cover_image_url,tier,subscription_tier,tags,amenities,phone,website,created_at,status,is_featured').eq('status','approved').limit(100);
+  const{data,error}=await sb.from('venues').select('id,name,venue_type,neighborhood,city,capacity,description,cover_image_url,tags,amenities,phone,website,created_at,status,is_featured').eq('status','approved').limit(100);
 
   if(error||!data?.length){
     // Try without status filter - some venues may not have status set
-    const{data:d2}=await sb.from('venues').select('id,name,venue_type,neighborhood,city,capacity,description,cover_image_url,tier,subscription_tier,tags,amenities,phone,website,created_at,is_featured').limit(100);
+    const{data:d2}=await sb.from('venues').select('id,name,venue_type,neighborhood,city,capacity,description,cover_image_url,tags,amenities,phone,website,created_at,is_featured').limit(100);
     all=(d2||[]);
   } else {
     all=data;

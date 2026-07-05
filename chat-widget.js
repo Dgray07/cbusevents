@@ -104,9 +104,9 @@
     const base = `You are an AI assistant embedded inside the CBUSEVENTS platform — Columbus, Ohio's event marketplace connecting venues, vendors, organizers, and attendees. You are talking to a ${ROLE === 'guest' ? 'visitor' : ROLE.replace('_', ' ')}${USER_NAME ? ' named ' + USER_NAME : ''}. Be warm, concise, and action-oriented. Always encourage the user to take the next step on the platform. Never make up specific prices, dates, or availability — direct users to their portal dashboard for live data. For links, always use cbusevents.com as the base URL.`;
 
     const roleContext = {
-      venue_owner: `This user owns or manages a Columbus venue. Help them maximise their listing performance, understand their plan limits, get more bookings, publish events, and grow their revenue through the platform. Key upsell: Standard ($29/mo) adds featured placement and verified badge; Premium ($79/mo) adds homepage feature, top of all listings, and flyer/merch design services.`,
-      vendor: `This user is a Columbus vendor or service provider. Help them get discovered by venues and organizers, understand how proposals work, build out their profile/portfolio, and upgrade their plan. Key upsell: Standard ($29/mo) adds featured directory placement; Premium ($79/mo) adds ability to send proposals directly to event organisers and top placement.`,
-      organizer: `This user is a Columbus event organizer. Help them find venues, connect with vendors, publish events, and manage their workflow. Key upsell: Pro ($19/mo) unlocks full vendor directory and receiving proposals; Agency ($49/mo) adds priority venue responses and homepage feature slot.`,
+      venue_owner: `This user owns or manages a Columbus venue. Help them maximise their listing performance, get more bookings, publish events, and grow their revenue through the platform.`,
+      vendor: `This user is a Columbus vendor or service provider. Help them get discovered by venues and organizers, understand how proposals work, and build out their profile/portfolio.`,
+      organizer: `This user is a Columbus event organizer. Help them find venues, connect with vendors, publish events, and manage their workflow.`,
       customer: `This user is a Columbus event attendee. Help them discover events, find things to do, and navigate the platform. Encourage them to save venues and follow organisers for personalised recommendations.`,
       guest: `This visitor is not yet signed in. Help them understand the platform and guide them to sign up at cbusevents.com/auth.html.`,
     };
@@ -115,7 +115,7 @@
 
     if (liveData?.venues?.length) {
       const vList = liveData.venues.slice(0, 12).map(v =>
-        `- ${v.name} (${v.venue_type || 'Venue'}, ${v.neighborhood || 'Columbus'}, capacity: ${v.capacity || 'varies'}, tier: ${v.tier || 'free'})`
+        `- ${v.name} (${v.venue_type || 'Venue'}, ${v.neighborhood || 'Columbus'}, capacity: ${v.capacity || 'varies'})`
       ).join('\n');
       prompt += `\n\nCURRENT LIVE VENUES ON CBUSEVENTS (use this to answer venue questions accurately):\n${vList}`;
     }
@@ -148,9 +148,9 @@
       };
 
       const [venuesRes, eventsRes, vendorsRes] = await Promise.all([
-        fetch(`${SB_URL}/rest/v1/venues?select=name,venue_type,neighborhood,capacity,tier&status=eq.approved&order=rank_score.desc&limit=15`, { headers }),
+        fetch(`${SB_URL}/rest/v1/venues?select=name,venue_type,neighborhood,capacity&status=eq.approved&order=rank_score.desc&limit=15`, { headers }),
         fetch(`${SB_URL}/rest/v1/events?select=title,category,start_time,venues(name)&status=eq.published&start_time=gte.${new Date().toISOString()}&order=start_time.asc&limit=12`, { headers }),
-        fetch(`${SB_URL}/rest/v1/vendors?select=business_name,category&subscription_status=eq.active&neq=subscription_tier.FREE&order=rank_score.desc&limit=10`, { headers }),
+        fetch(`${SB_URL}/rest/v1/vendors?select=business_name,category&order=rank_score.desc&limit=10`, { headers }),
       ]);
 
       const [venues, events, vendors] = await Promise.all([

@@ -458,7 +458,7 @@ async function handleSubmit() {
         await sb.from('venues').insert({ owner_id: userId, name: meta.venue_name, venue_type: meta.venue_type||null, capacity: meta.capacity?parseInt(meta.capacity):null, phone: meta.phone||null, status: 'pending', tier: 'free', city: 'Columbus', state: 'OH' });
       }
       if (selectedRole === 'vendor') {
-        await sb.from('vendors').upsert({ user_id: userId, email, business_name: meta.business_name||null, category: meta.vendor_type||null, phone: meta.phone||null, subscription_status: 'active', subscription_tier: 'FREE' }, { onConflict: 'user_id' });
+        await sb.from('vendors').upsert({ user_id: userId, email, business_name: meta.business_name||null, category: meta.vendor_type||null, phone: meta.phone||null }, { onConflict: 'user_id' });
       }
       if (selectedRole === 'organizer') {
         await sb.from('organizers').upsert({ user_id: userId, email, name: meta.full_name||null, phone: meta.phone||null }, { onConflict: 'user_id' }).catch(()=>{});

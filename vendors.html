@@ -99,9 +99,7 @@ nav{position:sticky;top:0;z-index:200;height:60px;display:flex;align-items:cente
 .card-cover img{width:100%;height:100%;object-fit:cover;display:block;}
 .card-cover-placeholder{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:40px;opacity:0.35;}
 .card-cover-gradient{position:absolute;inset:0;background:linear-gradient(to top,rgba(15,15,30,0.85) 0%,transparent 60%);}
-.card-tier-badge{position:absolute;top:12px;right:12px;font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;padding:3px 9px;border-radius:100px;}
-.badge-premium{background:rgba(251,191,36,0.15);color:var(--gold);border:1px solid rgba(251,191,36,0.3);}
-.badge-standard{background:var(--orange-soft);color:var(--orange);border:1px solid var(--orange-glow);}
+
 
 .card-avatar-wrap{padding:0 20px;margin-top:-24px;margin-bottom:10px;position:relative;z-index:2;}
 .card-avatar{width:48px;height:48px;border-radius:12px;border:2px solid var(--card);background:linear-gradient(135deg,var(--orange-soft),rgba(255,107,53,0.04));display:flex;align-items:center;justify-content:center;font-size:22px;overflow:hidden;}
@@ -267,7 +265,7 @@ nav.site-nav{display:flex;align-items:center;justify-content:space-between;paddi
   <div class="list-banner-inner">
     <div>
       <div class="list-banner-text">Are you a Columbus vendor? <span>Get in front of organizers searching right now.</span></div>
-      <div class="list-banner-sub">Free to list. Upgrade when you're ready to grow.</div>
+      <div class="list-banner-sub">Free to list your business.</div>
     </div>
     <a href="https://cbusevents.com/signup.html?role=vendor" class="list-banner-btn">List Your Business →</a>
   </div>
@@ -306,8 +304,7 @@ const ICONS = {
   lighting:'✨',photo_booth:'🎪',planning:'📋',rentals:'🪑',printing:'🖨',merch:'👕',
 };
 
-const TIER_RANK = {PREMIUM:0,STANDARD:1,FREE:2,'':3};
-const tRank = v => (v.is_featured?-1:0) + (TIER_RANK[(v.subscription_tier||'').toUpperCase()]??3);
+const tRank = v => v.is_featured?-1:0;
 
 let all=[], activeFilter='all', searchQuery='', sortMode='tier';
 
@@ -340,7 +337,7 @@ function render(){
   const featuredSection=document.getElementById('featuredSection');
   const featuredGrid=document.getElementById('featuredGrid');
   const showFeatured=activeFilter==='all'&&!searchQuery;
-  const featured=all.filter(v=>v.is_featured||(v.subscription_tier||'').toUpperCase()==='PREMIUM');
+  const featured=all.filter(v=>v.is_featured);
   if(showFeatured&&featured.length){
     featuredSection.style.display='';
     featuredGrid.innerHTML=featured.map((v,i)=>card(v,i,true)).join('');
@@ -359,19 +356,17 @@ function render(){
 function card(v,i,isFeaturedSection=false){
   const rawName=v.business_name||v.name||v.email||'Columbus Vendor';
   const name=rawName.includes('@')?rawName.split('@')[0]:rawName;
-  const tier=(v.subscription_tier||'').toUpperCase();
   const svcs=(v.services||[]).slice(0,3);
   const icon=ICONS[svcs[0]]||ICONS[v.category]||'⭐';
   const cat=v.category||SVC[svcs[0]]||'Vendor';
   const delay=Math.min(i*35,400);
-  const tierBadge=tier==='PREMIUM'?`<div class="card-tier-badge badge-premium">Premium</div>`:tier==='STANDARD'?`<div class="card-tier-badge badge-standard">Standard</div>`:'';
   const featuredBadge=isFeaturedSection&&v.is_featured?`<div class="featured-badge">⭐ Featured</div>`:'';
   const cardClass=isFeaturedSection?'featured-card':'vendor-card';
   const cover=v.cover_image_url?`<img src="${v.cover_image_url}" alt="${name}" loading="lazy">`:`<div class="card-cover-placeholder">${icon}</div>`;
   const avatar=v.profile_image_url?`<img src="${v.profile_image_url}" alt="${name}">`:`${icon}`;
   const tags=svcs.length?`<div class="card-tags">${svcs.map(s=>`<span class="card-tag">${SVC[s]||s}</span>`).join('')}</div>`:'';
   return `<div class="${cardClass}" style="animation-delay:${delay}ms" onclick="openModal('${v.id}')">
-    <div class="card-cover">${cover}<div class="card-cover-gradient"></div>${tierBadge}${featuredBadge}</div>
+    <div class="card-cover">${cover}<div class="card-cover-gradient"></div>${featuredBadge}</div>
     <div class="card-avatar-wrap"><div class="card-avatar">${avatar}</div></div>
     <div class="card-body">
       <div class="card-cat">${cat}</div>
@@ -400,11 +395,9 @@ function openModal(id){
   })();
   const rawName=v.business_name||v.name||v.email||'Columbus Vendor';
   const name=rawName.includes('@')?rawName.split('@')[0]:rawName;
-  const tier=(v.subscription_tier||'').toUpperCase();
   const svcs=v.services||[];
   const icon=ICONS[svcs[0]]||ICONS[v.category]||'⭐';
   const cat=v.category||SVC[svcs[0]]||'Vendor';
-  const tierBadge=tier==='PREMIUM'?`<span style="font-family:var(--mono);font-size:9px;font-weight:700;padding:3px 9px;border-radius:100px;background:rgba(251,191,36,0.12);color:var(--gold);border:1px solid rgba(251,191,36,0.25)">Premium</span>`:tier==='STANDARD'?`<span style="font-family:var(--mono);font-size:9px;font-weight:700;padding:3px 9px;border-radius:100px;background:var(--orange-soft);color:var(--orange);border:1px solid var(--orange-glow)">Standard</span>`:'';
   const cover=v.cover_image_url?`<img src="${v.cover_image_url}" alt="${name}">`:`<div class="modal-cover-placeholder">${icon}</div>`;
   const avatar=v.profile_image_url?`<img src="${v.profile_image_url}" alt="${name}">`:`${icon}`;
   const socials=[v.instagram&&`<a class="modal-social" href="https://instagram.com/${v.instagram.replace('@','')}" target="_blank">Instagram</a>`,v.tiktok&&`<a class="modal-social" href="https://tiktok.com/@${v.tiktok.replace('@','')}" target="_blank">TikTok</a>`,v.website&&`<a class="modal-social" href="${v.website}" target="_blank">Website</a>`].filter(Boolean).join('');
@@ -416,7 +409,7 @@ function openModal(id){
         <div class="modal-avatar-row">
           <div class="modal-avatar">${avatar}</div>
           <div>
-            <div class="modal-cat">${cat} ${tierBadge}</div>
+            <div class="modal-cat">${cat}</div>
             <div class="modal-name">${name}</div>
             ${v.years_in_business?`<div style="font-size:11px;color:var(--text-dim);margin-top:2px">${v.years_in_business} year${v.years_in_business>1?'s':''} in business</div>`:''}
           </div>
@@ -533,7 +526,7 @@ function handleSort(val){sortMode=val;render();}
 window.setFilter=setFilter;window.handleSearch=handleSearch;window.handleSort=handleSort;window.openModal=openModal;window.closeModal=closeModal;window.goToInquiry=goToInquiry;
 
 (async()=>{
-  const{data,error}=await sb.from('vendors').select('id,business_name,name,category,subscription_tier,services,description,cover_image_url,profile_image_url,instagram,tiktok,website,years_in_business,created_at,is_featured').limit(100);
+  const{data,error}=await sb.from('vendors').select('id,business_name,name,category,services,description,cover_image_url,profile_image_url,instagram,tiktok,website,years_in_business,created_at,is_featured').limit(100);
   if(error){
     console.error('Vendor load error:',error);
     // Try simpler query as fallback - RLS may be restricting columns

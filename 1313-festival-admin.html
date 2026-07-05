@@ -1106,10 +1106,6 @@
               <span class="label">Organizer Premium</span>
               <span class="val" id="conv-organizer">- (add manually)</span>
             </div>
-            <div class="conversion-row">
-              <span class="label">Potential Monthly Recurring</span>
-              <span class="val orange" id="conv-mrr">$-</span>
-            </div>
           </div>
         </div>
 
@@ -1369,7 +1365,6 @@
     const vApproved = allApps.filter(a => a.applicant_type === 'vendor' && a.status === 'approved').length;
     const vRevenue = allApps.filter(a => a.applicant_type === 'vendor' && a.status === 'approved').reduce((s,a) => s+(a.fee||0), 0);
     const totalRevenue = ftRevenue + vRevenue;
-    const mrr = (ftApproved * 0) + (vApproved * 0); // Update when subscription data flows
 
     document.getElementById('conv-revenue').textContent = '$' + totalRevenue.toLocaleString();
     document.getElementById('conv-ft-applied').textContent = ftApplied;
@@ -1382,7 +1377,6 @@
     document.getElementById('conv-v-remaining').textContent = (20 - vApproved) + ' of 20';
     document.getElementById('conv-rsvp-total').textContent = allRsvps.length;
     document.getElementById('conv-rsvp-phone').textContent = allRsvps.filter(r => r.phone).length;
-    document.getElementById('conv-mrr').textContent = mrr > 0 ? '$' + mrr + '/mo' : 'Pending Stripe data';
   }
 
   // SEND PAYMENT LINK

@@ -360,7 +360,7 @@ async function loadProducts() {
 
   let query = sb
     .from('vendor_products')
-    .select('*, vendors(id, business_name, cover_image_url, subscription_tier, slug, storefront_active, description, neighborhood, category)')
+    .select('*, vendors(id, business_name, cover_image_url, slug, storefront_active, description, neighborhood, category)')
     .eq('status', 'active')
     .order('created_at', { ascending: false });
 
