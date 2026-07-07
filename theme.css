@@ -32,23 +32,7 @@
   --muted: #5a5450;
 }
 
-/* Light mode for pages that are natively dark (portals) */
-[data-theme="light"][data-default="dark"] {
-  --bg: #f9f6f1;
-  --white: #ffffff;
-  --cream: #faf7f2;
-  --ink: #141210;
-  --ash: #3a3530;
-  --sub: #6b6560;
-  --mist: #a09890;
-  --rule: #e8e0d4;
-  --surface: #f5f0ea;
-  --card: #ffffff;
-  --border: #e8e0d4;
-  --border-sub: #f0e8dc;
-  --text: #141210;
-  --muted: #a09890;
-}
+/* Light theme removed platform-wide — dark only. */
 
 /* Smooth transitions on theme switch */
 html {
@@ -64,42 +48,11 @@ img, video, canvas, svg {
   transition: none !important;
 }
 
-/* Theme toggle button — works on any page */
-.theme-toggle {
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  border: 1.5px solid var(--rule, #e8e0d4);
-  background: transparent;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  font-size: 16px;
-  flex-shrink: 0;
-  color: var(--ash, #3a3530);
-  transition: border-color .15s, color .15s, background .15s !important;
-  padding: 0;
-  line-height: 1;
+/* Theme toggle button — hidden. Dark only, nothing to toggle. */
+.theme-toggle,
+#themeToggle {
+  display: none !important;
 }
-
-.theme-toggle:hover {
-  border-color: #FF6B35;
-  color: #FF6B35;
-}
-
-/* Icon visibility */
-.theme-icon-sun { display: none; }
-.theme-icon-moon { display: block; }
-
-[data-theme="dark"] .theme-icon-sun { display: block; }
-[data-theme="dark"] .theme-icon-moon { display: none; }
-
-/* For pages defaulting to dark, flip icon logic */
-[data-default="dark"] .theme-icon-sun { display: block; }
-[data-default="dark"] .theme-icon-moon { display: none; }
-[data-default="dark"][data-theme="light"] .theme-icon-sun { display: none; }
-[data-default="dark"][data-theme="light"] .theme-icon-moon { display: block; }
 
 /* Dark mode card/surface overrides for light pages */
 [data-theme="dark"] .card,

@@ -656,7 +656,7 @@ body{-webkit-tap-highlight-color:rgba(0,0,0,0);}
       </li>
     </ul>
     <div style="display:flex;align-items:center;gap:10px">
-      <button id="themeToggle" onclick="toggleTheme()" aria-label="Toggle dark mode" title="Toggle dark mode" style="width:34px;height:34px;border-radius:50%;background:none;border:1.5px solid var(--rule);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:15px;flex-shrink:0;transition:border-color 0.18s" onmouseover="this.style.borderColor='var(--flame)'" onmouseout="this.style.borderColor='var(--rule)'">🌙</button>
+      <button id="themeToggle" onclick="toggleTheme()" aria-label="Toggle dark mode" title="Toggle dark mode" style="display:none" onmouseover="this.style.borderColor='var(--flame)'" onmouseout="this.style.borderColor='var(--rule)'">🌙</button>
       <div style="position:relative" id="joinDropdown">
         <button onclick="toggleJoinMenu()" style="font-family:var(--mono);font-size:9px;letter-spacing:0.16em;text-transform:uppercase;color:var(--ash);background:none;border:none;cursor:pointer;transition:color 0.18s;display:flex;align-items:center;gap:4px" onmouseover="this.style.color='var(--flame)'" onmouseout="this.style.color='var(--ash)'">Join ▾</button>
         <div id="joinMenu" style="display:none;position:absolute;top:calc(100% + 8px);right:0;background:white;border:1px solid var(--rule);border-radius:12px;padding:8px;min-width:200px;box-shadow:0 16px 40px rgba(0,0,0,0.12);z-index:300">
@@ -1617,27 +1617,25 @@ document.addEventListener('click',function(e){
   });
 });
 
-// THEME
+// THEME (dark only — light theme removed)
 (function(){
-  const stored=localStorage.getItem('cbusevents_theme')||'dark';
-  applyTheme(stored);
+  localStorage.removeItem('cbusevents_theme');
+  applyTheme('dark');
 })();
 function applyTheme(t){
-  document.documentElement.setAttribute('data-theme',t);
-  localStorage.setItem('cbusevents_theme',t);
+  document.documentElement.setAttribute('data-theme','dark');
   const btn=document.getElementById('themeToggle');
-  if(btn)btn.textContent=t==='dark'?'☀️':'🌙';
+  if(btn)btn.textContent='☀️';
   // Update dropdown backgrounds for dark mode
-  const dropBg=t==='dark'?'#1c1c30':'white';
-  const dropBorder=t==='dark'?'rgba(255,255,255,0.09)':'var(--rule)';
+  const dropBg='#1c1c30';
+  const dropBorder='rgba(255,255,255,0.09)';
   ['columbusMenu','joinMenu','signinMenu'].forEach(id=>{
     const el=document.getElementById(id);
     if(el){el.style.background=dropBg;el.style.borderColor=dropBorder;}
   });
 }
 function toggleTheme(){
-  const current=document.documentElement.getAttribute('data-theme')||'light';
-  applyTheme(current==='dark'?'light':'dark');
+  applyTheme('dark');
 }
 
 // DATEBAR DATE
