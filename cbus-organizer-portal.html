@@ -966,8 +966,7 @@ async function doLogin(){
  if(error){const el=document.getElementById('aErr');if(el){el.textContent=error.message;el.style.display='block';}return;}
  currentUser=data.user;
  await loadData();await handleBoostReturn();await handlePendingBooking();setLoggedInNav();
- const upgradeParam=new URLSearchParams(window.location.search).get('upgrade');
- else nav('events');
+ nav('events');
 }
 
 async function doSignup(){
