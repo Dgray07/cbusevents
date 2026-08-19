@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
 <script>if(window.self!==window.top){window.stop();}</script>
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"CBUSEVENTS","url":"https://cbusevents.com","description":"Columbus Ohio event platform connecting venues, organizers, vendors, and customers","potentialAction":{"@type":"SearchAction","target":"https://cbusevents.com/?search={search_term_string}","query-input":"required name=search_term_string"}}</script>
@@ -27,6 +27,9 @@
 <link rel="preload" as="script" href="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js">
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700;1,900&family=DM+Sans:wght@300;400;500;600;700;800;900&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/cbus.css?v=1">
+<link rel="stylesheet" href="/theme.css">
+<script src="/theme.js"></script>
+<link rel="stylesheet" href="/cbus-workspace-switcher.css">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-font-smoothing:antialiased;}
 :root{
@@ -627,470 +630,339 @@ body{-webkit-tap-highlight-color:rgba(0,0,0,0);}
 </head>
 <body>
 
+<!-- ============================================================
+     CBUS EVENTS 2.0 HOMEPAGE — rebuilt to match the mockup's IA:
+     nav / hero+search / quick chips / trending rail / tonight /
+     this weekend / host CTA / popular venues / mobile bottom nav.
+     Community feed, founder spotlight, and scene digest sections
+     below this block are preserved as-is (not in the mockup, but
+     real existing functionality — restyled dark/orange, not cut).
+     ============================================================ -->
+<style>
+/* ---- CBUS 2.0 homepage additions (uses this file's existing
+        tokens: --flame, --cream, --ink, --ash, --sub, --mist,
+        --rule so it stays visually identical to the rest of the
+        dark-mode system already in place) ---- */
+.cb2-nav-inner{display:flex;align-items:center;justify-content:space-between;padding:0 48px;height:64px;gap:24px;}
+.cb2-logo{font-family:var(--display);font-weight:900;font-size:20px;letter-spacing:0.04em;color:var(--ink);white-space:nowrap;}
+.cb2-logo span{color:var(--flame);}
+.cb2-links{display:flex;align-items:center;gap:28px;list-style:none;}
+.cb2-links a{font-size:14px;font-weight:600;color:var(--sub);padding-bottom:20px;margin-bottom:-20px;border-bottom:2px solid transparent;transition:color .15s,border-color .15s;}
+.cb2-links a:hover{color:var(--ink);}
+.cb2-links a.active{color:var(--flame);border-bottom-color:var(--flame);}
+.cb2-links .cb2-new{font-size:8px;font-weight:800;letter-spacing:.06em;background:var(--flame);color:#fff;border-radius:4px;padding:2px 5px;margin-left:5px;vertical-align:2px;}
+.cb2-icons{display:flex;align-items:center;gap:14px;}
+.cb2-icon-btn{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;color:var(--ash);background:transparent;transition:background .15s,color .15s;position:relative;}
+.cb2-icon-btn:hover{background:var(--flame-l);color:var(--flame);}
+.cb2-badge{position:absolute;top:2px;right:2px;width:15px;height:15px;border-radius:50%;background:var(--flame);color:#fff;font-size:9px;font-weight:800;display:flex;align-items:center;justify-content:center;}
+.cb2-avatar{width:36px;height:36px;border-radius:50%;object-fit:cover;border:1.5px solid var(--rule);cursor:pointer;}
+.cb2-biz-wrap{position:relative;}
+.cb2-biz-btn{font-size:13px;font-weight:600;color:var(--sub);display:flex;align-items:center;gap:4px;}
+.cb2-biz-btn:hover{color:var(--ink);}
+.cb2-biz-menu{display:none;position:absolute;top:calc(100% + 10px);right:0;background:var(--paper);border:1px solid var(--rule);border-radius:12px;padding:8px;min-width:210px;box-shadow:0 16px 44px rgba(0,0,0,.35);z-index:300;}
+.cb2-biz-menu a{display:block;padding:9px 12px;border-radius:8px;font-size:13px;font-weight:600;color:var(--ink);}
+.cb2-biz-menu a:hover{background:var(--flame-l);color:var(--flame);}
+.cb2-biz-menu .cb2-div{height:1px;background:var(--rule);margin:5px 6px;}
+
+.cb2-hero{position:relative;padding:44px 48px 30px;overflow:hidden;background:linear-gradient(180deg,rgba(5,5,8,.55),rgba(5,5,8,.92)),url('https://images.unsplash.com/photo-1654115480560-67642e776a30?auto=format&fit=crop&w=1600&q=70') center/cover;}
+.cb2-hero-eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--flame);margin-bottom:10px;}
+.cb2-hero-h1{font-family:var(--display);font-weight:900;font-size:52px;line-height:1.02;color:#fff;max-width:640px;}
+.cb2-hero-h1 em{font-style:normal;color:var(--flame);}
+.cb2-hero-sub{font-size:15px;color:rgba(255,255,255,.72);margin-top:12px;}
+.cb2-search{display:flex;gap:0;margin-top:24px;background:var(--paper);border:1px solid var(--rule);border-radius:14px;padding:6px;max-width:720px;box-shadow:0 12px 32px rgba(0,0,0,.35);}
+.cb2-search input{flex:1;border:none;background:none;padding:10px 14px;font-size:14px;color:var(--ink);outline:none;}
+.cb2-search-divider{width:1px;background:var(--rule);margin:6px 0;}
+.cb2-search-btn{display:flex;align-items:center;gap:6px;background:var(--flame);color:#fff;border-radius:10px;padding:0 20px;font-size:13px;font-weight:700;}
+.cb2-chips{display:flex;gap:8px;margin-top:20px;flex-wrap:wrap;}
+.cb2-chip{padding:8px 16px;border-radius:100px;font-size:13px;font-weight:600;background:rgba(255,255,255,.06);color:rgba(255,255,255,.8);border:1px solid rgba(255,255,255,.1);white-space:nowrap;}
+.cb2-chip:hover{background:rgba(255,255,255,.12);}
+.cb2-chip.active{background:var(--flame);color:#fff;border-color:var(--flame);}
+
+.cb2-section{padding:36px 48px 4px;}
+.cb2-sec-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
+.cb2-sec-title{font-family:var(--display);font-weight:800;font-size:20px;color:var(--ink);display:flex;align-items:center;gap:8px;}
+.cb2-sec-link{font-size:12px;font-weight:700;color:var(--flame);}
+.cb2-rail{display:flex;gap:16px;overflow-x:auto;scroll-snap-type:x proximity;padding-bottom:6px;-webkit-overflow-scrolling:touch;}
+.cb2-rail::-webkit-scrollbar{display:none;}
+.cb2-card{flex:0 0 250px;scroll-snap-align:start;background:var(--paper);border:1px solid var(--rule);border-radius:16px;overflow:hidden;transition:transform .15s,border-color .15s;}
+.cb2-card:hover{transform:translateY(-3px);border-color:var(--flame-m);}
+.cb2-card-img{position:relative;height:150px;background:#1c1c30 center/cover;}
+.cb2-card-date{position:absolute;top:10px;left:10px;background:rgba(5,5,8,.85);border-radius:8px;padding:4px 8px;text-align:center;line-height:1.05;}
+.cb2-card-date b{display:block;font-size:15px;color:#fff;}
+.cb2-card-date span{display:block;font-size:8px;letter-spacing:.08em;color:var(--flame);font-weight:700;}
+.cb2-card-save{position:absolute;top:10px;right:10px;width:28px;height:28px;border-radius:50%;background:rgba(5,5,8,.6);display:flex;align-items:center;justify-content:center;color:#fff;font-size:13px;}
+.cb2-card-body{padding:12px 14px 14px;}
+.cb2-card-title{font-size:14px;font-weight:700;color:var(--ink);margin-bottom:3px;line-height:1.3;}
+.cb2-card-meta{font-size:12px;color:var(--mist);}
+
+.cb2-two-col{display:grid;grid-template-columns:1fr 1fr;gap:32px;padding:36px 48px 4px;}
+.cb2-tonight-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.cb2-tonight-card{background:var(--paper);border:1px solid var(--rule);border-radius:14px;padding:12px;}
+.cb2-tonight-time{font-family:var(--mono);font-size:11px;color:var(--flame);font-weight:700;margin-bottom:6px;}
+.cb2-tonight-title{font-size:13px;font-weight:700;color:var(--ink);margin-bottom:2px;}
+.cb2-tonight-venue{font-size:11px;color:var(--mist);}
+.cb2-weekend-row{display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid var(--rule);}
+.cb2-weekend-row:last-child{border-bottom:none;}
+.cb2-weekend-date{width:40px;text-align:center;flex-shrink:0;}
+.cb2-weekend-date b{display:block;font-size:16px;color:var(--flame);}
+.cb2-weekend-date span{display:block;font-size:8px;letter-spacing:.06em;color:var(--mist);text-transform:uppercase;}
+.cb2-weekend-title{font-size:13px;font-weight:700;color:var(--ink);}
+.cb2-weekend-venue{font-size:11px;color:var(--mist);}
+
+.cb2-cta{margin:36px 48px;background:linear-gradient(135deg,rgba(255,107,53,.14),rgba(255,107,53,.03));border:1px solid var(--flame-m);border-radius:18px;padding:26px 30px;display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap;}
+.cb2-cta-copy h3{font-family:var(--display);font-weight:800;font-size:18px;color:var(--ink);}
+.cb2-cta-copy p{font-size:13px;color:var(--sub);margin-top:2px;}
+.cb2-cta-btns{display:flex;gap:8px;flex-wrap:wrap;}
+.cb2-cta-btn{display:flex;flex-direction:column;align-items:center;gap:5px;background:var(--paper);border:1px solid var(--rule);border-radius:12px;padding:12px 16px;font-size:11px;font-weight:700;color:var(--ink);min-width:78px;}
+.cb2-cta-btn:hover{border-color:var(--flame);color:var(--flame);}
+.cb2-cta-btn .ic{font-size:17px;}
+
+.cb2-venue-card{flex:0 0 180px;scroll-snap-align:start;}
+.cb2-venue-img{height:110px;border-radius:14px;background:#1c1c30 center/cover;margin-bottom:8px;}
+.cb2-venue-name{font-size:13px;font-weight:700;color:var(--ink);}
+.cb2-venue-loc{font-size:11px;color:var(--mist);}
+
+.cb2-mobilenav{display:none;}
+@media(max-width:960px){
+  .cb2-nav-inner{padding:0 16px;height:56px;}
+  .cb2-links{display:none;}
+  .cb2-biz-wrap{display:none;}
+  .cb2-hero{padding:22px 16px 22px;}
+  .cb2-hero-h1{font-size:34px;}
+  .cb2-search{max-width:none;flex-wrap:wrap;}
+  .cb2-search input{min-width:100%;}
+  .cb2-search-divider{display:none;}
+  .cb2-search-btn{width:100%;justify-content:center;padding:11px;margin-top:4px;}
+  .cb2-section,.cb2-two-col,.cb2-cta{padding-left:16px;padding-right:16px;}
+  .cb2-two-col{grid-template-columns:1fr;gap:24px;}
+  .cb2-card{flex:0 0 210px;}
+  body{padding-bottom:64px;}
+  .cb2-mobilenav{display:flex;position:fixed;bottom:0;left:0;right:0;z-index:250;background:rgba(8,8,15,.97);-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px);border-top:1px solid rgba(255,255,255,.08);padding:8px 4px calc(6px + env(safe-area-inset-bottom));justify-content:space-around;}
+  .cb2-mn-item{display:flex;flex-direction:column;align-items:center;gap:3px;font-size:9px;font-weight:600;color:var(--mist);flex:1;}
+  .cb2-mn-item.active{color:var(--flame);}
+  .cb2-mn-item .ic{font-size:19px;line-height:1;}
+}
+</style>
+
 <!-- NAV -->
 <nav>
-  <div class="nav-inner">
-    <a href="https://cbusevents.com" class="nav-logo">CBUS<span>EVENTS</span></a>
-    <ul class="nav-links">
+  <div class="cb2-nav-inner">
+    <a href="https://cbusevents.com" class="cb2-logo">CBUS<span>EVENTS</span></a>
+    <ul class="cb2-links">
+      <li><a href="https://cbusevents.com" class="active">Discover</a></li>
       <li><a href="https://cbusevents.com/events.html">Events</a></li>
-      <li><a href="https://cbusevents.com/the-radar.html">The Radar</a></li>
       <li><a href="https://cbusevents.com/venues.html">Venues</a></li>
+      <li><a href="https://cbusevents.com/creators.html">Artists</a></li>
       <li><a href="https://cbusevents.com/vendors.html">Vendors</a></li>
-      <li><a href="https://cbusevents.com/marketplace.html" style="color:var(--flame)">Marketplace</a></li>
-      <li style="position:relative" id="columbusDropdown">
-        <button onclick="toggleColumbusMenu()" style="display:flex;align-items:center;gap:4px;font-family:var(--mono);font-size:9px;letter-spacing:0.2em;text-transform:uppercase;color:var(--ash);background:none;border:none;cursor:pointer;padding:0;transition:color 0.18s" onmouseover="this.style.color='var(--flame)'" onmouseout="this.style.color='var(--ash)'">Columbus ▾</button>
-        <div id="columbusMenu" style="display:none;position:absolute;top:calc(100% + 8px);left:0;background:white;border:1px solid var(--rule);border-radius:12px;padding:8px;min-width:210px;box-shadow:0 16px 40px rgba(0,0,0,0.12);z-index:300">
-          <a href="https://cbusevents.com/gallery-hop.html" style="display:flex;align-items:center;gap:10px;padding:9px 14px;border-radius:8px;font-size:13px;font-weight:600;color:var(--ink);text-decoration:none;transition:background 0.15s" onmouseover="this.style.background='var(--flame-l)'" onmouseout="this.style.background='transparent'">
-            <div style="width:6px;height:6px;border-radius:50%;background:var(--flame);flex-shrink:0"></div>
-            <div><div style="font-weight:600;font-size:13px">Gallery Hop</div><div style="font-size:11px;color:var(--mist);margin-top:1px">Every first Friday · Short North</div></div>
-          </a>
-          <div style="height:1px;background:var(--rule);margin:4px 8px"></div>
-          <a href="https://cbusevents.com/blog.html" style="display:block;padding:8px 14px;border-radius:8px;font-size:13px;color:var(--sub);text-decoration:none;transition:background 0.15s" onmouseover="this.style.background='var(--flame-l)'" onmouseout="this.style.background='transparent'">Columbus Blog</a>
-          <div style="height:1px;background:var(--rule);margin:4px 8px"></div>
-          <div style="padding:5px 14px 3px;font-family:var(--mono);font-size:8px;letter-spacing:0.14em;text-transform:uppercase;color:var(--mist)">Communities</div>
-          <a href="https://cbusevents.com/community.html?c=black-columbus" style="display:block;padding:7px 14px;border-radius:8px;font-size:13px;color:var(--sub);text-decoration:none" onmouseover="this.style.background='var(--flame-l)'" onmouseout="this.style.background='transparent'">Black Columbus</a>
-          <a href="https://cbusevents.com/community.html?c=latino-columbus" style="display:block;padding:7px 14px;border-radius:8px;font-size:13px;color:var(--sub);text-decoration:none" onmouseover="this.style.background='var(--flame-l)'" onmouseout="this.style.background='transparent'">Latino Columbus</a>
-          <a href="https://cbusevents.com/community.html?c=lgbtq-columbus" style="display:block;padding:7px 14px;border-radius:8px;font-size:13px;color:var(--sub);text-decoration:none" onmouseover="this.style.background='var(--flame-l)'" onmouseout="this.style.background='transparent'">LGBTQ+ Columbus</a>
-          <a href="https://cbusevents.com/communities.html" style="display:block;padding:7px 14px;border-radius:8px;font-size:13px;font-weight:600;color:var(--flame);text-decoration:none" onmouseover="this.style.background='var(--flame-l)'" onmouseout="this.style.background='transparent'">All Communities →</a>
-        </div>
-      </li>
+      <li><a href="https://cbusevents.com/the-radar.html">The Radar<span class="cb2-new">NEW</span></a></li>
     </ul>
-    <div style="display:flex;align-items:center;gap:10px">
-      <button id="themeToggle" onclick="toggleTheme()" aria-label="Toggle dark mode" title="Toggle dark mode" style="display:none" onmouseover="this.style.borderColor='var(--flame)'" onmouseout="this.style.borderColor='var(--rule)'">🌙</button>
-      <div style="position:relative" id="joinDropdown">
-        <button onclick="toggleJoinMenu()" style="font-family:var(--mono);font-size:9px;letter-spacing:0.16em;text-transform:uppercase;color:var(--ash);background:none;border:none;cursor:pointer;transition:color 0.18s;display:flex;align-items:center;gap:4px" onmouseover="this.style.color='var(--flame)'" onmouseout="this.style.color='var(--ash)'">Join ▾</button>
-        <div id="joinMenu" style="display:none;position:absolute;top:calc(100% + 8px);right:0;background:white;border:1px solid var(--rule);border-radius:12px;padding:8px;min-width:200px;box-shadow:0 16px 40px rgba(0,0,0,0.12);z-index:300">
-          <a href="https://cbusevents.com/signup.html?role=venue" style="display:block;padding:9px 14px;border-radius:8px;font-size:13px;color:var(--sub);text-decoration:none;transition:background 0.15s" onmouseover="this.style.background='var(--flame-l)'" onmouseout="this.style.background='transparent'">List Your Venue</a>
-          <a href="https://cbusevents.com/signup.html?role=vendor" style="display:block;padding:9px 14px;border-radius:8px;font-size:13px;color:var(--sub);text-decoration:none;transition:background 0.15s" onmouseover="this.style.background='var(--flame-l)'" onmouseout="this.style.background='transparent'">List Your Services</a>
-          <a href="https://cbusevents.com/signup.html?role=organizer" style="display:block;padding:9px 14px;border-radius:8px;font-size:13px;color:var(--sub);text-decoration:none;transition:background 0.15s" onmouseover="this.style.background='var(--flame-l)'" onmouseout="this.style.background='transparent'">Event Organizers</a>
-          <div style="height:1px;background:var(--rule);margin:4px 8px"></div>
-          <a href="https://cbusevents.com/signup.html?role=customer" style="display:block;padding:9px 14px;border-radius:8px;font-size:13px;color:var(--sub);text-decoration:none;transition:background 0.15s" onmouseover="this.style.background='var(--flame-l)'" onmouseout="this.style.background='transparent'">Find Events</a>
-          <a href="https://cbusevents.com/sales-landing.html" style="display:block;padding:9px 14px;border-radius:8px;font-size:13px;font-weight:600;color:var(--flame);text-decoration:none;transition:background 0.15s" onmouseover="this.style.background='var(--flame-l)'" onmouseout="this.style.background='transparent'">Brands &amp; Sponsors</a>
+    <div class="cb2-icons">
+      <div class="cb2-biz-wrap" id="cb2BizWrap">
+        <button class="cb2-biz-btn" onclick="document.getElementById('cb2BizMenu').style.display=document.getElementById('cb2BizMenu').style.display==='block'?'none':'block'">For Business ▾</button>
+        <div class="cb2-biz-menu" id="cb2BizMenu">
+          <a href="https://cbusevents.com/list-your-venue.html">List Your Venue</a>
+          <a href="https://cbusevents.com/signup.html?role=vendor">List Your Services</a>
+          <a href="https://cbusevents.com/signup.html?role=organizer">Become an Organizer</a>
+          <a href="https://cbusevents.com/food-professional.html">Food Professionals</a>
+          <div class="cb2-div"></div>
+          <a href="https://cbusevents.com/communities.html">Communities</a>
+          <a href="https://cbusevents.com/marketplace.html">Marketplace</a>
+          <a href="https://cbusevents.com/blog.html">Columbus Blog</a>
+          <div class="cb2-div"></div>
+          <a href="https://cbusevents.com/sales-landing.html" style="color:var(--flame)">Brands &amp; Sponsors</a>
         </div>
       </div>
-      <div style="position:relative" id="signinDropdown">
-        <button onclick="toggleSigninMenu()" class="nav-join" style="display:flex;align-items:center;gap:5px">Sign In ▾</button>
-        <div id="signinMenu" style="display:none;position:absolute;top:calc(100% + 8px);right:0;background:white;border:1px solid var(--rule);border-radius:12px;padding:8px;min-width:210px;box-shadow:0 16px 40px rgba(0,0,0,0.12);z-index:300">
-          <div style="padding:5px 14px 8px;font-family:var(--mono);font-size:8px;letter-spacing:0.14em;text-transform:uppercase;color:var(--mist)">Sign in as</div>
-          <a href="https://cbusevents.com/cbus-venue-portal.html" style="display:flex;align-items:center;justify-content:space-between;padding:9px 14px;border-radius:8px;font-size:13px;font-weight:600;color:var(--ink);text-decoration:none;transition:background 0.15s" onmouseover="this.style.background='var(--flame-l)'" onmouseout="this.style.background='transparent'">Venue Owner<span style="font-family:var(--mono);font-size:9px;color:var(--mist)">Portal</span></a>
-          <a href="https://cbusevents.com/cbus-vendor-portal.html" style="display:flex;align-items:center;justify-content:space-between;padding:9px 14px;border-radius:8px;font-size:13px;font-weight:600;color:var(--ink);text-decoration:none;transition:background 0.15s" onmouseover="this.style.background='var(--flame-l)'" onmouseout="this.style.background='transparent'">Vendor<span style="font-family:var(--mono);font-size:9px;color:var(--mist)">Portal</span></a>
-          <a href="https://cbusevents.com/cbus-organizer-portal.html" style="display:flex;align-items:center;justify-content:space-between;padding:9px 14px;border-radius:8px;font-size:13px;font-weight:600;color:var(--ink);text-decoration:none;transition:background 0.15s" onmouseover="this.style.background='var(--flame-l)'" onmouseout="this.style.background='transparent'">Event Organizer<span style="font-family:var(--mono);font-size:9px;color:var(--mist)">Portal</span></a>
-          <a href="https://cbusevents.com/food-professional.html" style="display:flex;align-items:center;justify-content:space-between;padding:9px 14px;border-radius:8px;font-size:13px;font-weight:600;color:var(--ink);text-decoration:none;transition:background 0.15s" onmouseover="this.style.background='var(--flame-l)'" onmouseout="this.style.background='transparent'">Food Professional<span style="font-family:var(--mono);font-size:9px;color:var(--mist)">Portal</span></a>
-          <a href="https://cbusevents.com/event-staff.html" style="display:flex;align-items:center;justify-content:space-between;padding:9px 14px;border-radius:8px;font-size:13px;font-weight:600;color:var(--ink);text-decoration:none;transition:background 0.15s" onmouseover="this.style.background='var(--flame-l)'" onmouseout="this.style.background='transparent'">Event Staff<span style="font-family:var(--mono);font-size:9px;color:var(--mist)">Portal</span></a>
-          <div style="height:1px;background:var(--rule);margin:4px 8px"></div>
-          <a href="https://cbusevents.com/customer-portal.html" style="display:flex;align-items:center;justify-content:space-between;padding:9px 14px;border-radius:8px;font-size:13px;font-weight:600;color:var(--flame);text-decoration:none;transition:background 0.15s" onmouseover="this.style.background='var(--flame-l)'" onmouseout="this.style.background='transparent'">Customer Account<span style="font-family:var(--mono);font-size:9px;color:var(--mist)">Free</span></a>
-        </div>
-      </div>
+      <button class="cb2-icon-btn" aria-label="Search" onclick="document.getElementById('cb2SearchInput')?.focus();document.getElementById('cb2SearchInput')?.scrollIntoView({behavior:'smooth',block:'center'});">🔍</button>
+      <a href="https://cbusevents.com/customer-portal.html?tab=saved" class="cb2-icon-btn" aria-label="Saved">🔖</a>
+      <button class="cb2-icon-btn" aria-label="Notifications" id="cb2NotifBtn">🔔</button>
+      <div id="cb2AcctChip"><a href="https://cbusevents.com/auth.html" class="cb2-icon-btn" aria-label="Sign in" id="cb2SignInBtn">👤</a></div>
     </div>
   </div>
 </nav>
 
-<!-- DATEBAR -->
-<div class="datebar">
-  <span class="datebar-date" id="datebar-date"></span>
-  <span class="datebar-sep">·</span>
-  <span class="datebar-tag">Columbus Event Ecosystem</span>
-  <div class="datebar-live">
-    <div class="datebar-dot"></div>
-    <span class="datebar-live-txt" id="datebar-live-txt">Loading activity...</span>
-  </div>
-</div>
-
 <!-- HERO -->
-<style>
-  .hero-est{background:var(--paper,#fff);border:0.5px solid var(--rule);border-radius:12px;padding:18px;margin-top:0;box-shadow:var(--sh2);}
-  .he-label{font-family:var(--mono);font-size:9px;letter-spacing:0.18em;text-transform:uppercase;color:var(--flame);margin-bottom:10px;}
-  .he-inrow{display:flex;align-items:center;gap:8px;border:1.5px solid var(--rule);border-radius:9px;padding:10px 14px;transition:border-color .15s;}
-  .he-inrow:focus-within{border-color:var(--flame);}
-  .he-dollar{font-family:var(--display);font-size:22px;font-weight:700;color:var(--ink);}
-  .he-input{border:none;outline:none;background:transparent;font-family:var(--display);font-size:22px;font-weight:700;color:var(--ink);width:90px;}
-  .he-per{font-size:12px;color:var(--mist);margin-left:auto;}
-  .he-out{font-size:13px;color:var(--ash);margin-top:12px;line-height:1.55;}
-  .he-out-mini{display:none;}
-  .he-out strong{color:var(--ink);font-weight:600;}
-  .he-toggle{background:none;border:none;color:var(--flame);font-family:var(--mono);font-size:10px;letter-spacing:0.06em;text-transform:uppercase;cursor:pointer;margin-top:10px;padding:0;}
-  .he-total{margin-top:12px;padding-top:12px;border-top:1px solid var(--rule);}
-  .he-totrow{display:flex;align-items:center;justify-content:space-between;font-size:12px;color:var(--ash);margin-bottom:8px;}
-  .he-qty{width:84px;border:0.5px solid var(--rule);border-radius:7px;padding:6px 10px;font-family:var(--font);font-size:14px;color:var(--ink);outline:none;text-align:right;background:var(--paper,#fff);}
-  .he-totout{font-size:13px;color:var(--ash);}
-  .he-cta{display:block;text-align:center;margin-top:14px;}
-  .he-fine{font-family:var(--mono);font-size:8px;color:var(--mist);text-align:center;margin-top:10px;letter-spacing:0.04em;}
-  .hero-search{background:var(--paper,#fff);border:0.5px solid var(--rule);border-radius:14px;padding:24px;display:flex;flex-direction:column;justify-content:center;min-height:260px;box-shadow:var(--sh2);}
-  .hs-label{font-family:var(--mono);font-size:9px;letter-spacing:0.18em;text-transform:uppercase;color:var(--flame);margin-bottom:8px;}
-  .hs-h{font-family:var(--display);font-size:26px;font-weight:900;color:var(--ink);line-height:1.05;margin-bottom:16px;}
-  .hs-form{display:flex;gap:8px;}
-  .hs-input{flex:1;background:var(--cream);border:0.5px solid var(--rule);border-radius:9px;padding:12px 14px;font-family:var(--font);font-size:14px;color:var(--ink);outline:none;transition:border-color .15s;}
-  .hs-input:focus{border-color:var(--flame);}
-  .hs-btn{background:var(--flame);color:#fff;border:none;border-radius:9px;padding:0 16px;font-size:18px;cursor:pointer;}
-  .hs-chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px;}
-  .hs-chip{font-family:var(--mono);font-size:10px;letter-spacing:0.05em;text-transform:uppercase;color:var(--ash);background:var(--cream);border:0.5px solid var(--rule);border-radius:20px;padding:7px 13px;text-decoration:none;transition:border-color .15s,color .15s;}
-  .hs-chip:hover{border-color:var(--flame);color:var(--flame);}
-  /* re-assert mobile estimate swap: must come after the .he-out-mini base rule above to win on source order */
-  @media(max-width:960px){.he-out-full{display:none;}.he-out-mini{display:block;}}
-</style>
-<section class="hero">
-  <div class="hero-head">
-    <div class="hero-label">Columbus, Ohio</div>
-    <h1 class="hero-h1">Everything <em>happening</em><br>in Columbus.</h1>
-    <p class="hero-sub">Discover events, find venues, hire vendors, or host your own. The whole Columbus event scene, in one place.</p>
+<section class="cb2-hero">
+  <div class="cb2-hero-eyebrow" id="cb2Greeting">Good day 👋</div>
+  <h1 class="cb2-hero-h1">Columbus<br><em>Happens Here.</em></h1>
+  <p class="cb2-hero-sub">Find something worth showing up for.</p>
+  <div class="cb2-search">
+    <input type="text" id="cb2SearchInput" placeholder="Search events, artists, venues..." onkeydown="if(event.key==='Enter')window.location.href='https://cbusevents.com/events.html?q='+encodeURIComponent(this.value)">
+    <div class="cb2-search-divider"></div>
+    <button class="cb2-search-btn" onclick="window.location.href='https://cbusevents.com/events.html?q='+encodeURIComponent(document.getElementById('cb2SearchInput').value)">🔍 Search</button>
   </div>
-  <div class="hero-grid hero-grid-v2">
-    <div class="hero-search hero-search-lead">
-      <div class="hs-label">Find your night</div>
-      <div class="hs-h">What are you looking for?</div>
-      <form id="hs-form" class="hs-form">
-        <input id="hs-q" class="hs-input" type="text" placeholder="Search events, venues, neighborhoods..." aria-label="Search events">
-        <button class="hs-btn" type="submit" aria-label="Search">&#8594;</button>
-      </form>
-      <div class="hs-chips">
-        <a href="events.html?when=tonight" class="hs-chip">Tonight</a>
-        <a href="events.html?when=weekend" class="hs-chip">This weekend</a>
-        <a href="events.html?price=free" class="hs-chip">Free</a>
-        <a href="events.html" class="hs-chip">Browse all &#8594;</a>
-      </div>
-    </div>
-    <div class="hero-routes">
-      <a class="hero-route" href="events.html">
-        <div class="hero-route-ic">🎟</div>
-        <div class="hero-route-txt"><div class="hero-route-t">Find something to do</div><div class="hero-route-s">Browse events &amp; buy tickets</div></div>
-        <span class="hero-route-arr">&rarr;</span>
-      </a>
-      <a class="hero-route" href="cbus-organizer-portal.html?action=add-event">
-        <div class="hero-route-ic">📣</div>
-        <div class="hero-route-txt"><div class="hero-route-t">Host an event</div><div class="hero-route-s">List it &amp; sell tickets in minutes</div></div>
-        <span class="hero-route-arr">&rarr;</span>
-      </a>
-      <a class="hero-route" href="venues.html">
-        <div class="hero-route-ic">🏛</div>
-        <div class="hero-route-txt"><div class="hero-route-t">Book a venue</div><div class="hero-route-s">Spaces taking bookings now</div></div>
-        <span class="hero-route-arr">&rarr;</span>
-      </a>
-      <a class="hero-route" href="vendors.html">
-        <div class="hero-route-ic">🤝</div>
-        <div class="hero-route-txt"><div class="hero-route-t">Hire a vendor</div><div class="hero-route-s">Food, photo, sound &amp; more</div></div>
-        <span class="hero-route-arr">&rarr;</span>
-      </a>
-    </div>
+  <div class="cb2-chips">
+    <a href="https://cbusevents.com/events.html" class="cb2-chip active">All Events</a>
+    <a href="https://cbusevents.com/events.html?when=tonight" class="cb2-chip">Tonight</a>
+    <a href="https://cbusevents.com/events.html?when=weekend" class="cb2-chip">This Weekend</a>
+    <a href="https://cbusevents.com/events.html?free=1" class="cb2-chip">Free Events</a>
+    <a href="https://cbusevents.com/events.html?cat=music" class="cb2-chip">Music</a>
+    <a href="https://cbusevents.com/events.html?cat=food-drink" class="cb2-chip">Food &amp; Drink</a>
+    <a href="https://cbusevents.com/events.html?cat=arts-culture" class="cb2-chip">Art &amp; Culture</a>
+    <a href="https://cbusevents.com/events.html?cat=sports" class="cb2-chip">Sports</a>
+    <a href="https://cbusevents.com/events.html" class="cb2-chip">More</a>
   </div>
 </section>
 
-<!-- Floating organizer estimator: collapsed pill that expands to the calculator -->
-<div id="estWidget" class="est-widget">
-  <button id="estPill" class="est-pill" type="button" aria-expanded="false">
-    <span class="est-pill-dot"></span> Organizer? See your payout <span class="est-pill-arr">&rarr;</span>
-  </button>
-  <div id="estPanel" class="est-panel" hidden>
-    <button id="estClose" class="est-close" type="button" aria-label="Close">&times;</button>
-    <div class="he-label">Ticketing estimator</div>
-    <div class="he-inrow">
-      <span class="he-dollar">$</span>
-      <input id="he-price" class="he-input" type="number" value="30" min="0" step="1" aria-label="Ticket price">
-      <span class="he-per">per ticket</span>
-    </div>
-    <div class="he-out"><span class="he-out-full">You keep <strong id="he-keep">$0.00</strong> per ticket, <strong id="he-diff" style="color:var(--flame)">$0.00</strong> less in fees than typical platforms.</span><span class="he-out-mini"><strong id="he-keep-m">$0.00</strong>/ticket, <strong id="he-diff-m" style="color:var(--flame)">$0.00</strong> less</span></div>
-    <button class="he-toggle" id="he-toggle" type="button">See it across a full event &#9662;</button>
-    <div class="he-total" id="he-total" style="display:none">
-      <div class="he-totrow"><span>Tickets sold</span><input id="he-qty" class="he-qty" type="number" value="200" min="0" step="1" aria-label="Tickets sold"></div>
-      <div class="he-totout">You save <strong id="he-save" style="color:var(--flame)">$0.00</strong> in fees on this event.</div>
-    </div>
-    <a href="cbus-organizer-portal.html?action=add-event" class="btn-primary he-cta">Add your event</a>
-    <div class="he-fine">5.9% + $1 all-in, Stripe included. Free events stay free.</div>
+<!-- TRENDING -->
+<section class="cb2-section">
+  <div class="cb2-sec-head">
+    <div class="cb2-sec-title">⚡ Trending in Columbus</div>
+    <a href="https://cbusevents.com/events.html" class="cb2-sec-link">View all</a>
+  </div>
+  <div class="cb2-rail" id="cb2Trending">
+    <div class="cb2-card"><div class="cb2-card-img"></div><div class="cb2-card-body"><div class="cb2-card-title">Loading events…</div></div></div>
+  </div>
+</section>
+
+<!-- TONIGHT + THIS WEEKEND -->
+<section class="cb2-two-col">
+  <div>
+    <div class="cb2-sec-head"><div class="cb2-sec-title">Tonight</div><a href="https://cbusevents.com/events.html?when=tonight" class="cb2-sec-link">View all</a></div>
+    <div class="cb2-tonight-grid" id="cb2Tonight"><div class="cb2-tonight-card">Loading…</div></div>
+  </div>
+  <div>
+    <div class="cb2-sec-head"><div class="cb2-sec-title">This Weekend</div><a href="https://cbusevents.com/events.html?when=weekend" class="cb2-sec-link">View all</a></div>
+    <div id="cb2Weekend"><div class="cb2-weekend-row">Loading…</div></div>
+  </div>
+</section>
+
+<!-- HOST CTA -->
+<div class="cb2-cta">
+  <div class="cb2-cta-copy">
+    <h3>Don't just attend the event.</h3>
+    <p>Be part of the ecosystem — host, sell, book, work, promote, discover.</p>
+  </div>
+  <div class="cb2-cta-btns">
+    <a href="https://cbusevents.com/signup.html?role=organizer" class="cb2-cta-btn"><span class="ic">🎤</span>I'm an Organizer</a>
+    <a href="https://cbusevents.com/list-your-venue.html" class="cb2-cta-btn"><span class="ic">🏛️</span>I'm a Venue</a>
+    <a href="https://cbusevents.com/signup.html?role=vendor" class="cb2-cta-btn"><span class="ic">🧾</span>I'm a Vendor</a>
+    <a href="https://cbusevents.com/event-staff.html" class="cb2-cta-btn"><span class="ic">🎫</span>I'm Event Staff</a>
   </div>
 </div>
+
+<!-- POPULAR VENUES -->
+<section class="cb2-section" style="padding-bottom:36px">
+  <div class="cb2-sec-head">
+    <div class="cb2-sec-title">Popular Venues</div>
+    <a href="https://cbusevents.com/venues.html" class="cb2-sec-link">View all</a>
+  </div>
+  <div class="cb2-rail" id="cb2Venues">
+    <div class="cb2-venue-card"><div class="cb2-venue-img"></div><div class="cb2-venue-name">Loading…</div></div>
+  </div>
+</section>
+
+<!-- MOBILE BOTTOM NAV -->
+<div class="cb2-mobilenav">
+  <a class="cb2-mn-item active" href="https://cbusevents.com"><span class="ic">🏠</span>Home</a>
+  <a class="cb2-mn-item" href="https://cbusevents.com/events.html"><span class="ic">📅</span>Events</a>
+  <a class="cb2-mn-item" href="https://cbusevents.com/venues.html"><span class="ic">📍</span>Venues</a>
+  <a class="cb2-mn-item" href="https://cbusevents.com/customer-portal.html?tab=saved"><span class="ic">❤️</span>Saved</a>
+  <a class="cb2-mn-item" href="https://cbusevents.com/customer-portal.html?tab=tickets"><span class="ic">🎟️</span>Tickets</a>
+  <a class="cb2-mn-item" href="https://cbusevents.com/customer-portal.html"><span class="ic">👤</span>Profile</a>
+</div>
+
 <script>
-(function(){
-  var price=document.getElementById('he-price');
-  if(price){
-    var keepEl=document.getElementById('he-keep'),diffEl=document.getElementById('he-diff'),
-        saveEl=document.getElementById('he-save'),qty=document.getElementById('he-qty'),
-        keepM=document.getElementById('he-keep-m'),diffM=document.getElementById('he-diff-m');
-    var m=function(n){return '$'+(Math.round(n*100)/100).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});};
-    var calc=function(){
-      var p=parseFloat(price.value)||0;
-      var cb=p>0?p*0.059+1:0;
-      var cp=p>0?(p*0.037+1.30)+(p*0.029+0.30):0;
-      keepEl.textContent=m(Math.max(p-cb,0));
-      diffEl.textContent=m(Math.max(cp-cb,0));
-      if(keepM)keepM.textContent=m(Math.max(p-cb,0));
-      if(diffM)diffM.textContent=m(Math.max(cp-cb,0));
-      var q=parseInt(qty&&qty.value)||0;
-      if(saveEl)saveEl.textContent=m(Math.max((cp-cb)*q,0));
-    };
-    price.addEventListener('input',calc);
-    if(qty)qty.addEventListener('input',calc);
-    var tog=document.getElementById('he-toggle'),tot=document.getElementById('he-total');
-    if(tog&&tot)tog.addEventListener('click',function(){tot.style.display='block';tog.style.display='none';});
-    calc();
-  }
-  // floating widget expand/collapse
-  var pill=document.getElementById('estPill'),panel=document.getElementById('estPanel'),
-      closeBtn=document.getElementById('estClose'),wrap=document.getElementById('estWidget');
-  function openEst(){panel.hidden=false;wrap.classList.add('open');pill.setAttribute('aria-expanded','true');}
-  function closeEst(){panel.hidden=true;wrap.classList.remove('open');pill.setAttribute('aria-expanded','false');}
-  if(pill)pill.addEventListener('click',function(){panel.hidden?openEst():closeEst();});
-  if(closeBtn)closeBtn.addEventListener('click',closeEst);
-  var form=document.getElementById('hs-form');
-  if(form)form.addEventListener('submit',function(e){
-    e.preventDefault();
-    var q=document.getElementById('hs-q').value.trim();
-    window.location.href='the-radar.html'+(q?('?q='+encodeURIComponent(q)):'');
-  });
-})();
-</script>
+/* ---- CBUS 2.0 homepage data loaders — real Supabase queries,
+        same tables/columns used elsewhere in this file. ---- */
+function cb2Fmt(t){var d=new Date(t);return{day:d.getDate(),mo:d.toLocaleDateString('en-US',{month:'short'}).toUpperCase(),time:d.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'})};}
+function cb2Url(id){return 'https://cbusevents.com/event.html?id='+id;}
+function cb2VenueName(e){return e.venue_name_override||(e.venues&&e.venues.name)||'Columbus';}
 
-<!-- TICKER -->
-<div class="ticker" id="ticker-wrap">
-  <div class="ticker-track" id="ticker-track">
-    <span class="ticker-item">Every Columbus venue, vendor & organizer in one place <span class="ticker-sep">·</span></span>
-    <span class="ticker-item">Free to list. Free to browse. <span class="ticker-sep">·</span></span>
-    <span class="ticker-item">No subscriptions. Pay only when you sell. <span class="ticker-sep">·</span></span>
-    <span class="ticker-item">Built in Columbus, for Columbus <span class="ticker-sep">·</span></span>
-    <span class="ticker-item">Real events, updated daily <span class="ticker-sep">·</span></span>
-    <span class="ticker-item">Find your weekend on CBUSEVENTS <span class="ticker-sep">·</span></span>
-    <span class="ticker-item">One platform for the whole event scene <span class="ticker-sep">·</span></span>
-    <span class="ticker-item">United by Events <span class="ticker-sep">·</span></span>
-    <span class="ticker-item">Every Columbus venue, vendor & organizer in one place <span class="ticker-sep">·</span></span>
-    <span class="ticker-item">Free to list. Free to browse. <span class="ticker-sep">·</span></span>
-    <span class="ticker-item">No subscriptions. Pay only when you sell. <span class="ticker-sep">·</span></span>
-    <span class="ticker-item">Built in Columbus, for Columbus <span class="ticker-sep">·</span></span>
-    <span class="ticker-item">Real events, updated daily <span class="ticker-sep">·</span></span>
-    <span class="ticker-item">Find your weekend on CBUSEVENTS <span class="ticker-sep">·</span></span>
-    <span class="ticker-item">One platform for the whole event scene <span class="ticker-sep">·</span></span>
-    <span class="ticker-item">United by Events <span class="ticker-sep">·</span></span>
-  </div>
-</div>
-
-<!-- ===== BROWSE THEATER (below hero) ===== -->
-<section class="cbx-theater">
-<style>
-.cbx-theater{background:var(--ink-deep);background-image:radial-gradient(60% 60% at 12% 0%,rgba(255,107,53,.06) 0%,transparent 60%),radial-gradient(50% 50% at 92% 30%,rgba(200,150,62,.05) 0%,transparent 55%);color:var(--on-dark);padding:0 0 64px;overflow:hidden;}
-/* Light mode: browse theater sits on solid white (the marquee hero and the cinematic tiles keep their dark treatment) */
-[data-theme="light"] .cbx-theater{background:#fff;background-image:none;color:var(--ink);}
-[data-theme="light"] .cbx-theater .rail-t{color:var(--ink);}
-[data-theme="light"] .cbx-theater .rail-eyebrow{color:var(--mist);}
-[data-theme="light"] .cbx-theater .rail-all{color:var(--mist);}
-[data-theme="light"] .cbx-theater .rail-all:hover{color:var(--flame);}
-[data-theme="light"] .cbx-theater .rail-fade.l{background:linear-gradient(90deg,#fff,transparent);}
-[data-theme="light"] .cbx-theater .rail-fade.r{background:linear-gradient(270deg,#fff,transparent);}
-.cbx-theater .cbx-rev{opacity:1;transform:none;transition:opacity .6s ease,transform .6s ease;}
-.cbx-theater.cbx-anim-ready .cbx-rev{opacity:0;transform:translateY(18px);}
-.cbx-theater.cbx-anim-ready .cbx-rev.cbx-in{opacity:1;transform:none;}
-/* marquee */
-.cbx-theater .marquee{position:relative;height:74vh;min-height:500px;max-height:720px;overflow:hidden;display:flex;align-items:flex-end;}
-.cbx-theater .mq-reel{position:absolute;inset:0;z-index:0;background:#0d0a07;}
-.cbx-theater .mq-frame{position:absolute;inset:0;opacity:0;transform:scale(1.04);will-change:opacity,transform;animation:cbxcycle 24s infinite;}
-.cbx-theater .mq-frame.f1{animation-delay:0s;background:radial-gradient(60% 80% at 25% 30%,rgba(255,107,53,.55),transparent 60%),radial-gradient(50% 70% at 80% 70%,rgba(200,150,62,.40),transparent 55%),linear-gradient(120deg,#2a1408,#0d0a07);}
-.cbx-theater .mq-frame.f2{animation-delay:6s;background:radial-gradient(55% 75% at 70% 25%,rgba(83,74,183,.45),transparent 60%),radial-gradient(60% 80% at 20% 75%,rgba(255,107,53,.40),transparent 55%),linear-gradient(200deg,#1a1030,#0d0a07);}
-.cbx-theater .mq-frame.f3{animation-delay:12s;background:radial-gradient(60% 70% at 50% 35%,rgba(26,107,64,.45),transparent 60%),radial-gradient(45% 60% at 85% 80%,rgba(200,150,62,.45),transparent 55%),linear-gradient(160deg,#0a2018,#0d0a07);}
-.cbx-theater .mq-frame.f4{animation-delay:18s;background:radial-gradient(65% 80% at 30% 70%,rgba(216,90,48,.50),transparent 60%),radial-gradient(50% 60% at 75% 25%,rgba(255,107,53,.45),transparent 55%),linear-gradient(220deg,#2a1810,#0d0a07);}
-@keyframes cbxcycle{0%{opacity:0;transform:scale(1.04);}4%{opacity:1;}21%{opacity:1;transform:scale(1.12);}25%{opacity:0;transform:scale(1.13);}100%{opacity:0;}}
-.cbx-theater .mq-sweep{position:absolute;inset:0;background:linear-gradient(105deg,transparent 30%,rgba(255,255,255,.06) 48%,transparent 66%);transform:translateX(-30%);animation:cbxsweep 9s ease-in-out infinite;}
-@keyframes cbxsweep{0%,100%{transform:translateX(-30%);}50%{transform:translateX(30%);}}
-.cbx-theater .mq-noise{position:absolute;inset:0;opacity:.5;mix-blend-mode:overlay;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.5'/%3E%3C/svg%3E");}
-.cbx-theater .mq-scrim{position:absolute;inset:0;z-index:1;background:linear-gradient(transparent 35%,rgba(10,8,6,.55) 70%,rgba(13,10,7,.94) 100%),linear-gradient(90deg,rgba(13,10,7,.7),transparent 55%);}
-.cbx-theater .mq-content{position:relative;z-index:2;max-width:1280px;margin:0 auto;width:100%;padding:0 var(--pad-x,48px) 56px;}
-.cbx-theater .mq-eyebrow{font-family:var(--mono);font-size:10px;letter-spacing:.26em;text-transform:uppercase;color:#fff;display:flex;align-items:center;gap:9px;margin-bottom:18px;}
-.cbx-theater .mq-eyebrow .dot{width:6px;height:6px;border-radius:50%;background:var(--flame);animation:cbxping 2s infinite;}
-@keyframes cbxping{0%{box-shadow:0 0 0 0 rgba(255,107,53,.55);}70%{box-shadow:0 0 0 9px rgba(255,107,53,0);}100%{box-shadow:0 0 0 0 rgba(255,107,53,0);}}
-.cbx-theater .mq-h{font-family:var(--display);font-weight:900;font-size:clamp(44px,7vw,86px);line-height:.96;letter-spacing:-.025em;color:#fff;max-width:15ch;text-shadow:0 2px 30px rgba(0,0,0,.5);}
-.cbx-theater .mq-h em{font-style:italic;color:var(--flame);}
-.cbx-theater .mq-sub{font-family:var(--mono);font-size:13px;letter-spacing:.03em;color:rgba(255,255,255,.78);margin-top:22px;max-width:48ch;line-height:1.7;}
-.cbx-theater .mq-cta{display:flex;gap:12px;margin-top:30px;flex-wrap:wrap;}
-.cbx-theater .mq-btn{font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;padding:15px 28px;border-radius:8px;transition:transform .18s,background .18s,border-color .18s;text-decoration:none;display:inline-block;}
-.cbx-theater .mq-btn.primary{background:var(--flame);color:#fff;}
-.cbx-theater .mq-btn.primary:hover{background:var(--flame-press,#e85a20);transform:translateY(-2px);}
-.cbx-theater .mq-btn.ghost{border:1px solid rgba(255,255,255,.35);color:#fff;}
-.cbx-theater .mq-btn.ghost:hover{border-color:#fff;transform:translateY(-2px);}
-.cbx-theater .mq-reelnote{position:absolute;top:24px;right:var(--pad-x,48px);z-index:2;font-family:var(--mono);font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.6);display:flex;align-items:center;gap:7px;}
-.cbx-theater .mq-reelnote .rn-play{color:var(--flame);font-size:11px;}
-/* rails */
-.cbx-theater .rail{position:relative;margin-top:46px;}
-.cbx-theater .rail-hd{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;padding:0 var(--pad-x,48px);max-width:1280px;margin:0 auto 16px;}
-.cbx-theater .rail-titles{display:flex;flex-direction:column;gap:6px;}
-.cbx-theater .rail-eyebrow{font-family:var(--mono);font-size:9px;letter-spacing:.22em;text-transform:uppercase;color:rgba(250,247,242,.55);display:flex;align-items:center;gap:8px;}
-.cbx-theater .rail-eyebrow .dot{width:5px;height:5px;border-radius:50%;background:var(--flame);animation:cbxpulse 2s infinite;}
-.cbx-theater .rail-t{font-family:var(--display);font-weight:900;font-size:clamp(22px,2.6vw,30px);line-height:1;letter-spacing:-.01em;color:#fff;}
-.cbx-theater .rail-t em{font-style:italic;color:var(--flame);}
-.cbx-theater .rail-all{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:rgba(250,247,242,.55);text-decoration:none;white-space:nowrap;transition:color .18s;flex-shrink:0;padding-bottom:4px;}
-.cbx-theater .rail-all:hover{color:var(--flame);}
-.cbx-theater .rail-wrap{position:relative;}
-.cbx-theater .rail-vp{display:flex;gap:16px;overflow-x:auto;scroll-behavior:smooth;scroll-snap-type:x proximity;padding:6px var(--pad-x,48px) 10px;max-width:1280px;margin:0 auto;scrollbar-width:none;-ms-overflow-style:none;}
-.cbx-theater .rail-vp::-webkit-scrollbar{display:none;}
-.cbx-theater .rail-vp>*{scroll-snap-align:start;flex:0 0 auto;}
-.cbx-theater .rail-fade{display:none;}
-.cbx-theater .rail-fade.l{left:0;background:linear-gradient(90deg,var(--ink-deep),transparent);}
-.cbx-theater .rail-fade.r{right:0;background:linear-gradient(270deg,var(--ink-deep),transparent);}
-.cbx-theater .rail-wrap.has-l .rail-fade.l{opacity:1;}
-.cbx-theater .rail-wrap.has-r .rail-fade.r{opacity:1;}
-.cbx-theater .rail-arrow{position:absolute;top:50%;transform:translateY(-50%);z-index:5;width:40px;height:40px;border-radius:50%;background:rgba(20,16,12,.82);border:1px solid var(--rule-dark,rgba(250,247,242,.12));color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);transition:background .18s,opacity .2s,border-color .18s;opacity:0;}
-.cbx-theater .rail-wrap:hover .rail-arrow{opacity:1;}
-.cbx-theater .rail-arrow:hover{background:var(--flame);border-color:var(--flame);}
-.cbx-theater .rail-arrow.prev{left:12px;}.cbx-theater .rail-arrow.next{right:12px;}
-@media(hover:none){.cbx-theater .rail-arrow{display:none;}}
-/* poster */
-.cbx-theater .poster{position:relative;width:236px;height:330px;border-radius:12px;overflow:hidden;background:linear-gradient(158deg,#241a13 0%,#15110d 88%);text-decoration:none;color:#fff;display:block;border:1px solid rgba(250,247,242,.07);transition:transform .28s cubic-bezier(.2,.7,.2,1),border-color .2s,box-shadow .28s;}
-.cbx-theater .poster.tone-flame{background:radial-gradient(120% 90% at 80% 8%,rgba(255,107,53,.22),transparent 55%),linear-gradient(158deg,#2a1810 0%,#15110d 86%);}
-.cbx-theater .poster.tone-gold{background:radial-gradient(120% 90% at 80% 8%,rgba(200,150,62,.18),transparent 55%),linear-gradient(158deg,#241d12 0%,#15110d 86%);}
-.cbx-theater .poster.tone-green{background:radial-gradient(120% 90% at 80% 8%,rgba(26,107,64,.20),transparent 55%),linear-gradient(158deg,#13201a 0%,#15110d 86%);}
-.cbx-theater .poster:hover{transform:translateY(-7px);border-color:rgba(255,107,53,.55);box-shadow:0 18px 40px rgba(0,0,0,.5);}
-.cbx-theater .po-num{position:absolute;top:-22px;right:2px;font-family:var(--display);font-weight:900;font-size:148px;line-height:1;color:rgba(250,247,242,.06);user-select:none;}
-.cbx-theater .po-img{position:absolute;inset:0;z-index:0;background-size:cover;background-position:center;background-repeat:no-repeat;background-color:#15110d;}
-.cbx-theater .po-img::after{content:'';position:absolute;inset:0;background:linear-gradient(180deg,rgba(10,8,6,.30) 0%,transparent 26%,transparent 48%,rgba(10,8,6,.82) 100%);}
-.cbx-theater .po-corner{position:absolute;width:13px;height:13px;border:1.5px solid rgba(250,247,242,.18);z-index:2;}
-.cbx-theater .po-corner.tl{top:14px;left:14px;border-right:none;border-bottom:none;}
-.cbx-theater .po-corner.br{bottom:14px;right:14px;border-left:none;border-top:none;}
-.cbx-theater .po-noise{position:absolute;inset:0;opacity:.5;mix-blend-mode:overlay;pointer-events:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.4'/%3E%3C/svg%3E");}
-.cbx-theater .po-chip{position:absolute;top:18px;left:18px;z-index:3;font-family:var(--mono);font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:#fff;background:rgba(20,16,12,.55);border:1px solid var(--rule-dark,rgba(250,247,242,.12));padding:5px 9px;border-radius:6px;-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);}
-.cbx-theater .po-tag{position:absolute;top:18px;right:18px;z-index:3;font-family:var(--mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;padding:5px 9px;border-radius:6px;}
-.cbx-theater .po-tag.free{color:#bfe6d2;background:rgba(26,107,64,.32);border:1px solid rgba(26,107,64,.5);}
-.cbx-theater .po-tag.paid{color:#fff;background:rgba(20,16,12,.5);border:1px solid var(--rule-dark,rgba(250,247,242,.12));}
-.cbx-theater .po-body{position:absolute;left:0;right:0;bottom:0;z-index:3;padding:20px 18px 18px;background:linear-gradient(transparent,rgba(10,8,6,.86) 58%);}
-.cbx-theater .po-title{font-family:var(--display);font-weight:900;font-size:19px;line-height:1.08;letter-spacing:-.01em;margin-bottom:7px;}
-.cbx-theater .po-meta{font-family:var(--mono);font-size:9px;letter-spacing:.06em;color:rgba(250,247,242,.55);display:flex;gap:7px;flex-wrap:wrap;}
-.cbx-theater .po-meta .sep{opacity:.5;}
-.cbx-theater .po-cta{margin-top:13px;opacity:0;max-height:0;overflow:hidden;transform:translateY(6px);transition:.26s;font-family:var(--mono);font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:#fff;background:var(--flame);text-align:center;padding:9px;border-radius:7px;}
-.cbx-theater .poster:hover .po-cta{opacity:1;max-height:44px;transform:none;}
-/* reel */
-.cbx-theater .reel{position:relative;width:172px;aspect-ratio:9/16;border-radius:12px;overflow:hidden;text-decoration:none;background:linear-gradient(165deg,#2a1d12,#15110d);border:1px solid rgba(250,247,242,.08);display:flex;align-items:flex-end;transition:transform .26s cubic-bezier(.2,.7,.2,1),border-color .2s;}
-.cbx-theater .reel:nth-child(3n+1){background:linear-gradient(165deg,#2a1810,#120b07);}
-.cbx-theater .reel:nth-child(3n+2){background:linear-gradient(165deg,#1a1030,#0f0b14);}
-.cbx-theater .reel:nth-child(3n+3){background:linear-gradient(165deg,#0f2018,#0a120d);}
-.cbx-theater .reel:hover{transform:translateY(-6px) scale(1.015);border-color:rgba(255,107,53,.5);}
-.cbx-theater .rl-shine{position:absolute;inset:0;background:linear-gradient(115deg,transparent 35%,rgba(255,255,255,.10) 50%,transparent 65%);transform:translateY(40%);animation:cbxshine 4.5s ease-in-out infinite;}
-.cbx-theater .reel:nth-child(2n) .rl-shine{animation-delay:1.4s;}
-.cbx-theater .reel:nth-child(3n) .rl-shine{animation-delay:2.6s;}
-@keyframes cbxshine{0%,100%{transform:translateY(45%);opacity:.5;}50%{transform:translateY(-45%);opacity:1;}}
-.cbx-theater .rl-play{position:absolute;top:14px;left:14px;color:rgba(255,255,255,.92);font-size:15px;filter:drop-shadow(0 1px 4px rgba(0,0,0,.5));}
-.cbx-theater .rl-shop{position:absolute;top:12px;right:12px;font-family:var(--mono);font-size:8px;letter-spacing:.1em;text-transform:uppercase;background:var(--flame);color:#fff;padding:3px 7px;border-radius:5px;}
-.cbx-theater .rl-cap{position:relative;z-index:1;width:100%;padding:14px 12px;font-family:var(--mono);font-size:9.5px;letter-spacing:.02em;color:#fff;background:linear-gradient(transparent,rgba(8,6,4,.85));}
-.cbx-theater .reel-empty{border:1.5px dashed rgba(255,107,53,.5);background:linear-gradient(165deg,rgba(255,107,53,.12),rgba(15,11,7,.6));cursor:pointer;flex-direction:column;align-items:center;justify-content:center;}
-.cbx-theater .reel-empty .rl-cap{background:none;text-align:center;color:#FF6B35;font-weight:700;}
-.cbx-theater .reel-empty .rl-play{position:static;font-size:22px;color:#FF6B35;margin-bottom:6px;}
-/* neighborhood tile */
-.cbx-theater .hood{position:relative;width:300px;height:178px;border-radius:12px;overflow:hidden;text-decoration:none;color:#fff;background:linear-gradient(135deg,#241a13,#15110d);border:1px solid rgba(250,247,242,.07);transition:transform .28s cubic-bezier(.2,.7,.2,1),border-color .2s;display:flex;flex-direction:column;justify-content:flex-end;padding:18px;}
-.cbx-theater .hood:hover{transform:translateY(-6px);border-color:rgba(255,107,53,.5);}
-.cbx-theater .hood::before{content:"";position:absolute;inset:0;background:var(--hue,rgba(255,107,53,.10));mix-blend-mode:screen;}
-.cbx-theater .hood-name{position:relative;font-family:var(--display);font-weight:900;font-size:24px;line-height:1;letter-spacing:-.01em;}
-.cbx-theater .hood-count{position:relative;font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:rgba(250,247,242,.55);margin-top:8px;}
-.cbx-theater .hood-arrow{position:absolute;top:16px;right:16px;font-size:15px;color:rgba(250,247,242,.55);transition:color .2s,transform .2s;}
-.cbx-theater .hood:hover .hood-arrow{color:var(--flame);transform:translateX(2px);}
-/* profile card */
-.cbx-theater .prof{width:212px;border-radius:12px;background:#1d1711;border:1px solid rgba(250,247,242,.07);padding:18px;text-decoration:none;color:#fff;transition:transform .26s cubic-bezier(.2,.7,.2,1),border-color .2s;display:flex;flex-direction:column;}
-.cbx-theater .prof:hover{transform:translateY(-6px);border-color:rgba(255,107,53,.45);}
-.cbx-theater .prof-av{width:50px;height:50px;border-radius:13px;display:flex;align-items:center;justify-content:center;font-family:var(--display);font-weight:900;font-size:22px;color:#fff;margin-bottom:14px;}
-.cbx-theater .av-venue{background:var(--role-venue,#c8963e);}.cbx-theater .av-vendor{background:var(--role-vendor,#1a6b40);color:#e8f3ec;}
-.cbx-theater .prof-name{font-family:var(--display);font-weight:700;font-size:16px;line-height:1.15;margin-bottom:8px;}
-.cbx-theater .prof-chip{align-self:flex-start;font-family:var(--mono);font-size:8px;letter-spacing:.12em;text-transform:uppercase;padding:3px 8px;border-radius:5px;margin-bottom:12px;}
-.cbx-theater .chip-venue{color:#f0d9a8;background:rgba(200,150,62,.16);}
-.cbx-theater .chip-vendor{color:#a8e0c0;background:rgba(26,107,64,.18);}
-.cbx-theater .prof-meta{font-family:var(--mono);font-size:10px;color:rgba(250,247,242,.55);line-height:1.6;margin-top:auto;}
-.cbx-theater .prof-cta{margin-top:14px;font-family:var(--mono);font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:rgba(250,247,242,.55);border:1px solid var(--rule-dark,rgba(250,247,242,.12));text-align:center;padding:9px;border-radius:7px;transition:.2s;}
-.cbx-theater .prof:hover .prof-cta{color:var(--flame);border-color:rgba(255,107,53,.5);}
-/* gig card */
-.cbx-theater .gig{width:262px;border-radius:12px;background:#1d1711;border:1px solid rgba(250,247,242,.07);padding:18px;text-decoration:none;color:#fff;transition:transform .26s cubic-bezier(.2,.7,.2,1),border-color .2s;display:flex;flex-direction:column;gap:12px;}
-.cbx-theater .gig:hover{transform:translateY(-6px);border-color:rgba(255,107,53,.45);}
-.cbx-theater .gig-pill{align-self:flex-start;font-family:var(--mono);font-size:8px;letter-spacing:.12em;text-transform:uppercase;padding:4px 9px;border-radius:20px;}
-.cbx-theater .gp-vendor{color:#a8e0c0;background:rgba(26,107,64,.18);}
-.cbx-theater .gp-staff{color:#bcd9f5;background:rgba(24,95,165,.18);}
-.cbx-theater .gp-dj{color:#d4c8ff;background:rgba(83,74,183,.20);}
-.cbx-theater .gp-photo{color:#f3c4b0;background:rgba(216,90,48,.16);}
-.cbx-theater .gp-food{color:#f3c4b0;background:rgba(216,90,48,.16);}
-.cbx-theater .gig-title{font-family:var(--display);font-weight:700;font-size:16px;line-height:1.2;}
-.cbx-theater .gig-sub{font-family:var(--mono);font-size:9px;color:rgba(250,247,242,.55);}
-.cbx-theater .gig-row{display:flex;align-items:flex-end;justify-content:space-between;margin-top:auto;padding-top:12px;border-top:1px solid var(--rule-dark,rgba(250,247,242,.12));}
-.cbx-theater .gig-pay{font-family:var(--display);font-weight:900;font-size:20px;color:var(--flame);line-height:1;}
-.cbx-theater .gig-pay span{font-family:var(--mono);font-size:8px;letter-spacing:.1em;text-transform:uppercase;color:rgba(250,247,242,.55);display:block;margin-top:4px;}
-.cbx-theater .gig-date{font-family:var(--mono);font-size:10px;color:rgba(250,247,242,.55);text-align:right;}
-.cbx-theater .gig-apply{font-family:var(--mono);font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:#fff;background:var(--flame);text-align:center;padding:10px;border-radius:7px;transition:background .18s;}
-.cbx-theater .gig:hover .gig-apply{background:var(--flame-press,#e85a20);}
-@keyframes cbxpulse{0%,100%{opacity:1;}50%{opacity:.3;}}
-@media(max-width:680px){
-.cbx-theater .marquee{height:72vh;min-height:440px;}.cbx-theater .mq-content{padding-bottom:38px;}.cbx-theater .mq-reelnote{display:none;}
-.cbx-theater .poster{width:172px;height:250px;}.cbx-theater .po-num{font-size:108px;top:-14px;}.cbx-theater .po-title{font-size:16px;}
-.cbx-theater .hood{width:230px;height:148px;}.cbx-theater .prof{width:176px;}.cbx-theater .gig{width:230px;}.cbx-theater .reel{width:132px;}.cbx-theater .rail{margin-top:38px;}
+async function cb2LoadTrending(){
+  try{
+    var el=document.getElementById('cb2Trending'); if(!el) return;
+    var {data}=await sb.from('events').select('id,title,start_time,venue_name_override,is_free,cover_image_url,venues(name)').eq('status','published').gte('start_time',new Date().toISOString()).order('start_time',{ascending:true}).limit(10);
+    if(!data||!data.length){el.innerHTML='<div style="color:var(--mist);font-size:13px;padding:20px 0">No upcoming events yet.</div>';return;}
+    el.innerHTML=data.map(function(e){var f=cb2Fmt(e.start_time);var img=e.cover_image_url?'background-image:url(\''+e.cover_image_url+'\')':'';
+      return '<a class="cb2-card" href="'+cb2Url(e.id)+'"><div class="cb2-card-img" style="'+img+'"><div class="cb2-card-date"><b>'+f.day+'</b><span>'+f.mo+'</span></div><div class="cb2-card-save">♡</div></div>'+
+        '<div class="cb2-card-body"><div class="cb2-card-title">'+(e.title||'Event')+'</div><div class="cb2-card-meta">'+cb2VenueName(e)+(e.is_free?' · Free':'')+'</div></div></a>';
+    }).join('');
+  }catch(err){console.warn('cb2 trending',err);}
 }
-@media(prefers-reduced-motion:reduce){.cbx-theater .mq-frame.f1{opacity:1;animation:none;}.cbx-theater .mq-frame.f2,.cbx-theater .mq-frame.f3,.cbx-theater .mq-frame.f4{display:none;}.cbx-theater .mq-sweep,.cbx-theater .rl-shine{display:none;}.cbx-theater .cbx-rev{opacity:1;transform:none;}}
-</style>
 
-  <!-- TONIGHT -->
-  <div class="rail cbx-rev" id="cbx-rail-tonight">
-    <div class="rail-hd"><div class="rail-titles"><div class="rail-eyebrow"><span class="dot"></span>Live now</div><div class="rail-t">Happening <em>tonight</em></div></div><a href="https://cbusevents.com/events.html?when=tonight" class="rail-all">See all &rarr;</a></div>
-    <div class="rail-wrap" data-rail><span class="rail-fade l"></span><span class="rail-fade r"></span><button class="rail-arrow prev" data-dir="-1" aria-label="Scroll left">&#8249;</button><button class="rail-arrow next" data-dir="1" aria-label="Scroll right">&#8250;</button>
-      <div class="rail-vp" id="cbx-tonight">
-        <a class="poster tone-flame" href="https://cbusevents.com/events.html?when=tonight"><div class="po-noise"></div><span class="po-corner tl"></span><span class="po-corner br"></span><div class="po-chip">Loading</div><div class="po-body"><div class="po-title">Loading tonight...</div><div class="po-meta"><span>Columbus</span></div></div></a>
-      </div>
-    </div>
-  </div>
+async function cb2LoadTonight(){
+  try{
+    var el=document.getElementById('cb2Tonight'); if(!el) return;
+    var start=new Date(); var end=new Date(); end.setHours(23,59,59,999);
+    var {data}=await sb.from('events').select('id,title,start_time,venue_name_override,venues(name)').eq('status','published').gte('start_time',start.toISOString()).lte('start_time',end.toISOString()).order('start_time',{ascending:true}).limit(4);
+    if(!data||!data.length){el.innerHTML='<div style="color:var(--mist);font-size:13px;grid-column:1/-1">Nothing tonight yet — check back soon.</div>';return;}
+    el.innerHTML=data.map(function(e){var f=cb2Fmt(e.start_time);
+      return '<a class="cb2-tonight-card" href="'+cb2Url(e.id)+'"><div class="cb2-tonight-time">'+f.time+'</div><div class="cb2-tonight-title">'+(e.title||'Event')+'</div><div class="cb2-tonight-venue">'+cb2VenueName(e)+'</div></a>';
+    }).join('');
+  }catch(err){console.warn('cb2 tonight',err);}
+}
 
-  <!-- OUR EVENTS -->
-  <div class="rail cbx-rev" id="cbx-rail-ours">
-    <div class="rail-hd"><div class="rail-titles"><div class="rail-eyebrow"><span class="dot"></span>Produced by CBUSEVENTS</div><div class="rail-t">Our <em>events</em></div></div><a href="https://cbusevents.com/organizer-profile.html?id=dcae39de-9265-4d67-b8be-5d0ca599069b" class="rail-all">See all &rarr;</a></div>
-    <div class="rail-wrap" data-rail><span class="rail-fade l"></span><span class="rail-fade r"></span><button class="rail-arrow prev" data-dir="-1" aria-label="Scroll left">&#8249;</button><button class="rail-arrow next" data-dir="1" aria-label="Scroll right">&#8250;</button>
-      <div class="rail-vp" id="cbx-ours">
-        <a class="poster tone-flame" href="https://cbusevents.com/organizer-profile.html?id=dcae39de-9265-4d67-b8be-5d0ca599069b"><div class="po-noise"></div><span class="po-corner tl"></span><span class="po-corner br"></span><div class="po-chip">Loading</div><div class="po-body"><div class="po-title">Loading our events...</div><div class="po-meta"><span>Columbus</span></div></div></a>
-      </div>
-    </div>
-    <div class="pulse-empty" id="cbx-ours-empty" hidden>
-      <div class="pulse-empty-t">Next one&rsquo;s in the works</div>
-      <div class="pulse-empty-s">Follow along for the next CBUSEVENTS production.</div>
-      <button type="button" onclick="window.location.href='https://cbusevents.com/organizer-profile.html?id=dcae39de-9265-4d67-b8be-5d0ca599069b'">Follow CBUSEVENTS</button>
-    </div>
-  </div>
+async function cb2LoadWeekend(){
+  try{
+    var el=document.getElementById('cb2Weekend'); if(!el) return;
+    var now=new Date(); var day=now.getDay();
+    var friOffset=(5-day+7)%7; var fri=new Date(now); fri.setDate(now.getDate()+friOffset); fri.setHours(0,0,0,0);
+    var sun=new Date(fri); sun.setDate(fri.getDate()+2); sun.setHours(23,59,59,999);
+    var {data}=await sb.from('events').select('id,title,start_time,venue_name_override,venues(name)').eq('status','published').gte('start_time',now.toISOString()).lte('start_time',sun.toISOString()).order('start_time',{ascending:true}).limit(5);
+    if(!data||!data.length){el.innerHTML='<div style="color:var(--mist);font-size:13px">Nothing posted for this weekend yet.</div>';return;}
+    el.innerHTML=data.map(function(e){var f=cb2Fmt(e.start_time);
+      return '<a class="cb2-weekend-row" href="'+cb2Url(e.id)+'" style="text-decoration:none"><div class="cb2-weekend-date"><b>'+f.day+'</b><span>'+f.mo+'</span></div><div><div class="cb2-weekend-title">'+(e.title||'Event')+'</div><div class="cb2-weekend-venue">'+cb2VenueName(e)+'</div></div></a>';
+    }).join('');
+  }catch(err){console.warn('cb2 weekend',err);}
+}
 
-  <!-- THIS WEEKEND -->
-  <div class="rail cbx-rev">
-    <div class="rail-hd"><div class="rail-titles"><div class="rail-eyebrow">Fri &ndash; Sun</div><div class="rail-t">This <em>weekend</em></div></div><a href="https://cbusevents.com/events.html?when=weekend" class="rail-all">See all &rarr;</a></div>
-    <div class="rail-wrap" data-rail><span class="rail-fade l"></span><span class="rail-fade r"></span><button class="rail-arrow prev" data-dir="-1" aria-label="Scroll left">&#8249;</button><button class="rail-arrow next" data-dir="1" aria-label="Scroll right">&#8250;</button>
-      <div class="rail-vp" id="cbx-weekend">
-        <a class="poster" href="https://cbusevents.com/events.html?when=weekend"><div class="po-noise"></div><span class="po-corner tl"></span><span class="po-corner br"></span><div class="po-chip">Soon</div><div class="po-body"><div class="po-title">Weekend events loading...</div><div class="po-meta"><span>Columbus</span></div></div></a>
-      </div>
-    </div>
-  </div>
+async function cb2LoadVenues(){
+  try{
+    var el=document.getElementById('cb2Venues'); if(!el) return;
+    var {data}=await sb.from('venues').select('id,name,neighborhood,cover_image_url').eq('status','approved').limit(10);
+    if(!data||!data.length){el.innerHTML='<div style="color:var(--mist);font-size:13px">No venues listed yet.</div>';return;}
+    el.innerHTML=data.map(function(v){var img=v.cover_image_url?'background-image:url(\''+v.cover_image_url+'\')':'';
+      return '<a class="cb2-venue-card" href="https://cbusevents.com/venue.html?id='+v.id+'"><div class="cb2-venue-img" style="'+img+'"></div><div class="cb2-venue-name">'+(v.name||'Venue')+'</div><div class="cb2-venue-loc">'+(v.neighborhood||'Columbus')+'</div></a>';
+    }).join('');
+  }catch(err){console.warn('cb2 venues',err);}
+}
 
-  <!-- BY NEIGHBORHOOD -->
-  <div class="rail cbx-rev">
-    <div class="rail-hd"><div class="rail-titles"><div class="rail-eyebrow">Browse the map</div><div class="rail-t">By <em>neighborhood</em></div></div><a href="https://cbusevents.com/events.html" class="rail-all">All areas &rarr;</a></div>
-    <div class="rail-wrap" data-rail><span class="rail-fade l"></span><span class="rail-fade r"></span><button class="rail-arrow prev" data-dir="-1" aria-label="Scroll left">&#8249;</button><button class="rail-arrow next" data-dir="1" aria-label="Scroll right">&#8250;</button>
-      <div class="rail-vp" id="cbx-hoods">
-        <a class="hood" style="--hue:rgba(255,107,53,0.12)" href="https://cbusevents.com/events.html"><span class="po-corner tl"></span><span class="hood-arrow">&rarr;</span><div class="hood-name">Short North</div><div class="hood-count">Browse area</div></a>
-        <a class="hood" style="--hue:rgba(200,150,62,0.12)" href="https://cbusevents.com/events.html"><span class="po-corner tl"></span><span class="hood-arrow">&rarr;</span><div class="hood-name">Franklinton</div><div class="hood-count">Browse area</div></a>
-        <a class="hood" style="--hue:rgba(26,107,64,0.12)" href="https://cbusevents.com/events.html"><span class="po-corner tl"></span><span class="hood-arrow">&rarr;</span><div class="hood-name">Olde Towne East</div><div class="hood-count">Browse area</div></a>
-      </div>
-    </div>
-  </div>
+function cb2Greet(name){
+  var h=new Date().getHours();
+  var g=h<12?'Good morning':h<18?'Good afternoon':'Good evening';
+  var el=document.getElementById('cb2Greeting');
+  if(el) el.textContent=g+(name?', '+name:'')+' 👋';
+}
 
-  <!-- THE SPACES -->
-  <div class="rail cbx-rev">
-    <div class="rail-hd"><div class="rail-titles"><div class="rail-eyebrow">Venues taking bookings</div><div class="rail-t">The <em>spaces</em></div></div><a href="https://cbusevents.com/venues.html" class="rail-all">All venues &rarr;</a></div>
-    <div class="rail-wrap" data-rail><span class="rail-fade l"></span><span class="rail-fade r"></span><button class="rail-arrow prev" data-dir="-1" aria-label="Scroll left">&#8249;</button><button class="rail-arrow next" data-dir="1" aria-label="Scroll right">&#8250;</button>
-      <div class="rail-vp" id="cbx-spaces">
-        <a class="prof" href="https://cbusevents.com/venues.html"><div class="prof-av av-venue">V</div><div class="prof-name">Loading venues...</div><span class="prof-chip chip-venue">Venue</span><div class="prof-meta">Columbus</div><div class="prof-cta">View space</div></a>
-      </div>
-    </div>
-  </div>
+/* Mount the workspace switcher + real avatar once auth resolves.
+   initNavAuth() below (existing function) already fetches the
+   session; we hook its result here without duplicating the query. */
+async function cb2InitAccountArea(){
+  try{
+    var {data:{session}}=await sb.auth.getSession();
+    if(!session){ cb2Greet(null); return; }
+    var user=session.user;
+    var {data:prof}=await sb.from('customer_profiles').select('full_name,avatar_url').eq('user_id',user.id).maybeSingle();
+    var name=prof&&prof.full_name?prof.full_name.split(' ')[0]:null;
+    cb2Greet(name);
+    var chip=document.getElementById('cb2AcctChip');
+    if(chip){
+      chip.innerHTML='<img class="cb2-avatar" src="'+(prof&&prof.avatar_url?prof.avatar_url:'https://api.dicebear.com/7.x/initials/svg?seed='+encodeURIComponent(name||'U'))+'" alt="Account" id="cb2AvatarImg">';
+    }
+    if(window.CBUSAccount){
+      CBUSAccount.init(sb);
+      CBUSAccount.mountSwitcher(chip, user.id, null);
+    }
+  }catch(err){console.warn('cb2 account area',err);cb2Greet(null);}
+}
 
-  <!-- THE MAKERS -->
-  <div class="rail cbx-rev">
-    <div class="rail-hd"><div class="rail-titles"><div class="rail-eyebrow">Vendors &amp; food pros</div><div class="rail-t">The <em>makers</em></div></div><a href="https://cbusevents.com/vendors.html" class="rail-all">All makers &rarr;</a></div>
-    <div class="rail-wrap" data-rail><span class="rail-fade l"></span><span class="rail-fade r"></span><button class="rail-arrow prev" data-dir="-1" aria-label="Scroll left">&#8249;</button><button class="rail-arrow next" data-dir="1" aria-label="Scroll right">&#8250;</button>
-      <div class="rail-vp" id="cbx-makers">
-        <a class="prof" href="https://cbusevents.com/vendors.html"><div class="prof-av av-vendor">M</div><div class="prof-name">Loading makers...</div><span class="prof-chip chip-vendor">Vendor</span><div class="prof-meta">Columbus</div><div class="prof-cta">View shop</div></a>
-      </div>
-    </div>
-  </div>
+document.addEventListener('click',function(e){
+  var menu=document.getElementById('cb2BizMenu');
+  var wrap=document.getElementById('cb2BizWrap');
+  if(menu&&wrap&&!wrap.contains(e.target)) menu.style.display='none';
+});
 
-  <!-- OPEN SPOTS -->
-  <div class="rail cbx-rev">
-    <div class="rail-hd"><div class="rail-titles"><div class="rail-eyebrow"><span class="dot"></span>Hiring &amp; open tables</div><div class="rail-t">Open <em>spots</em></div></div><a href="https://cbusevents.com/collab-board.html" class="rail-all">Collab board &rarr;</a></div>
-    <div class="rail-wrap" data-rail><span class="rail-fade l"></span><span class="rail-fade r"></span><button class="rail-arrow prev" data-dir="-1" aria-label="Scroll left">&#8249;</button><button class="rail-arrow next" data-dir="1" aria-label="Scroll right">&#8250;</button>
-      <div class="rail-vp" id="cbx-spots">
-        <a class="gig" href="https://cbusevents.com/collab-board.html"><span class="gig-pill gp-vendor">Open</span><div class="gig-title">Open spots loading...</div><div class="gig-sub">Columbus</div><div class="gig-row"><div class="gig-pay">&mdash;<span>Pay</span></div><div class="gig-date">TBA</div></div><div class="gig-apply">Apply</div></a>
-      </div>
-    </div>
-  </div>
-
-</section>
-
+/* Invoked from the main script block below, right after the
+   Supabase client (`sb`) is created — this file's `sb` is not
+   defined yet at this point in parse order. See cb2InitAll(). */
+window.cb2InitAll=function(){
+  cb2LoadTrending();
+  cb2LoadTonight();
+  cb2LoadWeekend();
+  cb2LoadVenues();
+  cb2InitAccountArea();
+};
+</script>
 
 <!-- CLAIM MODAL -->
 <div id="claimModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:600;align-items:center;justify-content:center;padding:20px" onclick="if(event.target===this)closeClaimModal()">
@@ -1328,6 +1200,7 @@ body{-webkit-tap-highlight-color:rgba(0,0,0,0);}
 const SB_URL="https://toblgvatvsjljbqogzsv.supabase.co";
 const SB_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRvYmxndmF0dnNqbGpicW9nenN2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMDgwNTAsImV4cCI6MjA4NzY4NDA1MH0._WJEQPizNDiQfDXQB_DHPaQhixPGpMdmYQSmyWmm_FQ";
 const sb=supabase.createClient(SB_URL,SB_KEY);
+if(typeof window.cb2InitAll==='function')window.cb2InitAll();
 const EDGE_FN_URL="https://toblgvatvsjljbqogzsv.supabase.co/functions/v1/email-capture";
 
 
