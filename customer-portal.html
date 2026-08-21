@@ -1049,7 +1049,7 @@ async function loadLiveEvents(user){
   const{data:follows}=await sb.from('customer_venue_follows').select('venue_id').eq('user_id',user.id);
   const followedIds=(follows||[]).map(f=>f.venue_id);
   const { data: events, error: evErr } = await sb.from('events')
-    .select('id,title,start_time,cover_image_url,is_boosted,is_third_party,venue_name_override,featured')
+    .select('id,title,start_time,cover_image_url,is_boosted,is_third_party,venue_id,venue_name_override,featured')
     .gte('start_time',new Date().toISOString())
     .eq('status','published')
     .order('start_time',{ascending:true})
@@ -1062,7 +1062,9 @@ async function loadLiveEvents(user){
   }
   // Sort followed venues first
   const sorted=[...events].sort((a,b)=>{
-    return 0; // venue follow sort disabled - no join available
+    const aF=followedIds.includes(a.venue_id)?0:1;
+    const bF=followedIds.includes(b.venue_id)?0:1;
+    return aF-bF;
   });
   if(subtitle)subtitle.textContent=sorted.length+' upcoming events';
   const colors=['ec1','ec2','ec3','ec4'];
@@ -1071,22 +1073,24 @@ async function loadLiveEvents(user){
     const d=new Date(e.start_time);
     const dateStr=d.toLocaleDateString('en-US',{month:'short',day:'numeric',timeZone:'America/New_York'});
     const timeStr=d.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit',timeZone:'America/New_York'});
-    const isFollowed=false;
-    const eventHref = 'https://cbusevents.com/event/' + e.id;
-    return '<div class="event-card" onclick="window.open(\'' + eventHref + '\',\'_blank\')" role="button" tabindex="0">'
+    const isFollowed=followedIds.includes(e.venue_id);
+    const eventHref = e.is_third_party?('https://cbusevents.com/the-radar.html'):('https://cbusevents.com/event/' + e.id);
+    const openAttr = e.is_third_party?' target="_blank" rel="noopener"':'';
+    return '<a class="event-card" href="'+eventHref+'"'+openAttr+' role="button">'
       +'<div class="event-card-img">'
       +(e.cover_image_url
         ?'<div class="event-card-img-bg" style="background-image:url(\''+e.cover_image_url+'\')"></div>'
         :'<div class="event-card-img-bg '+colors[i%4]+'"></div>')
       +'<div class="event-card-img-overlay"></div>'
-      +(isFollowed?'<div class="event-card-badge" style="background:var(--green);color:#000">Following</div>'
+      +(e.is_third_party?'<div class="event-card-badge" style="background:rgba(0,0,0,0.7)">External</div>'
+        :isFollowed?'<div class="event-card-badge" style="background:var(--green);color:#000">Following</div>'
         :e.is_boosted?'<div class="event-card-badge">Featured</div>':'')
       +'</div>'
       +'<div class="event-card-body">'
       +'<div class="event-card-venue">'+venueName+'</div>'
       +'<div class="event-card-name">'+e.title+'</div>'
       +'<div class="event-card-meta"><span class="event-card-date">'+dateStr+' · '+timeStr+'</span></div>'
-      +'</div></div>';
+      +'</div></a>';
   }).join('');
 }
 
