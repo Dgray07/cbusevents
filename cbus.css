@@ -20,7 +20,7 @@
    ============================================================ */
 
 /* 1. FONTS ------------------------------------------------- */
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700;1,900&family=DM+Sans:wght@300;400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Inter:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap');
 
 /* 2. RESET ------------------------------------------------- */
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-font-smoothing:antialiased;}
@@ -67,8 +67,8 @@ button{font-family:inherit;cursor:pointer;border:none;background:none;}
   --green:#1a6b40; --green-bg:#edf7f2; --green-bd:#b0dfc4;
 
   /* type */
-  --display:'Playfair Display',Georgia,serif;
-  --font:'DM Sans',system-ui,sans-serif;
+  --display:'Space Grotesk',system-ui,sans-serif;
+  --font:'Inter',system-ui,sans-serif;
   --mono:'DM Mono',ui-monospace,monospace;
 
   /* radius */
