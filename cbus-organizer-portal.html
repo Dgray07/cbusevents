@@ -10,27 +10,28 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700;9..40,800;9..40,900&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Inter:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;}
 :root{
-  --bg:#050508;
-  --surface:#0f0f1c;
-  --card:#1c1c30;
-  --card-hover:#222238;
-  --border:rgba(255,255,255,0.09);
-  --border-mid:rgba(255,255,255,0.15);
-  --text:#f4f4ff;
-  --sub:#8888b0;
-  --muted:#44445a;
+  --bg:#0D0D0F;
+  --surface:#131316;
+  --card:#17171B;
+  --card-hover:#1c1c20;
+  --border:#26262B;
+  --border-mid:rgba(245,243,239,0.15);
+  --text:#F5F3EF;
+  --sub:#B8B3AB;
+  --muted:#8A857C;
   --orange:#FF6B35;
   --orange-dim:rgba(255,107,53,0.12);
   --orange-glow:rgba(255,107,53,0.28);
-  --green:#30d693;
-  --red:#f47171;
-  --blue:#7c8cf8;
-  --gold:#f5bc30;
-  --font:'DM Sans',sans-serif;
+  --green:#639922;
+  --red:#E24B4A;
+  --blue:#5a9fd4;
+  --gold:#f5b942;
+  --font:'Inter',sans-serif;
+  --font-display:'Space Grotesk',sans-serif;
   --mono:'DM Mono',monospace;
   --shadow-sm:0 4px 20px rgba(0,0,0,0.8),0 0 0 1px rgba(255,255,255,0.08);
   --shadow-md:0 8px 32px rgba(0,0,0,0.85),0 0 0 1px rgba(255,255,255,0.1);
@@ -298,7 +299,7 @@ nav{
 .auth-tab.active{background:var(--card);color:var(--text);box-shadow:var(--shadow-sm);}
 
 /* ── SECTION HEADERS ──────────────────────────────────────── */
-.section-title{font-size:22px;font-weight:800;margin-bottom:5px;letter-spacing:-0.03em;}
+.section-title{font-family:var(--font-display);font-size:22px;font-weight:500;margin-bottom:5px;letter-spacing:-0.01em;}
 .section-sub{color:var(--sub);font-size:13px;margin-bottom:22px;line-height:1.5;}
 
 /* ── EMPTY STATE ──────────────────────────────────────────── */
