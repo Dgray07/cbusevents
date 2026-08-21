@@ -775,7 +775,7 @@ body{-webkit-tap-highlight-color:rgba(0,0,0,0);}
       </div>
       <button class="cb2-icon-btn" aria-label="Search" onclick="document.getElementById('cb2SearchInput')?.focus();document.getElementById('cb2SearchInput')?.scrollIntoView({behavior:'smooth',block:'center'});">🔍</button>
       <a href="https://cbusevents.com/customer-portal.html?tab=saved" class="cb2-icon-btn" aria-label="Saved">🔖</a>
-      <button class="cb2-icon-btn" aria-label="Notifications" id="cb2NotifBtn">🔔</button>
+      <button class="cb2-icon-btn" aria-label="Notifications" id="cb2NotifBtn" onclick="window.location.href='https://cbusevents.com/customer-portal.html?tab=notifications'">🔔</button>
       <div id="cb2AcctChip"><a href="https://cbusevents.com/auth.html" class="cb2-icon-btn" aria-label="Sign in" id="cb2SignInBtn">👤</a></div>
     </div>
   </div>
@@ -958,7 +958,7 @@ async function cb2InitAccountArea(){
     cb2Greet(name);
     var chip=document.getElementById('cb2AcctChip');
     if(chip){
-      chip.innerHTML='<img class="cb2-avatar" src="'+(prof&&prof.avatar_url?prof.avatar_url:'https://api.dicebear.com/7.x/initials/svg?seed='+encodeURIComponent(name||'U'))+'" alt="Account" id="cb2AvatarImg">';
+      chip.innerHTML='<a href="https://cbusevents.com/customer-portal.html" class="cb2-icon-btn" aria-label="Account" style="padding:0"><img class="cb2-avatar" src="'+(prof&&prof.avatar_url?prof.avatar_url:'https://api.dicebear.com/7.x/initials/svg?seed='+encodeURIComponent(name||'U'))+'" alt="Account" id="cb2AvatarImg"></a>';
     }
     if(window.CBUSAccount){
       CBUSAccount.init(sb);
