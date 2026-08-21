@@ -28,32 +28,33 @@
 <meta name="apple-mobile-web-app-title" content="CBUSEVENTS">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700;800;900&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Inter:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; -webkit-font-smoothing: antialiased; }
 
 :root {
-  --bg:         #080810;
-  --surface:    #0f0f1a;
-  --card:       #141420;
-  --card-hover: #18182a;
-  --border:     #1e1e2e;
-  --border-sub: #191928;
-  --text:       #f0f0fa;
-  --sub:        #7070a0;
-  --muted:      #40405a;
+  --bg:         #0D0D0F;
+  --surface:    #131316;
+  --card:       #17171B;
+  --card-hover: #1c1c20;
+  --border:     #26262B;
+  --border-sub: #1e1e22;
+  --text:       #F5F3EF;
+  --sub:        #B8B3AB;
+  --muted:      #8A857C;
   --orange:     #FF6B35;
   --orange-dim: rgba(255,107,53,0.1);
   --orange-border: rgba(255,107,53,0.25);
-  --green:      #34d399;
-  --green-dim:  rgba(52,211,153,0.1);
-  --green-border: rgba(52,211,153,0.2);
-  --red:        #f87171;
-  --blue:       #818cf8;
-  --blue-dim:   rgba(129,140,248,0.1);
-  --blue-border:rgba(129,140,248,0.2);
-  --gold:       #fbbf24;
-  --font:       'DM Sans', sans-serif;
+  --green:      #639922;
+  --green-dim:  rgba(99,153,34,0.1);
+  --green-border: rgba(99,153,34,0.25);
+  --red:        #E24B4A;
+  --blue:       #5a9fd4;
+  --blue-dim:   rgba(90,159,212,0.1);
+  --blue-border:rgba(90,159,212,0.25);
+  --gold:       #f5b942;
+  --font:       'Inter', sans-serif;
+  --font-display: 'Space Grotesk', sans-serif;
   --mono:       'DM Mono', monospace;
   --r-sm:  8px;
   --r-md:  10px;
@@ -460,7 +461,7 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
 /* ── PORTAL MOBILE BOTTOM NAV ── */
 .portal-mobile-nav{display:none;position:fixed;bottom:0;left:0;right:0;background:var(--surface);border-top:1px solid var(--border);z-index:300;padding-bottom:env(safe-area-inset-bottom);}
 .portal-mobile-nav-inner{display:flex;align-items:stretch;height:58px;padding:0 4px;}
-.pmn-btn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;background:none;border:none;cursor:pointer;color:var(--sub);font-size:9px;font-weight:600;transition:color 0.15s;padding:4px 2px;font-family:'DM Sans',sans-serif;letter-spacing:0.02em;text-transform:uppercase;}
+.pmn-btn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;background:none;border:none;cursor:pointer;color:var(--sub);font-size:9px;font-weight:600;transition:color 0.15s;padding:4px 2px;font-family:var(--font);letter-spacing:0.02em;text-transform:uppercase;}
 .pmn-btn.active{color:#FF6B35;}
 .pmn-btn svg{width:20px;height:20px;flex-shrink:0;}
 .pmn-icon{position:relative;display:inline-flex;}
@@ -479,7 +480,7 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
 <div id="authGate" style="display:flex;position:fixed;inset:0;background:var(--bg);z-index:9999;align-items:center;justify-content:center;padding:24px">
   <div style="background:var(--card);border:1px solid var(--border);border-radius:20px;padding:40px;width:100%;max-width:420px;box-shadow:0 32px 80px rgba(0,0,0,0.5)">
     <div style="text-align:center;margin-bottom:32px">
-      <div style="font-family:var(--font);font-weight:900;font-size:22px;letter-spacing:-0.05em;text-transform:uppercase;margin-bottom:6px">CBUS<span style="color:var(--orange)">EVENTS</span></div>
+      <div style="font-family:var(--font-display);font-weight:500;font-size:22px;letter-spacing:-0.01em;margin-bottom:6px">CBUS<span style="color:var(--orange)">EVENTS</span></div>
       <div style="color:var(--sub);font-size:13px">Your Columbus event dashboard</div>
     </div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:0;background:var(--surface);border-radius:10px;padding:4px;margin-bottom:24px">
@@ -753,7 +754,7 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
           </div>
           <div style="padding:16px;">
             <div style="display:flex;gap:8px;margin-bottom:12px;">
-              <input id="rideDestination" placeholder="Destination address or event name" style="flex:1;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:9px 12px;color:var(--text);font-size:12px;font-family:'DM Sans',sans-serif;outline:none;" />
+              <input id="rideDestination" placeholder="Destination address or event name" style="flex:1;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:9px 12px;color:var(--text);font-size:12px;font-family:var(--font);outline:none;" />
               <button onclick="estimateRide()" style="background:var(--orange);color:#fff;border:none;border-radius:8px;padding:9px 16px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;">Estimate</button>
             </div>
             <div id="rideResult" style="display:none;"></div>
@@ -1352,6 +1353,9 @@ document.addEventListener('DOMContentLoaded', function() {
   if(session?.user){
     currentUser=session.user;
     hideAuthGate(session.user);
+    var validTabs=['saved','tickets','organizer','recommendations','alerts'];
+    var tabParam=params.get('tab');
+    if(tabParam&&validTabs.includes(tabParam))setTimeout(()=>showSection(tabParam),150);
   } else {
     showAuthGate();
     if(params.get('tab')==='signup')setTimeout(()=>switchTab('signup'),100);
