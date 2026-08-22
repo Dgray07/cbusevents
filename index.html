@@ -682,6 +682,11 @@ body{-webkit-tap-highlight-color:rgba(0,0,0,0);}
 .cb2-intent-arrow{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;border:1px solid var(--rule);color:#fff;}
 @media(max-width:900px){.cb2-intent-grid{grid-template-columns:repeat(3,1fr);}}
 @media(max-width:600px){.cb2-intent-grid{grid-template-columns:repeat(2,1fr);}}
+.cb2-cta-hero{display:flex;align-items:center;gap:18px;background:var(--paper);border:1px solid var(--rule);border-radius:16px;padding:22px 26px;text-decoration:none;flex-wrap:wrap;transition:border-color .15s,transform .15s;}
+.cb2-cta-hero:hover{transform:translateY(-2px);border-color:var(--flame);}
+.cb2-cta-hero-title{font-family:var(--display);font-weight:600;font-size:16px;color:var(--ink);margin-bottom:3px;}
+.cb2-cta-hero-desc{font-size:13px;color:var(--sub);}
+.cb2-cta-hero-btn{display:flex;align-items:center;gap:8px;background:var(--flame);color:#050508;font-weight:700;font-size:13px;padding:12px 20px;border-radius:10px;white-space:nowrap;}
 .cb2-statbar{display:flex;gap:28px;margin-top:20px;padding-top:18px;border-top:1px solid var(--rule);flex-wrap:wrap;}
 .cb2-stat{display:flex;flex-direction:column;}
 .cb2-stat-n{font-family:var(--display);font-size:20px;font-weight:600;color:var(--flame);line-height:1;}
@@ -727,11 +732,11 @@ body{-webkit-tap-highlight-color:rgba(0,0,0,0);}
 .cb2-weekend-title{font-size:13px;font-weight:700;color:var(--ink);}
 .cb2-weekend-venue{font-size:11px;color:var(--mist);}
 
-.cb2-cta{margin:36px 48px;background:linear-gradient(135deg,rgba(255,107,53,.14),rgba(255,107,53,.03));border:1px solid var(--flame-m);border-radius:18px;padding:26px 30px;display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap;}
+.cb2-cta{margin:36px 48px;background:var(--paper);border:1px solid var(--rule);border-radius:18px;padding:26px 30px;display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap;}
 .cb2-cta-copy h3{font-family:var(--display);font-weight:800;font-size:18px;color:var(--ink);}
 .cb2-cta-copy p{font-size:13px;color:var(--sub);margin-top:2px;}
 .cb2-cta-btns{display:flex;gap:8px;flex-wrap:wrap;}
-.cb2-cta-btn{display:flex;flex-direction:column;align-items:center;gap:5px;background:var(--paper);border:1px solid var(--rule);border-radius:12px;padding:12px 16px;font-size:11px;font-weight:700;color:var(--ink);min-width:78px;}
+.cb2-cta-btn{display:flex;flex-direction:column;align-items:center;gap:5px;background:#1c1c20;border:1px solid var(--rule);border-radius:12px;padding:12px 16px;font-size:11px;font-weight:700;color:var(--ink);min-width:78px;}
 .cb2-cta-btn:hover{border-color:var(--flame);color:var(--flame);}
 .cb2-cta-btn .ic{font-size:17px;}
 
@@ -892,29 +897,50 @@ body{-webkit-tap-highlight-color:rgba(0,0,0,0);}
 </section>
 
 <!-- HOST CTA -->
-<div class="cb2-cta">
-  <div class="cb2-cta-copy">
-    <h3>Don't just attend the event.</h3>
-    <p>Be part of the ecosystem — host, sell, book, work, promote, discover.</p>
+<section class="cb2-section" style="padding-bottom:8px">
+  <div class="cb2-sec-head">
+    <div class="cb2-sec-title">Don't just attend the event.</div>
   </div>
-  <div class="cb2-cta-btns">
-    <a href="https://cbusevents.com/signup.html?role=organizer" class="cb2-cta-btn"><span class="ic">🎤</span>I'm an Organizer</a>
-    <a href="https://cbusevents.com/list-your-venue.html" class="cb2-cta-btn"><span class="ic">🏛️</span>I'm a Venue</a>
-    <a href="https://cbusevents.com/signup.html?role=vendor" class="cb2-cta-btn"><span class="ic">🧾</span>I'm a Vendor</a>
-    <a href="https://cbusevents.com/event-staff.html" class="cb2-cta-btn"><span class="ic">🎫</span>I'm Event Staff</a>
+  <p style="font-size:13px;color:var(--sub);margin:-8px 0 16px;">Be part of the ecosystem — host, sell, book, work, promote, discover.</p>
+  <div class="cb2-intent-grid" style="grid-template-columns:repeat(4,1fr);max-width:none;">
+    <a class="cb2-intent-card" href="https://cbusevents.com/signup.html?role=organizer">
+      <div class="cb2-intent-icon" style="background:rgba(255,107,53,.15);color:#FF7F4D">🎤</div>
+      <div class="cb2-intent-title">I'm an Organizer</div>
+      <div class="cb2-intent-desc">Create events, sell tickets, reach Columbus.</div>
+      <div class="cb2-intent-arrow">→</div>
+    </a>
+    <a class="cb2-intent-card" href="https://cbusevents.com/list-your-venue.html">
+      <div class="cb2-intent-icon" style="background:rgba(90,159,212,.15);color:#5a9fd4">🏛️</div>
+      <div class="cb2-intent-title">I'm a Venue</div>
+      <div class="cb2-intent-desc">List your space, take bookings, get seen.</div>
+      <div class="cb2-intent-arrow">→</div>
+    </a>
+    <a class="cb2-intent-card" href="https://cbusevents.com/signup.html?role=vendor">
+      <div class="cb2-intent-icon" style="background:rgba(99,153,34,.15);color:#8fc93a">🧾</div>
+      <div class="cb2-intent-title">I'm a Vendor</div>
+      <div class="cb2-intent-desc">Sell in the marketplace, apply to tables.</div>
+      <div class="cb2-intent-arrow">→</div>
+    </a>
+    <a class="cb2-intent-card" href="https://cbusevents.com/event-staff.html">
+      <div class="cb2-intent-icon" style="background:rgba(245,185,66,.15);color:#f5b942">🎫</div>
+      <div class="cb2-intent-title">I'm Event Staff</div>
+      <div class="cb2-intent-desc">Find gigs — security, bar, day-of work.</div>
+      <div class="cb2-intent-arrow">→</div>
+    </a>
   </div>
-</div>
+</section>
 
 <!-- QUICK ADD EVENT CTA -->
-<div class="cb2-cta" style="background:linear-gradient(135deg,rgba(255,107,53,.2),rgba(255,107,53,.04));">
-  <div class="cb2-cta-copy">
-    <h3>Running an event? Get it in front of Columbus.</h3>
-    <p>Ticketed here or somewhere else — list it in minutes and show up in Trending, Tonight, and This Weekend.</p>
-  </div>
-  <div class="cb2-cta-btns">
-    <a href="https://cbusevents.com/signup.html?role=organizer&next=create-event" class="cb2-cta-btn" style="min-width:160px;background:var(--flame);border-color:var(--flame);color:#050508;"><span class="ic">⚡</span>Add your event</a>
-  </div>
-</div>
+<section class="cb2-section" style="padding-top:8px">
+  <a class="cb2-cta-hero" href="https://cbusevents.com/signup.html?role=organizer&next=create-event">
+    <div class="cb2-intent-icon" style="background:rgba(255,107,53,.18);color:#FF7F4D;width:44px;height:44px;font-size:19px;flex-shrink:0;">⚡</div>
+    <div style="flex:1;min-width:220px;">
+      <div class="cb2-cta-hero-title">Running an event? Get it in front of Columbus.</div>
+      <div class="cb2-cta-hero-desc">Ticketed here or somewhere else — list it in minutes and show up in Trending, Tonight, and This Weekend.</div>
+    </div>
+    <div class="cb2-cta-hero-btn">Add your event <span>→</span></div>
+  </a>
+</section>
 
 <!-- POPULAR VENUES -->
 <section class="cb2-section" style="padding-bottom:36px">
