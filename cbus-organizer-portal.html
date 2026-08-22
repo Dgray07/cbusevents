@@ -2423,6 +2423,7 @@ function collabPostHTML(p){
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
         ${p.likes||0}
       </button>
+      ${currentUser&&currentUser.id===p.user_id?`<button onclick="deleteCollabPost('${p.id}')" style="background:none;border:none;color:var(--muted);font-size:12px;font-weight:600;cursor:pointer;font-family:var(--font);margin-left:auto" onmouseover="this.style.color='var(--red)'" onmouseout="this.style.color='var(--muted)'">Delete</button>`:''}
     </div>
   </div>`;
 }
@@ -2508,6 +2509,15 @@ async function likePost(id,btn){
     btn.innerHTML=`<svg width="14" height="14" viewBox="0 0 24 24" fill="var(--orange)" stroke="var(--orange)" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg> ${current+1}`;
     btn.style.color='var(--orange)';
   }
+}
+
+async function deleteCollabPost(id){
+  if(!currentUser)return;
+  if(!confirm('Delete this post? This can\'t be undone.'))return;
+  const r=await sb.from('collab_posts').delete().eq('id',id).eq('user_id',currentUser.id);
+  if(r.error){toast('Could not delete: '+r.error.message);return;}
+  toast('Post deleted.');
+  if(currentPage==='collaborate')loadCollabFeed();
 }
 
 async function applyToGig(gigId){
