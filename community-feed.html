@@ -284,8 +284,9 @@ async function deletePost(id){
   if(!currentUser)return;
   if(!confirm('Delete this post? This can\'t be undone.'))return;
   try{
-    const r=await sb.from('collab_posts').delete().eq('id',id).eq('user_id',currentUser.id);
+    const r=await sb.from('collab_posts').delete().eq('id',id).eq('user_id',currentUser.id).select();
     if(r.error){alert('Could not delete: '+r.error.message);return;}
+    if(!r.data||r.data.length===0){alert('Nothing was deleted — this usually means a database permission (RLS policy) is blocking it, not a bug in the page itself.');return;}
     if(activeTab==='feed')loadFeed();
   }catch(e){alert('Something went wrong. Try again.');}
 }
