@@ -1673,14 +1673,25 @@ async function initNavAuth(){
 // LOAD LIVE DATA
 async function loadLiveData(){
   try{
-    // Parallel: events, gigs, follower count, venue count, vendor count
-    const[eventsRes,gigsRes,followRes,venueRes,vendorRes]=await Promise.all([
+    // Independent: one query failing (e.g. an RLS permission gap) must not
+    // silently block the other four — allSettled instead of all.
+    const results=await Promise.allSettled([
       sb.from('events').select('id,title,start_time,venue_name_override,is_free,venues(name)').eq('status','published').gte('start_time',new Date().toISOString()).order('start_time',{ascending:true}).limit(5),
       sb.from('collab_gigs').select('*').eq('status','open').order('created_at',{ascending:false}).limit(6),
       sb.from('profile_follows').select('id',{count:'exact',head:true}).eq('following_id','dcae39de-9265-4d67-b8be-5d0ca599069b'),
       sb.from('venues').select('id',{count:'exact',head:true}).eq('status','approved'),
       sb.from('vendors').select('id',{count:'exact',head:true}),
     ]);
+    const pick=(r,fallback)=>{
+      if(r.status==='fulfilled'&&!r.value.error)return r.value;
+      console.warn('loadLiveData: one query failed',r.status==='rejected'?r.reason:r.value.error);
+      return fallback;
+    };
+    const eventsRes=pick(results[0],{data:[]});
+    const gigsRes=pick(results[1],{data:[]});
+    const followRes=pick(results[2],{count:0});
+    const venueRes=pick(results[3],{count:0});
+    const vendorRes=pick(results[4],{count:0});
 
     allEvents=eventsRes.data||[];
     const events=allEvents;
@@ -1728,6 +1739,9 @@ async function loadLiveData(){
       // Update sidebar events
       const sidebarEvts=document.getElementById('sidebar-events');
       if(sidebarEvts){
+        if(!events.length){
+          sidebarEvts.innerHTML='<div style="font-size:11px;color:var(--mist);padding:4px 0">No upcoming events yet.</div>';
+        }else{
         sidebarEvts.innerHTML=events.slice(0,2).map(e=>{
           const d=new Date(e.start_time);
           const mo=d.toLocaleDateString('en-US',{month:'short'}).toUpperCase();
@@ -1739,6 +1753,7 @@ async function loadLiveData(){
             <div><div class="sb-name">${e.title||'Untitled'}</div><div class="sb-venue-sm">${venue}</div></div>
           </div>`;
         }).join('');
+        }
       }
       // Update stat elements
       const statEvts=document.getElementById('stat-events');
