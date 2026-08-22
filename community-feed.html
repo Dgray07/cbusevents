@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="en" data-default="dark">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Community Feed — CBUSEVENTS</title>
+<meta name="description" content="Post updates, opportunities, and open gigs. Where Columbus's event organizers, vendors, venues, and staff connect first.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Inter:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/cbus.css?v=1">
+<link rel="stylesheet" href="/theme.css">
+<script src="/theme.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-font-smoothing:antialiased;}
+html{scroll-behavior:smooth;}
+body{background:var(--cream);color:var(--ink);font-family:var(--font);font-weight:300;overflow-x:hidden;}
+a{text-decoration:none;color:inherit;}
+button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit;}
+img{display:block;}
+
+/* ---- nav (ported to match every other public page) ---- */
+.cb2-nav-inner{display:flex;align-items:center;justify-content:space-between;padding:0 48px;height:64px;gap:24px;}
+.cb2-logo{font-family:var(--display);font-weight:900;font-size:20px;letter-spacing:0.04em;color:var(--ink);white-space:nowrap;}
+.cb2-logo span{color:var(--flame);}
+.cb2-links{display:flex;align-items:center;gap:28px;list-style:none;}
+.cb2-links a{font-size:14px;font-weight:600;color:var(--sub);padding-bottom:20px;margin-bottom:-20px;border-bottom:2px solid transparent;transition:color .15s,border-color .15s;}
+.cb2-links a:hover{color:var(--ink);}
+.cb2-links a.active{color:var(--flame);border-bottom-color:var(--flame);}
+.cb2-icons{display:flex;align-items:center;gap:14px;}
+.cb2-icon-btn{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;color:var(--ash);background:transparent;transition:background .15s,color .15s;position:relative;}
+.cb2-icon-btn:hover{background:var(--flame-l);color:var(--flame);}
+.cb2-avatar{width:36px;height:36px;border-radius:50%;object-fit:cover;border:1.5px solid var(--rule);cursor:pointer;}
+.cb2-biz-wrap{position:relative;}
+.cb2-biz-btn{font-size:13px;font-weight:600;color:var(--sub);display:flex;align-items:center;gap:4px;}
+.cb2-biz-btn:hover{color:var(--ink);}
+.cb2-biz-menu{display:none;position:absolute;top:calc(100% + 10px);right:0;background:var(--paper);border:1px solid var(--rule);border-radius:12px;padding:8px;min-width:210px;box-shadow:0 16px 44px rgba(0,0,0,.35);z-index:300;}
+.cb2-biz-menu a{display:block;padding:9px 12px;border-radius:8px;font-size:13px;font-weight:600;color:var(--ink);}
+.cb2-biz-menu a:hover{background:var(--flame-l);color:var(--flame);}
+.cb2-biz-menu .cb2-div{height:1px;background:var(--rule);margin:5px 6px;}
+@media(max-width:900px){.cb2-links{display:none;}.cb2-nav-inner{padding:0 16px;height:56px;}}
+
+/* ---- page ---- */
+.cf-page{max-width:760px;margin:0 auto;padding:0 22px 80px;}
+.cf-head{padding:34px 0 18px;}
+.cf-eyebrow{font-family:var(--mono);font-size:10px;letter-spacing:0.24em;text-transform:uppercase;color:var(--flame);margin-bottom:12px;}
+.cf-h1{font-family:var(--display);font-weight:500;font-size:clamp(26px,4vw,38px);line-height:1.05;letter-spacing:-0.01em;}
+.cf-h1 em{font-style:italic;color:var(--flame);}
+.cf-sub{margin-top:10px;color:var(--ash);font-size:14px;font-weight:300;}
+
+.cf-tabs{display:flex;gap:0;background:var(--paper);border:1px solid var(--rule);border-radius:12px;padding:4px;margin-bottom:20px;}
+.cf-tab{flex:1;padding:9px 0;border-radius:9px;font-size:13px;font-weight:600;text-align:center;color:var(--sub);}
+.cf-tab.on{background:var(--cream);color:var(--ink);}
+
+.cf-compose{background:var(--paper);border:1px solid var(--rule);border-radius:14px;padding:16px 18px;margin-bottom:18px;display:flex;align-items:center;gap:12px;}
+.cf-compose-avatar{width:38px;height:38px;border-radius:50%;background:var(--flame-l);border:1px solid var(--flame-m);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:var(--flame);flex-shrink:0;}
+.cf-compose-prompt{flex:1;background:var(--cream);border:1px solid var(--rule);border-radius:10px;padding:11px 14px;color:var(--mist);font-size:13px;text-align:left;}
+.cf-compose-btn{background:var(--flame);color:#080810;font-weight:700;font-size:12px;padding:10px 18px;border-radius:9px;white-space:nowrap;}
+
+.cf-post{background:var(--paper);border:1px solid var(--rule);border-radius:14px;padding:18px 20px;margin-bottom:12px;}
+.cf-post-head{display:flex;align-items:flex-start;gap:12px;margin-bottom:12px;}
+.cf-post-avatar{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;flex-shrink:0;}
+.cf-post-name{font-size:13px;font-weight:700;color:var(--ink);}
+.cf-post-meta{display:flex;align-items:center;gap:6px;margin-top:2px;}
+.cf-post-role{font-size:10px;font-weight:700;padding:1px 7px;border-radius:99px;}
+.cf-post-time{font-size:11px;color:var(--mist);}
+.cf-post-body{font-size:14px;color:var(--ink);line-height:1.65;white-space:pre-wrap;}
+.cf-post-foot{display:flex;align-items:center;gap:16px;margin-top:14px;padding-top:12px;border-top:1px solid var(--rule);}
+.cf-like-btn{display:flex;align-items:center;gap:5px;color:var(--mist);font-size:12px;font-weight:600;}
+.cf-like-btn:hover{color:var(--flame);}
+
+.cf-gig-bar{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:8px;}
+.cf-gig-count{font-size:13px;color:var(--sub);}
+.cf-gig-cats{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px;}
+.cf-gig-cat{font-size:11px;padding:4px 12px;border-radius:99px;border:1px solid var(--rule);color:var(--sub);font-weight:600;}
+.cf-gig-cat.on{border-color:var(--flame-m);background:var(--flame-l);color:var(--flame);}
+.cf-gig{background:var(--paper);border:1px solid var(--rule);border-radius:14px;padding:16px 18px;margin-bottom:10px;}
+.cf-gig-top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:6px;}
+.cf-gig-title{font-size:14px;font-weight:700;color:var(--ink);}
+.cf-gig-cat-pill{font-size:10px;font-weight:700;padding:2px 8px;border-radius:6px;background:var(--flame-l);color:var(--flame);white-space:nowrap;}
+.cf-gig-desc{font-size:13px;color:var(--ash);line-height:1.5;margin-bottom:10px;}
+.cf-gig-meta{display:flex;gap:14px;font-size:11px;color:var(--mist);}
+
+.cf-empty{text-align:center;padding:52px 20px;}
+.cf-empty-icon{font-size:36px;margin-bottom:12px;}
+.cf-empty-t{font-size:17px;font-weight:700;margin-bottom:6px;color:var(--ink);}
+.cf-empty-d{font-size:13px;color:var(--sub);margin-bottom:20px;}
+
+.cf-gate{text-align:center;padding:60px 20px;}
+.cf-gate-btn{display:inline-block;background:var(--flame);color:#080810;font-weight:700;font-size:13px;padding:12px 22px;border-radius:10px;margin-top:16px;}
+
+/* ---- modal ---- */
+.cf-modal-overlay{display:none;position:fixed;inset:0;background:rgba(5,5,8,.7);z-index:500;align-items:center;justify-content:center;padding:20px;}
+.cf-modal-overlay.open{display:flex;}
+.cf-modal{background:var(--paper);border:1px solid var(--rule);border-radius:16px;padding:22px;max-width:460px;width:100%;max-height:80vh;overflow-y:auto;}
+.cf-modal-title{font-size:16px;font-weight:700;color:var(--ink);margin-bottom:14px;}
+.cf-modal textarea,.cf-modal input,.cf-modal select{width:100%;background:var(--cream);border:1px solid var(--rule);border-radius:10px;padding:11px 13px;color:var(--ink);font-size:14px;font-family:var(--font);outline:none;margin-bottom:10px;}
+.cf-modal textarea{min-height:110px;resize:none;}
+.cf-modal-foot{display:flex;justify-content:flex-end;gap:8px;margin-top:8px;}
+.cf-modal-btn{padding:10px 18px;border-radius:9px;font-size:13px;font-weight:600;}
+.cf-modal-btn.ghost{color:var(--sub);}
+.cf-modal-btn.primary{background:var(--flame);color:#080810;}
+.cf-err{color:#E24B4A;font-size:12px;margin-top:2px;display:none;}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="cb2-nav-inner">
+    <a href="https://cbusevents.com" class="cb2-logo">CBUS<span>EVENTS</span></a>
+    <ul class="cb2-links">
+      <li><a href="https://cbusevents.com">Discover</a></li>
+      <li><a href="https://cbusevents.com/events.html">Events</a></li>
+      <li><a href="https://cbusevents.com/venues.html">Venues</a></li>
+      <li><a href="https://cbusevents.com/creators.html">Artists</a></li>
+      <li><a href="https://cbusevents.com/vendors.html">Vendors</a></li>
+      <li><a href="https://cbusevents.com/the-radar.html">The Radar<span class="cb2-new" style="font-size:8px;font-weight:800;letter-spacing:.06em;background:var(--flame);color:#fff;border-radius:4px;padding:2px 5px;margin-left:5px;vertical-align:2px;">NEW</span></a></li>
+    </ul>
+    <div class="cb2-icons">
+      <div class="cb2-biz-wrap" id="cb2BizWrap">
+        <button class="cb2-biz-btn" onclick="document.getElementById('cb2BizMenu').style.display=document.getElementById('cb2BizMenu').style.display==='block'?'none':'block'">For Business ▾</button>
+        <div class="cb2-biz-menu" id="cb2BizMenu">
+          <a href="https://cbusevents.com/list-your-venue.html">List Your Venue</a>
+          <a href="https://cbusevents.com/signup.html?role=vendor">List Your Services</a>
+          <a href="https://cbusevents.com/signup.html?role=organizer">Become an Organizer</a>
+          <a href="https://cbusevents.com/food-professional.html">Food Professionals</a>
+          <div class="cb2-div"></div>
+          <a href="https://cbusevents.com/communities.html">Communities</a>
+          <a href="https://cbusevents.com/marketplace.html">Marketplace</a>
+          <a href="https://cbusevents.com/blog.html">Columbus Blog</a>
+        </div>
+      </div>
+      <a href="https://cbusevents.com/customer-portal.html?tab=saved" class="cb2-icon-btn" aria-label="Saved">🔖</a>
+      <button class="cb2-icon-btn" aria-label="Notifications" onclick="window.location.href='https://cbusevents.com/customer-portal.html?tab=alerts'">🔔</button>
+      <div id="cb2AcctChip"><a href="https://cbusevents.com/auth.html?next=community-feed.html" class="cb2-icon-btn" aria-label="Sign in" id="cb2SignInBtn">👤</a></div>
+    </div>
+  </div>
+</nav>
+
+<div class="cf-page">
+  <header class="cf-head">
+    <div class="cf-eyebrow">Inside the Ecosystem</div>
+    <h1 class="cf-h1">Where Columbus <em>connects</em>.</h1>
+    <p class="cf-sub">Post updates, find gigs, trade work — organizers, vendors, venues, and staff, all in one feed.</p>
+  </header>
+
+  <div class="cf-tabs">
+    <div class="cf-tab on" id="cfTabFeed" onclick="switchTab('feed')">Community Feed</div>
+    <div class="cf-tab" id="cfTabGigs" onclick="switchTab('gigs')">Gig Board</div>
+  </div>
+
+  <div id="cfContent"><div style="color:var(--mist);font-size:13px;text-align:center;padding:32px">Loading…</div></div>
+</div>
+
+<!-- COMPOSE POST MODAL -->
+<div class="cf-modal-overlay" id="postModal" onclick="if(event.target===this)closeModals()">
+  <div class="cf-modal">
+    <div class="cf-modal-title">Share with the community</div>
+    <textarea id="postBody" placeholder="Share an update, opportunity, event recap, or anything useful for the Columbus community..."></textarea>
+    <div class="cf-err" id="postErr"></div>
+    <div class="cf-modal-foot">
+      <button class="cf-modal-btn ghost" onclick="closeModals()">Cancel</button>
+      <button class="cf-modal-btn primary" onclick="submitPost()">Post</button>
+    </div>
+  </div>
+</div>
+
+<!-- COMPOSE GIG MODAL -->
+<div class="cf-modal-overlay" id="gigModal" onclick="if(event.target===this)closeModals()">
+  <div class="cf-modal">
+    <div class="cf-modal-title">Post a gig</div>
+    <input id="gigTitle" placeholder="Gig title — e.g. Photographer needed for June festival">
+    <select id="gigCat"></select>
+    <input id="gigPay" placeholder="Pay / compensation — e.g. $200 flat, Negotiable">
+    <input id="gigDate" type="date">
+    <textarea id="gigDesc" placeholder="What you need, requirements, what they'll get..."></textarea>
+    <div class="cf-err" id="gigErr"></div>
+    <div class="cf-modal-foot">
+      <button class="cf-modal-btn ghost" onclick="closeModals()">Cancel</button>
+      <button class="cf-modal-btn primary" onclick="submitGig()">Post Gig</button>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="/workspace-switcher.js"></script>
+<script>
+const SB_URL='https://toblgvatvsjljbqogzsv.supabase.co';
+const SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRvYmxndmF0dnNqbGpicW9nenN2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMDgwNTAsImV4cCI6MjA4NzY4NDA1MH0._WJEQPizNDiQfDXQB_DHPaQhixPGpMdmYQSmyWmm_FQ';
+const sb=supabase.createClient(SB_URL,SB_KEY);
+let currentUser=null;
+let userRoles=[];
+let activeTab='feed';
+let activeGigCat='All';
+const GIG_CATS=['All','Photography','DJ','Staffing','Catering','Design','Videography','Other'];
+const ROLE_COLOR={organizer:'#FF7F4D',vendor:'#5a9fd4',venue_owner:'#8fc93a',food_professional:'#f5b942'};
+const ROLE_LABEL={organizer:'Organizer',vendor:'Vendor',venue_owner:'Venue',food_professional:'Food Pro'};
+
+function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+function timeAgo(iso){
+  const s=Math.floor((Date.now()-new Date(iso))/1000);
+  if(s<60)return 'just now';
+  if(s<3600)return Math.floor(s/60)+'m ago';
+  if(s<86400)return Math.floor(s/3600)+'h ago';
+  return Math.floor(s/86400)+'d ago';
+}
+
+async function cb2InitAccountArea(){
+  try{
+    const {data:{session}}=await sb.auth.getSession();
+    if(!session)return;
+    currentUser=session.user;
+    const {data:prof}=await sb.from('customer_profiles').select('full_name,avatar_url').eq('user_id',currentUser.id).maybeSingle();
+    const name=prof&&prof.full_name?prof.full_name.split(' ')[0]:null;
+    const chip=document.getElementById('cb2AcctChip');
+    if(chip)chip.innerHTML='<a href="https://cbusevents.com/customer-portal.html" class="cb2-icon-btn" aria-label="Account" style="padding:0"><img class="cb2-avatar" src="'+(prof&&prof.avatar_url?prof.avatar_url:'https://api.dicebear.com/7.x/initials/svg?seed='+encodeURIComponent(name||'U'))+'" alt="Account"></a>';
+    if(window.CBUSAccount){CBUSAccount.init(sb);CBUSAccount.mountSwitcher(chip,currentUser.id,null);}
+    const {data:roleRows}=await sb.from('user_roles').select('role').eq('user_id',currentUser.id);
+    userRoles=(roleRows||[]).map(r=>r.role);
+    if(!userRoles.length)userRoles=['customer'];
+  }catch(e){console.warn('account area',e);}
+}
+document.addEventListener('click',function(e){
+  const menu=document.getElementById('cb2BizMenu'),wrap=document.getElementById('cb2BizWrap');
+  if(menu&&wrap&&!wrap.contains(e.target))menu.style.display='none';
+});
+
+function switchTab(tab){
+  activeTab=tab;
+  document.getElementById('cfTabFeed').classList.toggle('on',tab==='feed');
+  document.getElementById('cfTabGigs').classList.toggle('on',tab==='gigs');
+  if(tab==='feed')loadFeed();else loadGigs();
+}
+
+function composePrompt(){
+  if(!currentUser)return `<div class="cf-compose" style="cursor:pointer" onclick="window.location.href='https://cbusevents.com/auth.html?next=community-feed.html'"><div class="cf-compose-avatar">?</div><div class="cf-compose-prompt">Sign in to post…</div><div class="cf-compose-btn">Sign in</div></div>`;
+  const initial=(currentUser.user_metadata?.full_name||currentUser.email)[0].toUpperCase();
+  return `<div class="cf-compose">
+    <div class="cf-compose-avatar">${initial}</div>
+    <button class="cf-compose-prompt" style="text-align:left" onclick="openPostModal()">Share an update or opportunity…</button>
+    <button class="cf-compose-btn" onclick="openPostModal()">Post</button>
+  </div>`;
+}
+
+async function loadFeed(){
+  const el=document.getElementById('cfContent');
+  el.innerHTML='<div style="color:var(--mist);font-size:13px;text-align:center;padding:32px">Loading feed…</div>';
+  let posts=[];
+  try{const r=await sb.from('collab_posts').select('*').order('created_at',{ascending:false}).limit(20);posts=r.data||[];}catch(e){posts=[];}
+  let html=composePrompt();
+  if(!posts.length){
+    html+=`<div class="cf-empty"><div class="cf-empty-icon">🤝</div><div class="cf-empty-t">Be the first to post</div><div class="cf-empty-d">Share updates, opportunities, and event recaps with the Columbus creative community.</div></div>`;
+  }else{
+    html+=posts.map(postHTML).join('');
+  }
+  el.innerHTML=html;
+}
+
+function postHTML(p){
+  const color=ROLE_COLOR[p.role]||'var(--ash)';
+  const label=ROLE_LABEL[p.role]||p.role||'Member';
+  const initial=(p.display_name||'?')[0].toUpperCase();
+  return `<div class="cf-post">
+    <div class="cf-post-head">
+      <div class="cf-post-avatar" style="background:${color}22;border:1px solid ${color}55;color:${color}">${esc(initial)}</div>
+      <div>
+        <div class="cf-post-name">${esc(p.display_name||'Anonymous')}</div>
+        <div class="cf-post-meta">
+          <span class="cf-post-role" style="background:${color}22;color:${color};border:1px solid ${color}40">${esc(label)}</span>
+          <span class="cf-post-time">${timeAgo(p.created_at)}</span>
+        </div>
+      </div>
+    </div>
+    <div class="cf-post-body">${esc(p.body)}</div>
+    ${p.image_url?`<img src="${esc(p.image_url)}" style="width:100%;border-radius:10px;margin-top:12px;object-fit:cover;max-height:300px">`:''}
+    <div class="cf-post-foot">
+      <button class="cf-like-btn" onclick="likePost('${esc(p.id)}',this)">♥ ${p.likes||0}</button>
+    </div>
+  </div>`;
+}
+
+async function likePost(id,btn){
+  if(!currentUser){window.location.href='https://cbusevents.com/auth.html?next=community-feed.html';return;}
+  try{
+    const {data}=await sb.from('collab_posts').select('likes').eq('id',id).maybeSingle();
+    const next=(data&&data.likes||0)+1;
+    await sb.from('collab_posts').update({likes:next}).eq('id',id);
+    if(btn)btn.textContent='♥ '+next;
+  }catch(e){console.warn('like',e);}
+}
+
+async function loadGigs(){
+  const el=document.getElementById('cfContent');
+  el.innerHTML='<div style="color:var(--mist);font-size:13px;text-align:center;padding:32px">Loading gigs…</div>';
+  let gigs=[];
+  try{const r=await sb.from('collab_gigs').select('*').eq('status','open').order('created_at',{ascending:false});gigs=r.data||[];}catch(e){gigs=[];}
+  window._allGigs=gigs;
+  renderGigs();
+}
+
+function renderGigs(){
+  const el=document.getElementById('cfContent');
+  const list=window._allGigs||[];
+  const filtered=activeGigCat==='All'?list:list.filter(g=>(g.category||'').toLowerCase()===activeGigCat.toLowerCase());
+  let html=`<div class="cf-gig-bar"><div class="cf-gig-count">${list.length} open gig${list.length!==1?'s':''}</div>
+    <button class="cf-compose-btn" onclick="openGigModal()">+ Post a Gig</button></div>
+    <div class="cf-gig-cats">${GIG_CATS.map(c=>`<button class="cf-gig-cat${c===activeGigCat?' on':''}" onclick="filterGigCat('${c}')">${c}</button>`).join('')}</div>`;
+  if(!filtered.length){
+    html+=`<div class="cf-empty"><div class="cf-empty-icon">🎯</div><div class="cf-empty-t">No open gigs${activeGigCat!=='All'?' in '+esc(activeGigCat):''} yet</div><div class="cf-empty-d">Post one, or check back soon.</div></div>`;
+  }else{
+    html+=filtered.map(gigHTML).join('');
+  }
+  el.innerHTML=html;
+}
+function filterGigCat(cat){activeGigCat=cat;renderGigs();}
+
+function gigHTML(g){
+  const dateStr=g.event_date?new Date(g.event_date+'T00:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric'}):null;
+  return `<div class="cf-gig">
+    <div class="cf-gig-top"><div class="cf-gig-title">${esc(g.title)}</div><div class="cf-gig-cat-pill">${esc(g.category||'')}</div></div>
+    <div class="cf-gig-desc">${esc(g.description||'')}</div>
+    <div class="cf-gig-meta">
+      ${g.pay?`<span>${esc(g.pay)}</span>`:''}
+      ${dateStr?`<span>${dateStr}</span>`:''}
+      <span>posted by ${esc(g.poster_name||'someone')}</span>
+    </div>
+  </div>`;
+}
+
+function openPostModal(){
+  if(!currentUser){window.location.href='https://cbusevents.com/auth.html?next='+encodeURIComponent('community-feed.html'+window.location.search);return;}
+  document.getElementById('postBody').value='';
+  document.getElementById('postErr').style.display='none';
+  document.getElementById('postModal').classList.add('open');
+}
+function openGigModal(){
+  if(!currentUser){window.location.href='https://cbusevents.com/auth.html?next=community-feed.html';return;}
+  const sel=document.getElementById('gigCat');
+  sel.innerHTML=GIG_CATS.slice(1).map(c=>`<option>${c}</option>`).join('');
+  ['gigTitle','gigPay','gigDate','gigDesc'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('gigErr').style.display='none';
+  document.getElementById('gigModal').classList.add('open');
+}
+function closeModals(){
+  document.getElementById('postModal').classList.remove('open');
+  document.getElementById('gigModal').classList.remove('open');
+}
+
+async function submitPost(){
+  const body=document.getElementById('postBody').value.trim();
+  const errEl=document.getElementById('postErr');
+  if(!body){errEl.textContent='Write something first.';errEl.style.display='block';return;}
+  const name=currentUser.user_metadata?.full_name||currentUser.email.split('@')[0];
+  const role=userRoles[0]||'customer';
+  try{
+    const r=await sb.from('collab_posts').insert({user_id:currentUser.id,role:role,display_name:name,body:body});
+    if(r.error){errEl.textContent='Error: '+r.error.message;errEl.style.display='block';return;}
+    closeModals();
+    if(activeTab==='feed')loadFeed();
+  }catch(e){errEl.textContent='Something went wrong. Try again.';errEl.style.display='block';}
+}
+
+async function submitGig(){
+  const title=document.getElementById('gigTitle').value.trim();
+  const desc=document.getElementById('gigDesc').value.trim();
+  const cat=document.getElementById('gigCat').value;
+  const pay=document.getElementById('gigPay').value.trim()||null;
+  const date=document.getElementById('gigDate').value||null;
+  const errEl=document.getElementById('gigErr');
+  if(!title||!desc){errEl.textContent='Title and description are required.';errEl.style.display='block';return;}
+  const name=currentUser.user_metadata?.full_name||currentUser.email.split('@')[0];
+  const role=userRoles[0]||'customer';
+  try{
+    const r=await sb.from('collab_gigs').insert({poster_id:currentUser.id,poster_name:name,poster_role:role,title,description:desc,category:cat,pay,event_date:date,status:'open'});
+    if(r.error){errEl.textContent='Error: '+r.error.message;errEl.style.display='block';return;}
+    closeModals();
+    activeGigCat='All';
+    if(activeTab==='gigs')loadGigs();else switchTab('gigs');
+  }catch(e){errEl.textContent='Something went wrong. Try again.';errEl.style.display='block';}
+}
+
+(async function init(){
+  await cb2InitAccountArea();
+  loadFeed();
+  const params=new URLSearchParams(window.location.search);
+  if(params.get('compose')==='1'){
+    const seeking=params.get('seeking');
+    setTimeout(()=>{
+      openPostModal();
+      const body=document.getElementById('postBody');
+      if(body&&seeking)body.value='Looking for a '+seeking+' — ';
+    },400);
+  }
+})();
+</script>
+</body>
+</html>

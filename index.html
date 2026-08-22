@@ -332,6 +332,11 @@ nav{
 .spotlight-sub{font-size:14px;color:var(--mist);max-width:240px;text-align:right;line-height:1.6;}
 .spot-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--rule);border:1px solid var(--rule);}
 .sc{background:var(--cream);padding:32px;transition:background 0.18s;cursor:pointer;}
+.city-card{background:var(--cream);padding:24px;min-width:230px;flex-shrink:0;}
+.city-cat{font-family:var(--mono);font-size:9px;letter-spacing:0.16em;text-transform:uppercase;color:var(--flame);margin-bottom:12px;}
+.city-name{font-family:var(--display);font-size:17px;font-weight:600;color:var(--ink);margin-bottom:4px;}
+.city-sub{font-size:12px;color:var(--sub);margin-bottom:2px;}
+.city-stat{font-size:11px;color:var(--mist);margin-top:8px;}
 .sc:hover{background:var(--flame-l);}
 .sc-init{width:52px;height:52px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--display);font-size:18px;font-weight:900;color:white;margin-bottom:14px;}
 .sc-init-1{background:linear-gradient(135deg,#FF6B35,#e8401a);}
@@ -359,6 +364,10 @@ nav{
 .form-inp:focus{border-color:var(--flame);}
 .form-inp::placeholder{color:var(--mist);}
 .form-submit{width:100%;background:var(--flame);color:white;font-family:var(--mono);font-size:10px;font-weight:500;letter-spacing:0.2em;text-transform:uppercase;padding:15px;border:none;cursor:pointer;margin-top:12px;transition:background 0.18s;}
+.form-submit:disabled{background:var(--rule);color:var(--mist);cursor:not-allowed;}
+.demand-pill{font-size:13px;font-weight:600;padding:9px 18px;border-radius:100px;border:1px solid var(--rule);background:transparent;color:var(--ash);cursor:pointer;transition:all 0.15s;}
+.demand-pill:hover{border-color:var(--flame);color:var(--ink);}
+.demand-pill.on{background:var(--flame);border-color:var(--flame);color:#050508;}
 .form-submit:hover{background:#e85a20;}
 .form-note{font-family:var(--mono);font-size:8px;letter-spacing:0.1em;color:var(--mist);text-align:center;margin-top:9px;}
 
@@ -1101,6 +1110,7 @@ window.cb2InitAll=function(){
   cb2LoadStatBar();
   cb2LoadVenues();
   cb2InitAccountArea();
+  cb2LoadCityStrip();
 };
 </script>
 
@@ -1213,74 +1223,39 @@ window.cb2InitAll=function(){
 </section>
 
 <!-- MEMBER SPOTLIGHT -->
-<!-- FOUNDER SPOTLIGHT + JOIN CTA -->
+<!-- SHOW THE CITY -->
 <section class="spotlight-section">
   <div class="srule"><span class="srule-lbl">Built in Columbus</span><span class="srule-line"></span></div>
+  <p style="font-size:13px;color:var(--sub);margin:-8px 0 18px;max-width:520px;">See who's making the city happen.</p>
 
-  <!-- Single real card: Deante -->
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--rule);border:1px solid var(--rule);margin-bottom:1px">
-    <div class="sc reveal" style="cursor:pointer" onclick="window.location.href='https://cbusevents.com/organizer-profile.html?id=dcae39de-9265-4d67-b8be-5d0ca599069b'">
-      <div class="sc-init sc-init-1" id="spotlight-avatar">D</div>
-      <div class="sc-name">Deante Gray</div>
-      <div class="sc-role">Founder · Event Organizer · Columbus</div>
-      <p class="sc-bio">Built CBUSEVENTS solo in under a week and launched March 9, 2026. Sources his entire vendor roster through the platform. Vendor tables filled, staff confirmed, all managed in one place.</p>
-      <div class="sc-stats">
-        <div><div class="sc-sn" id="spotlight-events">—</div><div class="sc-sl">Events Live</div></div>
-        <div><div class="sc-sn" id="spotlight-followers">—</div><div class="sc-sl">Followers</div></div>
-      </div>
-    </div>
+  <div id="cityStrip" style="display:flex;gap:1px;background:var(--rule);border:1px solid var(--rule);overflow-x:auto;">
+    <div style="padding:40px;color:var(--mist);font-size:12px;">Loading…</div>
+  </div>
 
-    <!-- Join CTA panel -->
-    <div class="sc reveal" style="background:#1a1612;display:flex;flex-direction:column;justify-content:center">
-      <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.22em;text-transform:uppercase;color:rgba(255,107,53,0.8);margin-bottom:16px">Join the Ecosystem</div>
-      <div style="font-family:var(--display);font-size:clamp(26px,3vw,40px);font-weight:900;color:white;line-height:1.0;margin-bottom:16px">Your next gig,<br>booking, or<br><em style="color:var(--flame)">vendor spot</em><br>is already here.</div>
-      <p style="font-size:13px;line-height:1.7;color:rgba(250,247,242,0.5);font-weight:300;margin-bottom:28px;max-width:340px">Columbus is growing. The venues, vendors, and organizers that get in now build the authority every newcomer sees first.</p>
-      <div style="display:flex;flex-direction:column;gap:10px;max-width:260px">
-        <a href="https://cbusevents.com/signup.html?role=organizer" class="btn-primary" style="text-align:center">Join as Organizer</a>
-        <a href="https://cbusevents.com/signup.html?role=vendor" class="btn-outline" style="text-align:center;border-color:rgba(255,255,255,0.2);color:white">Join as Vendor</a>
-        <a href="https://cbusevents.com/signup.html?role=venue" class="btn-outline" style="text-align:center;border-color:rgba(255,255,255,0.2);color:white">List Your Venue</a>
-      </div>
-      <div style="margin-top:24px;display:flex;gap:20px">
-        <div><div style="font-family:var(--display);font-size:22px;font-weight:900;color:white" id="cta-venues">—</div><div style="font-family:var(--mono);font-size:7px;letter-spacing:0.14em;text-transform:uppercase;color:rgba(250,247,242,0.35);margin-top:3px">Venues</div></div>
-        <div><div style="font-family:var(--display);font-size:22px;font-weight:900;color:white" id="cta-events">—</div><div style="font-family:var(--mono);font-size:7px;letter-spacing:0.14em;text-transform:uppercase;color:rgba(250,247,242,0.35);margin-top:3px">Events Live</div></div>
-        <div><div style="font-family:var(--display);font-size:22px;font-weight:900;color:white" id="cta-gigs">—</div><div style="font-family:var(--mono);font-size:7px;letter-spacing:0.14em;text-transform:uppercase;color:rgba(250,247,242,0.35);margin-top:3px">Open Gigs</div></div>
-      </div>
-    </div>
+  <div style="margin-top:20px;">
+    <a href="https://cbusevents.com/venues.html" class="link-dark" style="font-size:12px;">Explore Columbus →</a>
   </div>
 </section>
 
-<!-- SCENE REPORT DIGEST -->
+<!-- CREATE DEMAND -->
 <section class="digest-section">
   <div>
-    <div class="dig-ey">Every Friday Morning</div>
-    <h2 class="dig-h">The <em>Scene</em><br>Report.</h2>
-    <p class="dig-copy">Columbus's only editorial take on the local event scene. Open vendor spots, venue availability, organizer spotlights, and what's worth showing up for this weekend.</p>
-    <div class="dig-perks">
-      <div class="dig-perk"><span class="perk-chk">&#10003;</span>Open gig spots before they go public</div>
-      <div class="dig-perk"><span class="perk-chk">&#10003;</span>Upcoming events calendar every week</div>
-      <div class="dig-perk"><span class="perk-chk">&#10003;</span>Member spotlights and venue features</div>
-      <div class="dig-perk"><span class="perk-chk">&#10003;</span>No spam. Unsubscribe anytime.</div>
-    </div>
+    <div class="dig-ey">Create Demand</div>
+    <h2 class="dig-h">Need someone to make<br>your event <em>happen</em>?</h2>
+    <p class="dig-copy">Post what you need. Find who you need. Make it happen.</p>
   </div>
-  <div id="emailCaptureForm">
-    <div class="form-grp">
-      <label class="form-lbl">Email Address</label>
-      <input type="email" class="form-inp" id="captureEmail" placeholder="you@email.com">
+  <div>
+    <div class="form-lbl" style="margin-bottom:10px">What are you looking for?</div>
+    <div id="demandPills" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px;">
+      <button class="demand-pill" data-role="Vendor" onclick="selectDemand(this)">Vendor</button>
+      <button class="demand-pill" data-role="Venue" onclick="selectDemand(this)">Venue</button>
+      <button class="demand-pill" data-role="Artist" onclick="selectDemand(this)">Artist</button>
+      <button class="demand-pill" data-role="Staff" onclick="selectDemand(this)">Staff</button>
+      <button class="demand-pill" data-role="Sponsor" onclick="selectDemand(this)">Sponsor</button>
+      <button class="demand-pill" data-role="Partner" onclick="selectDemand(this)">Partner</button>
     </div>
-    <div class="form-grp">
-      <label class="form-lbl">I am a...</label>
-      <select class="form-inp" id="captureRole">
-        <option value="">Select your role</option>
-        <option value="venue">Venue</option>
-        <option value="organizer">Event Organizer</option>
-        <option value="vendor">Vendor / Food Professional</option>
-        <option value="staff">Event Staff</option>
-        <option value="attendee">Attendee</option>
-      </select>
-    </div>
-    <button class="form-submit" onclick="submitCapture('homepage-digest')">Get the Scene Report Free</button>
-    <div id="captureStatus"></div>
-    <div class="form-note">Published every Friday. Free. No spam.</div>
+    <button class="form-submit" id="demandSubmit" onclick="postOpportunity()" disabled>Post an Opportunity →</button>
+    <div class="form-note">Free to post. Goes straight to the Columbus creative community.</div>
   </div>
 </section>
 
@@ -1338,6 +1313,18 @@ window.cb2InitAll=function(){
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script src="/workspace-switcher.js"></script>
 <script>
+let selectedDemand=null;
+function selectDemand(btn){
+  document.querySelectorAll('.demand-pill').forEach(p=>p.classList.remove('on'));
+  btn.classList.add('on');
+  selectedDemand=btn.dataset.role;
+  const submitBtn=document.getElementById('demandSubmit');
+  if(submitBtn)submitBtn.disabled=false;
+}
+function postOpportunity(){
+  if(!selectedDemand)return;
+  window.location.href='https://cbusevents.com/community-feed.html?compose=1&seeking='+encodeURIComponent(selectedDemand);
+}
 const SB_URL="https://toblgvatvsjljbqogzsv.supabase.co";
 const SB_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRvYmxndmF0dnNqbGpicW9nenN2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMDgwNTAsImV4cCI6MjA4NzY4NDA1MH0._WJEQPizNDiQfDXQB_DHPaQhixPGpMdmYQSmyWmm_FQ";
 const sb=supabase.createClient(SB_URL,SB_KEY);
@@ -1865,6 +1852,65 @@ function timeAgo(dt){
 }
 
 // EMAIL CAPTURE
+function cb2Esc(s){return String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+async function cb2LoadCityStrip(){
+  const el=document.getElementById('cityStrip');
+  if(!el)return;
+  const cards=[];
+
+  // ORGANIZERS: one real upcoming event + its organizer's real name
+  try{
+    const r=await sb.from('events').select('title,venue_name_override,organizer_id,owner_id,venues(name)').eq('status','published').gte('start_time',new Date().toISOString()).order('start_time',{ascending:true}).limit(1);
+    const ev=(r.data||[])[0];
+    if(ev){
+      const orgId=ev.organizer_id||ev.owner_id;
+      let orgName='A Columbus organizer';
+      if(orgId){
+        const p=await sb.from('organizer_profiles').select('display_name,full_name').eq('user_id',orgId).maybeSingle();
+        orgName=(p.data&&(p.data.display_name||p.data.full_name))||orgName;
+      }
+      const venue=ev.venue_name_override||(ev.venues&&ev.venues.name)||'Columbus';
+      cards.push({cat:'Event Organizers',name:orgName,sub:ev.title+' · '+venue});
+    }else{
+      cards.push({cat:'Event Organizers',name:'Be the first',sub:'No native events live yet — start one.'});
+    }
+  }catch(e){cards.push({cat:'Event Organizers',name:'Be the first',sub:'No native events live yet — start one.'});}
+
+  // VENUES: one real approved venue
+  try{
+    const r=await sb.from('venues').select('name,neighborhood').eq('status','approved').limit(1);
+    const v=(r.data||[])[0];
+    if(v)cards.push({cat:'Venues',name:v.name,sub:v.neighborhood||'Columbus',stat:'Available for bookings'});
+    else cards.push({cat:'Venues',name:'Be the first',sub:'List your space on CBUS Events.'});
+  }catch(e){cards.push({cat:'Venues',name:'Be the first',sub:'List your space on CBUS Events.'});}
+
+  // VENDORS: one real vendor
+  try{
+    const r=await sb.from('vendors').select('business_name,category').limit(1);
+    const v=(r.data||[])[0];
+    if(v)cards.push({cat:'Vendors',name:v.business_name,sub:v.category||'Columbus vendor'});
+    else cards.push({cat:'Vendors',name:'Be the first',sub:'List your business on CBUS Events.'});
+  }catch(e){cards.push({cat:'Vendors',name:'Be the first',sub:'List your business on CBUS Events.'});}
+
+  // ARTISTS: honest, no backing table yet
+  cards.push({cat:'Artists',name:'Coming soon',sub:'Artist profiles are on the way.'});
+
+  // COMMUNITY: one real recent post from the feed
+  try{
+    const r=await sb.from('collab_posts').select('display_name,role,body').order('created_at',{ascending:false}).limit(1);
+    const p=(r.data||[])[0];
+    if(p)cards.push({cat:'Community',name:p.display_name||'A community member',sub:(p.body||'').slice(0,60)+((p.body||'').length>60?'…':'')});
+    else cards.push({cat:'Community',name:'Be the first',sub:'Post to the community feed.'});
+  }catch(e){cards.push({cat:'Community',name:'Be the first',sub:'Post to the community feed.'});}
+
+  el.innerHTML=cards.map(c=>`<div class="city-card">
+    <div class="city-cat">${cb2Esc(c.cat)}</div>
+    <div class="city-name">${cb2Esc(c.name)}</div>
+    <div class="city-sub">${cb2Esc(c.sub)}</div>
+    ${c.stat?`<div class="city-stat">${cb2Esc(c.stat)}</div>`:''}
+  </div>`).join('');
+}
+
 async function submitCapture(source){
   const input=document.getElementById('captureEmail');
   const status=document.getElementById('captureStatus');
