@@ -210,10 +210,14 @@ nav{
 
 /* ── COMMUNITY FEED ──────────────────────── */
 .feed-section{padding:72px 48px;background:var(--lk-bg);border-bottom:1px solid var(--rule);}
-.feed-layout{display:grid;grid-template-columns:1fr 300px;gap:18px;}
+.feed-layout{display:grid;grid-template-columns:1fr 300px;gap:18px;align-items:start;}
 
 /* LinkedIn cards */
 .lk-card{background:white;border:1px solid #e0ddd8;border-radius:8px;overflow:hidden;margin-bottom:12px;transition:box-shadow 0.18s;}
+#feed-empty{padding:20px 4px;}
+#feed-empty .lk-head{padding:22px 24px 8px;}
+#feed-empty .lk-body{padding:0 24px 22px;font-size:14px;}
+#feed-empty .lk-foot{padding:14px 24px 24px;}
 .lk-card:hover{box-shadow:var(--sh2);}
 .lk-head{padding:14px 16px 11px;display:flex;align-items:flex-start;gap:11px;}
 .lk-av{width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--display);font-size:16px;font-weight:900;color:white;flex-shrink:0;}
@@ -1183,14 +1187,6 @@ window.cb2InitAll=function(){
             <div class="sb-date"><div class="sb-mo">Jun</div><div class="sb-day">21</div></div>
             <div><div class="sb-name">Franklinton Art Crawl</div><div class="sb-venue-sm">Franklinton District</div></div>
           </div>
-          <div class="sb-evt" onclick="document.getElementById('cbx-rail-tonight').scrollIntoView({behavior:'smooth'})">
-            <div class="sb-date"><div class="sb-mo">Jun</div><div class="sb-day">28</div></div>
-            <div><div class="sb-name">Short North Rooftop</div><div class="sb-venue-sm">Venue 400</div></div>
-          </div>
-          <div class="sb-evt" onclick="document.getElementById('cbx-rail-tonight').scrollIntoView({behavior:'smooth'})">
-            <div class="sb-date"><div class="sb-mo">Jul</div><div class="sb-day">19</div></div>
-            <div><div class="sb-name">Exhibit of Expression</div><div class="sb-venue-sm">Columbus, TBA</div></div>
-          </div>
         </div>
         <div style="margin-top:12px;padding-top:10px;border-top:1px solid var(--rule)">
           <span class="link-dark" style="cursor:pointer;font-size:10px" onclick="document.getElementById('cbx-rail-tonight').scrollIntoView({behavior:'smooth'})">View full calendar →</span>
@@ -1199,23 +1195,8 @@ window.cb2InitAll=function(){
 
       <div class="sb-card">
         <div class="sb-title">On the Platform</div>
-        <div class="follow-list">
-          <div class="follow-row">
-            <div class="follow-av av-org" id="sidebar-founder-av">D</div>
-            <div class="follow-info"><div class="follow-name">Deante Gray</div><div class="follow-role-lbl">Event Organizer</div></div>
-            <button class="follow-btn" onclick="window.location.href='https://cbusevents.com/organizer-profile.html?id=dcae39de-9265-4d67-b8be-5d0ca599069b'">Follow</button>
-          </div>
-        </div>
-        <div style="margin-top:12px;padding-top:10px;border-top:1px solid var(--rule);font-size:11px;color:var(--mist);font-family:var(--mono);letter-spacing:0.08em">More profiles coming as the community grows.</div>
-      </div>
-
-      <div class="join-sidebar">
-        <div class="join-lbl">Your profile is missing</div>
-        <div class="join-h">Your next gig, booking, or vendor is already here.</div>
-        <a href="https://cbusevents.com/signup.html" class="join-btn">Create Free Profile</a>
-        <div class="join-counts">
-          <div><div class="jc-num" id="sb-event-ct">—</div><div class="jc-lbl">Events Live</div></div>
-          <div><div class="jc-num" id="sb-gig-ct">—</div><div class="jc-lbl">Open Gigs</div></div>
+        <div class="follow-list" id="sidebar-on-platform">
+          <div style="font-size:11px;color:var(--mist);font-family:var(--mono);letter-spacing:0.08em">See who's active in <a href="https://cbusevents.com/community-feed.html" class="link-dark" style="text-decoration:underline">the community feed →</a></div>
         </div>
       </div>
     </div>
@@ -1747,7 +1728,7 @@ async function loadLiveData(){
       // Update sidebar events
       const sidebarEvts=document.getElementById('sidebar-events');
       if(sidebarEvts){
-        sidebarEvts.innerHTML=events.slice(0,4).map(e=>{
+        sidebarEvts.innerHTML=events.slice(0,2).map(e=>{
           const d=new Date(e.start_time);
           const mo=d.toLocaleDateString('en-US',{month:'short'}).toUpperCase();
           const day=d.getDate();
