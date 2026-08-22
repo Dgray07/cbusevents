@@ -905,10 +905,17 @@ async function cb2LoadTonight(){
   try{
     var el=document.getElementById('cb2Tonight'); if(!el) return;
     var start=new Date(); var end=new Date(); end.setHours(23,59,59,999);
-    var {data}=await sb.from('events').select('id,title,start_time,venue_name_override,venues(name)').eq('status','published').gte('start_time',start.toISOString()).lte('start_time',end.toISOString()).order('start_time',{ascending:true}).limit(4);
+    var native=await sb.from('events').select('id,title,start_time,venue_name_override,venues(name)').eq('status','published').gte('start_time',start.toISOString()).lte('start_time',end.toISOString()).order('start_time',{ascending:true}).limit(4);
+    var ext=await sb.from('external_events').select('id,title,start_time,venue_name,source,ticket_url').eq('status','active').gte('start_time',start.toISOString()).lte('start_time',end.toISOString()).order('start_time',{ascending:true}).limit(4);
+    var nativeRows=(native.data||[]).map(function(e){return Object.assign({},e,{_ext:false});});
+    var extRows=(ext.data||[]).map(function(e){return Object.assign({},e,{_ext:true});});
+    var data=nativeRows.concat(extRows).sort(function(a,b){return new Date(a.start_time)-new Date(b.start_time);}).slice(0,4);
     if(!data||!data.length){el.innerHTML='<div style="color:var(--mist);font-size:13px;grid-column:1/-1">Nothing tonight yet — check back soon.</div>';return;}
     el.innerHTML=data.map(function(e){var f=cb2Fmt(e.start_time);
-      return '<a class="cb2-tonight-card" href="'+cb2Url(e.id)+'"><div class="cb2-tonight-time">'+f.time+'</div><div class="cb2-tonight-title">'+(e.title||'Event')+'</div><div class="cb2-tonight-venue">'+cb2VenueName(e)+'</div></a>';
+      var href=e._ext?(e.ticket_url||'https://cbusevents.com/the-radar.html'):cb2Url(e.id);
+      var openAttr=e._ext?' target="_blank" rel="noopener"':'';
+      var venue=e._ext?(e.venue_name||'Columbus'):cb2VenueName(e);
+      return '<a class="cb2-tonight-card" href="'+href+'"'+openAttr+'><div class="cb2-tonight-time">'+f.time+'</div><div class="cb2-tonight-title">'+(e.title||'Event')+'</div><div class="cb2-tonight-venue">'+venue+(e._ext?' · External':'')+'</div></a>';
     }).join('');
   }catch(err){console.warn('cb2 tonight',err);}
 }
@@ -919,10 +926,17 @@ async function cb2LoadWeekend(){
     var now=new Date(); var day=now.getDay();
     var friOffset=(5-day+7)%7; var fri=new Date(now); fri.setDate(now.getDate()+friOffset); fri.setHours(0,0,0,0);
     var sun=new Date(fri); sun.setDate(fri.getDate()+2); sun.setHours(23,59,59,999);
-    var {data}=await sb.from('events').select('id,title,start_time,venue_name_override,venues(name)').eq('status','published').gte('start_time',now.toISOString()).lte('start_time',sun.toISOString()).order('start_time',{ascending:true}).limit(5);
+    var native=await sb.from('events').select('id,title,start_time,venue_name_override,venues(name)').eq('status','published').gte('start_time',now.toISOString()).lte('start_time',sun.toISOString()).order('start_time',{ascending:true}).limit(5);
+    var ext=await sb.from('external_events').select('id,title,start_time,venue_name,source,ticket_url').eq('status','active').gte('start_time',now.toISOString()).lte('start_time',sun.toISOString()).order('start_time',{ascending:true}).limit(5);
+    var nativeRows=(native.data||[]).map(function(e){return Object.assign({},e,{_ext:false});});
+    var extRows=(ext.data||[]).map(function(e){return Object.assign({},e,{_ext:true});});
+    var data=nativeRows.concat(extRows).sort(function(a,b){return new Date(a.start_time)-new Date(b.start_time);}).slice(0,5);
     if(!data||!data.length){el.innerHTML='<div style="color:var(--mist);font-size:13px">Nothing posted for this weekend yet.</div>';return;}
     el.innerHTML=data.map(function(e){var f=cb2Fmt(e.start_time);
-      return '<a class="cb2-weekend-row" href="'+cb2Url(e.id)+'" style="text-decoration:none"><div class="cb2-weekend-date"><b>'+f.day+'</b><span>'+f.mo+'</span></div><div><div class="cb2-weekend-title">'+(e.title||'Event')+'</div><div class="cb2-weekend-venue">'+cb2VenueName(e)+'</div></div></a>';
+      var href=e._ext?(e.ticket_url||'https://cbusevents.com/the-radar.html'):cb2Url(e.id);
+      var openAttr=e._ext?' target="_blank" rel="noopener"':'';
+      var venue=e._ext?(e.venue_name||'Columbus'):cb2VenueName(e);
+      return '<a class="cb2-weekend-row" href="'+href+'"'+openAttr+' style="text-decoration:none"><div class="cb2-weekend-date"><b>'+f.day+'</b><span>'+f.mo+'</span></div><div><div class="cb2-weekend-title">'+(e.title||'Event')+'</div><div class="cb2-weekend-venue">'+venue+(e._ext?' · External':'')+'</div></div></a>';
     }).join('');
   }catch(err){console.warn('cb2 weekend',err);}
 }
@@ -1555,8 +1569,10 @@ async function initNavAuth(){
     const signinDrop=document.getElementById('signinDropdown');
     const joinDrop=document.getElementById('joinDropdown');
     if(session?.user){
-      const{data:roleData}=await sb.from('user_roles').select('role').eq('user_id',session.user.id).maybeSingle();
-      const role=roleData?.role||'customer';
+      const{data:roleRows}=await sb.from('user_roles').select('role').eq('user_id',session.user.id);
+      const rolesFound=(roleRows||[]).map(r=>r.role);
+      const priority=['organizer','vendor','venue_owner','food_professional','event_staff','sales_rep','customer'];
+      const role=priority.find(r=>rolesFound.includes(r))||'customer';
       const portalUrls={
         venue_owner:      'https://cbusevents.com/cbus-venue-portal.html',
         vendor:           'https://cbusevents.com/cbus-vendor-portal.html',

@@ -56,10 +56,10 @@
     var active = explicitRole || currentFileRole() || roles[0] || 'customer';
     var activeMeta = ROLE_META[active] || ROLE_META.customer;
 
-    // Single role: no dropdown needed, just a plain label — no dead UI
-    // pretending there's a choice when there isn't one.
+    // Single role: no dropdown needed, but it still has to actually
+    // go somewhere — a static label with no href was the bug.
     if(roles.length <= 1){
-      container.innerHTML = '<span class="ws-chip ws-chip--static">'+activeMeta.label+'</span>';
+      container.innerHTML = '<a class="ws-chip ws-chip--static" href="https://cbusevents.com/'+activeMeta.url+'">'+activeMeta.label+'</a>';
       return;
     }
 
