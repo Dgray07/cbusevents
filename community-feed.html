@@ -275,8 +275,19 @@ function postHTML(p){
     ${p.image_url?`<img src="${esc(p.image_url)}" style="width:100%;border-radius:10px;margin-top:12px;object-fit:cover;max-height:300px">`:''}
     <div class="cf-post-foot">
       <button class="cf-like-btn" onclick="likePost('${esc(p.id)}',this)">♥ ${p.likes||0}</button>
+      ${currentUser&&currentUser.id===p.user_id?`<button class="cf-like-btn" style="margin-left:auto" onclick="deletePost('${esc(p.id)}')">Delete</button>`:''}
     </div>
   </div>`;
+}
+
+async function deletePost(id){
+  if(!currentUser)return;
+  if(!confirm('Delete this post? This can\'t be undone.'))return;
+  try{
+    const r=await sb.from('collab_posts').delete().eq('id',id).eq('user_id',currentUser.id);
+    if(r.error){alert('Could not delete: '+r.error.message);return;}
+    if(activeTab==='feed')loadFeed();
+  }catch(e){alert('Something went wrong. Try again.');}
 }
 
 async function likePost(id,btn){
