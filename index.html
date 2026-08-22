@@ -669,6 +669,23 @@ body{-webkit-tap-highlight-color:rgba(0,0,0,0);}
 .cb2-hero-h1{font-family:var(--display);font-weight:900;font-size:52px;line-height:1.02;color:#fff;max-width:640px;}
 .cb2-hero-h1 em{font-style:normal;color:var(--flame);}
 .cb2-hero-sub{font-size:15px;color:rgba(255,255,255,.72);margin-top:12px;}
+.cb2-hero-sub2{font-size:13px;color:rgba(255,255,255,.5);margin-top:4px;}
+.cb2-intent-head{margin-top:32px;margin-bottom:14px;}.cb2-intent-head h2{font-family:var(--font);font-size:15px;font-weight:600;color:#fff;margin:0 0 2px;}
+.cb2-intent-head p{font-size:12px;color:rgba(255,255,255,.55);margin:0;}
+.cb2-intent-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:10px;max-width:1040px;}
+.cb2-intent-card{display:block;text-decoration:none;background:rgba(15,15,26,.7);border:1px solid var(--rule);border-radius:14px;padding:16px 14px;transition:border-color .15s,transform .15s;}
+.cb2-intent-card:hover{transform:translateY(-2px);}
+.cb2-intent-card.active{border-color:var(--flame);background:rgba(255,107,53,.08);}
+.cb2-intent-icon{width:32px;height:32px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:15px;margin-bottom:10px;}
+.cb2-intent-title{font-size:13px;font-weight:700;color:#fff;line-height:1.25;margin-bottom:5px;}
+.cb2-intent-desc{font-size:11px;color:rgba(255,255,255,.5);line-height:1.4;margin-bottom:10px;}
+.cb2-intent-arrow{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;border:1px solid var(--rule);color:#fff;}
+@media(max-width:900px){.cb2-intent-grid{grid-template-columns:repeat(3,1fr);}}
+@media(max-width:600px){.cb2-intent-grid{grid-template-columns:repeat(2,1fr);}}
+.cb2-statbar{display:flex;gap:28px;margin-top:20px;padding-top:18px;border-top:1px solid var(--rule);flex-wrap:wrap;}
+.cb2-stat{display:flex;flex-direction:column;}
+.cb2-stat-n{font-family:var(--display);font-size:20px;font-weight:600;color:var(--flame);line-height:1;}
+.cb2-stat-l{font-size:11px;color:rgba(255,255,255,.55);margin-top:3px;}
 .cb2-search{display:flex;gap:0;margin-top:24px;background:var(--paper);border:1px solid var(--rule);border-radius:14px;padding:6px;max-width:720px;box-shadow:0 12px 32px rgba(0,0,0,.35);}
 .cb2-search input{flex:1;border:none;background:none;padding:10px 14px;font-size:14px;color:var(--ink);outline:none;}
 .cb2-search-divider{width:1px;background:var(--rule);margin:6px 0;}
@@ -785,7 +802,49 @@ body{-webkit-tap-highlight-color:rgba(0,0,0,0);}
 <section class="cb2-hero">
   <div class="cb2-hero-eyebrow" id="cb2Greeting">Good day 👋</div>
   <h1 class="cb2-hero-h1">Columbus<br><em>Happens Here.</em></h1>
-  <p class="cb2-hero-sub">Find something worth showing up for.</p>
+  <p class="cb2-hero-sub">Discover what's happening. Create what's next.</p>
+  <p class="cb2-hero-sub2">Events, venues, vendors, tickets &amp; opportunities — all in one place.</p>
+
+  <div class="cb2-intent-head"><h2>What brings you here?</h2><p>Choose your path. We'll get you there fast.</p></div>
+  <div class="cb2-intent-grid">
+    <a class="cb2-intent-card active" href="https://cbusevents.com/events.html">
+      <div class="cb2-intent-icon" style="background:rgba(255,107,53,.15);color:#FF7F4D">🎟️</div>
+      <div class="cb2-intent-title">I'm looking for something to do</div>
+      <div class="cb2-intent-desc">Discover events, experiences &amp; nightlife.</div>
+      <div class="cb2-intent-arrow">→</div>
+    </a>
+    <a class="cb2-intent-card" href="https://cbusevents.com/signup.html?role=organizer&next=create-event">
+      <div class="cb2-intent-icon" style="background:rgba(129,102,247,.15);color:#a08cf5">🎫</div>
+      <div class="cb2-intent-title">I'm hosting an event</div>
+      <div class="cb2-intent-desc">Create, sell tickets &amp; reach Columbus.</div>
+      <div class="cb2-intent-arrow">→</div>
+    </a>
+    <a class="cb2-intent-card" href="https://cbusevents.com/venues.html">
+      <div class="cb2-intent-icon" style="background:rgba(90,159,212,.15);color:#5a9fd4">📍</div>
+      <div class="cb2-intent-title">I need a venue</div>
+      <div class="cb2-intent-desc">Find the perfect space for your event.</div>
+      <div class="cb2-intent-arrow">→</div>
+    </a>
+    <a class="cb2-intent-card" href="https://cbusevents.com/vendors.html">
+      <div class="cb2-intent-icon" style="background:rgba(99,153,34,.15);color:#8fc93a">🧰</div>
+      <div class="cb2-intent-title">I need vendors / services</div>
+      <div class="cb2-intent-desc">Find vendors, food, DJs, photographers &amp; more.</div>
+      <div class="cb2-intent-arrow">→</div>
+    </a>
+    <a class="cb2-intent-card" href="https://cbusevents.com/collab-board.html">
+      <div class="cb2-intent-icon" style="background:rgba(233,90,151,.15);color:#e95a97">👥</div>
+      <div class="cb2-intent-title">I'm looking for opportunities</div>
+      <div class="cb2-intent-desc">Find gigs, vendor spots &amp; event work.</div>
+      <div class="cb2-intent-arrow">→</div>
+    </a>
+    <a class="cb2-intent-card" href="https://cbusevents.com/feature-your-spot.html">
+      <div class="cb2-intent-icon" style="background:rgba(245,185,66,.15);color:#f5b942">📣</div>
+      <div class="cb2-intent-title">I want to promote my business / event</div>
+      <div class="cb2-intent-desc">Get seen by more of Columbus.</div>
+      <div class="cb2-intent-arrow">→</div>
+    </a>
+  </div>
+
   <div class="cb2-search">
     <input type="text" id="cb2SearchInput" placeholder="Search events, artists, venues..." onkeydown="if(event.key==='Enter')window.location.href='https://cbusevents.com/events.html?q='+encodeURIComponent(this.value)">
     <div class="cb2-search-divider"></div>
@@ -801,6 +860,11 @@ body{-webkit-tap-highlight-color:rgba(0,0,0,0);}
     <a href="https://cbusevents.com/events.html?cat=arts-culture" class="cb2-chip">Art &amp; Culture</a>
     <a href="https://cbusevents.com/events.html?cat=sports" class="cb2-chip">Sports</a>
     <a href="https://cbusevents.com/events.html" class="cb2-chip">More</a>
+  </div>
+  <div class="cb2-statbar" id="cb2StatBar">
+    <div class="cb2-stat"><span class="cb2-stat-n" id="cb2StatVenues">—</span><span class="cb2-stat-l">Venues</span></div>
+    <div class="cb2-stat"><span class="cb2-stat-n" id="cb2StatVendors">—</span><span class="cb2-stat-l">Vendors &amp; Services</span></div>
+    <div class="cb2-stat"><span class="cb2-stat-n" id="cb2StatEvents">—</span><span class="cb2-stat-l">Upcoming Events</span></div>
   </div>
 </section>
 
@@ -901,6 +965,20 @@ async function cb2LoadTrending(){
   }catch(err){console.warn('cb2 trending',err);}
 }
 
+async function cb2LoadStatBar(){
+  try{
+    var vEl=document.getElementById('cb2StatVenues');
+    var vdEl=document.getElementById('cb2StatVendors');
+    var eEl=document.getElementById('cb2StatEvents');
+    var venueCount=await sb.from('venues').select('id',{count:'exact',head:true}).eq('status','approved');
+    var vendorCount=await sb.from('vendors').select('id',{count:'exact',head:true});
+    var nativeCount=await sb.from('events').select('id',{count:'exact',head:true}).eq('status','published').gte('start_time',new Date().toISOString());
+    var extCount=await sb.from('external_events').select('id',{count:'exact',head:true}).eq('status','active').gte('start_time',new Date().toISOString());
+    if(vEl) vEl.textContent=(venueCount.count||0)+'+';
+    if(vdEl) vdEl.textContent=(vendorCount.count||0)+'+';
+    if(eEl) eEl.textContent=((nativeCount.count||0)+(extCount.count||0));
+  }catch(err){console.warn('cb2 statbar',err);}
+}
 async function cb2LoadTonight(){
   try{
     var el=document.getElementById('cb2Tonight'); if(!el) return;
@@ -994,6 +1072,7 @@ window.cb2InitAll=function(){
   cb2LoadTrending();
   cb2LoadTonight();
   cb2LoadWeekend();
+  cb2LoadStatBar();
   cb2LoadVenues();
   cb2InitAccountArea();
 };
