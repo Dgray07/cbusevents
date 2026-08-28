@@ -104,7 +104,19 @@
     <priority>0.5</priority>
   </url>
 
-  <!-- Event pages (0 events) — auto-generated 2026-08-27 -->
+  <!-- Event pages (2 events) — auto-generated 2026-08-28 -->
+  <url>
+    <loc>https://cbusevents.com/event.html?id=75a4f207-8f05-4d33-9ea2-8a20446d13c3</loc>
+    <lastmod>2026-08-28</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
 
+  <url>
+    <loc>https://cbusevents.com/event.html?id=19dedf90-8a3d-43ed-bbad-61d40a961f0b</loc>
+    <lastmod>2026-08-28</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
 
 </urlset>
